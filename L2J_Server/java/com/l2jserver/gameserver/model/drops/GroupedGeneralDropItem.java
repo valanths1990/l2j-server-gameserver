@@ -119,7 +119,17 @@ public class GroupedGeneralDropItem implements IDropItem
 				totalChance += item.getChance();
 				if (totalChance > random)
 				{
-					long amount = Rnd.get(item.getMin(victim, killer), item.getMax(victim, killer));
+					int amountMultiply = 1;
+					if (Config.PRECISE_DROP_CALCULATION)
+					{
+						amountMultiply = (int) (getChance(victim, killer) * chanceModifier * item.getChance()) / 100;
+						if (((getChance(victim, killer) * chanceModifier * item.getChance()) % 100) > (Rnd.nextDouble() * 100))
+						{
+							amountMultiply++;
+						}
+					}
+					
+					long amount = Rnd.get(item.getMin(victim, killer) * amountMultiply, item.getMax(victim, killer) * amountMultiply);
 					
 					List<ItemHolder> items = new ArrayList<>(1);
 					items.add(new ItemHolder(item.getItemId(), amount));
