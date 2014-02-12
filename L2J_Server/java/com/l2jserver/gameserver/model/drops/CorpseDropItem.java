@@ -20,11 +20,12 @@ package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 
 /**
  * @author Nos
  */
-public class CorpseDropItem extends GeneralDropItem
+public class DeathDropItem extends GeneralDropItem
 {
 	/**
 	 * @param itemId the item id
@@ -32,7 +33,7 @@ public class CorpseDropItem extends GeneralDropItem
 	 * @param max the max count
 	 * @param chance the chance of this drop item
 	 */
-	public CorpseDropItem(int itemId, long min, long max, double chance)
+	public DeathDropItem(int itemId, long min, long max, double chance)
 	{
 		super(itemId, min, max, chance);
 	}
@@ -44,12 +45,7 @@ public class CorpseDropItem extends GeneralDropItem
 	@Override
 	public long getMin(L2Character victim, L2Character killer)
 	{
-		final long min = super.getMin(victim, killer);
-		if (Config.RATE_DROP_AMOUNT_MULTIPLIER.containsKey(getItemId()))
-		{
-			return min;
-		}
-		return (long) (min * Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
+		return (long) (super.getMin(victim, killer) * (victim instanceof L2RaidBossInstance ? Config.RATE_RAID_DROP_AMOUNT_MULTIPLIER : Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER));
 	}
 	
 	/*
@@ -59,12 +55,7 @@ public class CorpseDropItem extends GeneralDropItem
 	@Override
 	public long getMax(L2Character victim, L2Character killer)
 	{
-		final long max = super.getMax(victim, killer);
-		if (Config.RATE_DROP_AMOUNT_MULTIPLIER.containsKey(getItemId()))
-		{
-			return max;
-		}
-		return (long) (max * Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
+		return (long) (super.getMax(victim, killer) * (victim instanceof L2RaidBossInstance ? Config.RATE_RAID_DROP_AMOUNT_MULTIPLIER : Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER));
 	}
 	
 	/*
@@ -74,11 +65,6 @@ public class CorpseDropItem extends GeneralDropItem
 	@Override
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		final double chance = super.getChance(victim, killer);
-		if (Config.RATE_DROP_CHANCE_MULTIPLIER.containsKey(getItemId()))
-		{
-			return chance;
-		}
-		return chance * Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
+		return super.getChance(victim, killer) * (victim instanceof L2RaidBossInstance ? Config.RATE_RAID_DROP_CHANCE_MULTIPLIER : Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER);
 	}
 }
