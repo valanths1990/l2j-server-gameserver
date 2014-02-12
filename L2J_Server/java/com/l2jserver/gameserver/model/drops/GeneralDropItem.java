@@ -202,7 +202,17 @@ public class GeneralDropItem implements IDropItem
 		
 		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
-			long amount = Rnd.get(getMin(victim, killer), getMax(victim, killer));
+			int amountMultiply = 1;
+			if (Config.PRECISE_DROP_CALCULATION && (getChance(victim, killer) > 100))
+			{
+				amountMultiply = (int) (getChance(victim, killer)) / 100;
+				if ((getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
+				{
+					amountMultiply++;
+				}
+			}
+			
+			long amount = Rnd.get(getMin(victim, killer) * amountMultiply, getMax(victim, killer) * amountMultiply);
 			
 			List<ItemHolder> items = new ArrayList<>(1);
 			items.add(new ItemHolder(getItemId(), amount));
