@@ -90,8 +90,9 @@ public class GroupedGeneralDropItem implements IDropItem
 	@Override
 	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
+		double chanceModifier = 1;
+		
 		int levelDifference = victim.getLevel() - killer.getLevel();
-		double chanceModifier;
 		if (victim instanceof L2RaidBossInstance)
 		{
 			chanceModifier = Math.max(0, Math.min(1, (levelDifference * 0.15) + 1));

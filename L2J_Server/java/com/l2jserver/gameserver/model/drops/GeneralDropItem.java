@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.util.Rnd;
@@ -153,7 +154,7 @@ public class GeneralDropItem implements IDropItem
 	@Override
 	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
-		if ((!victim.isRaid() && Config.DEEPBLUE_DROP_RULES) || (victim.isRaid() && Config.DEEPBLUE_DROP_RULES_RAID))
+		if (((!(victim instanceof L2RaidBossInstance)) && Config.DEEPBLUE_DROP_RULES) || ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID))
 		{
 			int levelDifference = victim.getLevel() - killer.getLevel();
 			double levelGapChanceToDrop;
