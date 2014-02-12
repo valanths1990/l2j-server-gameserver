@@ -25,7 +25,6 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
-import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
 
 /**
@@ -154,28 +153,58 @@ public class GeneralDropItem implements IDropItem
 	@Override
 	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
-		final int levelDifference = victim.getLevel() - killer.getLevel();
-		final double levelGapChanceToDrop;
-		if (getItemId() == Inventory.ADENA_ID)
+		if ((!victim.isRaid() && Config.DEEPBLUE_DROP_RULES) || (victim.isRaid() && Config.DEEPBLUE_DROP_RULES_RAID))
 		{
-			levelGapChanceToDrop = Util.map(levelDifference, -Config.DROP_ADENA_MAX_LEVEL_DIFFERENCE, -Config.DROP_ADENA_MIN_LEVEL_DIFFERENCE, Config.DROP_ADENA_MIN_LEVEL_GAP_CHANCE, 100.0);
-		}
-		else
-		{
-			levelGapChanceToDrop = Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0);
-		}
-		
-		// There is a chance of level gap that it wont drop this item
-		if (levelGapChanceToDrop < (Rnd.nextDouble() * 100))
-		{
-			return null;
+			int levelDifference = victim.getLevel() - killer.getLevel();
+			double levelGapChanceToDrop;
+			if (getItemId() == Inventory.ADENA_ID)
+			{
+				
+				if (levelDifference >= -8)
+				{
+					levelGapChanceToDrop = 100;
+				}
+				else if (levelDifference >= -15)
+				{
+					levelGapChanceToDrop = levelDifference;
+					levelGapChanceToDrop *= 12.857;
+					levelGapChanceToDrop += 202.857;
+				}
+				else
+				{
+					levelGapChanceToDrop = 10;
+				}
+			}
+			else
+			{
+				if (levelDifference >= -5)
+				{
+					levelGapChanceToDrop = 100;
+				}
+				else if (levelDifference >= -10)
+				{
+					levelGapChanceToDrop = levelDifference;
+					levelGapChanceToDrop *= 18;
+					levelGapChanceToDrop += 190;
+				}
+				else
+				{
+					levelGapChanceToDrop = 10;
+				}
+			}
+			
+			// There is a chance of level gap that it wont drop this item
+			if (levelGapChanceToDrop < (Rnd.nextDouble() * 100))
+			{
+				return null;
+			}
 		}
 		
 		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
-			final long amount = Rnd.get(getMin(victim, killer), getMax(victim, killer));
+			long amount = Rnd.get(getMin(victim, killer), getMax(victim, killer));
 			
-			final List<ItemHolder> items = new ArrayList<>(1);
+			List<ItemHolder> items = new ArrayList<>(1);
 			items.add(new ItemHolder(getItemId(), amount));
 			return items;
 		}
