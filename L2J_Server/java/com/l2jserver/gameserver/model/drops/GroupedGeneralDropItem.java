@@ -122,8 +122,9 @@ public class GroupedGeneralDropItem implements IDropItem
 					int amountMultiply = 1;
 					if (Config.PRECISE_DROP_CALCULATION)
 					{
-						amountMultiply = (int) (getChance(victim, killer) * chanceModifier * item.getChance()) / 100;
-						if (((getChance(victim, killer) * chanceModifier * item.getChance()) % 100) > (Rnd.nextDouble() * 100))
+						double totalItemChance = getChance(victim, killer) * chanceModifier * item.getChance();
+						amountMultiply = (int) (totalItemChance) / 100;
+						if ((totalItemChance % 100) > (Rnd.nextDouble() * 100))
 						{
 							amountMultiply++;
 						}
