@@ -99,7 +99,6 @@ public class GroupedGeneralDropItem implements IDropItem
 		}
 		else
 		{
-			chanceModifier = 1;
 			
 			double levelGapChanceToDrop = Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0);
 			// There is a chance of level gap that it wont drop this item
@@ -122,7 +121,7 @@ public class GroupedGeneralDropItem implements IDropItem
 					int amountMultiply = 1;
 					if (Config.PRECISE_DROP_CALCULATION)
 					{
-						double totalItemChance = getChance(victim, killer) * chanceModifier * item.getChance();
+						double totalItemChance = (getChance(victim, killer) * chanceModifier * item.getChance()) / 100;
 						amountMultiply = (int) (totalItemChance) / 100;
 						if ((totalItemChance % 100) > (Rnd.nextDouble() * 100))
 						{
