@@ -19,19 +19,17 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.items.L2Item;
 
 /**
  * @author Nos
  */
-public class GroupedDeathDropItem extends GroupedGeneralDropItem
+public class GroupedCorpseDropItem extends GroupedGeneralDropItem
 {
 	/**
 	 * @param chance the chance of this drop item.
 	 */
-	public GroupedDeathDropItem(double chance)
+	public GroupedCorpseDropItem(double chance)
 	{
 		super(chance);
 	}
@@ -43,15 +41,6 @@ public class GroupedDeathDropItem extends GroupedGeneralDropItem
 	@Override
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		for (final GeneralDropItem gdi : getItems())
-		{
-			final L2Item item = ItemTable.getInstance().getTemplate(gdi.getItemId());
-			if ((item == null) || !item.hasExImmediateEffect())
-			{
-				return super.getChance(victim, killer) * Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER;
-			}
-		}
-		
-		return super.getChance(victim, killer) * Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
+		return super.getChance(victim, killer) * (isHerbOnly() ? Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER : Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
 	}
 }

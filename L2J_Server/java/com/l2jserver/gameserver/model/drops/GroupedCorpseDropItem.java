@@ -42,6 +42,6 @@ public class GroupedDeathDropItem extends GroupedGeneralDropItem
 	@Override
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		return super.getChance(victim, killer) * (victim instanceof L2RaidBossInstance ? Config.RATE_RAID_DROP_CHANCE_MULTIPLIER : Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER);
+		return super.getChance(victim, killer) * (isHerbOnly() ? Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER : (victim instanceof L2RaidBossInstance ? Config.RATE_RAID_DROP_CHANCE_MULTIPLIER : Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER));
 	}
 }
