@@ -126,7 +126,7 @@ public class GroupedGeneralDropItem implements IDropItem
 				@Override
 				public double getChance(L2Character v, L2Character k)
 				{
-					return item.getChance() * getChance(v, k);
+					return item.getChance() * GroupedGeneralDropItem.this.getChance(v, k);
 				}
 			}.calculateDrops(victim, killer);
 		}
