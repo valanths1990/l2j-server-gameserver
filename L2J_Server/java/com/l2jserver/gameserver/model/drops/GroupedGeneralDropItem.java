@@ -104,6 +104,33 @@ public class GroupedGeneralDropItem implements IDropItem
 	@Override
 	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
+		if (getItems().size() == 1)
+		{
+			
+			final GeneralDropItem item = getItems().iterator().next();
+			return new GeneralDropItem(item.getItemId(), item.getMin(), item.getMax(), (item.getChance() * getChance()) / 100)
+			{
+				
+				@Override
+				public long getMax(L2Character v, L2Character k)
+				{
+					return item.getMax(v, k);
+				}
+				
+				@Override
+				public long getMin(L2Character v, L2Character k)
+				{
+					return item.getMin(v, k);
+				}
+				
+				@Override
+				public double getChance(L2Character v, L2Character k)
+				{
+					return item.getChance() * getChance(v, k);
+				}
+			}.calculateDrops(victim, killer);
+		}
+		
 		double chanceModifier = 1;
 		
 		int levelDifference = victim.getLevel() - killer.getLevel();
@@ -137,7 +164,8 @@ public class GroupedGeneralDropItem implements IDropItem
 			}
 		}
 		
-		if ((getChance(victim, killer) * chanceModifier) > (Rnd.nextDouble() * 100))
+		double chance = getChance(victim, killer) * chanceModifier;
+		if (chance > (Rnd.nextDouble() * 100))
 		{
 			double random = (Rnd.nextDouble() * 100);
 			double totalChance = 0;
@@ -148,9 +176,9 @@ public class GroupedGeneralDropItem implements IDropItem
 				if (totalChance > random)
 				{
 					int amountMultiply = 1;
-					if (Config.PRECISE_DROP_CALCULATION)
+					double totalItemChance = (chance * item.getChance()) / 100;
+					if (Config.PRECISE_DROP_CALCULATION && (totalItemChance >= 100))
 					{
-						double totalItemChance = (getChance(victim, killer) * chanceModifier * item.getChance()) / 100;
 						amountMultiply = (int) (totalItemChance) / 100;
 						if ((totalItemChance % 100) > (Rnd.nextDouble() * 100))
 						{
