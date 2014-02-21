@@ -127,7 +127,7 @@ public class GroupedGeneralDropItem implements IDropItem
 				@Override
 				public double getChance(L2Character v, L2Character k)
 				{
-					return item.getChance() * GroupedGeneralDropItem.this.getChance(v, k);
+					return (item.getChance() * GroupedGeneralDropItem.this.getChance(v, k)) / 100;
 				}
 			}.calculateDrops(victim, killer);
 		}
@@ -135,11 +135,11 @@ public class GroupedGeneralDropItem implements IDropItem
 		double chanceModifier = 1;
 		
 		int levelDifference = victim.getLevel() - killer.getLevel();
-		if (victim instanceof L2RaidBossInstance)
+		if ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID)
 		{
 			chanceModifier = Math.max(0, Math.min(1, (levelDifference * 0.15) + 1));
 		}
-		else
+		else if (Config.DEEPBLUE_DROP_RULES)
 		{
 			
 			double levelGapChanceToDrop;
