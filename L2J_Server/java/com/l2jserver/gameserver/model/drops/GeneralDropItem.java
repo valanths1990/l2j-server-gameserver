@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
@@ -78,17 +79,7 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public long getMin(L2Character victim, L2Character killer)
 	{
-		double multiplier = 1;
-		if (victim.isChampion())
-		{
-			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-		}
-		Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(getItemId());
-		if (dropChanceMultiplier != null)
-		{
-			multiplier *= dropChanceMultiplier;
-		}
-		return (long) (getMin() * multiplier);
+		return (long) (getMin() * getAmountMultiplier(victim));
 	}
 	
 	/**
@@ -108,17 +99,7 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public long getMax(L2Character victim, L2Character killer)
 	{
-		double multiplier = 1;
-		if (victim.isChampion())
-		{
-			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-		}
-		Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(getItemId());
-		if (dropChanceMultiplier != null)
-		{
-			multiplier *= dropChanceMultiplier;
-		}
-		return (long) (getMax() * multiplier);
+		return (long) (getMax() * getAmountMultiplier(victim));
 	}
 	
 	/**
@@ -138,13 +119,7 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		float multiplier = 1;
-		Float dropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(getItemId());
-		if (dropChanceMultiplier != null)
-		{
-			multiplier *= dropChanceMultiplier;
-		}
-		return getChance() * multiplier;
+		return getChance() * getChanceMultiplier(victim);
 	}
 	
 	/*
@@ -221,5 +196,75 @@ public class GeneralDropItem implements IDropItem
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * @param victim
+	 * @return
+	 */
+	protected double getAmountMultiplier(L2Character victim)
+	{
+		double multiplier = 1;
+		if (victim.isChampion())
+		{
+			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+		}
+		Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(getItemId());
+		if (dropChanceMultiplier != null)
+		{
+			multiplier *= dropChanceMultiplier;
+		}
+		else if (ItemTable.getInstance().getTemplate(getItemId()).hasExImmediateEffect())
+		{
+			multiplier *= Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER;
+		}
+		else
+		{
+			multiplier *= getDefaultAmountMultiplier();
+		}
+		return multiplier;
+	}
+	
+	/**
+	 * @return the default amount multiplier
+	 */
+	protected double getDefaultAmountMultiplier()
+	{
+		return 1;
+	}
+	
+	/**
+	 * @param victim
+	 * @return
+	 */
+	protected double getChanceMultiplier(L2Character victim)
+	{
+		float multiplier = 1;
+		Float dropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(getItemId());
+		if (dropChanceMultiplier != null)
+		{
+			multiplier *= dropChanceMultiplier;
+		}
+		else if (ItemTable.getInstance().getTemplate(getItemId()).hasExImmediateEffect())
+		{
+			multiplier *= Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
+		}
+		else if (victim instanceof L2RaidBossInstance)
+		{
+			multiplier *= Config.RATE_RAID_DROP_CHANCE_MULTIPLIER;
+		}
+		else
+		{
+			multiplier *= getDefaultChanceMultiplier();
+		}
+		return multiplier;
+	}
+	
+	/**
+	 * @return
+	 */
+	protected double getDefaultChanceMultiplier()
+	{
+		return 1;
 	}
 }

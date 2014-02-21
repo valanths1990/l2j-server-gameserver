@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.model.actor.L2Character;
 
 /**
  * @author Nos
@@ -36,11 +35,11 @@ public class GroupedCorpseDropItem extends GroupedGeneralDropItem
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDefaultChanceMultiplier()
 	 */
 	@Override
-	public double getChance(L2Character victim, L2Character killer)
+	protected double getDefaultChanceMultiplier()
 	{
-		return super.getChance(victim, killer) * (isHerbOnly() ? Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER : Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+		return Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
 	}
 }

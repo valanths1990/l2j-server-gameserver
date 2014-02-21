@@ -62,7 +62,7 @@ public class GroupedGeneralDropItem implements IDropItem
 	 */
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		return getChance();
+		return getChance() * getChanceMultiplier(victim);
 	}
 	
 	/**
@@ -196,5 +196,30 @@ public class GroupedGeneralDropItem implements IDropItem
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * @param victim
+	 * @return
+	 */
+	protected double getChanceMultiplier(L2Character victim)
+	{
+		if (isHerbOnly())
+		{
+			return Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
+		}
+		if (victim instanceof L2RaidBossInstance)
+		{
+			return Config.RATE_RAID_DROP_CHANCE_MULTIPLIER;
+		}
+		return getDefaultChanceMultiplier();
+	}
+	
+	/**
+	 * @return
+	 */
+	protected double getDefaultChanceMultiplier()
+	{
+		return 1;
 	}
 }
