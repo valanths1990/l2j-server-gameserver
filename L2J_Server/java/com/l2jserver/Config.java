@@ -868,9 +868,11 @@ public final class Config
 	public static float RATE_DEATH_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_CORPSE_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_HERB_DROP_AMOUNT_MULTIPLIER;
+	public static float RATE_RAID_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_DEATH_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_HERB_DROP_CHANCE_MULTIPLIER;
+	public static float RATE_RAID_DROP_CHANCE_MULTIPLIER;
 	public static Map<Integer, Float> RATE_DROP_AMOUNT_MULTIPLIER;
 	public static Map<Integer, Float> RATE_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_KARMA_LOST;
@@ -2169,9 +2171,11 @@ public final class Config
 			RATE_DEATH_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("DeathDropAmountMultiplier", 1);
 			RATE_CORPSE_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("CorpseDropAmountMultiplier", 1);
 			RATE_HERB_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("HerbDropAmountMultiplier", 1);
+			RATE_RAID_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("RaidDropAmountMultiplier", 1);
 			RATE_DEATH_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("DeathDropChanceMultiplier", 1);
 			RATE_CORPSE_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("CorpseDropChanceMultiplier", 1);
 			RATE_HERB_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("HerbDropChanceMultiplier", 1);
+			RATE_RAID_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("RaidDropChanceMultiplier", 1);
 			String[] dropAmountMultiplier = RatesSettings.getString("DropAmountMultiplierByItemId", "").split(";");
 			RATE_DROP_AMOUNT_MULTIPLIER = new HashMap<>(dropAmountMultiplier.length);
 			if (!dropAmountMultiplier[0].isEmpty())
