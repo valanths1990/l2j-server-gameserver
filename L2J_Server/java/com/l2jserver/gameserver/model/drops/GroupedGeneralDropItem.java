@@ -182,6 +182,61 @@ public class GroupedGeneralDropItem implements IDropItem
 	}
 	
 	/**
+	 * Creates a normalized group taking into account all drop modifiers, needed when handling a group which has items with different chance rates
+	 * @param victim
+	 * @param killer
+	 * @return a new normalized group with all drop modifiers applied
+	 */
+	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer)
+	{
+		double sumchance = 0;
+		for (GeneralDropItem item : getItems())
+		{
+			sumchance += (item.getChance(victim, killer) * getChance()) / 100;
+		}
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance);
+		List<GeneralDropItem> items = new ArrayList<>();
+		for (GeneralDropItem item : getItems())
+		{
+			items.add(new GeneralDropItem(item.getItemId(), item.getMin(victim, killer), item.getMax(victim, killer), (item.getChance(victim, killer) * getChance()) / sumchance)
+			{
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMin(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public long getMin(L2Character victim, L2Character killer)
+				{
+					return getMin();
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMax(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public long getMax(L2Character victim, L2Character killer)
+				{
+					return getMax();
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public double getChance(L2Character victim, L2Character killer)
+				{
+					return getChance();
+				}
+			});
+		}
+		group.setItems(items);
+		return group;
+		
+	}
+	
+	/**
 	 * @return <code>true</code> if this group contains only herbs
 	 */
 	public boolean isHerbOnly()
