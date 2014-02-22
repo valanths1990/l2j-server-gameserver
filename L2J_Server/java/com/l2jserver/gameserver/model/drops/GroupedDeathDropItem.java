@@ -18,7 +18,6 @@
  */
 package com.l2jserver.gameserver.model.drops;
 
-import com.l2jserver.Config;
 
 /**
  * @author Nos
@@ -33,13 +32,4 @@ public class GroupedCorpseDropItem extends GroupedGeneralDropItem
 		super(chance);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDefaultChanceMultiplier()
-	 */
-	@Override
-	protected double getDefaultChanceMultiplier()
-	{
-		return Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
-	}
 }
