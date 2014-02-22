@@ -129,7 +129,7 @@ public class GroupedGeneralDropItem implements IDropItem
 	}
 	
 	/**
-	 * statically normalizes a group
+	 * statically normalizes a group, useful when need to convert legacy SQL data
 	 * @return a new group with items, which have a sum of getChance() of 100%
 	 */
 	public GroupedGeneralDropItem normalizeMe()
