@@ -55,17 +55,6 @@ public class GroupedGeneralDropItem implements IDropItem
 	}
 	
 	/**
-	 * Gets the chance of this drop item.
-	 * @param victim the victim
-	 * @param killer the killer
-	 * @return the chance modified by any rates.
-	 */
-	public double getChance(L2Character victim, L2Character killer)
-	{
-		return getChance() * getChanceMultiplier(victim);
-	}
-	
-	/**
 	 * Gets the items.
 	 * @return the items
 	 */
@@ -280,7 +269,7 @@ public class GroupedGeneralDropItem implements IDropItem
 				@Override
 				public double getChance(L2Character v, L2Character k)
 				{
-					return (item.getChance() * GroupedGeneralDropItem.this.getChance(v, k)) / 100;
+					return (item.getChance(v, k) * GroupedGeneralDropItem.this.getChance()) / 100;
 				}
 			}.calculateDrops(victim, killer);
 		}
@@ -318,7 +307,7 @@ public class GroupedGeneralDropItem implements IDropItem
 			}
 		}
 		GroupedGeneralDropItem normalized = normalizeMe(victim, killer);
-		double chance = normalized.getChance(victim, killer) * chanceModifier;
+		double chance = normalized.getChance() * chanceModifier;
 		if (chance > (Rnd.nextDouble() * 100))
 		{
 			double random = (Rnd.nextDouble() * 100);
@@ -348,30 +337,5 @@ public class GroupedGeneralDropItem implements IDropItem
 			}
 		}
 		return null;
-	}
-	
-	/**
-	 * @param victim
-	 * @return
-	 */
-	protected double getChanceMultiplier(L2Character victim)
-	{
-		if (isHerbOnly())
-		{
-			return Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
-		}
-		if (victim instanceof L2RaidBossInstance)
-		{
-			return Config.RATE_RAID_DROP_CHANCE_MULTIPLIER;
-		}
-		return getDefaultChanceMultiplier();
-	}
-	
-	/**
-	 * @return
-	 */
-	protected double getDefaultChanceMultiplier()
-	{
-		return 1;
 	}
 }
