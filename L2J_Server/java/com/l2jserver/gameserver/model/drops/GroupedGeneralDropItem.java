@@ -129,6 +129,59 @@ public class GroupedGeneralDropItem implements IDropItem
 	}
 	
 	/**
+	 * statically normalizes a group
+	 * @return a new group with items, which have a sum of getChance() of 100%
+	 */
+	public GroupedGeneralDropItem normalizeMe()
+	{
+		double sumchance = 0;
+		for (GeneralDropItem item : getItems())
+		{
+			sumchance += (item.getChance() * getChance()) / 100;
+		}
+		final double sumchance1 = sumchance;
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1);
+		List<GeneralDropItem> items = new ArrayList<>();
+		for (final GeneralDropItem item : getItems())
+		{
+			items.add(new GeneralDropItem(item.getItemId(), item.getMin(), item.getMax(), (item.getChance() * getChance()) / sumchance1)
+			{
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMin(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public long getMin(L2Character victim, L2Character killer)
+				{
+					return item.getMin(victim, killer);
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMax(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public long getMax(L2Character victim, L2Character killer)
+				{
+					return item.getMax(victim, killer);
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public double getChance(L2Character victim, L2Character killer)
+				{
+					return (item.getChance(victim, killer) * GroupedGeneralDropItem.this.getChance()) / sumchance1;
+				}
+			});
+		}
+		group.setItems(items);
+		return group;
+	}
+	
+	/**
 	 * @return <code>true</code> if this group contains only herbs
 	 */
 	public boolean isHerbOnly()
