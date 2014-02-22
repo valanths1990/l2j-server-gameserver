@@ -317,24 +317,23 @@ public class GroupedGeneralDropItem implements IDropItem
 				return null;
 			}
 		}
-		
-		double chance = getChance(victim, killer) * chanceModifier;
+		GroupedGeneralDropItem normalized = normalizeMe(victim, killer);
+		double chance = normalized.getChance(victim, killer) * chanceModifier;
 		if (chance > (Rnd.nextDouble() * 100))
 		{
 			double random = (Rnd.nextDouble() * 100);
 			double totalChance = 0;
-			for (GeneralDropItem item : getItems())
+			for (GeneralDropItem item : normalized.getItems())
 			{
 				// Grouped item chance rates should not be modified.
 				totalChance += item.getChance();
 				if (totalChance > random)
 				{
 					int amountMultiply = 1;
-					double totalItemChance = (chance * item.getChance()) / 100;
-					if (Config.PRECISE_DROP_CALCULATION && (totalItemChance >= 100))
+					if (Config.PRECISE_DROP_CALCULATION && (chance >= 100))
 					{
-						amountMultiply = (int) (totalItemChance) / 100;
-						if ((totalItemChance % 100) > (Rnd.nextDouble() * 100))
+						amountMultiply = (int) (chance) / 100;
+						if ((chance % 100) > (Rnd.nextDouble() * 100))
 						{
 							amountMultiply++;
 						}
