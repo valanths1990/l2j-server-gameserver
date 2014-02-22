@@ -84,6 +84,51 @@ public class GroupedGeneralDropItem implements IDropItem
 	}
 	
 	/**
+	 * Returns a list of items in the group with chance multiplied by chance of the group
+	 * @return the list of items with modified chances
+	 */
+	public List<GeneralDropItem> extractMe()
+	{
+		List<GeneralDropItem> items = new ArrayList<>();
+		for (final GeneralDropItem item : getItems())
+		{
+			items.add(new GeneralDropItem(item.getItemId(), item.getMin(), item.getMax(), (item.getChance() * getChance()) / 100)
+			{
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMin(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public long getMin(L2Character victim, L2Character killer)
+				{
+					return item.getMin(victim, killer);
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMax(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public long getMax(L2Character victim, L2Character killer)
+				{
+					return item.getMax(victim, killer);
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public double getChance(L2Character victim, L2Character killer)
+				{
+					return (item.getChance(victim, killer) * GroupedGeneralDropItem.this.getChance()) / 100;
+				}
+			});
+		}
+		return Collections.unmodifiableList(items);
+	}
+	
+	/**
 	 * @return <code>true</code> if this group contains only herbs
 	 */
 	public boolean isHerbOnly()
