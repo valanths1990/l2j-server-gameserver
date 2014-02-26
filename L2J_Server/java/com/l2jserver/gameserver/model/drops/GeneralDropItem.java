@@ -38,8 +38,8 @@ public class GeneralDropItem implements IDropItem
 	private final long _min;
 	private final long _max;
 	private final double _chance;
-	protected double _defaultAmountMultiplier = 1;
-	protected double _defaultChanceMultiplier = 1;
+	protected final double _defaultAmountMultiplier;
+	protected final double _defaultChanceMultiplier;
 	
 	/**
 	 * @param itemId the item id
@@ -49,17 +49,22 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public GeneralDropItem(int itemId, long min, long max, double chance)
 	{
+		this(itemId, min, max, chance, 1, 1);
+	}
+	
+	public GeneralDropItem(int itemId, long min, long max, double chance, double defaultAmountMultiplier, double defaultChanceMultiplier)
+	{
 		_itemId = itemId;
 		_min = min;
 		_max = max;
 		_chance = chance;
+		_defaultAmountMultiplier = defaultAmountMultiplier;
+		_defaultChanceMultiplier = defaultChanceMultiplier;
 	}
 	
 	public GeneralDropItem(int itemId, long min, long max, double chance, DropListScope scope)
 	{
-		this(itemId, min, max, chance);
-		_defaultAmountMultiplier = scope.getDefaultAmountMultiplier();
-		_defaultChanceMultiplier = scope.getDefaultChanceMultiplier();
+		this(itemId, min, max, chance, scope.getDefaultAmountMultiplier(), scope.getDefaultChanceMultiplier());
 	}
 	
 	/**
