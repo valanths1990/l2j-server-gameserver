@@ -169,24 +169,30 @@ public class GroupedGeneralDropItem implements IDropItem
 		return group;
 	}
 	
+	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer)
+	{
+		return normalizeMe(victim, killer, 1);
+	}
+	
 	/**
 	 * Creates a normalized group taking into account all drop modifiers, needed when handling a group which has items with different chance rates
 	 * @param victim
 	 * @param killer
+	 * @param chanceModifier an additional chance modifier
 	 * @return a new normalized group with all drop modifiers applied
 	 */
-	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer)
+	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer, double chanceModifier)
 	{
 		double sumchance = 0;
 		for (GeneralDropItem item : getItems())
 		{
-			sumchance += (item.getChance(victim, killer) * getChance()) / 100;
+			sumchance += (item.getChance(victim, killer) * getChance() * chanceModifier) / 100;
 		}
 		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance);
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (GeneralDropItem item : getItems())
 		{
-			items.add(new GeneralDropItem(item.getItemId(), item.getMin(victim, killer), item.getMax(victim, killer), (item.getChance(victim, killer) * getChance()) / sumchance)
+			items.add(new GeneralDropItem(item.getItemId(), item.getMin(victim, killer), item.getMax(victim, killer), (item.getChance(victim, killer) * getChance() * chanceModifier) / sumchance)
 			{
 				/*
 				 * (non-Javadoc)
@@ -258,12 +264,49 @@ public class GroupedGeneralDropItem implements IDropItem
 			}.calculateDrops(victim, killer);
 		}
 		
-		double chanceModifier = 1;
-		
+		GroupedGeneralDropItem normalized = normalizeMe(victim, killer, getDeepBlueDropChance(victim, killer) / 100);
+		if (normalized.getChance() > (Rnd.nextDouble() * 100))
+		{
+			double random = (Rnd.nextDouble() * 100);
+			double totalChance = 0;
+			for (GeneralDropItem item : normalized.getItems())
+			{
+				// Grouped item chance rates should not be modified.
+				totalChance += item.getChance();
+				if (totalChance > random)
+				{
+					int amountMultiply = 1;
+					if (Config.PRECISE_DROP_CALCULATION && (normalized.getChance() >= 100))
+					{
+						amountMultiply = (int) (normalized.getChance()) / 100;
+						if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))
+						{
+							amountMultiply++;
+						}
+					}
+					
+					long amount = Rnd.get(item.getMin(victim, killer) * amountMultiply, item.getMax(victim, killer) * amountMultiply);
+					
+					List<ItemHolder> items = new ArrayList<>(1);
+					items.add(new ItemHolder(item.getItemId(), amount));
+					return items;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @param victim
+	 * @param killer
+	 * @return
+	 */
+	protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
+	{
 		int levelDifference = victim.getLevel() - killer.getLevel();
 		if ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID)
 		{
-			chanceModifier = Math.max(0, Math.min(1, (levelDifference * 0.15) + 1));
+			return Math.max(0, Math.min(1, (levelDifference * 0.15) + 1)) * 100;
 		}
 		else if (Config.DEEPBLUE_DROP_RULES)
 		{
@@ -285,41 +328,10 @@ public class GroupedGeneralDropItem implements IDropItem
 			}
 			
 			// There is a chance of level gap that it wont drop this item
-			if (levelGapChanceToDrop < (Rnd.nextDouble() * 100))
-			{
-				return null;
-			}
+			// Merged two probability rolls into single roll
+			
+			return levelGapChanceToDrop;
 		}
-		GroupedGeneralDropItem normalized = normalizeMe(victim, killer);
-		double chance = normalized.getChance() * chanceModifier;
-		if (chance > (Rnd.nextDouble() * 100))
-		{
-			double random = (Rnd.nextDouble() * 100);
-			double totalChance = 0;
-			for (GeneralDropItem item : normalized.getItems())
-			{
-				// Grouped item chance rates should not be modified.
-				totalChance += item.getChance();
-				if (totalChance > random)
-				{
-					int amountMultiply = 1;
-					if (Config.PRECISE_DROP_CALCULATION && (chance >= 100))
-					{
-						amountMultiply = (int) (chance) / 100;
-						if ((chance % 100) > (Rnd.nextDouble() * 100))
-						{
-							amountMultiply++;
-						}
-					}
-					
-					long amount = Rnd.get(item.getMin(victim, killer) * amountMultiply, item.getMax(victim, killer) * amountMultiply);
-					
-					List<ItemHolder> items = new ArrayList<>(1);
-					items.add(new ItemHolder(item.getItemId(), amount));
-					return items;
-				}
-			}
-		}
-		return null;
+		return 100;
 	}
 }

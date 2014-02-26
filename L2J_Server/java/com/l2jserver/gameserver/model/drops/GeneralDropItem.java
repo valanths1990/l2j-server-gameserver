@@ -145,6 +145,57 @@ public class GeneralDropItem implements IDropItem
 	{
 		if (((!(victim instanceof L2RaidBossInstance)) && Config.DEEPBLUE_DROP_RULES) || ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID))
 		{
+			double levelGapChanceToDrop = getDeepBlueDropChance(victim, killer);
+			
+			// There is a chance of level gap that it wont drop this item
+			if (levelGapChanceToDrop < (Rnd.nextDouble() * 100))
+			{
+				return null;
+			}
+		}
+		
+		if (getModifiedChance(victim, killer) > (Rnd.nextDouble() * 100))
+		{
+			int amountMultiply = 1;
+			if (Config.PRECISE_DROP_CALCULATION && (getModifiedChance(victim, killer) > 100))
+			{
+				amountMultiply = (int) getModifiedChance(victim, killer) / 100;
+				if ((getModifiedChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
+				{
+					amountMultiply++;
+				}
+			}
+			
+			long amount = Rnd.get(getMin(victim, killer) * amountMultiply, getMax(victim, killer) * amountMultiply);
+			
+			List<ItemHolder> items = new ArrayList<>(1);
+			items.add(new ItemHolder(getItemId(), amount));
+			return items;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * NOTE: isolated from {@link GeneralDropItem#getChance(L2Character, L2Character)} to avoid confusion in drop groups
+	 * @param victim
+	 * @param killer
+	 * @return a chance to drop modified by deep blue drop rules
+	 */
+	public double getModifiedChance(L2Character victim, L2Character killer)
+	{
+		return (getDeepBlueDropChance(victim, killer) * getChance(victim, killer)) / 100;
+	}
+	
+	/**
+	 * @param victim
+	 * @param killer
+	 * @return gets a chance modifier for large level differencies
+	 */
+	protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
+	{
+		if (((!(victim instanceof L2RaidBossInstance)) && Config.DEEPBLUE_DROP_RULES) || ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID))
+		{
 			int levelDifference = victim.getLevel() - killer.getLevel();
 			double levelGapChanceToDrop;
 			if (getItemId() == Inventory.ADENA_ID)
@@ -182,34 +233,9 @@ public class GeneralDropItem implements IDropItem
 					levelGapChanceToDrop = 10;
 				}
 			}
-			
-			// There is a chance of level gap that it wont drop this item
-			if (levelGapChanceToDrop < (Rnd.nextDouble() * 100))
-			{
-				return null;
-			}
+			return levelGapChanceToDrop;
 		}
-		
-		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
-		{
-			int amountMultiply = 1;
-			if (Config.PRECISE_DROP_CALCULATION && (getChance(victim, killer) > 100))
-			{
-				amountMultiply = (int) (getChance(victim, killer)) / 100;
-				if ((getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
-				{
-					amountMultiply++;
-				}
-			}
-			
-			long amount = Rnd.get(getMin(victim, killer) * amountMultiply, getMax(victim, killer) * amountMultiply);
-			
-			List<ItemHolder> items = new ArrayList<>(1);
-			items.add(new ItemHolder(getItemId(), amount));
-			return items;
-		}
-		
-		return null;
+		return 100;
 	}
 	
 	/**
