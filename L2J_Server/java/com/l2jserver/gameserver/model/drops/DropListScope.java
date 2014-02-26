@@ -19,6 +19,7 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.model.actor.L2Character;
 
 /**
  * @author Nos
@@ -26,7 +27,11 @@ import com.l2jserver.Config;
 public enum DropListScope
 {
 	DEATH(Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER, Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER),
-	CORPSE(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+	CORPSE(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER),
+	/**
+	 * This droplist scope isn't affected by ANY rates, nor Champion, etc...
+	 */
+	STATIC(1, 1);
 	
 	private final double _defaultAmountMultiplier;
 	private final double _defaultChanceMultiplier;
@@ -39,7 +44,34 @@ public enum DropListScope
 	
 	public IDropItem newDropItem(int itemId, long min, long max, double chance)
 	{
-		return new GeneralDropItem(itemId, min, max, chance, this);
+		switch (this)
+		{
+			case STATIC:
+				return new GeneralDropItem(itemId, min, max, chance)
+				{
+					/*
+					 * (non-Javadoc)
+					 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChanceMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
+					 */
+					@Override
+					protected double getChanceMultiplier(L2Character victim)
+					{
+						return 1;
+					}
+					
+					/*
+					 * (non-Javadoc)
+					 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getAmountMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
+					 */
+					@Override
+					protected double getAmountMultiplier(L2Character victim)
+					{
+						return 1;
+					}
+				};
+			default:
+				return new GeneralDropItem(itemId, min, max, chance, this);
+		}
 	}
 	
 	public GroupedGeneralDropItem newGroupedDropItem(double chance)
