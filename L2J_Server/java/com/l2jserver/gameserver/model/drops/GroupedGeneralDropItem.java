@@ -317,7 +317,7 @@ public class GroupedGeneralDropItem implements IDropItem
 	 * @param killer
 	 * @return
 	 */
-	protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
+	public double getDeepBlueDropChance(L2Character victim, L2Character killer)
 	{
 		int levelDifference = victim.getLevel() - killer.getLevel();
 		if ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID)
