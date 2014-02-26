@@ -19,6 +19,7 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.model.actor.L2Character;
 
 /**
  * @author Nos
@@ -57,6 +58,28 @@ public enum DropListScope
 			return new StaticDropItem(itemId, min, max, chance);
 		}
 		
+	}),
+	QUEST(new IDropItemFactory()
+	{
+		
+		@Override
+		public IDropItem newDropItem(int itemId, long min, long max, double chance)
+		{
+			return new StaticDropItem(itemId, min, max, chance)
+			{
+				@Override
+				protected boolean isPreciseCalculated()
+				{
+					return true;
+				}
+				
+				@Override
+				protected double getChanceMultiplier(L2Character victim)
+				{
+					return Config.RATE_QUEST_DROP;
+				}
+			};
+		}
 	});
 	
 	private final IDropItemFactory _factory;
