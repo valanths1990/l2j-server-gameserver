@@ -62,11 +62,6 @@ public class GeneralDropItem implements IDropItem
 		_defaultChanceMultiplier = defaultChanceMultiplier;
 	}
 	
-	public GeneralDropItem(int itemId, long min, long max, double chance, DropListScope scope)
-	{
-		this(itemId, min, max, chance, scope.getDefaultAmountMultiplier(), scope.getDefaultChanceMultiplier());
-	}
-	
 	/**
 	 * Gets the item id
 	 * @return the item id
@@ -175,7 +170,7 @@ public class GeneralDropItem implements IDropItem
 		
 		return null;
 	}
-
+	
 	/**
 	 * @return
 	 */

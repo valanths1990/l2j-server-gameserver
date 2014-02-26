@@ -26,66 +26,81 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  */
 public enum DropListScope
 {
-	DEATH(Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER, Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER),
-	CORPSE(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER),
+	DEATH(new IDropItemFactory()
+	{
+		
+		@Override
+		public IDropItem newDropItem(int itemId, long min, long max, double chance)
+		{
+			return new GeneralDropItem(itemId, min, max, chance, Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+		}
+		
+	}),
+	CORPSE(new IDropItemFactory()
+	{
+		
+		@Override
+		public IDropItem newDropItem(int itemId, long min, long max, double chance)
+		{
+			return new GeneralDropItem(itemId, min, max, chance, Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+		}
+		
+	}),
 	/**
 	 * This droplist scope isn't affected by ANY rates, nor Champion, etc...
 	 */
-	STATIC(1, 1);
-	
-	private final double _defaultAmountMultiplier;
-	private final double _defaultChanceMultiplier;
-	
-	private DropListScope(double defaultAmountMultiplier, double defaultChanceMultiplier)
+	STATIC(new IDropItemFactory()
 	{
-		_defaultAmountMultiplier = defaultAmountMultiplier;
-		_defaultChanceMultiplier = defaultChanceMultiplier;
+		
+		@Override
+		public IDropItem newDropItem(int itemId, long min, long max, double chance)
+		{
+			return new GeneralDropItem(itemId, min, max, chance)
+			{
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChanceMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				protected double getChanceMultiplier(L2Character victim)
+				{
+					return 1;
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getAmountMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				protected double getAmountMultiplier(L2Character victim)
+				{
+					return 1;
+				}
+				
+				@Override
+				protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
+				{
+					return 100;
+				}
+			};
+		}
+		
+	});
+	
+	private final IDropItemFactory _factory;
+	
+	private DropListScope(IDropItemFactory factory)
+	{
+		_factory = factory;
 	}
 	
 	public IDropItem newDropItem(int itemId, long min, long max, double chance)
 	{
-		switch (this)
-		{
-			case STATIC:
-				return new GeneralDropItem(itemId, min, max, chance)
-				{
-					/*
-					 * (non-Javadoc)
-					 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChanceMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
-					 */
-					@Override
-					protected double getChanceMultiplier(L2Character victim)
-					{
-						return 1;
-					}
-					
-					/*
-					 * (non-Javadoc)
-					 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getAmountMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
-					 */
-					@Override
-					protected double getAmountMultiplier(L2Character victim)
-					{
-						return 1;
-					}
-				};
-			default:
-				return new GeneralDropItem(itemId, min, max, chance, this);
-		}
+		return _factory.newDropItem(itemId, min, max, chance);
 	}
 	
 	public GroupedGeneralDropItem newGroupedDropItem(double chance)
 	{
 		return new GroupedGeneralDropItem(chance);
-	}
-	
-	public double getDefaultAmountMultiplier()
-	{
-		return _defaultAmountMultiplier;
-	}
-	
-	public double getDefaultChanceMultiplier()
-	{
-		return _defaultChanceMultiplier;
 	}
 }
