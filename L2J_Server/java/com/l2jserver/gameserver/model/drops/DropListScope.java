@@ -18,75 +18,42 @@
  */
 package com.l2jserver.gameserver.model.drops;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.l2jserver.Config;
 
 /**
  * @author Nos
  */
 public enum DropListScope
 {
-	DEATH(DeathDropItem.class, GroupedDeathDropItem.class),
-	CORPSE(CorpseDropItem.class, GroupedCorpseDropItem.class);
+	DEATH(Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER, Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER),
+	CORPSE(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
 	
-	private static final Logger _log = Logger.getLogger(DropListScope.class.getName());
+	private final double _defaultAmountMultiplier;
+	private final double _defaultChanceMultiplier;
 	
-	private final Class<? extends GeneralDropItem> _dropItemClass;
-	private final Class<? extends GroupedGeneralDropItem> _groupedDropItemClass;
-	
-	private DropListScope(Class<? extends GeneralDropItem> dropItemClass, Class<? extends GroupedGeneralDropItem> groupedDropItemClass)
+	private DropListScope(double defaultAmountMultiplier, double defaultChanceMultiplier)
 	{
-		_dropItemClass = dropItemClass;
-		_groupedDropItemClass = groupedDropItemClass;
+		_defaultAmountMultiplier = defaultAmountMultiplier;
+		_defaultChanceMultiplier = defaultChanceMultiplier;
 	}
 	
 	public IDropItem newDropItem(int itemId, long min, long max, double chance)
 	{
-		final Constructor<? extends GeneralDropItem> constructor;
-		try
-		{
-			constructor = _dropItemClass.getConstructor(int.class, long.class, long.class, double.class);
-		}
-		catch (NoSuchMethodException | SecurityException e)
-		{
-			_log.log(Level.SEVERE, "Constructor(int, long, long, double) not found for " + _dropItemClass.getSimpleName(), e);
-			return null;
-		}
-		
-		try
-		{
-			return constructor.newInstance(itemId, min, max, chance);
-		}
-		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-		{
-			_log.log(Level.SEVERE, "", e);
-			return null;
-		}
+		return new GeneralDropItem(itemId, min, max, chance, this);
 	}
 	
 	public GroupedGeneralDropItem newGroupedDropItem(double chance)
 	{
-		final Constructor<? extends GroupedGeneralDropItem> constructor;
-		try
-		{
-			constructor = _groupedDropItemClass.getConstructor(double.class);
-		}
-		catch (NoSuchMethodException | SecurityException e)
-		{
-			_log.log(Level.SEVERE, "Constructor(double) not found for " + _groupedDropItemClass.getSimpleName(), e);
-			return null;
-		}
-		
-		try
-		{
-			return constructor.newInstance(chance);
-		}
-		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-		{
-			_log.log(Level.SEVERE, "", e);
-			return null;
-		}
+		return new GroupedGeneralDropItem(chance);
+	}
+	
+	public double getDefaultAmountMultiplier()
+	{
+		return _defaultAmountMultiplier;
+	}
+	
+	public double getDefaultChanceMultiplier()
+	{
+		return _defaultChanceMultiplier;
 	}
 }
