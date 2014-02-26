@@ -111,6 +111,16 @@ public class GroupedGeneralDropItem implements IDropItem
 				{
 					return (item.getChance(victim, killer) * GroupedGeneralDropItem.this.getChance()) / 100;
 				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getModifiedChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public double getModifiedChance(L2Character victim, L2Character killer)
+				{
+					return item.getModifiedChance(victim, killer);
+				}
 			});
 		}
 		return Collections.unmodifiableList(items);
@@ -260,6 +270,12 @@ public class GroupedGeneralDropItem implements IDropItem
 				public double getChance(L2Character v, L2Character k)
 				{
 					return (item.getChance(v, k) * GroupedGeneralDropItem.this.getChance()) / 100;
+				}
+				
+				@Override
+				public double getModifiedChance(L2Character victim, L2Character killer)
+				{
+					return item.getModifiedChance(victim, killer);
 				}
 			}.calculateDrops(victim, killer);
 		}
