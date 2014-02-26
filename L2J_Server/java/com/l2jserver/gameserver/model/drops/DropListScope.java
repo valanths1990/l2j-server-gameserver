@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.model.actor.L2Character;
 
 /**
  * @author Nos
@@ -55,34 +54,7 @@ public enum DropListScope
 		@Override
 		public IDropItem newDropItem(int itemId, long min, long max, double chance)
 		{
-			return new GeneralDropItem(itemId, min, max, chance)
-			{
-				/*
-				 * (non-Javadoc)
-				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChanceMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
-				 */
-				@Override
-				protected double getChanceMultiplier(L2Character victim)
-				{
-					return 1;
-				}
-				
-				/*
-				 * (non-Javadoc)
-				 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getAmountMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
-				 */
-				@Override
-				protected double getAmountMultiplier(L2Character victim)
-				{
-					return 1;
-				}
-				
-				@Override
-				protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
-				{
-					return 100;
-				}
-			};
+			return new StaticDropItem(itemId, min, max, chance);
 		}
 		
 	});
