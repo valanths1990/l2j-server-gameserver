@@ -157,7 +157,7 @@ public class GeneralDropItem implements IDropItem
 		if (getModifiedChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
 			int amountMultiply = 1;
-			if (Config.PRECISE_DROP_CALCULATION && (getModifiedChance(victim, killer) > 100))
+			if (isPreciseCalculated() && (getModifiedChance(victim, killer) > 100))
 			{
 				amountMultiply = (int) getModifiedChance(victim, killer) / 100;
 				if ((getModifiedChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
@@ -174,6 +174,14 @@ public class GeneralDropItem implements IDropItem
 		}
 		
 		return null;
+	}
+
+	/**
+	 * @return
+	 */
+	protected boolean isPreciseCalculated()
+	{
+		return Config.PRECISE_DROP_CALCULATION;
 	}
 	
 	/**
