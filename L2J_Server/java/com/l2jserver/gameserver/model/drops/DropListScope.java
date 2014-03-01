@@ -68,7 +68,7 @@ public enum DropListScope
 			return new StaticDropItem(itemId, min, max, chance)
 			{
 				@Override
-				protected boolean isPreciseCalculated()
+				public boolean isPreciseCalculated()
 				{
 					return true;
 				}
