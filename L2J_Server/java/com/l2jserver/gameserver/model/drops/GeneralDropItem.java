@@ -174,7 +174,7 @@ public class GeneralDropItem implements IDropItem
 	/**
 	 * @return
 	 */
-	protected boolean isPreciseCalculated()
+	public boolean isPreciseCalculated()
 	{
 		return Config.PRECISE_DROP_CALCULATION;
 	}
