@@ -25,7 +25,7 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 /**
  * @author Nos
  */
-public enum DropListScope
+public enum DropListScope implements IDropItemFactory
 {
 	DEATH(new IDropItemFactory()
 	{
@@ -100,6 +100,7 @@ public enum DropListScope
 		_factory = factory;
 	}
 	
+	@Override
 	public IDropItem newDropItem(int itemId, long min, long max, double chance)
 	{
 		return _factory.newDropItem(itemId, min, max, chance);
