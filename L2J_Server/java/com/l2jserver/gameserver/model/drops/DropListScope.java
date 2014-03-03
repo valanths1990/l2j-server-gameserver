@@ -20,6 +20,7 @@ package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 
 /**
  * @author Nos
@@ -76,7 +77,17 @@ public enum DropListScope
 				@Override
 				protected double getChanceMultiplier(L2Character victim)
 				{
-					return Config.RATE_QUEST_DROP;
+					double championmult;
+					if ((getItemId() == Inventory.ADENA_ID) || (getItemId() == Inventory.ANCIENT_ADENA_ID))
+					{
+						championmult = Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+					}
+					else
+					{
+						championmult = Config.L2JMOD_CHAMPION_REWARDS;
+					}
+					
+					return (Config.L2JMOD_CHAMPION_ENABLE && victim.isChampion()) ? (Config.RATE_QUEST_DROP * championmult) : Config.RATE_QUEST_DROP;
 				}
 			};
 		}
