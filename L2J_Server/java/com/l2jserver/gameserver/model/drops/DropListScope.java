@@ -87,7 +87,7 @@ public enum DropListScope
 						championmult = Config.L2JMOD_CHAMPION_REWARDS;
 					}
 					
-					return (Config.L2JMOD_CHAMPION_ENABLE && victim.isChampion()) ? (Config.RATE_QUEST_DROP * championmult) : Config.RATE_QUEST_DROP;
+					return (Config.L2JMOD_CHAMPION_ENABLE && (victim != null) && victim.isChampion()) ? (Config.RATE_QUEST_DROP * championmult) : Config.RATE_QUEST_DROP;
 				}
 			};
 		}
