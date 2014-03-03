@@ -2768,4 +2768,166 @@ public class Quest extends AbstractScript implements IIdentifiable
 	{
 		return _isCustom;
 	}
+	}
+	
+	/**
+	 * @param player
+	 * @param item
+	 * @param victim the character that "dropped" the item
+	 * @return <code>true</code> if at least one item was given, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim)
+	{
+		List<ItemHolder> items = item.calculateDrops(victim, player);
+		if ((items == null) || items.isEmpty())
+		{
+			return false;
+		}
+		giveItems(player, items);
+		return true;
+	}
+	
+	/**
+	 * @param player
+	 * @param items
+	 */
+	protected static void giveItems(L2PcInstance player, List<ItemHolder> items)
+	{
+		for (ItemHolder item : items)
+		{
+			giveItems(player, item);
+		}
+		
+	}
+	
+	/**
+	 * Gives an item to the player
+	 * @param player
+	 * @param item
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached.
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit)
+	{
+		long maxToGive = limit - player.getInventory().getInventoryItemCount(item.getId(), -1);
+		if (maxToGive <= 0)
+		{
+			return false;
+		}
+		giveItems(player, item.getId(), Math.min(maxToGive, item.getCount()));
+		return true;
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit, boolean playSound)
+	{
+		boolean drop = giveItems(player, item, limit);
+		if (drop && playSound)
+		{
+			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+		}
+		return drop;
+	}
+	
+	/**
+	 * @param player
+	 * @param items
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached.
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit)
+	{
+		boolean b = false;
+		for (ItemHolder item : items)
+		{
+			b |= giveItems(player, item, limit);
+		}
+		return b;
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit, boolean playSound)
+	{
+		boolean drop = giveItems(player, items, limit);
+		if (drop && playSound)
+		{
+			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+		}
+		return drop;
+	}
+	
+	/**
+	 * @param player
+	 * @param items
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit)
+	{
+		boolean b = false;
+		for (ItemHolder item : items)
+		{
+			if ((limit != null) && limit.containsKey(item.getId()))
+			{
+				b |= giveItems(player, item, limit.get(item.getId()));
+			}
+			else
+			{
+				b = true;
+				giveItems(player, item);
+			}
+		}
+		return b;
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
+	{
+		boolean drop = giveItems(player, items, limit);
+		if (drop && playSound)
+		{
+			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+		}
+		return drop;
+	}
+	
+	/**
+	 * @param player
+	 * @param item
+	 * @param victim the character that "dropped" the item
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached.
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit)
+	{
+		return giveItems(player, item.calculateDrops(victim, player), limit);
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit, boolean playSound)
+	{
+		boolean drop = giveItems(player, item, victim, limit);
+		if (drop && playSound)
+		{
+			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+		}
+		return drop;
+	}
+	
+	/**
+	 * @param player
+	 * @param item
+	 * @param victim the character that "dropped" the item
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit)
+	{
+		return giveItems(player, item.calculateDrops(victim, player), limit);
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit, boolean playSound)
+	{
+		boolean drop = giveItems(player, item, victim, limit, playSound);
+		if (drop && playSound)
+		{
+			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+		}
+		return drop;
 }
