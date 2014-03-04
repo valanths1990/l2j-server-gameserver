@@ -24,7 +24,6 @@ import java.util.List;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.util.Rnd;
@@ -138,17 +137,6 @@ public class GeneralDropItem implements IDropItem
 	@Override
 	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
-		if (((!(victim instanceof L2RaidBossInstance)) && Config.DEEPBLUE_DROP_RULES) || ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID))
-		{
-			double levelGapChanceToDrop = getDeepBlueDropChance(victim, killer);
-			
-			// There is a chance of level gap that it wont drop this item
-			if (levelGapChanceToDrop < (Rnd.nextDouble() * 100))
-			{
-				return null;
-			}
-		}
-		
 		if (getModifiedChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
 			int amountMultiply = 1;
@@ -197,7 +185,7 @@ public class GeneralDropItem implements IDropItem
 	 */
 	protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
 	{
-		if (((!(victim instanceof L2RaidBossInstance)) && Config.DEEPBLUE_DROP_RULES) || ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID))
+		if (((!(victim.isRaid())) && Config.DEEPBLUE_DROP_RULES) || ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID))
 		{
 			int levelDifference = victim.getLevel() - killer.getLevel();
 			double levelGapChanceToDrop;
@@ -284,7 +272,7 @@ public class GeneralDropItem implements IDropItem
 		{
 			multiplier *= Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
 		}
-		else if (victim instanceof L2RaidBossInstance)
+		else if (victim.isRaid())
 		{
 			multiplier *= Config.RATE_RAID_DROP_CHANCE_MULTIPLIER;
 		}

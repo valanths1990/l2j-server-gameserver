@@ -24,7 +24,6 @@ import java.util.List;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.util.Rnd;
 
@@ -320,7 +319,7 @@ public class GroupedGeneralDropItem implements IDropItem
 	public double getDeepBlueDropChance(L2Character victim, L2Character killer)
 	{
 		int levelDifference = victim.getLevel() - killer.getLevel();
-		if ((victim instanceof L2RaidBossInstance) && Config.DEEPBLUE_DROP_RULES_RAID)
+		if ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID)
 		{
 			return Math.max(0, Math.min(1, (levelDifference * 0.15) + 1)) * 100;
 		}
