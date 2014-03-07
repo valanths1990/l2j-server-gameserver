@@ -249,6 +249,10 @@ public class GeneralDropItem implements IDropItem
 		{
 			multiplier *= Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER;
 		}
+		else if (victim.isRaid())
+		{
+			multiplier *= Config.RATE_RAID_DROP_AMOUNT_MULTIPLIER;
+		}
 		else
 		{
 			multiplier *= _defaultAmountMultiplier;
