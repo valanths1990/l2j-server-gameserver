@@ -214,19 +214,7 @@ public class GroupedGeneralDropItem implements IDropItem
 		{
 			sumchance += (item.getChance(victim, killer) * getChance() * chanceModifier) / 100;
 		}
-		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance)
-		{
-			/*
-			 * (non-Javadoc)
-			 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
-			 */
-			@Override
-			public double getDeepBlueDropChance(L2Character victim, L2Character killer)
-			{
-				// further normalizing will return same value
-				return 100;
-			}
-		};
+		GroupedGeneralDropItem group = new GroupedQuestDropItem(sumchance); // to discard further deep blue calculations
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (GeneralDropItem item : getItems())
 		{
