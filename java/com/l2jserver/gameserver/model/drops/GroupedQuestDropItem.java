@@ -54,4 +54,14 @@ public class GroupedQuestDropItem extends GroupedGeneralDropItem
 		return 100;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#isPreciseCalculated()
+	 */
+	@Override
+	public boolean isPreciseCalculated()
+	{
+		return true;
+	}
+	
 }

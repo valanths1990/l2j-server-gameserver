@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.model.drops;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.util.Rnd;
@@ -82,7 +81,7 @@ public interface IGroupedItemDropCalculationStrategy
 					if (totalChance > random)
 					{
 						int amountMultiply = 1;
-						if (Config.PRECISE_DROP_CALCULATION && (normalized.getChance() >= 100))
+						if (dropItem.isPreciseCalculated() && (normalized.getChance() >= 100))
 						{
 							amountMultiply = (int) (normalized.getChance()) / 100;
 							if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))

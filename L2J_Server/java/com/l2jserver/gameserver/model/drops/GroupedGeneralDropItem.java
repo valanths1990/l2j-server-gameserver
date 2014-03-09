@@ -156,7 +156,28 @@ public class GroupedGeneralDropItem implements IDropItem
 			sumchance += (item.getChance() * getChance()) / 100;
 		}
 		final double sumchance1 = sumchance;
-		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1, _strategy);
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1, _strategy)
+		{
+			/*
+			 * (non-Javadoc)
+			 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#isPreciseCalculated()
+			 */
+			@Override
+			public boolean isPreciseCalculated()
+			{
+				return GroupedGeneralDropItem.this.isPreciseCalculated();
+			}
+			
+			/*
+			 * (non-Javadoc)
+			 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+			 */
+			@Override
+			public double getDeepBlueDropChance(L2Character victim, L2Character killer)
+			{
+				return GroupedGeneralDropItem.this.getDeepBlueDropChance(victim, killer);
+			}
+		};
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (final GeneralDropItem item : getItems())
 		{
@@ -233,7 +254,28 @@ public class GroupedGeneralDropItem implements IDropItem
 		{
 			sumchance += (item.getChance(victim, killer) * getChance() * chanceModifier) / 100;
 		}
-		GroupedGeneralDropItem group = new GroupedQuestDropItem(sumchance, _strategy); // to discard further deep blue calculations
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance, _strategy)
+		{
+			/*
+			 * (non-Javadoc)
+			 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#isPreciseCalculated()
+			 */
+			@Override
+			public boolean isPreciseCalculated()
+			{
+				return GroupedGeneralDropItem.this.isPreciseCalculated();
+			}
+			
+			/*
+			 * (non-Javadoc)
+			 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+			 */
+			@Override
+			public double getDeepBlueDropChance(L2Character victim, L2Character killer)
+			{
+				return 100;
+			}
+		}; // to discard further deep blue calculations
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (GeneralDropItem item : getItems())
 		{
@@ -334,5 +376,10 @@ public class GroupedGeneralDropItem implements IDropItem
 			return levelGapChanceToDrop;
 		}
 		return 100;
+	}
+	
+	public boolean isPreciseCalculated()
+	{
+		return Config.PRECISE_DROP_CALCULATION;
 	}
 }

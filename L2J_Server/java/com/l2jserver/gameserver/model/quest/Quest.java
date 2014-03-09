@@ -3046,6 +3046,16 @@ public class Quest extends AbstractScript implements IIdentifiable
 					// keep this behavior
 					return items.getDeepBlueDropChance(victim, killer);
 				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#isPreciseCalculated()
+				 */
+				@Override
+				public boolean isPreciseCalculated()
+				{
+					return items.isPreciseCalculated();
+				}
 			};
 			List<GeneralDropItem> dropItems = new LinkedList<>(items.getItems());
 			itemLoop:
