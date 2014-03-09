@@ -35,6 +35,15 @@ public class GroupedQuestDropItem extends GroupedGeneralDropItem
 		super(chance);
 	}
 	
+	/**
+	 * @param chance
+	 * @param strategy
+	 */
+	public GroupedQuestDropItem(double chance, IGroupedItemDropCalculationStrategy strategy)
+	{
+		super(chance, strategy);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)

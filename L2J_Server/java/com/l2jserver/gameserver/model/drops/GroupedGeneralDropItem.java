@@ -25,22 +25,33 @@ import java.util.List;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author Nos
  */
 public class GroupedGeneralDropItem implements IDropItem
 {
+	
 	private final double _chance;
 	private List<GeneralDropItem> _items;
+	protected final IGroupedItemDropCalculationStrategy _strategy;
 	
 	/**
 	 * @param chance the chance of this drop item.
 	 */
 	public GroupedGeneralDropItem(double chance)
 	{
+		this(chance, IGroupedItemDropCalculationStrategy.DEFAULT_STRATEGY);
+	}
+	
+	/**
+	 * @param chance the chance of this drop item.
+	 * @param strategy to calculate drops.
+	 */
+	public GroupedGeneralDropItem(double chance, IGroupedItemDropCalculationStrategy strategy)
+	{
 		_chance = chance;
+		_strategy = strategy;
 	}
 	
 	/**
@@ -59,6 +70,14 @@ public class GroupedGeneralDropItem implements IDropItem
 	public List<GeneralDropItem> getItems()
 	{
 		return _items;
+	}
+	
+	/**
+	 * @return the strategy
+	 */
+	public IGroupedItemDropCalculationStrategy getStrategy()
+	{
+		return _strategy;
 	}
 	
 	/**
@@ -137,7 +156,7 @@ public class GroupedGeneralDropItem implements IDropItem
 			sumchance += (item.getChance() * getChance()) / 100;
 		}
 		final double sumchance1 = sumchance;
-		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1);
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1, _strategy);
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (final GeneralDropItem item : getItems())
 		{
@@ -214,7 +233,7 @@ public class GroupedGeneralDropItem implements IDropItem
 		{
 			sumchance += (item.getChance(victim, killer) * getChance() * chanceModifier) / 100;
 		}
-		GroupedGeneralDropItem group = new GroupedQuestDropItem(sumchance); // to discard further deep blue calculations
+		GroupedGeneralDropItem group = new GroupedQuestDropItem(sumchance, _strategy); // to discard further deep blue calculations
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (GeneralDropItem item : getItems())
 		{
@@ -273,71 +292,9 @@ public class GroupedGeneralDropItem implements IDropItem
 	 * @see com.l2jserver.gameserver.model.drop.IDropItem#calculateDrops(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
 	 */
 	@Override
-	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
+	public final List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
-		if (getItems().size() == 1)
-		{
-			
-			final GeneralDropItem item = getItems().iterator().next();
-			return new GeneralDropItem(item.getItemId(), item.getMin(), item.getMax(), (item.getChance() * getChance()) / 100)
-			{
-				
-				@Override
-				public long getMax(L2Character v, L2Character k)
-				{
-					return item.getMax(v, k);
-				}
-				
-				@Override
-				public long getMin(L2Character v, L2Character k)
-				{
-					return item.getMin(v, k);
-				}
-				
-				@Override
-				public double getChance(L2Character v, L2Character k)
-				{
-					return (item.getChance(v, k) * GroupedGeneralDropItem.this.getChance()) / 100;
-				}
-				
-				@Override
-				public double getModifiedChance(L2Character victim, L2Character killer)
-				{
-					return item.getModifiedChance(victim, killer);
-				}
-			}.calculateDrops(victim, killer);
-		}
-		
-		GroupedGeneralDropItem normalized = normalizeMe(victim, killer, true);
-		if (normalized.getChance() > (Rnd.nextDouble() * 100))
-		{
-			double random = (Rnd.nextDouble() * 100);
-			double totalChance = 0;
-			for (GeneralDropItem item : normalized.getItems())
-			{
-				// Grouped item chance rates should not be modified.
-				totalChance += item.getChance();
-				if (totalChance > random)
-				{
-					int amountMultiply = 1;
-					if (Config.PRECISE_DROP_CALCULATION && (normalized.getChance() >= 100))
-					{
-						amountMultiply = (int) (normalized.getChance()) / 100;
-						if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))
-						{
-							amountMultiply++;
-						}
-					}
-					
-					long amount = Rnd.get(item.getMin(victim, killer) * amountMultiply, item.getMax(victim, killer) * amountMultiply);
-					
-					List<ItemHolder> items = new ArrayList<>(1);
-					items.add(new ItemHolder(item.getItemId(), amount));
-					return items;
-				}
-			}
-		}
-		return null;
+		return _strategy.calculateDrops(this, victim, killer);
 	}
 	
 	/**

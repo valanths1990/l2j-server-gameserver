@@ -3034,7 +3034,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		GroupedGeneralDropItem toDrop;
 		if (smartDrop)
 		{
-			toDrop = new GroupedGeneralDropItem(items.getChance())
+			toDrop = new GroupedGeneralDropItem(items.getChance(), items.getStrategy())
 			{
 				/*
 				 * (non-Javadoc)
