@@ -135,7 +135,7 @@ public class GeneralDropItem implements IDropItem
 	 * @see com.l2jserver.gameserver.model.drop.IDropItem#calculateDrops(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
 	 */
 	@Override
-	public List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
+	public final List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
 		if (getModifiedChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
