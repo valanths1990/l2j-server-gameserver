@@ -180,7 +180,7 @@ public class GroupedGeneralDropItem implements IDropItem
 	
 	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer)
 	{
-		return normalizeMe(victim, killer, 1);
+		return normalizeMe(victim, killer, false, 1);
 	}
 	
 	/**
@@ -192,12 +192,41 @@ public class GroupedGeneralDropItem implements IDropItem
 	 */
 	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer, double chanceModifier)
 	{
+		return normalizeMe(victim, killer, false, chanceModifier);
+	}
+	
+	/**
+	 * Creates a normalized group taking into account all drop modifiers, needed when handling a group which has items with different chance rates
+	 * @param victim
+	 * @param killer
+	 * @param includeDeepBlueChance if to modify chance by {@link GroupedGeneralDropItem#getDeepBlueDropChance(L2Character, L2Character)}
+	 * @param chanceModifier an additional chance modifier
+	 * @return a new normalized group with all drop modifiers applied
+	 */
+	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer, boolean includeDeepBlueChance, double chanceModifier)
+	{
+		if (includeDeepBlueChance)
+		{
+			chanceModifier *= (getDeepBlueDropChance(victim, killer) / 100);
+		}
 		double sumchance = 0;
 		for (GeneralDropItem item : getItems())
 		{
 			sumchance += (item.getChance(victim, killer) * getChance() * chanceModifier) / 100;
 		}
-		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance);
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance)
+		{
+			/*
+			 * (non-Javadoc)
+			 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+			 */
+			@Override
+			public double getDeepBlueDropChance(L2Character victim, L2Character killer)
+			{
+				// further normalizing will return same value
+				return 100;
+			}
+		};
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (GeneralDropItem item : getItems())
 		{
@@ -237,6 +266,18 @@ public class GroupedGeneralDropItem implements IDropItem
 		group.setItems(items);
 		return group;
 		
+	}
+	
+	/**
+	 * Creates a normalized group taking into account all drop modifiers, needed when handling a group which has items with different chance rates
+	 * @param victim
+	 * @param killer
+	 * @param includeDeepBlueChance if to modify chance by {@link GroupedGeneralDropItem#getDeepBlueDropChance(L2Character, L2Character)}
+	 * @return a new normalized group with all drop modifiers applied
+	 */
+	public GroupedGeneralDropItem normalizeMe(L2Character victim, L2Character killer, boolean includeDeepBlueChance)
+	{
+		return normalizeMe(victim, killer, includeDeepBlueChance, 1);
 	}
 	
 	/*
@@ -279,7 +320,7 @@ public class GroupedGeneralDropItem implements IDropItem
 			}.calculateDrops(victim, killer);
 		}
 		
-		GroupedGeneralDropItem normalized = normalizeMe(victim, killer, getDeepBlueDropChance(victim, killer) / 100);
+		GroupedGeneralDropItem normalized = normalizeMe(victim, killer, true);
 		if (normalized.getChance() > (Rnd.nextDouble() * 100))
 		{
 			double random = (Rnd.nextDouble() * 100);

@@ -23,9 +23,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -46,6 +50,8 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2TrapInstance;
 import com.l2jserver.gameserver.model.base.AcquireSkillType;
+import com.l2jserver.gameserver.model.drops.GeneralDropItem;
+import com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem;
 import com.l2jserver.gameserver.model.events.AbstractScript;
 import com.l2jserver.gameserver.model.events.EventType;
 import com.l2jserver.gameserver.model.events.listeners.AbstractEventListener;
@@ -2931,3 +2937,383 @@ public class Quest extends AbstractScript implements IIdentifiable
 		}
 		return drop;
 }
+
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
+	{
+		Map<L2PcInstance, Map<Integer, Long>> rewardedCounts = calculateDistribution(players, items, limit);
+		// now give the calculated items to the players
+		giveItems(rewardedCounts, playSound);
+		return rewardedCounts;
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, long limit, boolean playSound)
+	{
+		return distributeItems(players, items, new StaticMap<Integer, Long>(limit), playSound);
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param item the items to distribute
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Long> distributeItems(Collection<L2PcInstance> players, ItemHolder item, long limit, boolean playSound)
+	{
+		Map<L2PcInstance, Map<Integer, Long>> distribution = distributeItems(players, Collections.singletonList(item), limit, playSound);
+		Map<L2PcInstance, Long> returnMap = new HashMap<>();
+		for (Entry<L2PcInstance, Map<Integer, Long>> entry : distribution.entrySet())
+		{
+			for (Entry<Integer, Long> entry2 : entry.getValue().entrySet())
+			{
+				returnMap.put(entry.getKey(), entry2.getValue());
+			}
+		}
+		return returnMap;
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param killer the one who "kills" the victim
+	 * @param victim the character that "dropped" the item
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound)
+	{
+		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param killer the one who "kills" the victim
+	 * @param victim the character that "dropped" the item
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound)
+	{
+		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param killer the one who "kills" the victim
+	 * @param victim the character that "dropped" the item
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound, boolean smartDrop)
+	{
+		GroupedGeneralDropItem toDrop;
+		if (smartDrop)
+		{
+			toDrop = new GroupedGeneralDropItem(items.getChance())
+			{
+				/*
+				 * (non-Javadoc)
+				 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+				 */
+				@Override
+				public double getDeepBlueDropChance(L2Character victim, L2Character killer)
+				{
+					// keep this behavior
+					return items.getDeepBlueDropChance(victim, killer);
+				}
+			};
+			List<GeneralDropItem> dropItems = new LinkedList<>(items.getItems());
+			itemLoop:
+			for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)
+			{
+				GeneralDropItem item = it.next();
+				for (L2PcInstance player : players)
+				{
+					if (player.getInventory().getInventoryItemCount(item.getItemId(), -1, true) < limit.get(item.getItemId()))
+					{
+						// we can give this item to this player
+						continue itemLoop;
+					}
+				}
+				// there's nobody to give this item to
+				it.remove();
+			}
+			toDrop.setItems(dropItems);
+			toDrop = toDrop.normalizeMe(victim, killer, true);
+		}
+		else
+		{
+			toDrop = items;
+		}
+		return distributeItems(players, toDrop, killer, victim, limit, playSound);
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param killer the one who "kills" the victim
+	 * @param victim the character that "dropped" the item
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound, boolean smartDrop)
+	{
+		return distributeItems(players, items, killer, victim, new StaticMap<Integer, Long>(limit), playSound, smartDrop);
+	}
+	
+	/**
+	 * @param players
+	 * @param items
+	 * @param limit
+	 * @return
+	 */
+	private static Map<L2PcInstance, Map<Integer, Long>> calculateDistribution(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit)
+	{
+		Map<L2PcInstance, Map<Integer, Long>> rewardedCounts = new HashMap<>();
+		for (L2PcInstance player : players)
+		{
+			rewardedCounts.put(player, new HashMap<Integer, Long>());
+		}
+		for (ItemHolder item : items)
+		{
+			long equaldist = item.getCount() / players.size();
+			long randomdist = item.getCount() % players.size();
+			List<L2PcInstance> toDist = new ArrayList<>(players);
+			do // this must happen at least once in order to get away already full players (and then equaldist can become nonzero)
+			{
+				for (Iterator<L2PcInstance> it = toDist.iterator(); it.hasNext();)
+				{
+					L2PcInstance player = it.next();
+					if (!rewardedCounts.get(player).containsKey(item.getId()))
+					{
+						rewardedCounts.get(player).put(item.getId(), 0L);
+					}
+					long maxGive = limit.get(item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
+					long toGive = equaldist;
+					if (equaldist >= maxGive)
+					{
+						toGive = maxGive;
+						randomdist += (equaldist - maxGive); // overflown items are available to next players
+						it.remove(); // this player is already full
+					}
+					rewardedCounts.get(player).put(item.getId(), rewardedCounts.get(player).get(item.getId()) + toGive);
+				}
+				equaldist = randomdist / toDist.size(); // the rest of items may be allowed to be equally distributed between remaining players
+				randomdist %= toDist.size();
+			}
+			while (equaldist > 0);
+			while (randomdist > 0)
+			{
+				if (toDist.isEmpty())
+				{
+					// we don't have any player left
+					break;
+				}
+				L2PcInstance player = toDist.get(getRandom(toDist.size()));
+				long maxGive = limit.get(item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
+				if (maxGive > 0)
+				{
+					// we can add an item to player
+					// so we add one item to player
+					rewardedCounts.get(player).put(item.getId(), rewardedCounts.get(player).get(item.getId()) + 1);
+					randomdist--;
+				}
+				toDist.remove(player); // Either way this player isn't allowable for next random award
+			}
+		}
+		return rewardedCounts;
+	}
+	
+	/**
+	 * Distributes items to players
+	 * @param rewardedCounts A scheme of distribution items (the structure is: Map<player Map<itemId, count>>)
+	 * @param playSound if to play sound if a player gets at least one item
+	 */
+	private static void giveItems(Map<L2PcInstance, Map<Integer, Long>> rewardedCounts, boolean playSound)
+	{
+		for (Entry<L2PcInstance, Map<Integer, Long>> entry : rewardedCounts.entrySet())
+		{
+			L2PcInstance player = entry.getKey();
+			boolean playPlayerSound = false;
+			for (Entry<Integer, Long> item : entry.getValue().entrySet())
+			{
+				if (item.getValue() >= 0)
+				{
+					playPlayerSound = true;
+					giveItems(player, item.getKey(), item.getValue());
+				}
+			}
+			if (playSound && playPlayerSound)
+			{
+				playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+			}
+		}
+	}
+	
+	/**
+	}
+	
+	/**
+	 * A static map, which always gets same value
+	 * @author Battlecruiser
+	 * @param <K>
+	 * @param <V>
+	 */
+	private static class StaticMap<K, V> implements Map<K, V>
+	{
+		
+		private final V _value;
+		
+		public StaticMap(V value)
+		{
+			_value = value;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#clear()
+		 */
+		@Override
+		public void clear()
+		{
+			// do nothing
+			
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#containsKey(java.lang.Object)
+		 */
+		@Override
+		public boolean containsKey(Object key)
+		{
+			return key != null;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#containsValue(java.lang.Object)
+		 */
+		@Override
+		public boolean containsValue(Object value)
+		{
+			return _value.equals(value);
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#entrySet()
+		 */
+		@Override
+		public Set<Entry<K, V>> entrySet()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#get(java.lang.Object)
+		 */
+		@Override
+		public V get(Object key)
+		{
+			return key == null ? null : _value;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#isEmpty()
+		 */
+		@Override
+		public boolean isEmpty()
+		{
+			return false;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#keySet()
+		 */
+		@Override
+		public Set<K> keySet()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public V put(K key, V value)
+		{
+			return value;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#putAll(java.util.Map)
+		 */
+		@Override
+		public void putAll(Map<? extends K, ? extends V> arg0)
+		{
+			// do nothing
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#remove(java.lang.Object)
+		 */
+		@Override
+		public V remove(Object arg0)
+		{
+			return _value;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#size()
+		 */
+		@Override
+		public int size()
+		{
+			return 1;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Map#values()
+		 */
+		@Override
+		public Collection<V> values()
+		{
+			return Collections.singleton(_value);
+		}
