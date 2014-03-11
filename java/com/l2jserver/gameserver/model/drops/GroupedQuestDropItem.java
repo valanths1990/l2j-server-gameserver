@@ -49,7 +49,7 @@ public class GroupedQuestDropItem extends GroupedGeneralDropItem
 	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
 	 */
 	@Override
-	public double getDeepBlueDropChance(L2Character victim, L2Character killer)
+	public double getKillerModifier(L2Character victim, L2Character killer)
 	{
 		return 100;
 	}

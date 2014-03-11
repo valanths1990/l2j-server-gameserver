@@ -65,47 +65,45 @@ public class GeneralDropItem implements IDropItem
 	 * Gets the item id
 	 * @return the item id
 	 */
-	public int getItemId()
+	public final int getItemId()
 	{
 		return _itemId;
 	}
 	
 	/**
-	 * Gets the min drop count
+	 * Gets the base min drop count
 	 * @return the min
 	 */
-	public long getMin()
+	public final long getMin()
 	{
 		return _min;
 	}
 	
 	/**
-	 * Gets the min drop count
-	 * @param victim the victim
-	 * @param killer the killer
+	 * Gets the min drop count modified by server rates
+	 * @param victim the victim who drops the item
 	 * @return the min modified by any rates.
 	 */
-	public long getMin(L2Character victim, L2Character killer)
+	public final long getMin(L2Character victim)
 	{
 		return (long) (getMin() * getAmountMultiplier(victim));
 	}
 	
 	/**
-	 * Gets the max drop count
+	 * Gets the base max drop count
 	 * @return the max
 	 */
-	public long getMax()
+	public final long getMax()
 	{
 		return _max;
 	}
 	
 	/**
-	 * Gets the max drop count
-	 * @param victim the victim
-	 * @param killer the killer
+	 * Gets the max drop count modified by server rates
+	 * @param victim the victim who drops the item
 	 * @return the max modified by any rates.
 	 */
-	public long getMax(L2Character victim, L2Character killer)
+	public final long getMax(L2Character victim)
 	{
 		return (long) (getMax() * getAmountMultiplier(victim));
 	}
@@ -114,22 +112,34 @@ public class GeneralDropItem implements IDropItem
 	 * Gets the chance of this drop item.
 	 * @return the chance
 	 */
-	public double getChance()
+	public final double getChance()
 	{
 		return _chance;
 	}
 	
 	/**
-	 * Gets the chance of this drop item.
-	 * @param victim the victim
-	 * @param killer the killer
+	 * Gets the general chance to drop this item modified by rates. <br>
+	 * This shall be used in calculating chance within drop groups.
+	 * @param victim the victim who drops the item
 	 * @return the chance modified by any rates.
 	 */
-	public double getChance(L2Character victim, L2Character killer)
+	public final double getChance(L2Character victim)
 	{
 		return getChance() * getChanceMultiplier(victim);
 	}
 	
+	/**
+	 * Gets the chance of dropping this item for current killer and victim (modified by server rates and another rules based on killer) <br>
+	 * This shall be used to calculate chance outside of drop groups.
+	 * @param victim the victim who drops the item
+	 * @param killer who kills the victim
+	 * @return a chance to drop modified by deep blue drop rules
+	 */
+	public final double getChance(L2Character victim, L2Character killer)
+	{
+		return (getKillerChanceModifier(victim, killer) * getChance(victim));
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.l2jserver.gameserver.model.drop.IDropItem#calculateDrops(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
@@ -137,19 +147,19 @@ public class GeneralDropItem implements IDropItem
 	@Override
 	public final List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
-		if (getModifiedChance(victim, killer) > (Rnd.nextDouble() * 100))
+		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
 			int amountMultiply = 1;
-			if (isPreciseCalculated() && (getModifiedChance(victim, killer) > 100))
+			if (isPreciseCalculated() && (getChance(victim, killer) > 100))
 			{
-				amountMultiply = (int) getModifiedChance(victim, killer) / 100;
-				if ((getModifiedChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
+				amountMultiply = (int) getChance(victim, killer) / 100;
+				if ((getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
 				{
 					amountMultiply++;
 				}
 			}
 			
-			long amount = Rnd.get(getMin(victim, killer) * amountMultiply, getMax(victim, killer) * amountMultiply);
+			long amount = Rnd.get(getMin(victim) * amountMultiply, getMax(victim) * amountMultiply);
 			
 			List<ItemHolder> items = new ArrayList<>(1);
 			items.add(new ItemHolder(getItemId(), amount));
@@ -168,22 +178,12 @@ public class GeneralDropItem implements IDropItem
 	}
 	
 	/**
-	 * NOTE: isolated from {@link GeneralDropItem#getChance(L2Character, L2Character)} to avoid confusion in drop groups
-	 * @param victim
-	 * @param killer
-	 * @return a chance to drop modified by deep blue drop rules
+	 * This handles by default deep blue drop rules. It may also be used to handle another drop chance rules based on killer
+	 * @param victim the victim who drops the item
+	 * @param killer who kills the victim
+	 * @return a number between 0 and 1 (usually)
 	 */
-	public double getModifiedChance(L2Character victim, L2Character killer)
-	{
-		return (getDeepBlueDropChance(victim, killer) * getChance(victim, killer)) / 100;
-	}
-	
-	/**
-	 * @param victim
-	 * @param killer
-	 * @return gets a chance modifier for large level differencies
-	 */
-	protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
+	protected double getKillerChanceModifier(L2Character victim, L2Character killer)
 	{
 		if (((!(victim.isRaid())) && Config.DEEPBLUE_DROP_RULES) || ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID))
 		{
@@ -224,13 +224,14 @@ public class GeneralDropItem implements IDropItem
 					levelGapChanceToDrop = 10;
 				}
 			}
-			return levelGapChanceToDrop;
+			return levelGapChanceToDrop / 100;
 		}
-		return 100;
+		return 1;
 	}
 	
 	/**
-	 * @param victim
+	 * This gets standard server rates for this item
+	 * @param victim who drops the item
 	 * @return
 	 */
 	protected double getAmountMultiplier(L2Character victim)
@@ -261,7 +262,8 @@ public class GeneralDropItem implements IDropItem
 	}
 	
 	/**
-	 * @param victim
+	 * This gets standard server rates for this item
+	 * @param victim who drops the item
 	 * @return
 	 */
 	protected double getChanceMultiplier(L2Character victim)

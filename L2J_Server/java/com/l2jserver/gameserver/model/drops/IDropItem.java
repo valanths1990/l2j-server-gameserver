@@ -28,6 +28,7 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
  */
 public interface IDropItem
 {
+	
 	/**
 	 * Calculates drops of this drop item.
 	 * @param victim the victim

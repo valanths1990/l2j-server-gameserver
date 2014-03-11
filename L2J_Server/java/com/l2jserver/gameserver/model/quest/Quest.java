@@ -3041,10 +3041,10 @@ public class Quest extends AbstractScript implements IIdentifiable
 				 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
 				 */
 				@Override
-				public double getDeepBlueDropChance(L2Character victim, L2Character killer)
+				public double getKillerModifier(L2Character victim, L2Character killer)
 				{
 					// keep this behavior
-					return items.getDeepBlueDropChance(victim, killer);
+					return items.getKillerModifier(victim, killer);
 				}
 				
 				/*
@@ -3074,7 +3074,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 				it.remove();
 			}
 			toDrop.setItems(dropItems);
-			toDrop = toDrop.normalizeMe(victim, killer, true);
+			toDrop = toDrop.normalizeMe(victim, killer);
 		}
 		else
 		{

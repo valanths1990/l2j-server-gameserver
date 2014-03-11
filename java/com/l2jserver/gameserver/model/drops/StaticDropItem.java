@@ -57,7 +57,7 @@ public class StaticDropItem extends GeneralDropItem
 	}
 	
 	@Override
-	protected double getDeepBlueDropChance(L2Character victim, L2Character killer)
+	protected double getKillerChanceModifier(L2Character victim, L2Character killer)
 	{
 		return 100;
 	}

@@ -44,32 +44,42 @@ public interface IGroupedItemDropCalculationStrategy
 				{
 					
 					@Override
-					public long getMax(L2Character v, L2Character k)
+					protected double getAmountMultiplier(L2Character victim)
 					{
-						return item.getMax(v, k);
+						return item.getAmountMultiplier(victim);
 					}
 					
 					@Override
-					public long getMin(L2Character v, L2Character k)
+					protected double getChanceMultiplier(L2Character victim)
 					{
-						return item.getMin(v, k);
+						return item.getChanceMultiplier(victim);
 					}
 					
+					/*
+					 * (non-Javadoc)
+					 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getKillerChanceModifier(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+					 */
 					@Override
-					public double getChance(L2Character v, L2Character k)
+					protected double getKillerChanceModifier(L2Character victim, L2Character killer)
 					{
-						return (item.getChance(v, k) * dropItem.getChance()) / 100;
+						// delegate this to the group
+						return dropItem.getKillerModifier(victim, killer);
 					}
 					
+					/*
+					 * (non-Javadoc)
+					 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#isPreciseCalculated()
+					 */
 					@Override
-					public double getModifiedChance(L2Character victim, L2Character killer)
+					public boolean isPreciseCalculated()
 					{
-						return item.getModifiedChance(victim, killer);
+						// delegate this to the group
+						return dropItem.isPreciseCalculated();
 					}
 				}.calculateDrops(victim, killer);
 			}
 			
-			GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer, true);
+			GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer);
 			if (normalized.getChance() > (Rnd.nextDouble() * 100))
 			{
 				double random = (Rnd.nextDouble() * 100);
@@ -90,7 +100,7 @@ public interface IGroupedItemDropCalculationStrategy
 							}
 						}
 						
-						long amount = Rnd.get(item.getMin(victim, killer) * amountMultiply, item.getMax(victim, killer) * amountMultiply);
+						long amount = Rnd.get(item.getMin(victim) * amountMultiply, item.getMax(victim) * amountMultiply);
 						
 						List<ItemHolder> items = new ArrayList<>(1);
 						items.add(new ItemHolder(item.getItemId(), amount));
