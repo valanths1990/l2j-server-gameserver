@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.drops;
+package com.l2jserver.gameserver.model.drops.strategy;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.drops.GeneralDropItem;
+import com.l2jserver.gameserver.model.drops.IDropItem;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 
 /**
@@ -68,6 +70,7 @@ public interface IKillerChanceModifierStrategy extends INonGroupedKillerChanceMo
 		@Override
 		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
 		{
+			// FIXME: default method in JDK8
 			return getKillerChanceModifier((IDropItem) item, victim, killer);
 		}
 		

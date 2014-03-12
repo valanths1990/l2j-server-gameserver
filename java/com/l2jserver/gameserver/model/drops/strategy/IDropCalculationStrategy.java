@@ -16,12 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.drops;
+package com.l2jserver.gameserver.model.drops.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.drops.GeneralDropItem;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.util.Rnd;
 

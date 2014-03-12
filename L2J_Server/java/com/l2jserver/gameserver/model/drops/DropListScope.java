@@ -18,6 +18,11 @@
  */
 package com.l2jserver.gameserver.model.drops;
 
+import com.l2jserver.gameserver.model.drops.strategy.IAmountMultiplierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IChanceMultiplierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
+
 
 /**
  * @author Nos

@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.drops;
+package com.l2jserver.gameserver.model.drops.strategy;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.drops.GeneralDropItem;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 
 /**
@@ -60,6 +61,11 @@ public interface IChanceMultiplierStrategy
 		}
 	};
 	
+	/**
+	 * Just a wrapper class to work around Java7 limitation. <br>
+	 * FIXME: Unwrap me in JDK8
+	 * @author Battlecruiser
+	 */
 	public static class Foo
 	{
 		public static IChanceMultiplierStrategy DEFAULT_STRATEGY(double defaultMultiplier)

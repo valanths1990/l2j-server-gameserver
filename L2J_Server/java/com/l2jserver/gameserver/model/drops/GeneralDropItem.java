@@ -22,6 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.drops.strategy.IAmountMultiplierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IChanceMultiplierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IDropCalculationStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.INonGroupedKillerChanceModifierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.util.Rnd;
 
