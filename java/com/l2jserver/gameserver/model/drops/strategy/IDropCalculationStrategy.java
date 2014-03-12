@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.model.drops.strategy;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -51,9 +51,7 @@ public interface IDropCalculationStrategy
 				
 				long amount = Rnd.get(item.getMin(victim) * amountMultiply, item.getMax(victim) * amountMultiply);
 				
-				List<ItemHolder> items = new ArrayList<>(1);
-				items.add(new ItemHolder(item.getItemId(), amount));
-				return items;
+				return Collections.singletonList(new ItemHolder(item.getItemId(), amount));
 			}
 			
 			return null;
