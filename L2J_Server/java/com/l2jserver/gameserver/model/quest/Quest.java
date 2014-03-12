@@ -3034,29 +3034,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		GroupedGeneralDropItem toDrop;
 		if (smartDrop)
 		{
-			toDrop = new GroupedGeneralDropItem(items.getChance(), items.getStrategy())
-			{
-				/*
-				 * (non-Javadoc)
-				 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getDeepBlueDropChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
-				 */
-				@Override
-				public double getKillerModifier(L2Character victim, L2Character killer)
-				{
-					// keep this behavior
-					return items.getKillerModifier(victim, killer);
-				}
-				
-				/*
-				 * (non-Javadoc)
-				 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#isPreciseCalculated()
-				 */
-				@Override
-				public boolean isPreciseCalculated()
-				{
-					return items.isPreciseCalculated();
-				}
-			};
+			toDrop = new GroupedGeneralDropItem(items.getChance(), items.getDropCalculationStrategy(), items.getKillerChanceModifierStrategy(), items.getPreciseStrategy());
 			List<GeneralDropItem> dropItems = new LinkedList<>(items.getItems());
 			itemLoop:
 			for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)

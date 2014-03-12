@@ -18,9 +18,6 @@
  */
 package com.l2jserver.gameserver.model.drops;
 
-import com.l2jserver.Config;
-import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 
 /**
  * @author Nos
@@ -33,7 +30,7 @@ public enum DropListScope implements IDropItemFactory
 		@Override
 		public IDropItem newDropItem(int itemId, long min, long max, double chance)
 		{
-			return new GeneralDropItem(itemId, min, max, chance, Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.DROP, IChanceMultiplierStrategy.DROP);
 		}
 		
 	}),
@@ -43,7 +40,7 @@ public enum DropListScope implements IDropItemFactory
 		@Override
 		public IDropItem newDropItem(int itemId, long min, long max, double chance)
 		{
-			return new GeneralDropItem(itemId, min, max, chance, Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER, Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.SPOIL, IChanceMultiplierStrategy.SPOIL);
 		}
 		
 	}),
@@ -56,7 +53,7 @@ public enum DropListScope implements IDropItemFactory
 		@Override
 		public IDropItem newDropItem(int itemId, long min, long max, double chance)
 		{
-			return new StaticDropItem(itemId, min, max, chance);
+			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.STATIC, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES);
 		}
 		
 	}),
@@ -66,30 +63,7 @@ public enum DropListScope implements IDropItemFactory
 		@Override
 		public IDropItem newDropItem(int itemId, long min, long max, double chance)
 		{
-			return new StaticDropItem(itemId, min, max, chance)
-			{
-				@Override
-				public boolean isPreciseCalculated()
-				{
-					return true;
-				}
-				
-				@Override
-				protected double getChanceMultiplier(L2Character victim)
-				{
-					double championmult;
-					if ((getItemId() == Inventory.ADENA_ID) || (getItemId() == Inventory.ANCIENT_ADENA_ID))
-					{
-						championmult = Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-					}
-					else
-					{
-						championmult = Config.L2JMOD_CHAMPION_REWARDS;
-					}
-					
-					return (Config.L2JMOD_CHAMPION_ENABLE && (victim != null) && victim.isChampion()) ? (Config.RATE_QUEST_DROP * championmult) : Config.RATE_QUEST_DROP;
-				}
-			};
+			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.QUEST, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES);
 		}
 	});
 	

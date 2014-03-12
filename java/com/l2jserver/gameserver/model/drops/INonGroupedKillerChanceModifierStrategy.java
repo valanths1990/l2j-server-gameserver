@@ -23,42 +23,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 /**
  * @author Battlecruiser
  */
-public class StaticDropItem extends GeneralDropItem
+public interface INonGroupedKillerChanceModifierStrategy
 {
-	/**
-	 * @param itemId
-	 * @param min
-	 * @param max
-	 * @param chance
-	 */
-	public StaticDropItem(int itemId, long min, long max, double chance)
-	{
-		super(itemId, min, max, chance);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChanceMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
-	 */
-	@Override
-	protected double getChanceMultiplier(L2Character victim)
-	{
-		return 1;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getAmountMultiplier(com.l2jserver.gameserver.model.actor.L2Character)
-	 */
-	@Override
-	protected double getAmountMultiplier(L2Character victim)
-	{
-		return 1;
-	}
-	
-	@Override
-	protected double getKillerChanceModifier(L2Character victim, L2Character killer)
-	{
-		return 100;
-	}
+	public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer);
 }
