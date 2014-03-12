@@ -63,12 +63,7 @@ public final class GroupedGeneralDropItem implements IDropItem
 		_killerChanceModifierStrategy = killerStrategy;
 		_preciseStrategy = preciseStrategy;
 	}
-	
-	public static GroupedGeneralDropItem QuestDropItem(double chance)
-	{
-		return new GroupedGeneralDropItem(chance, IGroupedItemDropCalculationStrategy.DEFAULT_STRATEGY, IKillerChanceModifierStrategy.NO_RULES, IPreciseDeterminationStrategy.ALWAYS);
-	}
-	
+
 	/**
 	 * Gets the chance of this drop item.
 	 * @return the chance

@@ -20,14 +20,14 @@ package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.gameserver.model.drops.strategy.IAmountMultiplierStrategy;
 import com.l2jserver.gameserver.model.drops.strategy.IChanceMultiplierStrategy;
+import com.l2jserver.gameserver.model.drops.strategy.IGroupedItemDropCalculationStrategy;
 import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrategy;
 import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
-
 
 /**
  * @author Nos
  */
-public enum DropListScope implements IDropItemFactory
+public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory
 {
 	DEATH(new IDropItemFactory()
 	{
@@ -36,6 +36,15 @@ public enum DropListScope implements IDropItemFactory
 		public IDropItem newDropItem(int itemId, long min, long max, double chance)
 		{
 			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.DROP, IChanceMultiplierStrategy.DROP);
+		}
+		
+	}, new IGroupedDropItemFactory()
+	{
+
+		@Override
+		public GroupedGeneralDropItem newGroupedDropItem(double chance)
+		{
+			return new GroupedGeneralDropItem(chance);
 		}
 		
 	}),
@@ -48,7 +57,8 @@ public enum DropListScope implements IDropItemFactory
 			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.SPOIL, IChanceMultiplierStrategy.SPOIL);
 		}
 		
-	}),
+	}, DEATH),
+
 	/**
 	 * This droplist scope isn't affected by ANY rates, nor Champion, etc...
 	 */
@@ -61,6 +71,15 @@ public enum DropListScope implements IDropItemFactory
 			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.STATIC, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES);
 		}
 		
+	}, new IGroupedDropItemFactory()
+	{
+
+		@Override
+		public GroupedGeneralDropItem newGroupedDropItem(double chance)
+		{
+			return new GroupedGeneralDropItem(chance, IGroupedItemDropCalculationStrategy.DEFAULT_STRATEGY, IKillerChanceModifierStrategy.NO_RULES, IPreciseDeterminationStrategy.ALWAYS);
+		}
+		
 	}),
 	QUEST(new IDropItemFactory()
 	{
@@ -70,13 +89,15 @@ public enum DropListScope implements IDropItemFactory
 		{
 			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.QUEST, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES);
 		}
-	});
+	}, STATIC);
 	
 	private final IDropItemFactory _factory;
+	private final IGroupedDropItemFactory _groupFactory;
 	
-	private DropListScope(IDropItemFactory factory)
+	private DropListScope(IDropItemFactory factory, IGroupedDropItemFactory groupFactory)
 	{
 		_factory = factory;
+		_groupFactory = groupFactory;
 	}
 	
 	@Override
@@ -85,8 +106,9 @@ public enum DropListScope implements IDropItemFactory
 		return _factory.newDropItem(itemId, min, max, chance);
 	}
 	
+	@Override
 	public GroupedGeneralDropItem newGroupedDropItem(double chance)
 	{
-		return new GroupedGeneralDropItem(chance);
+		return _groupFactory.newGroupedDropItem(chance);
 	}
 }
