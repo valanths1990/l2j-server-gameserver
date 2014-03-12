@@ -68,7 +68,7 @@ public interface IChanceMultiplierStrategy
 	 */
 	public static class Foo
 	{
-		public static IChanceMultiplierStrategy DEFAULT_STRATEGY(double defaultMultiplier)
+		public static IChanceMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
 		{
 			return new IChanceMultiplierStrategy()
 			{

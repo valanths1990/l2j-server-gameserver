@@ -48,7 +48,7 @@ public interface IAmountMultiplierStrategy
 	 */
 	public static class Foo
 	{
-		public static IAmountMultiplierStrategy DEFAULT_STRATEGY(double defaultMultiplier)
+		public static IAmountMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
 		{
 			return new IAmountMultiplierStrategy()
 			{
