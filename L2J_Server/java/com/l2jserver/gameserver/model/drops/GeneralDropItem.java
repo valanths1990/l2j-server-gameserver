@@ -18,7 +18,6 @@
  */
 package com.l2jserver.gameserver.model.drops;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -29,7 +28,6 @@ import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrate
 import com.l2jserver.gameserver.model.drops.strategy.INonGroupedKillerChanceModifierStrategy;
 import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author Nos
@@ -213,26 +211,7 @@ public final class GeneralDropItem implements IDropItem
 	@Override
 	public final List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
 	{
-		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
-		{
-			int amountMultiply = 1;
-			if (isPreciseCalculated() && (getChance(victim, killer) > 100))
-			{
-				amountMultiply = (int) getChance(victim, killer) / 100;
-				if ((getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
-				{
-					amountMultiply++;
-				}
-			}
-			
-			long amount = Rnd.get(getMin(victim) * amountMultiply, getMax(victim) * amountMultiply);
-			
-			List<ItemHolder> items = new ArrayList<>(1);
-			items.add(new ItemHolder(getItemId(), amount));
-			return items;
-		}
-		
-		return null;
+		return _dropCalculationStrategy.calculateDrops(this, victim, killer);
 	}
 	
 	/**
