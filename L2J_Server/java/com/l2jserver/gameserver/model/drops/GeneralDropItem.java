@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2004-2014 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,7 +28,6 @@ import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrate
 import com.l2jserver.gameserver.model.drops.strategy.INonGroupedKillerChanceModifierStrategy;
 import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
-import com.l2jserver.gameserver.util.Util;
 
 /**
  * @author Nos
@@ -39,13 +38,13 @@ public final class GeneralDropItem implements IDropItem
 	private final long _min;
 	private final long _max;
 	private final double _chance;
-	
+
 	protected final IAmountMultiplierStrategy _amountStrategy;
 	protected final IChanceMultiplierStrategy _chanceStrategy;
 	protected final IPreciseDeterminationStrategy _preciseStrategy;
 	protected final INonGroupedKillerChanceModifierStrategy _killerStrategy;
 	protected final IDropCalculationStrategy _dropCalculationStrategy;
-	
+
 	/**
 	 * @param itemId the item id
 	 * @param min the min count
@@ -56,22 +55,22 @@ public final class GeneralDropItem implements IDropItem
 	{
 		this(itemId, min, max, chance, 1, 1);
 	}
-	
+
 	public GeneralDropItem(int itemId, long min, long max, double chance, double defaultAmountMultiplier, double defaultChanceMultiplier)
 	{
 		this(itemId, min, max, defaultChanceMultiplier, IAmountMultiplierStrategy.Foo.DEFAULT_STRATEGY(defaultAmountMultiplier), IChanceMultiplierStrategy.Foo.DEFAULT_STRATEGY(defaultChanceMultiplier));
 	}
-	
+
 	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy)
 	{
 		this(itemId, min, max, chance, amountMultiplierStrategy, chanceMultiplierStrategy, IPreciseDeterminationStrategy.DEFAULT, IKillerChanceModifierStrategy.DEFAULT_NONGROUP_STRATEGY);
 	}
-	
+
 	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy, IPreciseDeterminationStrategy preciseStrategy, INonGroupedKillerChanceModifierStrategy killerStrategy)
 	{
 		this(itemId, min, max, chance, amountMultiplierStrategy, chanceMultiplierStrategy, preciseStrategy, killerStrategy, IDropCalculationStrategy.DEFAULT_STRATEGY);
 	}
-	
+
 	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy, IPreciseDeterminationStrategy preciseStrategy, INonGroupedKillerChanceModifierStrategy killerStrategy, IDropCalculationStrategy dropCalculationStrategy)
 	{
 		_itemId = itemId;
@@ -83,9 +82,9 @@ public final class GeneralDropItem implements IDropItem
 		_preciseStrategy = preciseStrategy;
 		_killerStrategy = killerStrategy;
 		_dropCalculationStrategy = dropCalculationStrategy;
-		
+
 	}
-	
+
 	/**
 	 * @return the _amountStrategy
 	 */
@@ -93,7 +92,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _amountStrategy;
 	}
-	
+
 	/**
 	 * @return the _chanceStrategy
 	 */
@@ -101,7 +100,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _chanceStrategy;
 	}
-	
+
 	/**
 	 * @return the _preciseStrategy
 	 */
@@ -109,7 +108,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _preciseStrategy;
 	}
-	
+
 	/**
 	 * @return the _killerStrategy
 	 */
@@ -117,7 +116,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _killerStrategy;
 	}
-	
+
 	/**
 	 * @return the _dropCalculationStrategy
 	 */
@@ -125,7 +124,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _dropCalculationStrategy;
 	}
-	
+
 	/**
 	 * Gets the item id
 	 * @return the item id
@@ -134,7 +133,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _itemId;
 	}
-	
+
 	/**
 	 * Gets the base min drop count
 	 * @return the min
@@ -143,7 +142,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _min;
 	}
-	
+
 	/**
 	 * Gets the min drop count modified by server rates
 	 * @param victim the victim who drops the item
@@ -153,7 +152,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return (long) (getMin() * getAmountMultiplier(victim));
 	}
-	
+
 	/**
 	 * Gets the base max drop count
 	 * @return the max
@@ -162,7 +161,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _max;
 	}
-	
+
 	/**
 	 * Gets the max drop count modified by server rates
 	 * @param victim the victim who drops the item
@@ -172,7 +171,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return (long) (getMax() * getAmountMultiplier(victim));
 	}
-	
+
 	/**
 	 * Gets the chance of this drop item.
 	 * @return the chance
@@ -181,7 +180,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _chance;
 	}
-	
+
 	/**
 	 * Gets the general chance to drop this item modified by rates. <br>
 	 * This shall be used in calculating chance within drop groups.
@@ -192,7 +191,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return getChance() * getChanceMultiplier(victim);
 	}
-	
+
 	/**
 	 * Gets the chance of dropping this item for current killer and victim (modified by server rates and another rules based on killer) <br>
 	 * This shall be used to calculate chance outside of drop groups.
@@ -204,7 +203,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return (getKillerChanceModifier(victim, killer) * getChance(victim));
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.l2jserver.gameserver.model.drop.IDropItem#calculateDrops(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
@@ -214,7 +213,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _dropCalculationStrategy.calculateDrops(this, victim, killer);
 	}
-	
+
 	/**
 	 * @return <code>true</code> if chance over 100% should be handled
 	 */
@@ -222,7 +221,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _preciseStrategy.isPreciseCalculated(this);
 	}
-	
+
 	/**
 	 * This handles by default deep blue drop rules. It may also be used to handle another drop chance rules based on killer
 	 * @param victim the victim who drops the item
@@ -233,7 +232,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _killerStrategy.getKillerChanceModifier(this, victim, killer);
 	}
-	
+
 	/**
 	 * This gets standard server rates for this item
 	 * @param victim who drops the item
@@ -243,7 +242,7 @@ public final class GeneralDropItem implements IDropItem
 	{
 		return _amountStrategy.getAmountMultiplier(this, victim);
 	}
-	
+
 	/**
 	 * This gets standard server rates for this item
 	 * @param victim who drops the item
