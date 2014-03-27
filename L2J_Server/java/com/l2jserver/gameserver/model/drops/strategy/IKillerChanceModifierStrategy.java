@@ -32,7 +32,7 @@ public interface IKillerChanceModifierStrategy extends INonGroupedKillerChanceMo
 {
 	public static final IKillerChanceModifierStrategy DEFAULT_STRATEGY = new IKillerChanceModifierStrategy()
 	{
-
+		
 		@Override
 		public double getKillerChanceModifier(IDropItem item, L2Character victim, L2Character killer)
 		{
@@ -40,27 +40,27 @@ public interface IKillerChanceModifierStrategy extends INonGroupedKillerChanceMo
 			if ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID)
 			{
 				// FIXME: Config?
-				return Math.max(0, Math.min(1, (levelDifference * 0.15) + 1)) * 100;
+				return Math.max(0, Math.min(1, (levelDifference * 0.15) + 1));
 			}
 			else if (Config.DEEPBLUE_DROP_RULES)
 			{
-
+				
 				return Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
 			}
 			return 1;
 		}
-
+		
 		@Override
 		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
 		{
 			// FIXME: default method in JDK8
 			return getKillerChanceModifier((IDropItem) item, victim, killer);
 		}
-
+		
 	};
 	public static final INonGroupedKillerChanceModifierStrategy DEFAULT_NONGROUP_STRATEGY = new INonGroupedKillerChanceModifierStrategy()
 	{
-
+		
 		@Override
 		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
 		{
@@ -69,7 +69,7 @@ public interface IKillerChanceModifierStrategy extends INonGroupedKillerChanceMo
 				int levelDifference = victim.getLevel() - killer.getLevel();
 				if (item.getItemId() == Inventory.ADENA_ID)
 				{
-
+					
 					return Util.map(levelDifference, -Config.DROP_ADENA_MAX_LEVEL_DIFFERENCE, -Config.DROP_ADENA_MIN_LEVEL_DIFFERENCE, Config.DROP_ADENA_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
 				}
 				return Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
@@ -77,23 +77,23 @@ public interface IKillerChanceModifierStrategy extends INonGroupedKillerChanceMo
 			return 1;
 		}
 	};
-
+	
 	IKillerChanceModifierStrategy NO_RULES = new IKillerChanceModifierStrategy()
 	{
-
+		
 		@Override
 		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
 		{
 			return 1;
 		}
-
+		
 		@Override
 		public double getKillerChanceModifier(IDropItem item, L2Character victim, L2Character killer)
 		{
 			return 1;
 		}
-
+		
 	};
-
+	
 	public double getKillerChanceModifier(IDropItem item, L2Character victim, L2Character killer);
 }
