@@ -29,75 +29,49 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
  */
 public interface IChanceMultiplierStrategy
 {
-	public static final IChanceMultiplierStrategy DROP = Foo.DEFAULT_STRATEGY(Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER);
-	public static final IChanceMultiplierStrategy SPOIL = Foo.DEFAULT_STRATEGY(Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
-	public static final IChanceMultiplierStrategy STATIC = new IChanceMultiplierStrategy()
+	public static final IChanceMultiplierStrategy DROP = DEFAULT_STRATEGY(Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER);
+	public static final IChanceMultiplierStrategy SPOIL = DEFAULT_STRATEGY(Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER);
+	public static final IChanceMultiplierStrategy STATIC = (item, victim) -> 1;
+	
+	public static final IChanceMultiplierStrategy QUEST = (item, victim) ->
 	{
-		
-		@Override
-		public double getChanceMultiplier(GeneralDropItem item, L2Character victim)
+		double championmult;
+		if ((item.getItemId() == Inventory.ADENA_ID) || (item.getItemId() == Inventory.ANCIENT_ADENA_ID))
 		{
-			return 1;
+			championmult = Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
 		}
+		else
+		{
+			championmult = Config.L2JMOD_CHAMPION_REWARDS;
+		}
+		
+		return (Config.L2JMOD_CHAMPION_ENABLE && (victim != null) && victim.isChampion()) ? (Config.RATE_QUEST_DROP * championmult) : Config.RATE_QUEST_DROP;
 	};
 	
-	public static final IChanceMultiplierStrategy QUEST = new IChanceMultiplierStrategy()
+	public static IChanceMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
 	{
-		
-		@Override
-		public double getChanceMultiplier(GeneralDropItem item, L2Character victim)
+		return (item, victim) ->
 		{
-			double championmult;
-			if ((item.getItemId() == Inventory.ADENA_ID) || (item.getItemId() == Inventory.ANCIENT_ADENA_ID))
+			float multiplier = 1;
+			Float dropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(item.getItemId());
+			if (dropChanceMultiplier != null)
 			{
-				championmult = Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+				multiplier *= dropChanceMultiplier;
+			}
+			else if (ItemTable.getInstance().getTemplate(item.getItemId()).hasExImmediateEffect())
+			{
+				multiplier *= Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
+			}
+			else if (victim.isRaid())
+			{
+				multiplier *= Config.RATE_RAID_DROP_CHANCE_MULTIPLIER;
 			}
 			else
 			{
-				championmult = Config.L2JMOD_CHAMPION_REWARDS;
+				multiplier *= defaultMultiplier;
 			}
-			
-			return (Config.L2JMOD_CHAMPION_ENABLE && (victim != null) && victim.isChampion()) ? (Config.RATE_QUEST_DROP * championmult) : Config.RATE_QUEST_DROP;
-		}
-	};
-	
-	/**
-	 * Just a wrapper class to work around Java7 limitation. <br>
-	 * FIXME: Unwrap me in JDK8
-	 * @author Battlecruiser
-	 */
-	public static class Foo
-	{
-		public static IChanceMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
-		{
-			return new IChanceMultiplierStrategy()
-			{
-				
-				@Override
-				public double getChanceMultiplier(GeneralDropItem item, L2Character victim)
-				{
-					float multiplier = 1;
-					Float dropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(item.getItemId());
-					if (dropChanceMultiplier != null)
-					{
-						multiplier *= dropChanceMultiplier;
-					}
-					else if (ItemTable.getInstance().getTemplate(item.getItemId()).hasExImmediateEffect())
-					{
-						multiplier *= Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
-					}
-					else if (victim.isRaid())
-					{
-						multiplier *= Config.RATE_RAID_DROP_CHANCE_MULTIPLIER;
-					}
-					else
-					{
-						multiplier *= defaultMultiplier;
-					}
-					return multiplier;
-				}
-			};
-		}
+			return multiplier;
+		};
 	}
 	
 	public double getChanceMultiplier(GeneralDropItem item, L2Character victim);

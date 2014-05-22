@@ -29,59 +29,38 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
  */
 public interface IAmountMultiplierStrategy
 {
-	public static final IAmountMultiplierStrategy DROP = Foo.DEFAULT_STRATEGY(Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER);
-	public static final IAmountMultiplierStrategy SPOIL = Foo.DEFAULT_STRATEGY(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
-	public static final IAmountMultiplierStrategy STATIC = new IAmountMultiplierStrategy()
-	{
-		
-		@Override
-		public double getAmountMultiplier(GeneralDropItem item, L2Character victim)
-		{
-			return 1;
-		}
-	};
+	public static final IAmountMultiplierStrategy DROP = DEFAULT_STRATEGY(Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER);
+	public static final IAmountMultiplierStrategy SPOIL = DEFAULT_STRATEGY(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
+	public static final IAmountMultiplierStrategy STATIC = (item, victim) -> 1;
 	
-	/**
-	 * Just a wrapper class to work around Java7 limitation. <br>
-	 * FIXME: Unwrap me in JDK8
-	 * @author Battlecruiser
-	 */
-	public static class Foo
+	public static IAmountMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
 	{
-		public static IAmountMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
+		return (item, victim) ->
 		{
-			return new IAmountMultiplierStrategy()
+			double multiplier = 1;
+			if (victim.isChampion())
 			{
-				
-				@Override
-				public double getAmountMultiplier(GeneralDropItem item, L2Character victim)
-				{
-					double multiplier = 1;
-					if (victim.isChampion())
-					{
-						multiplier *= item.getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-					}
-					Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(item.getItemId());
-					if (dropChanceMultiplier != null)
-					{
-						multiplier *= dropChanceMultiplier;
-					}
-					else if (ItemTable.getInstance().getTemplate(item.getItemId()).hasExImmediateEffect())
-					{
-						multiplier *= Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER;
-					}
-					else if (victim.isRaid())
-					{
-						multiplier *= Config.RATE_RAID_DROP_AMOUNT_MULTIPLIER;
-					}
-					else
-					{
-						multiplier *= defaultMultiplier;
-					}
-					return multiplier;
-				}
-			};
-		}
+				multiplier *= item.getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+			}
+			Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(item.getItemId());
+			if (dropChanceMultiplier != null)
+			{
+				multiplier *= dropChanceMultiplier;
+			}
+			else if (ItemTable.getInstance().getTemplate(item.getItemId()).hasExImmediateEffect())
+			{
+				multiplier *= Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER;
+			}
+			else if (victim.isRaid())
+			{
+				multiplier *= Config.RATE_RAID_DROP_AMOUNT_MULTIPLIER;
+			}
+			else
+			{
+				multiplier *= defaultMultiplier;
+			}
+			return multiplier;
+		};
 	}
 	
 	public double getAmountMultiplier(GeneralDropItem item, L2Character victim);

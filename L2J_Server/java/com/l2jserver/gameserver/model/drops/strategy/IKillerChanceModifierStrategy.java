@@ -30,70 +30,43 @@ import com.l2jserver.gameserver.util.Util;
  */
 public interface IKillerChanceModifierStrategy extends INonGroupedKillerChanceModifierStrategy
 {
-	public static final IKillerChanceModifierStrategy DEFAULT_STRATEGY = new IKillerChanceModifierStrategy()
+	public static final IKillerChanceModifierStrategy DEFAULT_STRATEGY = (item, victim, killer) ->
 	{
-		
-		@Override
-		public double getKillerChanceModifier(IDropItem item, L2Character victim, L2Character killer)
+		int levelDifference = victim.getLevel() - killer.getLevel();
+		if ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID)
+		{
+			// FIXME: Config?
+			return Math.max(0, Math.min(1, (levelDifference * 0.15) + 1));
+		}
+		else if (Config.DEEPBLUE_DROP_RULES)
+		{
+			
+			return Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
+		}
+		return 1;
+	};
+	public static final INonGroupedKillerChanceModifierStrategy DEFAULT_NONGROUP_STRATEGY = (item, victim, killer) ->
+	{
+		if (((!(victim.isRaid())) && Config.DEEPBLUE_DROP_RULES) || ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID))
 		{
 			int levelDifference = victim.getLevel() - killer.getLevel();
-			if ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID)
-			{
-				// FIXME: Config?
-				return Math.max(0, Math.min(1, (levelDifference * 0.15) + 1));
-			}
-			else if (Config.DEEPBLUE_DROP_RULES)
+			if (item.getItemId() == Inventory.ADENA_ID)
 			{
 				
-				return Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
+				return Util.map(levelDifference, -Config.DROP_ADENA_MAX_LEVEL_DIFFERENCE, -Config.DROP_ADENA_MIN_LEVEL_DIFFERENCE, Config.DROP_ADENA_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
 			}
-			return 1;
+			return Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
 		}
-		
-		@Override
-		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
-		{
-			// FIXME: default method in JDK8
-			return getKillerChanceModifier((IDropItem) item, victim, killer);
-		}
-		
-	};
-	public static final INonGroupedKillerChanceModifierStrategy DEFAULT_NONGROUP_STRATEGY = new INonGroupedKillerChanceModifierStrategy()
-	{
-		
-		@Override
-		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
-		{
-			if (((!(victim.isRaid())) && Config.DEEPBLUE_DROP_RULES) || ((victim.isRaid()) && Config.DEEPBLUE_DROP_RULES_RAID))
-			{
-				int levelDifference = victim.getLevel() - killer.getLevel();
-				if (item.getItemId() == Inventory.ADENA_ID)
-				{
-					
-					return Util.map(levelDifference, -Config.DROP_ADENA_MAX_LEVEL_DIFFERENCE, -Config.DROP_ADENA_MIN_LEVEL_DIFFERENCE, Config.DROP_ADENA_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
-				}
-				return Util.map(levelDifference, -Config.DROP_ITEM_MAX_LEVEL_DIFFERENCE, -Config.DROP_ITEM_MIN_LEVEL_DIFFERENCE, Config.DROP_ITEM_MIN_LEVEL_GAP_CHANCE, 100.0) / 100;
-			}
-			return 1;
-		}
+		return 1;
 	};
 	
-	IKillerChanceModifierStrategy NO_RULES = new IKillerChanceModifierStrategy()
-	{
-		
-		@Override
-		public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
-		{
-			return 1;
-		}
-		
-		@Override
-		public double getKillerChanceModifier(IDropItem item, L2Character victim, L2Character killer)
-		{
-			return 1;
-		}
-		
-	};
+	IKillerChanceModifierStrategy NO_RULES = (item, victim, killer) -> 1;
 	
 	public double getKillerChanceModifier(IDropItem item, L2Character victim, L2Character killer);
+	
+	@Override
+	public default double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer)
+	{
+		return getKillerChanceModifier((IDropItem) item, victim, killer);
+	}
 }
