@@ -37,67 +37,56 @@ public interface IGroupedItemDropCalculationStrategy
 	/**
 	 * The default strategy used in L2J to calculate drops.
 	 */
-	public static final IGroupedItemDropCalculationStrategy DEFAULT_STRATEGY = new IGroupedItemDropCalculationStrategy()
+	public static final IGroupedItemDropCalculationStrategy DEFAULT_STRATEGY = (dropItem, victim, killer) ->
 	{
-		
-		@Override
-		public List<ItemHolder> calculateDrops(final GroupedGeneralDropItem dropItem, L2Character victim, L2Character killer)
+		if (dropItem.getItems().size() == 1)
 		{
-			if (dropItem.getItems().size() == 1)
-			{
-				
-				final GeneralDropItem item = dropItem.getItems().iterator().next();
-				return new GeneralDropItem(item.getItemId(), item.getMin(), item.getMax(), (item.getChance() * dropItem.getChance()) / 100, item.getAmountStrategy(), item.getChanceStrategy(), dropItem.getPreciseStrategy(), dropItem.getKillerChanceModifierStrategy(), item.getDropCalculationStrategy()).calculateDrops(victim, killer);
-			}
 			
-			GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer);
-			if (normalized.getChance() > (Rnd.nextDouble() * 100))
-			{
-				double random = (Rnd.nextDouble() * 100);
-				double totalChance = 0;
-				for (GeneralDropItem item : normalized.getItems())
-				{
-					// Grouped item chance rates should not be modified.
-					totalChance += item.getChance();
-					if (totalChance > random)
-					{
-						int amountMultiply = 1;
-						if (dropItem.isPreciseCalculated() && (normalized.getChance() >= 100))
-						{
-							amountMultiply = (int) (normalized.getChance()) / 100;
-							if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))
-							{
-								amountMultiply++;
-							}
-						}
-						
-						long amount = Rnd.get(item.getMin(victim) * amountMultiply, item.getMax(victim) * amountMultiply);
-						
-						return Collections.singletonList(new ItemHolder(item.getItemId(), amount));
-					}
-				}
-			}
-			return null;
+			final GeneralDropItem item1 = dropItem.getItems().iterator().next();
+			return new GeneralDropItem(item1.getItemId(), item1.getMin(), item1.getMax(), (item1.getChance() * dropItem.getChance()) / 100, item1.getAmountStrategy(), item1.getChanceStrategy(), dropItem.getPreciseStrategy(), dropItem.getKillerChanceModifierStrategy(), item1.getDropCalculationStrategy()).calculateDrops(victim, killer);
 		}
 		
+		GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer);
+		if (normalized.getChance() > (Rnd.nextDouble() * 100))
+		{
+			double random = (Rnd.nextDouble() * 100);
+			double totalChance = 0;
+			for (GeneralDropItem item2 : normalized.getItems())
+			{
+				// Grouped item chance rates should not be modified.
+				totalChance += item2.getChance();
+				if (totalChance > random)
+				{
+					int amountMultiply = 1;
+					if (dropItem.isPreciseCalculated() && (normalized.getChance() >= 100))
+					{
+						amountMultiply = (int) (normalized.getChance()) / 100;
+						if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))
+						{
+							amountMultiply++;
+						}
+					}
+					
+					long amount = Rnd.get(item2.getMin(victim) * amountMultiply, item2.getMax(victim) * amountMultiply);
+					
+					return Collections.singletonList(new ItemHolder(item2.getItemId(), amount));
+				}
+			}
+		}
+		return null;
 	};
 	
 	/**
 	 * This strategy calculates a group's drop by calculating drops of its individual items and merging its results.
 	 */
-	public static final IGroupedItemDropCalculationStrategy DISBAND_GROUP = new IGroupedItemDropCalculationStrategy()
+	public static final IGroupedItemDropCalculationStrategy DISBAND_GROUP = (item, victim, killer) ->
 	{
-		
-		@Override
-		public List<ItemHolder> calculateDrops(GroupedGeneralDropItem item, L2Character victim, L2Character killer)
+		List<ItemHolder> dropped = new ArrayList<>();
+		for (IDropItem dropItem : item.extractMe())
 		{
-			List<ItemHolder> dropped = new ArrayList<>();
-			for (IDropItem dropItem : item.extractMe())
-			{
-				dropped.addAll(dropItem.calculateDrops(victim, killer));
-			}
-			return dropped.isEmpty() ? null : dropped;
+			dropped.addAll(dropItem.calculateDrops(victim, killer));
 		}
+		return dropped.isEmpty() ? null : dropped;
 	};
 	
 	public List<ItemHolder> calculateDrops(GroupedGeneralDropItem item, L2Character victim, L2Character killer);

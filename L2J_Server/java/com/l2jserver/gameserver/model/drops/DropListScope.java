@@ -29,67 +29,16 @@ import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrate
  */
 public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory
 {
-	DEATH(new IDropItemFactory()
-	{
-		
-		@Override
-		public IDropItem newDropItem(int itemId, long min, long max, double chance)
-		{
-			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.DROP, IChanceMultiplierStrategy.DROP);
-		}
-		
-	}, new IGroupedDropItemFactory()
-	{
-
-		@Override
-		public GroupedGeneralDropItem newGroupedDropItem(double chance)
-		{
-			return new GroupedGeneralDropItem(chance);
-		}
-		
-	}),
-	CORPSE(new IDropItemFactory()
-	{
-		
-		@Override
-		public IDropItem newDropItem(int itemId, long min, long max, double chance)
-		{
-			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.SPOIL, IChanceMultiplierStrategy.SPOIL);
-		}
-		
-	}, DEATH),
-
+	DEATH((itemId, min, max, chance) -> new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.DROP, IChanceMultiplierStrategy.DROP), chance -> new GroupedGeneralDropItem(chance)),
+	CORPSE((itemId, min, max, chance) -> new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.SPOIL, IChanceMultiplierStrategy.SPOIL), DEATH),
+	
 	/**
 	 * This droplist scope isn't affected by ANY rates, nor Champion, etc...
 	 */
-	STATIC(new IDropItemFactory()
-	{
-		
-		@Override
-		public IDropItem newDropItem(int itemId, long min, long max, double chance)
-		{
-			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.STATIC, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES);
-		}
-		
-	}, new IGroupedDropItemFactory()
-	{
-
-		@Override
-		public GroupedGeneralDropItem newGroupedDropItem(double chance)
-		{
-			return new GroupedGeneralDropItem(chance, IGroupedItemDropCalculationStrategy.DEFAULT_STRATEGY, IKillerChanceModifierStrategy.NO_RULES, IPreciseDeterminationStrategy.ALWAYS);
-		}
-		
-	}),
-	QUEST(new IDropItemFactory()
-	{
-		
-		@Override
-		public IDropItem newDropItem(int itemId, long min, long max, double chance)
-		{
-			return new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.QUEST, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES);
-		}
-	}, STATIC);
+	STATIC(
+		(itemId, min, max, chance) -> new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.STATIC, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES),
+		chance -> new GroupedGeneralDropItem(chance, IGroupedItemDropCalculationStrategy.DEFAULT_STRATEGY, IKillerChanceModifierStrategy.NO_RULES, IPreciseDeterminationStrategy.ALWAYS)),
+	QUEST((itemId, min, max, chance) -> new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.QUEST, IPreciseDeterminationStrategy.ALWAYS, IKillerChanceModifierStrategy.NO_RULES), STATIC);
 	
 	private final IDropItemFactory _factory;
 	private final IGroupedDropItemFactory _groupFactory;

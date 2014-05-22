@@ -31,31 +31,26 @@ import com.l2jserver.util.Rnd;
  */
 public interface IDropCalculationStrategy
 {
-	public static final IDropCalculationStrategy DEFAULT_STRATEGY = new IDropCalculationStrategy()
+	public static final IDropCalculationStrategy DEFAULT_STRATEGY = (item, victim, killer) ->
 	{
-		
-		@Override
-		public List<ItemHolder> calculateDrops(GeneralDropItem item, L2Character victim, L2Character killer)
+		if (item.getChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
-			if (item.getChance(victim, killer) > (Rnd.nextDouble() * 100))
+			int amountMultiply = 1;
+			if (item.isPreciseCalculated() && (item.getChance(victim, killer) > 100))
 			{
-				int amountMultiply = 1;
-				if (item.isPreciseCalculated() && (item.getChance(victim, killer) > 100))
+				amountMultiply = (int) item.getChance(victim, killer) / 100;
+				if ((item.getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
 				{
-					amountMultiply = (int) item.getChance(victim, killer) / 100;
-					if ((item.getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
-					{
-						amountMultiply++;
-					}
+					amountMultiply++;
 				}
-				
-				long amount = Rnd.get(item.getMin(victim) * amountMultiply, item.getMax(victim) * amountMultiply);
-				
-				return Collections.singletonList(new ItemHolder(item.getItemId(), amount));
 			}
 			
-			return null;
+			long amount = Rnd.get(item.getMin(victim) * amountMultiply, item.getMax(victim) * amountMultiply);
+			
+			return Collections.singletonList(new ItemHolder(item.getItemId(), amount));
 		}
+		
+		return null;
 	};
 	
 	public List<ItemHolder> calculateDrops(GeneralDropItem item, L2Character victim, L2Character killer);
