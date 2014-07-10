@@ -35,7 +35,7 @@ import com.l2jserver.util.Rnd;
 public interface IGroupedItemDropCalculationStrategy
 {
 	/**
-	 * The default strategy used in L2J to calculate drops.
+	 * The default strategy used in L2J to calculate drops. When the group's chance raises over 100% and group has precise calculation, the dropped item's amount increases.
 	 */
 	public static final IGroupedItemDropCalculationStrategy DEFAULT_STRATEGY = (dropItem, victim, killer) ->
 	{
@@ -53,7 +53,7 @@ public interface IGroupedItemDropCalculationStrategy
 			double totalChance = 0;
 			for (GeneralDropItem item2 : normalized.getItems())
 			{
-				// Grouped item chance rates should not be modified.
+				// Grouped item chance rates should not be modified (the whole magic was already done by normalizing thus the items' chance sum is always 100%).
 				totalChance += item2.getChance();
 				if (totalChance > random)
 				{
@@ -85,6 +85,34 @@ public interface IGroupedItemDropCalculationStrategy
 		for (IDropItem dropItem : item.extractMe())
 		{
 			dropped.addAll(dropItem.calculateDrops(victim, killer));
+		}
+		return dropped.isEmpty() ? null : dropped;
+	};
+	
+	/**
+	 * This strategy when group has precise calculation rolls multiple times over group to determine drops when group's chance raises over 100% instead of just multiplying the dropped item's amount. Thus it can produce different items from group at once.
+	 */
+	public static final IGroupedItemDropCalculationStrategy PRECISE_MULTIPLE_GROUP_ROLLS = (item, victim, killer) ->
+	{
+		if (!item.isPreciseCalculated())
+		{
+			// if item hasn't precise calculation there's no change from DEFAULT_STRATEGY
+			return DEFAULT_STRATEGY.calculateDrops(item, victim, victim);
+		}
+		GroupedGeneralDropItem newItem = new GroupedGeneralDropItem(item.getChance(), DEFAULT_STRATEGY, item.getKillerChanceModifierStrategy(), IPreciseDeterminationStrategy.NEVER);
+		newItem.setItems(item.getItems());
+		GroupedGeneralDropItem normalized = newItem.normalizeMe(victim, killer);
+		// Let's determine the number of rolls.
+		int rolls = (int) (normalized.getChance() / 100);
+		if ((Rnd.nextDouble() * 100) < (normalized.getChance() % 100))
+		{
+			rolls++;
+		}
+		List<ItemHolder> dropped = new ArrayList<>();
+		for (; rolls > 0; rolls--)
+		{
+			// As further normalizing on already normalized drop group does nothing, we can just pass the calculation to DEFAULT_STRATEGY with precise calculation disabled as we handle it.
+			dropped.addAll(normalized.calculateDrops(victim, killer));
 		}
 		return dropped.isEmpty() ? null : dropped;
 	};
