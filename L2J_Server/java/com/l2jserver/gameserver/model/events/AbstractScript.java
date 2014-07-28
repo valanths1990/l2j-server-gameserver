@@ -2427,7 +2427,7 @@ public abstract class AbstractScript extends ManagedScript
 		giveItems(player, items);
 		return true;
 	}
-
+	
 	/**
 	 * Gives an item to the player
 	 * @param player
@@ -2441,7 +2441,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		
 	}
-
+	
 	/**
 	 * Gives an item to the player
 	 * @param player
@@ -2459,7 +2459,7 @@ public abstract class AbstractScript extends ManagedScript
 		giveItems(player, item.getId(), Math.min(maxToGive, item.getCount()));
 		return true;
 	}
-
+	
 	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit, boolean playSound)
 	{
 		boolean drop = giveItems(player, item, limit);
@@ -2469,7 +2469,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return drop;
 	}
-
+	
 	/**
 	 * @param player
 	 * @param items
@@ -2485,7 +2485,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return b;
 	}
-
+	
 	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit, boolean playSound)
 	{
 		boolean drop = giveItems(player, items, limit);
@@ -2495,7 +2495,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return drop;
 	}
-
+	
 	/**
 	 * @param player
 	 * @param items
@@ -2519,7 +2519,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return b;
 	}
-
+	
 	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
 	{
 		boolean drop = giveItems(player, items, limit);
@@ -2529,7 +2529,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return drop;
 	}
-
+	
 	/**
 	 * @param player
 	 * @param item
@@ -2541,7 +2541,7 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		return giveItems(player, item.calculateDrops(victim, player), limit);
 	}
-
+	
 	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit, boolean playSound)
 	{
 		boolean drop = giveItems(player, item, victim, limit);
@@ -2551,7 +2551,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return drop;
 	}
-
+	
 	/**
 	 * @param player
 	 * @param item
@@ -2563,17 +2563,17 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		return giveItems(player, item.calculateDrops(victim, player), limit);
 	}
-
+	
 	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit, boolean playSound)
 	{
-		boolean drop = giveItems(player, item, victim, limit, playSound);
+		boolean drop = giveItems(player, item, victim, limit);
 		if (drop && playSound)
 		{
 			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2589,7 +2589,7 @@ public abstract class AbstractScript extends ManagedScript
 		giveItems(rewardedCounts, playSound);
 		return rewardedCounts;
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2602,7 +2602,7 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		return distributeItems(players, items, new StaticMap<Integer, Long>(limit), playSound);
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2624,7 +2624,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return returnMap;
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2639,7 +2639,7 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2654,7 +2654,7 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2696,7 +2696,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return distributeItems(players, toDrop, killer, victim, limit, playSound);
 	}
-
+	
 	/**
 	 * Distributes items to players equally
 	 * @param players the players to whom the items will be distributed
@@ -2712,7 +2712,7 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		return distributeItems(players, items, killer, victim, new StaticMap<Integer, Long>(limit), playSound, smartDrop);
 	}
-
+	
 	/**
 	 * @param players
 	 * @param items
@@ -2775,7 +2775,7 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		return rewardedCounts;
 	}
-
+	
 	/**
 	 * Distributes items to players
 	 * @param rewardedCounts A scheme of distribution items (the structure is: Map<player Map<itemId, count>>)
@@ -2801,7 +2801,7 @@ public abstract class AbstractScript extends ManagedScript
 			}
 		}
 	}
-
+	
 	/**
 	 * Take an amount of a specified item from player's inventory.
 	 * @param player the player whose item to take
