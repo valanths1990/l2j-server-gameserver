@@ -137,149 +137,13 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.scripting.ManagedScript;
 import com.l2jserver.gameserver.util.MinionList;
 import com.l2jserver.util.Rnd;
+import com.l2jserver.util.Util;
 
 /**
  * @author UnAfraid
  */
 public abstract class AbstractScript extends ManagedScript
 {
-	/**
-	 * A static map, which always gets same value
-	 * @author Battlecruiser
-	 * @param <K>
-	 * @param <V>
-	 */
-	private static class StaticMap<K, V> implements Map<K, V>
-	{
-		
-		private final V _value;
-		
-		public StaticMap(V value)
-		{
-			_value = value;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#clear()
-		 */
-		@Override
-		public void clear()
-		{
-			// do nothing
-			
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#containsKey(java.lang.Object)
-		 */
-		@Override
-		public boolean containsKey(Object key)
-		{
-			return key != null;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#containsValue(java.lang.Object)
-		 */
-		@Override
-		public boolean containsValue(Object value)
-		{
-			return _value.equals(value);
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#entrySet()
-		 */
-		@Override
-		public Set<Entry<K, V>> entrySet()
-		{
-			throw new UnsupportedOperationException();
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#get(java.lang.Object)
-		 */
-		@Override
-		public V get(Object key)
-		{
-			return key == null ? null : _value;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#isEmpty()
-		 */
-		@Override
-		public boolean isEmpty()
-		{
-			return false;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#keySet()
-		 */
-		@Override
-		public Set<K> keySet()
-		{
-			throw new UnsupportedOperationException();
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
-		 */
-		@Override
-		public V put(K key, V value)
-		{
-			return value;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#putAll(java.util.Map)
-		 */
-		@Override
-		public void putAll(Map<? extends K, ? extends V> arg0)
-		{
-			// do nothing
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#remove(java.lang.Object)
-		 */
-		@Override
-		public V remove(Object arg0)
-		{
-			return _value;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#size()
-		 */
-		@Override
-		public int size()
-		{
-			return 1;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Map#values()
-		 */
-		@Override
-		public Collection<V> values()
-		{
-			return Collections.singleton(_value);
-		}
-	}
 	
 	protected static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
 	private final Map<ListenerRegisterType, Set<Integer>> _registeredIds = new ConcurrentHashMap<>();
@@ -2504,23 +2368,40 @@ public abstract class AbstractScript extends ManagedScript
 	 */
 	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit)
 	{
+		return giveItems(player, items, Util.mapToFunction(limit));
+	}
+	
+	/**
+	 * @param player
+	 * @param items
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Function<Integer, Long> limit)
+	{
 		boolean b = false;
 		for (ItemHolder item : items)
 		{
-			if ((limit != null) && limit.containsKey(item.getId()))
+			if (limit != null)
 			{
-				b |= giveItems(player, item, limit.get(item.getId()));
+				Long longLimit = limit.apply(item.getId());
+				// null -> no limit specified for that item id. This trick is to avoid limit.apply() be called twice (once for the null check)
+				if (longLimit != null)
+				{
+					b |= giveItems(player, item, longLimit);
+					continue; // the item is given, continue with next
+				}
 			}
-			else
-			{
-				b = true;
-				giveItems(player, item);
-			}
+			// da BIG else
+			// no limit specified here (either limit or limit.apply(item.getId()) is null)
+			b = true;
+			giveItems(player, item);
+			
 		}
 		return b;
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Function<Integer, Long> limit, boolean playSound)
 	{
 		boolean drop = giveItems(player, items, limit);
 		if (drop && playSound)
@@ -2528,6 +2409,11 @@ public abstract class AbstractScript extends ManagedScript
 			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
+	{
+		return giveItems(player, items, Util.mapToFunction(limit), playSound);
 	}
 	
 	/**
@@ -2564,7 +2450,24 @@ public abstract class AbstractScript extends ManagedScript
 		return giveItems(player, item.calculateDrops(victim, player), limit);
 	}
 	
+	/**
+	 * @param player
+	 * @param item
+	 * @param victim the character that "dropped" the item
+	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
+	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
+	 */
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Function<Integer, Long> limit)
+	{
+		return giveItems(player, item.calculateDrops(victim, player), limit);
+	}
+	
 	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit, boolean playSound)
+	{
+		return giveItems(player, item, victim, Util.mapToFunction(limit), playSound);
+	}
+	
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Function<Integer, Long> limit, boolean playSound)
 	{
 		boolean drop = giveItems(player, item, victim, limit);
 		if (drop && playSound)
@@ -2582,7 +2485,7 @@ public abstract class AbstractScript extends ManagedScript
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Function<Integer, Long> limit, boolean playSound)
 	{
 		Map<L2PcInstance, Map<Integer, Long>> rewardedCounts = calculateDistribution(players, items, limit);
 		// now give the calculated items to the players
@@ -2598,9 +2501,22 @@ public abstract class AbstractScript extends ManagedScript
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
+	{
+		return distributeItems(players, items, Util.mapToFunction(limit), playSound);
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
 	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, long limit, boolean playSound)
 	{
-		return distributeItems(players, items, new StaticMap<Integer, Long>(limit), playSound);
+		return distributeItems(players, items, t -> limit, playSound);
 	}
 	
 	/**
@@ -2623,6 +2539,21 @@ public abstract class AbstractScript extends ManagedScript
 			}
 		}
 		return returnMap;
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param killer the one who "kills" the victim
+	 * @param victim the character that "dropped" the item
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @return the counts of each items given to each player
+	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, Function<Integer, Long> limit, boolean playSound)
+	{
+		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
 	}
 	
 	/**
@@ -2663,10 +2594,10 @@ public abstract class AbstractScript extends ManagedScript
 	 * @param victim the character that "dropped" the item
 	 * @param limit the limit what single player can have of each item
 	 * @param playSound if to play sound if a player gets at least one item
-	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
+	 * @param smartDrop true if to not calculate a drop, which can't be given to any player 'cause of limits
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound, boolean smartDrop)
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Function<Integer, Long> limit, boolean playSound, boolean smartDrop)
 	{
 		GroupedGeneralDropItem toDrop;
 		if (smartDrop)
@@ -2678,7 +2609,8 @@ public abstract class AbstractScript extends ManagedScript
 				GeneralDropItem item = it.next();
 				for (L2PcInstance player : players)
 				{
-					if (player.getInventory().getInventoryItemCount(item.getItemId(), -1, true) < limit.get(item.getItemId()))
+					int itemId = item.getItemId();
+					if (player.getInventory().getInventoryItemCount(itemId, -1, true) < avoidNull(limit, itemId))
 					{
 						// we can give this item to this player
 						continue itemLoop;
@@ -2708,9 +2640,25 @@ public abstract class AbstractScript extends ManagedScript
 	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
 	 * @return the counts of each items given to each player
 	 */
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound, boolean smartDrop)
+	{
+		return distributeItems(players, items, killer, victim, Util.mapToFunction(limit), playSound, smartDrop);
+	}
+	
+	/**
+	 * Distributes items to players equally
+	 * @param players the players to whom the items will be distributed
+	 * @param items the items to distribute
+	 * @param killer the one who "kills" the victim
+	 * @param victim the character that "dropped" the item
+	 * @param limit the limit what single player can have of each item
+	 * @param playSound if to play sound if a player gets at least one item
+	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
+	 * @return the counts of each items given to each player
+	 */
 	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound, boolean smartDrop)
 	{
-		return distributeItems(players, items, killer, victim, new StaticMap<Integer, Long>(limit), playSound, smartDrop);
+		return distributeItems(players, items, killer, victim, t -> limit, playSound, smartDrop);
 	}
 	
 	/**
@@ -2719,7 +2667,7 @@ public abstract class AbstractScript extends ManagedScript
 	 * @param limit
 	 * @return
 	 */
-	private static Map<L2PcInstance, Map<Integer, Long>> calculateDistribution(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit)
+	private static Map<L2PcInstance, Map<Integer, Long>> calculateDistribution(Collection<L2PcInstance> players, Collection<ItemHolder> items, Function<Integer, Long> limit)
 	{
 		Map<L2PcInstance, Map<Integer, Long>> rewardedCounts = new HashMap<>();
 		for (L2PcInstance player : players)
@@ -2740,7 +2688,7 @@ public abstract class AbstractScript extends ManagedScript
 					{
 						rewardedCounts.get(player).put(item.getId(), 0L);
 					}
-					long maxGive = limit.get(item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
+					long maxGive = avoidNull(limit, item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
 					long toGive = equaldist;
 					if (equaldist >= maxGive)
 					{
@@ -2762,7 +2710,8 @@ public abstract class AbstractScript extends ManagedScript
 					break;
 				}
 				L2PcInstance player = toDist.get(getRandom(toDist.size()));
-				long maxGive = limit.get(item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
+				// avoid null return
+				long maxGive = avoidNull(limit, item.getId()) - limit.apply(item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
 				if (maxGive > 0)
 				{
 					// we can add an item to player
@@ -2774,6 +2723,19 @@ public abstract class AbstractScript extends ManagedScript
 			}
 		}
 		return rewardedCounts;
+	}
+	
+	/**
+	 * This function is for avoidance null returns in function limits
+	 * @param <T> the type of function arg
+	 * @param function the function
+	 * @param arg the argument
+	 * @return {@link Long#MAX_VALUE} if function.apply(arg) is null, function.apply(arg) otherwise
+	 */
+	private static <T> long avoidNull(Function<T, Long> function, T arg)
+	{
+		Long longLimit = function.apply(arg);
+		return longLimit == null ? Long.MAX_VALUE : longLimit;
 	}
 	
 	/**
