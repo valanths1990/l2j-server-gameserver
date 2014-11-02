@@ -16,54 +16,57 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * @author UnAfraid
  */
-public class FuncAtkEvasion extends Func
+public class FuncAtkEvasion extends AbstractFunction
 {
 	private static final FuncAtkEvasion _fae_instance = new FuncAtkEvasion();
 	
-	public static Func getInstance()
+	public static AbstractFunction getInstance()
 	{
 		return _fae_instance;
 	}
 	
 	private FuncAtkEvasion()
 	{
-		super(Stats.EVASION_RATE, 0x10, null, 0);
+		super(Stats.EVASION_RATE, 0x10, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		final int level = env.getCharacter().getLevel();
-		if (env.getCharacter().isPlayer())
+		final int level = effector.getLevel();
+		double value = initVal;
+		if (effector.isPlayer())
 		{
 			// [Square(DEX)] * 6 + lvl;
-			env.addValue((Math.sqrt(env.getCharacter().getDEX()) * 6) + level);
+			value += (Math.sqrt(effector.getDEX()) * 6) + level;
 			if (level > 77)
 			{
-				env.addValue(level - 77);
+				value += level - 77;
 			}
 			if (level > 69)
 			{
-				env.addValue(level - 69);
+				value += level - 69;
 			}
 		}
 		else
 		{
 			// [Square(DEX)] * 6 + lvl;
-			env.addValue((Math.sqrt(env.getCharacter().getDEX()) * 6) + level);
+			value += (Math.sqrt(effector.getDEX()) * 6) + level;
 			if (level > 69)
 			{
-				env.addValue((level - 69) + 2);
+				value += (level - 69) + 2;
 			}
 		}
+		return value;
 	}
 }

@@ -132,8 +132,8 @@ import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.AbnormalType;
 import com.l2jserver.gameserver.model.skills.EffectScope;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 
 /**
  * @author mkizub
@@ -239,11 +239,6 @@ public abstract class DocumentBase
 					attachFunc(n, template, "Mul", condition);
 					break;
 				}
-				case "basemul":
-				{
-					attachFunc(n, template, "BaseMul", condition);
-					break;
-				}
 				case "div":
 				{
 					attachFunc(n, template, "Div", condition);
@@ -297,20 +292,20 @@ public abstract class DocumentBase
 			value = Double.parseDouble(valueString);
 		}
 		
-		int ord = Integer.decode(getValue(order, template));
-		Condition applayCond = parseCondition(n.getFirstChild(), template);
-		FuncTemplate ft = new FuncTemplate(attachCond, applayCond, name, stat, ord, value);
+		final int ord = Integer.decode(getValue(order, template));
+		final Condition applayCond = parseCondition(n.getFirstChild(), template);
+		final FuncTemplate ft = new FuncTemplate(attachCond, applayCond, name, stat, ord, value);
 		if (template instanceof L2Item)
 		{
 			((L2Item) template).attach(ft);
 		}
-		else if (template instanceof Skill)
-		{
-			((Skill) template).attach(ft);
-		}
 		else if (template instanceof AbstractEffect)
 		{
 			((AbstractEffect) template).attach(ft);
+		}
+		else
+		{
+			throw new RuntimeException("Attaching stat to a non-effect template!!!");
 		}
 	}
 	
@@ -341,7 +336,7 @@ public abstract class DocumentBase
 		parseTemplate(n, effect);
 		if (template instanceof L2Item)
 		{
-			((L2Item) template).attach(effect);
+			_log.severe("Item " + template + " with effects!!!");
 		}
 		else if (template instanceof Skill)
 		{
@@ -908,7 +903,7 @@ public abstract class DocumentBase
 				case "insidezoneid":
 				{
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
-					ArrayList<Integer> array = new ArrayList<>(st.countTokens());
+					List<Integer> array = new ArrayList<>(st.countTokens());
 					while (st.hasMoreTokens())
 					{
 						String item = st.nextToken().trim();
@@ -1004,7 +999,7 @@ public abstract class DocumentBase
 				case "class_id_restriction":
 				{
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
-					ArrayList<Integer> array = new ArrayList<>(st.countTokens());
+					List<Integer> array = new ArrayList<>(st.countTokens());
 					while (st.hasMoreTokens())
 					{
 						String item = st.nextToken().trim();
@@ -1088,7 +1083,7 @@ public abstract class DocumentBase
 				case "npcid":
 				{
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
-					ArrayList<Integer> array = new ArrayList<>(st.countTokens());
+					List<Integer> array = new ArrayList<>(st.countTokens());
 					while (st.hasMoreTokens())
 					{
 						String item = st.nextToken().trim();

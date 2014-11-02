@@ -21,7 +21,9 @@ package com.l2jserver.gameserver.model.conditions;
 import java.util.Set;
 
 import com.l2jserver.gameserver.enums.CategoryType;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * Condition Category Type implementation.
@@ -37,11 +39,11 @@ public class ConditionCategoryType extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		for (CategoryType type : _categoryTypes)
 		{
-			if (env.getCharacter().isInCategory(type))
+			if (effector.isInCategory(type))
 			{
 				return true;
 			}

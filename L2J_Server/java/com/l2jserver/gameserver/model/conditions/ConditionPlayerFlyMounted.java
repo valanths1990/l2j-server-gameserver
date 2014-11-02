@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerFlyMounted.
@@ -38,8 +40,8 @@ public class ConditionPlayerFlyMounted extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		return (env.getPlayer() != null) ? env.getPlayer().isFlyingMounted() == _val : true;
+		return (effector.getActingPlayer() != null) ? effector.getActingPlayer().isFlyingMounted() == _val : true;
 	}
 }

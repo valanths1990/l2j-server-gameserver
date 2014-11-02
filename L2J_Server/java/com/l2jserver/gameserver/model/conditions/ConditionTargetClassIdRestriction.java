@@ -18,34 +18,36 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionTargetClassIdRestriction.
  */
 public class ConditionTargetClassIdRestriction extends Condition
 {
-	private final ArrayList<Integer> _classIds;
+	private final List<Integer> _classIds;
 	
 	/**
 	 * Instantiates a new condition target class id restriction.
 	 * @param classId the class id
 	 */
-	public ConditionTargetClassIdRestriction(ArrayList<Integer> classId)
+	public ConditionTargetClassIdRestriction(List<Integer> classId)
 	{
 		_classIds = classId;
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (!(env.getTarget() instanceof L2PcInstance))
+		if (!(effected instanceof L2PcInstance))
 		{
 			return false;
 		}
-		return (_classIds.contains(((L2PcInstance) env.getTarget()).getClassId().getId()));
+		return (_classIds.contains((effected.getActingPlayer()).getClassId().getId()));
 	}
 }

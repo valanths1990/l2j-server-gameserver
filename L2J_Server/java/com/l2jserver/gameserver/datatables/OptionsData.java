@@ -30,8 +30,8 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.options.Options;
 import com.l2jserver.gameserver.model.options.OptionsSkillHolder;
 import com.l2jserver.gameserver.model.options.OptionsSkillType;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 
 /**
  * @author UnAfraid

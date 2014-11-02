@@ -21,10 +21,12 @@ package com.l2jserver.gameserver.model.conditions;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Fort;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
 /**
@@ -41,22 +43,27 @@ public class ConditionPlayerCanSummonSiegeGolem extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
+		if ((effector == null) || !effector.isPlayer())
+		{
+			return !_val;
+		}
+		
+		final L2PcInstance player = effector.getActingPlayer();
 		boolean canSummonSiegeGolem = true;
-		if ((env.getPlayer() == null) || env.getPlayer().isAlikeDead() || env.getPlayer().isCursedWeaponEquipped() || (env.getPlayer().getClan() == null))
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || (player.getClan() == null))
 		{
 			canSummonSiegeGolem = false;
 		}
 		
-		final Castle castle = CastleManager.getInstance().getCastle(env.getPlayer());
-		final Fort fort = FortManager.getInstance().getFort(env.getPlayer());
+		final Castle castle = CastleManager.getInstance().getCastle(player);
+		final Fort fort = FortManager.getInstance().getFort(player);
 		if ((castle == null) && (fort == null))
 		{
 			canSummonSiegeGolem = false;
 		}
 		
-		L2PcInstance player = env.getPlayer().getActingPlayer();
 		if (((fort != null) && (fort.getResidenceId() == 0)) || ((castle != null) && (castle.getResidenceId() == 0)))
 		{
 			player.sendPacket(SystemMessageId.INCORRECT_TARGET);
@@ -72,7 +79,7 @@ public class ConditionPlayerCanSummonSiegeGolem extends Condition
 			player.sendPacket(SystemMessageId.INCORRECT_TARGET);
 			canSummonSiegeGolem = false;
 		}
-		else if ((SevenSigns.getInstance().checkSummonConditions(env.getPlayer())))
+		else if ((SevenSigns.getInstance().checkSummonConditions(player)))
 		{
 			canSummonSiegeGolem = false;
 		}

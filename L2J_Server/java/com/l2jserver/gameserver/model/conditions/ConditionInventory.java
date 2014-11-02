@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionInventory.
@@ -40,9 +42,8 @@ public abstract class ConditionInventory extends Condition
 	
 	/**
 	 * Test impl.
-	 * @param env the env
 	 * @return true, if successful
 	 */
 	@Override
-	public abstract boolean testImpl(Env env);
+	public abstract boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item);
 }

@@ -16,41 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
-import com.l2jserver.Config;
-import com.l2jserver.gameserver.SevenSigns;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * @author UnAfraid
  */
-public class FuncGatesPDefMod extends Func
+public class FuncAtkCritical extends AbstractFunction
 {
-	private static final FuncGatesPDefMod _fmm_instance = new FuncGatesPDefMod();
+	private static final FuncAtkCritical _fac_instance = new FuncAtkCritical();
 	
-	public static Func getInstance()
+	public static AbstractFunction getInstance()
 	{
-		return _fmm_instance;
+		return _fac_instance;
 	}
 	
-	private FuncGatesPDefMod()
+	private FuncAtkCritical()
 	{
-		super(Stats.POWER_DEFENCE, 0x20, null, 0);
+		super(Stats.CRITICAL_RATE, 0x09, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		if (SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE) == SevenSigns.CABAL_DAWN)
-		{
-			env.mulValue(Config.ALT_SIEGE_DAWN_GATES_PDEF_MULT);
-		}
-		else if (SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE) == SevenSigns.CABAL_DUSK)
-		{
-			env.mulValue(Config.ALT_SIEGE_DUSK_GATES_PDEF_MULT);
-		}
+		return initVal * BaseStats.DEX.calcBonus(effector) * 10;
 	}
 }

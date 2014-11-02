@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionUsingSkill.
@@ -38,12 +40,12 @@ public final class ConditionUsingSkill extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getSkill() == null)
+		if (skill == null)
 		{
 			return false;
 		}
-		return env.getSkill().getId() == _skillId;
+		return skill.getId() == _skillId;
 	}
 }

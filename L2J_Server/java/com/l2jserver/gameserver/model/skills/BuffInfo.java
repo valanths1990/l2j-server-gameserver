@@ -34,7 +34,6 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.effects.AbstractEffect;
 import com.l2jserver.gameserver.model.effects.EffectTaskInfo;
 import com.l2jserver.gameserver.model.effects.EffectTickTask;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
@@ -48,7 +47,9 @@ public final class BuffInfo
 {
 	// Data
 	/** Data. */
-	private final Env _env;
+	private final L2Character _effector;
+	private final L2Character _effected;
+	private final Skill _skill;
 	/** The effects. */
 	private final List<AbstractEffect> _effects = new ArrayList<>(1);
 	// Tasks
@@ -71,12 +72,16 @@ public final class BuffInfo
 	
 	/**
 	 * Buff Info constructor.
-	 * @param env the cast data
+	 * @param effector
+	 * @param effected
+	 * @param skill
 	 */
-	public BuffInfo(Env env)
+	public BuffInfo(L2Character effector, L2Character effected, Skill skill)
 	{
-		_env = env;
-		_abnormalTime = Formulas.calcEffectAbnormalTime(env);
+		_effector = effector;
+		_effected = effected;
+		_skill = skill;
+		_abnormalTime = Formulas.calcEffectAbnormalTime(effector, effected, skill);
 		_periodStartTicks = GameTimeController.getInstance().getGameTicks();
 	}
 	
@@ -135,12 +140,7 @@ public final class BuffInfo
 	 */
 	public Skill getSkill()
 	{
-		return _env.getSkill();
-	}
-	
-	public Env getEnv()
-	{
-		return _env;
+		return _skill;
 	}
 	
 	/**
@@ -221,7 +221,7 @@ public final class BuffInfo
 	 */
 	public L2Character getEffector()
 	{
-		return _env.getCharacter();
+		return _effector;
 	}
 	
 	/**
@@ -230,7 +230,7 @@ public final class BuffInfo
 	 */
 	public L2Character getEffected()
 	{
-		return _env.getTarget();
+		return _effected;
 	}
 	
 	/**
@@ -258,11 +258,11 @@ public final class BuffInfo
 	public void initializeEffects()
 	{
 		// When effects are initialized, the successfully landed.
-		if (_env.getTarget().isPlayer() && !_env.getSkill().isPassive())
+		if (_effected.isPlayer() && !_skill.isPassive())
 		{
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
-			sm.addSkillName(_env.getSkill());
-			_env.getTarget().sendPacket(sm);
+			sm.addSkillName(_skill);
+			_effected.sendPacket(sm);
 		}
 		
 		// Creates a task that will stop all the effects.
@@ -295,7 +295,7 @@ public final class BuffInfo
 			}
 			
 			// Add stats.
-			_env.getTarget().addStatFuncs(effect.getStatFuncs(_env));
+			_effected.addStatFuncs(effect.getStatFuncs(_effector, _effected, _skill));
 		}
 	}
 	
@@ -315,13 +315,13 @@ public final class BuffInfo
 			continueForever = effect.onActionTime(this);
 		}
 		
-		if (!continueForever && _env.getSkill().isToggle())
+		if (!continueForever && _skill.isToggle())
 		{
 			final EffectTaskInfo task = getEffectTask(effect);
 			if (task != null)
 			{
 				task.getScheduledFuture().cancel(true); // Allow to finish current run.
-				_env.getTarget().getEffectList().remove(true, this); // Remove the buff from the effect list.
+				_effected.getEffectList().remove(true, this); // Remove the buff from the effect list.
 			}
 		}
 	}
@@ -350,9 +350,9 @@ public final class BuffInfo
 		
 		// Sends the proper system message.
 		SystemMessageId smId = null;
-		if (!(_env.getTarget().isSummon() && !((L2Summon) _env.getTarget()).getOwner().hasSummon()))
+		if (!(_effected.isSummon() && !((L2Summon) _effected).getOwner().hasSummon()))
 		{
-			if (_env.getSkill().isToggle())
+			if (_skill.isToggle())
 			{
 				smId = SystemMessageId.S1_HAS_BEEN_ABORTED;
 			}
@@ -360,7 +360,7 @@ public final class BuffInfo
 			{
 				smId = SystemMessageId.EFFECT_S1_HAS_BEEN_REMOVED;
 			}
-			else if (!_env.getSkill().isPassive())
+			else if (!_skill.isPassive())
 			{
 				smId = SystemMessageId.S1_HAS_WORN_OFF;
 			}
@@ -369,13 +369,13 @@ public final class BuffInfo
 		if (smId != null)
 		{
 			final SystemMessage sm = SystemMessage.getSystemMessage(smId);
-			sm.addSkillName(_env.getSkill());
-			_env.getTarget().sendPacket(sm);
+			sm.addSkillName(_skill);
+			_effected.sendPacket(sm);
 		}
 		
-		if (this == _env.getTarget().getEffectList().getShortBuff())
+		if (this == _effected.getEffectList().getShortBuff())
 		{
-			_env.getTarget().getEffectList().shortBuffStatusUpdate(null);
+			_effected.getEffectList().shortBuffStatusUpdate(null);
 		}
 	}
 	
@@ -385,27 +385,27 @@ public final class BuffInfo
 	 */
 	private void applyAbnormalVisualEffects()
 	{
-		if ((_env.getTarget() == null) || (_env.getSkill() == null))
+		if ((_effected == null) || (_skill == null))
 		{
 			return;
 		}
 		
-		if (_env.getSkill().hasAbnormalVisualEffects())
+		if (_skill.hasAbnormalVisualEffects())
 		{
-			_env.getTarget().startAbnormalVisualEffect(false, _env.getSkill().getAbnormalVisualEffects());
+			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
 		}
 		
-		if (_env.getTarget().isPlayer() && _env.getSkill().hasAbnormalVisualEffectsEvent())
+		if (_effected.isPlayer() && _skill.hasAbnormalVisualEffectsEvent())
 		{
-			_env.getTarget().startAbnormalVisualEffect(false, _env.getSkill().getAbnormalVisualEffectsEvent());
+			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsEvent());
 		}
 		
-		if (_env.getSkill().hasAbnormalVisualEffectsSpecial())
+		if (_skill.hasAbnormalVisualEffectsSpecial())
 		{
-			_env.getTarget().startAbnormalVisualEffect(false, _env.getSkill().getAbnormalVisualEffectsSpecial());
+			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
 		}
 		
-		_env.getTarget().updateAbnormalEffect();
+		_effected.updateAbnormalEffect();
 	}
 	
 	/**
@@ -414,27 +414,27 @@ public final class BuffInfo
 	 */
 	private void removeAbnormalVisualEffects()
 	{
-		if ((_env.getTarget() == null) || (_env.getSkill() == null))
+		if ((_effected == null) || (_skill == null))
 		{
 			return;
 		}
 		
-		if (_env.getSkill().hasAbnormalVisualEffects())
+		if (_skill.hasAbnormalVisualEffects())
 		{
-			_env.getTarget().stopAbnormalVisualEffect(false, _env.getSkill().getAbnormalVisualEffects());
+			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
 		}
 		
-		if (_env.getTarget().isPlayer() && _env.getSkill().hasAbnormalVisualEffectsEvent())
+		if (_effected.isPlayer() && _skill.hasAbnormalVisualEffectsEvent())
 		{
-			_env.getTarget().stopAbnormalVisualEffect(false, _env.getSkill().getAbnormalVisualEffectsEvent());
+			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsEvent());
 		}
 		
-		if (_env.getSkill().hasAbnormalVisualEffectsSpecial())
+		if (_skill.hasAbnormalVisualEffectsSpecial())
 		{
-			_env.getTarget().stopAbnormalVisualEffect(false, _env.getSkill().getAbnormalVisualEffectsSpecial());
+			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
 		}
 		
-		_env.getTarget().updateAbnormalEffect();
+		_effected.updateAbnormalEffect();
 	}
 	
 	/**
@@ -444,7 +444,7 @@ public final class BuffInfo
 	{
 		for (AbstractEffect effect : _effects)
 		{
-			_env.getTarget().addStatFuncs(effect.getStatFuncs(_env));
+			_effected.addStatFuncs(effect.getStatFuncs(_effector, _effected, _skill));
 		}
 	}
 	
@@ -455,9 +455,9 @@ public final class BuffInfo
 	{
 		for (AbstractEffect effect : _effects)
 		{
-			_env.getTarget().removeStatsOwner(effect);
+			_effected.removeStatsOwner(effect);
 		}
-		_env.getTarget().removeStatsOwner(_env.getSkill());
+		_effected.removeStatsOwner(_skill);
 	}
 	
 	/**

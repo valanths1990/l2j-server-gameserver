@@ -19,8 +19,11 @@
 package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.instancemanager.FortManager;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Fort;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
@@ -39,31 +42,37 @@ public class ConditionPlayerCanTakeFort extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
+		if ((effector == null) || !effector.isPlayer())
+		{
+			return !_val;
+		}
+		
+		final L2PcInstance player = effector.getActingPlayer();
 		boolean canTakeFort = true;
-		if ((env.getPlayer() == null) || env.getPlayer().isAlikeDead() || env.getPlayer().isCursedWeaponEquipped() || (env.getPlayer().getClan() == null))
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || !player.isClanLeader())
 		{
 			canTakeFort = false;
 		}
 		
-		final Fort fort = FortManager.getInstance().getFort(env.getPlayer());
+		final Fort fort = FortManager.getInstance().getFort(player);
 		final SystemMessage sm;
-		if ((fort == null) || (fort.getResidenceId() <= 0) || !fort.getSiege().isInProgress() || (fort.getSiege().getAttackerClan(env.getPlayer().getClan()) == null))
+		if ((fort == null) || (fort.getResidenceId() <= 0) || !fort.getSiege().isInProgress() || (fort.getSiege().getAttackerClan(player.getClan()) == null))
 		{
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-			sm.addSkillName(env.getSkill());
-			env.getPlayer().sendPacket(sm);
+			sm.addSkillName(skill);
+			player.sendPacket(sm);
 			canTakeFort = false;
 		}
-		else if (fort.getFlagPole() != env.getTarget())
+		else if (fort.getFlagPole() != effected)
 		{
-			env.getPlayer().sendPacket(SystemMessageId.INCORRECT_TARGET);
+			player.sendPacket(SystemMessageId.INCORRECT_TARGET);
 			canTakeFort = false;
 		}
-		else if (!Util.checkIfInRange(200, env.getPlayer(), env.getTarget(), true))
+		else if (!Util.checkIfInRange(200, player, effected, true))
 		{
-			env.getPlayer().sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
+			player.sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
 			canTakeFort = false;
 		}
 		return (_val == canTakeFort);

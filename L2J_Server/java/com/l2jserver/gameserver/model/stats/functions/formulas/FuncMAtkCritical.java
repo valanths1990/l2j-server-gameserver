@@ -16,33 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
-import com.l2jserver.gameserver.model.skills.funcs.Func;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.BaseStats;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * @author UnAfraid
  */
-public class FuncMaxMpMul extends Func
+public class FuncMAtkCritical extends AbstractFunction
 {
-	private static final FuncMaxMpMul _fmmm_instance = new FuncMaxMpMul();
+	private static final FuncMAtkCritical _fac_instance = new FuncMAtkCritical();
 	
-	public static Func getInstance()
+	public static AbstractFunction getInstance()
 	{
-		return _fmmm_instance;
+		return _fac_instance;
 	}
 	
-	private FuncMaxMpMul()
+	private FuncMAtkCritical()
 	{
-		super(Stats.MAX_MP, 0x20, null, 0);
+		super(Stats.MCRITICAL_RATE, 0x09, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		env.mulValue(BaseStats.MEN.calcBonus(env.getCharacter()));
+		// CT2: The magic critical rate has been increased to 10 times.
+		if (!effector.isPlayer() || (effector.getActiveWeaponInstance() != null))
+		{
+			return initVal * BaseStats.WIT.calcBonus(effector) * 10;
+		}
+		return initVal;
 	}
 }

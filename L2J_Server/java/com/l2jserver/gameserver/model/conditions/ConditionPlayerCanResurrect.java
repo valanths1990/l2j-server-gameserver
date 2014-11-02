@@ -21,7 +21,8 @@ package com.l2jserver.gameserver.model.conditions;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
@@ -39,75 +40,73 @@ public class ConditionPlayerCanResurrect extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		// Need skill rework for fix that properly
-		if (env.getSkill().getAffectRange() > 0)
+		if (skill.getAffectRange() > 0)
 		{
 			return true;
 		}
 		boolean canResurrect = true;
-		final L2Character caster = env.getCharacter();
-		final L2Character target = env.getTarget();
 		
-		if (target.isPlayer())
+		if (effected.isPlayer())
 		{
-			final L2PcInstance player = target.getActingPlayer();
+			final L2PcInstance player = effected.getActingPlayer();
 			if (!player.isDead())
 			{
 				canResurrect = false;
-				if (caster.isPlayer())
+				if (effector.isPlayer())
 				{
 					final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-					msg.addSkillName(env.getSkill());
-					caster.sendPacket(msg);
+					msg.addSkillName(skill);
+					effector.sendPacket(msg);
 				}
 			}
 			else if (player.isResurrectionBlocked())
 			{
 				canResurrect = false;
-				if (caster.isPlayer())
+				if (effector.isPlayer())
 				{
-					caster.sendPacket(SystemMessageId.REJECT_RESURRECTION);
+					effector.sendPacket(SystemMessageId.REJECT_RESURRECTION);
 				}
 			}
 			else if (player.isReviveRequested())
 			{
 				canResurrect = false;
-				if (caster.isPlayer())
+				if (effector.isPlayer())
 				{
-					caster.sendPacket(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED);
+					effector.sendPacket(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED);
 				}
 			}
 		}
-		else if (target.isSummon())
+		else if (effected.isSummon())
 		{
-			final L2Summon summon = (L2Summon) target;
+			final L2Summon summon = (L2Summon) effected;
 			final L2PcInstance player = summon.getOwner();
 			if (!summon.isDead())
 			{
 				canResurrect = false;
-				if (caster.isPlayer())
+				if (effector.isPlayer())
 				{
 					final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-					msg.addSkillName(env.getSkill());
-					caster.sendPacket(msg);
+					msg.addSkillName(skill);
+					effector.sendPacket(msg);
 				}
 			}
 			else if (summon.isResurrectionBlocked())
 			{
 				canResurrect = false;
-				if (caster.isPlayer())
+				if (effector.isPlayer())
 				{
-					caster.sendPacket(SystemMessageId.REJECT_RESURRECTION);
+					effector.sendPacket(SystemMessageId.REJECT_RESURRECTION);
 				}
 			}
 			else if ((player != null) && player.isRevivingPet())
 			{
 				canResurrect = false;
-				if (caster.isPlayer())
+				if (effector.isPlayer())
 				{
-					caster.sendPacket(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED); // Resurrection is already been proposed.
+					effector.sendPacket(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED); // Resurrection is already been proposed.
 				}
 			}
 		}

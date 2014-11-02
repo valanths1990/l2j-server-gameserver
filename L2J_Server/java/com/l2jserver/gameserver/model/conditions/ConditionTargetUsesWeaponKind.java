@@ -18,8 +18,10 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.L2Weapon;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionTargetUsesWeaponKind.
@@ -39,19 +41,19 @@ public class ConditionTargetUsesWeaponKind extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getTarget() == null)
+		if (effected == null)
 		{
 			return false;
 		}
 		
-		L2Weapon item = env.getTarget().getActiveWeaponItem();
-		if (item == null)
+		L2Weapon weapon = effected.getActiveWeaponItem();
+		if (weapon == null)
 		{
 			return false;
 		}
 		
-		return (item.getItemType().mask() & _weaponMask) != 0;
+		return (weapon.getItemType().mask() & _weaponMask) != 0;
 	}
 }

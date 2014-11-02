@@ -18,8 +18,10 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerActiveEffectId.
@@ -52,9 +54,9 @@ public class ConditionPlayerActiveEffectId extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		final BuffInfo info = env.getCharacter().getEffectList().getBuffInfoBySkillId(_effectId);
+		final BuffInfo info = effector.getEffectList().getBuffInfoBySkillId(_effectId);
 		return ((info != null) && ((_effectLvl == -1) || (_effectLvl <= info.getSkill().getLevel())));
 	}
 }

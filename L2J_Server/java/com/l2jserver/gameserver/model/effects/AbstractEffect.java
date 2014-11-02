@@ -28,11 +28,12 @@ import java.util.logging.Logger;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.handler.EffectHandler;
 import com.l2jserver.gameserver.model.StatsSet;
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.conditions.Condition;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 
 /**
  * Abstract effect implementation.<br>
@@ -114,12 +115,14 @@ public abstract class AbstractEffect
 	
 	/**
 	 * Tests the attach condition.
-	 * @param env the data
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
 	 * @return {@code true} if there isn't a condition to test or it's passed, {@code false} otherwise
 	 */
-	public boolean testConditions(Env env)
+	public boolean testConditions(L2Character caster, L2Character target, Skill skill)
 	{
-		return (_attachCond == null) || _attachCond.test(env);
+		return (_attachCond == null) || _attachCond.test(caster, target, skill);
 	}
 	
 	/**
@@ -228,26 +231,28 @@ public abstract class AbstractEffect
 	
 	/**
 	 * Get this effect's stats functions.
-	 * @param env the data
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
 	 * @return a list of stat functions.
 	 */
-	public List<Func> getStatFuncs(Env env)
+	public List<AbstractFunction> getStatFuncs(L2Character caster, L2Character target, Skill skill)
 	{
 		if (getFuncTemplates() == null)
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
-		final List<Func> funcs = new ArrayList<>(getFuncTemplates().size());
-		for (FuncTemplate t : getFuncTemplates())
+		final List<AbstractFunction> functions = new ArrayList<>(getFuncTemplates().size());
+		for (FuncTemplate functionTemplate : getFuncTemplates())
 		{
-			final Func f = t.getFunc(env, this);
-			if (f != null)
+			final AbstractFunction function = functionTemplate.getFunc(caster, target, skill, this);
+			if (function != null)
 			{
-				funcs.add(f);
+				functions.add(function);
 			}
 		}
-		return funcs;
+		return functions;
 	}
 	
 	/**

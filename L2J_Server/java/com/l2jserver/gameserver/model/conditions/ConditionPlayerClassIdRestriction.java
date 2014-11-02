@@ -20,7 +20,9 @@ package com.l2jserver.gameserver.model.conditions;
 
 import java.util.List;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerClassIdRestriction.
@@ -39,8 +41,8 @@ public class ConditionPlayerClassIdRestriction extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		return (env.getPlayer() != null) && (_classIds.contains(env.getPlayer().getClassId().getId()));
+		return (effector.getActingPlayer() != null) && (_classIds.contains(effector.getActingPlayer().getClassId().getId()));
 	}
 }

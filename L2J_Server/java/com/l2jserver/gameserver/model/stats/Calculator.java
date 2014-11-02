@@ -21,7 +21,9 @@ package com.l2jserver.gameserver.model.stats;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.l2jserver.gameserver.model.skills.funcs.Func;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * A calculator is created to manage and dynamically calculate the effect of a character property (ex : MAX_HP, REGENERATE_HP_RATE...).<br>
@@ -35,10 +37,10 @@ import com.l2jserver.gameserver.model.skills.funcs.Func;
 public final class Calculator
 {
 	/** Empty Func table definition */
-	private static final Func[] EMPTY_FUNCS = new Func[0];
+	private static final AbstractFunction[] EMPTY_FUNCS = new AbstractFunction[0];
 	
 	/** Table of Func object */
-	private Func[] _functions;
+	private AbstractFunction[] _functions;
 	
 	/**
 	 * Constructor of Calculator (Init value : emptyFuncs).
@@ -75,8 +77,8 @@ public final class Calculator
 			return false;
 		}
 		
-		Func[] funcs1 = c1._functions;
-		Func[] funcs2 = c2._functions;
+		AbstractFunction[] funcs1 = c1._functions;
+		AbstractFunction[] funcs2 = c2._functions;
 		
 		if (funcs1 == funcs2)
 		{
@@ -114,23 +116,23 @@ public final class Calculator
 	}
 	
 	/**
-	 * Add a Func to the Calculator.
-	 * @param f
+	 * Adds a function to the Calculator.
+	 * @param function the function
 	 */
-	public synchronized void addFunc(Func f)
+	public synchronized void addFunc(AbstractFunction function)
 	{
-		Func[] funcs = _functions;
-		Func[] tmp = new Func[funcs.length + 1];
+		AbstractFunction[] funcs = _functions;
+		AbstractFunction[] tmp = new AbstractFunction[funcs.length + 1];
 		
-		final int order = f.order;
+		final int order = function.getOrder();
 		int i;
 		
-		for (i = 0; (i < funcs.length) && (order >= funcs[i].order); i++)
+		for (i = 0; (i < funcs.length) && (order >= funcs[i].getOrder()); i++)
 		{
 			tmp[i] = funcs[i];
 		}
 		
-		tmp[i] = f;
+		tmp[i] = function;
 		
 		for (; i < funcs.length; i++)
 		{
@@ -141,17 +143,17 @@ public final class Calculator
 	}
 	
 	/**
-	 * Remove a Func from the Calculator.
-	 * @param f
+	 * Removes a function from the Calculator.
+	 * @param function the function
 	 */
-	public synchronized void removeFunc(Func f)
+	public synchronized void removeFunc(AbstractFunction function)
 	{
-		Func[] funcs = _functions;
-		Func[] tmp = new Func[funcs.length - 1];
+		AbstractFunction[] funcs = _functions;
+		AbstractFunction[] tmp = new AbstractFunction[funcs.length - 1];
 		
 		int i;
 		
-		for (i = 0; (i < funcs.length) && (f != funcs[i]); i++)
+		for (i = 0; (i < funcs.length) && (function != funcs[i]); i++)
 		{
 			tmp[i] = funcs[i];
 		}
@@ -174,22 +176,21 @@ public final class Calculator
 		{
 			_functions = tmp;
 		}
-		
 	}
 	
 	/**
 	 * Remove each Func with the specified owner of the Calculator.
-	 * @param owner
-	 * @return
+	 * @param owner the owner
+	 * @return a list of modified stats
 	 */
 	public synchronized List<Stats> removeOwner(Object owner)
 	{
 		List<Stats> modifiedStats = new ArrayList<>();
-		for (Func func : _functions)
+		for (AbstractFunction func : _functions)
 		{
-			if (func.funcOwner == owner)
+			if (func.getFuncOwner() == owner)
 			{
-				modifiedStats.add(func.stat);
+				modifiedStats.add(func.getStat());
 				removeFunc(func);
 			}
 		}
@@ -197,22 +198,28 @@ public final class Calculator
 	}
 	
 	/**
-	 * Run each Func of the Calculator.
-	 * @param env
+	 * Run each function of the Calculator.
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
+	 * @param initVal the initial value
+	 * @return the calculated value
 	 */
-	public void calc(Env env)
+	public double calc(L2Character caster, L2Character target, Skill skill, double initVal)
 	{
-		for (Func func : _functions)
+		double value = initVal;
+		for (AbstractFunction func : _functions)
 		{
-			func.calc(env);
+			value = func.calc(caster, target, skill, value);
 		}
+		return value;
 	}
 	
 	/**
 	 * Get array of all function, dont use for add/remove
 	 * @return
 	 */
-	public Func[] getFunctions()
+	public AbstractFunction[] getFunctions()
 	{
 		return _functions;
 	}

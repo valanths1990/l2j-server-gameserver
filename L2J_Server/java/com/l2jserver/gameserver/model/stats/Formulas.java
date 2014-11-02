@@ -27,6 +27,7 @@ import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.datatables.HitConditionBonus;
 import com.l2jserver.gameserver.datatables.KarmaData;
+import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
@@ -53,24 +54,24 @@ import com.l2jserver.gameserver.model.items.type.ArmorType;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncArmorSet;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncAtkAccuracy;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncAtkCritical;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncAtkEvasion;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncGatesMDefMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncGatesPDefMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncHenna;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMAtkCritical;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMAtkMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMAtkSpeed;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMDefMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMaxCpMul;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMaxHpMul;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMaxMpMul;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMoveSpeed;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncPAtkMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncPAtkSpeed;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncPDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncArmorSet;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncAtkAccuracy;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncAtkCritical;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncAtkEvasion;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncGatesMDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncGatesPDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncHenna;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMAtkCritical;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMAtkMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMAtkSpeed;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMaxCpMul;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMaxHpMul;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMaxMpMul;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMoveSpeed;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncPAtkMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncPAtkSpeed;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncPDefMod;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2CastleZone;
 import com.l2jserver.gameserver.model.zone.type.L2ClanHallZone;
@@ -1340,21 +1341,19 @@ public final class Formulas
 	
 	/**
 	 * Calculates the effect landing success.<br>
-	 * @param env the data transfer object
+	 * @param attacker the attacker
+	 * @param target the target
+	 * @param skill the skill
 	 * @return {@code true} if the effect lands
 	 */
-	public static boolean calcEffectSuccess(Env env)
+	public static boolean calcEffectSuccess(L2Character attacker, L2Character target, Skill skill)
 	{
-		final L2Character target = env.getTarget();
-		
 		// StaticObjects can not receive continuous effects.
 		if (target.isDoor() || (target instanceof L2SiegeFlagInstance) || (target instanceof L2StaticObjectInstance))
 		{
 			return false;
 		}
 		
-		final L2Character attacker = env.getCharacter();
-		final Skill skill = env.getSkill();
 		if (skill.isDebuff() && (target.calcStat(Stats.DEBUFF_IMMUNITY, 0, attacker, skill) > 0))
 		{
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_RESISTED_YOUR_S2);
@@ -1409,7 +1408,7 @@ public final class Formulas
 		{
 			double mAtk = attacker.getMAtk(null, null);
 			double val = 0;
-			if (env.isBlessedSpiritShot())// only blessed spiritshot!
+			if (attacker.isChargedShot(ShotType.BLESSED_SPIRITSHOTS))
 			{
 				val = mAtk * 3.0;// 3.0 is the blessed spiritshot multiplier
 			}
@@ -2035,14 +2034,13 @@ public final class Formulas
 	/**
 	 * Calculates the abnormal time for an effect.<br>
 	 * The abnormal time is taken from the skill definition, and it's global for all effects present in the skills.
-	 * @param env the data transfer object with required information
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
 	 * @return the time that the effect will last
 	 */
-	public static int calcEffectAbnormalTime(Env env)
+	public static int calcEffectAbnormalTime(L2Character caster, L2Character target, Skill skill)
 	{
-		final L2Character caster = env.getCharacter();
-		final L2Character target = env.getTarget();
-		final Skill skill = env.getSkill();
 		int time = skill.isPassive() || skill.isToggle() ? -1 : skill.getAbnormalTime();
 		
 		// An herb buff will affect both master and servitor, but the buff duration will be half of the normal duration.
@@ -2053,7 +2051,7 @@ public final class Formulas
 		}
 		
 		// If the skill is a mastery skill, the effect will last twice the default time.
-		if (env.isSkillMastery())
+		if (Formulas.calcSkillMastery(caster, skill))
 		{
 			time *= 2;
 		}

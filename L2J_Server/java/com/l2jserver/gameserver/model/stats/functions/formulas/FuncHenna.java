@@ -16,24 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * @author UnAfraid
  */
-public class FuncHenna extends Func
+public class FuncHenna extends AbstractFunction
 {
 	private static final Map<Stats, FuncHenna> _fh_instance = new HashMap<>();
 	
-	public static Func getInstance(Stats st)
+	public static AbstractFunction getInstance(Stats st)
 	{
 		if (!_fh_instance.containsKey(st))
 		{
@@ -44,36 +45,38 @@ public class FuncHenna extends Func
 	
 	private FuncHenna(Stats stat)
 	{
-		super(stat, 0x10, null, 0);
+		super(stat, 0x10, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		L2PcInstance pc = env.getPlayer();
+		L2PcInstance pc = effector.getActingPlayer();
+		double value = initVal;
 		if (pc != null)
 		{
-			switch (stat)
+			switch (getStat())
 			{
 				case STAT_STR:
-					env.addValue(pc.getHennaStatSTR());
+					value += pc.getHennaStatSTR();
 					break;
 				case STAT_CON:
-					env.addValue(pc.getHennaStatCON());
+					value += pc.getHennaStatCON();
 					break;
 				case STAT_DEX:
-					env.addValue(pc.getHennaStatDEX());
+					value += pc.getHennaStatDEX();
 					break;
 				case STAT_INT:
-					env.addValue(pc.getHennaStatINT());
+					value += pc.getHennaStatINT();
 					break;
 				case STAT_WIT:
-					env.addValue(pc.getHennaStatWIT());
+					value += pc.getHennaStatWIT();
 					break;
 				case STAT_MEN:
-					env.addValue(pc.getHennaStatMEN());
+					value += pc.getHennaStatMEN();
 					break;
 			}
 		}
+		return value;
 	}
 }

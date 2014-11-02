@@ -73,7 +73,7 @@ import com.l2jserver.gameserver.model.items.type.ItemType;
 import com.l2jserver.gameserver.model.options.EnchantOptions;
 import com.l2jserver.gameserver.model.options.Options;
 import com.l2jserver.gameserver.model.quest.QuestState;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.DropItem;
 import com.l2jserver.gameserver.network.serverpackets.GetItem;
@@ -1423,7 +1423,7 @@ public final class L2ItemInstance extends L2Object
 	 * @param player the player
 	 * @return the functions list
 	 */
-	public List<Func> getStatFuncs(L2Character player)
+	public List<AbstractFunction> getStatFuncs(L2Character player)
 	{
 		return getItem().getStatFuncs(this, player);
 	}
