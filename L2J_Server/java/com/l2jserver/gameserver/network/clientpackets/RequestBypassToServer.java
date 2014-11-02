@@ -23,12 +23,12 @@ import java.util.logging.Level;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.communitybbs.CommunityBoard;
 import com.l2jserver.gameserver.datatables.AdminTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.PlayerAction;
 import com.l2jserver.gameserver.handler.AdminCommandHandler;
 import com.l2jserver.gameserver.handler.BypassHandler;
+import com.l2jserver.gameserver.handler.CommunityBoardHandler;
 import com.l2jserver.gameserver.handler.IAdminCommandHandler;
 import com.l2jserver.gameserver.handler.IBypassHandler;
 import com.l2jserver.gameserver.model.L2Object;
@@ -42,8 +42,6 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcManorBypass
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerBypass;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.RequestShowCommunityBoard;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.ConfirmDlg;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
@@ -57,7 +55,7 @@ import com.l2jserver.gameserver.util.Util;
 public final class RequestBypassToServer extends L2GameClientPacket
 {
 	private static final String _C__23_REQUESTBYPASSTOSERVER = "[C] 23 RequestBypassToServer";
-	// FIXME: This is for compatibility, will be changed when bypass functionallity got an overhaul by Nos
+	// FIXME: This is for compatibility, will be changed when bypass functionality got an overhaul by Nos
 	private static final String[] _possibleNonHtmlCommands =
 	{
 		"_bbs",
@@ -170,6 +168,10 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					ach.useAdminCommand(_command, activeChar);
 				}
 			}
+			else if (CommunityBoardHandler.getInstance().isCommunityBoardCommand(_command))
+			{
+				CommunityBoardHandler.getInstance().handleParseCommand(_command, activeChar);
+			}
 			else if (_command.equals("come_here") && activeChar.isGM())
 			{
 				comeHere(activeChar);
@@ -223,48 +225,6 @@ public final class RequestBypassToServer extends L2GameClientPacket
 				catch (NumberFormatException nfe)
 				{
 					_log.log(Level.WARNING, "NFE for command [" + _command + "]", nfe);
-				}
-			}
-			else if (_command.startsWith("_bbs"))
-			{
-				if (Config.ENABLE_COMMUNITY_BOARD)
-				{
-					if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), _command)))
-					{
-						activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-					}
-				}
-				else
-				{
-					CommunityBoard.getInstance().handleCommands(getClient(), _command);
-				}
-			}
-			else if (_command.startsWith("bbs"))
-			{
-				if (Config.ENABLE_COMMUNITY_BOARD)
-				{
-					if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), _command)))
-					{
-						activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-					}
-				}
-				else
-				{
-					CommunityBoard.getInstance().handleCommands(getClient(), _command);
-				}
-			}
-			else if (_command.startsWith("_mail"))
-			{
-				if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), "_bbsmail")))
-				{
-					activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-				}
-			}
-			else if (_command.startsWith("_friend"))
-			{
-				if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), "_bbsfriend")))
-				{
-					activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
 				}
 			}
 			else if (_command.startsWith("_match"))

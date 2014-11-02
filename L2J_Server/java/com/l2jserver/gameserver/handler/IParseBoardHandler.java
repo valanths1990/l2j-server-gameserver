@@ -16,25 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.network.communityserver.writepackets;
+package com.l2jserver.gameserver.handler;
 
-import org.netcon.BaseWritePacket;
+import java.util.logging.Logger;
+
+import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * @authors Forsaiken, Gigiikun
+ * Community Board interface.
+ * @author Zoey76
  */
-public final class RequestCommunityBoardWrite extends BaseWritePacket
+public interface IParseBoardHandler
 {
-	public RequestCommunityBoardWrite(final int playerObjId, final String url, final String arg1, final String arg2, final String arg3, final String arg4, final String arg5)
-	{
-		super.writeC(0x02);
-		super.writeC(0x01);
-		super.writeD(playerObjId);
-		super.writeS(url);
-		super.writeS(arg1);
-		super.writeS(arg2);
-		super.writeS(arg3);
-		super.writeS(arg4);
-		super.writeS(arg5);
-	}
+	public static final Logger LOG = Logger.getLogger(IParseBoardHandler.class.getName());
+	
+	/**
+	 * Parses a community board command.
+	 * @param command the command
+	 * @param player the player
+	 * @return
+	 */
+	public boolean parseCommunityBoardCommand(String command, L2PcInstance player);
+	
+	/**
+	 * Gets the community board commands.
+	 * @return the community board commands
+	 */
+	public String[] getCommunityBoardCommands();
 }

@@ -631,7 +631,7 @@ public final class Util
 	 */
 	public static void sendCBHtml(L2PcInstance activeChar, String html, String fillMultiEdit, boolean buildActionCache)
 	{
-		if (activeChar == null)
+		if ((activeChar == null) || (html == null))
 		{
 			return;
 		}

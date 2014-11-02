@@ -32,8 +32,6 @@ import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableE
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2SwampZone;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.WorldInfo;
 
 public class PlayableStat extends CharStat
 {
@@ -175,10 +173,6 @@ public class PlayableStat extends CharStat
 		
 		getActiveChar().getStatus().setCurrentHp(getActiveChar().getStat().getMaxHp());
 		getActiveChar().getStatus().setCurrentMp(getActiveChar().getStat().getMaxMp());
-		if (getActiveChar() instanceof L2PcInstance)
-		{
-			CommunityServerThread.getInstance().sendPacket(new WorldInfo((L2PcInstance) getActiveChar(), null, WorldInfo.TYPE_UPDATE_PLAYER_DATA));
-		}
 		
 		return true;
 	}

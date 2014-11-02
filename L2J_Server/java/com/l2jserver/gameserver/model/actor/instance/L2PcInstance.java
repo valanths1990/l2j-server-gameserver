@@ -68,7 +68,6 @@ import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.cache.WarehouseCacheManager;
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
-import com.l2jserver.gameserver.communitybbs.Manager.RegionBBSManager;
 import com.l2jserver.gameserver.datatables.AdminTable;
 import com.l2jserver.gameserver.datatables.CharNameTable;
 import com.l2jserver.gameserver.datatables.CharSummonTable;
@@ -260,8 +259,6 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2BossZone;
 import com.l2jserver.gameserver.network.L2GameClient;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.WorldInfo;
 import com.l2jserver.gameserver.network.serverpackets.AbstractHtmlPacket;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.ChangeWaitType;
@@ -6225,10 +6222,6 @@ public final class L2PcInstance extends L2Playable
 			_apprentice = 0;
 			_sponsor = 0;
 			_activeWarehouse = null;
-			if (_isOnline)
-			{
-				CommunityServerThread.getInstance().sendPacket(new WorldInfo(this, null, WorldInfo.TYPE_UPDATE_PLAYER_DATA));
-			}
 			return;
 		}
 		
@@ -6240,10 +6233,6 @@ public final class L2PcInstance extends L2Playable
 		}
 		
 		_clanId = clan.getId();
-		if (_isOnline)
-		{
-			CommunityServerThread.getInstance().sendPacket(new WorldInfo(this, null, WorldInfo.TYPE_UPDATE_PLAYER_DATA));
-		}
 	}
 	
 	/**
@@ -11417,14 +11406,6 @@ public final class L2PcInstance extends L2Playable
 			_log.log(Level.SEVERE, "deleteMe()", e);
 		}
 		
-		try
-		{
-			CommunityServerThread.getInstance().sendPacket(new WorldInfo(this, null, WorldInfo.TYPE_UPDATE_PLAYER_STATUS));
-		}
-		catch (Exception e)
-		{
-			_log.log(Level.SEVERE, "deleteMe()", e);
-		}
 		// Recommendations must be saved before task (timer) is canceled
 		try
 		{
@@ -11716,16 +11697,6 @@ public final class L2PcInstance extends L2Playable
 		// Remove L2Object object from _allObjects of L2World
 		L2World.getInstance().removeObject(this);
 		L2World.getInstance().removeFromAllPlayers(this); // force remove in case of crash during teleport
-		
-		// update bbs
-		try
-		{
-			RegionBBSManager.getInstance().changeCommunityBoard();
-		}
-		catch (Exception e)
-		{
-			_log.log(Level.WARNING, "Exception on deleteMe() changeCommunityBoard: " + e.getMessage(), e);
-		}
 		
 		try
 		{

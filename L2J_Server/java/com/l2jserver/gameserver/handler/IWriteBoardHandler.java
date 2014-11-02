@@ -16,23 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.network.communityserver.writepackets;
+package com.l2jserver.gameserver.handler;
 
-import org.netcon.BaseWritePacket;
-
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * @authors Forsaiken, Gigiikun
+ * Community Board interface.
+ * @author Zoey76
  */
-public final class GameServerAuth extends BaseWritePacket
+public interface IWriteBoardHandler extends IParseBoardHandler
 {
-	public GameServerAuth()
-	{
-		super.writeC(0x00);
-		super.writeC(0x01);
-		super.writeD(Config.COMMUNITY_SERVER_HEX_ID.length);
-		super.writeB(Config.COMMUNITY_SERVER_HEX_ID);
-		super.writeD(Config.COMMUNITY_SERVER_SQL_DP_ID);
-	}
+	/**
+	 * Writes a community board command into the client.
+	 * @param player the player
+	 * @param arg1 the first argument
+	 * @param arg2 the second argument
+	 * @param arg3 the third argument
+	 * @param arg4 the fourth argument
+	 * @param arg5 the fifth argument
+	 * @return
+	 */
+	public boolean writeCommunityBoardCommand(L2PcInstance player, String arg1, String arg2, String arg3, String arg4, String arg5);
 }

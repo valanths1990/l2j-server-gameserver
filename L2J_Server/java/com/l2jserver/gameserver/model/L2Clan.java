@@ -58,8 +58,6 @@ import com.l2jserver.gameserver.model.itemcontainer.ItemContainer;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.WorldInfo;
 import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
 import com.l2jserver.gameserver.network.serverpackets.ExBrExtraUserInfo;
 import com.l2jserver.gameserver.network.serverpackets.ExSubPledgeSkillAdd;
@@ -305,10 +303,7 @@ public class L2Clan implements IIdentifiable, INamable
 		
 		broadcastClanStatus();
 		broadcastToOnlineMembers(SystemMessage.getSystemMessage(SystemMessageId.CLAN_LEADER_PRIVILEGES_HAVE_BEEN_TRANSFERRED_TO_C1).addString(member.getName()));
-		if (CommunityServerThread.getInstance() != null)
-		{
-			CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
-		}
+		
 		_log.log(Level.INFO, "Leader of Clan: " + getName() + " changed to: " + member.getName() + " ex leader: " + exMember.getName());
 	}
 	
@@ -367,8 +362,6 @@ public class L2Clan implements IIdentifiable, INamable
 		player.sendPacket(new PledgeShowMemberListUpdate(player));
 		player.sendPacket(new PledgeSkillList(this));
 		addSkillEffects(player);
-		// notify CB server about the change
-		CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 		
 		// Notify to scripts
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerClanJoin(member, this));
@@ -387,8 +380,6 @@ public class L2Clan implements IIdentifiable, INamable
 		}
 		
 		addClanMember(member);
-		// notify CB server about the change
-		CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 	}
 	
 	/**
@@ -521,11 +512,6 @@ public class L2Clan implements IIdentifiable, INamable
 		else
 		{
 			removeMemberInDatabase(exMember, clanJoinExpiryTime, getLeaderId() == objectId ? System.currentTimeMillis() + (Config.ALT_CLAN_CREATE_DAYS * 86400000L) : 0);
-		}
-		// notify CB server about the change
-		if (CommunityServerThread.getInstance() != null)
-		{
-			CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 		}
 		
 		// Notify to scripts
@@ -704,7 +690,7 @@ public class L2Clan implements IIdentifiable, INamable
 	public void setLevel(int level)
 	{
 		_level = level;
-		if ((_level >= 2) && (_forum == null) && (Config.COMMUNITY_TYPE > 0))
+		if ((_level >= 2) && (_forum == null) && Config.ENABLE_COMMUNITY_BOARD)
 		{
 			final Forum forum = ForumsBBSManager.getInstance().getForumByName("ClanRoot");
 			if (forum != null)
@@ -2520,8 +2506,6 @@ public class L2Clan implements IIdentifiable, INamable
 		
 		// TODO: Need correct message id
 		player.sendMessage("Alliance " + allyName + " has been created.");
-		// notify CB server about the change
-		CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 	}
 	
 	public void dissolveAlly(L2PcInstance player)
@@ -2553,8 +2537,6 @@ public class L2Clan implements IIdentifiable, INamable
 				clan.setAllyName(null);
 				clan.setAllyPenaltyExpiryTime(0, 0);
 				clan.updateClanInDB();
-				// notify CB server about the change
-				CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, clan, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 			}
 		}
 		
@@ -2566,8 +2548,6 @@ public class L2Clan implements IIdentifiable, INamable
 		
 		// The clan leader should take the XP penalty of a full death.
 		player.deathPenalty(false, false, false);
-		// notify CB server about the change
-		CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 	}
 	
 	public boolean levelUpClan(L2PcInstance player)
@@ -2843,14 +2823,6 @@ public class L2Clan implements IIdentifiable, INamable
 		// notify all the members about it
 		broadcastToOnlineMembers(SystemMessage.getSystemMessage(SystemMessageId.CLAN_LEVEL_INCREASED));
 		broadcastToOnlineMembers(new PledgeShowInfoUpdate(this));
-		/*
-		 * Micht : - use PledgeShowInfoUpdate instead of PledgeStatusChanged to update clan level ingame - remove broadcastClanStatus() to avoid members duplication
-		 */
-		// clan.broadcastToOnlineMembers(new PledgeStatusChanged(clan));
-		// clan.broadcastClanStatus();
-		
-		// notify CB server about the change
-		CommunityServerThread.getInstance().sendPacket(new WorldInfo(null, this, WorldInfo.TYPE_UPDATE_CLAN_DATA));
 	}
 	
 	/**
