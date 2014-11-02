@@ -19,9 +19,6 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.items.L2Item;
 
 /**
  * @author Nos
@@ -38,20 +35,11 @@ public class GroupedDeathDropItem extends GroupedGeneralDropItem
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+	 * @see com.l2jserver.gameserver.model.drops.GroupedGeneralDropItem#getGlobalChanceMultiplier()
 	 */
 	@Override
-	public double getChance(L2Character victim, L2Character killer)
+	protected double getGlobalChanceMultiplier()
 	{
-		for (final GeneralDropItem gdi : getItems())
-		{
-			final L2Item item = ItemTable.getInstance().getTemplate(gdi.getItemId());
-			if ((item == null) || !item.hasExImmediateEffect())
-			{
-				return super.getChance(victim, killer) * Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER;
-			}
-		}
-		
-		return super.getChance(victim, killer) * Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
+		return Config.RATE_DEATH_DROP_CHANCE_MULTIPLIER;
 	}
 }

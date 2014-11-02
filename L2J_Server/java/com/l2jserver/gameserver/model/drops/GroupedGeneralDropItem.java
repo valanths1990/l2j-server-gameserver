@@ -23,9 +23,11 @@ import java.util.Collections;
 import java.util.List;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
 
@@ -45,6 +47,11 @@ public class GroupedGeneralDropItem implements IDropItem
 		_chance = chance;
 	}
 	
+	protected double getGlobalChanceMultiplier()
+	{
+		return 1.;
+	}
+	
 	/**
 	 * Gets the chance of this drop item.
 	 * @return the chance
@@ -62,7 +69,16 @@ public class GroupedGeneralDropItem implements IDropItem
 	 */
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		return getChance();
+		for (final GeneralDropItem gdi : getItems())
+		{
+			final L2Item item = ItemTable.getInstance().getTemplate(gdi.getItemId());
+			if ((item == null) || !item.hasExImmediateEffect())
+			{
+				return getChance() * getGlobalChanceMultiplier();
+			}
+		}
+		
+		return getChance() * Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
 	}
 	
 	/**

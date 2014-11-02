@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.model.drops;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.model.actor.L2Character;
 
 /**
  * @author Nos
@@ -39,46 +38,21 @@ public class CorpseDropItem extends GeneralDropItem
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMin(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getGlobalAmountMultiplier()
 	 */
 	@Override
-	public long getMin(L2Character victim, L2Character killer)
+	protected double getGlobalAmountMultiplier()
 	{
-		final long min = super.getMin(victim, killer);
-		if (Config.RATE_DROP_AMOUNT_MULTIPLIER.containsKey(getItemId()))
-		{
-			return min;
-		}
-		return (long) (min * Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
+		return Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER;
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getMax(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
+	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getGlobalChanceMultiplier()
 	 */
 	@Override
-	public long getMax(L2Character victim, L2Character killer)
+	protected double getGlobalChanceMultiplier()
 	{
-		final long max = super.getMax(victim, killer);
-		if (Config.RATE_DROP_AMOUNT_MULTIPLIER.containsKey(getItemId()))
-		{
-			return max;
-		}
-		return (long) (max * Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.l2jserver.gameserver.model.drops.GeneralDropItem#getChance(com.l2jserver.gameserver.model.actor.L2Character, com.l2jserver.gameserver.model.actor.L2Character)
-	 */
-	@Override
-	public double getChance(L2Character victim, L2Character killer)
-	{
-		final double chance = super.getChance(victim, killer);
-		if (Config.RATE_DROP_CHANCE_MULTIPLIER.containsKey(getItemId()))
-		{
-			return chance;
-		}
-		return chance * Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
+		return Config.RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
 	}
 }

@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
 
@@ -50,6 +52,52 @@ public class GeneralDropItem implements IDropItem
 		_min = min;
 		_max = max;
 		_chance = chance;
+	}
+	
+	protected double getGlobalChanceMultiplier()
+	{
+		return 1.;
+	}
+	
+	protected double getGlobalAmountMultiplier()
+	{
+		return 1.;
+	}
+	
+	private final long getMinMax(L2Character victim, L2Character killer, long val)
+	{
+		double multiplier = 1;
+		
+		// individual drop amount
+		Float individualDropAmountMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(getItemId());
+		if (individualDropAmountMultiplier != null)
+		{
+			// individual amount list multiplier
+			multiplier *= individualDropAmountMultiplier;
+		}
+		else
+		{
+			final L2Item item = ItemTable.getInstance().getTemplate(getItemId());
+			// global amount multiplier
+			if ((item != null) && item.hasExImmediateEffect())
+			{
+				// global herb amount multiplier
+				multiplier *= Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER;
+			}
+			else
+			{
+				// drop type specific amount multiplier
+				multiplier *= getGlobalAmountMultiplier();
+			}
+		}
+		
+		// global champions amount multiplier
+		if (victim.isChampion())
+		{
+			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+		}
+		
+		return (long) (val * multiplier);
 	}
 	
 	/**
@@ -78,17 +126,7 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public long getMin(L2Character victim, L2Character killer)
 	{
-		double multiplier = 1;
-		if (victim.isChampion())
-		{
-			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-		}
-		Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(getItemId());
-		if (dropChanceMultiplier != null)
-		{
-			multiplier *= dropChanceMultiplier;
-		}
-		return (long) (getMin() * multiplier);
+		return getMinMax(victim, killer, getMin());
 	}
 	
 	/**
@@ -108,17 +146,7 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public long getMax(L2Character victim, L2Character killer)
 	{
-		double multiplier = 1;
-		if (victim.isChampion())
-		{
-			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-		}
-		Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(getItemId());
-		if (dropChanceMultiplier != null)
-		{
-			multiplier *= dropChanceMultiplier;
-		}
-		return (long) (getMax() * multiplier);
+		return getMinMax(victim, killer, getMax());
 	}
 	
 	/**
@@ -138,13 +166,36 @@ public class GeneralDropItem implements IDropItem
 	 */
 	public double getChance(L2Character victim, L2Character killer)
 	{
-		float multiplier = 1;
-		Float dropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(getItemId());
-		if (dropChanceMultiplier != null)
+		double multiplier = 1;
+		
+		// individual drop chance
+		Float individualDropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(getItemId());
+		if (individualDropChanceMultiplier != null)
 		{
-			multiplier *= dropChanceMultiplier;
+			multiplier *= individualDropChanceMultiplier;
 		}
-		return getChance() * multiplier;
+		else
+		{
+			final L2Item item = ItemTable.getInstance().getTemplate(getItemId());
+			if ((item != null) && item.hasExImmediateEffect())
+			{
+				multiplier *= Config.RATE_HERB_DROP_CHANCE_MULTIPLIER;
+			}
+			else
+			{
+				multiplier *= getGlobalChanceMultiplier();
+			}
+		}
+		
+		// global champions chance multiplier, there is no such option yet
+		// @formatter:off
+		/*if (victim.isChampion())
+		{
+			multiplier *= getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS_CHANCE : Config.L2JMOD_CHAMPION_ADENAS_REWARDS_CHANCE;
+		}*/
+		// @formatter:on
+		
+		return (getChance() * multiplier);
 	}
 	
 	/*
@@ -174,9 +225,10 @@ public class GeneralDropItem implements IDropItem
 		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
 		{
 			final long amount = Rnd.get(getMin(victim, killer), getMax(victim, killer));
-			
 			final List<ItemHolder> items = new ArrayList<>(1);
+			
 			items.add(new ItemHolder(getItemId(), amount));
+			
 			return items;
 		}
 		
