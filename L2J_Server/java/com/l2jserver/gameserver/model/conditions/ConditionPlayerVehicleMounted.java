@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * @author Nyaran
@@ -36,12 +38,12 @@ public class ConditionPlayerVehicleMounted extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getPlayer() == null)
+		if (effector.getActingPlayer() == null)
 		{
 			return true;
 		}
-		return (env.getPlayer().isInVehicle() == _val);
+		return (effector.getActingPlayer().isInVehicle() == _val);
 	}
 }

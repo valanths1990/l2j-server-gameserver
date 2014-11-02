@@ -28,7 +28,6 @@ import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Calculator;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.MoveType;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.TraitType;
@@ -69,26 +68,26 @@ public class CharStat
 	 * Indeed, Func with lowest priority order is executed firsta and Funcs with the same order are executed in unspecified order.<br>
 	 * The result of the calculation is stored in the value property of an Env class instance.<br>
 	 * @param stat The stat to calculate the new value with modifiers
-	 * @param init The initial value of the stat before applying modifiers
+	 * @param initVal The initial value of the stat before applying modifiers
 	 * @param target The L2Charcater whose properties will be used in the calculation (ex : CON, INT...)
 	 * @param skill The L2Skill whose properties will be used in the calculation (ex : Level...)
 	 * @return
 	 */
-	public final double calcStat(Stats stat, double init, L2Character target, Skill skill)
+	public final double calcStat(Stats stat, double initVal, L2Character target, Skill skill)
 	{
+		double value = initVal;
 		if (stat == null)
 		{
-			return init;
+			return value;
 		}
 		
 		final int id = stat.ordinal();
-		
 		final Calculator c = _activeChar.getCalculators()[id];
 		
 		// If no Func object found, no modifier is applied
 		if ((c == null) || (c.size() == 0))
 		{
-			return init;
+			return value;
 		}
 		
 		// Apply transformation stats.
@@ -97,22 +96,15 @@ public class CharStat
 			double val = getActiveChar().getTransformation().getStat(getActiveChar().getActingPlayer(), stat);
 			if (val > 0)
 			{
-				init = val;
+				value = val;
 			}
 		}
 		
-		// Create and init an Env object to pass parameters to the Calculator
-		final Env env = new Env();
-		env.setCharacter(_activeChar);
-		env.setTarget(target);
-		env.setSkill(skill);
-		env.setValue(init);
-		
 		// Launch the calculation
-		c.calc(env);
+		value = c.calc(_activeChar, target, skill, value);
 		
 		// avoid some troubles with negative stats (some stats should never be negative)
-		if (env.getValue() <= 0)
+		if (value <= 0)
 		{
 			switch (stat)
 			{
@@ -132,10 +124,13 @@ public class CharStat
 				case STAT_MEN:
 				case STAT_STR:
 				case STAT_WIT:
-					env.setValue(1);
+				{
+					value = 1.0;
+					break;
+				}
 			}
 		}
-		return env.getValue();
+		return value;
 	}
 	
 	/**

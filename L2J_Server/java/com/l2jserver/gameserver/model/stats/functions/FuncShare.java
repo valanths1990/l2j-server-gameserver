@@ -16,40 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs;
+package com.l2jserver.gameserver.model.stats.functions;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.conditions.Condition;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 
 /**
  * @author UnAfraid
  */
-public class FuncShare extends Func
+public class FuncShare extends AbstractFunction
 {
-	public FuncShare(Stats pStat, int pOrder, Object owner, double value)
+	public FuncShare(Stats stat, int order, Object owner, double value, Condition applayCond)
 	{
-		super(pStat, pOrder, owner, value);
+		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		if ((cond == null) || cond.test(env))
+		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill))
 		{
-			final L2Character ch = env.getCharacter();
-			if ((ch != null) && ch.isServitor())
+			if ((effector != null) && effector.isServitor())
 			{
-				final L2Summon summon = (L2Summon) ch;
+				final L2Summon summon = (L2Summon) effector;
 				final L2PcInstance player = summon.getOwner();
 				if (player != null)
 				{
-					env.addValue(getBaseValue(stat, player) * _value);
+					return initVal + (getBaseValue(getStat(), player) * getValue());
 				}
 			}
 		}
+		return initVal;
 	}
 	
 	public static double getBaseValue(Stats stat, L2PcInstance player)

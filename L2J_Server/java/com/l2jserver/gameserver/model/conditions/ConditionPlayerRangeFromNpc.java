@@ -19,7 +19,8 @@
 package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.util.Util;
 
 /**
@@ -43,12 +44,12 @@ public class ConditionPlayerRangeFromNpc extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		boolean existNpc = false;
 		if ((_npcIds != null) && (_npcIds.length > 0) && (_radius > 0))
 		{
-			for (L2Character target : env.getCharacter().getKnownList().getKnownCharactersInRadius(_radius))
+			for (L2Character target : effector.getKnownList().getKnownCharactersInRadius(_radius))
 			{
 				if (target.isNpc() && Util.contains(_npcIds, target.getId()))
 				{

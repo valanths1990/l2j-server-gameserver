@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionTargetAbnormal.
@@ -38,8 +40,8 @@ public class ConditionTargetAbnormal extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		return (env.getTarget().getAbnormalVisualEffects() & _abnormalId) != 0;
+		return (effected.getAbnormalVisualEffects() & _abnormalId) != 0;
 	}
 }

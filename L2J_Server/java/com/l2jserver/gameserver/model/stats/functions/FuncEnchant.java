@@ -16,51 +16,50 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs;
+package com.l2jserver.gameserver.model.stats.functions;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.conditions.Condition;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 
-public class FuncEnchant extends Func
+public class FuncEnchant extends AbstractFunction
 {
-	public FuncEnchant(Stats pStat, int pOrder, Object owner, double value)
+	public FuncEnchant(Stats stat, int order, Object owner, double value, Condition applayCond)
 	{
-		super(pStat, pOrder, owner, value);
+		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		if ((cond != null) && !cond.test(env))
+		double value = initVal;
+		if ((getApplayCond() != null) && !getApplayCond().test(effector, effected, skill))
 		{
-			return;
+			return value;
 		}
-		L2ItemInstance item = (L2ItemInstance) funcOwner;
 		
+		L2ItemInstance item = (L2ItemInstance) getFuncOwner();
 		int enchant = item.getEnchantLevel();
-		
 		if (enchant <= 0)
 		{
-			return;
+			return value;
 		}
 		
 		int overenchant = 0;
-		
 		if (enchant > 3)
 		{
 			overenchant = enchant - 3;
 			enchant = 3;
 		}
 		
-		if (env.getPlayer() != null)
+		if (effector.isPlayer())
 		{
-			L2PcInstance player = env.getPlayer();
-			if (player.isInOlympiadMode() && (Config.ALT_OLY_ENCHANT_LIMIT >= 0) && ((enchant + overenchant) > Config.ALT_OLY_ENCHANT_LIMIT))
+			if (effector.getActingPlayer().isInOlympiadMode() && (Config.ALT_OLY_ENCHANT_LIMIT >= 0) && ((enchant + overenchant) > Config.ALT_OLY_ENCHANT_LIMIT))
 			{
 				if (Config.ALT_OLY_ENCHANT_LIMIT > 3)
 				{
@@ -74,36 +73,35 @@ public class FuncEnchant extends Func
 			}
 		}
 		
-		if ((stat == Stats.MAGIC_DEFENCE) || (stat == Stats.POWER_DEFENCE))
+		if ((getStat() == Stats.MAGIC_DEFENCE) || (getStat() == Stats.POWER_DEFENCE))
 		{
-			env.addValue(enchant + (3 * overenchant));
-			return;
+			return value + enchant + (3 * overenchant);
 		}
 		
-		if (stat == Stats.MAGIC_ATTACK)
+		if (getStat() == Stats.MAGIC_ATTACK)
 		{
 			switch (item.getItem().getItemGradeSPlus())
 			{
 				case S:
 					// M. Atk. increases by 4 for all weapons.
 					// Starting at +4, M. Atk. bonus double.
-					env.addValue((4 * enchant) + (8 * overenchant));
+					value += (4 * enchant) + (8 * overenchant);
 					break;
 				case A:
 				case B:
 				case C:
 					// M. Atk. increases by 3 for all weapons.
 					// Starting at +4, M. Atk. bonus double.
-					env.addValue((3 * enchant) + (6 * overenchant));
+					value += (3 * enchant) + (6 * overenchant);
 					break;
 				case D:
 				case NONE:
 					// M. Atk. increases by 2 for all weapons. Starting at +4, M. Atk. bonus double.
 					// Starting at +4, M. Atk. bonus double.
-					env.addValue((2 * enchant) + (4 * overenchant));
+					value += (2 * enchant) + (4 * overenchant);
 					break;
 			}
-			return;
+			return value;
 		}
 		
 		if (item.isWeapon())
@@ -118,20 +116,20 @@ public class FuncEnchant extends Func
 						{
 							// P. Atk. increases by 10 for bows.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((10 * enchant) + (20 * overenchant));
+							value += (10 * enchant) + (20 * overenchant);
 						}
 						else
 						{
 							// P. Atk. increases by 6 for two-handed swords, two-handed blunts, dualswords, and two-handed combat weapons.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((6 * enchant) + (12 * overenchant));
+							value += (6 * enchant) + (12 * overenchant);
 						}
 					}
 					else
 					{
 						// P. Atk. increases by 5 for one-handed swords, one-handed blunts, daggers, spears, and other weapons.
 						// Starting at +4, P. Atk. bonus double.
-						env.addValue((5 * enchant) + (10 * overenchant));
+						value += (5 * enchant) + (10 * overenchant);
 					}
 					break;
 				case A:
@@ -141,20 +139,20 @@ public class FuncEnchant extends Func
 						{
 							// P. Atk. increases by 8 for bows.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((8 * enchant) + (16 * overenchant));
+							value += (8 * enchant) + (16 * overenchant);
 						}
 						else
 						{
 							// P. Atk. increases by 5 for two-handed swords, two-handed blunts, dualswords, and two-handed combat weapons.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((5 * enchant) + (10 * overenchant));
+							value += (5 * enchant) + (10 * overenchant);
 						}
 					}
 					else
 					{
 						// P. Atk. increases by 4 for one-handed swords, one-handed blunts, daggers, spears, and other weapons.
 						// Starting at +4, P. Atk. bonus double.
-						env.addValue((4 * enchant) + (8 * overenchant));
+						value += (4 * enchant) + (8 * overenchant);
 					}
 					break;
 				case B:
@@ -165,20 +163,20 @@ public class FuncEnchant extends Func
 						{
 							// P. Atk. increases by 6 for bows.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((6 * enchant) + (12 * overenchant));
+							value += (6 * enchant) + (12 * overenchant);
 						}
 						else
 						{
 							// P. Atk. increases by 4 for two-handed swords, two-handed blunts, dualswords, and two-handed combat weapons.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((4 * enchant) + (8 * overenchant));
+							value += (4 * enchant) + (8 * overenchant);
 						}
 					}
 					else
 					{
 						// P. Atk. increases by 3 for one-handed swords, one-handed blunts, daggers, spears, and other weapons.
 						// Starting at +4, P. Atk. bonus double.
-						env.addValue((3 * enchant) + (6 * overenchant));
+						value += (3 * enchant) + (6 * overenchant);
 					}
 					break;
 				case D:
@@ -190,17 +188,18 @@ public class FuncEnchant extends Func
 						{
 							// Bows increase by 4.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((4 * enchant) + (8 * overenchant));
+							value += (4 * enchant) + (8 * overenchant);
 							break;
 						}
 						default:
 							// P. Atk. increases by 2 for all weapons with the exception of bows.
 							// Starting at +4, P. Atk. bonus double.
-							env.addValue((2 * enchant) + (4 * overenchant));
+							value += (2 * enchant) + (4 * overenchant);
 							break;
 					}
 					break;
 			}
 		}
+		return value;
 	}
 }

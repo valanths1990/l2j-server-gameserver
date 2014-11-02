@@ -55,13 +55,12 @@ import com.l2jserver.gameserver.model.effects.L2EffectType;
 import com.l2jserver.gameserver.model.entity.TvTEvent;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.TraitType;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.serverpackets.FlyToLocation.FlyType;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
@@ -985,7 +984,7 @@ public final class Skill implements IIdentifiable
 		return _effectPoint < 0;
 	}
 	
-	public boolean checkCondition(L2Character activeChar, L2Object target, boolean itemOrWeapon)
+	public boolean checkCondition(L2Character activeChar, L2Object object, boolean itemOrWeapon)
 	{
 		if (activeChar.canOverrideCond(PcCondOverride.SKILL_CONDITIONS) && !Config.GM_SKILL_RESTRICTION)
 		{
@@ -998,17 +997,10 @@ public final class Skill implements IIdentifiable
 			return true;
 		}
 		
-		final Env env = new Env();
-		env.setCharacter(activeChar);
-		if (target instanceof L2Character)
-		{
-			env.setTarget((L2Character) target);
-		}
-		env.setSkill(this);
-		
+		final L2Character target = (object instanceof L2Character) ? (L2Character) object : null;
 		for (Condition cond : preCondition)
 		{
-			if (!cond.test(env))
+			if (!cond.test(activeChar, target, this))
 			{
 				final String msg = cond.getMessage();
 				final int msgId = cond.getMessageId();
@@ -1222,25 +1214,22 @@ public final class Skill implements IIdentifiable
 		return true;
 	}
 	
-	public List<Func> getStatFuncs(AbstractEffect effect, L2Character player)
+	public List<AbstractFunction> getStatFuncs(AbstractEffect effect, L2Character player)
 	{
 		if (_funcTemplates == null)
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
 		if (!(player instanceof L2Playable) && !(player instanceof L2Attackable))
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
-		final List<Func> funcs = new ArrayList<>(_funcTemplates.size());
-		final Env env = new Env();
-		env.setCharacter(player);
-		env.setSkill(this);
+		final List<AbstractFunction> funcs = new ArrayList<>(_funcTemplates.size());
 		for (FuncTemplate t : _funcTemplates)
 		{
-			Func f = t.getFunc(env, this); // skill is owner
+			AbstractFunction f = t.getFunc(player, null, this, this); // skill is owner
 			if (f != null)
 			{
 				funcs.add(f);
@@ -1358,16 +1347,10 @@ public final class Skill implements IIdentifiable
 			return;
 		}
 		
-		final Env env = new Env();
-		env.setSkillMastery(Formulas.calcSkillMastery(effector, this));
-		env.setCharacter(effector);
-		env.setCubic(cubic);
-		env.setTarget(effected);
-		env.setSkill(this);
-		boolean addContinuousEffects = !passive && (_operateType.isToggle() || (_operateType.isContinuous() && Formulas.calcEffectSuccess(env)));
+		boolean addContinuousEffects = !passive && (_operateType.isToggle() || (_operateType.isContinuous() && Formulas.calcEffectSuccess(effector, effected, this)));
 		if (!self && !passive)
 		{
-			final BuffInfo info = new BuffInfo(env);
+			final BuffInfo info = new BuffInfo(effector, effected, this);
 			if (addContinuousEffects && (abnormalTime > 0))
 			{
 				info.setAbnormalTime(abnormalTime);
@@ -1397,10 +1380,9 @@ public final class Skill implements IIdentifiable
 		
 		if (self)
 		{
-			addContinuousEffects = !passive && (_operateType.isToggle() || ((_operateType.isContinuous() || _operateType.isSelfContinuous()) && Formulas.calcEffectSuccess(env)));
+			addContinuousEffects = !passive && (_operateType.isToggle() || ((_operateType.isContinuous() || _operateType.isSelfContinuous()) && Formulas.calcEffectSuccess(effector, effector, this)));
 			
-			env.setTarget(effector);
-			final BuffInfo info = new BuffInfo(env);
+			final BuffInfo info = new BuffInfo(effector, effector, this);
 			if (addContinuousEffects && (abnormalTime > 0))
 			{
 				info.setAbnormalTime(abnormalTime);
@@ -1424,8 +1406,7 @@ public final class Skill implements IIdentifiable
 		
 		if (passive)
 		{
-			env.setTarget(effector);
-			final BuffInfo info = new BuffInfo(env);
+			final BuffInfo info = new BuffInfo(effector, effector, this);
 			applyEffectScope(EffectScope.PASSIVE, info, false, true);
 			effector.getEffectList().add(info);
 		}
@@ -1483,12 +1464,7 @@ public final class Skill implements IIdentifiable
 						// and continuous effects on caster
 						applyEffects(target, caster, false, 0);
 						
-						final Env env = new Env();
-						env.setCharacter(caster);
-						env.setTarget(target);
-						env.setSkill(this);
-						
-						final BuffInfo info = new BuffInfo(env);
+						final BuffInfo info = new BuffInfo(caster, target, this);
 						applyEffectScope(EffectScope.GENERAL, info, true, false);
 						
 						EffectScope pvpOrPveEffectScope = caster.isPlayable() && target.isAttackable() ? EffectScope.PVE : caster.isPlayable() && target.isPlayable() ? EffectScope.PVP : null;

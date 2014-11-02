@@ -21,7 +21,9 @@ package com.l2jserver.gameserver.model.conditions;
 import java.util.ArrayList;
 
 import com.l2jserver.gameserver.model.L2Clan;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerHasClanHall.
@@ -42,18 +44,17 @@ public final class ConditionPlayerHasClanHall extends Condition
 	
 	/**
 	 * Test impl.
-	 * @param env the env
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getPlayer() == null)
+		if (effector.getActingPlayer() == null)
 		{
 			return false;
 		}
 		
-		final L2Clan clan = env.getPlayer().getClan();
+		final L2Clan clan = effector.getActingPlayer().getClan();
 		if (clan == null)
 		{
 			return ((_clanHall.size() == 1) && (_clanHall.get(0) == 0));

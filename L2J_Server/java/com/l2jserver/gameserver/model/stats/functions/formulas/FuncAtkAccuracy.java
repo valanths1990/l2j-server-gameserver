@@ -16,42 +16,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * @author UnAfraid
  */
-public class FuncAtkAccuracy extends Func
+public class FuncAtkAccuracy extends AbstractFunction
 {
 	private static final FuncAtkAccuracy _faa_instance = new FuncAtkAccuracy();
 	
-	public static Func getInstance()
+	public static AbstractFunction getInstance()
 	{
 		return _faa_instance;
 	}
 	
 	private FuncAtkAccuracy()
 	{
-		super(Stats.ACCURACY_COMBAT, 0x10, null, 0);
+		super(Stats.ACCURACY_COMBAT, 0x10, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		final int level = env.getCharacter().getLevel();
+		final int level = effector.getLevel();
 		// [Square(DEX)] * 6 + lvl + weapon hitbonus;
-		env.addValue((Math.sqrt(env.getCharacter().getDEX()) * 6) + level);
+		double value = initVal + (Math.sqrt(effector.getDEX()) * 6) + level;
 		if (level > 77)
 		{
-			env.addValue(level - 76);
+			value += level - 76;
 		}
 		if (level > 69)
 		{
-			env.addValue(level - 69);
+			value += level - 69;
 		}
+		return value;
 	}
 }

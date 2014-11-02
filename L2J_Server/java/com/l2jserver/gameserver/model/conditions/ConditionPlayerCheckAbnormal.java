@@ -18,9 +18,11 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.AbnormalType;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * Condition implementation to verify player's abnormal type and level.
@@ -53,9 +55,9 @@ public class ConditionPlayerCheckAbnormal extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		final BuffInfo info = env.getCharacter().getEffectList().getBuffInfoByAbnormalType(_type);
+		final BuffInfo info = effector.getEffectList().getBuffInfoByAbnormalType(_type);
 		return ((info != null) && ((_level == -1) || (_level >= info.getSkill().getAbnormalLvl())));
 	}
 }

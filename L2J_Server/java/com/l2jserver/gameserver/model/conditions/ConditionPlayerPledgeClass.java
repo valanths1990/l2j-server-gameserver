@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerPledgeClass.
@@ -40,16 +42,15 @@ public final class ConditionPlayerPledgeClass extends Condition
 	
 	/**
 	 * Test impl.
-	 * @param env the env
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if ((env.getPlayer() == null) || (env.getPlayer().getClan() == null))
+		if ((effector.getActingPlayer() == null) || (effector.getActingPlayer().getClan() == null))
 		{
 			return false;
 		}
-		return (_pledgeClass == -1) ? env.getPlayer().isClanLeader() : (env.getPlayer().getPledgeClass() >= _pledgeClass);
+		return (_pledgeClass == -1) ? effector.getActingPlayer().isClanLeader() : (effector.getActingPlayer().getPledgeClass() >= _pledgeClass);
 	}
 }

@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionLogicNot.
@@ -41,10 +43,6 @@ public class ConditionLogicNot extends Condition
 		}
 	}
 	
-	/**
-	 * Sets the listener.
-	 * @param listener the new listener
-	 */
 	@Override
 	void setListener(ConditionListener listener)
 	{
@@ -59,14 +57,9 @@ public class ConditionLogicNot extends Condition
 		super.setListener(listener);
 	}
 	
-	/**
-	 * Test impl.
-	 * @param env the env
-	 * @return true, if successful
-	 */
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		return !_condition.test(env);
+		return !_condition.test(effector, effected, skill, item);
 	}
 }

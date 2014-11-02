@@ -16,33 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions;
 
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.stats.BaseStats;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.conditions.Condition;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 
 /**
- * @author UnAfraid
+ * Returns the initial value minus the function value, if the condition are met.
+ * @author Zoey76
  */
-public class FuncMAtkSpeed extends Func
+public class FuncSub extends AbstractFunction
 {
-	private static final FuncMAtkSpeed _fas_instance = new FuncMAtkSpeed();
-	
-	public static Func getInstance()
+	public FuncSub(Stats stat, int order, Object owner, double value, Condition applayCond)
 	{
-		return _fas_instance;
-	}
-	
-	private FuncMAtkSpeed()
-	{
-		super(Stats.MAGIC_ATTACK_SPEED, 0x20, null, 0);
+		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		env.mulValue(BaseStats.WIT.calcBonus(env.getCharacter()));
+		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill))
+		{
+			return initVal - getValue();
+		}
+		return initVal;
 	}
 }

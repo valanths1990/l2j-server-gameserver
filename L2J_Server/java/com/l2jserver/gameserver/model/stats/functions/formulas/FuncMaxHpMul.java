@@ -16,24 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
-public class FuncSet extends Func
+/**
+ * @author UnAfraid
+ */
+public class FuncMaxHpMul extends AbstractFunction
 {
-	public FuncSet(Stats pStat, int pOrder, Object owner, double value)
+	private static final FuncMaxHpMul _fmhm_instance = new FuncMaxHpMul();
+	
+	public static AbstractFunction getInstance()
 	{
-		super(pStat, pOrder, owner, value);
+		return _fmhm_instance;
+	}
+	
+	private FuncMaxHpMul()
+	{
+		super(Stats.MAX_HP, 0x20, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		if ((cond == null) || cond.test(env))
-		{
-			env.setValue(_value);
-		}
+		return initVal * BaseStats.CON.calcBonus(effector);
 	}
 }

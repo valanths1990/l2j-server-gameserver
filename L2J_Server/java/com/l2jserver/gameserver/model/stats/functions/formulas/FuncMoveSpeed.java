@@ -16,33 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions.formulas;
 
-import com.l2jserver.gameserver.model.skills.funcs.Func;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.BaseStats;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 
 /**
  * @author UnAfraid
  */
-public class FuncPAtkSpeed extends Func
+public class FuncMoveSpeed extends AbstractFunction
 {
-	private static final FuncPAtkSpeed _fas_instance = new FuncPAtkSpeed();
+	private static final FuncMoveSpeed _fms_instance = new FuncMoveSpeed();
 	
-	public static Func getInstance()
+	public static AbstractFunction getInstance()
 	{
-		return _fas_instance;
+		return _fms_instance;
 	}
 	
-	private FuncPAtkSpeed()
+	private FuncMoveSpeed()
 	{
-		super(Stats.POWER_ATTACK_SPEED, 0x20, null, 0);
+		super(Stats.MOVE_SPEED, 0x30, null, 0, null);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		env.mulValue(BaseStats.DEX.calcBonus(env.getCharacter()));
+		return initVal * BaseStats.DEX.calcBonus(effector);
 	}
 }

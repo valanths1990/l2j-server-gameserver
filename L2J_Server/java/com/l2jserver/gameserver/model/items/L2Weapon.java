@@ -31,7 +31,6 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillSee;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
@@ -353,11 +352,7 @@ public final class L2Weapon extends L2Item
 		final Skill onCritSkill = _skillsOnCrit.getSkill();
 		if (_skillsOnCritCondition != null)
 		{
-			Env env = new Env();
-			env.setCharacter(caster);
-			env.setTarget(target);
-			env.setSkill(onCritSkill);
-			if (!_skillsOnCritCondition.test(env))
+			if (!_skillsOnCritCondition.test(caster, target, onCritSkill))
 			{
 				// Chance not met
 				return;
@@ -406,11 +401,7 @@ public final class L2Weapon extends L2Item
 		
 		if (_skillsOnMagicCondition != null)
 		{
-			Env env = new Env();
-			env.setCharacter(caster);
-			env.setTarget(target);
-			env.setSkill(onMagicSkill);
-			if (!_skillsOnMagicCondition.test(env))
+			if (!_skillsOnMagicCondition.test(caster, target, onMagicSkill))
 			{
 				// Chance not met
 				return;

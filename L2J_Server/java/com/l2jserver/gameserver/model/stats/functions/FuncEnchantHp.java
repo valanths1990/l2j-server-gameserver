@@ -16,35 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs;
+package com.l2jserver.gameserver.model.stats.functions;
 
 import com.l2jserver.gameserver.datatables.EnchantItemHPBonusData;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.conditions.Condition;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 
 /**
  * @author Yamaneko
  */
-public class FuncEnchantHp extends Func
+public class FuncEnchantHp extends AbstractFunction
 {
-	public FuncEnchantHp(Stats pStat, int pOrder, Object owner, double value)
+	public FuncEnchantHp(Stats stat, int order, Object owner, double value, Condition applayCond)
 	{
-		super(pStat, pOrder, owner, value);
+		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		if ((cond != null) && !cond.test(env))
+		if ((getApplayCond() != null) && !getApplayCond().test(effector, effected, skill))
 		{
-			return;
+			return initVal;
 		}
 		
-		final L2ItemInstance item = (L2ItemInstance) funcOwner;
+		final L2ItemInstance item = (L2ItemInstance) getFuncOwner();
 		if (item.getEnchantLevel() > 0)
 		{
-			env.addValue(EnchantItemHPBonusData.getInstance().getHPBonus(item));
+			return initVal + EnchantItemHPBonusData.getInstance().getHPBonus(item);
 		}
+		return initVal;
 	}
 }

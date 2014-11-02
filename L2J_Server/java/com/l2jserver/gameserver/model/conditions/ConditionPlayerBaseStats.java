@@ -20,7 +20,8 @@ package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerBaseStats.
@@ -47,17 +48,16 @@ public class ConditionPlayerBaseStats extends Condition
 	
 	/**
 	 * Test impl.
-	 * @param env the env
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getPlayer() == null)
+		if (effector.getActingPlayer() == null)
 		{
 			return false;
 		}
-		final L2PcInstance player = env.getPlayer();
+		final L2PcInstance player = effector.getActingPlayer();
 		switch (_stat)
 		{
 			case Int:

@@ -16,46 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.skills.funcs.formulas;
+package com.l2jserver.gameserver.model.stats.functions;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.stats.BaseStats;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.conditions.Condition;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 
 /**
- * @author UnAfraid
+ * Returns the initial value divided the function value, if the condition are met.
+ * @author Zoey76
  */
-public class FuncMAtkCritical extends Func
+public class FuncDiv extends AbstractFunction
 {
-	private static final FuncMAtkCritical _fac_instance = new FuncMAtkCritical();
-	
-	public static Func getInstance()
+	public FuncDiv(Stats stat, int order, Object owner, double value, Condition applayCond)
 	{
-		return _fac_instance;
-	}
-	
-	private FuncMAtkCritical()
-	{
-		super(Stats.MCRITICAL_RATE, 0x09, null, 0);
+		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public void calc(Env env)
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
 	{
-		L2Character p = env.getCharacter();
-		// CT2: The magic critical rate has been increased to 10 times.
-		if (p.isPlayer())
+		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill))
 		{
-			if (p.getActiveWeaponInstance() != null)
+			try
 			{
-				env.mulValue(BaseStats.WIT.calcBonus(p) * 10);
+				return initVal / getValue();
+			}
+			catch (Exception e)
+			{
+				LOG.warning(FuncDiv.class.getSimpleName() + ": Division by zero: " + getValue() + "!");
 			}
 		}
-		else
-		{
-			env.mulValue(BaseStats.WIT.calcBonus(p) * 10);
-		}
+		return initVal;
 	}
 }

@@ -20,7 +20,8 @@ package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
@@ -38,24 +39,23 @@ public class ConditionTargetMyPartyExceptMe extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		boolean isPartyMember = true;
-		final L2PcInstance player = env.getPlayer();
-		final L2Character target = env.getTarget();
-		if ((player == null) || (target == null) || !target.isPlayer())
+		final L2PcInstance player = effector.getActingPlayer();
+		if ((player == null) || (effected == null) || !effected.isPlayer())
 		{
 			isPartyMember = false;
 		}
-		else if (player == target)
+		else if (player == effected)
 		{
 			player.sendPacket(SystemMessageId.CANNOT_USE_ON_YOURSELF);
 			isPartyMember = false;
 		}
-		else if (!player.isInParty() || !player.getParty().equals(target.getParty()))
+		else if (!player.isInParty() || !player.getParty().equals(effected.getParty()))
 		{
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-			sm.addSkillName(env.getSkill());
+			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			isPartyMember = false;
 		}

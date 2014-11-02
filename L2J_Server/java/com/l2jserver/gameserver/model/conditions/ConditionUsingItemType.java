@@ -18,11 +18,12 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.ArmorType;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionUsingItemType.
@@ -44,14 +45,14 @@ public final class ConditionUsingItemType extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if ((env.getCharacter() == null) || !env.getCharacter().isPlayer())
+		if ((effector == null) || !effector.isPlayer())
 		{
 			return false;
 		}
 		
-		final Inventory inv = env.getPlayer().getInventory();
+		final Inventory inv = effector.getInventory();
 		// If ConditionUsingItemType is one between Light, Heavy or Magic
 		if (_armor)
 		{

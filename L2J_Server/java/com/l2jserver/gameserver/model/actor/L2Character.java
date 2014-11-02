@@ -122,13 +122,12 @@ import com.l2jserver.gameserver.model.skills.EffectScope;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.skills.SkillChannelized;
 import com.l2jserver.gameserver.model.skills.SkillChannelizer;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Calculator;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.AbstractNpcInfo;
@@ -1997,13 +1996,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		if (skill.hasEffects(EffectScope.START))
 		{
-			final Env env = new Env();
-			env.setSkillMastery(Formulas.calcSkillMastery(this, skill));
-			env.setCharacter(this);
-			env.setTarget(target);
-			env.setSkill(skill);
-			final BuffInfo info = new BuffInfo(env);
-			skill.applyEffectScope(EffectScope.START, info, true, false);
+			skill.applyEffectScope(EffectScope.START, new BuffInfo(this, target, skill), true, false);
 		}
 		
 		// Before start AI Cast Broadcast Fly Effect is Need
@@ -3597,11 +3590,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * <li>If _calculators is linked to NPC_STD_CALCULATOR, create a copy of NPC_STD_CALCULATOR in _calculators</li>
 	 * <li>Add the Func object to _calculators</li>
 	 * </ul>
-	 * @param f The Func object to add to the Calculator corresponding to the state affected
+	 * @param function The Func object to add to the Calculator corresponding to the state affected
 	 */
-	public final void addStatFunc(Func f)
+	public final void addStatFunc(AbstractFunction function)
 	{
-		if (f == null)
+		if (function == null)
 		{
 			return;
 		}
@@ -3624,7 +3617,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			}
 			
 			// Select the Calculator of the affected state in the Calculator set
-			int stat = f.stat.ordinal();
+			int stat = function.getStat().ordinal();
 			
 			if (_calculators[stat] == null)
 			{
@@ -3632,7 +3625,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			}
 			
 			// Add the Func to the calculator corresponding to the state
-			_calculators[stat].addFunc(f);
+			_calculators[stat].addFunc(function);
 		}
 	}
 	
@@ -3649,13 +3642,13 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * <li>Learn a new passive skill</li>
 	 * <li>Use an active skill</li>
 	 * </ul>
-	 * @param funcs The list of Func objects to add to the Calculator corresponding to the state affected
+	 * @param functions The list of Func objects to add to the Calculator corresponding to the state affected
 	 */
-	public final void addStatFuncs(List<Func> funcs)
+	public final void addStatFuncs(List<AbstractFunction> functions)
 	{
 		if (!isPlayer() && getKnownList().getKnownPlayers().isEmpty())
 		{
-			for (Func f : funcs)
+			for (AbstractFunction f : functions)
 			{
 				addStatFunc(f);
 			}
@@ -3663,9 +3656,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		else
 		{
 			final List<Stats> modifiedStats = new ArrayList<>();
-			for (Func f : funcs)
+			for (AbstractFunction f : functions)
 			{
-				modifiedStats.add(f.stat);
+				modifiedStats.add(f.getStat());
 				addStatFunc(f);
 			}
 			broadcastModifiedStats(modifiedStats);
@@ -3685,17 +3678,17 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * <li>Remove the Func object from _calculators</li>
 	 * <li>If L2Character is a L2NPCInstance and _calculators is equal to NPC_STD_CALCULATOR, free cache memory and just create a link on NPC_STD_CALCULATOR in _calculators</li>
 	 * </ul>
-	 * @param f The Func object to remove from the Calculator corresponding to the state affected
+	 * @param function The Func object to remove from the Calculator corresponding to the state affected
 	 */
-	public final void removeStatFunc(Func f)
+	public final void removeStatFunc(AbstractFunction function)
 	{
-		if (f == null)
+		if (function == null)
 		{
 			return;
 		}
 		
 		// Select the Calculator of the affected state in the Calculator set
-		int stat = f.stat.ordinal();
+		int stat = function.getStat().ordinal();
 		
 		synchronized (this)
 		{
@@ -3705,7 +3698,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			}
 			
 			// Remove the Func object from the Calculator
-			_calculators[stat].removeFunc(f);
+			_calculators[stat].removeFunc(function);
 			
 			if (_calculators[stat].size() == 0)
 			{
@@ -3744,13 +3737,13 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * <li>Unequip an item from inventory</li>
 	 * <li>Stop an active skill</li>
 	 * </ul>
-	 * @param funcs The list of Func objects to add to the Calculator corresponding to the state affected
+	 * @param functions The list of Func objects to add to the Calculator corresponding to the state affected
 	 */
-	public final void removeStatFuncs(Func[] funcs)
+	public final void removeStatFuncs(AbstractFunction[] functions)
 	{
 		if (!isPlayer() && getKnownList().getKnownPlayers().isEmpty())
 		{
-			for (Func f : funcs)
+			for (AbstractFunction f : functions)
 			{
 				removeStatFunc(f);
 			}
@@ -3758,9 +3751,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		else
 		{
 			final List<Stats> modifiedStats = new ArrayList<>();
-			for (Func f : funcs)
+			for (AbstractFunction f : functions)
 			{
-				modifiedStats.add(f.stat);
+				modifiedStats.add(f.getStat());
 				removeStatFunc(f);
 			}
 			
