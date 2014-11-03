@@ -222,16 +222,48 @@ public class GeneralDropItem implements IDropItem
 			return null;
 		}
 		
-		if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
+		final List<ItemHolder> items = new ArrayList<>(1);
+		
+		if (Config.L2JMOD_OLD_DROP_BEHAVIOR)
 		{
-			final long amount = Rnd.get(getMin(victim, killer), getMax(victim, killer));
-			final List<ItemHolder> items = new ArrayList<>(1);
+			double chance = getChance(victim, killer);
+			if (Config.L2JMOD_CHAMPION_ENABLE && victim.isChampion() && (getItemId() != Inventory.ADENA_ID))
+			{
+				chance *= Config.L2JMOD_CHAMPION_REWARDS;
+			}
 			
-			items.add(new ItemHolder(getItemId(), amount));
+			long amount = 0;
 			
-			return items;
+			if (chance > 100)
+			{
+				int chanceOveflow = (int) (chance / 100);
+				chance = chance % 100;
+				while (chanceOveflow > 0)
+				{
+					amount += Rnd.get(getMin(victim, killer), getMax(victim, killer));
+					chanceOveflow--;
+				}
+			}
+			
+			if (chance > (Rnd.nextDouble() * 100))
+			{
+				amount += Rnd.get(getMin(victim, killer), getMax(victim, killer));
+			}
+			
+			if (amount > 0)
+			{
+				items.add(new ItemHolder(getItemId(), amount));
+			}
+		}
+		else
+		{
+			if (getChance(victim, killer) > (Rnd.nextDouble() * 100))
+			{
+				final long amount = Rnd.get(getMin(victim, killer), getMax(victim, killer));
+				items.add(new ItemHolder(getItemId(), amount));
+			}
 		}
 		
-		return null;
+		return items;
 	}
 }

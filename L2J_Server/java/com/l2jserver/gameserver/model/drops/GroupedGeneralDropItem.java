@@ -126,22 +126,62 @@ public class GroupedGeneralDropItem implements IDropItem
 		
 		if ((getChance(victim, killer) * chanceModifier) > (Rnd.nextDouble() * 100))
 		{
-			double random = (Rnd.nextDouble() * 100);
+			final List<ItemHolder> items = new ArrayList<>(1);
+			long amount = 0;
 			double totalChance = 0;
-			for (GeneralDropItem item : getItems())
+			double random = (Rnd.nextDouble() * 100);
+			double chance = 0;
+			
+			if (Config.L2JMOD_OLD_DROP_BEHAVIOR)
 			{
-				// Grouped item chance rates should not be modified.
-				totalChance += item.getChance();
-				if (totalChance > random)
+				for (GeneralDropItem item : getItems())
 				{
-					long amount = Rnd.get(item.getMin(victim, killer), item.getMax(victim, killer));
+					// Grouped item chance rates should not be modified.
+					totalChance += item.getChance();
 					
-					List<ItemHolder> items = new ArrayList<>(1);
-					items.add(new ItemHolder(item.getItemId(), amount));
-					return items;
+					if (totalChance > 100)
+					{
+						int chanceOverflow = (int) (totalChance / 100);
+						chance = totalChance % 100;
+						while (chanceOverflow > 0)
+						{
+							amount += Rnd.get(item.getMin(victim, killer), item.getMax(victim, killer));
+							chanceOverflow--;
+						}
+					}
+					else
+					{
+						chance = totalChance;
+					}
+					
+					if (chance > random)
+					{
+						amount += Rnd.get(item.getMin(victim, killer), item.getMax(victim, killer));
+					}
+					
+					if (amount > 0)
+					{
+						items.add(new ItemHolder(item.getItemId(), amount));
+						return items;
+					}
+				}
+			}
+			else
+			{
+				for (GeneralDropItem item : getItems())
+				{
+					// Grouped item chance rates should not be modified.
+					totalChance += item.getChance();
+					if (totalChance > random)
+					{
+						amount = Rnd.get(item.getMin(victim, killer), item.getMax(victim, killer));
+						items.add(new ItemHolder(item.getItemId(), amount));
+						return items;
+					}
 				}
 			}
 		}
+		
 		return null;
 	}
 }
