@@ -647,6 +647,12 @@ public final class Util
 		sendCBHtml(activeChar, html, fillMultiEdit, 0);
 	}
 	
+	@Deprecated
+	public static void sendCBHtml(L2PcInstance activeChar, String html, String fillMultiEdit, boolean buildHtmlActionCache)
+	{
+		sendCBHtml(activeChar, html, fillMultiEdit, buildHtmlActionCache ? 0 : -1);
+	}
+	
 	/**
 	 * Helper method to send a community board html to the specified player.<br>
 	 * It fills a multiedit field in the send html if {@code fillMultiEdit}<br>
