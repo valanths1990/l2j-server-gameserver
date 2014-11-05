@@ -53,6 +53,10 @@ public interface IChanceMultiplierStrategy
 		return (item, victim) ->
 		{
 			float multiplier = 1;
+			if (victim.isChampion())
+			{
+				multiplier *= item.getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+			}
 			Float dropChanceMultiplier = Config.RATE_DROP_CHANCE_MULTIPLIER.get(item.getItemId());
 			if (dropChanceMultiplier != null)
 			{

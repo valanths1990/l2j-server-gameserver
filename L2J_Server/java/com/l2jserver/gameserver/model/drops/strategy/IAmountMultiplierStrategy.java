@@ -22,7 +22,6 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.drops.GeneralDropItem;
-import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 
 /**
  * @author Battlecruiser
@@ -38,10 +37,7 @@ public interface IAmountMultiplierStrategy
 		return (item, victim) ->
 		{
 			double multiplier = 1;
-			if (victim.isChampion())
-			{
-				multiplier *= item.getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS : Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
-			}
+			
 			Float dropChanceMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(item.getItemId());
 			if (dropChanceMultiplier != null)
 			{
