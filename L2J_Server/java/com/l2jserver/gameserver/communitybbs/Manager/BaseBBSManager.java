@@ -31,34 +31,6 @@ public abstract class BaseBBSManager
 	
 	public abstract void parsewrite(String ar1, String ar2, String ar3, String ar4, String ar5, L2PcInstance activeChar);
 	
-	protected void separateAndSend(String html, L2PcInstance acha)
-	{
-		if (html == null)
-		{
-			return;
-		}
-		if (html.length() < 4096)
-		{
-			acha.sendPacket(new ShowBoard(html, "101"));
-			acha.sendPacket(new ShowBoard(null, "102"));
-			acha.sendPacket(new ShowBoard(null, "103"));
-			
-		}
-		else if (html.length() < 8192)
-		{
-			acha.sendPacket(new ShowBoard(html.substring(0, 4096), "101"));
-			acha.sendPacket(new ShowBoard(html.substring(4096), "102"));
-			acha.sendPacket(new ShowBoard(null, "103"));
-			
-		}
-		else if (html.length() < 16384)
-		{
-			acha.sendPacket(new ShowBoard(html.substring(0, 4096), "101"));
-			acha.sendPacket(new ShowBoard(html.substring(4096, 8192), "102"));
-			acha.sendPacket(new ShowBoard(html.substring(8192), "103"));
-		}
-	}
-	
 	/**
 	 * @param html
 	 * @param acha

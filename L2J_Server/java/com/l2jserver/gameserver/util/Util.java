@@ -145,7 +145,7 @@ public final class Util
 	 * @param squared - If set to true, distance returned will be squared.
 	 * @return {@code double} - Distance between object and given x, y , z.
 	 */
-	public static double calculateDistance(int x1, int y1, int z1, int x2, int y2, int z2, boolean includeZAxis, boolean squared)
+	public static double calculateDistance(double x1, double y1, double z1, double x2, double y2, double z2, boolean includeZAxis, boolean squared)
 	{
 		final double distance = Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + (includeZAxis ? Math.pow(z1 - z2, 2) : 0);
 		return (squared) ? distance : Math.sqrt(distance);
@@ -596,9 +596,9 @@ public final class Util
 	}
 	
 	/**
-	 * Sends the given html to the player.
-	 * @param activeChar
-	 * @param html
+	 * Helper method to send a NpcHtmlMessage to the specified player.
+	 * @param activeChar the player to send the html content to
+	 * @param html the html content
 	 */
 	public static void sendHtml(L2PcInstance activeChar, String html)
 	{
@@ -607,40 +607,69 @@ public final class Util
 		activeChar.sendPacket(npcHtml);
 	}
 	
+	/**
+	 * Helper method to send a community board html to the specified player.<br>
+	 * HtmlActionCache will be build with npc origin 0 which means the<br>
+	 * links on the html are not bound to a specific npc.
+	 * @param activeChar the player
+	 * @param html the html content
+	 */
 	public static void sendCBHtml(L2PcInstance activeChar, String html)
 	{
-		sendCBHtml(activeChar, html, true);
-	}
-	
-	public static void sendCBHtml(L2PcInstance activeChar, String html, boolean buildActionCache)
-	{
-		sendCBHtml(activeChar, html, null, buildActionCache);
-	}
-	
-	public static void sendCBHtml(L2PcInstance activeChar, String html, String fillMultiEdit)
-	{
-		sendCBHtml(activeChar, html, fillMultiEdit, true);
+		sendCBHtml(activeChar, html, 0);
 	}
 	
 	/**
-	 * Sends the html using the community board window.
-	 * @param activeChar
-	 * @param html
-	 * @param fillMultiEdit fills the multiedit window (if any) inside the community board.
-	 * @param buildActionCache if false, action cache will not be built and players won't be able to click links in the HTML
+	 * Helper method to send a community board html to the specified player.<br>
+	 * When {@code npcObjId} is greater -1 the HtmlActionCache will be build<br>
+	 * with the npcObjId as origin. An origin of 0 means the cached bypasses<br>
+	 * are not bound to a specific npc.
+	 * @param activeChar the player to send the html content to
+	 * @param html the html content
+	 * @param npcObjId bypass origin to use
 	 */
-	public static void sendCBHtml(L2PcInstance activeChar, String html, String fillMultiEdit, boolean buildActionCache)
+	public static void sendCBHtml(L2PcInstance activeChar, String html, int npcObjId)
 	{
-		if (activeChar == null)
+		sendCBHtml(activeChar, html, null, npcObjId);
+	}
+	
+	/**
+	 * Helper method to send a community board html to the specified player.<br>
+	 * HtmlActionCache will be build with npc origin 0 which means the<br>
+	 * links on the html are not bound to a specific npc. It also fills a<br>
+	 * multiedit field in the send html if fillMultiEdit is not null.
+	 * @param activeChar the player
+	 * @param html the html content
+	 * @param fillMultiEdit text to fill the multiedit field with(may be null)
+	 */
+	public static void sendCBHtml(L2PcInstance activeChar, String html, String fillMultiEdit)
+	{
+		sendCBHtml(activeChar, html, fillMultiEdit, 0);
+	}
+	
+	/**
+	 * Helper method to send a community board html to the specified player.<br>
+	 * It fills a multiedit field in the send html if {@code fillMultiEdit}<br>
+	 * is not null. When {@code npcObjId} is greater -1 the HtmlActionCache will be build<br>
+	 * with the npcObjId as origin. An origin of 0 means the cached bypasses<br>
+	 * are not bound to a specific npc.
+	 * @param activeChar the player
+	 * @param html the html content
+	 * @param fillMultiEdit text to fill the multiedit field with(may be null)
+	 * @param npcObjId bypass origin to use
+	 */
+	public static void sendCBHtml(L2PcInstance activeChar, String html, String fillMultiEdit, int npcObjId)
+	{
+		if ((activeChar == null) || (html == null))
 		{
 			return;
 		}
 		
 		activeChar.clearHtmlActions(HtmlActionScope.COMM_BOARD_HTML);
 		
-		if (buildActionCache)
+		if (npcObjId > -1)
 		{
-			buildHtmlActionCache(activeChar, HtmlActionScope.COMM_BOARD_HTML, 0, html);
+			buildHtmlActionCache(activeChar, HtmlActionScope.COMM_BOARD_HTML, npcObjId, html);
 		}
 		
 		if (fillMultiEdit != null)
