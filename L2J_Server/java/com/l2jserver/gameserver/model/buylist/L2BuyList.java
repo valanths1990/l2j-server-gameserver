@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class L2BuyList
 {

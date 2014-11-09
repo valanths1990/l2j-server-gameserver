@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model.drops;
 import com.l2jserver.Config;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public class DeathDropItem extends GeneralDropItem
 {

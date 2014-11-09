@@ -33,7 +33,7 @@ import com.l2jserver.gameserver.enums.CategoryType;
 
 /**
  * This class holds different categories containing class ids or npc ids.
- * @author Nos, xban1x
+ * @author NosBit, xban1x
  */
 public final class CategoryData extends DocumentParser
 {

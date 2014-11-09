@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.model.skills;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public enum EffectScope
 {

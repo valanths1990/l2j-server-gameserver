@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public class GroupedGeneralDropItem implements IDropItem
 {

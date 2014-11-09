@@ -64,7 +64,7 @@ import com.l2jserver.util.Rnd;
 import com.l2jserver.util.StringUtil;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public class TvTEvent
 {

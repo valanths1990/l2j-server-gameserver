@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model;
 import com.l2jserver.gameserver.datatables.AdminTable;
 
 /**
- * @author FBIagent<br>
+ * @author HorridoJoho
  */
 public class L2AccessLevel
 {

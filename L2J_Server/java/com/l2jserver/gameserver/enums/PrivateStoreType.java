@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.enums;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public enum PrivateStoreType
 {

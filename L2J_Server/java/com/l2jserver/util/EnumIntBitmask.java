@@ -19,7 +19,7 @@
 package com.l2jserver.util;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  * @param <E> The enum type
  */
 public final class EnumIntBitmask<E extends Enum<E>> implements Cloneable

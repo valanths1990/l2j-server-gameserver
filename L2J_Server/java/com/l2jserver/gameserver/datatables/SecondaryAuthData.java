@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
 import com.l2jserver.gameserver.engines.DocumentParser;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public class SecondaryAuthData extends DocumentParser
 {

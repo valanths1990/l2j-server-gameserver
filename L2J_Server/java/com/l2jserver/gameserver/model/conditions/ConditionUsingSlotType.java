@@ -23,7 +23,7 @@ import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public class ConditionUsingSlotType extends Condition
 {

@@ -51,7 +51,7 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * NPC data parser.
- * @author Nos
+ * @author NosBit
  */
 public class NpcData extends DocumentParser
 {

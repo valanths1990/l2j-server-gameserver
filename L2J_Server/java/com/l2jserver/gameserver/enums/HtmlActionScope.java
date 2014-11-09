@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.enums;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public enum HtmlActionScope
 {

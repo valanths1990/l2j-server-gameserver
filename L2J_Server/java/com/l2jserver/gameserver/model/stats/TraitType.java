@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.model.stats;
 
 /**
- * @author UnAfraid, Nos
+ * @author UnAfraid, NosBit
  */
 public enum TraitType
 {

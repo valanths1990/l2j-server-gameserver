@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.model.items.L2Item;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class Product
 {

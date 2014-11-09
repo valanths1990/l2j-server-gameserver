@@ -27,7 +27,7 @@ import com.l2jserver.util.StringUtil;
 
 /**
  * A class containing useful methods for constructing HTML
- * @author Nos
+ * @author NosBit
  */
 public class HtmlUtil
 {

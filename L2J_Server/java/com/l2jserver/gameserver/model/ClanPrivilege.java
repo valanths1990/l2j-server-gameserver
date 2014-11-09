@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model;
 /**
  * This enum is used for clan privileges.<br>
  * The ordinal of each entry is the bit index in the privilege bitmask.
- * @author FBIagent
+ * @author HorridoJoho
  */
 public enum ClanPrivilege
 {

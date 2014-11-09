@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class DecayTaskManager
 {

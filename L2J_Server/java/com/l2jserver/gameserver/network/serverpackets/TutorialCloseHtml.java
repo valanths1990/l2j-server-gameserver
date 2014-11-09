@@ -22,7 +22,7 @@ import com.l2jserver.gameserver.enums.HtmlActionScope;
 
 /**
  * TutorialCloseHtml server packet implementation.
- * @author FBIagent
+ * @author HorridoJoho
  */
 public class TutorialCloseHtml extends L2GameServerPacket
 {

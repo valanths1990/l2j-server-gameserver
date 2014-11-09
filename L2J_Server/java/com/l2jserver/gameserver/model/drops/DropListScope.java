@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public enum DropListScope
 {

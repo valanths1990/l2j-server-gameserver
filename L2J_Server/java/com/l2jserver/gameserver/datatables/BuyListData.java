@@ -37,7 +37,7 @@ import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.util.file.filter.NumericNameFilter;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class BuyListData extends DocumentParser
 {

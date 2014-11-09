@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.util;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public final class LinePointIterator3D
 {
