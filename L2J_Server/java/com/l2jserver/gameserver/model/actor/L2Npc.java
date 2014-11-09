@@ -23,6 +23,8 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
@@ -144,6 +146,8 @@ public class L2Npc extends L2Character
 	
 	private int _shotsMask = 0;
 	private int _killingBlowWeaponId;
+	/** Map of summoned NPCs by this NPC. */
+	private volatile Map<Integer, L2Npc> _summonedNpcs = null;
 	
 	public int getSoulShotChance()
 	{
@@ -1956,5 +1960,73 @@ public class L2Npc extends L2Character
 	public int getKillingBlowWeapon()
 	{
 		return _killingBlowWeaponId;
+	}
+	
+	/**
+	 * Adds a summoned NPC.
+	 * @param npc the summoned NPC
+	 */
+	public final void addSummonedNpc(L2Npc npc)
+	{
+		if (_summonedNpcs == null)
+		{
+			synchronized (this)
+			{
+				if (_summonedNpcs == null)
+				{
+					_summonedNpcs = new ConcurrentHashMap<>();
+				}
+			}
+		}
+		
+		_summonedNpcs.put(npc.getObjectId(), npc);
+		
+		npc.setSummoner(this);
+	}
+	
+	/**
+	 * Removes a summoned NPC by object ID.
+	 * @param objectId the summoned NPC object ID
+	 */
+	public final void removeSummonedNpc(int objectId)
+	{
+		if (_summonedNpcs != null)
+		{
+			_summonedNpcs.remove(objectId);
+		}
+	}
+	
+	/**
+	 * Gets the summoned NPC by object ID.
+	 * @param objectId the summoned NPC object ID
+	 * @return the summoned NPC
+	 */
+	public final L2Npc getSummonedNpc(int objectId)
+	{
+		if (_summonedNpcs != null)
+		{
+			return _summonedNpcs.get(objectId);
+		}
+		return null;
+	}
+	
+	/**
+	 * Gets the summoned NPC count.
+	 * @return the summoned NPC count
+	 */
+	public final int getSummonedNpcCount()
+	{
+		return _summonedNpcs != null ? _summonedNpcs.size() : 0;
+	}
+	
+	/**
+	 * Resets the summoned NPCs list.
+	 */
+	public final void resetSummonedNpcs()
+	{
+		if (_summonedNpcs != null)
+		{
+			_summonedNpcs.clear();
+		}
 	}
 }
