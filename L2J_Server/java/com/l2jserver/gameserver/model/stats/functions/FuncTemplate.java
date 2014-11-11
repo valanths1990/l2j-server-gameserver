@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.model.stats.functions;
 import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
+import com.l2jserver.gameserver.enums.StatFunction;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.conditions.Condition;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
@@ -42,17 +43,26 @@ public final class FuncTemplate
 	private final int _order;
 	private final double _value;
 	
-	public FuncTemplate(Condition attachCond, Condition applayCond, String functionName, Stats stat, int order, double value)
+	public FuncTemplate(Condition attachCond, Condition applayCond, String functionName, int order, Stats stat, double value)
 	{
+		final StatFunction function = StatFunction.valueOf(functionName.toUpperCase());
+		if (order >= 0)
+		{
+			_order = order;
+		}
+		else
+		{
+			_order = function.getOrder();
+		}
+		
 		_attachCond = attachCond;
 		_applayCond = applayCond;
 		_stat = stat;
-		_order = order;
 		_value = value;
 		
 		try
 		{
-			final Class<?> functionClass = Class.forName("com.l2jserver.gameserver.model.stats.functions.Func" + functionName);
+			final Class<?> functionClass = Class.forName("com.l2jserver.gameserver.model.stats.functions.Func" + function.getName());
 			_constructor = functionClass.getConstructor(new Class<?>[]
 			{
 				// Stats to update

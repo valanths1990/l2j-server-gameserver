@@ -80,36 +80,18 @@ public class OptionsData extends DocumentParser
 										switch (fd.getNodeName())
 										{
 											case "add":
-											{
-												parseFuncs(fd.getAttributes(), "Add", op);
-												break;
-											}
-											case "mul":
-											{
-												parseFuncs(fd.getAttributes(), "Mul", op);
-												break;
-											}
-											case "basemul":
-											{
-												parseFuncs(fd.getAttributes(), "BaseMul", op);
-												break;
-											}
 											case "sub":
-											{
-												parseFuncs(fd.getAttributes(), "Sub", op);
-												break;
-											}
+											case "mul":
 											case "div":
-											{
-												parseFuncs(fd.getAttributes(), "Div", op);
-												break;
-											}
 											case "set":
+											case "share":
+											case "enchant":
+											case "enchanthp":
 											{
-												parseFuncs(fd.getAttributes(), "Set", op);
-												break;
+												parseFuncs(fd.getAttributes(), fd.getNodeName(), op);
 											}
 										}
+										
 									}
 									break;
 								}
@@ -147,12 +129,17 @@ public class OptionsData extends DocumentParser
 		}
 	}
 	
-	private void parseFuncs(NamedNodeMap attrs, String func, Options op)
+	private void parseFuncs(NamedNodeMap attrs, String functionName, Options op)
 	{
 		Stats stat = Stats.valueOfXml(parseString(attrs, "stat"));
-		int ord = Integer.decode(parseString(attrs, "order"));
 		double val = parseDouble(attrs, "val");
-		op.addFunc(new FuncTemplate(null, null, func, stat, ord, val));
+		int order = -1;
+		final Node orderNode = attrs.getNamedItem("order");
+		if (orderNode != null)
+		{
+			order = Integer.parseInt(orderNode.getNodeValue());
+		}
+		op.addFunc(new FuncTemplate(null, null, functionName, order, stat, val));
 	}
 	
 	public Options getOptions(int id)

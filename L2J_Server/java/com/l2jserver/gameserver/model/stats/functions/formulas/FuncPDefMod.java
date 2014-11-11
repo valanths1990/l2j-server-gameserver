@@ -40,7 +40,7 @@ public class FuncPDefMod extends AbstractFunction
 	
 	private FuncPDefMod()
 	{
-		super(Stats.POWER_DEFENCE, 0x20, null, 0, null);
+		super(Stats.POWER_DEFENCE, 1, null, 0, null);
 	}
 	
 	@Override

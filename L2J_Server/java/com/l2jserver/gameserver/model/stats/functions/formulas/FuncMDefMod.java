@@ -40,7 +40,7 @@ public class FuncMDefMod extends AbstractFunction
 	
 	private FuncMDefMod()
 	{
-		super(Stats.MAGIC_DEFENCE, 0x20, null, 0, null);
+		super(Stats.MAGIC_DEFENCE, 1, null, 0, null);
 	}
 	
 	@Override

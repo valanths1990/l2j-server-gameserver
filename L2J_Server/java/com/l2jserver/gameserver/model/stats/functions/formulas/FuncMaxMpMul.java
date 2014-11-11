@@ -38,7 +38,7 @@ public class FuncMaxMpMul extends AbstractFunction
 	
 	private FuncMaxMpMul()
 	{
-		super(Stats.MAX_MP, 0x20, null, 0, null);
+		super(Stats.MAX_MP, 10, null, 0, null);
 	}
 	
 	@Override

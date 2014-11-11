@@ -38,7 +38,7 @@ public class FuncMAtkCritical extends AbstractFunction
 	
 	private FuncMAtkCritical()
 	{
-		super(Stats.MCRITICAL_RATE, 0x09, null, 0, null);
+		super(Stats.MCRITICAL_RATE, 10, null, 0, null);
 	}
 	
 	@Override

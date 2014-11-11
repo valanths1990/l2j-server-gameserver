@@ -27,6 +27,7 @@ import java.util.Map;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.enums.StatFunction;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.CrystalType;
@@ -41,7 +42,7 @@ public class EnchantItemHPBonusData extends DocumentParser
 {
 	private final Map<CrystalType, List<Integer>> _armorHPBonuses = new EnumMap<>(CrystalType.class);
 	
-	private static final float fullArmorModifier = 1.5f; // TODO: Move it to config!
+	private static final float FULL_ARMOR_MODIFIER = 1.5f; // TODO: Move it to config!
 	
 	/**
 	 * Instantiates a new enchant hp bonus data.
@@ -99,25 +100,7 @@ public class EnchantItemHPBonusData extends DocumentParser
 						case L2Item.SLOT_UNDERWEAR:
 						case L2Item.SLOT_L_HAND:
 						case L2Item.SLOT_BELT:
-							item.attach(new FuncTemplate(null, null, "EnchantHp", Stats.MAX_HP, 0x60, 0));
-							break;
-						default:
-							break;
-					}
-				}
-			}
-			
-			// Shields
-			final Collection<Integer> shieldIds = it.getAllWeaponsId();
-			for (Integer itemId : shieldIds)
-			{
-				item = it.getTemplate(itemId);
-				if ((item != null) && (item.getCrystalType() != CrystalType.NONE))
-				{
-					switch (item.getBodyPart())
-					{
-						case L2Item.SLOT_L_HAND:
-							item.attach(new FuncTemplate(null, null, "EnchantHp", Stats.MAX_HP, 0x60, 0));
+							item.attach(new FuncTemplate(null, null, StatFunction.ENCHANTHP.getName(), -1, Stats.MAX_HP, 0));
 							break;
 						default:
 							break;
@@ -151,7 +134,7 @@ public class EnchantItemHPBonusData extends DocumentParser
 		final int bonus = values.get(Math.min(item.getOlyEnchantLevel(), values.size()) - 1);
 		if (item.getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR)
 		{
-			return (int) (bonus * fullArmorModifier);
+			return (int) (bonus * FULL_ARMOR_MODIFIER);
 		}
 		return bonus;
 	}
