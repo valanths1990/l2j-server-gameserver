@@ -21,7 +21,7 @@ package com.l2jserver.util;
 import java.util.Arrays;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public class HexUtils
 {

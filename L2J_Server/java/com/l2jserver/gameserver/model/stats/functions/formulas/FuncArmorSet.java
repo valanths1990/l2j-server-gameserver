@@ -48,7 +48,7 @@ public class FuncArmorSet extends AbstractFunction
 	
 	private FuncArmorSet(Stats stat)
 	{
-		super(stat, 0x10, null, 0, null);
+		super(stat, 10, null, 0, null);
 	}
 	
 	@Override

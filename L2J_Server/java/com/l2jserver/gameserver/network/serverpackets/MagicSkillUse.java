@@ -29,7 +29,7 @@ import com.l2jserver.gameserver.model.interfaces.IPositionable;
 
 /**
  * MagicSkillUse server packet implementation.
- * @author UnAfraid, Nos
+ * @author UnAfraid, NosBit
  */
 public final class MagicSkillUse extends L2GameServerPacket
 {

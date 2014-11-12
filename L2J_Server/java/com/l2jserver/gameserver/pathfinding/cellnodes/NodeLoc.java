@@ -23,7 +23,7 @@ import com.l2jserver.gameserver.geoengine.Direction;
 import com.l2jserver.gameserver.pathfinding.AbstractNodeLoc;
 
 /**
- * @author -Nemesiss-, FBIagent
+ * @author -Nemesiss-, HorridoJoho
  */
 public class NodeLoc extends AbstractNodeLoc
 {

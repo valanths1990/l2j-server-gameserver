@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrate
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class GroupedGeneralDropItem implements IDropItem
 {

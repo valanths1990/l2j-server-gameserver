@@ -25,7 +25,7 @@ import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrate
 import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory
 {

@@ -27,7 +27,7 @@ import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public class TvTManager
 {

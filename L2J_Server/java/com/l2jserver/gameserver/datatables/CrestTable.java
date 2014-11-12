@@ -41,7 +41,7 @@ import com.l2jserver.gameserver.model.L2Crest.CrestType;
 import com.l2jserver.util.file.filter.BMPFilter;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class CrestTable
 {

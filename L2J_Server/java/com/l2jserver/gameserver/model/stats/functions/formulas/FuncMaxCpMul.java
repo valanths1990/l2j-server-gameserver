@@ -38,7 +38,7 @@ public class FuncMaxCpMul extends AbstractFunction
 	
 	private FuncMaxCpMul()
 	{
-		super(Stats.MAX_CP, 0x20, null, 0, null);
+		super(Stats.MAX_CP, 10, null, 0, null);
 	}
 	
 	@Override

@@ -26,7 +26,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.util.Util;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public abstract class AbstractHtmlPacket extends L2GameServerPacket
 {

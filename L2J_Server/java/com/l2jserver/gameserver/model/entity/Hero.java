@@ -775,7 +775,6 @@ public class Hero
 								}
 							}
 						}
-						_heroes.remove(heroId);
 						_heroes.put(heroId, hero);
 						
 						_completeHeroes.put(heroId, hero);
@@ -929,20 +928,11 @@ public class Hero
 	}
 	
 	/**
-	 * @param objectId the player's object Id to verify.
-	 * @return {@code true} if there are heros and the player is in the list, {@code false} otherwise.
-	 */
-	public boolean isHero(int objectId)
-	{
-		return _heroes.containsKey(objectId) && _heroes.get(objectId).getBoolean(CLAIMED);
-	}
-	
-	/**
 	 * Verifies if the given object ID belongs to a claimed hero.
 	 * @param objectId the player's object ID to verify
-	 * @return {@code true} if the given object ID belongs to a claimed hero, {@code false} otherwise
+	 * @return {@code true} if there are heros and the player is in the list, {@code false} otherwise
 	 */
-	public boolean isClaimed(int objectId)
+	public boolean isHero(int objectId)
 	{
 		return _heroes.containsKey(objectId) && _heroes.get(objectId).getBoolean(CLAIMED);
 	}
@@ -953,7 +943,14 @@ public class Hero
 	 */
 	public void claimHero(L2PcInstance player)
 	{
-		_heroes.get(player.getObjectId()).set(CLAIMED, true);
+		StatsSet hero = _heroes.get(player.getObjectId());
+		if (hero == null)
+		{
+			hero = new StatsSet();
+			_heroes.put(player.getObjectId(), hero);
+		}
+		
+		hero.set(CLAIMED, true);
 		
 		final L2Clan clan = player.getClan();
 		if ((clan != null) && (clan.getLevel() >= 5))

@@ -26,7 +26,7 @@ import com.l2jserver.gameserver.model.interfaces.ILocational;
 
 /**
  * This packet shows the mouse click particle for 30 seconds on every location.
- * @author Nos
+ * @author NosBit
  */
 public final class ExShowTrace extends L2GameServerPacket
 {

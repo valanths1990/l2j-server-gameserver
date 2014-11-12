@@ -38,7 +38,7 @@ import com.l2jserver.gameserver.util.LinePointIterator;
 import com.l2jserver.gameserver.util.LinePointIterator3D;
 
 /**
- * @author -Nemesiss-, FBIagent
+ * @author -Nemesiss-, HorridoJoho
  */
 public class GeoData implements IGeoDriver
 {

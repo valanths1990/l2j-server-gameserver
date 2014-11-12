@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * Lets drink to code!
- * @author zabbix
- * @author FBIagent
+ * @author zabbix, HorridoJoho
  */
 public final class RequestLinkHtml extends L2GameClientPacket
 {

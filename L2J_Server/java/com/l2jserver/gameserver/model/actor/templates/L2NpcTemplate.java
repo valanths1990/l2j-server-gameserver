@@ -41,7 +41,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * NPC template.
- * @author Nos
+ * @author NosBit
  */
 public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 {

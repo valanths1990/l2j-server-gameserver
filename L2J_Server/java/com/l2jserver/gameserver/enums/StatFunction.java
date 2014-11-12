@@ -19,39 +19,35 @@
 package com.l2jserver.gameserver.enums;
 
 /**
- * @author NosBit
+ * @author Zealar
  */
-public enum PrivateStoreType
+public enum StatFunction
 {
-	NONE(0),
-	SELL(1),
-	SELL_MANAGE(2),
-	BUY(3),
-	BUY_MANAGE(4),
-	MANUFACTURE(5),
-	PACKAGE_SELL(8);
+	ADD("Add", 30),
+	DIV("Div", 20),
+	ENCHANT("Enchant", 0),
+	ENCHANTHP("EnchantHp", 40),
+	MUL("Mul", 20),
+	SET("Set", 0),
+	SHARE("Share", 30),
+	SUB("Sub", 30);
 	
-	private int _id;
+	String name;
+	int order;
 	
-	private PrivateStoreType(int id)
+	StatFunction(String name, int order)
 	{
-		_id = id;
+		this.name = name;
+		this.order = order;
 	}
 	
-	public int getId()
+	public String getName()
 	{
-		return _id;
+		return name;
 	}
 	
-	public static PrivateStoreType findById(int id)
+	public int getOrder()
 	{
-		for (PrivateStoreType privateStoreType : values())
-		{
-			if (privateStoreType.getId() == id)
-			{
-				return privateStoreType;
-			}
-		}
-		return null;
+		return order;
 	}
 }

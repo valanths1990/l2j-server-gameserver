@@ -655,7 +655,7 @@ public class L2Party extends AbstractPlayerGroup
 		
 		L2PcInstance looter = getActualLooter(player, itemId, spoil, target);
 		
-		looter.addItem(spoil ? "Sweeper Party" : "Party", itemId, itemCount, player, true);
+		looter.addItem(spoil ? "Sweeper Party" : "Party", itemId, itemCount, target, true);
 		
 		// Send messages to other party members about reward
 		if (itemCount > 1)

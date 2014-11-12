@@ -24,7 +24,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public interface IDropItem
 {

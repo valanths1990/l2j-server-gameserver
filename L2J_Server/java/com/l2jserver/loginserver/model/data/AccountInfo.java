@@ -21,7 +21,7 @@ package com.l2jserver.loginserver.model.data;
 import java.util.Objects;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public final class AccountInfo
 {

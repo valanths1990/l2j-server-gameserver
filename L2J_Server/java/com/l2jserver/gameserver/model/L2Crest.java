@@ -26,7 +26,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExPledgeCrestLarge;
 import com.l2jserver.gameserver.network.serverpackets.PledgeCrest;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class L2Crest implements IIdentifiable
 {
