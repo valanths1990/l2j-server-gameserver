@@ -938,6 +938,16 @@ public class Hero
 	}
 	
 	/**
+	 * Verifies if the given object ID belongs to a unclaimed hero.
+	 * @param objectId the player's object ID to verify
+	 * @return {@code true} if player is unclaimed hero
+	 */
+	public boolean isUnclaimedHero(int objectId)
+	{
+		return _heroes.containsKey(objectId) && !_heroes.get(objectId).getBoolean(CLAIMED);
+	}
+	
+	/**
 	 * Claims the hero status for the given player.
 	 * @param player the player to become hero
 	 */
