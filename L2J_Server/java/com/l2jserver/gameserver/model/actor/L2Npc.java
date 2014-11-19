@@ -1394,6 +1394,13 @@ public class L2Npc extends L2Character
 		
 		// Notify Walking Manager
 		WalkingManager.getInstance().onDeath(this);
+		
+		// Removes itself from the summoned list.
+		final L2Character summoner = getSummoner();
+		if ((summoner != null) && summoner.isNpc())
+		{
+			((L2Npc) summoner).removeSummonedNpc(getObjectId());
+		}
 	}
 	
 	/**
@@ -1410,8 +1417,6 @@ public class L2Npc extends L2Character
 	@Override
 	public boolean deleteMe()
 	{
-		L2WorldRegion oldRegion = getWorldRegion();
-		
 		try
 		{
 			onDecay();
@@ -1426,6 +1431,7 @@ public class L2Npc extends L2Character
 			getSkillChannelized().abortChannelization();
 		}
 		
+		final L2WorldRegion oldRegion = getWorldRegion();
 		if (oldRegion != null)
 		{
 			oldRegion.removeFromZones(this);
@@ -1992,6 +1998,7 @@ public class L2Npc extends L2Character
 	{
 		if (_summonedNpcs != null)
 		{
+			System.out.println("Removing npc!!");
 			_summonedNpcs.remove(objectId);
 		}
 	}

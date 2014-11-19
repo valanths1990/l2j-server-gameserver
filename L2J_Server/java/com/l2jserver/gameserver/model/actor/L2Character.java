@@ -519,8 +519,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public void onDecay()
 	{
-		L2WorldRegion reg = getWorldRegion();
 		decayMe();
+		
+		final L2WorldRegion reg = getWorldRegion();
 		if (reg != null)
 		{
 			reg.removeFromZones(this);

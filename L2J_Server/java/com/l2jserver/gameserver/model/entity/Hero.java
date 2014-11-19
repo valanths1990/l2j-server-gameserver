@@ -938,7 +938,7 @@ public class Hero
 	}
 	
 	/**
-	 * Verifies if the given object ID belongs to a unclaimed hero.
+	 * Verifies if the given object ID belongs to an unclaimed hero.
 	 * @param objectId the player's object ID to verify
 	 * @return {@code true} if player is unclaimed hero
 	 */
