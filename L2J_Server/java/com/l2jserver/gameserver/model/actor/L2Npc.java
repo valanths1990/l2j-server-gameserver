@@ -1998,7 +1998,6 @@ public class L2Npc extends L2Character
 	{
 		if (_summonedNpcs != null)
 		{
-			System.out.println("Removing npc!!");
 			_summonedNpcs.remove(objectId);
 		}
 	}
