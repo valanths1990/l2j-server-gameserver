@@ -188,6 +188,12 @@ public final class RequestActionUse extends L2GameClientPacket
 				}
 				break;
 			case 19: // Unsummon Pet
+				
+				if (!validateSummon(summon, true))
+				{
+					break;
+				}
+				
 				if (summon.isDead())
 				{
 					sendPacket(SystemMessageId.DEAD_PET_CANNOT_BE_RETURNED);
@@ -210,11 +216,6 @@ public final class RequestActionUse extends L2GameClientPacket
 					{
 						sendPacket(SystemMessageId.THE_HELPER_PET_CANNOT_BE_RETURNED);
 					}
-					break;
-				}
-				
-				if (!validateSummon(summon, true))
-				{
 					break;
 				}
 				
