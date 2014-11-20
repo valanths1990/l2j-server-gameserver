@@ -42,24 +42,9 @@ import com.l2jserver.gameserver.util.LinePointIterator3D;
  */
 public class GeoData implements IGeoDriver
 {
-	private static class SingletonHolder
-	{
-		protected final static GeoData _instance;
-		
-		static
-		{
-			_instance = new GeoData();
-		}
-	}
-	
 	private static final Logger LOGGER = Logger.getLogger(GeoData.class.getName());
 	private static final int ELEVATED_SEE_OVER_DISTANCE = 2;
 	private static final int MAX_SEE_OVER_HEIGHT = 48;
-	
-	public static GeoData getInstance()
-	{
-		return SingletonHolder._instance;
-	}
 	
 	private final IGeoDriver _driver;
 	
@@ -672,5 +657,15 @@ public class GeoData implements IGeoDriver
 	public boolean hasGeo(int x, int y)
 	{
 		return hasGeoPos(getGeoX(x), getGeoY(y));
+	}
+	
+	public static GeoData getInstance()
+	{
+		return SingletonHolder._instance;
+	}
+	
+	private static class SingletonHolder
+	{
+		protected final static GeoData _instance = new GeoData();
 	}
 }

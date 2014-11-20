@@ -43,9 +43,9 @@ import com.l2jserver.gameserver.script.DateRange;
 import com.l2jserver.gameserver.util.Broadcast;
 import com.l2jserver.util.StringUtil;
 
-public class Announcements
+public final class Announcements
 {
-	private static Logger _log = Logger.getLogger(Announcements.class.getName());
+	private static final Logger _log = Logger.getLogger(Announcements.class.getName());
 	
 	private final List<String> _announcements = new FastList<>();
 	private final List<String> _critAnnouncements = new FastList<>();
