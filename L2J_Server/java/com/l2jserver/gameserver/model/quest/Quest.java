@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -78,11 +79,12 @@ public class Quest extends AbstractScript implements IIdentifiable
 	public static final Logger _log = Logger.getLogger(Quest.class.getName());
 	
 	/** Map containing lists of timers from the name of the timer. */
-	private final Map<String, List<QuestTimer>> _allEventTimers = new ConcurrentHashMap<>();
+	private volatile Map<String, List<QuestTimer>> _questTimers = null;
 	private final ReentrantReadWriteLock _rwLock = new ReentrantReadWriteLock();
 	private final WriteLock _writeLock = _rwLock.writeLock();
 	private final ReadLock _readLock = _rwLock.readLock();
-	private final Map<Predicate<L2PcInstance>, String> _startCondition = new LinkedHashMap<>();
+	/** Map containing all the start conditions. */
+	private volatile Map<Predicate<L2PcInstance>, String> _startCondition = null;
 	
 	private final int _questId;
 	private final String _name;
@@ -240,6 +242,25 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	/**
+	 * Gets the quest timers.
+	 * @return the quest timers
+	 */
+	public final Map<String, List<QuestTimer>> getQuestTimers()
+	{
+		if (_questTimers == null)
+		{
+			synchronized (this)
+			{
+				if (_questTimers == null)
+				{
+					_questTimers = new ConcurrentHashMap<>(1);
+				}
+			}
+		}
+		return _questTimers;
+	}
+	
+	/**
 	 * Add a timer to the quest (if it doesn't exist already) and start it.
 	 * @param name the name of the timer (also passed back as "event" in {@link #onAdvEvent(String, L2Npc, L2PcInstance)})
 	 * @param time time in ms for when to fire the timer
@@ -250,7 +271,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void startQuestTimer(String name, long time, L2Npc npc, L2PcInstance player, boolean repeating)
 	{
-		final List<QuestTimer> timers = _allEventTimers.computeIfAbsent(name, k -> new ArrayList<>());
+		final List<QuestTimer> timers = getQuestTimers().computeIfAbsent(name, k -> new ArrayList<>(1));
 		// if there exists a timer with this name, allow the timer only if the [npc, player] set is unique
 		// nulls act as wildcards
 		if (getQuestTimer(name, npc, player) == null)
@@ -276,7 +297,12 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public QuestTimer getQuestTimer(String name, L2Npc npc, L2PcInstance player)
 	{
-		final List<QuestTimer> timers = _allEventTimers.get(name);
+		if (_questTimers == null)
+		{
+			return null;
+		}
+		
+		final List<QuestTimer> timers = getQuestTimers().get(name);
 		if (timers != null)
 		{
 			_readLock.lock();
@@ -307,7 +333,12 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void cancelQuestTimers(String name)
 	{
-		final List<QuestTimer> timers = _allEventTimers.get(name);
+		if (_questTimers == null)
+		{
+			return;
+		}
+		
+		final List<QuestTimer> timers = getQuestTimers().get(name);
 		if (timers != null)
 		{
 			_writeLock.lock();
@@ -351,9 +382,9 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void removeQuestTimer(QuestTimer timer)
 	{
-		if (timer != null)
+		if ((timer != null) && (_questTimers != null))
 		{
-			final List<QuestTimer> timers = _allEventTimers.get(timer.getName());
+			final List<QuestTimer> timers = getQuestTimers().get(timer.getName());
 			if (timers != null)
 			{
 				_writeLock.lock();
@@ -367,11 +398,6 @@ public class Quest extends AbstractScript implements IIdentifiable
 				}
 			}
 		}
-	}
-	
-	public Map<String, List<QuestTimer>> getQuestTimers()
-	{
-		return _allEventTimers;
 	}
 	
 	// These are methods to call within the core to call the quest events.
@@ -2720,23 +2746,26 @@ public class Quest extends AbstractScript implements IIdentifiable
 		// cancel all pending timers before reloading.
 		// if timers ought to be restarted, the quest can take care of it
 		// with its code (example: save global data indicating what timer must be restarted).
-		for (List<QuestTimer> timers : _allEventTimers.values())
+		if (_questTimers != null)
 		{
-			_readLock.lock();
-			try
+			for (List<QuestTimer> timers : getQuestTimers().values())
 			{
-				for (QuestTimer timer : timers)
+				_readLock.lock();
+				try
 				{
-					timer.cancel();
+					for (QuestTimer timer : timers)
+					{
+						timer.cancel();
+					}
 				}
+				finally
+				{
+					_readLock.unlock();
+				}
+				timers.clear();
 			}
-			finally
-			{
-				_readLock.unlock();
-			}
-			timers.clear();
+			getQuestTimers().clear();
 		}
-		_allEventTimers.clear();
 		
 		if (removeFromList)
 		{
@@ -2774,6 +2803,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	/**
+	 * Verifies if this is a custom quest.
 	 * @return {@code true} if the quest script is a custom quest, {@code false} otherwise.
 	 */
 	public boolean isCustomQuest()
@@ -2781,8 +2811,37 @@ public class Quest extends AbstractScript implements IIdentifiable
 		return _isCustom;
 	}
 	
+	/**
+	 * Gets the start conditions.
+	 * @return the start conditions
+	 */
+	private Map<Predicate<L2PcInstance>, String> getStartConditions()
+	{
+		if (_startCondition == null)
+		{
+			synchronized (this)
+			{
+				if (_startCondition == null)
+				{
+					_startCondition = new LinkedHashMap<>(1);
+				}
+			}
+		}
+		return _startCondition;
+	}
+	
+	/**
+	 * Verifies if the player meets all the start conditions.
+	 * @param player the player
+	 * @return {@code true} if all conditions are met
+	 */
 	public boolean canStartQuest(L2PcInstance player)
 	{
+		if (_startCondition == null)
+		{
+			return true;
+		}
+		
 		for (Predicate<L2PcInstance> cond : _startCondition.keySet())
 		{
 			if (!cond.test(player))
@@ -2793,76 +2852,144 @@ public class Quest extends AbstractScript implements IIdentifiable
 		return true;
 	}
 	
+	/**
+	 * Gets the HTML for the first starting condition not met.
+	 * @param player the player
+	 * @return the HTML
+	 */
 	public String getStartConditionHtml(L2PcInstance player)
 	{
-		for (Map.Entry<Predicate<L2PcInstance>, String> startRequirement : _startCondition.entrySet())
+		if (_startCondition == null)
+		{
+			return null;
+		}
+		
+		for (Entry<Predicate<L2PcInstance>, String> startRequirement : _startCondition.entrySet())
 		{
 			if (!startRequirement.getKey().test(player))
 			{
 				return startRequirement.getValue();
 			}
 		}
-		
 		return null;
 	}
 	
-	public void addStartCondition(Predicate<L2PcInstance> questStartRequirement, String html)
+	/**
+	 * Adds a predicate to the start conditions.
+	 * @param questStartRequirement the predicate condition
+	 * @param html the HTML to display if that condition is not met
+	 */
+	public void addCondStart(Predicate<L2PcInstance> questStartRequirement, String html)
 	{
-		_startCondition.put(questStartRequirement, html);
+		getStartConditions().put(questStartRequirement, html);
 	}
 	
-	public void addLevelCondition(int minLevel, int maxLevel, String html)
+	/**
+	 * Adds a minimum/maximum level start condition to the quest.
+	 * @param minLevel the minimum player's level to start the quest
+	 * @param maxLevel the maximum player's level to start the quest
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondLevel(int minLevel, int maxLevel, String html)
 	{
-		_startCondition.put(p -> (p.getLevel() >= minLevel) && (p.getLevel() <= maxLevel), html);
+		getStartConditions().put(p -> (p.getLevel() >= minLevel) && (p.getLevel() <= maxLevel), html);
 	}
 	
-	public void addMinLevelCondition(int minLevel, String html)
+	/**
+	 * Adds a minimum level start condition to the quest.
+	 * @param minLevel the minimum player's level to start the quest
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondMinLevel(int minLevel, String html)
 	{
-		_startCondition.put(p -> p.getLevel() >= minLevel, html);
+		getStartConditions().put(p -> p.getLevel() >= minLevel, html);
 	}
 	
-	public void addMaxLevelCondition(int maxLevel, String html)
+	/**
+	 * Adds a minimum/maximum level start condition to the quest.
+	 * @param maxLevel the maximum player's level to start the quest
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondMaxLevel(int maxLevel, String html)
 	{
-		_startCondition.put(p -> p.getLevel() <= maxLevel, html);
+		getStartConditions().put(p -> p.getLevel() <= maxLevel, html);
 	}
 	
-	public void addRaceCondition(Race race, String html)
+	/**
+	 * Adds a race start condition to the quest.
+	 * @param race the race
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondRace(Race race, String html)
 	{
-		_startCondition.put(p -> p.getRace() == race, html);
+		getStartConditions().put(p -> p.getRace() == race, html);
 	}
 	
-	public void addNotRaceCondition(Race race, String html)
+	/**
+	 * Adds a not-race start condition to the quest.
+	 * @param race the race
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondNotRace(Race race, String html)
 	{
-		_startCondition.put(p -> p.getRace() != race, html);
+		getStartConditions().put(p -> p.getRace() != race, html);
 	}
 	
-	public void addCompletedQuestCondition(String name, String html)
+	/**
+	 * Adds a quest completed start condition to the quest.
+	 * @param name the quest name
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondCompletedQuest(String name, String html)
 	{
-		_startCondition.put(p -> p.hasQuestState(name) && p.getQuestState(name).isCompleted(), html);
+		getStartConditions().put(p -> p.hasQuestState(name) && p.getQuestState(name).isCompleted(), html);
 	}
 	
-	public void addClassIdCondition(ClassId classId, String html)
+	/**
+	 * Adds a class ID start condition to the quest.
+	 * @param classId the class ID
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondClassId(ClassId classId, String html)
 	{
-		_startCondition.put(p -> p.getClassId() == classId, html);
+		getStartConditions().put(p -> p.getClassId() == classId, html);
 	}
 	
-	public void addNotClassIdCondition(ClassId classId, String html)
+	/**
+	 * Adds a not-class ID start condition to the quest.
+	 * @param classId the class ID
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondNotClassId(ClassId classId, String html)
 	{
-		_startCondition.put(p -> p.getClassId() != classId, html);
+		getStartConditions().put(p -> p.getClassId() != classId, html);
 	}
 	
-	public void addIsSubClassActiveCondition(String html)
+	/**
+	 * Adds a subclass active start condition to the quest.
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondIsSubClassActive(String html)
 	{
-		_startCondition.put(p -> p.isSubClassActive(), html);
+		getStartConditions().put(p -> p.isSubClassActive(), html);
 	}
 	
-	public void addIsNotSubClassActiveCondition(String html)
+	/**
+	 * Adds a not-subclass active start condition to the quest.
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondIsNotSubClassActive(String html)
 	{
-		_startCondition.put(p -> !p.isSubClassActive(), html);
+		getStartConditions().put(p -> !p.isSubClassActive(), html);
 	}
 	
-	public void addInCategoryCondition(CategoryType categoryType, String html)
+	/**
+	 * Adds a category start condition to the quest.
+	 * @param categoryType the category type
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondInCategory(CategoryType categoryType, String html)
 	{
-		_startCondition.put(p -> p.isInCategory(categoryType), html);
+		getStartConditions().put(p -> p.isInCategory(categoryType), html);
 	}
 }
