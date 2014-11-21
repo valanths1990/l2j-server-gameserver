@@ -38,7 +38,7 @@ public class FuncMAtkSpeed extends AbstractFunction
 	
 	private FuncMAtkSpeed()
 	{
-		super(Stats.MAGIC_ATTACK_SPEED, 10, null, 0, null);
+		super(Stats.MAGIC_ATTACK_SPEED, 1, null, 0, null);
 	}
 	
 	@Override

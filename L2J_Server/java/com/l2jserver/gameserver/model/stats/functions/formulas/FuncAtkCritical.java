@@ -38,7 +38,7 @@ public class FuncAtkCritical extends AbstractFunction
 	
 	private FuncAtkCritical()
 	{
-		super(Stats.CRITICAL_RATE, 10, null, 0, null);
+		super(Stats.CRITICAL_RATE, 1, null, 0, null);
 	}
 	
 	@Override

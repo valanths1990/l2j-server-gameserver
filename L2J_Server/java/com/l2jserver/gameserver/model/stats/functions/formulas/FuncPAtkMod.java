@@ -38,7 +38,7 @@ public class FuncPAtkMod extends AbstractFunction
 	
 	private FuncPAtkMod()
 	{
-		super(Stats.POWER_ATTACK, 10, null, 0, null);
+		super(Stats.POWER_ATTACK, 1, null, 0, null);
 	}
 	
 	@Override

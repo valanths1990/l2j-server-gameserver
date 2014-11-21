@@ -39,7 +39,7 @@ public class FuncGatesMDefMod extends AbstractFunction
 	
 	private FuncGatesMDefMod()
 	{
-		super(Stats.MAGIC_DEFENCE, 10, null, 0, null);
+		super(Stats.MAGIC_DEFENCE, 1, null, 0, null);
 	}
 	
 	@Override

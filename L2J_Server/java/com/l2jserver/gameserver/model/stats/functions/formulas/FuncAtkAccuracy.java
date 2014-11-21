@@ -37,7 +37,7 @@ public class FuncAtkAccuracy extends AbstractFunction
 	
 	private FuncAtkAccuracy()
 	{
-		super(Stats.ACCURACY_COMBAT, 10, null, 0, null);
+		super(Stats.ACCURACY_COMBAT, 1, null, 0, null);
 	}
 	
 	@Override

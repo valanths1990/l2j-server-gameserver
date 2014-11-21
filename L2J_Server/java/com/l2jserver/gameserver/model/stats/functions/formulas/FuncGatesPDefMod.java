@@ -39,7 +39,7 @@ public class FuncGatesPDefMod extends AbstractFunction
 	
 	private FuncGatesPDefMod()
 	{
-		super(Stats.POWER_DEFENCE, 10, null, 0, null);
+		super(Stats.POWER_DEFENCE, 1, null, 0, null);
 	}
 	
 	@Override

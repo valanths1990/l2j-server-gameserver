@@ -45,7 +45,7 @@ public class FuncHenna extends AbstractFunction
 	
 	private FuncHenna(Stats stat)
 	{
-		super(stat, 10, null, 0, null);
+		super(stat, 1, null, 0, null);
 	}
 	
 	@Override

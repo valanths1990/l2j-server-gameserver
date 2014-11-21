@@ -224,29 +224,27 @@ public abstract class DocumentBase
 		{
 			final String name = n.getNodeName().toLowerCase();
 			
-			if (name.equalsIgnoreCase("effect"))
+			switch (name)
 			{
-				if (template instanceof AbstractEffect)
+				case "effect":
 				{
-					throw new RuntimeException("Nested effects");
-				}
-				attachEffect(n, template, condition, effectScope);
-			}
-			else
-			{
-				switch (name)
-				{
-					case "add":
-					case "sub":
-					case "mul":
-					case "div":
-					case "set":
-					case "share":
-					case "enchant":
-					case "enchanthp":
+					if (template instanceof AbstractEffect)
 					{
-						attachFunc(n, template, name, condition);
+						throw new RuntimeException("Nested effects");
 					}
+					attachEffect(n, template, condition, effectScope);
+					break;
+				}
+				case "add":
+				case "sub":
+				case "mul":
+				case "div":
+				case "set":
+				case "share":
+				case "enchant":
+				case "enchanthp":
+				{
+					attachFunc(n, template, name, condition);
 				}
 			}
 		}

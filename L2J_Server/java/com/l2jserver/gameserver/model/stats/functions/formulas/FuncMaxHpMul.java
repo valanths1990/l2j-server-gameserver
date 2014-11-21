@@ -38,7 +38,7 @@ public class FuncMaxHpMul extends AbstractFunction
 	
 	private FuncMaxHpMul()
 	{
-		super(Stats.MAX_HP, 10, null, 0, null);
+		super(Stats.MAX_HP, 1, null, 0, null);
 	}
 	
 	@Override

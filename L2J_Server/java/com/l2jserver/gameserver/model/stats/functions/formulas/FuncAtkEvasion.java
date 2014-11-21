@@ -37,7 +37,7 @@ public class FuncAtkEvasion extends AbstractFunction
 	
 	private FuncAtkEvasion()
 	{
-		super(Stats.EVASION_RATE, 10, null, 0, null);
+		super(Stats.EVASION_RATE, 1, null, 0, null);
 	}
 	
 	@Override
