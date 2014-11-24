@@ -94,8 +94,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	private int timepass = 0;
 	private int chaostime = 0;
 	private final L2NpcTemplate _skillrender;
-	private List<Skill> shortRangeSkills = new ArrayList<>();
-	private List<Skill> longRangeSkills = new ArrayList<>();
 	int lastBuffTick;
 	
 	/**
@@ -2527,7 +2525,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	
 	private List<Skill> longRangeSkillRender()
 	{
-		longRangeSkills = _skillrender.getAISkills(AISkillScope.LONG_RANGE);
+		List<Skill> longRangeSkills = _skillrender.getAISkills(AISkillScope.LONG_RANGE);
 		if (longRangeSkills.isEmpty())
 		{
 			longRangeSkills = getActiveChar().getLongRangeSkill();
@@ -2537,7 +2535,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	
 	private List<Skill> shortRangeSkillRender()
 	{
-		shortRangeSkills = _skillrender.getAISkills(AISkillScope.SHORT_RANGE);
+		List<Skill> shortRangeSkills = _skillrender.getAISkills(AISkillScope.SHORT_RANGE);
 		if (shortRangeSkills.isEmpty())
 		{
 			shortRangeSkills = getActiveChar().getShortRangeSkill();
