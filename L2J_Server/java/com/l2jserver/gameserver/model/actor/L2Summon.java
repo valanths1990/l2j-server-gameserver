@@ -111,10 +111,8 @@ public abstract class L2Summon extends L2Playable
 	{
 		super(objectId, template);
 		setInstanceType(InstanceType.L2Summon);
-		
 		setInstanceId(owner.getInstanceId()); // set instance to same as owner
-		
-		_showSummonAnimation = true;
+		setShowSummonAnimation(true);
 		_owner = owner;
 		getAI();
 		

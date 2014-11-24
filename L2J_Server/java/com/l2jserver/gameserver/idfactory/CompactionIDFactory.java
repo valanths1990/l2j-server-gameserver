@@ -43,8 +43,6 @@ public class CompactionIDFactory extends IdFactory
 		
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
 		{
-			// con.createStatement().execute("drop table if exists tmp_obj_id");
-			
 			Integer[] tmp_obj_ids = extractUsedObjectIDTable();
 			
 			int N = tmp_obj_ids.length;

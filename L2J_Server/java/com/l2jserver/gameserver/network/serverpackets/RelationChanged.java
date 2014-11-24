@@ -63,7 +63,7 @@ public final class RelationChanged extends L2GameServerPacket
 		_singled._autoAttackable = autoattackable ? 1 : 0;
 		_singled._karma = activeChar.getKarma();
 		_singled._pvpFlag = activeChar.getPvpFlag();
-		_invisible = activeChar.isInvisible();
+		setInvisible(activeChar.isInvisible());
 	}
 	
 	public RelationChanged()

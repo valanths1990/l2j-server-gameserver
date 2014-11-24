@@ -28,10 +28,10 @@ import java.util.Set;
  */
 public class ListContainer
 {
-	protected int _listId;
-	protected boolean _applyTaxes = false;
-	protected boolean _maintainEnchantment = false;
-	protected double _useRate = 1.0;
+	private int _listId;
+	private boolean _applyTaxes = false;
+	private boolean _maintainEnchantment = false;
+	private double _useRate = 1.0;
 	
 	protected List<Entry> _entries = new ArrayList<>();
 	protected Set<Integer> _npcsAllowed = null;

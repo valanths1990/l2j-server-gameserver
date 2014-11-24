@@ -92,7 +92,7 @@ public class CharInfo extends L2GameServerPacket
 		_mAtkSpd = _activeChar.getMAtkSpd();
 		_pAtkSpd = _activeChar.getPAtkSpd();
 		_attackSpeedMultiplier = _activeChar.getAttackSpeedMultiplier();
-		_invisible = cha.isInvisible();
+		setInvisible(cha.isInvisible());
 		
 		_moveMultiplier = cha.getMovementSpeedMultiplier();
 		_runSpd = (int) Math.round(cha.getRunSpeed() / _moveMultiplier);
@@ -118,7 +118,7 @@ public class CharInfo extends L2GameServerPacket
 	{
 		boolean gmSeeInvis = false;
 		
-		if (_invisible)
+		if (isInvisible())
 		{
 			final L2PcInstance activeChar = getClient().getActiveChar();
 			if ((activeChar != null) && activeChar.canOverrideCond(PcCondOverride.SEE_ALL_PLAYERS))
@@ -160,7 +160,7 @@ public class CharInfo extends L2GameServerPacket
 			writeC(_activeChar.isRunning() ? 1 : 0);
 			writeC(_activeChar.isInCombat() ? 1 : 0);
 			writeC(_activeChar.isAlikeDead() ? 1 : 0);
-			writeC(!gmSeeInvis && _invisible ? 1 : 0); // invisible ?? 0=false 1=true 2=summoned (only works if model has a summon animation)
+			writeC(!gmSeeInvis && isInvisible() ? 1 : 0); // invisible ?? 0=false 1=true 2=summoned (only works if model has a summon animation)
 			
 			writeD(-1); // High Five NPCString ID
 			writeS(_activeChar.getAppearance().getVisibleName());
@@ -270,7 +270,7 @@ public class CharInfo extends L2GameServerPacket
 			
 			writeC(!_activeChar.isInOlympiadMode() && _activeChar.isAlikeDead() ? 1 : 0);
 			
-			writeC(!gmSeeInvis && _invisible ? 1 : 0); // invisible = 1 visible =0
+			writeC(!gmSeeInvis && isInvisible() ? 1 : 0); // invisible = 1 visible =0
 			
 			writeC(_activeChar.getMountType().ordinal()); // 1-on Strider, 2-on Wyvern, 3-on Great Wolf, 0-no mount
 			writeC(_activeChar.getPrivateStoreType().getId());

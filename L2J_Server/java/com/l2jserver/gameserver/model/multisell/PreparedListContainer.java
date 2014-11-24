@@ -35,16 +35,15 @@ public class PreparedListContainer extends ListContainer
 	public PreparedListContainer(ListContainer template, boolean inventoryOnly, L2PcInstance player, L2Npc npc)
 	{
 		super(template.getListId());
-		_maintainEnchantment = template.getMaintainEnchantment();
-		
-		_applyTaxes = false;
+		setMaintainEnchantment(template.getMaintainEnchantment());
+		setApplyTaxes(false);
 		double taxRate = 0;
 		if (npc != null)
 		{
 			_npcObjectId = npc.getObjectId();
 			if (template.getApplyTaxes() && npc.getIsInTown() && (npc.getCastle().getOwnerId() > 0))
 			{
-				_applyTaxes = true;
+				setApplyTaxes(true);
 				taxRate = npc.getCastle().getTaxRate();
 			}
 		}
@@ -57,7 +56,7 @@ public class PreparedListContainer extends ListContainer
 			}
 			
 			final L2ItemInstance[] items;
-			if (_maintainEnchantment)
+			if (getMaintainEnchantment())
 			{
 				items = player.getInventory().getUniqueItemsByEnchantLevel(false, false, false);
 			}
@@ -82,7 +81,7 @@ public class PreparedListContainer extends ListContainer
 						{
 							if (item.getId() == ing.getItemId())
 							{
-								_entries.add(new PreparedEntry(ent, item, _applyTaxes, _maintainEnchantment, taxRate));
+								_entries.add(new PreparedEntry(ent, item, getApplyTaxes(), getMaintainEnchantment(), taxRate));
 								break; // next entry
 							}
 						}
@@ -95,7 +94,7 @@ public class PreparedListContainer extends ListContainer
 			_entries = new ArrayList<>(template.getEntries().size());
 			for (Entry ent : template.getEntries())
 			{
-				_entries.add(new PreparedEntry(ent, null, _applyTaxes, false, taxRate));
+				_entries.add(new PreparedEntry(ent, null, getApplyTaxes(), false, taxRate));
 			}
 		}
 	}
