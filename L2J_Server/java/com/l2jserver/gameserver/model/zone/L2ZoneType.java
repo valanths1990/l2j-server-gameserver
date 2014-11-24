@@ -244,7 +244,7 @@ public abstract class L2ZoneType extends ListenersContainer
 				
 				for (int element : _race)
 				{
-					if (((L2PcInstance) character).getRace().ordinal() == element)
+					if (character.getRace().ordinal() == element)
 					{
 						ok = true;
 						break;

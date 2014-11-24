@@ -538,7 +538,7 @@ public class AugmentationData
 		int stat34 = 0;
 		if (Config.RETAIL_LIKE_AUGMENTATION)
 		{
-			if (((L2Weapon) item.getItem()).isMagicWeapon())
+			if (item.getItem().isMagicWeapon())
 			{
 				List<AugmentationChance> _selectedChances12 = new ArrayList<>();
 				List<AugmentationChance> _selectedChances34 = new ArrayList<>();

@@ -2659,7 +2659,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		L2CharacterAI oldAI = _ai;
 		if ((oldAI != null) && (oldAI != newAI) && (oldAI instanceof L2AttackableAI))
 		{
-			((L2AttackableAI) oldAI).stopAITask();
+			oldAI.stopAITask();
 		}
 		_ai = newAI;
 	}
@@ -2941,7 +2941,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		else if (isSummon())
 		{
-			((L2Summon) this).broadcastStatusUpdate();
+			broadcastStatusUpdate();
 		}
 		else if (isNpc())
 		{

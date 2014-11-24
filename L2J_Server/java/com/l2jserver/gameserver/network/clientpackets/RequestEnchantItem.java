@@ -223,7 +223,7 @@ public final class RequestEnchantItem extends L2GameClientPacket
 					
 					if ((item.isArmor()) && (item.getEnchantLevel() == 4) && item.isEquipped())
 					{
-						enchant4Skill = ((L2Armor) it).getEnchant4Skill();
+						enchant4Skill = it.getEnchant4Skill();
 						if (enchant4Skill != null)
 						{
 							// add skills bestowed from +4 armor
