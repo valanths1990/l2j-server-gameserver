@@ -1,5 +1,6 @@
 L2J Server Project
 ==============
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/L2J/L2J_Server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 L2J Server is an open-source server emulator fully written in Java for the MMORPG Lineage II.
 --------------
