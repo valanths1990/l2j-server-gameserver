@@ -403,7 +403,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		super.onIntentionAttack(target);
 	}
 	
-	private void thinkCast()
+	protected void thinkCast()
 	{
 		if (checkTargetLost(getCastTarget()))
 		{
@@ -428,7 +428,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	 * <li>If the actor is a L2MonsterInstance that can't attack, order to it to random walk (1/100)</li>
 	 * </ul>
 	 */
-	private void thinkActive()
+	protected void thinkActive()
 	{
 		L2Attackable npc = getActiveChar();
 		
@@ -710,7 +710,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	 * </ul>
 	 * TODO: Manage casting rules to healer mobs (like Ant Nurses)
 	 */
-	private void thinkAttack()
+	protected void thinkAttack()
 	{
 		final L2Attackable npc = getActiveChar();
 		if (npc.isCastingNow())

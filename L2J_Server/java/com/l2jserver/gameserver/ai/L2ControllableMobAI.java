@@ -46,7 +46,7 @@ import com.l2jserver.util.Rnd;
  * AI for controllable mobs
  * @author littlecrow
  */
-public class L2ControllableMobAI extends L2AttackableAI
+public final class L2ControllableMobAI extends L2AttackableAI
 {
 	public static final int AI_IDLE = 1;
 	public static final int AI_NORMAL = 2;
@@ -128,6 +128,7 @@ public class L2ControllableMobAI extends L2AttackableAI
 		}
 	}
 	
+	@Override
 	protected void thinkCast()
 	{
 		L2Attackable npc = (L2Attackable) _actor;
@@ -261,6 +262,7 @@ public class L2ControllableMobAI extends L2AttackableAI
 		_accessor.doAttack(getForcedTarget());
 	}
 	
+	@Override
 	protected void thinkAttack()
 	{
 		if ((getAttackTarget() == null) || getAttackTarget().isAlikeDead())
@@ -367,7 +369,8 @@ public class L2ControllableMobAI extends L2AttackableAI
 		}
 	}
 	
-	private void thinkActive()
+	@Override
+	protected void thinkActive()
 	{
 		setAttackTarget(findNextRndTarget());
 		L2Character hated;
@@ -388,7 +391,7 @@ public class L2ControllableMobAI extends L2AttackableAI
 		}
 	}
 	
-	private boolean autoAttackCondition(L2Character target)
+	private boolean checkAutoAttackCondition(L2Character target)
 	{
 		if ((target == null) || !(_actor instanceof L2Attackable))
 		{
@@ -469,7 +472,7 @@ public class L2ControllableMobAI extends L2AttackableAI
 			
 			L2Character target = (L2Character) obj;
 			
-			if (autoAttackCondition(target))
+			if (checkAutoAttackCondition(target))
 			{
 				potentialTarget.add(target);
 			}
