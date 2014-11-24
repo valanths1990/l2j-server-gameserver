@@ -47,6 +47,18 @@
 		</mapper>
 	</pathconvert>
 
+	<target name="checkRequirements" description="Check Requirements.">
+		<fail message="Ant 1.9.1 is required. But your version is ${ant.version} and if you are using Eclipse probably is outdated.">
+			<condition>
+				<not>
+					<antversion atleast="1.9.1" />
+				</not>
+			</condition>
+		</fail>
+		<available classname="java.util.stream.Stream" property="JDK8.present" />
+		<fail unless="JDK8.present" message="Java 1.8 is required. But your version is Java ${ant.java.version} and probably JDK is not installed." />
+	</target>
+
 	<target name="init" depends="checkRequirements" description="Create the output directories.">
 		<delete dir="${build.bin}" quiet="true" />
 		<mkdir dir="${build.bin}" />
@@ -63,6 +75,10 @@
 	</target>
 
 	<target name="jar" depends="compile" description="Create the jar files.">
+		<tstamp>
+			<format property="time.stamp" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+
 		<jar destfile="${build.dist.login}/l2jlogin.jar" level="9">
 			<fileset dir="${build.bin}">
 				<exclude name="**/dbinstaller/**" />
@@ -70,8 +86,10 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
+				<attribute name="Class-Path" value="../libs/c3p0-0.9.5-pre10.jar ../libs/javolution-5.5.1.jar ../libs/mail-1.5.2.jar ../libs/mmocore.jar ../libs/mysql-connector-java-5.1.31-bin.jar ../libs/weupnp-0.1.3.jar" />
+				<attribute name="Main-Class" value="com.l2jserver.loginserver.L2LoginServer" />
 			</manifest>
 		</jar>
 		<jar destfile="${build.dist.login}/L2J_Configurator.jar" level="9">
@@ -85,7 +103,6 @@
 				<exclude name="**/gsregistering/**" />
 				<exclude name="**/log/**" />
 				<exclude name="**/loginserver/**" />
-				<exclude name="**/ngl/**" />
 				<exclude name="**/status/**" />
 				<exclude name="**/util/**" />
 				<exclude name="**/Config/**" />
@@ -94,7 +111,7 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Class-Path" value="${manifest.libs}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
 				<attribute name="Main-Class" value="com.l2jserver.tools.configurator.ConfigUserInterface" />
@@ -109,8 +126,10 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
+				<attribute name="Class-Path" value="${manifest.libs}" />
+				<attribute name="Main-Class" value="com.l2jserver.gameserver.GameServer" />
 			</manifest>
 		</jar>
 		<jar destfile="${build.dist.game}/L2J_Configurator.jar" level="9">
@@ -124,7 +143,6 @@
 				<exclude name="**/gsregistering/**" />
 				<exclude name="**/log/**" />
 				<exclude name="**/loginserver/**" />
-				<exclude name="**/ngl/**" />
 				<exclude name="**/status/**" />
 				<exclude name="**/util/**" />
 				<exclude name="**/Config/**" />
@@ -133,7 +151,7 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Class-Path" value="${manifest.libs}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
 				<attribute name="Main-Class" value="com.l2jserver.tools.configurator.ConfigUserInterface" />
@@ -150,7 +168,7 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Class-Path" value="${manifest.libs}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
 				<attribute name="Main-Class" value="com.l2jserver.tools.dbinstaller.LauncherCS" />
@@ -167,7 +185,7 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Class-Path" value="${manifest.libs}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
 				<attribute name="Main-Class" value="com.l2jserver.tools.dbinstaller.LauncherGS" />
@@ -184,7 +202,7 @@
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${build.tstamp}" />
+				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Class-Path" value="${manifest.libs}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
 				<attribute name="Main-Class" value="com.l2jserver.tools.dbinstaller.LauncherLS" />
@@ -194,17 +212,5 @@
 
 	<target name="build" depends="jar" description="Create the Zip file.">
 		<zip destfile="${build}/L2J_Server_BETA.zip" basedir="${build.dist}" level="9" />
-	</target>
-
-	<target name="checkRequirements" description="Check Requirements.">
-		<fail message="Ant 1.9.1 is required. But your version is ${ant.version} and if you are using Eclipse probably is outdated.">
-			<condition>
-				<not>
-					<antversion atleast="1.9.1" />
-				</not>
-			</condition>
-		</fail>
-		<available classname="java.util.stream.Stream" property="JDK8.present" />
-		<fail unless="JDK8.present" message="Java 1.8 is required. But your version is Java ${ant.java.version} and probably JDK is not installed." />
 	</target>
 </project>

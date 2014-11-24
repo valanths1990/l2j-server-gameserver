@@ -18,8 +18,6 @@
  */
 package com.l2jserver.util;
 
-import javolution.text.TextBuilder;
-
 import com.l2jserver.Config;
 
 /**
@@ -199,16 +197,12 @@ public final class StringUtil
 	 */
 	public static String concat(final String... strings)
 	{
-		final TextBuilder sbString = TextBuilder.newInstance();
-		
+		final StringBuilder sbString = new StringBuilder();
 		for (final String string : strings)
 		{
 			sbString.append(string);
 		}
-		
-		String result = sbString.toString();
-		TextBuilder.recycle(sbString);
-		return result;
+		return sbString.toString();
 	}
 	
 	/**
@@ -221,12 +215,10 @@ public final class StringUtil
 	{
 		final int length = getLength(strings);
 		final StringBuilder sbString = new StringBuilder(sizeHint > length ? sizeHint : length);
-		
 		for (final String string : strings)
 		{
 			sbString.append(string);
 		}
-		
 		return sbString;
 	}
 	
@@ -272,14 +264,11 @@ public final class StringUtil
 	
 	public static String getTraceString(StackTraceElement[] trace)
 	{
-		final TextBuilder sbString = TextBuilder.newInstance();
+		final StringBuilder sbString = new StringBuilder();
 		for (final StackTraceElement element : trace)
 		{
 			sbString.append(element.toString()).append(Config.EOL);
 		}
-		
-		String result = sbString.toString();
-		TextBuilder.recycle(sbString);
-		return result;
+		return sbString.toString();
 	}
 }
