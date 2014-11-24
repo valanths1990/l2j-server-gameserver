@@ -41,8 +41,7 @@ public final class AuctionableHall extends ClanHall
 	private final int _grade;
 	protected boolean _paid;
 	private final int _lease;
-	
-	protected final int _chRate = 604800000;
+	private final int _chRate = 604800000;
 	
 	public AuctionableHall(StatsSet set)
 	{

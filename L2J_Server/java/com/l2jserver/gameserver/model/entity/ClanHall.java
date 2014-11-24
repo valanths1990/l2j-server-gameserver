@@ -50,7 +50,6 @@ public abstract class ClanHall
 	private final String _desc;
 	private final String _location;
 	private L2ClanHallZone _zone;
-	protected final int _chRate = 604800000;
 	protected boolean _isFree = true;
 	private final Map<Integer, ClanHallFunction> _functions;
 	
