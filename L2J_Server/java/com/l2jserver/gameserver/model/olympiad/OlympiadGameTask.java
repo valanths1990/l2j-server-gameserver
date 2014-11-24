@@ -35,7 +35,7 @@ public final class OlympiadGameTask implements Runnable
 	protected static final Logger _log = Logger.getLogger(OlympiadGameTask.class.getName());
 	protected static final long BATTLE_PERIOD = Config.ALT_OLY_BATTLE; // 6 mins
 	
-	public static final int[] TELEPORT_TO_ARENA =
+	private static final int[] TELEPORT_TO_ARENA_TIMES =
 	{
 		120,
 		60,
@@ -49,7 +49,7 @@ public final class OlympiadGameTask implements Runnable
 		1,
 		0
 	};
-	public static final int[] BATTLE_START_TIME_FIRST =
+	private static final int[] BATTLE_START_TIME_FIRST =
 	{
 		60,
 		50,
@@ -59,7 +59,7 @@ public final class OlympiadGameTask implements Runnable
 		10,
 		0
 	};
-	public static final int[] BATTLE_START_TIME_SECOND =
+	private static final int[] BATTLE_START_TIME_SECOND =
 	{
 		10,
 		5,
@@ -69,7 +69,7 @@ public final class OlympiadGameTask implements Runnable
 		1,
 		0
 	};
-	public static final int[] TELEPORT_TO_TOWN =
+	private static final int[] TELEPORT_TO_TOWN_TIMES =
 	{
 		40,
 		30,
@@ -189,7 +189,7 @@ public final class OlympiadGameTask implements Runnable
 						_game.broadcastPacket(sm);
 					}
 					
-					delay = getDelay(TELEPORT_TO_ARENA);
+					delay = getDelay(TELEPORT_TO_ARENA_TIMES);
 					if (_countDown <= 0)
 					{
 						_state = GameState.GAME_STARTED;
@@ -277,9 +277,9 @@ public final class OlympiadGameTask implements Runnable
 				case GAME_STOPPED:
 				{
 					_state = GameState.TELEPORT_TO_TOWN;
-					_countDown = TELEPORT_TO_TOWN[0];
+					_countDown = TELEPORT_TO_TOWN_TIMES[0];
 					stopGame();
-					delay = getDelay(TELEPORT_TO_TOWN);
+					delay = getDelay(TELEPORT_TO_TOWN_TIMES);
 					break;
 				}
 				// Teleport to town countdown
@@ -292,7 +292,7 @@ public final class OlympiadGameTask implements Runnable
 						_game.broadcastPacket(sm);
 					}
 					
-					delay = getDelay(TELEPORT_TO_TOWN);
+					delay = getDelay(TELEPORT_TO_TOWN_TIMES);
 					if (_countDown <= 0)
 					{
 						_state = GameState.CLEANUP;
