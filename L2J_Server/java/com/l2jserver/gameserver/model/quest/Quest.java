@@ -624,7 +624,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 			return;
 		}
 		player.setLastQuestNpcObject(npc.getObjectId());
-		showResult(player, res);
+		showResult(player, res, npc);
 	}
 	
 	/**
@@ -2643,7 +2643,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		{
 			if (npc != null)
 			{
-				content = content.replaceAll("%objectId%", Integer.toString(npc.getObjectId()));
+				content = content.replaceAll("%objectId%", String.valueOf(npc.getObjectId()));
 			}
 			
 			if (questwindow && (questId > 0) && (questId < 20000) && (questId != 999))
