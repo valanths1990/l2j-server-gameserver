@@ -63,19 +63,13 @@ public final class FuncTemplate
 		try
 		{
 			final Class<?> functionClass = Class.forName("com.l2jserver.gameserver.model.stats.functions.Func" + function.getName());
-			_constructor = functionClass.getConstructor(new Class<?>[]
-			{
-				// Stats to update
-				Stats.class,
-				// Order of execution
-				Integer.TYPE,
-				// Owner
-				Object.class,
-				// Value for function
-				Double.TYPE,
-				// Condition
-				Condition.class
-			});
+			_constructor = functionClass.getConstructor(
+				Stats.class, // Stats to update
+				Integer.TYPE, // Order of execution
+				Object.class, // Owner
+				Double.TYPE, // Value for function
+				Condition.class // Condition
+			);
 		}
 		catch (ClassNotFoundException | NoSuchMethodException e)
 		{
