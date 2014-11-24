@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -91,10 +92,10 @@ public final class BotReportTable
 	 */
 	private void loadReportedCharData()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+			Statement st = con.createStatement();
+			ResultSet rset = st.executeQuery(SQL_LOAD_REPORTED_CHAR_DATA))
 		{
-			PreparedStatement st = con.prepareStatement(SQL_LOAD_REPORTED_CHAR_DATA);
-			ResultSet rset = st.executeQuery();
 			long lastResetTime = 0;
 			try
 			{
@@ -147,9 +148,6 @@ public final class BotReportTable
 				}
 			}
 			
-			rset.close();
-			st.close();
-			
 			_log.info("BotReportTable: Loaded " + _reports.size() + " bot reports");
 		}
 		catch (Exception e)
@@ -164,25 +162,23 @@ public final class BotReportTable
 	 */
 	public void saveReportedCharData()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+			Statement st = con.createStatement();
+			PreparedStatement ps = con.prepareStatement(SQL_INSERT_REPORTED_CHAR_DATA))
 		{
-			PreparedStatement st = con.prepareStatement(SQL_CLEAR_REPORTED_CHAR_DATA);
-			st.execute();
+			st.execute(SQL_CLEAR_REPORTED_CHAR_DATA);
 			
-			st = con.prepareStatement(SQL_INSERT_REPORTED_CHAR_DATA);
 			for (Map.Entry<Integer, ReportedCharData> entrySet : _reports.entrySet())
 			{
 				Map<Integer, Long> reportTable = entrySet.getValue()._reporters;
 				for (int reporterId : reportTable.keySet())
 				{
-					st.setInt(1, entrySet.getKey());
-					st.setInt(2, reporterId);
-					st.setLong(3, reportTable.get(reporterId));
-					st.execute();
-					st.clearParameters();
+					ps.setInt(1, entrySet.getKey());
+					ps.setInt(2, reporterId);
+					ps.setLong(3, reportTable.get(reporterId));
+					ps.execute();
 				}
 			}
-			st.close();
 		}
 		catch (Exception e)
 		{

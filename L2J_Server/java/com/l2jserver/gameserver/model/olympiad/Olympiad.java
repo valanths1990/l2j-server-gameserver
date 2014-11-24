@@ -882,41 +882,40 @@ public class Olympiad extends ListenersContainer
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement(OLYMPIAD_GET_HEROS))
 		{
-			ResultSet rset;
 			StatsSet hero;
 			List<StatsSet> soulHounds = new ArrayList<>();
 			for (int element : HERO_IDS)
 			{
 				statement.setInt(1, element);
-				rset = statement.executeQuery();
-				statement.clearParameters();
 				
-				if (rset.next())
+				try (ResultSet rset = statement.executeQuery())
 				{
-					hero = new StatsSet();
-					hero.set(CLASS_ID, element);
-					hero.set(CHAR_ID, rset.getInt(CHAR_ID));
-					hero.set(CHAR_NAME, rset.getString(CHAR_NAME));
-					
-					if ((element == 132) || (element == 133)) // Male & Female Soulhounds rank as one hero class
+					if (rset.next())
 					{
-						hero = _nobles.get(hero.getInt(CHAR_ID));
+						hero = new StatsSet();
+						hero.set(CLASS_ID, element);
 						hero.set(CHAR_ID, rset.getInt(CHAR_ID));
-						soulHounds.add(hero);
-					}
-					else
-					{
-						record = new LogRecord(Level.INFO, "Hero " + hero.getString(CHAR_NAME));
-						record.setParameters(new Object[]
+						hero.set(CHAR_NAME, rset.getString(CHAR_NAME));
+						
+						if ((element == 132) || (element == 133)) // Male & Female Soulhounds rank as one hero class
 						{
-							hero.getInt(CHAR_ID),
-							hero.getInt(CLASS_ID)
-						});
-						_logResults.log(record);
-						_heroesToBe.add(hero);
+							hero = _nobles.get(hero.getInt(CHAR_ID));
+							hero.set(CHAR_ID, rset.getInt(CHAR_ID));
+							soulHounds.add(hero);
+						}
+						else
+						{
+							record = new LogRecord(Level.INFO, "Hero " + hero.getString(CHAR_NAME));
+							record.setParameters(new Object[]
+								{
+									hero.getInt(CHAR_ID),
+									hero.getInt(CLASS_ID)
+								});
+							_logResults.log(record);
+							_heroesToBe.add(hero);
+						}
 					}
 				}
-				rset.close();
 			}
 			
 			switch (soulHounds.size())
