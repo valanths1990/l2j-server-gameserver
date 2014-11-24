@@ -791,7 +791,7 @@ public abstract class OlympiadGameNormal extends AbstractOlympiadGame
 		_damageP2 = 0;
 	}
 	
-	protected static final void saveResults(Participant one, Participant two, int _winner, long _startTime, long _fightTime, CompetitionType type)
+	protected static final void saveResults(Participant one, Participant two, int winner, long startTime, long fightTime, CompetitionType type)
 	{
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement("INSERT INTO olympiad_fights (charOneId, charTwoId, charOneClass, charTwoClass, winner, start, time, classed) values(?,?,?,?,?,?,?,?)"))
@@ -800,9 +800,9 @@ public abstract class OlympiadGameNormal extends AbstractOlympiadGame
 			statement.setInt(2, two.getObjectId());
 			statement.setInt(3, one.getBaseClass());
 			statement.setInt(4, two.getBaseClass());
-			statement.setInt(5, _winner);
-			statement.setLong(6, _startTime);
-			statement.setLong(7, _fightTime);
+			statement.setInt(5, winner);
+			statement.setLong(6, startTime);
+			statement.setLong(7, fightTime);
 			statement.setInt(8, (type == CompetitionType.CLASSED ? 1 : 0));
 			statement.execute();
 		}
