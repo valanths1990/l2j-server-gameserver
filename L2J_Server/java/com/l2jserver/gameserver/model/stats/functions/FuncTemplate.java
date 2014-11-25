@@ -63,8 +63,7 @@ public final class FuncTemplate
 		try
 		{
 			final Class<?> functionClass = Class.forName("com.l2jserver.gameserver.model.stats.functions.Func" + function.getName());
-			_constructor = functionClass.getConstructor(
-				Stats.class, // Stats to update
+			_constructor = functionClass.getConstructor(Stats.class, // Stats to update
 				Integer.TYPE, // Order of execution
 				Object.class, // Owner
 				Double.TYPE, // Value for function

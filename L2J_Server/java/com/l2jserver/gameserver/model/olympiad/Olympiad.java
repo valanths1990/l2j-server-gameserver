@@ -907,10 +907,10 @@ public class Olympiad extends ListenersContainer
 						{
 							record = new LogRecord(Level.INFO, "Hero " + hero.getString(CHAR_NAME));
 							record.setParameters(new Object[]
-								{
-									hero.getInt(CHAR_ID),
-									hero.getInt(CLASS_ID)
-								});
+							{
+								hero.getInt(CHAR_ID),
+								hero.getInt(CLASS_ID)
+							});
 							_logResults.log(record);
 							_heroesToBe.add(hero);
 						}

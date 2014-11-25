@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class ListContainer
 {
-	private int _listId;
+	private final int _listId;
 	private boolean _applyTaxes = false;
 	private boolean _maintainEnchantment = false;
 	private double _useRate = 1.0;
