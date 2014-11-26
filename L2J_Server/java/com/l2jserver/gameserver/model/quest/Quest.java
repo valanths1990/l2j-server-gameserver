@@ -558,7 +558,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 			showError(player, e);
 			return;
 		}
-		showResult(player, res);
+		showResult(player, res, npc);
 	}
 	
 	/**
