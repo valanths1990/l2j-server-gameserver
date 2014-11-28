@@ -4927,6 +4927,12 @@ public final class NpcStringId
 	public static final NpcStringId S1_I_WILL_REMEMBER_YOU;
 	
 	/**
+	 * ID: 71559<br>
+	 * Message: $s1 has become the lord of the Town of Goddard. May there be glory in the territory of Goddard!
+	 */
+	public static final NpcStringId S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_GODDARD_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_GODDARD;
+	
+	/**
 	 * ID: 71653<br>
 	 * Message: Frederick is looking for you, my liege.
 	 */
@@ -22426,6 +22432,7 @@ public final class NpcStringId
 		S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_ADEN_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_ADEN = new NpcStringId(71351);
 		S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_SCHUTTGART_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_SCHUTTGART = new NpcStringId(71459);
 		S1_I_WILL_REMEMBER_YOU = new NpcStringId(71551);
+		S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_GODDARD_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_GODDARD = new NpcStringId(71559);
 		FREDERICK_IS_LOOKING_FOR_YOU_MY_LIEGE = new NpcStringId(71653);
 		HO_HO_DID_YOU_THINK_YOU_COULD_REALLY_STOP_TRADING_WITH_US = new NpcStringId(71654);
 		YOU_HAVE_CHARGED_INTO_THE_TEMPLE = new NpcStringId(71655);
