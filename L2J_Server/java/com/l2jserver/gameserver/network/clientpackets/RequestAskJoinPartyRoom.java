@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public class RequestAskJoinPartyRoom extends L2GameClientPacket
 {
-	private static String _name;
+	private String _name;
 	
 	@Override
 	protected void readImpl()
