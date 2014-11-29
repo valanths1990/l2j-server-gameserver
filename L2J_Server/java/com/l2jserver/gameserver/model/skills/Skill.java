@@ -33,6 +33,7 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.datatables.SkillTreesData;
+import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.handler.ITargetTypeHandler;
 import com.l2jserver.gameserver.handler.TargetHandler;
@@ -62,6 +63,7 @@ import com.l2jserver.gameserver.model.stats.TraitType;
 import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 import com.l2jserver.gameserver.model.zone.ZoneId;
+import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.FlyToLocation.FlyType;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
@@ -182,6 +184,7 @@ public final class Skill implements IIdentifiable
 	// Condition lists
 	private List<Condition> _preCondition;
 	private List<Condition> _itemPreCondition;
+	private Set<MountType> _rideState;
 	// Function lists
 	private List<FuncTemplate> _funcTemplates;
 	
@@ -284,6 +287,26 @@ public final class Skill implements IIdentifiable
 		
 		_affectRange = set.getInt("affectRange", 0);
 		
+		final String rideState = set.getString("rideState", null);
+		if (rideState != null)
+		{
+			String[] state = rideState.split(";");
+			if (state.length > 0)
+			{
+				_rideState = new HashSet<>(state.length);
+				for (String s : state)
+				{
+					try
+					{
+						_rideState.add(MountType.valueOf(s));
+					}
+					catch (Exception e)
+					{
+						_log.warning("Bad data in rideState for skill " + this + " !\n" + e);
+					}
+				}
+			}
+		}
 		final String affectLimit = set.getString("affectLimit", null);
 		if (affectLimit != null)
 		{
@@ -991,6 +1014,14 @@ public final class Skill implements IIdentifiable
 			return true;
 		}
 		
+		if (activeChar.isPlayer() && !canBeUseWhileRiding((L2PcInstance) activeChar))
+		{
+			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
+			sm.addSkillName(_id);
+			activeChar.sendPacket(sm);
+			return false;
+		}
+		
 		final List<Condition> preCondition = itemOrWeapon ? _itemPreCondition : _preCondition;
 		if ((preCondition == null) || preCondition.isEmpty())
 		{
@@ -1021,6 +1052,16 @@ public final class Skill implements IIdentifiable
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Checks if a player can use this skill while riding.
+	 * @param player the player
+	 * @return {@code true} if the player can use this skill, {@code false} otherwise
+	 */
+	public boolean canBeUseWhileRiding(final L2PcInstance player)
+	{
+		return (_rideState == null) || _rideState.contains(player.getMountType());
 	}
 	
 	public L2Object[] getTargetList(L2Character activeChar, boolean onlyFirst)
@@ -1802,5 +1843,10 @@ public final class Skill implements IIdentifiable
 	public int getChannelingTickInitialDelay()
 	{
 		return _channelingTickInitialDelay;
+	}
+	
+	public Set<MountType> getRideState()
+	{
+		return _rideState;
 	}
 }

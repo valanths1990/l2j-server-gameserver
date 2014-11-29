@@ -4070,7 +4070,7 @@ public final class L2PcInstance extends L2Playable
 			return false;
 		}
 		
-		if (isMounted() || inObserverMode())
+		if (inObserverMode())
 		{
 			return false;
 		}
