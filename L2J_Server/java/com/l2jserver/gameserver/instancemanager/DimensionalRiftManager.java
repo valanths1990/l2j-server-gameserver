@@ -193,7 +193,7 @@ public final class DimensionalRiftManager
 												final DimensionalRiftRoom riftRoom = _rooms.get(type).get(roomId);
 												x = riftRoom.getRandomX();
 												y = riftRoom.getRandomY();
-												z = riftRoom.getTeleportCoorinates()[2];
+												z = riftRoom.getTeleportCoorinates().getZ();
 												
 												if ((template != null) && _rooms.containsKey(type) && _rooms.get(type).containsKey(roomId))
 												{
@@ -261,8 +261,7 @@ public final class DimensionalRiftManager
 	
 	public void teleportToWaitingRoom(L2PcInstance player)
 	{
-		int[] coords = getRoom((byte) 0, (byte) 0).getTeleportCoorinates();
-		player.teleToLocation(coords[0], coords[1], coords[2]);
+		player.teleToLocation(getRoom((byte) 0, (byte) 0).getTeleportCoorinates());
 	}
 	
 	public synchronized void start(L2PcInstance player, byte type, L2Npc npc)
