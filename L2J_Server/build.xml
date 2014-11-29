@@ -48,10 +48,10 @@
 	</pathconvert>
 
 	<target name="checkRequirements" description="Check Requirements.">
-		<fail message="Ant 1.9.1 is required. But your version is ${ant.version} and if you are using Eclipse probably is outdated.">
+		<fail message="Ant 1.8.2 is required. But your version is ${ant.version} and if you are using Eclipse probably is outdated.">
 			<condition>
 				<not>
-					<antversion atleast="1.9.1" />
+					<antversion atleast="1.8.2" />
 				</not>
 			</condition>
 		</fail>
@@ -71,7 +71,7 @@
 	</target>
 
 	<target name="compile" depends="dist" description="Compile the source.">
-		<javac srcdir="${src}" classpathref="classpath" destdir="${build.bin}" compiler="javac1.8" debug="true" debuglevel="lines,vars,source" includeantruntime="false" source="1.8" target="1.8" />
+		<javac srcdir="${src}" classpathref="classpath" destdir="${build.bin}" compiler="modern" debug="true" debuglevel="lines,vars,source" includeantruntime="false" source="1.8" target="1.8" />
 	</target>
 
 	<target name="jar" depends="compile" description="Create the jar files.">
