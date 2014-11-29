@@ -58,13 +58,13 @@ public class L2SiegeZone extends L2ZoneType
 		setSettings(settings);
 	}
 	
-	private final class Settings extends AbstractZoneSettings
+	public final class Settings extends AbstractZoneSettings
 	{
 		private int _siegableId = -1;
 		private Siegable _siege = null;
 		private boolean _isActiveSiege = false;
 		
-		public Settings()
+		protected Settings()
 		{
 		}
 		

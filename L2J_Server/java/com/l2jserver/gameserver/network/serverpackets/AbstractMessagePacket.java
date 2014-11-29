@@ -52,7 +52,7 @@ import com.l2jserver.gameserver.network.SystemMessageId.SMLocalisation;
 @SuppressWarnings("unchecked")
 public abstract class AbstractMessagePacket<T extends AbstractMessagePacket<?>> extends L2GameServerPacket
 {
-	protected static final SMParam[] EMPTY_PARAM_ARRAY = new SMParam[0];
+	private static final SMParam[] EMPTY_PARAM_ARRAY = new SMParam[0];
 	
 	private static final class SMParam
 	{

@@ -134,8 +134,8 @@ public final class BotReportTable
 				
 				if (date > lastResetTime)
 				{
-					ReporterCharData rcd = null;
-					if ((rcd = _charRegistry.get(reporter)) != null)
+					ReporterCharData rcd = _charRegistry.get(reporter);
+					if (rcd != null)
 					{
 						rcd.setPoints(rcd.getPointsLeft() - 1);
 					}
@@ -194,8 +194,15 @@ public final class BotReportTable
 	public boolean reportBot(L2PcInstance reporter)
 	{
 		L2Object target = reporter.getTarget();
-		L2PcInstance bot = null;
-		if ((target == null) || ((bot = target.getActingPlayer()) == null) || (target.getObjectId() == reporter.getObjectId()))
+		
+		if (target == null)
+		{
+			return false;
+		}
+		
+		L2PcInstance bot = target.getActingPlayer();
+		
+		if ((bot == null) || (target.getObjectId() == reporter.getObjectId()))
 		{
 			return false;
 		}

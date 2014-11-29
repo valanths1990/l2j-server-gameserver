@@ -149,15 +149,12 @@ public class GameServer
 	private final SelectorThread<L2GameClient> _selectorThread;
 	private final L2GamePacketHandler _gamePacketHandler;
 	private final DeadLockDetector _deadDetectThread;
-	private final IdFactory _idFactory;
 	public static GameServer gameServer;
-	private final LoginServerThread _loginThread;
-	private static Status _statusServer;
 	public static final Calendar dateTimeServerStarted = Calendar.getInstance();
 	
 	public long getUsedMemoryMB()
 	{
-		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576; // ;
+		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
 	}
 	
 	public SelectorThread<L2GameClient> getSelectorThread()
@@ -177,16 +174,13 @@ public class GameServer
 	
 	public GameServer() throws Exception
 	{
-		gameServer = this;
 		long serverLoadStart = System.currentTimeMillis();
 		
 		_log.info(getClass().getSimpleName() + ": Used memory: " + getUsedMemoryMB() + "MB");
 		
-		_idFactory = IdFactory.getInstance();
-		
-		if (!_idFactory.isInitialized())
+		if (!IdFactory.getInstance().isInitialized())
 		{
-			_log.severe(getClass().getSimpleName() + ": Could not read object IDs from DB. Please Check Your Data.");
+			_log.severe(getClass().getSimpleName() + ": Could not read object IDs from DB. Please check your data.");
 			throw new Exception("Could not initialize the ID factory");
 		}
 		
@@ -319,10 +313,9 @@ public class GameServer
 		try
 		{
 			_log.info(getClass().getSimpleName() + ": Loading server scripts:");
-			final File scripts = new File(Config.DATAPACK_ROOT, "data/scripts.cfg");
 			if (!Config.ALT_DEV_NO_HANDLERS || !Config.ALT_DEV_NO_QUESTS)
 			{
-				L2ScriptEngineManager.getInstance().executeScriptList(scripts);
+				L2ScriptEngineManager.getInstance().executeScriptList(new File(Config.DATAPACK_ROOT, "data/scripts.cfg"));
 			}
 		}
 		catch (IOException ioe)
@@ -409,9 +402,7 @@ public class GameServer
 		long totalMem = Runtime.getRuntime().maxMemory() / 1048576;
 		_log.info(getClass().getSimpleName() + ": Started, free memory " + freeMem + " Mb of " + totalMem + " Mb");
 		Toolkit.getDefaultToolkit().beep();
-		
-		_loginThread = LoginServerThread.getInstance();
-		_loginThread.start();
+		LoginServerThread.getInstance().start();
 		
 		final SelectorConfig sc = new SelectorConfig();
 		sc.MAX_READ_PER_PASS = Config.MMO_MAX_READ_PER_PASS;
@@ -483,8 +474,7 @@ public class GameServer
 		
 		if (Config.IS_TELNET_ENABLED)
 		{
-			_statusServer = new Status(Server.serverMode);
-			_statusServer.start();
+			new Status(Server.serverMode).start();
 		}
 		else
 		{

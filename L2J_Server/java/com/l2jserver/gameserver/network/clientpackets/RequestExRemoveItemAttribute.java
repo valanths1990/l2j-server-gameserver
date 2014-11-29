@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.network.serverpackets.UserInfo;
 
 public class RequestExRemoveItemAttribute extends L2GameClientPacket
 {
-	private static String _C__D0_23_REQUESTEXREMOVEITEMATTRIBUTE = "[C] D0:23 RequestExRemoveItemAttribute";
+	private static final String _C__D0_23_REQUESTEXREMOVEITEMATTRIBUTE = "[C] D0:23 RequestExRemoveItemAttribute";
 	
 	private int _objectId;
 	private long _price;

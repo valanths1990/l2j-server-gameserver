@@ -18,16 +18,15 @@
  */
 package com.l2jserver.gameserver;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javolution.util.FastList;
 
@@ -47,8 +46,8 @@ public final class Announcements
 {
 	private static final Logger _log = Logger.getLogger(Announcements.class.getName());
 	
-	private final List<String> _announcements = new FastList<>();
-	private final List<String> _critAnnouncements = new FastList<>();
+	private List<String> _announcements = new FastList<>();
+	private List<String> _critAnnouncements = new FastList<>();
 	private final List<List<Object>> _eventAnnouncements = new FastList<>();
 	
 	protected Announcements()
@@ -63,10 +62,8 @@ public final class Announcements
 	
 	public void loadAnnouncements()
 	{
-		_announcements.clear();
-		_critAnnouncements.clear();
-		readFromDisk("data/announcements.txt", _announcements);
-		readFromDisk("data/critannouncements.txt", _critAnnouncements);
+		_announcements = readFromDisk("data/announcements.txt");
+		_critAnnouncements = readFromDisk("data/critannouncements.txt");
 		
 		if (Config.DEBUG)
 		{
@@ -78,14 +75,12 @@ public final class Announcements
 	{
 		for (String announce : _announcements)
 		{
-			CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), announce);
-			activeChar.sendPacket(cs);
+			activeChar.sendPacket(new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), announce));
 		}
 		
 		for (String critAnnounce : _critAnnouncements)
 		{
-			CreatureSay cs = new CreatureSay(0, Say2.CRITICAL_ANNOUNCE, activeChar.getName(), critAnnounce);
-			activeChar.sendPacket(cs);
+			activeChar.sendPacket(new CreatureSay(0, Say2.CRITICAL_ANNOUNCE, activeChar.getName(), critAnnounce));
 		}
 		
 		for (List<Object> eventAnnounce : _eventAnnouncements)
@@ -105,7 +100,6 @@ public final class Announcements
 				}
 				activeChar.sendPacket(sm);
 			}
-			
 		}
 	}
 	
@@ -169,32 +163,26 @@ public final class Announcements
 		saveToDisk(true);
 	}
 	
-	private void readFromDisk(String path, List<String> list)
+	private List<String> readFromDisk(String path)
 	{
-		final File file = new File(Config.DATAPACK_ROOT, path);
-		try (FileReader fr = new FileReader(file);
-			LineNumberReader lnr = new LineNumberReader(fr))
+		try
 		{
-			String line = null;
-			while ((line = lnr.readLine()) != null)
-			{
-				StringTokenizer st = new StringTokenizer(line, Config.EOL);
-				if (st.hasMoreTokens())
-				{
-					list.add(st.nextToken());
-				}
-			}
+			//@formatter:off
+			return Files.lines(Paths.get(Config.DATAPACK_ROOT.getPath(), path), StandardCharsets.UTF_8)
+				.collect(Collectors.toCollection(FastList::new));
+			//@formatter:on
 		}
-		catch (IOException e1)
+		catch (IOException ioe)
 		{
-			_log.log(Level.SEVERE, "Error reading announcements: ", e1);
+			_log.log(Level.SEVERE, "Error reading announcements: ", ioe);
+			return new FastList<>();
 		}
 	}
 	
 	private void saveToDisk(boolean isCritical)
 	{
-		String path;
-		List<String> list;
+		final String path;
+		final List<String> list;
 		
 		if (isCritical)
 		{
@@ -207,18 +195,13 @@ public final class Announcements
 			list = _announcements;
 		}
 		
-		final File file = new File(path);
-		try (FileWriter save = new FileWriter(file))
+		try
 		{
-			for (String announce : list)
-			{
-				save.write(announce);
-				save.write(Config.EOL);
-			}
+			Files.write(Paths.get(Config.DATAPACK_ROOT.getPath(), path), list, StandardCharsets.UTF_8);
 		}
-		catch (IOException e)
+		catch (IOException ioe)
 		{
-			_log.log(Level.SEVERE, "Saving to the announcements file has failed: ", e);
+			_log.log(Level.SEVERE, "Saving to the announcements file has failed: ", ioe);
 		}
 	}
 	
@@ -254,7 +237,7 @@ public final class Announcements
 		{
 			// Announce string to everyone on server
 			String text = command.substring(lengthToTrim);
-			SingletonHolder._instance.announceToAll(text, isCritical);
+			announceToAll(text, isCritical);
 		}
 		// No body cares!
 		catch (StringIndexOutOfBoundsException e)

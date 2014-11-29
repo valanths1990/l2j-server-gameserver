@@ -41,7 +41,6 @@ public class Status extends Thread
 	private final ServerSocket statusServerSocket;
 	
 	private final int _uptime;
-	private final int _statusPort;
 	private String _statusPw;
 	private final int _mode;
 	private final List<LoginStatusThread> _loginStatus;
@@ -108,7 +107,7 @@ public class Status extends Thread
 		{
 			telnetSettings.load(is);
 		}
-		_statusPort = Integer.parseInt(telnetSettings.getProperty("StatusPort", "12345"));
+		int statusPort = Integer.parseInt(telnetSettings.getProperty("StatusPort", "12345"));
 		_statusPw = telnetSettings.getProperty("StatusPW");
 		
 		if ((_mode == Server.MODE_GAMESERVER) || (_mode == Server.MODE_LOGINSERVER))
@@ -120,9 +119,9 @@ public class Status extends Thread
 				_statusPw = rndPW(10);
 				_log.info("Password Has Been Set To: " + _statusPw);
 			}
-			_log.info("Telnet StatusServer started successfully, listening on Port: " + _statusPort);
+			_log.info("Telnet StatusServer started successfully, listening on Port: " + statusPort);
 		}
-		statusServerSocket = new ServerSocket(_statusPort);
+		statusServerSocket = new ServerSocket(statusPort);
 		_uptime = (int) System.currentTimeMillis();
 		_loginStatus = new FastList<>();
 	}

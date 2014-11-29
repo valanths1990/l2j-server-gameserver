@@ -81,7 +81,6 @@ public final class L2CubicInstance implements IIdentifiable
 	
 	private final int _cubicId;
 	private final int _cubicPower;
-	private final int _cubicDuration;
 	private final int _cubicDelay;
 	private final int _cubicSkillChance;
 	private final int _cubicMaxCount;
@@ -98,7 +97,6 @@ public final class L2CubicInstance implements IIdentifiable
 		_owner = owner;
 		_cubicId = cubicId;
 		_cubicPower = cubicPower;
-		_cubicDuration = cubicDuration * 1000;
 		_cubicDelay = cubicDelay * 1000;
 		_cubicSkillChance = cubicSkillChance;
 		_cubicMaxCount = cubicMaxCount;
@@ -159,7 +157,7 @@ public final class L2CubicInstance implements IIdentifiable
 				_skills.add(SkillData.getInstance().getSkill(5115, 4));
 				break;
 		}
-		_disappearTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubicDisappear(this), _cubicDuration); // disappear
+		_disappearTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubicDisappear(this), cubicDuration * 1000); // disappear
 	}
 	
 	public synchronized void doAction()
@@ -700,8 +698,7 @@ public final class L2CubicInstance implements IIdentifiable
 		double percentleft = 100.0;
 		L2Party party = _owner.getParty();
 		
-		// if owner is in a duel but not in a party duel, then it is the same as he does not have a
-		// party
+		// if owner is in a duel but not in a party duel, then it is the same as he does not have a party
 		if (_owner.isInDuel())
 		{
 			if (!DuelManager.getInstance().getDuel(_owner.getDuelId()).isPartyDuel())
@@ -714,8 +711,7 @@ public final class L2CubicInstance implements IIdentifiable
 		{
 			// Get all visible objects in a spheric area near the L2Character
 			// Get a list of Party Members
-			List<L2PcInstance> partyList = party.getMembers();
-			for (L2Character partyMember : partyList)
+			for (L2Character partyMember : party.getMembers())
 			{
 				if (!partyMember.isDead())
 				{

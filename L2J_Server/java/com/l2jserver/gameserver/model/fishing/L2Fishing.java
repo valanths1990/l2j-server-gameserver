@@ -49,7 +49,6 @@ public class L2Fishing implements Runnable
 	private int _fishCurHp;
 	private final double _regenHp;
 	private final boolean _isUpperGrade;
-	private int _lureType;
 	
 	@Override
 	public void run()
@@ -86,19 +85,20 @@ public class L2Fishing implements Runnable
 		_fishId = fish.getItemId();
 		_time = fish.getCombatDuration();
 		_isUpperGrade = isUpperGrade;
+		final int lureType;
 		if (isUpperGrade)
 		{
-			_deceptiveMode = Rnd.get(100) >= 90 ? 1 : 0;
-			_lureType = 2;
+			_deceptiveMode = ((Rnd.get(100) >= 90) ? 1 : 0);
+			lureType = 2;
 		}
 		else
 		{
 			_deceptiveMode = 0;
-			_lureType = isNoob ? 0 : 1;
+			lureType = (isNoob ? 0 : 1);
 		}
-		_mode = Rnd.get(100) >= 80 ? 1 : 0;
+		_mode = ((Rnd.get(100) >= 80) ? 1 : 0);
 		
-		_fisher.broadcastPacket(new ExFishingStartCombat(_fisher, _time, _fishMaxHp, _mode, _lureType, _deceptiveMode));
+		_fisher.broadcastPacket(new ExFishingStartCombat(_fisher, _time, _fishMaxHp, _mode, lureType, _deceptiveMode));
 		_fisher.sendPacket(new PlaySound(1, "SF_S_01", 0, 0, 0, 0, 0));
 		// Succeeded in getting a bite
 		_fisher.sendPacket(SystemMessageId.GOT_A_BITE);

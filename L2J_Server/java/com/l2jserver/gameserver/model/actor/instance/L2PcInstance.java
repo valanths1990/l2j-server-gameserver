@@ -11019,7 +11019,8 @@ public final class L2PcInstance extends L2Playable
 		{
 			if (validateHtmlAction(_htmlActionCaches[i], action))
 			{
-				return _lastHtmlActionOriginObjId = _htmlActionOriginObjectIds[i];
+				_lastHtmlActionOriginObjId = _htmlActionOriginObjectIds[i];
+				return _lastHtmlActionOriginObjId;
 			}
 		}
 		
@@ -11612,18 +11613,16 @@ public final class L2PcInstance extends L2Playable
 		int lvl = getRandomFishLvl();
 		int grade = getRandomFishGrade();
 		int group = getRandomFishGroup(grade);
-		List<L2Fish> fishs = FishData.getInstance().getFish(lvl, group, grade);
-		if ((fishs == null) || fishs.isEmpty())
+		List<L2Fish> fish = FishData.getInstance().getFish(lvl, group, grade);
+		if ((fish == null) || fish.isEmpty())
 		{
-			sendMessage("Error - Fishes are not definied");
+			sendMessage("Error - Fish are not defined");
 			endFishing(false);
 			return;
 		}
-		int check = Rnd.get(fishs.size());
 		// Use a copy constructor else the fish data may be over-written below
-		_fish = fishs.get(check).clone();
-		fishs.clear();
-		fishs = null;
+		_fish = fish.get(Rnd.get(fish.size())).clone();
+		fish.clear();
 		sendPacket(SystemMessageId.CAST_LINE_AND_START_FISHING);
 		if (!GameTimeController.getInstance().isNight() && _lure.isNightLure())
 		{

@@ -98,8 +98,9 @@ public class DropProtection implements Runnable
 		unprotect();
 		
 		_isProtected = true;
+		_owner = player;
 		
-		if ((_owner = player) == null)
+		if (_owner == null)
 		{
 			throw new NullPointerException("Trying to protect dropped item to null owner");
 		}

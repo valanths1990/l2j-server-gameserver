@@ -55,8 +55,6 @@ public final class BuffInfo
 	// Tasks
 	/** Effect tasks for ticks. */
 	private volatile Map<AbstractEffect, EffectTaskInfo> _tasks;
-	/** Task for effect ending. */
-	private BuffTimeTask _effectTimeTask;
 	/** Scheduled future. */
 	private ScheduledFuture<?> _scheduledFutureTimeTask;
 	// Time and ticks
@@ -268,8 +266,7 @@ public final class BuffInfo
 		// Creates a task that will stop all the effects.
 		if (_abnormalTime > 0)
 		{
-			_effectTimeTask = new BuffTimeTask(this);
-			_scheduledFutureTimeTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(_effectTimeTask, 0, 1000L);
+			_scheduledFutureTimeTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new BuffTimeTask(this), 0, 1000L);
 		}
 		
 		applyAbnormalVisualEffects();

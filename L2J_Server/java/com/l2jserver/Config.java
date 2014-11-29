@@ -23,10 +23,8 @@ import info.tak11.subnet.Subnet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -38,6 +36,9 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -48,6 +49,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -1071,7 +1073,7 @@ public final class Config
 	public static long SOD_STAGE_2_LENGTH;
 	
 	// chatfilter
-	public static ArrayList<String> FILTER_LIST;
+	public static List<String> FILTER_LIST;
 	
 	// Email
 	public static String EMAIL_SERVERINFO_NAME;
@@ -2690,28 +2692,19 @@ public final class Config
 			SOD_TIAT_KILL_COUNT = GraciaSeedsSettings.getInt("TiatKillCountForNextState", 10);
 			SOD_STAGE_2_LENGTH = GraciaSeedsSettings.getLong("Stage2Length", 720) * 60000;
 			
-			final File chat_filter = new File(CHAT_FILTER_FILE);
-			try (FileReader fr = new FileReader(chat_filter);
-				BufferedReader br = new BufferedReader(fr);
-				LineNumberReader lnr = new LineNumberReader(br))
+			try
 			{
-				FILTER_LIST = new ArrayList<>();
-				
-				String line = null;
-				while ((line = lnr.readLine()) != null)
-				{
-					if (line.trim().isEmpty() || (line.charAt(0) == '#'))
-					{
-						continue;
-					}
-					
-					FILTER_LIST.add(line.trim());
-				}
+				//@formatter:off
+				FILTER_LIST = Files.lines(Paths.get(CHAT_FILTER_FILE), StandardCharsets.UTF_8)
+					.map(String::trim)
+					.filter(line -> (!line.isEmpty() && (line.charAt(0) != '#')))
+					.collect(Collectors.toList());
+				//@formatter:on
 				_log.info("Loaded " + FILTER_LIST.size() + " Filter Words.");
 			}
-			catch (Exception e)
+			catch (IOException ioe)
 			{
-				_log.log(Level.WARNING, "Error while loading chat filter words!", e);
+				_log.log(Level.WARNING, "Error while loading chat filter words!", ioe);
 			}
 			
 			final PropertiesParser ClanHallSiege = new PropertiesParser(CH_SIEGE_FILE);

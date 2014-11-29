@@ -45,8 +45,6 @@ public class BaseMail implements Runnable
 {
 	private static final Logger _log = Logger.getLogger(BaseMail.class.getName());
 	
-	private final Properties _mailProp = new Properties();
-	private final SmtpAuthenticator _authenticator;
 	private MimeMessage _messageMime = null;
 	
 	private class SmtpAuthenticator extends Authenticator
@@ -67,15 +65,6 @@ public class BaseMail implements Runnable
 	
 	public BaseMail(String account, String mailId, String... args)
 	{
-		_mailProp.put("mail.smtp.host", Config.EMAIL_SYS_HOST);
-		_mailProp.put("mail.smtp.auth", Config.EMAIL_SYS_SMTP_AUTH);
-		_mailProp.put("mail.smtp.port", Config.EMAIL_SYS_PORT);
-		_mailProp.put("mail.smtp.socketFactory.port", Config.EMAIL_SYS_PORT);
-		_mailProp.put("mail.smtp.socketFactory.class", Config.EMAIL_SYS_FACTORY);
-		_mailProp.put("mail.smtp.socketFactory.fallback", Config.EMAIL_SYS_FACTORY_CALLBACK);
-		
-		_authenticator = Config.EMAIL_SYS_SMTP_AUTH ? new SmtpAuthenticator() : null;
-		
 		String mailAddr = getUserMail(account);
 		
 		if (mailAddr == null)
@@ -91,7 +80,16 @@ public class BaseMail implements Runnable
 		
 		String message = compileHtml(account, content.getText(), args);
 		
-		Session mailSession = Session.getDefaultInstance(_mailProp, _authenticator);
+		final Properties mailProp = new Properties();
+		mailProp.put("mail.smtp.host", Config.EMAIL_SYS_HOST);
+		mailProp.put("mail.smtp.auth", Config.EMAIL_SYS_SMTP_AUTH);
+		mailProp.put("mail.smtp.port", Config.EMAIL_SYS_PORT);
+		mailProp.put("mail.smtp.socketFactory.port", Config.EMAIL_SYS_PORT);
+		mailProp.put("mail.smtp.socketFactory.class", Config.EMAIL_SYS_FACTORY);
+		mailProp.put("mail.smtp.socketFactory.fallback", Config.EMAIL_SYS_FACTORY_CALLBACK);
+		final SmtpAuthenticator authenticator = (Config.EMAIL_SYS_SMTP_AUTH ? new SmtpAuthenticator() : null);
+		
+		Session mailSession = Session.getDefaultInstance(mailProp, authenticator);
 		
 		try
 		{

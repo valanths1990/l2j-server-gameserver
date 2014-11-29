@@ -129,10 +129,9 @@ public final class GameTimeController extends Thread
 	 */
 	private final void moveObjects()
 	{
-		L2Character character;
 		for (FastMap.Entry<Integer, L2Character> e = _movingObjects.head(), tail = _movingObjects.tail(); (e = e.getNext()) != tail;)
 		{
-			character = e.getValue();
+			final L2Character character = e.getValue();
 			
 			if (character.updatePosition(getGameTicks()))
 			{

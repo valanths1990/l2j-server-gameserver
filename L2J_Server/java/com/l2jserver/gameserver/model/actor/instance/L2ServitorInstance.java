@@ -129,7 +129,8 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	
 	public void setItemConsumeInterval(int interval)
 	{
-		_consumeItemInterval = _consumeItemIntervalRemaining = interval;
+		_consumeItemInterval = interval;
+		_consumeItemIntervalRemaining = interval;
 	}
 	
 	public int getItemConsumeInterval()
@@ -141,7 +142,8 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	
 	public void setLifeTime(int lifeTime)
 	{
-		_lifeTime = _lifeTimeRemaining = lifeTime;
+		_lifeTime = lifeTime;
+		_lifeTimeRemaining = lifeTime;
 	}
 	
 	public int getLifeTime()
@@ -519,7 +521,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	public void run()
 	{
 		int usedtime = 5000;
-		int newTimeRemaining = (_lifeTimeRemaining -= usedtime);
+		_lifeTimeRemaining -= usedtime;
 		
 		if (isDead() || !isVisible())
 		{
@@ -531,7 +533,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		}
 		
 		// check if the summon's lifetime has ran out
-		if (newTimeRemaining < 0)
+		if (_lifeTimeRemaining < 0)
 		{
 			sendPacket(SystemMessageId.SERVITOR_PASSED_AWAY);
 			unSummon(getOwner());
@@ -540,10 +542,10 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		
 		if (_consumeItemInterval > 0)
 		{
-			int newConsumeCountDown = (_consumeItemIntervalRemaining -= usedtime);
+			_consumeItemIntervalRemaining -= usedtime;
 			
 			// check if it is time to consume another item
-			if ((newConsumeCountDown <= 0) && (getItemConsume().getCount() > 0) && (getItemConsume().getId() > 0) && !isDead())
+			if ((_consumeItemIntervalRemaining <= 0) && (getItemConsume().getCount() > 0) && (getItemConsume().getId() > 0) && !isDead())
 			{
 				if (destroyItemByItemId("Consume", getItemConsume().getId(), getItemConsume().getCount(), this, false))
 				{
@@ -562,7 +564,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 			}
 		}
 		
-		sendPacket(new SetSummonRemainTime(getLifeTime(), newTimeRemaining));
+		sendPacket(new SetSummonRemainTime(getLifeTime(), _lifeTimeRemaining));
 		updateEffectIcons();
 	}
 }

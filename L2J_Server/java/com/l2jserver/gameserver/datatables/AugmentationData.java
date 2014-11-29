@@ -81,10 +81,9 @@ public class AugmentationData
 	private static final int ACC_NECK_SKILLS = 24;
 	private static final int ACC_NECK_BLOCKSIZE = ACC_NECK_SKILLS + (4 * ACC_STAT_SUBBLOCKSIZE);
 	
-	private final List<List<Integer>> _blueSkills = new ArrayList<>(10);
-	private final List<List<Integer>> _purpleSkills = new ArrayList<>(10);
-	private final List<List<Integer>> _redSkills = new ArrayList<>(10);
-	private final List<List<Integer>> _yellowSkills = new ArrayList<>(10);
+	private final List<List<Integer>> _blueSkills = new ArrayList<>();
+	private final List<List<Integer>> _purpleSkills = new ArrayList<>();
+	private final List<List<Integer>> _redSkills = new ArrayList<>();
 	
 	private final List<AugmentationChance> _augmentationChances = new ArrayList<>();
 	private final List<augmentationChanceAcc> _augmentationChancesAcc = new ArrayList<>();
@@ -98,7 +97,6 @@ public class AugmentationData
 			_blueSkills.add(new ArrayList<Integer>());
 			_purpleSkills.add(new ArrayList<Integer>());
 			_redSkills.add(new ArrayList<Integer>());
-			_yellowSkills.add(new ArrayList<Integer>());
 		}
 		
 		load();

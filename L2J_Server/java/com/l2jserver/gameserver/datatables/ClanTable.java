@@ -185,7 +185,6 @@ public class ClanTable
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_EXISTS);
 			sm.addString(clanName);
 			player.sendPacket(sm);
-			sm = null;
 			return null;
 		}
 		

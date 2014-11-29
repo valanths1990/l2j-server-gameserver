@@ -69,8 +69,6 @@ public class LoginController
 	
 	protected ScrambledKeyPair[] _keyPairs;
 	
-	private final Thread _purge;
-	
 	protected byte[][] _blowfishKeys;
 	private static final int BLOWFISH_KEYS = 20;
 	
@@ -107,9 +105,9 @@ public class LoginController
 		// Store keys for blowfish communication
 		generateBlowFishKeys();
 		
-		_purge = new PurgeThread();
-		_purge.setDaemon(true);
-		_purge.start();
+		Thread purge = new PurgeThread();
+		purge.setDaemon(true);
+		purge.start();
 	}
 	
 	/**

@@ -79,9 +79,7 @@ public final class RequestJoinAlly extends L2GameClientPacket
 		sm.addString(activeChar.getClan().getAllyName());
 		sm.addString(activeChar.getName());
 		target.sendPacket(sm);
-		sm = null;
-		AskJoinAlly aja = new AskJoinAlly(activeChar.getObjectId(), activeChar.getClan().getAllyName());
-		target.sendPacket(aja);
+		target.sendPacket(new AskJoinAlly(activeChar.getObjectId(), activeChar.getClan().getAllyName()));
 	}
 	
 	@Override

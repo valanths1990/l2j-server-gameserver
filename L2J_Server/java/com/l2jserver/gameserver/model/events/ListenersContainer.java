@@ -112,7 +112,7 @@ public class ListenersContainer
 			{
 				if (_listeners == null)
 				{
-					return _listeners = new ConcurrentHashMap<>();
+					_listeners = new ConcurrentHashMap<>();
 				}
 			}
 		}

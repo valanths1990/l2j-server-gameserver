@@ -55,13 +55,13 @@ public class MultiSellChoose extends L2GameClientPacket
 	@SuppressWarnings("unused")
 	private int _unk3;
 	@SuppressWarnings("unused")
-	private int _unk7;
-	@SuppressWarnings("unused")
 	private int _unk4;
 	@SuppressWarnings("unused")
 	private int _unk5;
 	@SuppressWarnings("unused")
 	private int _unk6;
+	@SuppressWarnings("unused")
+	private int _unk7;
 	@SuppressWarnings("unused")
 	private int _unk8;
 	@SuppressWarnings("unused")
@@ -428,7 +428,6 @@ public class MultiSellChoose extends L2GameClientPacket
 								sm.addItemName(e.getItemId());
 								sm.addLong(e.getItemCount() * _amount);
 								player.sendPacket(sm);
-								sm = null;
 							}
 							else
 							{
@@ -444,7 +443,6 @@ public class MultiSellChoose extends L2GameClientPacket
 									sm.addItemName(e.getItemId());
 								}
 								player.sendPacket(sm);
-								sm = null;
 							}
 						}
 					}
@@ -453,7 +451,6 @@ public class MultiSellChoose extends L2GameClientPacket
 					StatusUpdate su = new StatusUpdate(player);
 					su.addAttribute(StatusUpdate.CUR_LOAD, player.getCurrentLoad());
 					player.sendPacket(su);
-					su = null;
 				}
 				finally
 				{

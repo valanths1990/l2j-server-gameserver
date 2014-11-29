@@ -84,12 +84,10 @@ public class LoginServerThread extends Thread
 	
 	/** @see com.l2jserver.loginserver.L2LoginServer#PROTOCOL_REV */
 	private static final int REVISION = 0x0106;
-	private RSAPublicKey _publicKey;
 	private final String _hostname;
 	private final int _port;
 	private final int _gamePort;
 	private Socket _loginSocket;
-	private InputStream _in;
 	private OutputStream _out;
 	
 	/**
@@ -99,14 +97,12 @@ public class LoginServerThread extends Thread
 	 * <br>
 	 * and then after handshake, with a new key sent by<br>
 	 * login server during the handshake. This new key is stored<br>
-	 * in {@link #_blowfishKey}
+	 * in blowfishKey
 	 */
 	private NewCrypt _blowfish;
-	private byte[] _blowfishKey;
 	private byte[] _hexID;
 	private final boolean _acceptAlternate;
 	private int _requestID;
-	private int _serverID;
 	private final boolean _reserveHost;
 	private int _maxPlayer;
 	private final List<WaitingClient> _waitingClients;
@@ -167,16 +163,16 @@ public class LoginServerThread extends Thread
 				// Connection
 				_log.info("Connecting to login on " + _hostname + ":" + _port);
 				_loginSocket = new Socket(_hostname, _port);
-				_in = _loginSocket.getInputStream();
+				InputStream in = _loginSocket.getInputStream();
 				_out = new BufferedOutputStream(_loginSocket.getOutputStream());
 				
 				// init Blowfish
-				_blowfishKey = Util.generateHex(40);
+				byte[] blowfishKey = Util.generateHex(40);
 				_blowfish = new NewCrypt("_;v.]05-31!|+-%xT!^[$\00");
 				while (!isInterrupted())
 				{
-					lengthLo = _in.read();
-					lengthHi = _in.read();
+					lengthLo = in.read();
+					lengthHi = in.read();
 					length = (lengthHi * 256) + lengthLo;
 					
 					if (lengthHi < 0)
@@ -192,7 +188,7 @@ public class LoginServerThread extends Thread
 					int left = length - 2;
 					while ((newBytes != -1) && (receivedBytes < (length - 2)))
 					{
-						newBytes = _in.read(incoming, receivedBytes, left);
+						newBytes = in.read(incoming, receivedBytes, left);
 						receivedBytes = receivedBytes + newBytes;
 						left -= newBytes;
 					}
@@ -224,26 +220,26 @@ public class LoginServerThread extends Thread
 								_log.warning("/!\\ Revision mismatch between LS and GS /!\\");
 								break;
 							}
+							
+							RSAPublicKey publicKey;
+							
 							try
 							{
 								KeyFactory kfac = KeyFactory.getInstance("RSA");
 								BigInteger modulus = new BigInteger(init.getRSAKey());
 								RSAPublicKeySpec kspec1 = new RSAPublicKeySpec(modulus, RSAKeyGenParameterSpec.F4);
-								_publicKey = (RSAPublicKey) kfac.generatePublic(kspec1);
+								publicKey = (RSAPublicKey) kfac.generatePublic(kspec1);
 							}
-							
 							catch (GeneralSecurityException e)
 							{
-								_log.warning("Troubles while init the public key send by login");
+								_log.warning("Trouble while init the public key send by login");
 								break;
 							}
 							// send the blowfish key through the rsa encryption
-							BlowFishKey bfk = new BlowFishKey(_blowfishKey, _publicKey);
-							sendPacket(bfk);
+							sendPacket(new BlowFishKey(blowfishKey, publicKey));
 							// now, only accept packet with the new encryption
-							_blowfish = new NewCrypt(_blowfishKey);
-							AuthRequest ar = new AuthRequest(_requestID, _acceptAlternate, _hexID, _gamePort, _reserveHost, _maxPlayer, _subnets, _hosts);
-							sendPacket(ar);
+							_blowfish = new NewCrypt(blowfishKey);
+							sendPacket(new AuthRequest(_requestID, _acceptAlternate, _hexID, _gamePort, _reserveHost, _maxPlayer, _subnets, _hosts));
 							break;
 						case 0x01:
 							LoginServerFail lsf = new LoginServerFail(incoming);
@@ -252,10 +248,10 @@ public class LoginServerThread extends Thread
 							break;
 						case 0x02:
 							AuthResponse aresp = new AuthResponse(incoming);
-							_serverID = aresp.getServerId();
+							int serverID = aresp.getServerId();
 							_serverName = aresp.getServerName();
-							Config.saveHexid(_serverID, hexToString(_hexID));
-							_log.info("Registered on login as Server " + _serverID + " : " + _serverName);
+							Config.saveHexid(serverID, hexToString(_hexID));
+							_log.info("Registered on login as Server " + serverID + " : " + _serverName);
 							ServerStatus st = new ServerStatus();
 							if (Config.SERVER_LIST_BRACKET)
 							{

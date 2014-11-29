@@ -31,8 +31,7 @@ public class ExShowFortressSiegeInfo extends L2GameServerPacket
 {
 	private final int _fortId;
 	private final int _size;
-	private final Fort _fort;
-	private int _csize;
+	private final int _csize;
 	private final int _csize2;
 	
 	/**
@@ -40,15 +39,11 @@ public class ExShowFortressSiegeInfo extends L2GameServerPacket
 	 */
 	public ExShowFortressSiegeInfo(Fort fort)
 	{
-		_fort = fort;
 		_fortId = fort.getResidenceId();
 		_size = fort.getFortSize();
 		FastList<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(_fortId);
-		if (commanders != null)
-		{
-			_csize = commanders.size();
-		}
-		_csize2 = _fort.getSiege().getCommanders().size();
+		_csize = ((commanders == null) ? 0 : commanders.size());
+		_csize2 = fort.getSiege().getCommanders().size();
 	}
 	
 	@Override

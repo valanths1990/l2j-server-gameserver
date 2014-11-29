@@ -24,18 +24,15 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 public final class ShortCutInit extends L2GameServerPacket
 {
 	private Shortcut[] _shortCuts;
-	private L2PcInstance _activeChar;
 	
 	public ShortCutInit(L2PcInstance activeChar)
 	{
-		_activeChar = activeChar;
-		
-		if (_activeChar == null)
+		if (activeChar == null)
 		{
 			return;
 		}
 		
-		_shortCuts = _activeChar.getAllShortCuts();
+		_shortCuts = activeChar.getAllShortCuts();
 	}
 	
 	@Override

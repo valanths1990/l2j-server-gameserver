@@ -18,19 +18,19 @@
  */
 package com.l2jserver.gameserver.pathfinding.geonodes;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.LineNumberReader;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +45,7 @@ import com.l2jserver.gameserver.pathfinding.AbstractNode;
 import com.l2jserver.gameserver.pathfinding.AbstractNodeLoc;
 import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.pathfinding.utils.FastNodeList;
+import com.l2jserver.gameserver.util.Util;
 
 /**
  * @author -Nemesiss-
@@ -388,29 +389,34 @@ public class GeoPathFinding extends PathFinding
 	
 	protected GeoPathFinding()
 	{
-		final File file = new File(Config.PATHNODE_DIR, "pn_index.txt");
-		try (FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			LineNumberReader lnr = new LineNumberReader(br))
+		try
 		{
 			_log.info("Path Engine: - Loading Path Nodes...");
-			String line;
-			while ((line = lnr.readLine()) != null)
-			{
-				if (line.trim().isEmpty())
-				{
-					continue;
-				}
-				StringTokenizer st = new StringTokenizer(line, "_");
-				byte rx = Byte.parseByte(st.nextToken());
-				byte ry = Byte.parseByte(st.nextToken());
-				LoadPathNodeFile(rx, ry);
-			}
+			//@formatter:off
+			Files.lines(Paths.get(Config.PATHNODE_DIR.getPath(), "pn_index.txt"), StandardCharsets.UTF_8)
+				.map(String::trim)
+				.filter(l -> !l.isEmpty())
+				.forEach(line -> {
+					final String[] parts = line.split("_");
+					
+					if ((parts.length < 2)
+						|| !Util.isDigit(parts[0])
+						|| !Util.isDigit(parts[1]))
+					{
+						_log.warning("Invalid pathnode entry: '" + line + "', must be in format 'XX_YY', where X and Y - integers");
+						return;
+					}
+					
+					byte rx = Byte.parseByte(parts[0]);
+					byte ry = Byte.parseByte(parts[1]);
+					LoadPathNodeFile(rx, ry);
+				});
+			//@formatter:on
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
 			_log.log(Level.WARNING, "", e);
-			throw new Error("Failed to Read pn_index File.");
+			throw new Error("Failed to read pn_index file.");
 		}
 	}
 	

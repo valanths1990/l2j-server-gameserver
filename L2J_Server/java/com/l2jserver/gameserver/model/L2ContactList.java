@@ -46,9 +46,9 @@ public class L2ContactList
 	private final L2PcInstance activeChar;
 	private final List<String> _contacts;
 	
-	private final String QUERY_ADD = "INSERT INTO character_contacts (charId, contactId) VALUES (?, ?)";
-	private final String QUERY_REMOVE = "DELETE FROM character_contacts WHERE charId = ? and contactId = ?";
-	private final String QUERY_LOAD = "SELECT contactId FROM character_contacts WHERE charId = ?";
+	private static final String QUERY_ADD = "INSERT INTO character_contacts (charId, contactId) VALUES (?, ?)";
+	private static final String QUERY_REMOVE = "DELETE FROM character_contacts WHERE charId = ? and contactId = ?";
+	private static final String QUERY_LOAD = "SELECT contactId FROM character_contacts WHERE charId = ?";
 	
 	public L2ContactList(L2PcInstance player)
 	{

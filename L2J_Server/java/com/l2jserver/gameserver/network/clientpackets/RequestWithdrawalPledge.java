@@ -70,7 +70,6 @@ public final class RequestWithdrawalPledge extends L2GameClientPacket
 		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_HAS_WITHDRAWN_FROM_THE_CLAN);
 		sm.addString(activeChar.getName());
 		clan.broadcastToOnlineMembers(sm);
-		sm = null;
 		
 		// Remove the Player From the Member list
 		clan.broadcastToOnlineMembers(new PledgeShowMemberListDelete(activeChar.getName()));

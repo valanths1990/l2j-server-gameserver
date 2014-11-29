@@ -27,7 +27,6 @@ public final class WareHouseWithdrawalList extends AbstractItemPacket
 	public static final int CLAN = 4;
 	public static final int CASTLE = 3; // not sure
 	public static final int FREIGHT = 1;
-	private L2PcInstance _activeChar;
 	private long _playerAdena;
 	private L2ItemInstance[] _items;
 	/**
@@ -42,17 +41,15 @@ public final class WareHouseWithdrawalList extends AbstractItemPacket
 	
 	public WareHouseWithdrawalList(L2PcInstance player, int type)
 	{
-		_activeChar = player;
-		_whType = type;
-		
-		_playerAdena = _activeChar.getAdena();
-		if (_activeChar.getActiveWarehouse() == null)
+		if (player.getActiveWarehouse() == null)
 		{
-			_log.warning("error while sending withdraw request to: " + _activeChar.getName());
+			_log.warning("error while sending withdraw request to: " + player.getName());
 			return;
 		}
 		
-		_items = _activeChar.getActiveWarehouse().getItems();
+		_playerAdena = player.getAdena();
+		_items = player.getActiveWarehouse().getItems();
+		_whType = type;
 	}
 	
 	@Override

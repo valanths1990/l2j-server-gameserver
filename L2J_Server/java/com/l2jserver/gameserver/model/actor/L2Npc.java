@@ -129,7 +129,7 @@ public class L2Npc extends L2Character
 	/** Time of last social packet broadcast */
 	private long _lastSocialBroadcast = 0;
 	/** Minimum interval between social packets */
-	private final int _minimalSocialInterval = 6000;
+	private static final int MINIMUM_SOCIAL_INTERVAL = 6000;
 	/** Support for random animation switching */
 	private boolean _isRandomAnimationEnabled = true;
 	private boolean _isTalking = true;
@@ -368,7 +368,7 @@ public class L2Npc extends L2Character
 	{
 		// Send a packet SocialAction to all L2PcInstance in the _KnownPlayers of the L2NpcInstance
 		long now = System.currentTimeMillis();
-		if ((now - _lastSocialBroadcast) > _minimalSocialInterval)
+		if ((now - _lastSocialBroadcast) > MINIMUM_SOCIAL_INTERVAL)
 		{
 			_lastSocialBroadcast = now;
 			broadcastPacket(new SocialAction(getObjectId(), animationId));

@@ -89,7 +89,6 @@ public final class RequestOustPledgeMember extends L2GameClientPacket
 		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.CLAN_MEMBER_S1_EXPELLED);
 		sm.addString(member.getName());
 		clan.broadcastToOnlineMembers(sm);
-		sm = null;
 		activeChar.sendPacket(SystemMessageId.YOU_HAVE_SUCCEEDED_IN_EXPELLING_CLAN_MEMBER);
 		activeChar.sendPacket(SystemMessageId.YOU_MUST_WAIT_BEFORE_ACCEPTING_A_NEW_MEMBER);
 		

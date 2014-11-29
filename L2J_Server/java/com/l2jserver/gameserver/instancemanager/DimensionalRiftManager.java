@@ -58,7 +58,7 @@ public final class DimensionalRiftManager
 {
 	private static Logger _log = Logger.getLogger(DimensionalRiftManager.class.getName());
 	private final Map<Byte, Map<Byte, DimensionalRiftRoom>> _rooms = new HashMap<>(7);
-	private final int DIMENSIONAL_FRAGMENT_ITEM_ID = 7079;
+	private static final int DIMENSIONAL_FRAGMENT_ITEM_ID = 7079;
 	
 	public static DimensionalRiftManager getInstance()
 	{

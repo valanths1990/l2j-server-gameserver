@@ -28,19 +28,12 @@ import com.l2jserver.gameserver.instancemanager.ItemsOnGroundManager;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class ItemsAutoDestroy
+public final class ItemsAutoDestroy
 {
-	protected List<L2ItemInstance> _items = null;
-	protected static long _sleep;
+	private final List<L2ItemInstance> _items = new FastList<>();
 	
 	protected ItemsAutoDestroy()
 	{
-		_items = new FastList<>();
-		_sleep = Config.AUTODESTROY_ITEM_AFTER * 1000;
-		if (_sleep == 0)
-		{
-			_sleep = 3600000;
-		}
 		ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(this::removeItems, 5000, 5000);
 	}
 	
@@ -97,14 +90,19 @@ public class ItemsAutoDestroy
 						}
 					}
 				}
-				else if ((curtime - item.getDropTime()) > _sleep)
+				else
 				{
-					L2World.getInstance().removeVisibleObject(item, item.getWorldRegion());
-					L2World.getInstance().removeObject(item);
-					_items.remove(item);
-					if (Config.SAVE_DROPPED_ITEM)
+					final long sleep = ((Config.AUTODESTROY_ITEM_AFTER == 0) ? 3600000 : Config.AUTODESTROY_ITEM_AFTER * 1000);
+					
+					if ((curtime - item.getDropTime()) > sleep)
 					{
-						ItemsOnGroundManager.getInstance().removeObject(item);
+						L2World.getInstance().removeVisibleObject(item, item.getWorldRegion());
+						L2World.getInstance().removeObject(item);
+						_items.remove(item);
+						if (Config.SAVE_DROPPED_ITEM)
+						{
+							ItemsOnGroundManager.getInstance().removeObject(item);
+						}
 					}
 				}
 			}

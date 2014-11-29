@@ -52,7 +52,7 @@ public class L2BossZone extends L2ZoneType
 		0
 	};
 	
-	private final class Settings extends AbstractZoneSettings
+	public final class Settings extends AbstractZoneSettings
 	{
 		// track the times that players got disconnected. Players are allowed
 		// to log back into the zone as long as their log-out was within _timeInvade time...
@@ -65,7 +65,7 @@ public class L2BossZone extends L2ZoneType
 		
 		private final List<L2Character> _raidList = new FastList<>();
 		
-		public Settings()
+		protected Settings()
 		{
 		}
 		

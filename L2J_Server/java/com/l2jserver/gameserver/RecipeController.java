@@ -262,7 +262,8 @@ public class RecipeController
 			}
 			
 			// make temporary items
-			if ((_items = listItems(false)) == null)
+			_items = listItems(false);
+			if (_items == null)
 			{
 				abort();
 				return;
@@ -402,8 +403,10 @@ public class RecipeController
 				}
 			}
 			
-			if ((_items = listItems(true)) == null) // this line actually takes materials from inventory
-			{ // handle possible cheaters here
+			_items = listItems(true); // this line actually takes materials from inventory
+			if (_items == null)
+			{
+				// handle possible cheaters here
 				// (they click craft then try to get rid of items in order to get free craft)
 			}
 			else if (Rnd.get(100) < _recipeList.getSuccessRate())

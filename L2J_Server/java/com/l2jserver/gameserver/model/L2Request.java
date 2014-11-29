@@ -104,7 +104,6 @@ public class L2Request
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_BUSY_TRY_LATER);
 			sm.addString(partner.getName());
 			_player.sendPacket(sm);
-			sm = null;
 			return false;
 		}
 		if (isProcessingRequest())

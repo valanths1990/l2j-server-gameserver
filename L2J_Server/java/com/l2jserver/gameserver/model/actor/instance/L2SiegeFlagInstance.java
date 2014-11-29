@@ -40,7 +40,6 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 public class L2SiegeFlagInstance extends L2Npc
 {
 	private L2Clan _clan;
-	private L2PcInstance _player;
 	private Siegable _siege;
 	private final boolean _isAdvanced;
 	private boolean _canTalk;
@@ -53,7 +52,6 @@ public class L2SiegeFlagInstance extends L2Npc
 		if (TerritoryWarManager.getInstance().isTWInProgress())
 		{
 			_clan = player.getClan();
-			_player = player;
 			_canTalk = false;
 			if (_clan == null)
 			{
@@ -73,12 +71,11 @@ public class L2SiegeFlagInstance extends L2Npc
 			return;
 		}
 		_clan = player.getClan();
-		_player = player;
 		_canTalk = true;
-		_siege = SiegeManager.getInstance().getSiege(_player.getX(), _player.getY(), _player.getZ());
+		_siege = SiegeManager.getInstance().getSiege(player.getX(), player.getY(), player.getZ());
 		if (_siege == null)
 		{
-			_siege = FortSiegeManager.getInstance().getSiege(_player.getX(), _player.getY(), _player.getZ());
+			_siege = FortSiegeManager.getInstance().getSiege(player.getX(), player.getY(), player.getZ());
 		}
 		if (_siege == null)
 		{

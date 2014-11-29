@@ -56,7 +56,7 @@ import com.l2jserver.tools.images.ImagesTable;
 public class GUserInterface extends BaseGameServerRegister implements ActionListener
 {
 	private final JFrame _frame;
-	protected final JTableModel _dtm;
+	private final JTableModel _dtm;
 	protected final JProgressBar _progressBar;
 	
 	public JTable _gsTable;

@@ -1638,23 +1638,21 @@ public final class Skill implements IIdentifiable
 			}
 			List<ItemHolder> items = null;
 			double chance = 0;
-			int prodId = 0;
-			int quantity = 0;
-			final int lenght = prodData.length - 1;
+			final int length = prodData.length - 1;
 			try
 			{
-				items = new ArrayList<>(lenght / 2);
-				for (int j = 0; j < lenght; j++)
+				items = new ArrayList<>(length / 2);
+				for (int j = 0; j < length; j += 2)
 				{
-					prodId = Integer.parseInt(prodData[j]);
-					quantity = Integer.parseInt(prodData[j += 1]);
+					final int prodId = Integer.parseInt(prodData[j]);
+					final int quantity = Integer.parseInt(prodData[j + 1]);
 					if ((prodId <= 0) || (quantity <= 0))
 					{
 						_log.warning("Extractable skills data: Error in Skill Id: " + skillId + " Level: " + skillLvl + " wrong production Id: " + prodId + " or wrond quantity: " + quantity + "!");
 					}
 					items.add(new ItemHolder(prodId, quantity));
 				}
-				chance = Double.parseDouble(prodData[lenght]);
+				chance = Double.parseDouble(prodData[length]);
 			}
 			catch (Exception e)
 			{

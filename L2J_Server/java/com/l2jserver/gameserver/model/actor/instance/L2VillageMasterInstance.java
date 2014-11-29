@@ -1004,7 +1004,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_EXISTS);
 					sm.addString(clanName);
 					player.sendPacket(sm);
-					sm = null;
 				}
 				else
 				{
@@ -1164,7 +1163,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 		sm.addString(leaderName);
 		sm.addString(clanName);
 		clan.broadcastToOnlineMembers(sm);
-		sm = null;
 	}
 	
 	/**

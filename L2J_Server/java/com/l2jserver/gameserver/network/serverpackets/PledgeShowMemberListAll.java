@@ -99,8 +99,8 @@ public class PledgeShowMemberListAll extends L2GameServerPacket
 			writeS(m.getName());
 			writeD(m.getLevel());
 			writeD(m.getClassId());
-			L2PcInstance player;
-			if ((player = m.getPlayerInstance()) != null)
+			L2PcInstance player = m.getPlayerInstance();
+			if (player != null)
 			{
 				writeD(player.getAppearance().getSex() ? 1 : 0); // no visible effect
 				writeD(player.getRace().ordinal());// writeD(1);

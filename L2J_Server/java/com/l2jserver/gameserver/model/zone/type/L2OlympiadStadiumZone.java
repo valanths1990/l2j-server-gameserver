@@ -61,11 +61,11 @@ public class L2OlympiadStadiumZone extends L2ZoneRespawn
 		setSettings(settings);
 	}
 	
-	private final class Settings extends AbstractZoneSettings
+	public final class Settings extends AbstractZoneSettings
 	{
 		private OlympiadGameTask _task = null;
 		
-		public Settings()
+		protected Settings()
 		{
 		}
 		

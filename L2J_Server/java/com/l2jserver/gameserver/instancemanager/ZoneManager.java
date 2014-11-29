@@ -202,16 +202,12 @@ public final class ZoneManager extends DocumentParser
 						L2ZoneForm zoneForm = null;
 						try
 						{
-							coords = null;
-							int[] point;
-							rs.clear();
-							
 							for (Node cd = d.getFirstChild(); cd != null; cd = cd.getNextSibling())
 							{
 								if ("node".equalsIgnoreCase(cd.getNodeName()))
 								{
 									attrs = cd.getAttributes();
-									point = new int[2];
+									int[] point = new int[2];
 									point[0] = parseInteger(attrs, "X");
 									point[1] = parseInteger(attrs, "Y");
 									rs.add(point);
@@ -219,6 +215,7 @@ public final class ZoneManager extends DocumentParser
 							}
 							
 							coords = rs.toArray(new int[rs.size()][2]);
+							rs.clear();
 							
 							if ((coords == null) || (coords.length == 0))
 							{

@@ -39,7 +39,6 @@ public final class FortSiegeGuardManager
 	
 	private final Fort _fort;
 	private final FastMap<Integer, FastList<L2Spawn>> _siegeGuards = new FastMap<>();
-	private FastList<L2Spawn> _siegeGuardsSpawns;
 	
 	public FortSiegeGuardManager(Fort fort)
 	{
@@ -110,37 +109,35 @@ public final class FortSiegeGuardManager
 	{
 		_siegeGuards.clear();
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT * FROM fort_siege_guards Where fortId = ? "))
+			PreparedStatement ps = con.prepareStatement("SELECT npcId, x, y, z, heading, respawnDelay FROM fort_siege_guards WHERE fortId = ?"))
 		{
-			ps.setInt(1, getFort().getResidenceId());
+			final int fortId = getFort().getResidenceId();
+			ps.setInt(1, fortId);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				L2Spawn spawn1;
-				L2NpcTemplate template1;
-				_siegeGuardsSpawns = new FastList<>();
+				FastList<L2Spawn> siegeGuardSpawns = new FastList<>();
 				while (rs.next())
 				{
-					int fortId = rs.getInt("fortId");
-					template1 = NpcData.getInstance().getTemplate(rs.getInt("npcId"));
-					if (template1 != null)
+					L2NpcTemplate template = NpcData.getInstance().getTemplate(rs.getInt("npcId"));
+					if (template != null)
 					{
-						spawn1 = new L2Spawn(template1);
-						spawn1.setAmount(1);
-						spawn1.setX(rs.getInt("x"));
-						spawn1.setY(rs.getInt("y"));
-						spawn1.setZ(rs.getInt("z"));
-						spawn1.setHeading(rs.getInt("heading"));
-						spawn1.setRespawnDelay(rs.getInt("respawnDelay"));
-						spawn1.setLocationId(0);
+						L2Spawn spawn = new L2Spawn(template);
+						spawn.setAmount(1);
+						spawn.setX(rs.getInt("x"));
+						spawn.setY(rs.getInt("y"));
+						spawn.setZ(rs.getInt("z"));
+						spawn.setHeading(rs.getInt("heading"));
+						spawn.setRespawnDelay(rs.getInt("respawnDelay"));
+						spawn.setLocationId(0);
 						
-						_siegeGuardsSpawns.add(spawn1);
+						siegeGuardSpawns.add(spawn);
 					}
 					else
 					{
-						_log.warning("Missing npc data in npc table for id: " + rs.getInt("npcId"));
+						_log.warning("Missing npc data in npc table for ID: " + rs.getInt("npcId"));
 					}
-					_siegeGuards.put(fortId, _siegeGuardsSpawns);
 				}
+				_siegeGuards.put(fortId, siegeGuardSpawns);
 			}
 		}
 		catch (Exception e)

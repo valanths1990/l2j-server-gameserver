@@ -89,8 +89,7 @@ public final class RequestVoteNew extends L2GameClientPacket
 		
 		activeChar.giveRecom(target);
 		
-		SystemMessage sm = null;
-		sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_RECOMMENDED_C1_YOU_HAVE_S2_RECOMMENDATIONS_LEFT);
+		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_RECOMMENDED_C1_YOU_HAVE_S2_RECOMMENDATIONS_LEFT);
 		sm.addPcName(target);
 		sm.addInt(activeChar.getRecomLeft());
 		activeChar.sendPacket(sm);
@@ -98,7 +97,6 @@ public final class RequestVoteNew extends L2GameClientPacket
 		sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_BEEN_RECOMMENDED_BY_C1);
 		sm.addPcName(activeChar);
 		target.sendPacket(sm);
-		sm = null;
 		
 		activeChar.sendPacket(new UserInfo(activeChar));
 		sendPacket(new ExBrExtraUserInfo(activeChar));

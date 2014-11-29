@@ -760,7 +760,7 @@ public class SevenSignsFestival implements SpawnListener
 	};
 	// @formatter:on
 	
-	protected FestivalManager _managerInstance;
+	private FestivalManager _managerInstance;
 	protected ScheduledFuture<?> _managerScheduledTask;
 	
 	protected int _signsCycle = SevenSigns.getInstance().getCurrentCycle();
@@ -927,9 +927,9 @@ public class SevenSignsFestival implements SpawnListener
 	{
 		// Start the Festival Manager for the first time after the server has started
 		// at the specified time, then invoke it automatically after every cycle.
-		FestivalManager fm = new FestivalManager();
+		_managerInstance = new FestivalManager();
 		setNextFestivalStart(Config.ALT_FESTIVAL_MANAGER_START + FESTIVAL_SIGNUP_TIME);
-		_managerScheduledTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(fm, Config.ALT_FESTIVAL_MANAGER_START, Config.ALT_FESTIVAL_CYCLE_LENGTH);
+		_managerScheduledTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(_managerInstance, Config.ALT_FESTIVAL_MANAGER_START, Config.ALT_FESTIVAL_CYCLE_LENGTH);
 		
 		_log.info("SevenSignsFestival: The first Festival of Darkness cycle begins in " + (Config.ALT_FESTIVAL_MANAGER_START / 60000) + " minute(s).");
 	}
@@ -1785,7 +1785,6 @@ public class SevenSignsFestival implements SpawnListener
 		public FestivalManager()
 		{
 			_festivalInstances = new FastMap<>();
-			_managerInstance = this;
 			
 			// Increment the cycle counter.
 			_festivalCycle++;

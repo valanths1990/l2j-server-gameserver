@@ -596,7 +596,6 @@ public final class BlockCheckerEngine
 				spawn.stopRespawn();
 				spawn.getLastSpawn().deleteMe();
 				SpawnTable.getInstance().deleteSpawn(spawn, false);
-				spawn = null;
 			}
 			_spawns.clear();
 			

@@ -34,9 +34,8 @@ import com.l2jserver.gameserver.network.L2GameClient.GameClientState;
  */
 public class RequestSaveKeyMapping extends L2GameClientPacket
 {
-	private static String _C__D0_22_REQUESTSAVEKEYMAPPING = "[C] D0:22 RequestSaveKeyMapping";
+	private static final String _C__D0_22_REQUESTSAVEKEYMAPPING = "[C] D0:22 RequestSaveKeyMapping";
 	
-	private int _tabNum;
 	private final Map<Integer, List<ActionKey>> _keyMap = new HashMap<>();
 	private final Map<Integer, List<Integer>> _catMap = new HashMap<>();
 	
@@ -47,7 +46,7 @@ public class RequestSaveKeyMapping extends L2GameClientPacket
 		
 		readD(); // Unknown
 		readD(); // Unknown
-		_tabNum = readD();
+		final int _tabNum = readD();
 		for (int i = 0; i < _tabNum; i++)
 		{
 			int cmd1Size = readC();

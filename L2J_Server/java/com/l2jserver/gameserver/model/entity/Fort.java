@@ -921,7 +921,7 @@ public final class Fort extends AbstractResidence
 			{
 				if (_siege == null)
 				{
-					return _siege = new FortSiege(this);
+					_siege = new FortSiege(this);
 				}
 			}
 		}

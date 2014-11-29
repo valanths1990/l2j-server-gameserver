@@ -1062,7 +1062,6 @@ public class OlympiadGameTeams extends AbstractOlympiadGame
 				}
 			}
 			
-			reason = null;
 			for (int i = _teamTwoSize; --i >= 0;)
 			{
 				par = _teamTwo[i];

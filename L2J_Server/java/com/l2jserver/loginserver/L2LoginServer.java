@@ -68,7 +68,7 @@ public final class L2LoginServer
 		return _instance;
 	}
 	
-	public L2LoginServer()
+	private L2LoginServer()
 	{
 		_instance = this;
 		Server.serverMode = Server.MODE_LOGINSERVER;
@@ -215,28 +215,19 @@ public final class L2LoginServer
 		final File bannedFile = new File("./banned_ip.cfg");
 		if (bannedFile.exists() && bannedFile.isFile())
 		{
-			String line;
-			String[] parts;
 			try (FileInputStream fis = new FileInputStream(bannedFile);
 				InputStreamReader is = new InputStreamReader(fis);
-				LineNumberReader reader = new LineNumberReader(is))
+				LineNumberReader lnr = new LineNumberReader(is))
 			{
-				while ((line = reader.readLine()) != null)
-				{
-					line = line.trim();
-					// check if this line isn't a comment line
-					if ((line.length() > 0) && (line.charAt(0) != '#'))
-					{
-						// split comments if any
-						parts = line.split("#", 2);
-						
-						// discard comments in the line, if any
+				//@formatter:off
+				lnr.lines()
+					.map(String::trim)
+					.filter(l -> !l.isEmpty() && (l.charAt(0) != '#'))
+					.forEach(line -> {
+						String[] parts = line.split("#", 2); // address[ duration][ # comments]
 						line = parts[0];
-						
-						parts = line.split(" ");
-						
+						parts = line.split("\\s+"); // durations might be aligned via multiple spaces
 						String address = parts[0];
-						
 						long duration = 0;
 						
 						if (parts.length > 1)
@@ -245,10 +236,10 @@ public final class L2LoginServer
 							{
 								duration = Long.parseLong(parts[1]);
 							}
-							catch (NumberFormatException e)
+							catch (NumberFormatException nfe)
 							{
-								_log.warning("Skipped: Incorrect ban duration (" + parts[1] + ") on (" + bannedFile.getName() + "). Line: " + reader.getLineNumber());
-								continue;
+								_log.warning("Skipped: Incorrect ban duration (" + parts[1] + ") on (" + bannedFile.getName() + "). Line: " + lnr.getLineNumber());
+								return;
 							}
 						}
 						
@@ -258,10 +249,10 @@ public final class L2LoginServer
 						}
 						catch (UnknownHostException e)
 						{
-							_log.warning("Skipped: Invalid address (" + parts[0] + ") on (" + bannedFile.getName() + "). Line: " + reader.getLineNumber());
+							_log.warning("Skipped: Invalid address (" + address + ") on (" + bannedFile.getName() + "). Line: " + lnr.getLineNumber());
 						}
-					}
-				}
+					});
+				//@formatter:on
 			}
 			catch (IOException e)
 			{

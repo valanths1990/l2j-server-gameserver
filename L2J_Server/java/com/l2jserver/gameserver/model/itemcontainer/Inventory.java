@@ -786,7 +786,7 @@ public abstract class Inventory extends ItemContainer
 	 * Returns the instance of new ChangeRecorder
 	 * @return ChangeRecorder
 	 */
-	public ChangeRecorder newRecorder()
+	private ChangeRecorder newRecorder()
 	{
 		return new ChangeRecorder(this);
 	}
