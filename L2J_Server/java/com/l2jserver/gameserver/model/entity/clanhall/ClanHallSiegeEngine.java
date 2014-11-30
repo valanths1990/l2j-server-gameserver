@@ -201,7 +201,10 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 				if (guard != null)
 				{
 					guard.stopRespawn();
-					guard.getLastSpawn().deleteMe();
+					if (guard.getLastSpawn() != null)
+					{
+						guard.getLastSpawn().deleteMe();
+					}
 				}
 			}
 		}
