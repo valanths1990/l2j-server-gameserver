@@ -323,8 +323,7 @@ public class DimensionalRift
 		
 		DimensionalRiftManager.getInstance().getRoom(_type, _choosenRoom).setPartyInside(true);
 		checkBossRoom(_choosenRoom);
-		Location coords = getRoomCoord(_choosenRoom);
-		player.teleToLocation(coords);
+		player.teleToLocation(getRoomCoord(_choosenRoom));
 	}
 	
 	protected void teleportToWaitingRoom(L2PcInstance player)

@@ -271,14 +271,6 @@ public class GameServer
 		GrandBossManager.getInstance().initZones();
 		EventDroplist.getInstance();
 		
-		printSection("Siege");
-		SiegeScheduleData.getInstance();
-		SiegeManager.getInstance().getSieges();
-		FortSiegeManager.getInstance();
-		TerritoryWarManager.getInstance();
-		CastleManorManager.getInstance();
-		MercTicketManager.getInstance();
-		
 		printSection("Olympiad");
 		Olympiad.getInstance();
 		Hero.getInstance();
@@ -306,10 +298,6 @@ public class GameServer
 		AirShipManager.getInstance();
 		GraciaSeedsManager.getInstance();
 		
-		CastleManager.getInstance().activateInstances();
-		FortManager.getInstance().activateInstances();
-		MerchantPriceConfigTable.getInstance().updateReferences();
-		
 		try
 		{
 			_log.info(getClass().getSimpleName() + ": Loading server scripts:");
@@ -327,7 +315,19 @@ public class GameServer
 		FourSepulchersManager.getInstance().init();
 		DimensionalRiftManager.getInstance();
 		RaidBossSpawnManager.getInstance();
+		
+		printSection("Siege");
+		SiegeManager.getInstance().getSieges();
+		CastleManager.getInstance().activateInstances();
 		FortManager.getInstance().loadInstances();
+		FortManager.getInstance().activateInstances();
+		FortSiegeManager.getInstance();
+		SiegeScheduleData.getInstance();
+		
+		MerchantPriceConfigTable.getInstance().updateReferences();
+		TerritoryWarManager.getInstance();
+		CastleManorManager.getInstance();
+		MercTicketManager.getInstance();
 		
 		QuestManager.getInstance().report();
 		
