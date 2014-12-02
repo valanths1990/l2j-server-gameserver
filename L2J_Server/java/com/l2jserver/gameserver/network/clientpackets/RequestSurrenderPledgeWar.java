@@ -71,7 +71,7 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
 		SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_SURRENDERED_TO_THE_S1_CLAN);
 		msg.addString(_pledgeName);
 		activeChar.sendPacket(msg);
-		activeChar.deathPenalty(false, false, false);
+		activeChar.increaseDeathPenaltyBuffLevel();
 		ClanTable.getInstance().deleteclanswars(_clan.getId(), clan.getId());
 		// Zoey76: TODO: Implement or cleanup.
 		// L2PcInstance leader = L2World.getInstance().getPlayer(clan.getLeaderName());

@@ -890,7 +890,6 @@ public final class Config
 	public static int KARMA_RATE_DROP_ITEM;
 	public static int KARMA_RATE_DROP_EQUIP;
 	public static int KARMA_RATE_DROP_EQUIP_WEAPON;
-	public static double[] PLAYER_XP_PERCENT_LOST;
 	
 	// --------------------------------------------------
 	// Seven Signs Settings
@@ -2101,44 +2100,6 @@ public final class Config
 			KARMA_RATE_DROP_ITEM = RatesSettings.getInt("KarmaRateDropItem", 50);
 			KARMA_RATE_DROP_EQUIP = RatesSettings.getInt("KarmaRateDropEquip", 40);
 			KARMA_RATE_DROP_EQUIP_WEAPON = RatesSettings.getInt("KarmaRateDropEquipWeapon", 10);
-			
-			// Initializing table
-			PLAYER_XP_PERCENT_LOST = new double[Byte.MAX_VALUE + 1];
-			
-			// Default value
-			for (int i = 0; i <= Byte.MAX_VALUE; i++)
-			{
-				PLAYER_XP_PERCENT_LOST[i] = 1.;
-			}
-			
-			// Now loading into table parsed values
-			try
-			{
-				String[] values = RatesSettings.getString("PlayerXPPercentLost", "0,39-7.0;40,75-4.0;76,76-2.5;77,77-2.0;78,78-1.5").split(";");
-				
-				for (String s : values)
-				{
-					int min;
-					int max;
-					double val;
-					
-					String[] vals = s.split("-");
-					String[] mM = vals[0].split(",");
-					
-					min = Integer.parseInt(mM[0]);
-					max = Integer.parseInt(mM[1]);
-					val = Double.parseDouble(vals[1]);
-					
-					for (int i = min; i <= max; i++)
-					{
-						PLAYER_XP_PERCENT_LOST[i] = val;
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				_log.log(Level.WARNING, "Error while loading Player XP percent lost!", e);
-			}
 			
 			RATE_DEATH_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("DeathDropAmountMultiplier", 1);
 			RATE_CORPSE_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("CorpseDropAmountMultiplier", 1);

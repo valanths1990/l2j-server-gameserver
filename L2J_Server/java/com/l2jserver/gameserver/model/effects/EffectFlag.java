@@ -24,7 +24,6 @@ package com.l2jserver.gameserver.model.effects;
 public enum EffectFlag
 {
 	NONE,
-	CHARM_OF_LUCK,
 	RESURRECTION_SPECIAL,
 	NOBLESS_BLESSING,
 	SILENT_MOVE,

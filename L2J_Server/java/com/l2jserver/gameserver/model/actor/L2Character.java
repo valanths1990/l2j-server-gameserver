@@ -60,6 +60,7 @@ import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
 import com.l2jserver.gameserver.model.CharEffectList;
 import com.l2jserver.gameserver.model.L2AccessLevel;
+import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2Party;
 import com.l2jserver.gameserver.model.L2World;
@@ -6730,6 +6731,33 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * @return the clan id of current character.
 	 */
 	public int getClanId()
+	{
+		return 0;
+	}
+	
+	/**
+	 * Dummy method overriden in {@link L2PcInstance}
+	 * @return the clan of current character.
+	 */
+	public L2Clan getClan()
+	{
+		return null;
+	}
+	
+	/**
+	 * Dummy method overriden in {@link L2PcInstance}
+	 * @return {@code true} if player is in academy, {@code false} otherwise.
+	 */
+	public boolean isAcademyMember()
+	{
+		return false;
+	}
+	
+	/**
+	 * Dummy method overriden in {@link L2PcInstance}
+	 * @return the pledge type of current character.
+	 */
+	public int getPledgeType()
 	{
 		return 0;
 	}

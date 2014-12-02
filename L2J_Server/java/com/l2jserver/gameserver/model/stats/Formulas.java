@@ -2104,7 +2104,7 @@ public final class Formulas
 		{
 			exp /= Config.RATE_KARMA_LOST;
 		}
-		return (int) ((Math.abs(exp) / karmaLooseMul) / 15);
+		return (int) ((Math.abs(exp) / karmaLooseMul) / 30);
 	}
 	
 	/**

@@ -182,6 +182,14 @@ public enum Stats
 	// Souls
 	MAX_SOULS("maxSouls"),
 	
+	REDUCE_EXP_LOST_BY_PVP("reduceExpLostByPvp"),
+	REDUCE_EXP_LOST_BY_MOB("reduceExpLostByMob"),
+	REDUCE_EXP_LOST_BY_RAID("reduceExpLostByRaid"),
+	
+	REDUCE_DEAD_PENALTY_BY_PVP("reduceDeadPenaltyByPvp"),
+	REDUCE_DEAD_PENALTY_BY_MOB("reduceDeadPenaltyByMob"),
+	REDUCE_DEAD_PENALTY_BY_RAID("reduceDeadPenaltyByRaid"),
+	
 	// Fishing
 	FISHING_EXPERTISE("fishingExpertise");
 	

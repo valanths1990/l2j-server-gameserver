@@ -74,6 +74,7 @@ import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.OfflineTradersTable;
 import com.l2jserver.gameserver.datatables.OptionsData;
 import com.l2jserver.gameserver.datatables.PetDataTable;
+import com.l2jserver.gameserver.datatables.PlayerXpPercentLostData;
 import com.l2jserver.gameserver.datatables.RecipeData;
 import com.l2jserver.gameserver.datatables.SecondaryAuthData;
 import com.l2jserver.gameserver.datatables.SiegeScheduleData;
@@ -235,6 +236,7 @@ public class GameServer
 		InitialEquipmentData.getInstance();
 		InitialShortcutData.getInstance();
 		ExperienceTable.getInstance();
+		PlayerXpPercentLostData.getInstance();
 		KarmaData.getInstance();
 		HitConditionBonus.getInstance();
 		CharTemplateTable.getInstance();

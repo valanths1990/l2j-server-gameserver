@@ -2544,7 +2544,7 @@ public class L2Clan implements IIdentifiable, INamable
 		updateClanInDB();
 		
 		// The clan leader should take the XP penalty of a full death.
-		player.deathPenalty(false, false, false);
+		player.increaseDeathPenaltyBuffLevel();
 	}
 	
 	public boolean levelUpClan(L2PcInstance player)

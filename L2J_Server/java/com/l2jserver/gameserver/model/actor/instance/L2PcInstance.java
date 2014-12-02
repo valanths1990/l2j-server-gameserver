@@ -80,6 +80,7 @@ import com.l2jserver.gameserver.datatables.HennaData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.PetDataTable;
+import com.l2jserver.gameserver.datatables.PlayerXpPercentLostData;
 import com.l2jserver.gameserver.datatables.RecipeData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.datatables.SkillTreesData;
@@ -5215,11 +5216,12 @@ public final class L2PcInstance extends L2Playable
 			}
 			else
 			{
+				final boolean insidePvpZone = isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.SIEGE);
 				if ((pk == null) || !pk.isCursedWeaponEquipped())
 				{
 					onDieDropItem(killer); // Check if any item should be dropped
 					
-					if (!(isInsideZone(ZoneId.PVP) && !isInsideZone(ZoneId.SIEGE)))
+					if (!insidePvpZone)
 					{
 						if ((pk != null) && (pk.getClan() != null) && (getClan() != null) && !isAcademyMember() && !(pk.isAcademyMember()))
 						{
@@ -5241,19 +5243,10 @@ public final class L2PcInstance extends L2Playable
 							}
 						}
 					}
-					
-					if (Config.ALT_GAME_DELEVEL)
+					// If player is Lucky shouldn't get penalized.
+					if (!isLucky() && !insidePvpZone)
 					{
-						// If player is Lucky shouldn't get penalized.
-						if (!isLucky())
-						{
-							// Reduce the Experience of the L2PcInstance in function of the calculated Death Penalty
-							// NOTE: deathPenalty +- Exp will update karma
-							// Penalty is lower if the player is at war with the pk (war has to be declared)
-							final boolean siegeNpc = (killer instanceof L2DefenderInstance) || (killer instanceof L2FortCommanderInstance);
-							final boolean atWar = (pk != null) && (getClan() != null) && (getClan().isAtWarWith(pk.getClanId()));
-							deathPenalty(atWar, (pk != null), siegeNpc);
-						}
+						calculateDeathExpPenalty(killer, atWarWith(pk));
 					}
 				}
 			}
@@ -5597,70 +5590,32 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Reduce the Experience (and level if necessary) of the L2PcInstance in function of the calculated Death Penalty. <B><U> Actions</U> :</B> <li>Calculate the Experience loss</li> <li>Set the value of _expBeforeDeath</li> <li>Set the new Experience value of the L2PcInstance and Decrease its level
-	 * if necessary</li> <li>Send a Server->Client StatusUpdate packet with its new Experience</li>
-	 * @param atwar
-	 * @param killed_by_pc
-	 * @param killed_by_siege_npc
+	 * Reduce the Experience (and level if necessary) of the L2PcInstance in function of the calculated Death Penalty.<BR>
+	 * <B><U> Actions</U> :</B> <li>Calculate the Experience loss</li> <li>Set the value of _expBeforeDeath</li> <li>Set the new Experience value of the L2PcInstance and Decrease its level if necessary</li> <li>Send a Server->Client StatusUpdate packet with its new Experience</li>
+	 * @param killer
+	 * @param atWar
 	 */
-	public void deathPenalty(boolean atwar, boolean killed_by_pc, boolean killed_by_siege_npc)
+	public void calculateDeathExpPenalty(L2Character killer, boolean atWar)
 	{
-		// TODO Need Correct Penalty
-		// Get the level of the L2PcInstance
 		final int lvl = getLevel();
+		double percentLost = PlayerXpPercentLostData.getInstance().getXpPercent(getLevel());
 		
-		int clan_luck = getSkillLevel(CommonSkill.CLAN_LUCK.getId());
-		
-		double clan_luck_modificator = 1.0;
-		
-		if (!killed_by_pc)
+		if (killer.isRaid())
 		{
-			switch (clan_luck)
-			{
-				case 3:
-					clan_luck_modificator = 0.8;
-					break;
-				case 2:
-					clan_luck_modificator = 0.8;
-					break;
-				case 1:
-					clan_luck_modificator = 0.88;
-					break;
-				default:
-					clan_luck_modificator = 1.0;
-					break;
-			}
+			percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_RAID, 1, null, null);
 		}
-		else
+		else if (killer.isMonster())
 		{
-			switch (clan_luck)
-			{
-				case 3:
-					clan_luck_modificator = 0.5;
-					break;
-				case 2:
-					clan_luck_modificator = 0.5;
-					break;
-				case 1:
-					clan_luck_modificator = 0.5;
-					break;
-				default:
-					clan_luck_modificator = 1.0;
-					break;
-			}
+			percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_MOB, 1, null, null);
 		}
-		
-		// The death steal you some Exp
-		double percentLost = Config.PLAYER_XP_PERCENT_LOST[getLevel()] * clan_luck_modificator;
+		else if (killer.isPlayable())
+		{
+			percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_PVP, 1, null, null);
+		}
 		
 		if (getKarma() > 0)
 		{
 			percentLost *= Config.RATE_KARMA_EXP_LOST;
-		}
-		
-		if (isFestivalParticipant() || atwar)
-		{
-			percentLost /= 4.0;
 		}
 		
 		// Calculate the Experience loss
@@ -5677,29 +5632,13 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		
-		// Get the Experience before applying penalty
-		setExpBeforeDeath(getExp());
-		
-		// No xp loss inside pvp zone unless
-		// - it's a siege zone and you're NOT participating
-		// - you're killed by a non-pc whose not belong to the siege
-		if (isInsideZone(ZoneId.PVP))
+		if (isFestivalParticipant() || atWar)
 		{
-			// No xp loss for siege participants inside siege zone
-			if (isInsideZone(ZoneId.SIEGE))
-			{
-				if (isInSiege() && (killed_by_pc || killed_by_siege_npc))
-				{
-					lostExp = 0;
-				}
-			}
-			else if (killed_by_pc)
-			{
-				lostExp = 0;
-			}
+			lostExp /= 4.0;
 		}
 		
-		// Set the new Experience value of the L2PcInstance
+		setExpBeforeDeath(getExp());
+		
 		getStat().addExp(-lostExp);
 	}
 	
@@ -6120,6 +6059,7 @@ public final class L2PcInstance extends L2Playable
 	/**
 	 * @return the _clan object of the L2PcInstance.
 	 */
+	@Override
 	public L2Clan getClan()
 	{
 		return _clan;
@@ -9460,6 +9400,7 @@ public final class L2PcInstance extends L2Playable
 		_pledgeType = typeId;
 	}
 	
+	@Override
 	public int getPledgeType()
 	{
 		return _pledgeType;
@@ -9947,6 +9888,7 @@ public final class L2PcInstance extends L2Playable
 		return _lvlJoinedAcademy;
 	}
 	
+	@Override
 	public boolean isAcademyMember()
 	{
 		return _lvlJoinedAcademy > 0;
@@ -12378,14 +12320,30 @@ public final class L2PcInstance extends L2Playable
 	
 	public void calculateDeathPenaltyBuffLevel(L2Character killer)
 	{
-		if ((getKarma() > 0) || (Rnd.get(1, 100) <= Config.DEATH_PENALTY_CHANCE))
+		if (isResurrectSpecialAffected() || isLucky() || isBlockedFromDeathPenalty() || isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.SIEGE) || canOverrideCond(PcCondOverride.DEATH_PENALTY))
 		{
-			if (!(killer.getActingPlayer() != null) && !(canOverrideCond(PcCondOverride.DEATH_PENALTY)))
+			return;
+		}
+		double percent = 1.0;
+		
+		if (killer.isRaid())
+		{
+			percent *= calcStat(Stats.REDUCE_EXP_LOST_BY_RAID, 1, null, null);
+		}
+		else if (killer.isMonster())
+		{
+			percent *= calcStat(Stats.REDUCE_EXP_LOST_BY_MOB, 1, null, null);
+		}
+		else if (killer.isPlayable())
+		{
+			percent *= calcStat(Stats.REDUCE_EXP_LOST_BY_PVP, 1, null, null);
+		}
+		
+		if (Rnd.get(1, 100) <= ((Config.DEATH_PENALTY_CHANCE) * percent))
+		{
+			if (!killer.isPlayable() || (getKarma() > 0))
 			{
-				if (!(isCharmOfLuckAffected() && killer.isRaid()) && !isResurrectSpecialAffected() && !isLucky() && !isBlockedFromDeathPenalty() && !(isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.SIEGE)))
-				{
-					increaseDeathPenaltyBuffLevel();
-				}
+				increaseDeathPenaltyBuffLevel();
 			}
 		}
 	}
@@ -12406,9 +12364,7 @@ public final class L2PcInstance extends L2Playable
 				removeSkill(skill, true);
 			}
 		}
-		
 		_deathPenaltyBuffLevel++;
-		
 		addSkill(SkillData.getInstance().getSkill(5076, getDeathPenaltyBuffLevel()), false);
 		sendPacket(new EtcStatusUpdate(this));
 		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DEATH_PENALTY_LEVEL_S1_ADDED);
@@ -14340,5 +14296,25 @@ public final class L2PcInstance extends L2Playable
 	{
 		return _hasCharmOfCourage;
 		
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player got war with the target, {@code false} otherwise.
+	 */
+	public boolean atWarWith(L2Playable target)
+	{
+		if (target == null)
+		{
+			return false;
+		}
+		if ((_clan != null) && !isAcademyMember()) // Current player
+		{
+			if ((target.getClan() != null) && !target.isAcademyMember()) // Target player
+			{
+				return _clan.isAtWarWith(target.getClan());
+			}
+		}
+		return false;
 	}
 }
