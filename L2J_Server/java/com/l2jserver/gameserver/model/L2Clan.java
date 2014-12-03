@@ -2542,9 +2542,6 @@ public class L2Clan implements IIdentifiable, INamable
 		changeAllyCrest(0, false);
 		setAllyPenaltyExpiryTime(currentTime + (Config.ALT_CREATE_ALLY_DAYS_WHEN_DISSOLVED * 86400000L), L2Clan.PENALTY_TYPE_DISSOLVE_ALLY); // 24*60*60*1000 = 86400000
 		updateClanInDB();
-		
-		// The clan leader should take the XP penalty of a full death.
-		player.increaseDeathPenaltyBuffLevel();
 	}
 	
 	public boolean levelUpClan(L2PcInstance player)

@@ -6193,6 +6193,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public abstract int getLevel();
 	
+	public final double calcStat(Stats stat, double init)
+	{
+		return getStat().calcStat(stat, init, null, null);
+	}
+	
 	// Stat - NEED TO REMOVE ONCE L2CHARSTAT IS COMPLETE
 	public final double calcStat(Stats stat, double init, L2Character target, Skill skill)
 	{

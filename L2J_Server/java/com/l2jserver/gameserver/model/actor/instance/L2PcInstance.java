@@ -5600,17 +5600,20 @@ public final class L2PcInstance extends L2Playable
 		final int lvl = getLevel();
 		double percentLost = PlayerXpPercentLostData.getInstance().getXpPercent(getLevel());
 		
-		if (killer.isRaid())
+		if (killer != null)
 		{
-			percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_RAID, 1, null, null);
-		}
-		else if (killer.isMonster())
-		{
-			percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_MOB, 1, null, null);
-		}
-		else if (killer.isPlayable())
-		{
-			percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_PVP, 1, null, null);
+			if (killer.isRaid())
+			{
+				percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_RAID, 1);
+			}
+			else if (killer.isMonster())
+			{
+				percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_MOB, 1);
+			}
+			else if (killer.isPlayable())
+			{
+				percentLost *= calcStat(Stats.REDUCE_EXP_LOST_BY_PVP, 1);
+			}
 		}
 		
 		if (getKarma() > 0)
@@ -12320,6 +12323,12 @@ public final class L2PcInstance extends L2Playable
 	
 	public void calculateDeathPenaltyBuffLevel(L2Character killer)
 	{
+		if (killer == null)
+		{
+			_log.warning(this + " called calculateDeathPenaltyBuffLevel with killer null!");
+			return;
+		}
+		
 		if (isResurrectSpecialAffected() || isLucky() || isBlockedFromDeathPenalty() || isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.SIEGE) || canOverrideCond(PcCondOverride.DEATH_PENALTY))
 		{
 			return;
@@ -12328,15 +12337,15 @@ public final class L2PcInstance extends L2Playable
 		
 		if (killer.isRaid())
 		{
-			percent *= calcStat(Stats.REDUCE_EXP_LOST_BY_RAID, 1, null, null);
+			percent *= calcStat(Stats.REDUCE_DEATH_PENALTY_BY_RAID, 1);
 		}
 		else if (killer.isMonster())
 		{
-			percent *= calcStat(Stats.REDUCE_EXP_LOST_BY_MOB, 1, null, null);
+			percent *= calcStat(Stats.REDUCE_DEATH_PENALTY_BY_MOB, 1);
 		}
 		else if (killer.isPlayable())
 		{
-			percent *= calcStat(Stats.REDUCE_EXP_LOST_BY_PVP, 1, null, null);
+			percent *= calcStat(Stats.REDUCE_DEATH_PENALTY_BY_PVP, 1);
 		}
 		
 		if (Rnd.get(1, 100) <= ((Config.DEATH_PENALTY_CHANCE) * percent))

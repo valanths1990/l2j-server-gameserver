@@ -186,9 +186,9 @@ public enum Stats
 	REDUCE_EXP_LOST_BY_MOB("reduceExpLostByMob"),
 	REDUCE_EXP_LOST_BY_RAID("reduceExpLostByRaid"),
 	
-	REDUCE_DEAD_PENALTY_BY_PVP("reduceDeadPenaltyByPvp"),
-	REDUCE_DEAD_PENALTY_BY_MOB("reduceDeadPenaltyByMob"),
-	REDUCE_DEAD_PENALTY_BY_RAID("reduceDeadPenaltyByRaid"),
+	REDUCE_DEATH_PENALTY_BY_PVP("reduceDeathPenaltyByPvp"),
+	REDUCE_DEATH_PENALTY_BY_MOB("reduceDeathPenaltyByMob"),
+	REDUCE_DEATH_PENALTY_BY_RAID("reduceDeathPenaltyByRaid"),
 	
 	// Fishing
 	FISHING_EXPERTISE("fishingExpertise");

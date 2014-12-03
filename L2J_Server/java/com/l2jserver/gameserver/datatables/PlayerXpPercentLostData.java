@@ -31,7 +31,8 @@ import com.l2jserver.gameserver.engines.DocumentParser;
  */
 public final class PlayerXpPercentLostData extends DocumentParser
 {
-	private final double[] _playerXpPercentLost = new double[Byte.MAX_VALUE + 1];
+	private final int _maxlevel = ExperienceTable.getInstance().getMaxLevel();
+	private final double[] _playerXpPercentLost = new double[_maxlevel + 1];
 	
 	protected PlayerXpPercentLostData()
 	{
@@ -66,10 +67,10 @@ public final class PlayerXpPercentLostData extends DocumentParser
 	
 	public double getXpPercent(final int level)
 	{
-		if (level > Byte.MAX_VALUE)
+		if (level > _maxlevel)
 		{
-			_log.warning("Require to hight level inside PlayerXpPercentLostData (" + level + ")");
-			return _playerXpPercentLost[Byte.MAX_VALUE];
+			_log.warning("Require to high level inside PlayerXpPercentLostData (" + level + ")");
+			return _playerXpPercentLost[_maxlevel];
 		}
 		return _playerXpPercentLost[level];
 	}
