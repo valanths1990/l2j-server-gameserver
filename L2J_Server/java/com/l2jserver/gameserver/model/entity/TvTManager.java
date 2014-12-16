@@ -23,8 +23,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * @author HorridoJoho
@@ -112,14 +112,14 @@ public class TvTManager
 	{
 		if (!TvTEvent.startParticipation())
 		{
-			Announcements.getInstance().announceToAll("TvT Event: Event was cancelled.");
+			Broadcast.toAllOnlinePlayers("TvT Event: Event was cancelled.");
 			_log.warning("TvTEventEngine[TvTManager.run()]: Error spawning event npc for participation.");
 			
 			scheduleEventStart();
 		}
 		else
 		{
-			Announcements.getInstance().announceToAll("TvT Event: Registration opened for " + Config.TVT_EVENT_PARTICIPATION_TIME + " minute(s).");
+			Broadcast.toAllOnlinePlayers("TvT Event: Registration opened for " + Config.TVT_EVENT_PARTICIPATION_TIME + " minute(s).");
 			
 			// schedule registration end
 			_task.setStartTime(System.currentTimeMillis() + (60000L * Config.TVT_EVENT_PARTICIPATION_TIME));
@@ -134,7 +134,7 @@ public class TvTManager
 	{
 		if (!TvTEvent.startFight())
 		{
-			Announcements.getInstance().announceToAll("TvT Event: Event cancelled due to lack of Participation.");
+			Broadcast.toAllOnlinePlayers("TvT Event: Event cancelled due to lack of Participation.");
 			_log.info("TvTEventEngine[TvTManager.run()]: Lack of registration, abort event.");
 			
 			scheduleEventStart();
@@ -152,7 +152,7 @@ public class TvTManager
 	 */
 	public void endEvent()
 	{
-		Announcements.getInstance().announceToAll(TvTEvent.calculateRewards());
+		Broadcast.toAllOnlinePlayers(TvTEvent.calculateRewards());
 		TvTEvent.sysMsgToAllParticipants("TvT Event: Teleporting back to the registration npc in " + Config.TVT_EVENT_START_LEAVE_TELEPORT_DELAY + " second(s).");
 		TvTEvent.stopFight();
 		
@@ -258,7 +258,7 @@ public class TvTManager
 			{
 				if (TvTEvent.isParticipating())
 				{
-					Announcements.getInstance().announceToAll("TvT Event: " + (time / 60 / 60) + " hour(s) until registration is closed!");
+					Broadcast.toAllOnlinePlayers("TvT Event: " + (time / 60 / 60) + " hour(s) until registration is closed!");
 				}
 				else if (TvTEvent.isStarted())
 				{
@@ -269,7 +269,7 @@ public class TvTManager
 			{
 				if (TvTEvent.isParticipating())
 				{
-					Announcements.getInstance().announceToAll("TvT Event: " + (time / 60) + " minute(s) until registration is closed!");
+					Broadcast.toAllOnlinePlayers("TvT Event: " + (time / 60) + " minute(s) until registration is closed!");
 				}
 				else if (TvTEvent.isStarted())
 				{
@@ -280,7 +280,7 @@ public class TvTManager
 			{
 				if (TvTEvent.isParticipating())
 				{
-					Announcements.getInstance().announceToAll("TvT Event: " + time + " second(s) until registration is closed!");
+					Broadcast.toAllOnlinePlayers("TvT Event: " + time + " second(s) until registration is closed!");
 				}
 				else if (TvTEvent.isStarted())
 				{

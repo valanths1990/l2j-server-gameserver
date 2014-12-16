@@ -41,7 +41,6 @@ import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
@@ -51,6 +50,7 @@ import com.l2jserver.gameserver.model.entity.Hero;
 import com.l2jserver.gameserver.model.events.ListenersContainer;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * @author godson
@@ -402,8 +402,8 @@ public class Olympiad extends ListenersContainer
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.OLYMPIAD_PERIOD_S1_HAS_ENDED);
 			sm.addInt(_currentCycle);
 			
-			Announcements.getInstance().announceToAll(sm);
-			Announcements.getInstance().announceToAll("Olympiad Validation Period has began");
+			Broadcast.toAllOnlinePlayers(sm);
+			Broadcast.toAllOnlinePlayers("Olympiad Validation Period has began");
 			
 			if (_scheduledWeeklyTask != null)
 			{
@@ -433,7 +433,7 @@ public class Olympiad extends ListenersContainer
 		@Override
 		public void run()
 		{
-			Announcements.getInstance().announceToAll("Olympiad Validation Period has ended");
+			Broadcast.toAllOnlinePlayers("Olympiad Validation Period has ended");
 			_period = 0;
 			_currentCycle++;
 			deleteNobles();
@@ -481,7 +481,7 @@ public class Olympiad extends ListenersContainer
 			
 			_inCompPeriod = true;
 			
-			Announcements.getInstance().announceToAll(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_STARTED));
+			Broadcast.toAllOnlinePlayers(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_STARTED));
 			_log.info("Olympiad System: Olympiad Game Started");
 			_logResults.info("Result,Player1,Player2,Player1 HP,Player2 HP,Player1 Damage,Player2 Damage,Points,Classed");
 			
@@ -494,7 +494,7 @@ public class Olympiad extends ListenersContainer
 			long regEnd = getMillisToCompEnd() - 600000;
 			if (regEnd > 0)
 			{
-				ThreadPoolManager.getInstance().scheduleGeneral(() -> Announcements.getInstance().announceToAll(SystemMessage.getSystemMessage(SystemMessageId.OLYMPIAD_REGISTRATION_PERIOD_ENDED)), regEnd);
+				ThreadPoolManager.getInstance().scheduleGeneral(() -> Broadcast.toAllOnlinePlayers(SystemMessage.getSystemMessage(SystemMessageId.OLYMPIAD_REGISTRATION_PERIOD_ENDED)), regEnd);
 			}
 			
 			_scheduledCompEnd = ThreadPoolManager.getInstance().scheduleGeneral(() ->
@@ -504,7 +504,7 @@ public class Olympiad extends ListenersContainer
 					return;
 				}
 				_inCompPeriod = false;
-				Announcements.getInstance().announceToAll(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_ENDED));
+				Broadcast.toAllOnlinePlayers(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_ENDED));
 				_log.info("Olympiad System: Olympiad Game Ended");
 				
 				while (OlympiadGameManager.getInstance().isBattleStarted()) // cleared in game manager
@@ -574,7 +574,7 @@ public class Olympiad extends ListenersContainer
 		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.OLYMPIAD_PERIOD_S1_HAS_STARTED);
 		sm.addInt(_currentCycle);
 		
-		Announcements.getInstance().announceToAll(sm);
+		Broadcast.toAllOnlinePlayers(sm);
 		
 		Calendar currentTime = Calendar.getInstance();
 		currentTime.add(Calendar.MONTH, 1);

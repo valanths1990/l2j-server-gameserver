@@ -34,7 +34,6 @@ import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.ClanTable;
 import com.l2jserver.gameserver.datatables.NpcData;
@@ -189,7 +188,7 @@ public class Siege implements Siegable
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.REGISTRATION_TERM_FOR_S1_ENDED);
 					sm.addCastleId(getCastle().getResidenceId());
-					Announcements.getInstance().announceToAll(sm);
+					Broadcast.toAllOnlinePlayers(sm);
 					_isRegistrationOver = true;
 					clearSiegeWaitingClan();
 					_scheduledStartSiegeTask = ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 13600000); // Prepare task for 1 hr left before siege start.
@@ -254,7 +253,7 @@ public class Siege implements Siegable
 		{
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_OF_S1_HAS_ENDED);
 			sm.addCastleId(getCastle().getResidenceId());
-			Announcements.getInstance().announceToAll(sm);
+			Broadcast.toAllOnlinePlayers(sm);
 			
 			if (getCastle().getOwnerId() > 0)
 			{
@@ -262,7 +261,7 @@ public class Siege implements Siegable
 				sm = SystemMessage.getSystemMessage(SystemMessageId.CLAN_S1_VICTORIOUS_OVER_S2_S_SIEGE);
 				sm.addString(clan.getName());
 				sm.addCastleId(getCastle().getResidenceId());
-				Announcements.getInstance().announceToAll(sm);
+				Broadcast.toAllOnlinePlayers(sm);
 				
 				if (clan.getId() == _firstOwnerClanId)
 				{
@@ -289,7 +288,7 @@ public class Siege implements Siegable
 			{
 				sm = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_S1_DRAW);
 				sm.addCastleId(getCastle().getResidenceId());
-				Announcements.getInstance().announceToAll(sm);
+				Broadcast.toAllOnlinePlayers(sm);
 			}
 			
 			for (L2SiegeClan attackerClan : getAttackerClans())
@@ -495,7 +494,7 @@ public class Siege implements Siegable
 					ownerClan.increaseBloodAllianceCount();
 				}
 				sm.addCastleId(getCastle().getResidenceId());
-				Announcements.getInstance().announceToAll(sm);
+				Broadcast.toAllOnlinePlayers(sm);
 				saveCastleSiege();
 				return;
 			}
@@ -523,7 +522,7 @@ public class Siege implements Siegable
 			
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_OF_S1_HAS_STARTED);
 			sm.addCastleId(getCastle().getResidenceId());
-			Announcements.getInstance().announceToAll(sm);
+			Broadcast.toAllOnlinePlayers(sm);
 			
 			// Notify to scripts.
 			EventDispatcher.getInstance().notifyEventAsync(new OnCastleSiegeStart(this), getCastle());

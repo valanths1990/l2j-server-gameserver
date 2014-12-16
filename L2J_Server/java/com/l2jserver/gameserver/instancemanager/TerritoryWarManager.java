@@ -35,7 +35,6 @@ import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.ClanTable;
 import com.l2jserver.gameserver.datatables.NpcData;
@@ -62,6 +61,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.Broadcast;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.PropertiesParser;
 
@@ -1049,7 +1049,7 @@ public final class TerritoryWarManager implements Siegable
 		}
 		
 		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.TERRITORY_WAR_HAS_BEGUN);
-		Announcements.getInstance().announceToAll(sm);
+		Broadcast.toAllOnlinePlayers(sm);
 	}
 	
 	protected void endTerritoryWar()
@@ -1168,7 +1168,7 @@ public final class TerritoryWarManager implements Siegable
 		}
 		// change next TW date
 		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.TERRITORY_WAR_HAS_ENDED);
-		Announcements.getInstance().announceToAll(sm);
+		Broadcast.toAllOnlinePlayers(sm);
 	}
 	
 	protected boolean updatePlayerTWStateFlags(boolean clear)
@@ -1320,14 +1320,14 @@ public final class TerritoryWarManager implements Siegable
 				else if ((timeRemaining <= 7200000) && (timeRemaining > 1200000))
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.THE_TERRITORY_WAR_REGISTERING_PERIOD_ENDED);
-					Announcements.getInstance().announceToAll(sm);
+					Broadcast.toAllOnlinePlayers(sm);
 					_isRegistrationOver = true;
 					_scheduledStartTWTask = ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartTWTask(), timeRemaining - 1200000); // Prepare task for 20 mins left before TW start.
 				}
 				else if ((timeRemaining <= 1200000) && (timeRemaining > 600000))
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.TERRITORY_WAR_BEGINS_IN_20_MINUTES);
-					Announcements.getInstance().announceToAll(sm);
+					Broadcast.toAllOnlinePlayers(sm);
 					_isTWChannelOpen = true;
 					_isRegistrationOver = true;
 					updatePlayerTWStateFlags(false);
@@ -1336,7 +1336,7 @@ public final class TerritoryWarManager implements Siegable
 				else if ((timeRemaining <= 600000) && (timeRemaining > 300000))
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.TERRITORY_WAR_BEGINS_IN_10_MINUTES);
-					Announcements.getInstance().announceToAll(sm);
+					Broadcast.toAllOnlinePlayers(sm);
 					_isTWChannelOpen = true;
 					_isRegistrationOver = true;
 					updatePlayerTWStateFlags(false);
@@ -1345,7 +1345,7 @@ public final class TerritoryWarManager implements Siegable
 				else if ((timeRemaining <= 300000) && (timeRemaining > 60000))
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.TERRITORY_WAR_BEGINS_IN_5_MINUTES);
-					Announcements.getInstance().announceToAll(sm);
+					Broadcast.toAllOnlinePlayers(sm);
 					_isTWChannelOpen = true;
 					_isRegistrationOver = true;
 					updatePlayerTWStateFlags(false);
@@ -1354,7 +1354,7 @@ public final class TerritoryWarManager implements Siegable
 				else if ((timeRemaining <= 60000) && (timeRemaining > 0))
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.TERRITORY_WAR_BEGINS_IN_1_MINUTE);
-					Announcements.getInstance().announceToAll(sm);
+					Broadcast.toAllOnlinePlayers(sm);
 					_isTWChannelOpen = true;
 					_isRegistrationOver = true;
 					updatePlayerTWStateFlags(false);

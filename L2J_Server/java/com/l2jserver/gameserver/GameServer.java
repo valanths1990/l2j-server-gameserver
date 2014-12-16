@@ -39,6 +39,7 @@ import com.l2jserver.Server;
 import com.l2jserver.UPnPService;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.datatables.AnnouncementsTable;
 import com.l2jserver.gameserver.datatables.ArmorSetsData;
 import com.l2jserver.gameserver.datatables.AugmentationData;
 import com.l2jserver.gameserver.datatables.BotReportTable;
@@ -136,7 +137,6 @@ import com.l2jserver.gameserver.network.L2GamePacketHandler;
 import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.script.faenor.FaenorScriptEngine;
 import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
-import com.l2jserver.gameserver.taskmanager.AutoAnnounceTaskManager;
 import com.l2jserver.gameserver.taskmanager.KnownListUpdateTaskManager;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
 import com.l2jserver.status.Status;
@@ -200,7 +200,7 @@ public class GameServer
 		InstanceManager.getInstance();
 		L2World.getInstance();
 		MapRegionManager.getInstance();
-		Announcements.getInstance();
+		AnnouncementsTable.getInstance();
 		GlobalVariablesManager.getInstance();
 		
 		printSection("Data");
@@ -446,8 +446,6 @@ public class GameServer
 		
 		printSection("UPnP");
 		UPnPService.getInstance();
-		
-		AutoAnnounceTaskManager.getInstance();
 	}
 	
 	public static void main(String[] args) throws Exception

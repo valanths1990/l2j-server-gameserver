@@ -32,15 +32,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.datatables.AnnouncementsTable;
 import com.l2jserver.gameserver.datatables.EventDroplist;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.model.Location;
+import com.l2jserver.gameserver.model.announce.EventAnnouncement;
 import com.l2jserver.gameserver.model.drops.GeneralDropItem;
 import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.script.DateRange;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * Parent class for long time events.<br>
@@ -282,10 +284,10 @@ public class LongTimeEvent extends Quest
 		}
 		
 		// Send message on begin
-		Announcements.getInstance().announceToAll(_onEnterMsg);
+		Broadcast.toAllOnlinePlayers(_onEnterMsg);
 		
 		// Add announce for entering players
-		Announcements.getInstance().addEventAnnouncement(_eventPeriod, _onEnterMsg);
+		AnnouncementsTable.getInstance().addAnnouncement(new EventAnnouncement(_eventPeriod, _onEnterMsg));
 		
 		// Schedule event end (now only for message sending)
 		ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEnd(), millisToEventEnd);
@@ -330,7 +332,7 @@ public class LongTimeEvent extends Quest
 		public void run()
 		{
 			// Send message on end
-			Announcements.getInstance().announceToAll(_endMsg);
+			Broadcast.toAllOnlinePlayers(_endMsg);
 		}
 	}
 }

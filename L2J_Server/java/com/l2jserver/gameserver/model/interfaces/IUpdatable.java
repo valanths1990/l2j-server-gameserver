@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2013 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -16,14 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.script;
+package com.l2jserver.gameserver.model.interfaces;
 
 /**
- * @author Luis Arias
+ * @author UnAfraid
  */
-public interface EngineInterface
+public interface IUpdatable
 {
-	public void addEventDrop(int[] items, int[] count, double chance, DateRange range);
-	
-	public void onPlayerLogin(String message, DateRange range);
+	public boolean updateMe();
 }

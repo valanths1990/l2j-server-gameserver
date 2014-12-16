@@ -451,7 +451,7 @@ public final class BuffInfo
 	 */
 	public void removeStats()
 	{
-		_effects.forEach(effect -> _effected.removeStatsOwner(effect));
+		_effects.forEach(_effected::removeStatsOwner);
 		_effected.removeStatsOwner(_skill);
 	}
 	

@@ -33,7 +33,6 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
@@ -42,6 +41,7 @@ import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
+import com.l2jserver.gameserver.util.Broadcast;
 import com.l2jserver.util.Rnd;
 
 /**
@@ -519,7 +519,7 @@ public class AutoSpawnHandler
 					// Announce to all players that the spawn has taken place, with the nearest town location.
 					if (spawnInst.isBroadcasting())
 					{
-						Announcements.getInstance().announceToAll("The " + npcInst.getName() + " has spawned near " + nearestTown + "!");
+						Broadcast.toAllOnlinePlayers("The " + npcInst.getName() + " has spawned near " + nearestTown + "!");
 					}
 				}
 				

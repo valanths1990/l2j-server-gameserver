@@ -40,7 +40,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.DoorTable;
 import com.l2jserver.gameserver.datatables.NpcData;
@@ -64,6 +63,7 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.clientpackets.Say2;
 import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * Main class for game instances.
@@ -705,7 +705,7 @@ public final class Instance
 			interval = 300000;
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DUNGEON_EXPIRES_IN_S1_MINUTES);
 			sm.addString(Integer.toString(timeLeft));
-			Announcements.getInstance().announceToInstance(sm, getId());
+			Broadcast.toPlayersInInstance(sm, getId());
 			remaining = remaining - 300000;
 		}
 		else if (remaining > 60000)
@@ -714,7 +714,7 @@ public final class Instance
 			interval = 60000;
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DUNGEON_EXPIRES_IN_S1_MINUTES);
 			sm.addString(Integer.toString(timeLeft));
-			Announcements.getInstance().announceToInstance(sm, getId());
+			Broadcast.toPlayersInInstance(sm, getId());
 			remaining = remaining - 60000;
 		}
 		else if (remaining > 30000)
