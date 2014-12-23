@@ -82,7 +82,7 @@ public final class EventDispatcher
 	{
 		try
 		{
-			return Containers.Global().hasListener(event.getType()) || container.hasListener(event.getType()) ? notifyEventImpl(event, container, callbackClass) : null;
+			return Containers.Global().hasListener(event.getType()) || ((container != null) && container.hasListener(event.getType())) ? notifyEventImpl(event, container, callbackClass) : null;
 		}
 		catch (Exception e)
 		{
