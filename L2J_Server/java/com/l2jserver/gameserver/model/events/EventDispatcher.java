@@ -46,7 +46,7 @@ public final class EventDispatcher
 	 */
 	public <T extends AbstractEventReturn> T notifyEvent(IBaseEvent event)
 	{
-		return Containers.Global().hasListener(event.getType()) ? notifyEvent(event, null, null) : null;
+		return notifyEvent(event, null, null);
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public final class EventDispatcher
 	 */
 	public <T extends AbstractEventReturn> T notifyEvent(IBaseEvent event, Class<T> callbackClass)
 	{
-		return Containers.Global().hasListener(event.getType()) ? notifyEvent(event, null, callbackClass) : null;
+		return notifyEvent(event, null, callbackClass);
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public final class EventDispatcher
 	 */
 	public <T extends AbstractEventReturn> T notifyEvent(IBaseEvent event, ListenersContainer container)
 	{
-		return Containers.Global().hasListener(event.getType()) ? notifyEvent(event, container, null) : null;
+		return notifyEvent(event, container, null);
 	}
 	
 	/**
