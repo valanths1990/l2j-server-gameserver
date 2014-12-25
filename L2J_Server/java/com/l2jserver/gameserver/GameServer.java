@@ -269,7 +269,6 @@ public class GameServer
 		ItemAuctionManager.getInstance();
 		CastleManager.getInstance().loadInstances();
 		NpcBufferTable.getInstance();
-		DayNightSpawnManager.getInstance().trim().notifyChangeMode();
 		GrandBossManager.getInstance().initZones();
 		EventDroplist.getInstance();
 		
@@ -314,6 +313,7 @@ public class GameServer
 		}
 		
 		SpawnTable.getInstance().load();
+		DayNightSpawnManager.getInstance().trim().notifyChangeMode();
 		FourSepulchersManager.getInstance().init();
 		DimensionalRiftManager.getInstance();
 		RaidBossSpawnManager.getInstance();
