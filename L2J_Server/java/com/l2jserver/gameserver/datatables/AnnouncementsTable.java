@@ -41,7 +41,7 @@ import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
  */
 public final class AnnouncementsTable
 {
-	private static Logger _log = Logger.getLogger(AnnouncementsTable.class.getName());
+	private static Logger LOGGER = Logger.getLogger(AnnouncementsTable.class.getName());
 	
 	private final Map<Integer, IAnnouncement> _announcements = new ConcurrentSkipListMap<>();
 	
@@ -88,7 +88,7 @@ public final class AnnouncementsTable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Failed loading announcements:", e);
+			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Failed loading announcements:", e);
 		}
 	}
 	

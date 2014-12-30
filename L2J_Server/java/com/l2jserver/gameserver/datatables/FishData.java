@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -34,7 +35,7 @@ import com.l2jserver.gameserver.model.fishing.L2Fish;
  * This class holds the Fish information.
  * @author nonom
  */
-public final class FishData extends DocumentParser
+public final class FishData implements DocumentParser
 {
 	private static final Map<Integer, L2Fish> _fishNormal = new HashMap<>();
 	private static final Map<Integer, L2Fish> _fishEasy = new HashMap<>();
@@ -55,17 +56,17 @@ public final class FishData extends DocumentParser
 		_fishNormal.clear();
 		_fishHard.clear();
 		parseDatapackFile("data/stats/fishing/fishes.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + (_fishEasy.size() + _fishNormal.size() + _fishHard.size()) + " Fishes.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + (_fishEasy.size() + _fishNormal.size() + _fishHard.size()) + " Fishes.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		Node att;
 		L2Fish fish;
 		StatsSet set;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -136,7 +137,7 @@ public final class FishData extends DocumentParser
 			}
 			default:
 			{
-				_log.warning(getClass().getSimpleName() + ": Unmanaged fish grade!");
+				LOGGER.warning(getClass().getSimpleName() + ": Unmanaged fish grade!");
 				return result;
 			}
 		}
@@ -152,7 +153,7 @@ public final class FishData extends DocumentParser
 		
 		if (result.isEmpty())
 		{
-			_log.warning(getClass().getSimpleName() + ": Cannot find any fish for level: " + level + " group: " + group + " and grade: " + grade + "!");
+			LOGGER.warning(getClass().getSimpleName() + ": Cannot find any fish for level: " + level + " group: " + group + " and grade: " + grade + "!");
 		}
 		return result;
 	}

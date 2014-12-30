@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -35,7 +36,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * This class holds the Enchant Item information.
  * @author UnAfraid
  */
-public class EnchantItemData extends DocumentParser
+public class EnchantItemData implements DocumentParser
 {
 	public static final Map<Integer, EnchantScroll> _scrolls = new HashMap<>();
 	public static final Map<Integer, EnchantSupportItem> _supports = new HashMap<>();
@@ -54,17 +55,17 @@ public class EnchantItemData extends DocumentParser
 		_scrolls.clear();
 		_supports.clear();
 		parseDatapackFile("data/enchantItemData.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _scrolls.size() + " Enchant Scrolls.");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _supports.size() + " Support Items.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _scrolls.size() + " Enchant Scrolls.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _supports.size() + " Support Items.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		StatsSet set;
 		Node att;
 		NamedNodeMap attrs;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -94,11 +95,11 @@ public class EnchantItemData extends DocumentParser
 						}
 						catch (NullPointerException e)
 						{
-							_log.log(Level.WARNING, getClass().getSimpleName() + ": Unexistent enchant scroll: " + set.getString("id") + " defined in enchant data!");
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Unexistent enchant scroll: " + set.getString("id") + " defined in enchant data!");
 						}
 						catch (IllegalAccessError e)
 						{
-							_log.log(Level.WARNING, getClass().getSimpleName() + ": Wrong enchant scroll item type: " + set.getString("id") + " defined in enchant data!");
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Wrong enchant scroll item type: " + set.getString("id") + " defined in enchant data!");
 						}
 					}
 					else if ("support".equalsIgnoreCase(d.getNodeName()))
@@ -118,11 +119,11 @@ public class EnchantItemData extends DocumentParser
 						}
 						catch (NullPointerException e)
 						{
-							_log.log(Level.WARNING, getClass().getSimpleName() + ": Unexistent enchant support item: " + set.getString("id") + " defined in enchant data!");
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Unexistent enchant support item: " + set.getString("id") + " defined in enchant data!");
 						}
 						catch (IllegalAccessError e)
 						{
-							_log.log(Level.WARNING, getClass().getSimpleName() + ": Wrong enchant support item type: " + set.getString("id") + " defined in enchant data!");
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Wrong enchant support item type: " + set.getString("id") + " defined in enchant data!");
 						}
 					}
 				}

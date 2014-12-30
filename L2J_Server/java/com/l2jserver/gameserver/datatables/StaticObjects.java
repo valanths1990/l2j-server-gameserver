@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -35,7 +36,7 @@ import com.l2jserver.gameserver.model.actor.templates.L2CharTemplate;
  * This class loads and holds all static object data.
  * @author UnAfraid
  */
-public final class StaticObjects extends DocumentParser
+public final class StaticObjects implements DocumentParser
 {
 	private static final Map<Integer, L2StaticObjectInstance> _staticObjects = new HashMap<>();
 	
@@ -52,16 +53,16 @@ public final class StaticObjects extends DocumentParser
 	{
 		_staticObjects.clear();
 		parseDatapackFile("data/staticObjects.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _staticObjects.size() + " static object templates.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _staticObjects.size() + " static object templates.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		Node att;
 		StatsSet set;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{

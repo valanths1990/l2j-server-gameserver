@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.engines.DocumentParser;
@@ -32,7 +33,7 @@ import com.l2jserver.gameserver.model.base.ClassId;
  * Holds all skill learn data for all npcs.
  * @author xban1x
  */
-public final class SkillLearnData extends DocumentParser
+public final class SkillLearnData implements DocumentParser
 {
 	private final Map<Integer, List<ClassId>> _skillLearn = new HashMap<>();
 	
@@ -46,13 +47,13 @@ public final class SkillLearnData extends DocumentParser
 	{
 		_skillLearn.clear();
 		parseDatapackFile("data/skillLearn.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _skillLearn.size() + " Skill Learn data.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _skillLearn.size() + " Skill Learn data.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node node = getCurrentDocument().getFirstChild(); node != null; node = node.getNextSibling())
+		for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(node.getNodeName()))
 			{

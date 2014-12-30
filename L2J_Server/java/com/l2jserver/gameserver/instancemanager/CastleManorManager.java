@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -57,7 +58,7 @@ import com.l2jserver.util.Rnd;
  * Castle manor system.
  * @author malyelfik
  */
-public final class CastleManorManager extends DocumentParser implements IStorable
+public final class CastleManorManager implements DocumentParser, IStorable
 {
 	// SQL queries
 	private static final String INSERT_PRODUCT = "INSERT INTO castle_manor_production VALUES (?, ?, ?, ?, ?, ?)";
@@ -109,13 +110,13 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 			// Send debug message
 			if (Config.DEBUG)
 			{
-				_log.info(getClass().getSimpleName() + ": Current mode " + _mode.toString());
+				LOGGER.info(getClass().getSimpleName() + ": Current mode " + _mode.toString());
 			}
 		}
 		else
 		{
 			_mode = ManorMode.DISABLED;
-			_log.info(getClass().getSimpleName() + ": Manor system is deactivated.");
+			LOGGER.info(getClass().getSimpleName() + ": Manor system is deactivated.");
 		}
 	}
 	
@@ -123,16 +124,16 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 	public final void load()
 	{
 		parseDatapackFile("data/seeds.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _seeds.size() + " seeds.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _seeds.size() + " seeds.");
 	}
 	
 	@Override
-	protected final void parseDocument()
+	public final void parseDocument(Document doc)
 	{
 		StatsSet set;
 		NamedNodeMap attrs;
 		Node att;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -200,7 +201,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 						}
 						else
 						{
-							_log.warning(getClass().getSimpleName() + ": Unknown seed id: " + seedId + "!");
+							LOGGER.warning(getClass().getSimpleName() + ": Unknown seed id: " + seedId + "!");
 						}
 					}
 				}
@@ -231,18 +232,18 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 						}
 						else
 						{
-							_log.warning(getClass().getSimpleName() + ": Unknown crop id: " + cropId + "!");
+							LOGGER.warning(getClass().getSimpleName() + ": Unknown crop id: " + cropId + "!");
 						}
 					}
 				}
 				_procure.put(castleId, current);
 				_procureNext.put(castleId, next);
 			}
-			_log.info(getClass().getSimpleName() + ": Manor data loaded.");
+			LOGGER.info(getClass().getSimpleName() + ": Manor data loaded.");
 		}
 		catch (Exception e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Unable to load manor data! " + e.getMessage());
+			LOGGER.warning(getClass().getSimpleName() + ": Unable to load manor data! " + e.getMessage());
 		}
 	}
 	
@@ -428,7 +429,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 		scheduleModeChange();
 		if (Config.DEBUG)
 		{
-			_log.info(getClass().getName() + ": Manor mode changed to " + _mode.toString() + "!");
+			LOGGER.info(getClass().getName() + ": Manor mode changed to " + _mode.toString() + "!");
 		}
 	}
 	
@@ -463,7 +464,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 			}
 			catch (Exception e)
 			{
-				_log.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
+				LOGGER.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
 			}
 		}
 	}
@@ -500,7 +501,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 			}
 			catch (Exception e)
 			{
-				_log.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
+				LOGGER.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
 			}
 		}
 	}
@@ -521,7 +522,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 		}
 		catch (Exception e)
 		{
-			_log.info(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
+			LOGGER.info(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
 		}
 	}
 	
@@ -541,7 +542,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 		}
 		catch (Exception e)
 		{
-			_log.info(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
+			LOGGER.info(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
 		}
 	}
 	
@@ -684,7 +685,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 		}
 		catch (Exception e)
 		{
-			_log.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
+			LOGGER.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
 			return false;
 		}
 	}
@@ -712,7 +713,7 @@ public final class CastleManorManager extends DocumentParser implements IStorabl
 			}
 			catch (Exception e)
 			{
-				_log.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
+				LOGGER.severe(getClass().getSimpleName() + ": Unable to store manor data! " + e.getMessage());
 			}
 		}
 	}

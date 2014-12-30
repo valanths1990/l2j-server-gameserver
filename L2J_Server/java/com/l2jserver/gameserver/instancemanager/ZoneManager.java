@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.instancemanager;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -52,7 +54,7 @@ import com.l2jserver.gameserver.model.zone.type.NpcSpawnTerritory;
  * This class manages the zones
  * @author durgus
  */
-public final class ZoneManager extends DocumentParser
+public final class ZoneManager implements DocumentParser
 {
 	private static final Map<String, AbstractZoneSettings> _settings = new HashMap<>();
 	
@@ -100,7 +102,7 @@ public final class ZoneManager extends DocumentParser
 			}
 		}
 		GrandBossManager.getInstance().getZones().clear();
-		_log.info(getClass().getSimpleName() + ": Removed zones in " + count + " regions.");
+		LOGGER.info(getClass().getSimpleName() + ": Removed zones in " + count + " regions.");
 		
 		// Load the zones
 		load();
@@ -117,7 +119,7 @@ public final class ZoneManager extends DocumentParser
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc, File f)
 	{
 		// Get the world regions
 		final L2WorldRegion[][] worldRegions = L2World.getInstance().getWorldRegions();
@@ -129,7 +131,7 @@ public final class ZoneManager extends DocumentParser
 		String zoneType, zoneShape;
 		final List<int[]> rs = new ArrayList<>();
 		
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -153,7 +155,7 @@ public final class ZoneManager extends DocumentParser
 						}
 						else
 						{
-							_log.warning("ZoneData: Missing type for zone in file: " + getCurrentFile().getName());
+							LOGGER.warning("ZoneData: Missing type for zone in file: " + f.getName());
 							continue;
 						}
 						
@@ -182,12 +184,12 @@ public final class ZoneManager extends DocumentParser
 						{
 							if (zoneName == null)
 							{
-								_log.warning("ZoneData: Missing name for NpcSpawnTerritory in file: " + getCurrentFile().getName() + ", skipping zone");
+								LOGGER.warning("ZoneData: Missing name for NpcSpawnTerritory in file: " + f.getName() + ", skipping zone");
 								continue;
 							}
 							else if (_spawnTerritories.containsKey(zoneName))
 							{
-								_log.warning("ZoneData: Name " + zoneName + " already used for another zone, check file: " + getCurrentFile().getName() + ". Skipping zone");
+								LOGGER.warning("ZoneData: Name " + zoneName + " already used for another zone, check file: " + f.getName() + ". Skipping zone");
 								continue;
 							}
 						}
@@ -219,7 +221,7 @@ public final class ZoneManager extends DocumentParser
 							
 							if ((coords == null) || (coords.length == 0))
 							{
-								_log.warning(getClass().getSimpleName() + ": ZoneData: missing data for zone: " + zoneId + " XML file: " + getCurrentFile().getName());
+								LOGGER.warning(getClass().getSimpleName() + ": ZoneData: missing data for zone: " + zoneId + " XML file: " + f.getName());
 								continue;
 							}
 							
@@ -236,7 +238,7 @@ public final class ZoneManager extends DocumentParser
 								}
 								else
 								{
-									_log.warning(getClass().getSimpleName() + ": ZoneData: Missing cuboid vertex in sql data for zone: " + zoneId + " in file: " + getCurrentFile().getName());
+									LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Missing cuboid vertex in sql data for zone: " + zoneId + " in file: " + f.getName());
 									continue;
 								}
 							}
@@ -256,7 +258,7 @@ public final class ZoneManager extends DocumentParser
 								}
 								else
 								{
-									_log.warning(getClass().getSimpleName() + ": ZoneData: Bad data for zone: " + zoneId + " in file: " + getCurrentFile().getName());
+									LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Bad data for zone: " + zoneId + " in file: " + f.getName());
 									continue;
 								}
 							}
@@ -272,19 +274,19 @@ public final class ZoneManager extends DocumentParser
 								}
 								else
 								{
-									_log.warning(getClass().getSimpleName() + ": ZoneData: Bad data for zone: " + zoneId + " in file: " + getCurrentFile().getName());
+									LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Bad data for zone: " + zoneId + " in file: " + f.getName());
 									continue;
 								}
 							}
 							else
 							{
-								_log.warning(getClass().getSimpleName() + ": ZoneData: Unknown shape: \"" + zoneShape + "\"  for zone: " + zoneId + " in file: " + getCurrentFile().getName());
+								LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Unknown shape: \"" + zoneShape + "\"  for zone: " + zoneId + " in file: " + f.getName());
 								continue;
 							}
 						}
 						catch (Exception e)
 						{
-							_log.log(Level.WARNING, getClass().getSimpleName() + ": ZoneData: Failed to load zone " + zoneId + " coordinates: " + e.getMessage(), e);
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": ZoneData: Failed to load zone " + zoneId + " coordinates: " + e.getMessage(), e);
 						}
 						
 						// No further parameters needed, if NpcSpawnTerritory is loading
@@ -307,7 +309,7 @@ public final class ZoneManager extends DocumentParser
 						}
 						catch (Exception e)
 						{
-							_log.warning(getClass().getSimpleName() + ": ZoneData: No such zone type: " + zoneType + " in file: " + getCurrentFile().getName());
+							LOGGER.warning(getClass().getSimpleName() + ": ZoneData: No such zone type: " + zoneType + " in file: " + f.getName());
 							continue;
 						}
 						
@@ -342,7 +344,7 @@ public final class ZoneManager extends DocumentParser
 						}
 						if (checkId(zoneId))
 						{
-							_log.config(getClass().getSimpleName() + ": Caution: Zone (" + zoneId + ") from file: " + getCurrentFile().getName() + " overrides previos definition.");
+							LOGGER.config(getClass().getSimpleName() + ": Caution: Zone (" + zoneId + ") from file: " + f.getName() + " overrides previos definition.");
 						}
 						
 						if ((zoneName != null) && !zoneName.isEmpty())
@@ -384,8 +386,8 @@ public final class ZoneManager extends DocumentParser
 		_spawnTerritories.clear();
 		parseDatapackDirectory("data/zones", false);
 		parseDatapackDirectory("data/zones/npcSpawnTerritories", false);
-		_log.info(getClass().getSimpleName() + ": Loaded " + _classZones.size() + " zone classes and " + getSize() + " zones.");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _spawnTerritories.size() + " NPC spawn territoriers.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _classZones.size() + " zone classes and " + getSize() + " zones.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _spawnTerritories.size() + " NPC spawn territoriers.");
 	}
 	
 	/**

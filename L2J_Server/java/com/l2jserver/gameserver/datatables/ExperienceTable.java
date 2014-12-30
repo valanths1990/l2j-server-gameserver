@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.datatables;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -30,7 +31,7 @@ import com.l2jserver.gameserver.engines.DocumentParser;
  * This class holds the Experience points for each level for players and pets.
  * @author mrTJO
  */
-public final class ExperienceTable extends DocumentParser
+public final class ExperienceTable implements DocumentParser
 {
 	private final Map<Integer, Long> _expTable = new HashMap<>();
 	
@@ -50,15 +51,15 @@ public final class ExperienceTable extends DocumentParser
 	{
 		_expTable.clear();
 		parseDatapackFile("data/stats/experience.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _expTable.size() + " levels.");
-		_log.info(getClass().getSimpleName() + ": Max Player Level is: " + (MAX_LEVEL - 1));
-		_log.info(getClass().getSimpleName() + ": Max Pet Level is: " + (MAX_PET_LEVEL - 1));
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _expTable.size() + " levels.");
+		LOGGER.info(getClass().getSimpleName() + ": Max Player Level is: " + (MAX_LEVEL - 1));
+		LOGGER.info(getClass().getSimpleName() + ": Max Pet Level is: " + (MAX_PET_LEVEL - 1));
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		final Node table = getCurrentDocument().getFirstChild();
+		final Node table = doc.getFirstChild();
 		final NamedNodeMap tableAttr = table.getAttributes();
 		
 		MAX_LEVEL = (byte) (Byte.parseByte(tableAttr.getNamedItem("maxLevel").getNodeValue()) + 1);

@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 
 public class SummonSkillsTable
 {
-	private static Logger _log = Logger.getLogger(SummonSkillsTable.class.getName());
+	private static Logger LOGGER = Logger.getLogger(SummonSkillsTable.class.getName());
 	private final Map<Integer, Map<Integer, L2PetSkillLearn>> _skillTrees = new HashMap<>();
 	
 	protected SummonSkillsTable()
@@ -68,9 +68,9 @@ public class SummonSkillsTable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error while loading pet skill tree:", e);
+			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error while loading pet skill tree:", e);
 		}
-		_log.info(getClass().getSimpleName() + ": Loaded " + count + " skills.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + count + " skills.");
 	}
 	
 	public int getAvailableLevel(L2Summon cha, int skillId)
@@ -78,7 +78,7 @@ public class SummonSkillsTable
 		int lvl = 0;
 		if (!_skillTrees.containsKey(cha.getId()))
 		{
-			_log.warning(getClass().getSimpleName() + ": Pet id " + cha.getId() + " does not have any skills assigned.");
+			LOGGER.warning(getClass().getSimpleName() + ": Pet id " + cha.getId() + " does not have any skills assigned.");
 			return lvl;
 		}
 		Collection<L2PetSkillLearn> skills = _skillTrees.get(cha.getId()).values();
@@ -127,7 +127,7 @@ public class SummonSkillsTable
 		List<Integer> skillIds = new ArrayList<>();
 		if (!_skillTrees.containsKey(cha.getId()))
 		{
-			_log.warning(getClass().getSimpleName() + ": Pet id " + cha.getId() + " does not have any skills assigned.");
+			LOGGER.warning(getClass().getSimpleName() + ": Pet id " + cha.getId() + " does not have any skills assigned.");
 			return skillIds;
 		}
 		Collection<L2PetSkillLearn> skills = _skillTrees.get(cha.getId()).values();

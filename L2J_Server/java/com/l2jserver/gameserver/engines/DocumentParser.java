@@ -38,47 +38,41 @@ import com.l2jserver.util.file.filter.XMLFilter;
  * Abstract class for XML parsers.
  * @author Zoey76
  */
-public abstract class DocumentParser
+public interface DocumentParser
 {
-	protected final Logger _log = Logger.getLogger(getClass().getName());
+	static final Logger LOGGER = Logger.getLogger(DocumentParser.class.getName());
 	
-	private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-	private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+	static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+	static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
 	/** The default file filter, ".xml" files only. */
-	private static final XMLFilter XML_FILTER = new XMLFilter();
-	
-	private File _currentFile;
-	
-	private Document _currentDocument;
-	
-	private FileFilter _currentFilter = null;
+	static final XMLFilter XML_FILTER = new XMLFilter();
 	
 	/**
 	 * This method can be used to load/reload the data.<br>
 	 * It's highly recommended to clear the data storage, either the list or map.
 	 */
-	public abstract void load();
+	public void load();
 	
 	/**
 	 * Wrapper for {@link #parseFile(File)} method.
 	 * @param path the relative path to the datapack root of the XML file to parse.
 	 */
-	protected void parseDatapackFile(String path)
+	default void parseDatapackFile(String path)
 	{
 		parseFile(new File(Config.DATAPACK_ROOT, path));
 	}
 	
 	/**
 	 * Parses a single XML file.<br>
-	 * If the file was successfully parsed, call {@link #parseDocument(Document)} for the parsed document.<br>
+	 * If the file was successfully parsed, call {@link #parseDocument(Document, File)} for the parsed document.<br>
 	 * <b>Validation is enforced.</b>
 	 * @param f the XML file to parse.
 	 */
-	protected void parseFile(File f)
+	default void parseFile(File f)
 	{
 		if (!getCurrentFileFilter().accept(f))
 		{
-			_log.warning(getClass().getSimpleName() + ": Could not parse " + f.getName() + " is not a file or it doesn't exist!");
+			LOGGER.warning(getClass().getSimpleName() + ": Could not parse " + f.getName() + " is not a file or it doesn't exist!");
 			return;
 		}
 		
@@ -86,44 +80,23 @@ public abstract class DocumentParser
 		dbf.setNamespaceAware(true);
 		dbf.setValidating(true);
 		dbf.setIgnoringComments(true);
-		_currentDocument = null;
-		_currentFile = f;
 		try
 		{
 			dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 			final DocumentBuilder db = dbf.newDocumentBuilder();
 			db.setErrorHandler(new XMLErrorHandler());
-			_currentDocument = db.parse(f);
+			parseDocument(db.parse(f), f);
 		}
 		catch (SAXParseException e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Could not parse file " + f.getName() + " at line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getMessage());
+			LOGGER.warning(getClass().getSimpleName() + ": Could not parse file " + f.getName() + " at line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getMessage());
 			return;
 		}
 		catch (Exception e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Could not parse file " + f.getName() + ": " + e.getMessage());
+			LOGGER.warning(getClass().getSimpleName() + ": Could not parse file " + f.getName() + ": " + e.getMessage());
 			return;
 		}
-		parseDocument();
-	}
-	
-	/**
-	 * Gets the current file.
-	 * @return the current file
-	 */
-	public File getCurrentFile()
-	{
-		return _currentFile;
-	}
-	
-	/**
-	 * Gets the current document.
-	 * @return the current document
-	 */
-	protected Document getCurrentDocument()
-	{
-		return _currentDocument;
 	}
 	
 	/**
@@ -131,7 +104,7 @@ public abstract class DocumentParser
 	 * @param file the path to the directory where the XML files are.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	protected boolean parseDirectory(File file)
+	default boolean parseDirectory(File file)
 	{
 		return parseDirectory(file, false);
 	}
@@ -141,7 +114,7 @@ public abstract class DocumentParser
 	 * @param path the path to the directory where the XML files are.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	protected boolean parseDirectory(String path)
+	default boolean parseDirectory(String path)
 	{
 		return parseDirectory(new File(path), false);
 	}
@@ -152,7 +125,7 @@ public abstract class DocumentParser
 	 * @param recursive parses all sub folders if there is.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	protected boolean parseDirectory(String path, boolean recursive)
+	default boolean parseDirectory(String path, boolean recursive)
 	{
 		return parseDirectory(new File(path), recursive);
 	}
@@ -163,11 +136,11 @@ public abstract class DocumentParser
 	 * @param recursive parses all sub folders if there is.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	protected boolean parseDirectory(File dir, boolean recursive)
+	default boolean parseDirectory(File dir, boolean recursive)
 	{
 		if (!dir.exists())
 		{
-			_log.warning(getClass().getSimpleName() + ": Folder " + dir.getAbsolutePath() + " doesn't exist!");
+			LOGGER.warning(getClass().getSimpleName() + ": Folder " + dir.getAbsolutePath() + " doesn't exist!");
 			return false;
 		}
 		
@@ -192,25 +165,31 @@ public abstract class DocumentParser
 	 * @param recursive parses all sub folders if there is
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise
 	 */
-	protected boolean parseDatapackDirectory(String path, boolean recursive)
+	default boolean parseDatapackDirectory(String path, boolean recursive)
 	{
 		return parseDirectory(new File(Config.DATAPACK_ROOT, path), recursive);
 	}
 	
 	/**
-	 * Overridable method that could parse a custom document.<br>
-	 * @param doc the document to parse.
+	 * Abstract method that when implemented will parse the current document.<br>
+	 * Is expected to be call from {@link #parseFile(File)}.
+	 * @param doc the current document to parse
+	 * @param f the current file
 	 */
-	protected void parseDocument(Document doc)
+	default void parseDocument(Document doc, File f)
 	{
-		// Do nothing, to be overridden in sub-classes.
+		parseDocument(doc);
 	}
 	
 	/**
 	 * Abstract method that when implemented will parse the current document.<br>
 	 * Is expected to be call from {@link #parseFile(File)}.
+	 * @param doc the current document to parse
 	 */
-	protected abstract void parseDocument();
+	default void parseDocument(Document doc)
+	{
+		LOGGER.severe("Parser not implemented!");
+	}
 	
 	/**
 	 * Parses a boolean value.
@@ -218,7 +197,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Boolean parseBoolean(Node node, Boolean defaultValue)
+	default Boolean parseBoolean(Node node, Boolean defaultValue)
 	{
 		return node != null ? Boolean.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -228,7 +207,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Boolean parseBoolean(Node node)
+	default Boolean parseBoolean(Node node)
 	{
 		return parseBoolean(node, null);
 	}
@@ -239,7 +218,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Boolean parseBoolean(NamedNodeMap attrs, String name)
+	default Boolean parseBoolean(NamedNodeMap attrs, String name)
 	{
 		return parseBoolean(attrs.getNamedItem(name));
 	}
@@ -251,7 +230,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Boolean parseBoolean(NamedNodeMap attrs, String name, Boolean defaultValue)
+	default Boolean parseBoolean(NamedNodeMap attrs, String name, Boolean defaultValue)
 	{
 		return parseBoolean(attrs.getNamedItem(name), defaultValue);
 	}
@@ -262,7 +241,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Byte parseByte(Node node, Byte defaultValue)
+	default Byte parseByte(Node node, Byte defaultValue)
 	{
 		return node != null ? Byte.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -272,7 +251,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Byte parseByte(Node node)
+	default Byte parseByte(Node node)
 	{
 		return parseByte(node, null);
 	}
@@ -283,7 +262,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Byte parseByte(NamedNodeMap attrs, String name)
+	default Byte parseByte(NamedNodeMap attrs, String name)
 	{
 		return parseByte(attrs.getNamedItem(name));
 	}
@@ -295,7 +274,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Byte parseByte(NamedNodeMap attrs, String name, Byte defaultValue)
+	default Byte parseByte(NamedNodeMap attrs, String name, Byte defaultValue)
 	{
 		return parseByte(attrs.getNamedItem(name), defaultValue);
 	}
@@ -306,7 +285,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Short parseShort(Node node, Short defaultValue)
+	default Short parseShort(Node node, Short defaultValue)
 	{
 		return node != null ? Short.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -316,7 +295,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Short parseShort(Node node)
+	default Short parseShort(Node node)
 	{
 		return parseShort(node, null);
 	}
@@ -327,7 +306,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Short parseShort(NamedNodeMap attrs, String name)
+	default Short parseShort(NamedNodeMap attrs, String name)
 	{
 		return parseShort(attrs.getNamedItem(name));
 	}
@@ -339,9 +318,30 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Short parseShort(NamedNodeMap attrs, String name, Short defaultValue)
+	default Short parseShort(NamedNodeMap attrs, String name, Short defaultValue)
 	{
 		return parseShort(attrs.getNamedItem(name), defaultValue);
+	}
+	
+	/**
+	 * Parses an int value.
+	 * @param node the node to parse
+	 * @param defaultValue the default value
+	 * @return if the node is not null, the value of the parsed node, otherwise the default value
+	 */
+	default int parseInt(Node node, Integer defaultValue)
+	{
+		return node != null ? Integer.parseInt(node.getNodeValue()) : defaultValue;
+	}
+	
+	/**
+	 * Parses an int value.
+	 * @param node the node to parse
+	 * @return if the node is not null, the value of the parsed node, otherwise the default value
+	 */
+	default int parseInt(Node node)
+	{
+		return parseInt(node, -1);
 	}
 	
 	/**
@@ -350,7 +350,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Integer parseInteger(Node node, Integer defaultValue)
+	default Integer parseInteger(Node node, Integer defaultValue)
 	{
 		return node != null ? Integer.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -360,7 +360,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Integer parseInteger(Node node)
+	default Integer parseInteger(Node node)
 	{
 		return parseInteger(node, null);
 	}
@@ -371,7 +371,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Integer parseInteger(NamedNodeMap attrs, String name)
+	default Integer parseInteger(NamedNodeMap attrs, String name)
 	{
 		return parseInteger(attrs.getNamedItem(name));
 	}
@@ -383,7 +383,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Integer parseInteger(NamedNodeMap attrs, String name, Integer defaultValue)
+	default Integer parseInteger(NamedNodeMap attrs, String name, Integer defaultValue)
 	{
 		return parseInteger(attrs.getNamedItem(name), defaultValue);
 	}
@@ -394,7 +394,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Long parseLong(Node node, Long defaultValue)
+	default Long parseLong(Node node, Long defaultValue)
 	{
 		return node != null ? Long.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -404,7 +404,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Long parseLong(Node node)
+	default Long parseLong(Node node)
 	{
 		return parseLong(node, null);
 	}
@@ -415,7 +415,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Long parseLong(NamedNodeMap attrs, String name)
+	default Long parseLong(NamedNodeMap attrs, String name)
 	{
 		return parseLong(attrs.getNamedItem(name));
 	}
@@ -427,7 +427,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Long parseLong(NamedNodeMap attrs, String name, Long defaultValue)
+	default Long parseLong(NamedNodeMap attrs, String name, Long defaultValue)
 	{
 		return parseLong(attrs.getNamedItem(name), defaultValue);
 	}
@@ -438,7 +438,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Float parseFloat(Node node, Float defaultValue)
+	default Float parseFloat(Node node, Float defaultValue)
 	{
 		return node != null ? Float.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -448,7 +448,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Float parseFloat(Node node)
+	default Float parseFloat(Node node)
 	{
 		return parseFloat(node, null);
 	}
@@ -459,7 +459,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Float parseFloat(NamedNodeMap attrs, String name)
+	default Float parseFloat(NamedNodeMap attrs, String name)
 	{
 		return parseFloat(attrs.getNamedItem(name));
 	}
@@ -471,7 +471,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Float parseFloat(NamedNodeMap attrs, String name, Float defaultValue)
+	default Float parseFloat(NamedNodeMap attrs, String name, Float defaultValue)
 	{
 		return parseFloat(attrs.getNamedItem(name), defaultValue);
 	}
@@ -482,7 +482,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Double parseDouble(Node node, Double defaultValue)
+	default Double parseDouble(Node node, Double defaultValue)
 	{
 		return node != null ? Double.valueOf(node.getNodeValue()) : defaultValue;
 	}
@@ -492,7 +492,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Double parseDouble(Node node)
+	default Double parseDouble(Node node)
 	{
 		return parseDouble(node, null);
 	}
@@ -503,7 +503,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected Double parseDouble(NamedNodeMap attrs, String name)
+	default Double parseDouble(NamedNodeMap attrs, String name)
 	{
 		return parseDouble(attrs.getNamedItem(name));
 	}
@@ -515,7 +515,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected Double parseDouble(NamedNodeMap attrs, String name, Double defaultValue)
+	default Double parseDouble(NamedNodeMap attrs, String name, Double defaultValue)
 	{
 		return parseDouble(attrs.getNamedItem(name), defaultValue);
 	}
@@ -526,7 +526,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected String parseString(Node node, String defaultValue)
+	default String parseString(Node node, String defaultValue)
 	{
 		return node != null ? node.getNodeValue() : defaultValue;
 	}
@@ -536,7 +536,7 @@ public abstract class DocumentParser
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected String parseString(Node node)
+	default String parseString(Node node)
 	{
 		return parseString(node, null);
 	}
@@ -547,7 +547,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	protected String parseString(NamedNodeMap attrs, String name)
+	default String parseString(NamedNodeMap attrs, String name)
 	{
 		return parseString(attrs.getNamedItem(name));
 	}
@@ -559,7 +559,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	protected String parseString(NamedNodeMap attrs, String name, String defaultValue)
+	default String parseString(NamedNodeMap attrs, String name, String defaultValue)
 	{
 		return parseString(attrs.getNamedItem(name), defaultValue);
 	}
@@ -572,7 +572,7 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise the default value
 	 */
-	protected <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz, T defaultValue)
+	default <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz, T defaultValue)
 	{
 		if (node == null)
 		{
@@ -585,7 +585,7 @@ public abstract class DocumentParser
 		}
 		catch (IllegalArgumentException e)
 		{
-			_log.warning("[" + getCurrentFile().getName() + "] Invalid value specified for node: " + node.getNodeName() + " specified value: " + node.getNodeValue() + " should be enum value of \"" + clazz.getSimpleName() + "\" using default value: " + defaultValue);
+			LOGGER.warning("Invalid value specified for node: " + node.getNodeName() + " specified value: " + node.getNodeValue() + " should be enum value of \"" + clazz.getSimpleName() + "\" using default value: " + defaultValue);
 			return defaultValue;
 		}
 	}
@@ -597,7 +597,7 @@ public abstract class DocumentParser
 	 * @param clazz the class of the enumerated
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise null
 	 */
-	protected <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz)
+	default <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz)
 	{
 		return parseEnum(node, clazz, null);
 	}
@@ -610,7 +610,7 @@ public abstract class DocumentParser
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise null
 	 */
-	protected <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name)
+	default <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name)
 	{
 		return parseEnum(attrs.getNamedItem(name), clazz);
 	}
@@ -624,34 +624,25 @@ public abstract class DocumentParser
 	 * @param defaultValue the default value
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise the default value
 	 */
-	protected <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name, T defaultValue)
+	default <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name, T defaultValue)
 	{
 		return parseEnum(attrs.getNamedItem(name), clazz, defaultValue);
-	}
-	
-	/**
-	 * Sets the current file filter.
-	 * @param filter the file filter
-	 */
-	public void setCurrentFileFilter(FileFilter filter)
-	{
-		_currentFilter = filter;
 	}
 	
 	/**
 	 * Gets the current file filter.
 	 * @return the current file filter
 	 */
-	public FileFilter getCurrentFileFilter()
+	default FileFilter getCurrentFileFilter()
 	{
-		return _currentFilter != null ? _currentFilter : XML_FILTER;
+		return XML_FILTER;
 	}
 	
 	/**
 	 * Simple XML error handler.
 	 * @author Zoey76
 	 */
-	protected class XMLErrorHandler implements ErrorHandler
+	class XMLErrorHandler implements ErrorHandler
 	{
 		@Override
 		public void warning(SAXParseException e) throws SAXParseException

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -42,7 +43,7 @@ import com.l2jserver.gameserver.network.serverpackets.ShortCutRegister;
  * What shortcuts get each newly created character.
  * @author Zoey76
  */
-public final class InitialShortcutData extends DocumentParser
+public final class InitialShortcutData implements DocumentParser
 {
 	private final Map<ClassId, List<Shortcut>> _initialShortcutData = new HashMap<>();
 	private final List<Shortcut> _initialGlobalShortcutList = new ArrayList<>();
@@ -64,15 +65,15 @@ public final class InitialShortcutData extends DocumentParser
 		
 		parseDatapackFile("data/stats/initialShortcuts.xml");
 		
-		_log.info(getClass().getSimpleName() + ": Loaded " + _initialGlobalShortcutList.size() + " Initial Global Shortcuts data.");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _initialShortcutData.size() + " Initial Shortcuts data.");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _macroPresets.size() + " Macros presets.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _initialGlobalShortcutList.size() + " Initial Global Shortcuts data.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _initialShortcutData.size() + " Initial Shortcuts data.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _macroPresets.size() + " Macros presets.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equals(n.getNodeName()))
 			{

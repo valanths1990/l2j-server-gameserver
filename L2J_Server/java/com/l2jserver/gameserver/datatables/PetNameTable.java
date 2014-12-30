@@ -33,7 +33,7 @@ import com.l2jserver.L2DatabaseFactory;
 
 public class PetNameTable
 {
-	private static Logger _log = Logger.getLogger(PetNameTable.class.getName());
+	private static Logger LOGGER = Logger.getLogger(PetNameTable.class.getName());
 	
 	public static PetNameTable getInstance()
 	{
@@ -62,7 +62,7 @@ public class PetNameTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing petname:" + e.getMessage(), e);
+			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing petname:" + e.getMessage(), e);
 		}
 		return result;
 	}
@@ -83,7 +83,7 @@ public class PetNameTable
 		}
 		catch (PatternSyntaxException e) // case of illegal pattern
 		{
-			_log.warning(getClass().getSimpleName() + ": Pet name pattern of config is wrong!");
+			LOGGER.warning(getClass().getSimpleName() + ": Pet name pattern of config is wrong!");
 			pattern = Pattern.compile(".*");
 		}
 		Matcher regexp = pattern.matcher(name);

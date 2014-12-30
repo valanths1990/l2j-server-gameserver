@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -49,7 +50,7 @@ import com.l2jserver.gameserver.util.Broadcast;
  * This class manages walking monsters.
  * @author GKR
  */
-public final class WalkingManager extends DocumentParser
+public final class WalkingManager implements DocumentParser
 {
 	// Repeat style:
 	// 0 - go back
@@ -74,13 +75,13 @@ public final class WalkingManager extends DocumentParser
 	public final void load()
 	{
 		parseDatapackFile("data/Routes.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _routes.size() + " walking routes.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _routes.size() + " walking routes.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		Node n = getCurrentDocument().getFirstChild();
+		Node n = doc.getFirstChild();
 		for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
 		{
 			if (d.getNodeName().equals("route"))
@@ -137,7 +138,7 @@ public final class WalkingManager extends DocumentParser
 								npcString = NpcStringId.getNpcStringId(node.getNodeValue());
 								if (npcString == null)
 								{
-									_log.warning(getClass().getSimpleName() + ": Unknown npcString '" + node.getNodeValue() + "' for route '" + routeName + "'");
+									LOGGER.warning(getClass().getSimpleName() + ": Unknown npcString '" + node.getNodeValue() + "' for route '" + routeName + "'");
 									continue;
 								}
 							}
@@ -149,7 +150,7 @@ public final class WalkingManager extends DocumentParser
 									npcString = NpcStringId.getNpcStringId(Integer.parseInt(node.getNodeValue()));
 									if (npcString == null)
 									{
-										_log.warning(getClass().getSimpleName() + ": Unknown npcString '" + node.getNodeValue() + "' for route '" + routeName + "'");
+										LOGGER.warning(getClass().getSimpleName() + ": Unknown npcString '" + node.getNodeValue() + "' for route '" + routeName + "'");
 										continue;
 									}
 								}
@@ -174,7 +175,7 @@ public final class WalkingManager extends DocumentParser
 						}
 						catch (Exception e)
 						{
-							_log.warning(getClass().getSimpleName() + ": Error in target definition for route '" + routeName + "'");
+							LOGGER.warning(getClass().getSimpleName() + ": Error in target definition for route '" + routeName + "'");
 						}
 					}
 				}
@@ -273,7 +274,7 @@ public final class WalkingManager extends DocumentParser
 					if (!npc.isInsideRadius(node, 3000, true, false))
 					{
 						final String message = "Route '" + routeName + "': NPC (id=" + npc.getId() + ", x=" + npc.getX() + ", y=" + npc.getY() + ", z=" + npc.getZ() + ") is too far from starting point (node x=" + node.getX() + ", y=" + node.getY() + ", z=" + node.getZ() + ", range=" + npc.calculateDistance(node, true, true) + "), walking will not start";
-						_log.warning(getClass().getSimpleName() + ": " + message);
+						LOGGER.warning(getClass().getSimpleName() + ": " + message);
 						npc.sendDebugMessage(message);
 						return;
 					}

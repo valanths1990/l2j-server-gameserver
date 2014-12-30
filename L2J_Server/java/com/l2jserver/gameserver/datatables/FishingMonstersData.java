@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.datatables;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -32,7 +33,7 @@ import com.l2jserver.gameserver.model.fishing.L2FishingMonster;
  * This class holds the Fishing Monsters information.
  * @author nonom
  */
-public final class FishingMonstersData extends DocumentParser
+public final class FishingMonstersData implements DocumentParser
 {
 	private static final Map<Integer, L2FishingMonster> _fishingMonstersData = new HashMap<>();
 	
@@ -49,17 +50,17 @@ public final class FishingMonstersData extends DocumentParser
 	{
 		_fishingMonstersData.clear();
 		parseDatapackFile("data/stats/fishing/fishingMonsters.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _fishingMonstersData.size() + " Fishing Monsters.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _fishingMonstersData.size() + " Fishing Monsters.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		Node att;
 		L2FishingMonster fishingMonster;
 		StatsSet set;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{

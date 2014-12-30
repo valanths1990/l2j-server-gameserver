@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.model.L2TeleportLocation;
 
 public class TeleportLocationTable
 {
-	private static Logger _log = Logger.getLogger(TeleportLocationTable.class.getName());
+	private static Logger LOGGER = Logger.getLogger(TeleportLocationTable.class.getName());
 	
 	private final Map<Integer, L2TeleportLocation> _teleports = new HashMap<>();
 	
@@ -63,11 +63,11 @@ public class TeleportLocationTable
 				
 				_teleports.put(teleport.getTeleId(), teleport);
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded " + _teleports.size() + " Teleport Location Templates.");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded " + _teleports.size() + " Teleport Location Templates.");
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error loading Teleport Table.", e);
+			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error loading Teleport Table.", e);
 		}
 		
 		if (Config.CUSTOM_TELEPORT_TABLE)
@@ -94,12 +94,12 @@ public class TeleportLocationTable
 				_cTeleCount = _teleports.size() - _cTeleCount;
 				if (_cTeleCount > 0)
 				{
-					_log.info(getClass().getSimpleName() + ": Loaded " + _cTeleCount + " Custom Teleport Location Templates.");
+					LOGGER.info(getClass().getSimpleName() + ": Loaded " + _cTeleCount + " Custom Teleport Location Templates.");
 				}
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while creating custom teleport table " + e.getMessage(), e);
+				LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while creating custom teleport table " + e.getMessage(), e);
 			}
 		}
 	}

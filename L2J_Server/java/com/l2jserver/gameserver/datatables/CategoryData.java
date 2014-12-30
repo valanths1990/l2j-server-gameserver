@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -35,9 +36,9 @@ import com.l2jserver.gameserver.enums.CategoryType;
  * This class holds different categories containing class ids or npc ids.
  * @author NosBit, xban1x
  */
-public final class CategoryData extends DocumentParser
+public final class CategoryData implements DocumentParser
 {
-	private static final Logger _log = Logger.getLogger(CategoryData.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(CategoryData.class.getName());
 	
 	private final Map<CategoryType, Set<Integer>> _categories = new HashMap<>();
 	
@@ -51,13 +52,13 @@ public final class CategoryData extends DocumentParser
 	{
 		_categories.clear();
 		parseDatapackFile("data/categoryData.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _categories.size() + " Categories.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _categories.size() + " Categories.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node node = getCurrentDocument().getFirstChild(); node != null; node = node.getNextSibling())
+		for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(node.getNodeName()))
 			{
@@ -69,7 +70,7 @@ public final class CategoryData extends DocumentParser
 						final CategoryType categoryType = CategoryType.findByName(attrs.getNamedItem("name").getNodeValue());
 						if (categoryType == null)
 						{
-							_log.log(Level.WARNING, getClass().getSimpleName() + ": Can't find category by name :" + attrs.getNamedItem("name").getNodeValue());
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Can't find category by name :" + attrs.getNamedItem("name").getNodeValue());
 							continue;
 						}
 						
@@ -99,7 +100,7 @@ public final class CategoryData extends DocumentParser
 		final Set<Integer> category = getCategoryByType(type);
 		if (category == null)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Can't find category type :" + type);
+			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Can't find category type :" + type);
 			return false;
 		}
 		return category.contains(id);

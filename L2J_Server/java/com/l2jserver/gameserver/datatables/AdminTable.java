@@ -27,6 +27,7 @@ import java.util.logging.Level;
 
 import javolution.util.FastMap;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -42,7 +43,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 /**
  * @author UnAfraid
  */
-public class AdminTable extends DocumentParser
+public class AdminTable implements DocumentParser
 {
 	private static final Map<Integer, L2AccessLevel> _accessLevels = new HashMap<>();
 	private static final Map<String, L2AdminCommandAccessRight> _adminCommandAccessRights = new HashMap<>();
@@ -60,20 +61,20 @@ public class AdminTable extends DocumentParser
 		_accessLevels.clear();
 		_adminCommandAccessRights.clear();
 		parseDatapackFile("config/accessLevels.xml");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _accessLevels.size() + " Access Levels");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _accessLevels.size() + " Access Levels");
 		parseDatapackFile("config/adminCommands.xml");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _adminCommandAccessRights.size() + " Access Commands");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _adminCommandAccessRights.size() + " Access Commands");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		Node attr;
 		StatsSet set;
 		L2AccessLevel level;
 		L2AdminCommandAccessRight command;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -165,11 +166,11 @@ public class AdminTable extends DocumentParser
 			{
 				acar = new L2AdminCommandAccessRight(adminCommand, true, accessLevel.getLevel());
 				_adminCommandAccessRights.put(adminCommand, acar);
-				_log.info(getClass().getSimpleName() + ": No rights defined for admin command " + adminCommand + " auto setting accesslevel: " + accessLevel.getLevel() + " !");
+				LOGGER.info(getClass().getSimpleName() + ": No rights defined for admin command " + adminCommand + " auto setting accesslevel: " + accessLevel.getLevel() + " !");
 			}
 			else
 			{
-				_log.info(getClass().getSimpleName() + ": No rights defined for admin command " + adminCommand + " !");
+				LOGGER.info(getClass().getSimpleName() + ": No rights defined for admin command " + adminCommand + " !");
 				return false;
 			}
 		}
@@ -186,7 +187,7 @@ public class AdminTable extends DocumentParser
 		final L2AdminCommandAccessRight acar = _adminCommandAccessRights.get(command);
 		if (acar == null)
 		{
-			_log.info(getClass().getSimpleName() + ": No rights defined for admin command " + command + ".");
+			LOGGER.info(getClass().getSimpleName() + ": No rights defined for admin command " + command + ".");
 			return false;
 		}
 		return acar.getRequireConfirm();

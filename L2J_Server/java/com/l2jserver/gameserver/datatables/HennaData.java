@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -38,7 +39,7 @@ import com.l2jserver.gameserver.model.items.L2Henna;
  * Allowed classes to wear each henna.
  * @author Zoey76
  */
-public final class HennaData extends DocumentParser
+public final class HennaData implements DocumentParser
 {
 	private static final Map<Integer, L2Henna> _hennaList = new HashMap<>();
 	
@@ -55,13 +56,13 @@ public final class HennaData extends DocumentParser
 	{
 		_hennaList.clear();
 		parseDatapackFile("data/stats/hennaList.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _hennaList.size() + " Henna data.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _hennaList.size() + " Henna data.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equals(n.getNodeName()))
 			{

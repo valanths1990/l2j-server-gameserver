@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
 
 public class NpcBufferTable
 {
-	private static final Logger _log = Logger.getLogger(NpcBufferTable.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NpcBufferTable.class.getName());
 	
 	private final Map<Integer, NpcBufferSkills> _buffers = new HashMap<>();
 	
@@ -132,7 +132,7 @@ public class NpcBufferTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error reading npc_buffer table: " + e.getMessage(), e);
+			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error reading npc_buffer table: " + e.getMessage(), e);
 		}
 		
 		if (Config.CUSTOM_NPCBUFFER_TABLES)
@@ -177,10 +177,10 @@ public class NpcBufferTable
 			}
 			catch (SQLException e)
 			{
-				_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error reading custom_npc_buffer table: " + e.getMessage(), e);
+				LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error reading custom_npc_buffer table: " + e.getMessage(), e);
 			}
 		}
-		_log.info(getClass().getSimpleName() + ": Loaded " + _buffers.size() + " buffers and " + skillCount + " skills.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _buffers.size() + " buffers and " + skillCount + " skills.");
 	}
 	
 	public NpcBufferData getSkillInfo(int npcId, int buffGroup)

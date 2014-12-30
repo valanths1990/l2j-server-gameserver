@@ -39,7 +39,7 @@ import com.l2jserver.gameserver.network.L2GameClient.GameClientState;
 
 public class OfflineTradersTable
 {
-	private static Logger _log = Logger.getLogger(OfflineTradersTable.class.getName());
+	private static Logger LOGGER = Logger.getLogger(OfflineTradersTable.class.getName());
 	
 	// SQL DEFINITIONS
 	private static final String SAVE_OFFLINE_STATUS = "INSERT INTO character_offline_trade (`charId`,`time`,`type`,`title`) VALUES (?,?,?,?)";
@@ -131,20 +131,20 @@ public class OfflineTradersTable
 				}
 				catch (Exception e)
 				{
-					_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while saving offline trader: " + pc.getObjectId() + " " + e, e);
+					LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while saving offline trader: " + pc.getObjectId() + " " + e, e);
 				}
 			}
-			_log.info(getClass().getSimpleName() + ": Offline traders stored.");
+			LOGGER.info(getClass().getSimpleName() + ": Offline traders stored.");
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while saving offline traders: " + e, e);
+			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while saving offline traders: " + e, e);
 		}
 	}
 	
 	public void restoreOfflineTraders()
 	{
-		_log.info(getClass().getSimpleName() + ": Loading offline traders...");
+		LOGGER.info(getClass().getSimpleName() + ": Loading offline traders...");
 		int nTraders = 0;
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			Statement stm = con.createStatement();
@@ -167,7 +167,7 @@ public class OfflineTradersTable
 				PrivateStoreType type = PrivateStoreType.findById(rs.getInt("type"));
 				if (type == null)
 				{
-					_log.warning(getClass().getSimpleName() + ": PrivateStoreType with id " + rs.getInt("type") + " could not be found.");
+					LOGGER.warning(getClass().getSimpleName() + ": PrivateStoreType with id " + rs.getInt("type") + " could not be found.");
 					continue;
 				}
 				
@@ -243,7 +243,7 @@ public class OfflineTradersTable
 				}
 				catch (Exception e)
 				{
-					_log.log(Level.WARNING, getClass().getSimpleName() + ": Error loading trader: " + player, e);
+					LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error loading trader: " + player, e);
 					if (player != null)
 					{
 						player.deleteMe();
@@ -251,7 +251,7 @@ public class OfflineTradersTable
 				}
 			}
 			
-			_log.info(getClass().getSimpleName() + ": Loaded: " + nTraders + " offline trader(s)");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded: " + nTraders + " offline trader(s)");
 			
 			try (Statement stm1 = con.createStatement())
 			{
@@ -261,7 +261,7 @@ public class OfflineTradersTable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while loading offline traders: ", e);
+			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while loading offline traders: ", e);
 		}
 	}
 	

@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.datatables;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -30,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -53,7 +55,7 @@ import com.l2jserver.gameserver.util.Util;
  * NPC data parser.
  * @author NosBit
  */
-public class NpcData extends DocumentParser
+public class NpcData implements DocumentParser
 {
 	private final Map<Integer, L2NpcTemplate> _npcs = new ConcurrentHashMap<>();
 	private final Map<String, Integer> _clans = new ConcurrentHashMap<>();
@@ -70,13 +72,13 @@ public class NpcData extends DocumentParser
 		_minionData = new MinionData();
 		
 		parseDatapackDirectory("data/stats/npcs", false);
-		_log.info(getClass().getSimpleName() + ": Loaded " + _npcs.size() + " NPCs.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _npcs.size() + " NPCs.");
 		
 		if (Config.CUSTOM_NPC_DATA)
 		{
 			final int npcCount = _npcs.size();
 			parseDatapackDirectory("data/stats/npcs/custom", true);
-			_log.info(getClass().getSimpleName() + ": Loaded " + (_npcs.size() - npcCount) + " Custom NPCs.");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded " + (_npcs.size() - npcCount) + " Custom NPCs.");
 		}
 		
 		_minionData = null;
@@ -84,9 +86,9 @@ public class NpcData extends DocumentParser
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc, File f)
 	{
-		for (Node node = getCurrentDocument().getFirstChild(); node != null; node = node.getNextSibling())
+		for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(node.getNodeName()))
 			{
@@ -336,7 +338,7 @@ public class NpcData extends DocumentParser
 											}
 											else
 											{
-												_log.warning("[" + getCurrentFile().getName() + "] skill not found. NPC ID: " + npcId + " Skill ID:" + skillId + " Skill Level: " + skillLevel);
+												LOGGER.warning("[" + f.getName() + "] skill not found. NPC ID: " + npcId + " Skill ID:" + skillId + " Skill Level: " + skillLevel);
 											}
 										}
 									}
@@ -438,7 +440,7 @@ public class NpcData extends DocumentParser
 											}
 											
 											List<IDropItem> dropList = new ArrayList<>();
-											parseDropList(drop_lists_node, dropListScope, dropList);
+											parseDropList(f, drop_lists_node, dropListScope, dropList);
 											dropLists.put(dropListScope, Collections.unmodifiableList(dropList));
 										}
 									}
@@ -619,7 +621,7 @@ public class NpcData extends DocumentParser
 		}
 	}
 	
-	private void parseDropList(Node drop_list_node, DropListScope dropListScope, List<IDropItem> drops)
+	private void parseDropList(File f, Node drop_list_node, DropListScope dropListScope, List<IDropItem> drops)
 	{
 		for (Node drop_node = drop_list_node.getFirstChild(); drop_node != null; drop_node = drop_node.getNextSibling())
 		{
@@ -644,7 +646,7 @@ public class NpcData extends DocumentParser
 						}
 						else
 						{
-							_log.warning("[" + getCurrentFile() + "] grouped general drop item supports only general drop item.");
+							LOGGER.warning("[" + f + "] grouped general drop item supports only general drop item.");
 						}
 					}
 					dropItem.setItems(items);
@@ -803,7 +805,7 @@ public class NpcData extends DocumentParser
 	 * Once Spawn System gets reworked delete this class<br>
 	 * @author Zealar
 	 */
-	private final class MinionData extends DocumentParser
+	private final class MinionData implements DocumentParser
 	{
 		public final Map<Integer, List<MinionHolder>> _tempMinions = new HashMap<>();
 		
@@ -817,13 +819,13 @@ public class NpcData extends DocumentParser
 		{
 			_tempMinions.clear();
 			parseDatapackFile("data/minionData.xml");
-			_log.info(getClass().getSimpleName() + ": Loaded " + _tempMinions.size() + " minions data.");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded " + _tempMinions.size() + " minions data.");
 		}
 		
 		@Override
-		protected void parseDocument()
+		public void parseDocument(Document doc)
 		{
-			for (Node node = getCurrentDocument().getFirstChild(); node != null; node = node.getNextSibling())
+			for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
 			{
 				if ("list".equals(node.getNodeName()))
 				{

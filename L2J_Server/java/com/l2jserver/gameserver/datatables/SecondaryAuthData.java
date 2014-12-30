@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.engines.DocumentParser;
@@ -30,7 +31,7 @@ import com.l2jserver.gameserver.engines.DocumentParser;
 /**
  * @author NosBit
  */
-public class SecondaryAuthData extends DocumentParser
+public class SecondaryAuthData implements DocumentParser
 {
 	private boolean _enabled = false;
 	private int _maxAttempts = 5;
@@ -48,15 +49,15 @@ public class SecondaryAuthData extends DocumentParser
 	{
 		_forbiddenPasswords.clear();
 		parseFile(new File("config/SecondaryAuth.xml"));
-		_log.info(getClass().getSimpleName() + ": Loaded " + _forbiddenPasswords.size() + " forbidden passwords.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _forbiddenPasswords.size() + " forbidden passwords.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		try
 		{
-			for (Node node = getCurrentDocument().getFirstChild(); node != null; node = node.getNextSibling())
+			for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
 			{
 				if ("list".equalsIgnoreCase(node.getNodeName()))
 				{
@@ -94,7 +95,7 @@ public class SecondaryAuthData extends DocumentParser
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Failed to load secondary auth data from xml.", e);
+			LOGGER.log(Level.WARNING, "Failed to load secondary auth data from xml.", e);
 		}
 	}
 	

@@ -35,7 +35,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public final class BotReportTable
 {
-	private static final Logger _log = Logger.getLogger(BotReportTable.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BotReportTable.class.getName());
 	
 	private static final int COLUMN_BOT_ID = 1;
 	private static final int COLUMN_REPORTER_ID = 2;
@@ -78,7 +78,7 @@ public final class BotReportTable
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, "BotReportTable: Could not load punishments from /config/botreport_punishments.xml", e);
+				LOGGER.log(Level.WARNING, "BotReportTable: Could not load punishments from /config/botreport_punishments.xml", e);
 			}
 			
 			loadReportedCharData();
@@ -148,11 +148,11 @@ public final class BotReportTable
 				}
 			}
 			
-			_log.info("BotReportTable: Loaded " + _reports.size() + " bot reports");
+			LOGGER.info("BotReportTable: Loaded " + _reports.size() + " bot reports");
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "BotReportTable: Could not load reported char data!", e);
+			LOGGER.log(Level.WARNING, "BotReportTable: Could not load reported char data!", e);
 		}
 	}
 	
@@ -182,7 +182,7 @@ public final class BotReportTable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "BotReportTable: Could not update reported char data in database!", e);
+			LOGGER.log(Level.SEVERE, "BotReportTable: Could not update reported char data in database!", e);
 		}
 	}
 	
@@ -374,7 +374,7 @@ public final class BotReportTable
 		}
 		else
 		{
-			_log.warning("BotReportTable: Could not add punishment for " + neededReports + " report(s): Skill " + skillId + "-" + skillLevel + " does not exist!");
+			LOGGER.warning("BotReportTable: Could not add punishment for " + neededReports + " report(s): Skill " + skillId + "-" + skillLevel + " does not exist!");
 		}
 	}
 	
@@ -410,7 +410,7 @@ public final class BotReportTable
 		catch (Exception e)
 		{
 			ThreadPoolManager.getInstance().scheduleGeneral(new ResetPointTask(), 24 * 3600 * 1000);
-			_log.log(Level.WARNING, "BotReportTable: Could not properly schedule bot report points reset task. Scheduled in 24 hours.", e);
+			LOGGER.log(Level.WARNING, "BotReportTable: Could not properly schedule bot report points reset task. Scheduled in 24 hours.", e);
 		}
 	}
 	

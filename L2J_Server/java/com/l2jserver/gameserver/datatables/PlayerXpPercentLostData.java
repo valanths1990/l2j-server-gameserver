@@ -20,6 +20,7 @@ package com.l2jserver.gameserver.datatables;
 
 import java.util.Arrays;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -29,7 +30,7 @@ import com.l2jserver.gameserver.engines.DocumentParser;
  * This class holds the Player Xp Percent Lost Data for each level for players.
  * @author Zealar
  */
-public final class PlayerXpPercentLostData extends DocumentParser
+public final class PlayerXpPercentLostData implements DocumentParser
 {
 	private final int _maxlevel = ExperienceTable.getInstance().getMaxLevel();
 	private final double[] _playerXpPercentLost = new double[_maxlevel + 1];
@@ -47,9 +48,9 @@ public final class PlayerXpPercentLostData extends DocumentParser
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -69,7 +70,7 @@ public final class PlayerXpPercentLostData extends DocumentParser
 	{
 		if (level > _maxlevel)
 		{
-			_log.warning("Require to high level inside PlayerXpPercentLostData (" + level + ")");
+			LOGGER.warning("Require to high level inside PlayerXpPercentLostData (" + level + ")");
 			return _playerXpPercentLost[_maxlevel];
 		}
 		return _playerXpPercentLost[level];

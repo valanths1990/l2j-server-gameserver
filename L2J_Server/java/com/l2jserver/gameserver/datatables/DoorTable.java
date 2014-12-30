@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -41,7 +42,7 @@ import com.l2jserver.gameserver.pathfinding.AbstractNodeLoc;
 /**
  * @author JIV, GodKratos, UnAfraid
  */
-public class DoorTable extends DocumentParser
+public class DoorTable implements DocumentParser
 {
 	private static final Map<String, Set<Integer>> _groups = new HashMap<>();
 	
@@ -64,12 +65,12 @@ public class DoorTable extends DocumentParser
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		Node att;
 		StatsSet set;
-		for (Node a = getCurrentDocument().getFirstChild(); a != null; a = a.getNextSibling())
+		for (Node a = doc.getFirstChild(); a != null; a = a.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(a.getNodeName()))
 			{
@@ -92,7 +93,7 @@ public class DoorTable extends DocumentParser
 			}
 		}
 		
-		_log.info(getClass().getSimpleName() + ": Loaded " + _doors.size() + " Door Templates for " + _regions.size() + " regions.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _doors.size() + " Door Templates for " + _regions.size() + " regions.");
 	}
 	
 	public void insertCollisionData(StatsSet set)

@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.datatables;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -30,7 +31,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  * This class load, holds and calculates the hit condition bonuses.
  * @author Nik
  */
-public final class HitConditionBonus extends DocumentParser
+public final class HitConditionBonus implements DocumentParser
 {
 	private int frontBonus = 0;
 	private int sideBonus = 0;
@@ -52,23 +53,23 @@ public final class HitConditionBonus extends DocumentParser
 	public void load()
 	{
 		parseDatapackFile("data/stats/hitConditionBonus.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded Hit Condition bonuses.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded Hit Condition bonuses.");
 		if (Config.DEBUG)
 		{
-			_log.info(getClass().getSimpleName() + ": Front bonus: " + frontBonus);
-			_log.info(getClass().getSimpleName() + ": Side bonus: " + sideBonus);
-			_log.info(getClass().getSimpleName() + ": Back bonus: " + backBonus);
-			_log.info(getClass().getSimpleName() + ": High bonus: " + highBonus);
-			_log.info(getClass().getSimpleName() + ": Low bonus: " + lowBonus);
-			_log.info(getClass().getSimpleName() + ": Dark bonus: " + darkBonus);
-			_log.info(getClass().getSimpleName() + ": Rain bonus: " + rainBonus);
+			LOGGER.info(getClass().getSimpleName() + ": Front bonus: " + frontBonus);
+			LOGGER.info(getClass().getSimpleName() + ": Side bonus: " + sideBonus);
+			LOGGER.info(getClass().getSimpleName() + ": Back bonus: " + backBonus);
+			LOGGER.info(getClass().getSimpleName() + ": High bonus: " + highBonus);
+			LOGGER.info(getClass().getSimpleName() + ": Low bonus: " + lowBonus);
+			LOGGER.info(getClass().getSimpleName() + ": Dark bonus: " + darkBonus);
+			LOGGER.info(getClass().getSimpleName() + ": Rain bonus: " + rainBonus);
 		}
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		final Node n = getCurrentDocument().getFirstChild();
+		final Node n = doc.getFirstChild();
 		NamedNodeMap attrs;
 		for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
 		{
