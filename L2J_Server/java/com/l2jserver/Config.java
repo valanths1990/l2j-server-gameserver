@@ -18,8 +18,6 @@
  */
 package com.l2jserver;
 
-import info.tak11.subnet.Subnet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,6 +48,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -3940,7 +3939,6 @@ public final class Config
 			{
 				Enumeration<NetworkInterface> niList = NetworkInterface.getNetworkInterfaces();
 				
-				Subnet sub = new Subnet();
 				while (niList.hasMoreElements())
 				{
 					NetworkInterface ni = niList.nextElement();
@@ -3962,14 +3960,18 @@ public final class Config
 							continue;
 						}
 						
-						sub.setIPAddress(ia.getAddress().getHostAddress());
-						sub.setMaskedBits(ia.getNetworkPrefixLength());
-						String subnet = sub.getSubnetAddress() + '/' + sub.getMaskedBits();
+						final String hostAddress = ia.getAddress().getHostAddress();
+						final int subnetPrefixLength = ia.getNetworkPrefixLength();
+						final int subnetMaskInt = IntStream.rangeClosed(1, subnetPrefixLength).reduce((r, e) -> (r << 1) + 1).orElse(0) << (32 - subnetPrefixLength);
+						final int hostAddressInt = Arrays.stream(hostAddress.split("\\.")).mapToInt(Integer::parseInt).reduce((r, e) -> (r << 8) + e).orElse(0);
+						final int subnetAddressInt = hostAddressInt & subnetMaskInt;
+						final String subnetAddress = ((subnetAddressInt >> 24) & 0xFF) + "." + ((subnetAddressInt >> 16) & 0xFF) + "." + ((subnetAddressInt >> 8) & 0xFF) + "." + (subnetAddressInt & 0xFF);
+						final String subnet = subnetAddress + '/' + subnetPrefixLength;
 						if (!_subnets.contains(subnet) && !subnet.equals("0.0.0.0/0"))
 						{
 							_subnets.add(subnet);
-							_hosts.add(sub.getIPAddress());
-							LOGGER.log(Level.INFO, "Network Config: Adding new subnet: " + subnet + " address: " + sub.getIPAddress());
+							_hosts.add(hostAddress);
+							LOGGER.log(Level.INFO, "Network Config: Adding new subnet: " + subnet + " address: " + hostAddress);
 						}
 					}
 				}
