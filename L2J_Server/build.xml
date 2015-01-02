@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="L2J_Server" default="build" basedir=".">
 	<description>
+		Copyright (C) 2004-2015 L2J Server
+		
 		This script will build the L2J Server.
 
 		This program is free software; you can redistribute it and/or modify
@@ -211,6 +213,9 @@
 	</target>
 
 	<target name="build" depends="jar" description="Create the Zip file.">
-		<zip destfile="${build}/L2J_Server_BETA.zip" basedir="${build.dist}" level="9" />
+		<tstamp>
+			<format property="build.date" pattern="yyyy-MM-dd"/>
+		</tstamp>
+		<zip destfile="${build}/L2J_Server_${build.date}.zip" basedir="${build.dist}" level="9" />
 	</target>
 </project>
