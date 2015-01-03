@@ -159,30 +159,12 @@
 				<attribute name="Main-Class" value="com.l2jserver.tools.configurator.ConfigUserInterface" />
 			</manifest>
 		</jar>
-		<jar destfile="${build.dist.tools}/dbinst_cs.jar" level="9">
+		<jar destfile="${build.dist.tools}/Database_Installer_GS.jar" level="9">
 			<fileset dir="${build.bin}">
 				<include name="**/dbinstaller/**" />
 				<include name="**/images/**" />
 				<include name="**/util/**" />
 				<include name="**/SQLFilter**" />
-				<exclude name="**/LauncherGS*" />
-				<exclude name="**/LauncherLS*" />
-			</fileset>
-			<manifest>
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${time.stamp}" />
-				<attribute name="Class-Path" value="${manifest.libs}" />
-				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
-				<attribute name="Main-Class" value="com.l2jserver.tools.dbinstaller.LauncherCS" />
-			</manifest>
-		</jar>
-		<jar destfile="${build.dist.tools}/dbinst_gs.jar" level="9">
-			<fileset dir="${build.bin}">
-				<include name="**/dbinstaller/**" />
-				<include name="**/images/**" />
-				<include name="**/util/**" />
-				<include name="**/SQLFilter**" />
-				<exclude name="**/LauncherCS*" />
 				<exclude name="**/LauncherLS*" />
 			</fileset>
 			<manifest>
@@ -193,13 +175,12 @@
 				<attribute name="Main-Class" value="com.l2jserver.tools.dbinstaller.LauncherGS" />
 			</manifest>
 		</jar>
-		<jar destfile="${build.dist.tools}/dbinst_ls.jar" level="9">
+		<jar destfile="${build.dist.tools}/Database_Installer_LS.jar" level="9">
 			<fileset dir="${build.bin}">
 				<include name="**/dbinstaller/**" />
 				<include name="**/images/**" />
 				<include name="**/util/**" />
 				<include name="**/SQLFilter**" />
-				<exclude name="**/LauncherCS*" />
 				<exclude name="**/LauncherGS*" />
 			</fileset>
 			<manifest>
