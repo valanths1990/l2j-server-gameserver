@@ -2725,6 +2725,10 @@ public abstract class AbstractScript extends ManagedScript
 					}
 					rewardedCounts.get(player).put(item.getId(), rewardedCounts.get(player).get(item.getId()) + toGive);
 				}
+				if (toDist.isEmpty())
+				{
+					return rewardedCounts;
+				}
 				equaldist = randomdist / toDist.size(); // the rest of items may be allowed to be equally distributed between remaining players
 				randomdist %= toDist.size();
 			}
