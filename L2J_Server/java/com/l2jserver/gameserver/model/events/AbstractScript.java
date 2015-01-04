@@ -2701,7 +2701,7 @@ public abstract class AbstractScript extends ManagedScript
 		{
 			rewardedCounts.put(player, new HashMap<Integer, Long>());
 		}
-		for (ItemHolder item : items)
+		nextItem: for (ItemHolder item : items)
 		{
 			long equaldist = item.getCount() / players.size();
 			long randomdist = item.getCount() % players.size();
@@ -2728,7 +2728,7 @@ public abstract class AbstractScript extends ManagedScript
 				if (toDist.isEmpty())
 				{
 					// there's no one to give items anymore, all players will be full when we give the items
-					return rewardedCounts;
+					continue nextItem;
 				}
 				equaldist = randomdist / toDist.size(); // the rest of items may be allowed to be equally distributed between remaining players
 				randomdist %= toDist.size();
@@ -2739,7 +2739,7 @@ public abstract class AbstractScript extends ManagedScript
 				if (toDist.isEmpty())
 				{
 					// we don't have any player left
-					break;
+					continue nextItem;
 				}
 				L2PcInstance player = toDist.get(getRandom(toDist.size()));
 				// avoid null return
