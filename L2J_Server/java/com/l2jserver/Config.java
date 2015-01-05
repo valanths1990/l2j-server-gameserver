@@ -36,6 +36,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +57,7 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.engines.DocumentParser;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
+import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.util.FloodProtectorConfig;
@@ -104,6 +106,7 @@ public final class Config
 	public static final String CHAT_FILTER_FILE = "./config/chatfilter.txt";
 	public static final String EMAIL_CONFIG_FILE = "./config/Email.properties";
 	public static final String CH_SIEGE_FILE = "./config/ConquerableHallSiege.properties";
+	public static final String GEODATA_FILE = "./config/GeoData.properties";
 	// --------------------------------------------------
 	// L2J Variable Definitions
 	// --------------------------------------------------
@@ -506,24 +509,10 @@ public final class Config
 	public static int MAX_NPC_ANIMATION;
 	public static int MIN_MONSTER_ANIMATION;
 	public static int MAX_MONSTER_ANIMATION;
-	public static int COORD_SYNCHRONIZE;
 	public static boolean ENABLE_FALLING_DAMAGE;
 	public static boolean GRIDS_ALWAYS_ON;
 	public static int GRID_NEIGHBOR_TURNON_TIME;
 	public static int GRID_NEIGHBOR_TURNOFF_TIME;
-	public static int GEODATA;
-	public static String GEODATA_DRIVER;
-	public static File PATHNODE_DIR;
-	public static boolean GEODATA_CELLFINDING;
-	public static String PATHFIND_BUFFERS;
-	public static float LOW_WEIGHT;
-	public static float MEDIUM_WEIGHT;
-	public static float HIGH_WEIGHT;
-	public static boolean ADVANCED_DIAGONAL_STRATEGY;
-	public static float DIAGONAL_WEIGHT;
-	public static int MAX_POSTFILTER_PASSES;
-	public static boolean DEBUG_PATH;
-	public static boolean FORCE_GEODATA;
 	public static boolean MOVE_BASED_KNOWNLIST;
 	public static long KNOWNLIST_UPDATE_INTERVAL;
 	public static int PEACE_ZONE_MODE;
@@ -1096,6 +1085,24 @@ public final class Config
 	public static boolean CHS_ENABLE_FAME;
 	public static int CHS_FAME_AMOUNT;
 	public static int CHS_FAME_FREQUENCY;
+	
+	// GeoData Settings
+	public static int GEODATA;
+	public static File PATHNODE_DIR;
+	public static boolean GEODATA_CELLFINDING;
+	public static String PATHFIND_BUFFERS;
+	public static float LOW_WEIGHT;
+	public static float MEDIUM_WEIGHT;
+	public static float HIGH_WEIGHT;
+	public static boolean ADVANCED_DIAGONAL_STRATEGY;
+	public static float DIAGONAL_WEIGHT;
+	public static int MAX_POSTFILTER_PASSES;
+	public static boolean DEBUG_PATH;
+	public static boolean FORCE_GEODATA;
+	public static int COORD_SYNCHRONIZE;
+	public static Path GEODATA_PATH;
+	public static boolean TRY_LOAD_UNSPECIFIED_REGIONS;
+	public static Map<String, Boolean> GEODATA_REGIONS;
 	
 	/**
 	 * This class initializes all global variables for configuration.<br>
@@ -1809,32 +1816,6 @@ public final class Config
 			GRIDS_ALWAYS_ON = General.getBoolean("GridsAlwaysOn", false);
 			GRID_NEIGHBOR_TURNON_TIME = General.getInt("GridNeighborTurnOnTime", 1);
 			GRID_NEIGHBOR_TURNOFF_TIME = General.getInt("GridNeighborTurnOffTime", 90);
-			GEODATA = General.getInt("GeoData", 0);
-			GEODATA_DRIVER = General.getString("GeoDataDriver", "com.l2jserver.gameserver.geoengine.NullDriver");
-			try
-			{
-				PATHNODE_DIR = new File(General.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
-			}
-			catch (IOException e)
-			{
-				_log.log(Level.WARNING, "Error setting pathnode directory!", e);
-				PATHNODE_DIR = new File("data/pathnode");
-			}
-			GEODATA_CELLFINDING = General.getBoolean("CellPathFinding", false);
-			PATHFIND_BUFFERS = General.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
-			LOW_WEIGHT = General.getFloat("LowWeight", 0.5f);
-			MEDIUM_WEIGHT = General.getFloat("MediumWeight", 2);
-			HIGH_WEIGHT = General.getFloat("HighWeight", 3);
-			ADVANCED_DIAGONAL_STRATEGY = General.getBoolean("AdvancedDiagonalStrategy", true);
-			DIAGONAL_WEIGHT = General.getFloat("DiagonalWeight", 0.707f);
-			MAX_POSTFILTER_PASSES = General.getInt("MaxPostfilterPasses", 3);
-			DEBUG_PATH = General.getBoolean("DebugPath", false);
-			FORCE_GEODATA = General.getBoolean("ForceGeodata", true);
-			COORD_SYNCHRONIZE = General.getInt("CoordSynchronize", -1);
-			
-			String str = General.getString("EnableFallingDamage", "auto");
-			ENABLE_FALLING_DAMAGE = "auto".equalsIgnoreCase(str) ? GEODATA > 0 : Boolean.parseBoolean(str);
-			
 			PEACE_ZONE_MODE = General.getInt("PeaceZoneMode", 0);
 			DEFAULT_GLOBAL_CHAT = General.getString("GlobalChat", "ON");
 			DEFAULT_TRADE_CHAT = General.getString("TradeChat", "ON");
@@ -2676,6 +2657,49 @@ public final class Config
 			CHS_ENABLE_FAME = ClanHallSiege.getBoolean("EnableFame", false);
 			CHS_FAME_AMOUNT = ClanHallSiege.getInt("FameAmount", 0);
 			CHS_FAME_FREQUENCY = ClanHallSiege.getInt("FameFrequency", 0);
+			
+			final PropertiesParser geoData = new PropertiesParser(GEODATA_FILE);
+			
+			GEODATA = geoData.getInt("GeoData", 0);
+			
+			try
+			{
+				PATHNODE_DIR = new File(geoData.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
+			}
+			catch (IOException e)
+			{
+				_log.log(Level.WARNING, "Error setting pathnode directory!", e);
+				PATHNODE_DIR = new File("data/pathnode");
+			}
+			
+			GEODATA_CELLFINDING = geoData.getBoolean("CellPathFinding", false);
+			PATHFIND_BUFFERS = geoData.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
+			LOW_WEIGHT = geoData.getFloat("LowWeight", 0.5f);
+			MEDIUM_WEIGHT = geoData.getFloat("MediumWeight", 2);
+			HIGH_WEIGHT = geoData.getFloat("HighWeight", 3);
+			ADVANCED_DIAGONAL_STRATEGY = geoData.getBoolean("AdvancedDiagonalStrategy", true);
+			DIAGONAL_WEIGHT = geoData.getFloat("DiagonalWeight", 0.707f);
+			MAX_POSTFILTER_PASSES = geoData.getInt("MaxPostfilterPasses", 3);
+			DEBUG_PATH = geoData.getBoolean("DebugPath", false);
+			FORCE_GEODATA = geoData.getBoolean("ForceGeoData", true);
+			COORD_SYNCHRONIZE = geoData.getInt("CoordSynchronize", -1);
+			GEODATA_PATH = Paths.get(geoData.getString("GeoDataPath", "./data/geodata"));
+			TRY_LOAD_UNSPECIFIED_REGIONS = geoData.getBoolean("TryLoadUnspecifiedRegions", true);
+			GEODATA_REGIONS = new HashMap<>();
+			for (int regionX = L2World.TILE_X_MIN; regionX <= L2World.TILE_X_MAX; regionX++)
+			{
+				for (int regionY = L2World.TILE_Y_MIN; regionY <= L2World.TILE_Y_MAX; regionY++)
+				{
+					String key = regionX + "_" + regionY;
+					if (geoData.containskey(regionX + "_" + regionY))
+					{
+						GEODATA_REGIONS.put(key, geoData.getBoolean(key, false));
+					}
+				}
+			}
+			
+			String str = General.getString("EnableFallingDamage", "auto");
+			ENABLE_FALLING_DAMAGE = "auto".equalsIgnoreCase(str) ? GEODATA > 0 : Boolean.parseBoolean(str);
 		}
 		else if (Server.serverMode == Server.MODE_LOGINSERVER)
 		{
