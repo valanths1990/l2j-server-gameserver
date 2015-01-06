@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -181,6 +181,14 @@ public enum Stats
 	
 	// Souls
 	MAX_SOULS("maxSouls"),
+	
+	REDUCE_EXP_LOST_BY_PVP("reduceExpLostByPvp"),
+	REDUCE_EXP_LOST_BY_MOB("reduceExpLostByMob"),
+	REDUCE_EXP_LOST_BY_RAID("reduceExpLostByRaid"),
+	
+	REDUCE_DEATH_PENALTY_BY_PVP("reduceDeathPenaltyByPvp"),
+	REDUCE_DEATH_PENALTY_BY_MOB("reduceDeathPenaltyByMob"),
+	REDUCE_DEATH_PENALTY_BY_RAID("reduceDeathPenaltyByRaid"),
 	
 	// Fishing
 	FISHING_EXPERTISE("fishingExpertise");

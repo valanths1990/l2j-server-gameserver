@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -36,7 +37,7 @@ import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 /**
  * @author UnAfraid
  */
-public class OptionsData extends DocumentParser
+public class OptionsData implements DocumentParser
 {
 	private final Map<Integer, Options> _data = new HashMap<>();
 	
@@ -50,15 +51,15 @@ public class OptionsData extends DocumentParser
 	{
 		_data.clear();
 		parseDatapackDirectory("data/stats/options", false);
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _data.size() + " Options.");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _data.size() + " Options.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		int id;
 		Options op;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
@@ -80,36 +81,18 @@ public class OptionsData extends DocumentParser
 										switch (fd.getNodeName())
 										{
 											case "add":
-											{
-												parseFuncs(fd.getAttributes(), "Add", op);
-												break;
-											}
-											case "mul":
-											{
-												parseFuncs(fd.getAttributes(), "Mul", op);
-												break;
-											}
-											case "basemul":
-											{
-												parseFuncs(fd.getAttributes(), "BaseMul", op);
-												break;
-											}
 											case "sub":
-											{
-												parseFuncs(fd.getAttributes(), "Sub", op);
-												break;
-											}
+											case "mul":
 											case "div":
-											{
-												parseFuncs(fd.getAttributes(), "Div", op);
-												break;
-											}
 											case "set":
+											case "share":
+											case "enchant":
+											case "enchanthp":
 											{
-												parseFuncs(fd.getAttributes(), "Set", op);
-												break;
+												parseFuncs(fd.getAttributes(), fd.getNodeName(), op);
 											}
 										}
+										
 									}
 									break;
 								}
@@ -147,12 +130,17 @@ public class OptionsData extends DocumentParser
 		}
 	}
 	
-	private void parseFuncs(NamedNodeMap attrs, String func, Options op)
+	private void parseFuncs(NamedNodeMap attrs, String functionName, Options op)
 	{
 		Stats stat = Stats.valueOfXml(parseString(attrs, "stat"));
-		int ord = Integer.decode(parseString(attrs, "order"));
 		double val = parseDouble(attrs, "val");
-		op.addFunc(new FuncTemplate(null, null, func, stat, ord, val));
+		int order = -1;
+		final Node orderNode = attrs.getNamedItem("order");
+		if (orderNode != null)
+		{
+			order = Integer.parseInt(orderNode.getNodeValue());
+		}
+		op.addFunc(new FuncTemplate(null, null, functionName, order, stat, val));
 	}
 	
 	public Options getOptions(int id)

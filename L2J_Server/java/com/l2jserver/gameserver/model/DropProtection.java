@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -98,8 +98,9 @@ public class DropProtection implements Runnable
 		unprotect();
 		
 		_isProtected = true;
+		_owner = player;
 		
-		if ((_owner = player) == null)
+		if (_owner == null)
 		{
 			throw new NullPointerException("Trying to protect dropped item to null owner");
 		}

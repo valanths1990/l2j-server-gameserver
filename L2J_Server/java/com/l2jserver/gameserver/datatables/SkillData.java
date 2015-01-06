@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  */
 public final class SkillData
 {
-	private static Logger _log = Logger.getLogger(SkillData.class.getName());
+	private static Logger LOGGER = Logger.getLogger(SkillData.class.getName());
 	
 	private final Map<Integer, Skill> _skills = new HashMap<>();
 	private final Map<Integer, Integer> _skillMaxLevel = new HashMap<>();
@@ -120,12 +120,12 @@ public final class SkillData
 		{
 			if (Config.DEBUG)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": call to unexisting skill level id: " + skillId + " requested level: " + level + " max level: " + maxLvl, new Throwable());
+				LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": call to unexisting skill level id: " + skillId + " requested level: " + level + " max level: " + maxLvl, new Throwable());
 			}
 			return _skills.get(getSkillHashCode(skillId, maxLvl));
 		}
 		
-		_log.warning(getClass().getSimpleName() + ": No skill info found for skill id " + skillId + " and skill level " + level + ".");
+		LOGGER.warning(getClass().getSimpleName() + ": No skill info found for skill id " + skillId + " and skill level " + level + ".");
 		return null;
 	}
 	

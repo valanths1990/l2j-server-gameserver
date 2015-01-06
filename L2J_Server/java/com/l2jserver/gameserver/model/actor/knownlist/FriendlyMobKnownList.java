@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -63,7 +63,7 @@ public class FriendlyMobKnownList extends AttackableKnownList
 		if (getActiveChar().hasAI())
 		{
 			getActiveChar().getAI().notifyEvent(CtrlEvent.EVT_FORGET_OBJECT, object);
-			if (getActiveChar().getTarget() == (L2Character) object)
+			if (getActiveChar().getTarget() == object)
 			{
 				getActiveChar().setTarget(null);
 			}

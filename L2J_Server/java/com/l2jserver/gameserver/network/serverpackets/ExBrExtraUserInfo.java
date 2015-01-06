@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -38,7 +38,7 @@ public class ExBrExtraUserInfo extends L2GameServerPacket
 		_charObjId = player.getObjectId();
 		_abnormalVisualEffectsEvent = player.getAbnormalVisualEffectEvent();
 		_lectureMark = 1; // TODO: Implement.
-		_invisible = player.isInvisible();
+		setInvisible(player.isInvisible());
 	}
 	
 	@Override

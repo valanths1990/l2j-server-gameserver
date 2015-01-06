@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -32,7 +32,6 @@ import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.ClanTable;
 import com.l2jserver.gameserver.datatables.NpcData;
@@ -54,6 +53,7 @@ import com.l2jserver.gameserver.network.NpcStringId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * @author BiggBoss
@@ -201,7 +201,10 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 				if (guard != null)
 				{
 					guard.stopRespawn();
-					guard.getLastSpawn().deleteMe();
+					if (guard.getLastSpawn() != null)
+					{
+						guard.getLastSpawn().deleteMe();
+					}
 				}
 			}
 		}
@@ -313,7 +316,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		_hall.banishForeigners();
 		SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.REGISTRATION_TERM_FOR_S1_ENDED);
 		msg.addString(getName());
-		Announcements.getInstance().announceToAll(msg);
+		Broadcast.toAllOnlinePlayers(msg);
 		_hall.updateSiegeStatus(SiegeStatus.WAITING_BATTLE);
 		
 		_siegeTask = ThreadPoolManager.getInstance().scheduleGeneral(new SiegeStarts(), 3600000);
@@ -331,7 +334,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 			_hall.updateSiegeStatus(SiegeStatus.WAITING_BATTLE);
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_OF_S1_HAS_BEEN_CANCELED_DUE_TO_LACK_OF_INTEREST);
 			sm.addString(_hall.getName());
-			Announcements.getInstance().announceToAll(sm);
+			Broadcast.toAllOnlinePlayers(sm);
 			return;
 		}
 		
@@ -370,7 +373,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	{
 		SystemMessage end = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_OF_S1_HAS_ENDED);
 		end.addString(_hall.getName());
-		Announcements.getInstance().announceToAll(end);
+		Broadcast.toAllOnlinePlayers(end);
 		
 		L2Clan winner = getWinner();
 		SystemMessage finalMsg = null;
@@ -381,13 +384,13 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 			finalMsg = SystemMessage.getSystemMessage(SystemMessageId.CLAN_S1_VICTORIOUS_OVER_S2_S_SIEGE);
 			finalMsg.addString(winner.getName());
 			finalMsg.addString(_hall.getName());
-			Announcements.getInstance().announceToAll(finalMsg);
+			Broadcast.toAllOnlinePlayers(finalMsg);
 		}
 		else
 		{
 			finalMsg = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_S1_DRAW);
 			finalMsg.addString(_hall.getName());
-			Announcements.getInstance().announceToAll(finalMsg);
+			Broadcast.toAllOnlinePlayers(finalMsg);
 		}
 		_missionAccomplished = false;
 		

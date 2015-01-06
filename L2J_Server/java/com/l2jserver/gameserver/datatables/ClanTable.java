@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -185,7 +185,6 @@ public class ClanTable
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_EXISTS);
 			sm.addString(clanName);
 			player.sendPacket(sm);
-			sm = null;
 			return null;
 		}
 		

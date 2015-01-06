@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -2354,7 +2354,6 @@ public class L2Clan implements IIdentifiable, INamable
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_IS_NOT_A_CLAN_LEADER);
 			sm.addString(target.getName());
 			activeChar.sendPacket(sm);
-			sm = null;
 			return false;
 		}
 		L2Clan targetClan = target.getClan();
@@ -2364,7 +2363,6 @@ public class L2Clan implements IIdentifiable, INamable
 			sm.addString(targetClan.getName());
 			sm.addString(targetClan.getAllyName());
 			activeChar.sendPacket(sm);
-			sm = null;
 			return false;
 		}
 		if (targetClan.getAllyPenaltyExpiryTime() > System.currentTimeMillis())
@@ -2375,7 +2373,6 @@ public class L2Clan implements IIdentifiable, INamable
 				sm.addString(target.getClan().getName());
 				sm.addString(target.getClan().getAllyName());
 				activeChar.sendPacket(sm);
-				sm = null;
 				return false;
 			}
 			if (targetClan.getAllyPenaltyType() == PENALTY_TYPE_CLAN_DISMISSED)
@@ -2545,9 +2542,6 @@ public class L2Clan implements IIdentifiable, INamable
 		changeAllyCrest(0, false);
 		setAllyPenaltyExpiryTime(currentTime + (Config.ALT_CREATE_ALLY_DAYS_WHEN_DISSOLVED * 86400000L), L2Clan.PENALTY_TYPE_DISSOLVE_ALLY); // 24*60*60*1000 = 86400000
 		updateClanInDB();
-		
-		// The clan leader should take the XP penalty of a full death.
-		player.deathPenalty(false, false, false);
 	}
 	
 	public boolean levelUpClan(L2PcInstance player)
@@ -2578,7 +2572,6 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage sp = SystemMessage.getSystemMessage(SystemMessageId.SP_DECREASED_S1);
 						sp.addInt(20000);
 						player.sendPacket(sp);
-						sp = null;
 						increaseClanLevel = true;
 					}
 				}
@@ -2595,7 +2588,6 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage sp = SystemMessage.getSystemMessage(SystemMessageId.SP_DECREASED_S1);
 						sp.addInt(100000);
 						player.sendPacket(sp);
-						sp = null;
 						increaseClanLevel = true;
 					}
 				}
@@ -2606,6 +2598,7 @@ public class L2Clan implements IIdentifiable, INamable
 				// Upgrade to 3
 				if ((player.getSp() >= 350000) && (player.getInventory().getItemByItemId(1419) != null))
 				{
+					// TODO unhardcode these item IDs
 					// itemId 1419 == Blood Mark
 					if (player.destroyItemByItemId("ClanLvl", 1419, 1, player.getTarget(), false))
 					{
@@ -2613,11 +2606,9 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage sp = SystemMessage.getSystemMessage(SystemMessageId.SP_DECREASED_S1);
 						sp.addInt(350000);
 						player.sendPacket(sp);
-						sp = null;
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED);
 						sm.addItemName(1419);
 						player.sendPacket(sm);
-						sm = null;
 						increaseClanLevel = true;
 					}
 				}
@@ -2635,11 +2626,9 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage sp = SystemMessage.getSystemMessage(SystemMessageId.SP_DECREASED_S1);
 						sp.addInt(1000000);
 						player.sendPacket(sp);
-						sp = null;
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED);
 						sm.addItemName(3874);
 						player.sendPacket(sm);
-						sm = null;
 						increaseClanLevel = true;
 					}
 				}
@@ -2657,11 +2646,9 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage sp = SystemMessage.getSystemMessage(SystemMessageId.SP_DECREASED_S1);
 						sp.addInt(2500000);
 						player.sendPacket(sp);
-						sp = null;
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED);
 						sm.addItemName(3870);
 						player.sendPacket(sm);
-						sm = null;
 						increaseClanLevel = true;
 					}
 				}
@@ -2675,7 +2662,6 @@ public class L2Clan implements IIdentifiable, INamable
 					SystemMessage cr = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
 					cr.addInt(Config.CLAN_LEVEL_6_COST);
 					player.sendPacket(cr);
-					cr = null;
 					increaseClanLevel = true;
 				}
 				break;
@@ -2688,7 +2674,6 @@ public class L2Clan implements IIdentifiable, INamable
 					SystemMessage cr = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
 					cr.addInt(Config.CLAN_LEVEL_7_COST);
 					player.sendPacket(cr);
-					cr = null;
 					increaseClanLevel = true;
 				}
 				break;
@@ -2700,7 +2685,6 @@ public class L2Clan implements IIdentifiable, INamable
 					SystemMessage cr = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
 					cr.addInt(Config.CLAN_LEVEL_8_COST);
 					player.sendPacket(cr);
-					cr = null;
 					increaseClanLevel = true;
 				}
 				break;
@@ -2715,7 +2699,6 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage cr = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
 						cr.addInt(Config.CLAN_LEVEL_9_COST);
 						player.sendPacket(cr);
-						cr = null;
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 						sm.addItemName(9910);
 						sm.addLong(150);
@@ -2735,7 +2718,6 @@ public class L2Clan implements IIdentifiable, INamable
 						SystemMessage cr = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
 						cr.addInt(Config.CLAN_LEVEL_10_COST);
 						player.sendPacket(cr);
-						cr = null;
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 						sm.addItemName(9911);
 						sm.addLong(5);
@@ -2761,7 +2743,6 @@ public class L2Clan implements IIdentifiable, INamable
 					SystemMessage cr = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
 					cr.addInt(Config.CLAN_LEVEL_11_COST);
 					player.sendPacket(cr);
-					cr = null;
 					increaseClanLevel = true;
 				}
 				break;
@@ -2780,8 +2761,7 @@ public class L2Clan implements IIdentifiable, INamable
 		su.addAttribute(StatusUpdate.SP, player.getSp());
 		player.sendPacket(su);
 		
-		ItemList il = new ItemList(player, false);
-		player.sendPacket(il);
+		player.sendPacket(new ItemList(player, false));
 		
 		changeLevel(getLevel() + 1);
 		

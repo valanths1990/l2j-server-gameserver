@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -222,48 +222,10 @@ public abstract class DocumentBase
 		}
 		for (; n != null; n = n.getNextSibling())
 		{
-			switch (n.getNodeName().toLowerCase())
+			final String name = n.getNodeName().toLowerCase();
+			
+			switch (name)
 			{
-				case "add":
-				{
-					attachFunc(n, template, "Add", condition);
-					break;
-				}
-				case "sub":
-				{
-					attachFunc(n, template, "Sub", condition);
-					break;
-				}
-				case "mul":
-				{
-					attachFunc(n, template, "Mul", condition);
-					break;
-				}
-				case "div":
-				{
-					attachFunc(n, template, "Div", condition);
-					break;
-				}
-				case "set":
-				{
-					attachFunc(n, template, "Set", condition);
-					break;
-				}
-				case "share":
-				{
-					attachFunc(n, template, "Share", condition);
-					break;
-				}
-				case "enchant":
-				{
-					attachFunc(n, template, "Enchant", condition);
-					break;
-				}
-				case "enchanthp":
-				{
-					attachFunc(n, template, "EnchantHp", condition);
-					break;
-				}
 				case "effect":
 				{
 					if (template instanceof AbstractEffect)
@@ -273,14 +235,31 @@ public abstract class DocumentBase
 					attachEffect(n, template, condition, effectScope);
 					break;
 				}
+				case "add":
+				case "sub":
+				case "mul":
+				case "div":
+				case "set":
+				case "share":
+				case "enchant":
+				case "enchanthp":
+				{
+					attachFunc(n, template, name, condition);
+				}
 			}
 		}
 	}
 	
-	protected void attachFunc(Node n, Object template, String name, Condition attachCond)
+	protected void attachFunc(Node n, Object template, String functionName, Condition attachCond)
 	{
 		Stats stat = Stats.valueOfXml(n.getAttributes().getNamedItem("stat").getNodeValue());
-		String order = n.getAttributes().getNamedItem("order").getNodeValue();
+		int order = -1;
+		final Node orderNode = n.getAttributes().getNamedItem("order");
+		if (orderNode != null)
+		{
+			order = Integer.parseInt(orderNode.getNodeValue());
+		}
+		
 		String valueString = n.getAttributes().getNamedItem("val").getNodeValue();
 		double value;
 		if (valueString.charAt(0) == '#')
@@ -292,9 +271,8 @@ public abstract class DocumentBase
 			value = Double.parseDouble(valueString);
 		}
 		
-		final int ord = Integer.decode(getValue(order, template));
 		final Condition applayCond = parseCondition(n.getFirstChild(), template);
-		final FuncTemplate ft = new FuncTemplate(attachCond, applayCond, name, stat, ord, value);
+		final FuncTemplate ft = new FuncTemplate(attachCond, applayCond, functionName, order, stat, value);
 		if (template instanceof L2Item)
 		{
 			((L2Item) template).attach(ft);

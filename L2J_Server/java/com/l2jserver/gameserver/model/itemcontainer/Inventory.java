@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -786,7 +786,7 @@ public abstract class Inventory extends ItemContainer
 	 * Returns the instance of new ChangeRecorder
 	 * @return ChangeRecorder
 	 */
-	public ChangeRecorder newRecorder()
+	private ChangeRecorder newRecorder()
 	{
 		return new ChangeRecorder(this);
 	}

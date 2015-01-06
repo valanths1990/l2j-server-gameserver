@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -545,7 +545,7 @@ public class L2Event
 	{
 		final List<Entry<L2PcInstance, Integer>> list = new LinkedList<>(unsortMap.entrySet());
 		
-		list.sort(Comparator.comparing(Entry<L2PcInstance, Integer>::getValue));
+		list.sort(Comparator.comparing(Entry::getValue));
 		
 		final Map<L2PcInstance, Integer> sortedMap = new LinkedHashMap<>();
 		for (Entry<L2PcInstance, Integer> entry : list)

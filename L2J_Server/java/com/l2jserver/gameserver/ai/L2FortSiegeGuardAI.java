@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -79,7 +79,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 		_selfAnalysis.init();
 		_attackTimeout = Integer.MAX_VALUE;
 		_globalAggro = -10; // 10 seconds timeout of ATTACK after respawn
-		_attackRange = ((L2Attackable) _actor).getPhysicalAttackRange();
+		_attackRange = _actor.getPhysicalAttackRange();
 	}
 	
 	@Override
@@ -147,7 +147,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 		if ((target != null) && target.isInvul())
 		{
 			// However EffectInvincible requires to check GMs specially
-			if ((target instanceof L2PcInstance) && ((L2PcInstance) target).isGM())
+			if ((target instanceof L2PcInstance) && target.isGM())
 			{
 				return false;
 			}

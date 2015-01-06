@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -78,7 +78,6 @@ public final class RequestPetitionCancel extends L2GameClientPacket
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PETITION_CANCELED_SUBMIT_S1_MORE_TODAY);
 					sm.addString(String.valueOf(numRemaining));
 					activeChar.sendPacket(sm);
-					sm = null;
 					
 					// Notify all GMs that the player's pending petition has been cancelled.
 					String msgContent = activeChar.getName() + " has canceled a pending petition.";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -43,8 +43,6 @@ public class CompactionIDFactory extends IdFactory
 		
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
 		{
-			// con.createStatement().execute("drop table if exists tmp_obj_id");
-			
 			Integer[] tmp_obj_ids = extractUsedObjectIDTable();
 			
 			int N = tmp_obj_ids.length;

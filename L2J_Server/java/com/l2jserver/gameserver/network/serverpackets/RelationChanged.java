@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -63,7 +63,7 @@ public final class RelationChanged extends L2GameServerPacket
 		_singled._autoAttackable = autoattackable ? 1 : 0;
 		_singled._karma = activeChar.getKarma();
 		_singled._pvpFlag = activeChar.getPvpFlag();
-		_invisible = activeChar.isInvisible();
+		setInvisible(activeChar.isInvisible());
 	}
 	
 	public RelationChanged()

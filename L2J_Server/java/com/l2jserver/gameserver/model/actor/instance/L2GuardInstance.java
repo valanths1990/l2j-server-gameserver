@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.ai.L2AttackableAI;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.L2WorldRegion;
@@ -95,7 +94,7 @@ public class L2GuardInstance extends L2Attackable
 		L2WorldRegion region = L2World.getInstance().getRegion(getX(), getY());
 		if ((region != null) && (!region.isActive()))
 		{
-			((L2AttackableAI) getAI()).stopAITask();
+			getAI().stopAITask();
 		}
 	}
 	

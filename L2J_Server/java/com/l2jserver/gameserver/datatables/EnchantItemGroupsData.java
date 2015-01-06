@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -36,7 +37,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author UnAfraid
  */
-public final class EnchantItemGroupsData extends DocumentParser
+public final class EnchantItemGroupsData implements DocumentParser
 {
 	private final Map<String, EnchantItemGroup> _itemGroups = new HashMap<>();
 	private final Map<Integer, EnchantScrollGroup> _scrollGroups = new HashMap<>();
@@ -52,14 +53,14 @@ public final class EnchantItemGroupsData extends DocumentParser
 		_itemGroups.clear();
 		_scrollGroups.clear();
 		parseDatapackFile("data/enchantItemGroups.xml");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _itemGroups.size() + " item group templates.");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _scrollGroups.size() + " scroll group templates.");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _itemGroups.size() + " item group templates.");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _scrollGroups.size() + " scroll group templates.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{

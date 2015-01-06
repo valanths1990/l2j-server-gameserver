@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.model.skills;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -55,8 +54,6 @@ public final class BuffInfo
 	// Tasks
 	/** Effect tasks for ticks. */
 	private volatile Map<AbstractEffect, EffectTaskInfo> _tasks;
-	/** Task for effect ending. */
-	private BuffTimeTask _effectTimeTask;
 	/** Scheduled future. */
 	private ScheduledFuture<?> _scheduledFutureTimeTask;
 	// Time and ticks
@@ -246,17 +243,18 @@ public final class BuffInfo
 		// Cancels the task that will end this buff info
 		if ((_scheduledFutureTimeTask != null) && !_scheduledFutureTimeTask.isCancelled())
 		{
-			_scheduledFutureTimeTask.cancel(false);
+			_scheduledFutureTimeTask.cancel(true);
 		}
-		
-		// Remove stats
-		removeStats();
-		
 		finishEffects();
 	}
 	
 	public void initializeEffects()
 	{
+		if ((_effected == null) || (_skill == null))
+		{
+			return;
+		}
+		
 		// When effects are initialized, the successfully landed.
 		if (_effected.isPlayer() && !_skill.isPassive())
 		{
@@ -268,15 +266,13 @@ public final class BuffInfo
 		// Creates a task that will stop all the effects.
 		if (_abnormalTime > 0)
 		{
-			_effectTimeTask = new BuffTimeTask(this);
-			_scheduledFutureTimeTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(_effectTimeTask, 0, 1000L);
+			_scheduledFutureTimeTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new BuffTimeTask(this), 0, 1000L);
 		}
 		
-		applyAbnormalVisualEffects();
-		
+		boolean update = false;
 		for (AbstractEffect effect : _effects)
 		{
-			if (effect.isInstant())
+			if (effect.isInstant() || (_effected.isDead() && !_skill.isPassive()))
 			{
 				continue;
 			}
@@ -287,15 +283,23 @@ public final class BuffInfo
 			// If it's a continuous effect, if has ticks schedule a task with period, otherwise schedule a simple task to end it.
 			if (effect.getTicks() > 0)
 			{
-				// The task for the effect ticks
+				// The task for the effect ticks.
 				final EffectTickTask effectTask = new EffectTickTask(this, effect);
 				final ScheduledFuture<?> scheduledFuture = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(effectTask, effect.getTicks() * Config.EFFECT_TICK_RATIO, effect.getTicks() * Config.EFFECT_TICK_RATIO);
-				// Adds the task for ticking
+				// Adds the task for ticking.
 				addTask(effect, new EffectTaskInfo(effectTask, scheduledFuture));
 			}
 			
 			// Add stats.
 			_effected.addStatFuncs(effect.getStatFuncs(_effector, _effected, _skill));
+			
+			update = true;
+		}
+		
+		if (update)
+		{
+			// Add abnormal visual effects.
+			addAbnormalVisualEffects();
 		}
 	}
 	
@@ -320,7 +324,7 @@ public final class BuffInfo
 			final EffectTaskInfo task = getEffectTask(effect);
 			if (task != null)
 			{
-				task.getScheduledFuture().cancel(true); // Allow to finish current run.
+				task.getScheduledFuture().cancel(true); // Don't allow to finish current run.
 				_effected.getEffectList().remove(true, this); // Remove the buff from the effect list.
 			}
 		}
@@ -328,8 +332,17 @@ public final class BuffInfo
 	
 	public void finishEffects()
 	{
-		removeAbnormalVisualEffects();
-		
+		// Cancels the ticking task.
+		if (_tasks != null)
+		{
+			for (EffectTaskInfo effectTask : _tasks.values())
+			{
+				effectTask.getScheduledFuture().cancel(true); // Don't allow to finish current run.
+			}
+		}
+		// Remove stats
+		removeStats();
+		// Notify on exit.
 		for (AbstractEffect effect : _effects)
 		{
 			// Instant effects shouldn't call onExit(..).
@@ -338,20 +351,12 @@ public final class BuffInfo
 				effect.onExit(this);
 			}
 		}
-		
-		// Cancels the ticking task.
-		if (_tasks != null)
-		{
-			for (Entry<AbstractEffect, EffectTaskInfo> entry : _tasks.entrySet())
-			{
-				entry.getValue().getScheduledFuture().cancel(true);
-			}
-		}
-		
-		// Sends the proper system message.
-		SystemMessageId smId = null;
+		// Remove abnormal visual effects.
+		removeAbnormalVisualEffects();
+		// Set the proper system message.
 		if (!(_effected.isSummon() && !((L2Summon) _effected).getOwner().hasSummon()))
 		{
+			SystemMessageId smId = null;
 			if (_skill.isToggle())
 			{
 				smId = SystemMessageId.S1_HAS_BEEN_ABORTED;
@@ -364,15 +369,15 @@ public final class BuffInfo
 			{
 				smId = SystemMessageId.S1_HAS_WORN_OFF;
 			}
+			
+			if (smId != null)
+			{
+				final SystemMessage sm = SystemMessage.getSystemMessage(smId);
+				sm.addSkillName(_skill);
+				_effected.sendPacket(sm);
+			}
 		}
-		
-		if (smId != null)
-		{
-			final SystemMessage sm = SystemMessage.getSystemMessage(smId);
-			sm.addSkillName(_skill);
-			_effected.sendPacket(sm);
-		}
-		
+		// Remove short buff.
 		if (this == _effected.getEffectList().getShortBuff())
 		{
 			_effected.getEffectList().shortBuffStatusUpdate(null);
@@ -383,13 +388,8 @@ public final class BuffInfo
 	 * Applies all the abnormal visual effects to the effected.<br>
 	 * Prevents multiple updates.
 	 */
-	private void applyAbnormalVisualEffects()
+	private void addAbnormalVisualEffects()
 	{
-		if ((_effected == null) || (_skill == null))
-		{
-			return;
-		}
-		
 		if (_skill.hasAbnormalVisualEffects())
 		{
 			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
@@ -405,6 +405,7 @@ public final class BuffInfo
 			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
 		}
 		
+		// Update abnormal visual effects.
 		_effected.updateAbnormalEffect();
 	}
 	
@@ -442,10 +443,7 @@ public final class BuffInfo
 	 */
 	public void addStats()
 	{
-		for (AbstractEffect effect : _effects)
-		{
-			_effected.addStatFuncs(effect.getStatFuncs(_effector, _effected, _skill));
-		}
+		_effects.forEach(effect -> _effected.addStatFuncs(effect.getStatFuncs(_effector, _effected, _skill)));
 	}
 	
 	/**
@@ -453,10 +451,7 @@ public final class BuffInfo
 	 */
 	public void removeStats()
 	{
-		for (AbstractEffect effect : _effects)
-		{
-			_effected.removeStatsOwner(effect);
-		}
+		_effects.forEach(_effected::removeStatsOwner);
 		_effected.removeStatsOwner(_skill);
 	}
 	

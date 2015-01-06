@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -643,13 +643,17 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 			}
 		}
 		
+		// Reset summoner
+		mob.setSummoner(null);
+		// Reset summoned list
+		mob.resetSummonedNpcs();
 		// Link the L2NpcInstance to this L2Spawn
 		mob.setSpawn(this);
 		
-		// Init other values of the L2NpcInstance (ex : from its L2CharTemplate for INT, STR, DEX...) and add it in the world as a visible object
+		// Spawn NPC
 		mob.spawnMe(newlocx, newlocy, newlocz);
 		
-		L2Spawn.notifyNpcSpawned(mob);
+		notifyNpcSpawned(mob);
 		
 		_spawnedNpcs.add(mob);
 		if (_lastSpawnPoints != null)

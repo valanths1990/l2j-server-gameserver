@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,7 +22,6 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -94,8 +93,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	private int timepass = 0;
 	private int chaostime = 0;
 	private final L2NpcTemplate _skillrender;
-	private List<Skill> shortRangeSkills = new ArrayList<>();
-	private List<Skill> longRangeSkills = new ArrayList<>();
 	int lastBuffTick;
 	
 	/**
@@ -163,7 +160,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		if (target.isInvul())
 		{
 			// However EffectInvincible requires to check GMs specially
-			if ((target instanceof L2PcInstance) && ((L2PcInstance) target).isGM())
+			if ((target instanceof L2PcInstance) && target.isGM())
 			{
 				return false;
 			}
@@ -405,7 +402,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		super.onIntentionAttack(target);
 	}
 	
-	private void thinkCast()
+	protected void thinkCast()
 	{
 		if (checkTargetLost(getCastTarget()))
 		{
@@ -430,7 +427,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	 * <li>If the actor is a L2MonsterInstance that can't attack, order to it to random walk (1/100)</li>
 	 * </ul>
 	 */
-	private void thinkActive()
+	protected void thinkActive()
 	{
 		L2Attackable npc = getActiveChar();
 		
@@ -712,7 +709,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	 * </ul>
 	 * TODO: Manage casting rules to healer mobs (like Ant Nurses)
 	 */
-	private void thinkAttack()
+	protected void thinkAttack()
 	{
 		final L2Attackable npc = getActiveChar();
 		if (npc.isCastingNow())
@@ -2527,7 +2524,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	
 	private List<Skill> longRangeSkillRender()
 	{
-		longRangeSkills = _skillrender.getAISkills(AISkillScope.LONG_RANGE);
+		List<Skill> longRangeSkills = _skillrender.getAISkills(AISkillScope.LONG_RANGE);
 		if (longRangeSkills.isEmpty())
 		{
 			longRangeSkills = getActiveChar().getLongRangeSkill();
@@ -2537,7 +2534,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	
 	private List<Skill> shortRangeSkillRender()
 	{
-		shortRangeSkills = _skillrender.getAISkills(AISkillScope.SHORT_RANGE);
+		List<Skill> shortRangeSkills = _skillrender.getAISkills(AISkillScope.SHORT_RANGE);
 		if (shortRangeSkills.isEmpty())
 		{
 			shortRangeSkills = getActiveChar().getShortRangeSkill();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -51,7 +51,6 @@ public final class RequestReplySurrenderPledgeWar extends L2GameClientPacket
 		
 		if (_answer == 1)
 		{
-			requestor.deathPenalty(false, false, false);
 			ClanTable.getInstance().deleteclanswars(requestor.getClanId(), activeChar.getClanId());
 		}
 		else

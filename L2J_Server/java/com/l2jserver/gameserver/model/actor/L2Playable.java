@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -130,11 +130,6 @@ public abstract class L2Playable extends L2Character
 		
 		// Stop HP/MP/CP Regeneration task
 		getStatus().stopHpMpRegeneration();
-		
-		if (isCharmOfLuckAffected())
-		{
-			stopEffects(L2EffectType.CHARM_OF_LUCK);
-		}
 		
 		boolean deleteBuffs = true;
 		
@@ -312,15 +307,6 @@ public abstract class L2Playable extends L2Character
 	public final boolean isProtectionBlessingAffected()
 	{
 		return isAffected(EffectFlag.PROTECTION_BLESSING);
-	}
-	
-	/**
-	 * Charm of Luck - During a Raid/Boss war, decreased chance for death penalty.
-	 * @return
-	 */
-	public final boolean isCharmOfLuckAffected()
-	{
-		return isAffected(EffectFlag.CHARM_OF_LUCK);
 	}
 	
 	@Override

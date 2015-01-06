@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,7 +26,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExPledgeCrestLarge;
 import com.l2jserver.gameserver.network.serverpackets.PledgeCrest;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class L2Crest implements IIdentifiable
 {

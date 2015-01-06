@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -342,9 +342,9 @@ public abstract class L2Vehicle extends L2Character
 	}
 	
 	@Override
-	public boolean updatePosition(int gameTicks)
+	public boolean updatePosition()
 	{
-		final boolean result = super.updatePosition(gameTicks);
+		final boolean result = super.updatePosition();
 		
 		for (L2PcInstance player : _passengers)
 		{

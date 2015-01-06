@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -39,6 +39,7 @@ import com.l2jserver.Server;
 import com.l2jserver.UPnPService;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.datatables.AnnouncementsTable;
 import com.l2jserver.gameserver.datatables.ArmorSetsData;
 import com.l2jserver.gameserver.datatables.AugmentationData;
 import com.l2jserver.gameserver.datatables.BotReportTable;
@@ -74,6 +75,7 @@ import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.OfflineTradersTable;
 import com.l2jserver.gameserver.datatables.OptionsData;
 import com.l2jserver.gameserver.datatables.PetDataTable;
+import com.l2jserver.gameserver.datatables.PlayerXpPercentLostData;
 import com.l2jserver.gameserver.datatables.RecipeData;
 import com.l2jserver.gameserver.datatables.SecondaryAuthData;
 import com.l2jserver.gameserver.datatables.SiegeScheduleData;
@@ -135,7 +137,6 @@ import com.l2jserver.gameserver.network.L2GamePacketHandler;
 import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.script.faenor.FaenorScriptEngine;
 import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
-import com.l2jserver.gameserver.taskmanager.AutoAnnounceTaskManager;
 import com.l2jserver.gameserver.taskmanager.KnownListUpdateTaskManager;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
 import com.l2jserver.status.Status;
@@ -149,15 +150,12 @@ public class GameServer
 	private final SelectorThread<L2GameClient> _selectorThread;
 	private final L2GamePacketHandler _gamePacketHandler;
 	private final DeadLockDetector _deadDetectThread;
-	private final IdFactory _idFactory;
 	public static GameServer gameServer;
-	private final LoginServerThread _loginThread;
-	private static Status _statusServer;
 	public static final Calendar dateTimeServerStarted = Calendar.getInstance();
 	
 	public long getUsedMemoryMB()
 	{
-		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576; // ;
+		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
 	}
 	
 	public SelectorThread<L2GameClient> getSelectorThread()
@@ -177,16 +175,13 @@ public class GameServer
 	
 	public GameServer() throws Exception
 	{
-		gameServer = this;
 		long serverLoadStart = System.currentTimeMillis();
 		
 		_log.info(getClass().getSimpleName() + ": Used memory: " + getUsedMemoryMB() + "MB");
 		
-		_idFactory = IdFactory.getInstance();
-		
-		if (!_idFactory.isInitialized())
+		if (!IdFactory.getInstance().isInitialized())
 		{
-			_log.severe(getClass().getSimpleName() + ": Could not read object IDs from DB. Please Check Your Data.");
+			_log.severe(getClass().getSimpleName() + ": Could not read object IDs from DB. Please check your data.");
 			throw new Exception("Could not initialize the ID factory");
 		}
 		
@@ -205,7 +200,7 @@ public class GameServer
 		InstanceManager.getInstance();
 		L2World.getInstance();
 		MapRegionManager.getInstance();
-		Announcements.getInstance();
+		AnnouncementsTable.getInstance();
 		GlobalVariablesManager.getInstance();
 		
 		printSection("Data");
@@ -241,6 +236,7 @@ public class GameServer
 		InitialEquipmentData.getInstance();
 		InitialShortcutData.getInstance();
 		ExperienceTable.getInstance();
+		PlayerXpPercentLostData.getInstance();
 		KarmaData.getInstance();
 		HitConditionBonus.getInstance();
 		CharTemplateTable.getInstance();
@@ -273,17 +269,8 @@ public class GameServer
 		ItemAuctionManager.getInstance();
 		CastleManager.getInstance().loadInstances();
 		NpcBufferTable.getInstance();
-		DayNightSpawnManager.getInstance().trim().notifyChangeMode();
 		GrandBossManager.getInstance().initZones();
 		EventDroplist.getInstance();
-		
-		printSection("Siege");
-		SiegeScheduleData.getInstance();
-		SiegeManager.getInstance().getSieges();
-		FortSiegeManager.getInstance();
-		TerritoryWarManager.getInstance();
-		CastleManorManager.getInstance();
-		MercTicketManager.getInstance();
 		
 		printSection("Olympiad");
 		Olympiad.getInstance();
@@ -312,17 +299,12 @@ public class GameServer
 		AirShipManager.getInstance();
 		GraciaSeedsManager.getInstance();
 		
-		CastleManager.getInstance().activateInstances();
-		FortManager.getInstance().activateInstances();
-		MerchantPriceConfigTable.getInstance().updateReferences();
-		
 		try
 		{
 			_log.info(getClass().getSimpleName() + ": Loading server scripts:");
-			final File scripts = new File(Config.DATAPACK_ROOT, "data/scripts.cfg");
 			if (!Config.ALT_DEV_NO_HANDLERS || !Config.ALT_DEV_NO_QUESTS)
 			{
-				L2ScriptEngineManager.getInstance().executeScriptList(scripts);
+				L2ScriptEngineManager.getInstance().executeScriptList(new File(Config.DATAPACK_ROOT, "data/scripts.cfg"));
 			}
 		}
 		catch (IOException ioe)
@@ -331,10 +313,23 @@ public class GameServer
 		}
 		
 		SpawnTable.getInstance().load();
+		DayNightSpawnManager.getInstance().trim().notifyChangeMode();
 		FourSepulchersManager.getInstance().init();
 		DimensionalRiftManager.getInstance();
 		RaidBossSpawnManager.getInstance();
+		
+		printSection("Siege");
+		SiegeManager.getInstance().getSieges();
+		CastleManager.getInstance().activateInstances();
 		FortManager.getInstance().loadInstances();
+		FortManager.getInstance().activateInstances();
+		FortSiegeManager.getInstance();
+		SiegeScheduleData.getInstance();
+		
+		MerchantPriceConfigTable.getInstance().updateReferences();
+		TerritoryWarManager.getInstance();
+		CastleManorManager.getInstance();
+		MercTicketManager.getInstance();
 		
 		QuestManager.getInstance().report();
 		
@@ -409,9 +404,7 @@ public class GameServer
 		long totalMem = Runtime.getRuntime().maxMemory() / 1048576;
 		_log.info(getClass().getSimpleName() + ": Started, free memory " + freeMem + " Mb of " + totalMem + " Mb");
 		Toolkit.getDefaultToolkit().beep();
-		
-		_loginThread = LoginServerThread.getInstance();
-		_loginThread.start();
+		LoginServerThread.getInstance().start();
 		
 		final SelectorConfig sc = new SelectorConfig();
 		sc.MAX_READ_PER_PASS = Config.MMO_MAX_READ_PER_PASS;
@@ -453,8 +446,6 @@ public class GameServer
 		
 		printSection("UPnP");
 		UPnPService.getInstance();
-		
-		AutoAnnounceTaskManager.getInstance();
 	}
 	
 	public static void main(String[] args) throws Exception
@@ -483,8 +474,7 @@ public class GameServer
 		
 		if (Config.IS_TELNET_ENABLED)
 		{
-			_statusServer = new Status(Server.serverMode);
-			_statusServer.start();
+			new Status(Server.serverMode).start();
 		}
 		else
 		{

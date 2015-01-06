@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -27,10 +27,10 @@ import com.l2jserver.gameserver.network.serverpackets.ExListPartyMatchingWaiting
 public class RequestListPartyMatchingWaitingRoom extends L2GameClientPacket
 {
 	private static final String _C__D0_31_REQUESTLISTPARTYMATCHINGWAITINGROOM = "[C] D0:31 RequestListPartyMatchingWaitingRoom";
-	private static int _page;
-	private static int _minlvl;
-	private static int _maxlvl;
-	private static int _mode; // 1 - waitlist 0 - room waitlist
+	private int _page;
+	private int _minlvl;
+	private int _maxlvl;
+	private int _mode; // 1 - waitlist 0 - room waitlist
 	
 	@Override
 	protected void readImpl()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -58,7 +58,7 @@ public final class DimensionalRiftManager
 {
 	private static Logger _log = Logger.getLogger(DimensionalRiftManager.class.getName());
 	private final Map<Byte, Map<Byte, DimensionalRiftRoom>> _rooms = new HashMap<>(7);
-	private final int DIMENSIONAL_FRAGMENT_ITEM_ID = 7079;
+	private static final int DIMENSIONAL_FRAGMENT_ITEM_ID = 7079;
 	
 	public static DimensionalRiftManager getInstance()
 	{
@@ -193,7 +193,7 @@ public final class DimensionalRiftManager
 												final DimensionalRiftRoom riftRoom = _rooms.get(type).get(roomId);
 												x = riftRoom.getRandomX();
 												y = riftRoom.getRandomY();
-												z = riftRoom.getTeleportCoorinates()[2];
+												z = riftRoom.getTeleportCoorinates().getZ();
 												
 												if ((template != null) && _rooms.containsKey(type) && _rooms.get(type).containsKey(roomId))
 												{
@@ -261,8 +261,7 @@ public final class DimensionalRiftManager
 	
 	public void teleportToWaitingRoom(L2PcInstance player)
 	{
-		int[] coords = getRoom((byte) 0, (byte) 0).getTeleportCoorinates();
-		player.teleToLocation(coords[0], coords[1], coords[2]);
+		player.teleToLocation(getRoom((byte) 0, (byte) 0).getTeleportCoorinates());
 	}
 	
 	public synchronized void start(L2PcInstance player, byte type, L2Npc npc)

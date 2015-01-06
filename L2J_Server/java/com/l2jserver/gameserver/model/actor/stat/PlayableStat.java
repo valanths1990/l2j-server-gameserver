@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -161,9 +161,9 @@ public class PlayableStat extends CharStat
 			setExp(getExpForLevel(getLevel()));
 		}
 		
-		if (!levelIncreased && (getActiveChar() instanceof L2PcInstance) && !((L2PcInstance) (getActiveChar())).isGM() && Config.DECREASE_SKILL_LEVEL)
+		if (!levelIncreased && (getActiveChar() instanceof L2PcInstance) && !getActiveChar().isGM() && Config.DECREASE_SKILL_LEVEL)
 		{
-			((L2PcInstance) (getActiveChar())).checkPlayerSkills();
+			((L2PcInstance) getActiveChar()).checkPlayerSkills();
 		}
 		
 		if (!levelIncreased)

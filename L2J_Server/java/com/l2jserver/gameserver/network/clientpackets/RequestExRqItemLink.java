@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExRpItemLink;
  */
 public class RequestExRqItemLink extends L2GameClientPacket
 {
-	private static String _C__D0_1E_REQUESTEXRQITEMLINK = "[C] D0:1E RequestExRqItemLink";
+	private static final String _C__D0_1E_REQUESTEXRQITEMLINK = "[C] D0:1E RequestExRqItemLink";
 	private int _objectId;
 	
 	@Override

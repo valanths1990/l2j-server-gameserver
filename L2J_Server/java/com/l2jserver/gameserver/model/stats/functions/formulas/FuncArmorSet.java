@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -48,7 +48,7 @@ public class FuncArmorSet extends AbstractFunction
 	
 	private FuncArmorSet(Stats stat)
 	{
-		super(stat, 0x10, null, 0, null);
+		super(stat, 1, null, 0, null);
 	}
 	
 	@Override

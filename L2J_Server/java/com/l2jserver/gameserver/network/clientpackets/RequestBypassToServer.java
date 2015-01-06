@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -50,12 +50,12 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * RequestBypassToServer client packet implementation.
- * @author FBIagent
+ * @author HorridoJoho
  */
 public final class RequestBypassToServer extends L2GameClientPacket
 {
 	private static final String _C__23_REQUESTBYPASSTOSERVER = "[C] 23 RequestBypassToServer";
-	// FIXME: This is for compatibility, will be changed when bypass functionality got an overhaul by Nos
+	// FIXME: This is for compatibility, will be changed when bypass functionality got an overhaul by NosBit
 	private static final String[] _possibleNonHtmlCommands =
 	{
 		"_bbs",

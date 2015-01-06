@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -42,6 +42,7 @@ import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
+import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.datatables.DoorTable;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.NpcData;
@@ -56,6 +57,7 @@ import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Npc;
+import com.l2jserver.gameserver.model.actor.L2Playable;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2MonsterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -118,6 +120,7 @@ import com.l2jserver.gameserver.model.events.listeners.RunnableEventListener;
 import com.l2jserver.gameserver.model.events.returns.AbstractEventReturn;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
+import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.interfaces.IPositionable;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.itemcontainer.PcInventory;
@@ -1567,6 +1570,20 @@ public abstract class AbstractScript extends ManagedScript
 	
 	/**
 	 * Add a temporary spawn of the specified NPC.
+	 * @param summoner the NPC that requires this spawn
+	 * @param npcId the ID of the NPC to spawn
+	 * @param pos the object containing the spawn location coordinates
+	 * @param randomOffset if {@code true}, adds +/- 50~100 to X/Y coordinates of the spawn location
+	 * @param despawnDelay time in milliseconds till the NPC is despawned (0 - only despawned on server shutdown)
+	 * @return the {@link L2Npc} object of the newly spawned NPC, {@code null} if the NPC doesn't exist
+	 */
+	public static L2Npc addSpawn(L2Npc summoner, int npcId, IPositionable pos, boolean randomOffset, long despawnDelay)
+	{
+		return addSpawn(summoner, npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
+	}
+	
+	/**
+	 * Add a temporary spawn of the specified NPC.
 	 * @param npcId the ID of the NPC to spawn
 	 * @param pos the object containing the spawn location coordinates
 	 * @param isSummonSpawn if {@code true}, displays a summon animation on NPC spawn
@@ -1685,56 +1702,83 @@ public abstract class AbstractScript extends ManagedScript
 	 */
 	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId)
 	{
+		return addSpawn(null, npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, instanceId);
+	}
+	
+	/**
+	 * Add a temporary spawn of the specified NPC.
+	 * @param summoner the NPC that requires this spawn
+	 * @param npcId the ID of the NPC to spawn
+	 * @param x the X coordinate of the spawn location
+	 * @param y the Y coordinate of the spawn location
+	 * @param z the Z coordinate (height) of the spawn location
+	 * @param heading the heading of the NPC
+	 * @param randomOffset if {@code true}, adds +/- 50~100 to X/Y coordinates of the spawn location
+	 * @param despawnDelay time in milliseconds till the NPC is despawned (0 - only despawned on server shutdown)
+	 * @param isSummonSpawn if {@code true}, displays a summon animation on NPC spawn
+	 * @param instanceId the ID of the instance to spawn the NPC in (0 - the open world)
+	 * @return the {@link L2Npc} object of the newly spawned NPC or {@code null} if the NPC doesn't exist
+	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
+	 * @see #addSpawn(int, int, int, int, int, boolean, long)
+	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean)
+	 */
+	public static L2Npc addSpawn(L2Npc summoner, int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId)
+	{
 		try
 		{
-			L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
+			final L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
 			if (template == null)
 			{
-				_log.log(Level.SEVERE, "addSpawn(): no NPC template found for NPC #" + npcId + "!");
+				_log.severe("Couldn't find NPC template for ID:" + npcId + "!");
+				return null;
 			}
-			else
+			
+			if ((x == 0) && (y == 0))
 			{
-				if ((x == 0) && (y == 0))
-				{
-					_log.log(Level.SEVERE, "addSpawn(): invalid spawn coordinates for NPC #" + npcId + "!");
-					return null;
-				}
-				if (randomOffset)
-				{
-					int offset = Rnd.get(50, 100);
-					if (Rnd.nextBoolean())
-					{
-						offset *= -1;
-					}
-					x += offset;
-					
-					offset = Rnd.get(50, 100);
-					if (Rnd.nextBoolean())
-					{
-						offset *= -1;
-					}
-					y += offset;
-				}
-				L2Spawn spawn = new L2Spawn(template);
-				spawn.setInstanceId(instanceId);
-				spawn.setHeading(heading);
-				spawn.setX(x);
-				spawn.setY(y);
-				spawn.setZ(z);
-				spawn.stopRespawn();
-				L2Npc result = spawn.spawnOne(isSummonSpawn);
-				
-				if (despawnDelay > 0)
-				{
-					result.scheduleDespawn(despawnDelay);
-				}
-				
-				return result;
+				_log.log(Level.SEVERE, "addSpawn(): invalid spawn coordinates for NPC #" + npcId + "!");
+				return null;
 			}
+			
+			if (randomOffset)
+			{
+				int offset = Rnd.get(50, 100);
+				if (Rnd.nextBoolean())
+				{
+					offset *= -1;
+				}
+				x += offset;
+				
+				offset = Rnd.get(50, 100);
+				if (Rnd.nextBoolean())
+				{
+					offset *= -1;
+				}
+				y += offset;
+			}
+			
+			final L2Spawn spawn = new L2Spawn(template);
+			spawn.setInstanceId(instanceId);
+			spawn.setHeading(heading);
+			spawn.setX(x);
+			spawn.setY(y);
+			spawn.setZ(z);
+			spawn.stopRespawn();
+			
+			final L2Npc npc = spawn.spawnOne(isSummonSpawn);
+			if (despawnDelay > 0)
+			{
+				npc.scheduleDespawn(despawnDelay);
+			}
+			
+			if (summoner != null)
+			{
+				summoner.addSummonedNpc(npc);
+			}
+			return npc;
 		}
-		catch (Exception e1)
+		catch (Exception e)
 		{
-			_log.warning("Could not spawn NPC #" + npcId + "; error: " + e1.getMessage());
+			_log.warning("Could not spawn NPC #" + npcId + "; error: " + e.getMessage());
 		}
 		
 		return null;
@@ -3076,6 +3120,85 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		loc.setInstanceId(instanceId);
 		player.teleToLocation(loc, allowRandomOffset);
+	}
+	
+	/**
+	 * Monster is running and attacking the playable.
+	 * @param npc the NPC that performs the attack
+	 * @param playable the player
+	 */
+	protected void addAttackPlayerDesire(L2Npc npc, L2Playable playable)
+	{
+		addAttackPlayerDesire(npc, playable, 999);
+	}
+	
+	/**
+	 * Monster is running and attacking the target.
+	 * @param npc the NPC that performs the attack
+	 * @param target the target of the attack
+	 * @param desire the desire to perform the attack
+	 */
+	protected void addAttackPlayerDesire(L2Npc npc, L2Playable target, int desire)
+	{
+		if (npc instanceof L2Attackable)
+		{
+			((L2Attackable) npc).addDamageHate(target, 0, desire);
+		}
+		npc.setIsRunning(true);
+		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+	}
+	
+	/**
+	 * Instantly cast a skill upon the given target.
+	 * @param npc the caster NPC
+	 * @param target the target of the cast
+	 * @param skill the skill to cast
+	 */
+	protected void castSkill(L2Npc npc, L2Playable target, SkillHolder skill)
+	{
+		npc.setTarget(target);
+		npc.doCast(skill.getSkill());
+	}
+	
+	/**
+	 * Instantly cast a skill upon the given target.
+	 * @param npc the caster NPC
+	 * @param target the target of the cast
+	 * @param skill the skill to cast
+	 */
+	protected void castSkill(L2Npc npc, L2Playable target, Skill skill)
+	{
+		npc.setTarget(target);
+		npc.doCast(skill);
+	}
+	
+	/**
+	 * Adds the desire to cast a skill to the given NPC.
+	 * @param npc the NPC whom cast the skill
+	 * @param target the skill target
+	 * @param skill the skill to cast
+	 * @param desire the desire to cast the skill
+	 */
+	protected void addSkillCastDesire(L2Npc npc, L2Character target, SkillHolder skill, int desire)
+	{
+		addSkillCastDesire(npc, target, skill.getSkill(), desire);
+	}
+	
+	/**
+	 * Adds the desire to cast a skill to the given NPC.
+	 * @param npc the NPC whom cast the skill
+	 * @param target the skill target
+	 * @param skill the skill to cast
+	 * @param desire the desire to cast the skill
+	 */
+	protected void addSkillCastDesire(L2Npc npc, L2Character target, Skill skill, int desire)
+	{
+		if (npc instanceof L2Attackable)
+		{
+			((L2Attackable) npc).addDamageHate(target, 0, desire);
+		}
+		npc.setTarget(target);
+		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_CAST, skill, target);
 	}
 	
 	/**

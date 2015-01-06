@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -2104,7 +2104,7 @@ public final class Formulas
 		{
 			exp /= Config.RATE_KARMA_LOST;
 		}
-		return (int) ((Math.abs(exp) / karmaLooseMul) / 15);
+		return (int) ((Math.abs(exp) / karmaLooseMul) / 30);
 	}
 	
 	/**

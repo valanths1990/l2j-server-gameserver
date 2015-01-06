@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -140,8 +140,7 @@ public class Shutdown extends Thread
 		if (_counterInstance != null)
 		{
 			_counterInstance._abort();
-			Announcements _an = Announcements.getInstance();
-			_an.announceToAll("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!");
+			Broadcast.toAllOnlinePlayers("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!", false);
 		}
 	}
 	
@@ -380,8 +379,7 @@ public class Shutdown extends Thread
 		if (_counterInstance != null)
 		{
 			_counterInstance._abort();
-			Announcements _an = Announcements.getInstance();
-			_an.announceToAll("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!");
+			Broadcast.toAllOnlinePlayers("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!", false);
 		}
 	}
 	

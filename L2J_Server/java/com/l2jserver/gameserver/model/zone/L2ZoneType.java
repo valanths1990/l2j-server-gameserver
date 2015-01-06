@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -244,7 +244,7 @@ public abstract class L2ZoneType extends ListenersContainer
 				
 				for (int element : _race)
 				{
-					if (((L2PcInstance) character).getRace().ordinal() == element)
+					if (character.getRace().ordinal() == element)
 					{
 						ok = true;
 						break;

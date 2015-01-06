@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -25,7 +25,7 @@ import com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrate
 import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrategy;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory
 {

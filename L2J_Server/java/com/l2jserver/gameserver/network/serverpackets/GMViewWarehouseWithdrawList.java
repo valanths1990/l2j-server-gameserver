@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,15 +26,13 @@ public class GMViewWarehouseWithdrawList extends AbstractItemPacket
 {
 	private final L2ItemInstance[] _items;
 	private final String _playerName;
-	private L2PcInstance _activeChar;
 	private final long _money;
 	
 	public GMViewWarehouseWithdrawList(L2PcInstance cha)
 	{
-		_activeChar = cha;
-		_items = _activeChar.getWarehouse().getItems();
-		_playerName = _activeChar.getName();
-		_money = _activeChar.getWarehouse().getAdena();
+		_items = cha.getWarehouse().getItems();
+		_playerName = cha.getName();
+		_money = cha.getWarehouse().getAdena();
 	}
 	
 	public GMViewWarehouseWithdrawList(L2Clan clan)

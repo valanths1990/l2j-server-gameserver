@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -34,7 +34,7 @@ public abstract class L2GameServerPacket extends SendablePacket<L2GameClient>
 {
 	protected static final Logger _log = Logger.getLogger(L2GameServerPacket.class.getName());
 	
-	protected boolean _invisible = false;
+	private boolean _invisible = false;
 	
 	private static final int[] PAPERDOLL_ORDER = new int[]
 	{

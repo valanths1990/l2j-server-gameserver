@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -68,7 +68,7 @@ public class DimensionalRift
 		_type = type;
 		_party = party;
 		_choosenRoom = room;
-		int[] coords = getRoomCoord(room);
+		Location coords = getRoomCoord(room);
 		party.setDimensionalRift(this);
 		for (L2PcInstance p : party.getMembers())
 		{
@@ -85,7 +85,7 @@ public class DimensionalRift
 					qs.startQuest();
 				}
 			}
-			p.teleToLocation(new Location(coords[0], coords[1], coords[2]));
+			p.teleToLocation(coords);
 		}
 		createSpawnTimer(_choosenRoom);
 		createTeleporterTimer(true);
@@ -323,8 +323,7 @@ public class DimensionalRift
 		
 		DimensionalRiftManager.getInstance().getRoom(_type, _choosenRoom).setPartyInside(true);
 		checkBossRoom(_choosenRoom);
-		int[] coords = getRoomCoord(_choosenRoom);
-		player.teleToLocation(new Location(coords[0], coords[1], coords[2]));
+		player.teleToLocation(getRoomCoord(_choosenRoom));
 	}
 	
 	protected void teleportToWaitingRoom(L2PcInstance player)
@@ -475,7 +474,7 @@ public class DimensionalRift
 		isBossRoom = DimensionalRiftManager.getInstance().getRoom(_type, room).isBossRoom();
 	}
 	
-	public int[] getRoomCoord(byte room)
+	public Location getRoomCoord(byte room)
 	{
 		return DimensionalRiftManager.getInstance().getRoom(_type, room).getTeleportCoorinates();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,7 +22,10 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
@@ -126,7 +129,7 @@ public class L2Npc extends L2Character
 	/** Time of last social packet broadcast */
 	private long _lastSocialBroadcast = 0;
 	/** Minimum interval between social packets */
-	private final int _minimalSocialInterval = 6000;
+	private static final int MINIMUM_SOCIAL_INTERVAL = 6000;
 	/** Support for random animation switching */
 	private boolean _isRandomAnimationEnabled = true;
 	private boolean _isTalking = true;
@@ -144,6 +147,8 @@ public class L2Npc extends L2Character
 	
 	private int _shotsMask = 0;
 	private int _killingBlowWeaponId;
+	/** Map of summoned NPCs by this NPC. */
+	private volatile Map<Integer, L2Npc> _summonedNpcs = null;
 	
 	public int getSoulShotChance()
 	{
@@ -363,7 +368,7 @@ public class L2Npc extends L2Character
 	{
 		// Send a packet SocialAction to all L2PcInstance in the _KnownPlayers of the L2NpcInstance
 		long now = System.currentTimeMillis();
-		if ((now - _lastSocialBroadcast) > _minimalSocialInterval)
+		if ((now - _lastSocialBroadcast) > MINIMUM_SOCIAL_INTERVAL)
 		{
 			_lastSocialBroadcast = now;
 			broadcastPacket(new SocialAction(getObjectId(), animationId));
@@ -1390,6 +1395,13 @@ public class L2Npc extends L2Character
 		
 		// Notify Walking Manager
 		WalkingManager.getInstance().onDeath(this);
+		
+		// Removes itself from the summoned list.
+		final L2Character summoner = getSummoner();
+		if ((summoner != null) && summoner.isNpc())
+		{
+			((L2Npc) summoner).removeSummonedNpc(getObjectId());
+		}
 	}
 	
 	/**
@@ -1406,8 +1418,6 @@ public class L2Npc extends L2Character
 	@Override
 	public boolean deleteMe()
 	{
-		L2WorldRegion oldRegion = getWorldRegion();
-		
 		try
 		{
 			onDecay();
@@ -1422,6 +1432,7 @@ public class L2Npc extends L2Character
 			getSkillChannelized().abortChannelization();
 		}
 		
+		final L2WorldRegion oldRegion = getWorldRegion();
 		if (oldRegion != null)
 		{
 			oldRegion.removeFromZones(this);
@@ -1956,5 +1967,82 @@ public class L2Npc extends L2Character
 	public int getKillingBlowWeapon()
 	{
 		return _killingBlowWeaponId;
+	}
+	
+	/**
+	 * Adds a summoned NPC.
+	 * @param npc the summoned NPC
+	 */
+	public final void addSummonedNpc(L2Npc npc)
+	{
+		if (_summonedNpcs == null)
+		{
+			synchronized (this)
+			{
+				if (_summonedNpcs == null)
+				{
+					_summonedNpcs = new ConcurrentHashMap<>();
+				}
+			}
+		}
+		
+		_summonedNpcs.put(npc.getObjectId(), npc);
+		
+		npc.setSummoner(this);
+	}
+	
+	/**
+	 * Removes a summoned NPC by object ID.
+	 * @param objectId the summoned NPC object ID
+	 */
+	public final void removeSummonedNpc(int objectId)
+	{
+		if (_summonedNpcs != null)
+		{
+			_summonedNpcs.remove(objectId);
+		}
+	}
+	
+	/**
+	 * Gets the summoned NPCs.
+	 * @return the summoned NPCs
+	 */
+	public final Collection<L2Npc> getSummonedNpcs()
+	{
+		return _summonedNpcs != null ? _summonedNpcs.values() : Collections.<L2Npc> emptyList();
+	}
+	
+	/**
+	 * Gets the summoned NPC by object ID.
+	 * @param objectId the summoned NPC object ID
+	 * @return the summoned NPC
+	 */
+	public final L2Npc getSummonedNpc(int objectId)
+	{
+		if (_summonedNpcs != null)
+		{
+			return _summonedNpcs.get(objectId);
+		}
+		return null;
+	}
+	
+	/**
+	 * Gets the summoned NPC count.
+	 * @return the summoned NPC count
+	 */
+	public final int getSummonedNpcCount()
+	{
+		return _summonedNpcs != null ? _summonedNpcs.size() : 0;
+	}
+	
+	/**
+	 * Resets the summoned NPCs list.
+	 */
+	public final void resetSummonedNpcs()
+	{
+		if (_summonedNpcs != null)
+		{
+			_summonedNpcs.clear();
+		}
 	}
 }

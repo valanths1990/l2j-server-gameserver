@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  *
  * This file is part of L2J Server.
  *
@@ -18,15 +18,11 @@
  */
 package com.l2jserver;
 
-import info.tak11.subnet.Subnet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -38,6 +34,10 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -48,12 +48,16 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.engines.DocumentParser;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
+import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.util.FloodProtectorConfig;
@@ -73,7 +77,7 @@ public final class Config
 	// --------------------------------------------------
 	// Constants
 	// --------------------------------------------------
-	public static final String EOL = System.getProperty("line.separator");
+	public static final String EOL = System.lineSeparator();
 	
 	// --------------------------------------------------
 	// L2J Property File Definitions
@@ -102,6 +106,7 @@ public final class Config
 	public static final String CHAT_FILTER_FILE = "./config/chatfilter.txt";
 	public static final String EMAIL_CONFIG_FILE = "./config/Email.properties";
 	public static final String CH_SIEGE_FILE = "./config/ConquerableHallSiege.properties";
+	public static final String GEODATA_FILE = "./config/GeoData.properties";
 	// --------------------------------------------------
 	// L2J Variable Definitions
 	// --------------------------------------------------
@@ -504,24 +509,10 @@ public final class Config
 	public static int MAX_NPC_ANIMATION;
 	public static int MIN_MONSTER_ANIMATION;
 	public static int MAX_MONSTER_ANIMATION;
-	public static int COORD_SYNCHRONIZE;
 	public static boolean ENABLE_FALLING_DAMAGE;
 	public static boolean GRIDS_ALWAYS_ON;
 	public static int GRID_NEIGHBOR_TURNON_TIME;
 	public static int GRID_NEIGHBOR_TURNOFF_TIME;
-	public static int GEODATA;
-	public static String GEODATA_DRIVER;
-	public static File PATHNODE_DIR;
-	public static boolean GEODATA_CELLFINDING;
-	public static String PATHFIND_BUFFERS;
-	public static float LOW_WEIGHT;
-	public static float MEDIUM_WEIGHT;
-	public static float HIGH_WEIGHT;
-	public static boolean ADVANCED_DIAGONAL_STRATEGY;
-	public static float DIAGONAL_WEIGHT;
-	public static int MAX_POSTFILTER_PASSES;
-	public static boolean DEBUG_PATH;
-	public static boolean FORCE_GEODATA;
 	public static boolean MOVE_BASED_KNOWNLIST;
 	public static long KNOWNLIST_UPDATE_INTERVAL;
 	public static int PEACE_ZONE_MODE;
@@ -892,7 +883,6 @@ public final class Config
 	public static int KARMA_RATE_DROP_ITEM;
 	public static int KARMA_RATE_DROP_EQUIP;
 	public static int KARMA_RATE_DROP_EQUIP_WEAPON;
-	public static double[] PLAYER_XP_PERCENT_LOST;
 	
 	// --------------------------------------------------
 	// Seven Signs Settings
@@ -1075,7 +1065,7 @@ public final class Config
 	public static long SOD_STAGE_2_LENGTH;
 	
 	// chatfilter
-	public static ArrayList<String> FILTER_LIST;
+	public static List<String> FILTER_LIST;
 	
 	// Email
 	public static String EMAIL_SERVERINFO_NAME;
@@ -1099,6 +1089,24 @@ public final class Config
 	public static boolean CHS_ENABLE_FAME;
 	public static int CHS_FAME_AMOUNT;
 	public static int CHS_FAME_FREQUENCY;
+	
+	// GeoData Settings
+	public static int GEODATA;
+	public static File PATHNODE_DIR;
+	public static boolean GEODATA_CELLFINDING;
+	public static String PATHFIND_BUFFERS;
+	public static float LOW_WEIGHT;
+	public static float MEDIUM_WEIGHT;
+	public static float HIGH_WEIGHT;
+	public static boolean ADVANCED_DIAGONAL_STRATEGY;
+	public static float DIAGONAL_WEIGHT;
+	public static int MAX_POSTFILTER_PASSES;
+	public static boolean DEBUG_PATH;
+	public static boolean FORCE_GEODATA;
+	public static int COORD_SYNCHRONIZE;
+	public static Path GEODATA_PATH;
+	public static boolean TRY_LOAD_UNSPECIFIED_REGIONS;
+	public static Map<String, Boolean> GEODATA_REGIONS;
 	
 	/**
 	 * This class initializes all global variables for configuration.<br>
@@ -1813,32 +1821,6 @@ public final class Config
 			GRIDS_ALWAYS_ON = General.getBoolean("GridsAlwaysOn", false);
 			GRID_NEIGHBOR_TURNON_TIME = General.getInt("GridNeighborTurnOnTime", 1);
 			GRID_NEIGHBOR_TURNOFF_TIME = General.getInt("GridNeighborTurnOffTime", 90);
-			GEODATA = General.getInt("GeoData", 0);
-			GEODATA_DRIVER = General.getString("GeoDataDriver", "com.l2jserver.gameserver.geoengine.NullDriver");
-			try
-			{
-				PATHNODE_DIR = new File(General.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
-			}
-			catch (IOException e)
-			{
-				_log.log(Level.WARNING, "Error setting pathnode directory!", e);
-				PATHNODE_DIR = new File("data/pathnode");
-			}
-			GEODATA_CELLFINDING = General.getBoolean("CellPathFinding", false);
-			PATHFIND_BUFFERS = General.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
-			LOW_WEIGHT = General.getFloat("LowWeight", 0.5f);
-			MEDIUM_WEIGHT = General.getFloat("MediumWeight", 2);
-			HIGH_WEIGHT = General.getFloat("HighWeight", 3);
-			ADVANCED_DIAGONAL_STRATEGY = General.getBoolean("AdvancedDiagonalStrategy", true);
-			DIAGONAL_WEIGHT = General.getFloat("DiagonalWeight", 0.707f);
-			MAX_POSTFILTER_PASSES = General.getInt("MaxPostfilterPasses", 3);
-			DEBUG_PATH = General.getBoolean("DebugPath", false);
-			FORCE_GEODATA = General.getBoolean("ForceGeodata", true);
-			COORD_SYNCHRONIZE = General.getInt("CoordSynchronize", -1);
-			
-			String str = General.getString("EnableFallingDamage", "auto");
-			ENABLE_FALLING_DAMAGE = "auto".equalsIgnoreCase(str) ? GEODATA > 0 : Boolean.parseBoolean(str);
-			
 			PEACE_ZONE_MODE = General.getInt("PeaceZoneMode", 0);
 			DEFAULT_GLOBAL_CHAT = General.getString("GlobalChat", "ON");
 			DEFAULT_TRADE_CHAT = General.getString("TradeChat", "ON");
@@ -2106,44 +2088,6 @@ public final class Config
 			KARMA_RATE_DROP_ITEM = RatesSettings.getInt("KarmaRateDropItem", 50);
 			KARMA_RATE_DROP_EQUIP = RatesSettings.getInt("KarmaRateDropEquip", 40);
 			KARMA_RATE_DROP_EQUIP_WEAPON = RatesSettings.getInt("KarmaRateDropEquipWeapon", 10);
-			
-			// Initializing table
-			PLAYER_XP_PERCENT_LOST = new double[Byte.MAX_VALUE + 1];
-			
-			// Default value
-			for (int i = 0; i <= Byte.MAX_VALUE; i++)
-			{
-				PLAYER_XP_PERCENT_LOST[i] = 1.;
-			}
-			
-			// Now loading into table parsed values
-			try
-			{
-				String[] values = RatesSettings.getString("PlayerXPPercentLost", "0,39-7.0;40,75-4.0;76,76-2.5;77,77-2.0;78,78-1.5").split(";");
-				
-				for (String s : values)
-				{
-					int min;
-					int max;
-					double val;
-					
-					String[] vals = s.split("-");
-					String[] mM = vals[0].split(",");
-					
-					min = Integer.parseInt(mM[0]);
-					max = Integer.parseInt(mM[1]);
-					val = Double.parseDouble(vals[1]);
-					
-					for (int i = min; i <= max; i++)
-					{
-						PLAYER_XP_PERCENT_LOST[i] = val;
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				_log.log(Level.WARNING, "Error while loading Player XP percent lost!", e);
-			}
 			
 			RATE_DEATH_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("DeathDropAmountMultiplier", 1);
 			RATE_CORPSE_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("CorpseDropAmountMultiplier", 1);
@@ -2699,28 +2643,19 @@ public final class Config
 			SOD_TIAT_KILL_COUNT = GraciaSeedsSettings.getInt("TiatKillCountForNextState", 10);
 			SOD_STAGE_2_LENGTH = GraciaSeedsSettings.getLong("Stage2Length", 720) * 60000;
 			
-			final File chat_filter = new File(CHAT_FILTER_FILE);
-			try (FileReader fr = new FileReader(chat_filter);
-				BufferedReader br = new BufferedReader(fr);
-				LineNumberReader lnr = new LineNumberReader(br))
+			try
 			{
-				FILTER_LIST = new ArrayList<>();
-				
-				String line = null;
-				while ((line = lnr.readLine()) != null)
-				{
-					if (line.trim().isEmpty() || (line.charAt(0) == '#'))
-					{
-						continue;
-					}
-					
-					FILTER_LIST.add(line.trim());
-				}
+				//@formatter:off
+				FILTER_LIST = Files.lines(Paths.get(CHAT_FILTER_FILE), StandardCharsets.UTF_8)
+					.map(String::trim)
+					.filter(line -> (!line.isEmpty() && (line.charAt(0) != '#')))
+					.collect(Collectors.toList());
+				//@formatter:on
 				_log.info("Loaded " + FILTER_LIST.size() + " Filter Words.");
 			}
-			catch (Exception e)
+			catch (IOException ioe)
 			{
-				_log.log(Level.WARNING, "Error while loading chat filter words!", e);
+				_log.log(Level.WARNING, "Error while loading chat filter words!", ioe);
 			}
 			
 			final PropertiesParser ClanHallSiege = new PropertiesParser(CH_SIEGE_FILE);
@@ -2731,6 +2666,49 @@ public final class Config
 			CHS_ENABLE_FAME = ClanHallSiege.getBoolean("EnableFame", false);
 			CHS_FAME_AMOUNT = ClanHallSiege.getInt("FameAmount", 0);
 			CHS_FAME_FREQUENCY = ClanHallSiege.getInt("FameFrequency", 0);
+			
+			final PropertiesParser geoData = new PropertiesParser(GEODATA_FILE);
+			
+			GEODATA = geoData.getInt("GeoData", 0);
+			
+			try
+			{
+				PATHNODE_DIR = new File(geoData.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
+			}
+			catch (IOException e)
+			{
+				_log.log(Level.WARNING, "Error setting pathnode directory!", e);
+				PATHNODE_DIR = new File("data/pathnode");
+			}
+			
+			GEODATA_CELLFINDING = geoData.getBoolean("CellPathFinding", false);
+			PATHFIND_BUFFERS = geoData.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
+			LOW_WEIGHT = geoData.getFloat("LowWeight", 0.5f);
+			MEDIUM_WEIGHT = geoData.getFloat("MediumWeight", 2);
+			HIGH_WEIGHT = geoData.getFloat("HighWeight", 3);
+			ADVANCED_DIAGONAL_STRATEGY = geoData.getBoolean("AdvancedDiagonalStrategy", true);
+			DIAGONAL_WEIGHT = geoData.getFloat("DiagonalWeight", 0.707f);
+			MAX_POSTFILTER_PASSES = geoData.getInt("MaxPostfilterPasses", 3);
+			DEBUG_PATH = geoData.getBoolean("DebugPath", false);
+			FORCE_GEODATA = geoData.getBoolean("ForceGeoData", true);
+			COORD_SYNCHRONIZE = geoData.getInt("CoordSynchronize", -1);
+			GEODATA_PATH = Paths.get(geoData.getString("GeoDataPath", "./data/geodata"));
+			TRY_LOAD_UNSPECIFIED_REGIONS = geoData.getBoolean("TryLoadUnspecifiedRegions", true);
+			GEODATA_REGIONS = new HashMap<>();
+			for (int regionX = L2World.TILE_X_MIN; regionX <= L2World.TILE_X_MAX; regionX++)
+			{
+				for (int regionY = L2World.TILE_Y_MIN; regionY <= L2World.TILE_Y_MAX; regionY++)
+				{
+					String key = regionX + "_" + regionY;
+					if (geoData.containskey(regionX + "_" + regionY))
+					{
+						GEODATA_REGIONS.put(key, geoData.getBoolean(key, false));
+					}
+				}
+			}
+			
+			String str = General.getString("EnableFallingDamage", "auto");
+			ENABLE_FALLING_DAMAGE = "auto".equalsIgnoreCase(str) ? GEODATA > 0 : Boolean.parseBoolean(str);
 		}
 		else if (Server.serverMode == Server.MODE_LOGINSERVER)
 		{
@@ -3917,7 +3895,7 @@ public final class Config
 		return result;
 	}
 	
-	private static class IPConfigData extends DocumentParser
+	private static class IPConfigData implements DocumentParser
 	{
 		private static final List<String> _subnets = new ArrayList<>(5);
 		private static final List<String> _hosts = new ArrayList<>(5);
@@ -3933,22 +3911,22 @@ public final class Config
 			File f = new File(IP_CONFIG_FILE);
 			if (f.exists())
 			{
-				_log.log(Level.INFO, "Network Config: ipconfig.xml exists using manual configuration...");
+				LOGGER.log(Level.INFO, "Network Config: ipconfig.xml exists using manual configuration...");
 				parseFile(new File(IP_CONFIG_FILE));
 			}
 			else
 			// Auto configuration...
 			{
-				_log.log(Level.INFO, "Network Config: ipconfig.xml doesn't exists using automatic configuration...");
+				LOGGER.log(Level.INFO, "Network Config: ipconfig.xml doesn't exists using automatic configuration...");
 				autoIpConfig();
 			}
 		}
 		
 		@Override
-		protected void parseDocument()
+		public void parseDocument(Document doc)
 		{
 			NamedNodeMap attrs;
-			for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+			for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 			{
 				if ("gameserver".equalsIgnoreCase(n.getNodeName()))
 				{
@@ -3962,7 +3940,7 @@ public final class Config
 							
 							if (_hosts.size() != _subnets.size())
 							{
-								_log.log(Level.WARNING, "Failed to Load " + IP_CONFIG_FILE + " File - subnets does not match server addresses.");
+								LOGGER.log(Level.WARNING, "Failed to Load " + IP_CONFIG_FILE + " File - subnets does not match server addresses.");
 							}
 						}
 					}
@@ -3970,7 +3948,7 @@ public final class Config
 					Node att = n.getAttributes().getNamedItem("address");
 					if (att == null)
 					{
-						_log.log(Level.WARNING, "Failed to load " + IP_CONFIG_FILE + " file - default server address is missing.");
+						LOGGER.log(Level.WARNING, "Failed to load " + IP_CONFIG_FILE + " file - default server address is missing.");
 						_hosts.add("127.0.0.1");
 					}
 					else
@@ -3995,7 +3973,7 @@ public final class Config
 			}
 			catch (IOException e)
 			{
-				_log.log(Level.INFO, "Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
+				LOGGER.log(Level.INFO, "Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
 				externalIp = "127.0.0.1";
 			}
 			
@@ -4003,7 +3981,6 @@ public final class Config
 			{
 				Enumeration<NetworkInterface> niList = NetworkInterface.getNetworkInterfaces();
 				
-				Subnet sub = new Subnet();
 				while (niList.hasMoreElements())
 				{
 					NetworkInterface ni = niList.nextElement();
@@ -4025,14 +4002,18 @@ public final class Config
 							continue;
 						}
 						
-						sub.setIPAddress(ia.getAddress().getHostAddress());
-						sub.setMaskedBits(ia.getNetworkPrefixLength());
-						String subnet = sub.getSubnetAddress() + '/' + sub.getMaskedBits();
+						final String hostAddress = ia.getAddress().getHostAddress();
+						final int subnetPrefixLength = ia.getNetworkPrefixLength();
+						final int subnetMaskInt = IntStream.rangeClosed(1, subnetPrefixLength).reduce((r, e) -> (r << 1) + 1).orElse(0) << (32 - subnetPrefixLength);
+						final int hostAddressInt = Arrays.stream(hostAddress.split("\\.")).mapToInt(Integer::parseInt).reduce((r, e) -> (r << 8) + e).orElse(0);
+						final int subnetAddressInt = hostAddressInt & subnetMaskInt;
+						final String subnetAddress = ((subnetAddressInt >> 24) & 0xFF) + "." + ((subnetAddressInt >> 16) & 0xFF) + "." + ((subnetAddressInt >> 8) & 0xFF) + "." + (subnetAddressInt & 0xFF);
+						final String subnet = subnetAddress + '/' + subnetPrefixLength;
 						if (!_subnets.contains(subnet) && !subnet.equals("0.0.0.0/0"))
 						{
 							_subnets.add(subnet);
-							_hosts.add(sub.getIPAddress());
-							_log.log(Level.INFO, "Network Config: Adding new subnet: " + subnet + " address: " + sub.getIPAddress());
+							_hosts.add(hostAddress);
+							LOGGER.log(Level.INFO, "Network Config: Adding new subnet: " + subnet + " address: " + hostAddress);
 						}
 					}
 				}
@@ -4040,11 +4021,11 @@ public final class Config
 				// External host and subnet
 				_hosts.add(externalIp);
 				_subnets.add("0.0.0.0/0");
-				_log.log(Level.INFO, "Network Config: Adding new subnet: 0.0.0.0/0 address: " + externalIp);
+				LOGGER.log(Level.INFO, "Network Config: Adding new subnet: 0.0.0.0/0 address: " + externalIp);
 			}
 			catch (SocketException e)
 			{
-				_log.log(Level.INFO, "Network Config: Configuration failed please configure manually using ipconfig.xml", e);
+				LOGGER.log(Level.INFO, "Network Config: Configuration failed please configure manually using ipconfig.xml", e);
 				System.exit(0);
 			}
 		}

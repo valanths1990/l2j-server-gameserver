@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -192,7 +192,6 @@ public class CellPathFinding extends PathFinding
 		
 		int currentX, currentY, currentZ;
 		ListIterator<AbstractNodeLoc> middlePoint, endPoint;
-		AbstractNodeLoc locMiddle, locEnd;
 		boolean remove;
 		int pass = 0;
 		do
@@ -203,15 +202,14 @@ public class CellPathFinding extends PathFinding
 			remove = false;
 			middlePoint = path.listIterator();
 			endPoint = path.listIterator(1);
-			locEnd = null;
 			currentX = x;
 			currentY = y;
 			currentZ = z;
 			
 			while (endPoint.hasNext())
 			{
-				locEnd = endPoint.next();
-				locMiddle = middlePoint.next();
+				AbstractNodeLoc locEnd = endPoint.next();
+				AbstractNodeLoc locMiddle = middlePoint.next();
 				if (GeoData.getInstance().canMove(currentX, currentY, currentZ, locEnd.getX(), locEnd.getY(), locEnd.getZ(), instanceId))
 				{
 					middlePoint.remove();
@@ -237,8 +235,7 @@ public class CellPathFinding extends PathFinding
 			middlePoint = path.listIterator();
 			while (middlePoint.hasNext())
 			{
-				locMiddle = middlePoint.next();
-				dropDebugItem(65, 1, locMiddle);
+				dropDebugItem(65, 1, middlePoint.next());
 			}
 		}
 		

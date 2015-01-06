@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -38,7 +38,7 @@ public class FuncMaxCpMul extends AbstractFunction
 	
 	private FuncMaxCpMul()
 	{
-		super(Stats.MAX_CP, 0x20, null, 0, null);
+		super(Stats.MAX_CP, 1, null, 0, null);
 	}
 	
 	@Override

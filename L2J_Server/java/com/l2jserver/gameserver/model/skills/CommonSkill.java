@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -46,7 +46,6 @@ public enum CommonSkill
 	LUCKY(194, 1),
 	EXPERTISE(239, 1),
 	CRYSTALLIZE(248, 1),
-	CLAN_LUCK(390, 1),
 	ONYX_BEAST_TRANSFORMATION(617, 1),
 	CREATE_COMMON(1320, 1),
 	DIVINE_INSPIRATION(1405, 1),

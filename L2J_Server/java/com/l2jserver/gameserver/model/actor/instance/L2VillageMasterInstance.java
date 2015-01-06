@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -943,10 +943,9 @@ public class L2VillageMasterInstance extends L2NpcInstance
 		clan.setDissolvingExpiryTime(System.currentTimeMillis() + (Config.ALT_CLAN_DISSOLVE_DAYS * 86400000L)); // 24*60*60*1000 = 86400000
 		clan.updateClanInDB();
 		
-		ClanTable.getInstance().scheduleRemoveClan(clan.getId());
-		
 		// The clan leader should take the XP penalty of a full death.
-		player.deathPenalty(false, false, false);
+		player.calculateDeathExpPenalty(null, false);
+		ClanTable.getInstance().scheduleRemoveClan(clan.getId());
 	}
 	
 	private static final void recoverClan(L2PcInstance player, int clanId)
@@ -1004,7 +1003,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_EXISTS);
 					sm.addString(clanName);
 					player.sendPacket(sm);
-					sm = null;
 				}
 				else
 				{
@@ -1164,7 +1162,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 		sm.addString(leaderName);
 		sm.addString(clanName);
 		clan.broadcastToOnlineMembers(sm);
-		sm = null;
 	}
 	
 	/**

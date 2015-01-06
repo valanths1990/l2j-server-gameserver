@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,7 +26,6 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.datatables.EnchantItemData;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.items.L2Armor;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.enchant.EnchantResultType;
 import com.l2jserver.gameserver.model.items.enchant.EnchantScroll;
@@ -223,7 +222,7 @@ public final class RequestEnchantItem extends L2GameClientPacket
 					
 					if ((item.isArmor()) && (item.getEnchantLevel() == 4) && item.isEquipped())
 					{
-						enchant4Skill = ((L2Armor) it).getEnchant4Skill();
+						enchant4Skill = it.getEnchant4Skill();
 						if (enchant4Skill != null)
 						{
 							// add skills bestowed from +4 armor

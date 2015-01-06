@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * Lets drink to code!
- * @author zabbix
- * @author FBIagent
+ * @author zabbix, HorridoJoho
  */
 public final class RequestLinkHtml extends L2GameClientPacket
 {

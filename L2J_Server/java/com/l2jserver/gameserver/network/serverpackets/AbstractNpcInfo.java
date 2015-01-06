@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -316,14 +316,14 @@ public abstract class AbstractNpcInfo extends L2GameServerPacket
 			_idTemplate = cha.getTemplate().getDisplayId();
 			_collisionHeight = cha.getTemplate().getfCollisionHeight();
 			_collisionRadius = cha.getTemplate().getfCollisionRadius();
-			_invisible = cha.isInvisible();
+			setInvisible(cha.isInvisible());
 		}
 		
 		@Override
 		protected void writeImpl()
 		{
 			boolean gmSeeInvis = false;
-			if (_invisible)
+			if (isInvisible())
 			{
 				final L2PcInstance activeChar = getClient().getActiveChar();
 				if ((activeChar != null) && activeChar.canOverrideCond(PcCondOverride.SEE_ALL_PLAYERS))

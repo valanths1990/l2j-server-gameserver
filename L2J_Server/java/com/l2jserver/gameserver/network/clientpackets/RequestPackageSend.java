@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -40,7 +40,7 @@ import com.l2jserver.gameserver.util.Util;
  */
 public class RequestPackageSend extends L2GameClientPacket
 {
-	private final String _C_A8_REQUESTPACKAGESEND = "[C] A8 RequestPackageSend";
+	private static final String _C_A8_REQUESTPACKAGESEND = "[C] A8 RequestPackageSend";
 	private static final int BATCH_LENGTH = 12; // length of the one item
 	
 	private ItemHolder _items[] = null;

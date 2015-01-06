@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,7 +21,7 @@ package com.l2jserver.loginserver.model.data;
 import java.util.Objects;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public final class AccountInfo
 {

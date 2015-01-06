@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -64,7 +64,7 @@ import com.l2jserver.util.Rnd;
 import com.l2jserver.util.StringUtil;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public class TvTEvent
 {

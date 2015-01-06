@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -27,7 +27,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExUISetting;
  */
 public class RequestKeyMapping extends L2GameClientPacket
 {
-	private static String _C__D0_21_REQUESTKEYMAPPING = "[C] D0:21 RequestKeyMapping";
+	private static final String _C__D0_21_REQUESTKEYMAPPING = "[C] D0:21 RequestKeyMapping";
 	
 	@Override
 	protected void readImpl()

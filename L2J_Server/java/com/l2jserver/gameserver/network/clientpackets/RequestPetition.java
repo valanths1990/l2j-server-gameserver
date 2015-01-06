@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -89,7 +89,6 @@ public final class RequestPetition extends L2GameClientPacket
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.WE_HAVE_RECEIVED_S1_PETITIONS_TODAY);
 			sm.addInt(totalPetitions);
 			activeChar.sendPacket(sm);
-			sm = null;
 			return;
 		}
 		
@@ -113,7 +112,6 @@ public final class RequestPetition extends L2GameClientPacket
 		sm = SystemMessage.getSystemMessage(SystemMessageId.S1_PETITION_ON_WAITING_LIST);
 		sm.addInt(PetitionManager.getInstance().getPendingPetitionCount());
 		activeChar.sendPacket(sm);
-		sm = null;
 	}
 	
 	@Override

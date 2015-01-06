@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -37,7 +37,7 @@ public class FuncAtkEvasion extends AbstractFunction
 	
 	private FuncAtkEvasion()
 	{
-		super(Stats.EVASION_RATE, 0x10, null, 0, null);
+		super(Stats.EVASION_RATE, 1, null, 0, null);
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,11 +21,11 @@ package com.l2jserver.gameserver.network.clientpackets;
 import java.util.Base64;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.LoginServerThread;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.datatables.AnnouncementsTable;
 import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
@@ -437,7 +437,7 @@ public class EnterWorld extends L2GameClientPacket
 		activeChar.sendMessage(getText("VGhhbmsgeW91IGZvciAxMCB5ZWFycyE="));
 		
 		SevenSigns.getInstance().sendCurrentPeriodMsg(activeChar);
-		Announcements.getInstance().showAnnouncements(activeChar);
+		AnnouncementsTable.getInstance().showAnnouncements(activeChar);
 		
 		if (showClanNotice)
 		{

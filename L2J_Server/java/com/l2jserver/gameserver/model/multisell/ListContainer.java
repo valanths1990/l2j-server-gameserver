@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -28,10 +28,10 @@ import java.util.Set;
  */
 public class ListContainer
 {
-	protected int _listId;
-	protected boolean _applyTaxes = false;
-	protected boolean _maintainEnchantment = false;
-	protected double _useRate = 1.0;
+	private final int _listId;
+	private boolean _applyTaxes = false;
+	private boolean _maintainEnchantment = false;
+	private double _useRate = 1.0;
 	
 	protected List<Entry> _entries = new ArrayList<>();
 	protected Set<Integer> _npcsAllowed = null;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -596,7 +596,6 @@ public final class BlockCheckerEngine
 				spawn.stopRespawn();
 				spawn.getLastSpawn().deleteMe();
 				SpawnTable.getInstance().deleteSpawn(spawn, false);
-				spawn = null;
 			}
 			_spawns.clear();
 			

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -55,12 +55,12 @@ import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.enums.Team;
-import com.l2jserver.gameserver.instancemanager.DimensionalRiftManager;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
 import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
 import com.l2jserver.gameserver.model.CharEffectList;
 import com.l2jserver.gameserver.model.L2AccessLevel;
+import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2Party;
 import com.l2jserver.gameserver.model.L2World;
@@ -519,8 +519,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public void onDecay()
 	{
-		L2WorldRegion reg = getWorldRegion();
 		decayMe();
+		
+		final L2WorldRegion reg = getWorldRegion();
 		if (reg != null)
 		{
 			reg.removeFromZones(this);
@@ -700,20 +701,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	public void teleToLocation(int x, int y, int z, int heading, int instanceId, int randomOffset)
 	{
 		setInstanceId(instanceId);
-		
-		if (isPlayer() && DimensionalRiftManager.getInstance().checkIfInRiftZone(getX(), getY(), getZ(), false)) // true -> ignore waiting room :)
-		{
-			L2PcInstance player = getActingPlayer();
-			player.sendMessage("You have been sent to the waiting room.");
-			if (player.isInParty() && player.getParty().isInDimensionalRift())
-			{
-				player.getParty().getDimensionalRift().usedTeleport(player);
-			}
-			int[] newCoords = DimensionalRiftManager.getInstance().getRoom((byte) 0, (byte) 0).getTeleportCoorinates();
-			x = newCoords[0];
-			y = newCoords[1];
-			z = newCoords[2];
-		}
 		
 		if (_isPendingRevive)
 		{
@@ -2658,7 +2645,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		L2CharacterAI oldAI = _ai;
 		if ((oldAI != null) && (oldAI != newAI) && (oldAI instanceof L2AttackableAI))
 		{
-			((L2AttackableAI) oldAI).stopAITask();
+			oldAI.stopAITask();
 		}
 		_ai = newAI;
 	}
@@ -2924,6 +2911,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	public final void setIsRunning(boolean value)
 	{
+		if (_isRunning == value)
+		{
+			return;
+		}
+		
 		_isRunning = value;
 		if (getRunSpeed() != 0)
 		{
@@ -2935,7 +2927,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		else if (isSummon())
 		{
-			((L2Summon) this).broadcastStatusUpdate();
+			broadcastStatusUpdate();
 		}
 		else if (isNpc())
 		{
@@ -4111,10 +4103,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * the L2Character position is automatically set to the destination position even if the movement is not finished.<br>
 	 * <FONT COLOR=#FF0000><B><U>Caution</U>: The current Z position is obtained FROM THE CLIENT by the Client->Server ValidatePosition Packet.<br>
 	 * But x and y positions must be calculated to avoid that players try to modify their movement speed.</B></FONT>
-	 * @param gameTicks Nb of ticks since the server start
 	 * @return True if the movement is finished
 	 */
-	public boolean updatePosition(int gameTicks)
+	public boolean updatePosition()
 	{
 		// Get movement data
 		MoveData m = _move;
@@ -4137,6 +4128,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			m._xAccurate = getX();
 			m._yAccurate = getY();
 		}
+		
+		int gameTicks = GameTimeController.getInstance().getGameTicks();
 		
 		// Check if the position has already been calculated
 		if (m._moveTimestamp == gameTicks)
@@ -4227,7 +4220,29 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		// Set the timer of last position update to now
 		m._moveTimestamp = gameTicks;
 		
-		return (distFraction > 1);
+		if (distFraction > 1)
+		{
+			ThreadPoolManager.getInstance().executeAi(() ->
+			{
+				try
+				{
+					if (Config.MOVE_BASED_KNOWNLIST)
+					{
+						getKnownList().findObjects();
+					}
+					
+					getAI().notifyEvent(CtrlEvent.EVT_ARRIVED);
+				}
+				catch (final Throwable e)
+				{
+					_log.log(Level.WARNING, "", e);
+				}
+			});
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public void revalidateZone(boolean force)
@@ -6201,6 +6216,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public abstract int getLevel();
 	
+	public final double calcStat(Stats stat, double init)
+	{
+		return getStat().calcStat(stat, init, null, null);
+	}
+	
 	// Stat - NEED TO REMOVE ONCE L2CHARSTAT IS COMPLETE
 	public final double calcStat(Stats stat, double init, L2Character target, Skill skill)
 	{
@@ -6745,6 +6765,33 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	/**
 	 * Dummy method overriden in {@link L2PcInstance}
+	 * @return the clan of current character.
+	 */
+	public L2Clan getClan()
+	{
+		return null;
+	}
+	
+	/**
+	 * Dummy method overriden in {@link L2PcInstance}
+	 * @return {@code true} if player is in academy, {@code false} otherwise.
+	 */
+	public boolean isAcademyMember()
+	{
+		return false;
+	}
+	
+	/**
+	 * Dummy method overriden in {@link L2PcInstance}
+	 * @return the pledge type of current character.
+	 */
+	public int getPledgeType()
+	{
+		return 0;
+	}
+	
+	/**
+	 * Dummy method overriden in {@link L2PcInstance}
 	 * @return the alliance id of current character.
 	 */
 	public int getAllyId()
@@ -6896,7 +6943,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				if (_invulAgainst == null)
 				{
-					return _invulAgainst = new ConcurrentHashMap<>();
+					_invulAgainst = new ConcurrentHashMap<>();
 				}
 			}
 		}

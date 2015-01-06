@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.datatables;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -32,7 +33,7 @@ import com.l2jserver.gameserver.model.fishing.L2FishingRod;
  * This class holds the Fishing Rods information.
  * @author nonom
  */
-public final class FishingRodsData extends DocumentParser
+public final class FishingRodsData implements DocumentParser
 {
 	private static final Map<Integer, L2FishingRod> _fishingRods = new HashMap<>();
 	
@@ -49,17 +50,17 @@ public final class FishingRodsData extends DocumentParser
 	{
 		_fishingRods.clear();
 		parseDatapackFile("data/stats/fishing/fishingRods.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _fishingRods.size() + " Fishing Rods.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _fishingRods.size() + " Fishing Rods.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		Node att;
 		L2FishingRod fishingRod;
 		StatsSet set;
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
