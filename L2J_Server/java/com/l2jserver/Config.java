@@ -458,7 +458,6 @@ public final class Config
 	public static boolean HTML_ACTION_CACHE_DEBUG;
 	public static boolean PACKET_HANDLER_DEBUG;
 	public static boolean DEVELOPER;
-	public static boolean ACCEPT_GEOEDITOR_CONN;
 	public static boolean ALT_DEV_NO_HANDLERS;
 	public static boolean ALT_DEV_NO_QUESTS;
 	public static boolean ALT_DEV_NO_SPAWNS;
@@ -1747,7 +1746,6 @@ public final class Config
 			HTML_ACTION_CACHE_DEBUG = General.getBoolean("HtmlActionCacheDebug", false);
 			PACKET_HANDLER_DEBUG = General.getBoolean("PacketHandlerDebug", false);
 			DEVELOPER = General.getBoolean("Developer", false);
-			ACCEPT_GEOEDITOR_CONN = General.getBoolean("AcceptGeoeditorConn", false);
 			ALT_DEV_NO_HANDLERS = General.getBoolean("AltDevNoHandlers", false) || Boolean.getBoolean("nohandlers");
 			ALT_DEV_NO_QUESTS = General.getBoolean("AltDevNoQuests", false) || Boolean.getBoolean("noquests");
 			ALT_DEV_NO_SPAWNS = General.getBoolean("AltDevNoSpawns", false) || Boolean.getBoolean("nospawns");

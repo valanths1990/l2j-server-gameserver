@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.network.clientpackets;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.geoeditorcon.GeoEditorListener;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.zone.ZoneId;
@@ -129,14 +128,6 @@ public class ValidatePosition extends L2GameClientPacket
 		// activeChar.setLastPartyPosition(_x, _y, _z);
 		// party.broadcastToPartyMembers(activeChar, new PartyMemberPosition(activeChar));
 		// }
-		
-		if (Config.ACCEPT_GEOEDITOR_CONN)
-		{
-			if ((GeoEditorListener.getInstance().getThread() != null) && GeoEditorListener.getInstance().getThread().isWorking() && GeoEditorListener.getInstance().getThread().isSend(activeChar))
-			{
-				GeoEditorListener.getInstance().getThread().sendGmPosition(_x, _y, (short) _z);
-			}
-		}
 		
 		// Don't allow flying transformations outside gracia area!
 		if (activeChar.isFlyingMounted() && (_x > L2World.GRACIA_MAX_X))

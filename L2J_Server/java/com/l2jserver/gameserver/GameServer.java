@@ -88,7 +88,6 @@ import com.l2jserver.gameserver.datatables.SummonSkillsTable;
 import com.l2jserver.gameserver.datatables.TeleportLocationTable;
 import com.l2jserver.gameserver.datatables.TransformData;
 import com.l2jserver.gameserver.datatables.UIData;
-import com.l2jserver.gameserver.geoeditorcon.GeoEditorListener;
 import com.l2jserver.gameserver.handler.EffectHandler;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.AirShipManager;
@@ -367,11 +366,6 @@ public class GameServer
 		if (Config.ALLOW_MAIL)
 		{
 			MailManager.getInstance();
-		}
-		
-		if (Config.ACCEPT_GEOEDITOR_CONN)
-		{
-			GeoEditorListener.getInstance();
 		}
 		
 		PunishmentManager.getInstance();
