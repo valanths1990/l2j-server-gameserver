@@ -18,7 +18,6 @@
  */
 package com.l2jserver.gameserver;
 
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -79,11 +78,7 @@ public class GeoData
 						}
 						catch (Exception e)
 						{
-							// ignore file not found errors
-							if (!(e instanceof FileNotFoundException))
-							{
-								LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Failed to load " + geoFilePath.getFileName() + "!", e);
-							}
+							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Failed to load " + geoFilePath.getFileName() + "!", e);
 						}
 					}
 				}
