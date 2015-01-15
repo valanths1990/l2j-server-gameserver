@@ -1087,9 +1087,8 @@ public final class Config
 	public static int CHS_FAME_FREQUENCY;
 	
 	// GeoData Settings
-	public static int GEODATA;
+	public static int PATHFINDING;
 	public static File PATHNODE_DIR;
-	public static boolean GEODATA_CELLFINDING;
 	public static String PATHFIND_BUFFERS;
 	public static float LOW_WEIGHT;
 	public static float MEDIUM_WEIGHT;
@@ -1948,6 +1947,7 @@ public final class Config
 			BOTREPORT_RESETPOINT_HOUR = General.getString("BotReportPointsResetHour", "00:00").split(":");
 			BOTREPORT_REPORT_DELAY = General.getInt("BotReportDelay", 30) * 60000;
 			BOTREPORT_ALLOW_REPORTS_FROM_SAME_CLAN_MEMBERS = General.getBoolean("AllowReportsFromSameClanMembers", false);
+			ENABLE_FALLING_DAMAGE = General.getBoolean("EnableFallingDamage", true);
 			
 			// Load FloodProtector L2Properties file
 			final PropertiesParser FloodProtectors = new PropertiesParser(FLOOD_PROTECTOR_FILE);
@@ -2660,8 +2660,6 @@ public final class Config
 			
 			final PropertiesParser geoData = new PropertiesParser(GEODATA_FILE);
 			
-			GEODATA = geoData.getInt("GeoData", 0);
-			
 			try
 			{
 				PATHNODE_DIR = new File(geoData.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
@@ -2672,7 +2670,7 @@ public final class Config
 				PATHNODE_DIR = new File("data/pathnode");
 			}
 			
-			GEODATA_CELLFINDING = geoData.getBoolean("CellPathFinding", false);
+			PATHFINDING = geoData.getInt("PathFinding", 0);
 			PATHFIND_BUFFERS = geoData.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
 			LOW_WEIGHT = geoData.getFloat("LowWeight", 0.5f);
 			MEDIUM_WEIGHT = geoData.getFloat("MediumWeight", 2);
@@ -2697,9 +2695,6 @@ public final class Config
 					}
 				}
 			}
-			
-			String str = General.getString("EnableFallingDamage", "auto");
-			ENABLE_FALLING_DAMAGE = "auto".equalsIgnoreCase(str) ? GEODATA > 0 : Boolean.parseBoolean(str);
 		}
 		else if (Server.serverMode == Server.MODE_LOGINSERVER)
 		{

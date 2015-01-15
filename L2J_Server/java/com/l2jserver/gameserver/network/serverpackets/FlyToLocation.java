@@ -18,8 +18,8 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.interfaces.ILocational;
 
 /**
  * @author KenM
@@ -50,7 +50,7 @@ public final class FlyToLocation extends L2GameServerPacket
 		_type = type;
 	}
 	
-	public FlyToLocation(L2Character cha, L2Object dest, FlyType type)
+	public FlyToLocation(L2Character cha, ILocational dest, FlyType type)
 	{
 		this(cha, dest.getX(), dest.getY(), dest.getZ(), type);
 	}

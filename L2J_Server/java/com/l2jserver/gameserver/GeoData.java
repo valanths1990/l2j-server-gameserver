@@ -50,12 +50,6 @@ public class GeoData
 	
 	protected GeoData()
 	{
-		if (Config.GEODATA == 0)
-		{
-			LOGGER.info(getClass().getSimpleName() + ": Disabled.");
-			return;
-		}
-		
 		int loadedRegions = 0;
 		try
 		{

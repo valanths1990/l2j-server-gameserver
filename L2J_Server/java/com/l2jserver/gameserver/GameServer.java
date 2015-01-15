@@ -254,7 +254,8 @@ public class GameServer
 		
 		printSection("Geodata");
 		GeoData.getInstance();
-		if (Config.GEODATA == 2)
+		
+		if (Config.PATHFINDING > 0)
 		{
 			PathFinding.getInstance();
 		}

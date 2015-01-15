@@ -8829,7 +8829,7 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		
-		if ((skill.getFlyType() == FlyType.CHARGE) && (Config.GEODATA > 0) && !GeoData.getInstance().canMove(this, target))
+		if ((skill.getFlyType() == FlyType.CHARGE) && !GeoData.getInstance().canMove(this, target))
 		{
 			sendPacket(SystemMessageId.THE_TARGET_IS_LOCATED_WHERE_YOU_CANNOT_CHARGE);
 			return false;
@@ -13490,6 +13490,12 @@ public final class L2PcInstance extends L2Playable
 		
 		final int deltaZ = getZ() - z;
 		if (deltaZ <= getBaseTemplate().getSafeFallHeight())
+		{
+			return false;
+		}
+		
+		// If there is no geodata loaded for the place we are client Z correction might cause falling damage.
+		if (!GeoData.getInstance().hasGeo(getX(), getY()))
 		{
 			return false;
 		}

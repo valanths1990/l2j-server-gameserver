@@ -1225,7 +1225,7 @@ public final class Skill implements IIdentifiable
 			}
 		}
 		
-		if ((Config.GEODATA > 0) && !GeoData.getInstance().canSeeTarget(caster, target))
+		if (!GeoData.getInstance().canSeeTarget(caster, target))
 		{
 			return false;
 		}
