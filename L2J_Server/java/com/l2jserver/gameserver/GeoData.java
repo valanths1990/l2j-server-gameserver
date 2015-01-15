@@ -19,6 +19,7 @@
 package com.l2jserver.gameserver;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +69,7 @@ public class GeoData
 							loadedRegions++;
 						}
 					}
-					else if (Config.TRY_LOAD_UNSPECIFIED_REGIONS)
+					else if (Config.TRY_LOAD_UNSPECIFIED_REGIONS && Files.exists(geoFilePath))
 					{
 						try
 						{
