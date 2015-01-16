@@ -1830,6 +1830,17 @@ public class L2Npc extends L2Character
 	}
 	
 	/**
+	 * Sends an event to a given object.
+	 * @param eventName the event name
+	 * @param receiver the receiver
+	 * @param reference the reference
+	 */
+	public void sendScriptEvent(String eventName, L2Object receiver, L2Object reference)
+	{
+		EventDispatcher.getInstance().notifyEventAsync(new OnNpcEventReceived(eventName, this, (L2Npc) receiver, reference), receiver);
+	}
+	
+	/**
 	 * Gets point in range between radiusMin and radiusMax from this NPC
 	 * @param radiusMin miminal range from NPC (not closer than)
 	 * @param radiusMax maximal range from NPC (not further than)

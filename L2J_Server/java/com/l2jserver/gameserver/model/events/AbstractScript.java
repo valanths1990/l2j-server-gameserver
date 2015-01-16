@@ -2650,6 +2650,17 @@ public abstract class AbstractScript extends ManagedScript
 	}
 	
 	/**
+	 * Adds desire to move to the given NPC.
+	 * @param npc the NPC
+	 * @param loc the location
+	 * @param desire the desire
+	 */
+	protected void addMoveToDesire(L2Npc npc, Location loc, int desire)
+	{
+		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, loc);
+	}
+	
+	/**
 	 * Instantly cast a skill upon the given target.
 	 * @param npc the caster NPC
 	 * @param target the target of the cast
