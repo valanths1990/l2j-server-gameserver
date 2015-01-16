@@ -3267,18 +3267,14 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (count > 0)
 		{
-			L2ItemInstance item = null;
-			if (ItemTable.getInstance().getTemplate(itemId) != null)
-			{
-				item = ItemTable.getInstance().createDummyItem(itemId);
-			}
-			else
+			final L2Item item = ItemTable.getInstance().getTemplate(itemId);
+			if (item == null)
 			{
 				_log.log(Level.SEVERE, "Item doesn't exist so cannot be added. Item ID: " + itemId);
 				return null;
 			}
 			// Sends message to client if requested
-			if (sendMessage && ((!isCastingNow() && item.getItem().hasExImmediateEffect()) || !item.getItem().hasExImmediateEffect()))
+			if (sendMessage && ((!isCastingNow() && item.hasExImmediateEffect()) || !item.hasExImmediateEffect()))
 			{
 				if (count > 1)
 				{
@@ -3315,9 +3311,9 @@ public final class L2PcInstance extends L2Playable
 			}
 			
 			// Auto-use herbs.
-			if (item.getItem().hasExImmediateEffect())
+			if (item.hasExImmediateEffect())
 			{
-				final IItemHandler handler = ItemHandler.getInstance().getHandler(item.getEtcItem());
+				final IItemHandler handler = ItemHandler.getInstance().getHandler(item instanceof L2EtcItem ? (L2EtcItem) item : null);
 				if (handler == null)
 				{
 					_log.warning("No item handler registered for Herb ID " + item.getId() + "!");
@@ -3340,14 +3336,6 @@ public final class L2PcInstance extends L2Playable
 				else if (CursedWeaponsManager.getInstance().isCursed(createdItem.getId()))
 				{
 					CursedWeaponsManager.getInstance().activate(this, createdItem);
-				}
-				else if (FortSiegeManager.getInstance().isCombat(createdItem.getId()))
-				{
-					if (FortSiegeManager.getInstance().activateCombatFlag(this, item))
-					{
-						Fort fort = FortManager.getInstance().getFort(this);
-						fort.getSiege().announceToPlayer(SystemMessage.getSystemMessage(SystemMessageId.C1_ACQUIRED_THE_FLAG), getName());
-					}
 				}
 				// Territory Ward
 				else if ((createdItem.getId() >= 13560) && (createdItem.getId() <= 13568))

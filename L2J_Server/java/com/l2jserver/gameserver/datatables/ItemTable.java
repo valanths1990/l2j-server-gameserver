@@ -297,24 +297,6 @@ public class ItemTable
 	}
 	
 	/**
-	 * Returns a dummy item.<br>
-	 * <U><I>Concept :</I></U><BR>
-	 * Dummy item is created by setting the ID of the object in the world at null value
-	 * @param itemId : int designating the item
-	 * @return L2ItemInstance designating the dummy item created
-	 */
-	public L2ItemInstance createDummyItem(int itemId)
-	{
-		L2Item item = getTemplate(itemId);
-		if (item == null)
-		{
-			return null;
-		}
-		L2ItemInstance temp = new L2ItemInstance(0, item);
-		return temp;
-	}
-	
-	/**
 	 * Destroys the L2ItemInstance.<br>
 	 * <B><U> Actions</U> :</B>
 	 * <ul>

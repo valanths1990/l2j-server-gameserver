@@ -1151,7 +1151,7 @@ public class L2Attackable extends L2Npc
 		{
 			for (ItemHolder item : _sweepItems)
 			{
-				lootItems.add(ItemTable.getInstance().createDummyItem(item.getId()).getItem());
+				lootItems.add(ItemTable.getInstance().getTemplate(item.getId()));
 			}
 		}
 		return lootItems;

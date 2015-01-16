@@ -386,7 +386,7 @@ public class TvTEvent
 				PcInventory inv = playerInstance.getInventory();
 				
 				// Check for stackable item, non stackabe items need to be added one by one
-				if (ItemTable.getInstance().createDummyItem(reward[0]).isStackable())
+				if (ItemTable.getInstance().getTemplate(reward[0]).isStackable())
 				{
 					inv.addItem("TvT Event", reward[0], reward[1], playerInstance, playerInstance);
 					

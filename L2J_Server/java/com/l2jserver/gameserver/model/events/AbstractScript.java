@@ -117,6 +117,7 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.interfaces.IPositionable;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.itemcontainer.PcInventory;
+import com.l2jserver.gameserver.model.items.L2EtcItem;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.olympiad.Olympiad;
@@ -2015,8 +2016,8 @@ public abstract class AbstractScript extends ManagedScript
 			return;
 		}
 		
-		final L2ItemInstance _tmpItem = ItemTable.getInstance().createDummyItem(itemId);
-		if (_tmpItem == null)
+		final L2Item item = ItemTable.getInstance().getTemplate(itemId);
+		if (item == null)
 		{
 			return;
 		}
@@ -2029,9 +2030,9 @@ public abstract class AbstractScript extends ManagedScript
 			}
 			else if (Config.RATE_QUEST_REWARD_USE_MULTIPLIERS)
 			{
-				if (_tmpItem.isEtcItem())
+				if (item instanceof L2EtcItem)
 				{
-					switch (_tmpItem.getEtcItem().getItemType())
+					switch (((L2EtcItem) item).getItemType())
 					{
 						case POTION:
 							count *= Config.RATE_QUEST_REWARD_POTION;
@@ -2063,13 +2064,13 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		
 		// Add items to player's inventory
-		L2ItemInstance item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-		if (item == null)
+		final L2ItemInstance itemInstance = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
+		if (itemInstance == null)
 		{
 			return;
 		}
 		
-		sendItemGetMessage(player, item, count);
+		sendItemGetMessage(player, itemInstance, count);
 	}
 	
 	/**
