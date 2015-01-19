@@ -25,14 +25,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.L2ArmorSet;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 
 /**
  * @author godson, Luno, UnAfraid
  */
-public final class ArmorSetsData implements DocumentParser
+public final class ArmorSetsData implements IXmlReader
 {
 	private static final Map<Integer, L2ArmorSet> _armorSets = new HashMap<>();
 	

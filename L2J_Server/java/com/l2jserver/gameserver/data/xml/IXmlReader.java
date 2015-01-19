@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.engines;
+package com.l2jserver.gameserver.data.xml;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -38,9 +38,9 @@ import com.l2jserver.util.file.filter.XMLFilter;
  * Abstract class for XML parsers.
  * @author Zoey76
  */
-public interface DocumentParser
+public interface IXmlReader
 {
-	static final Logger LOGGER = Logger.getLogger(DocumentParser.class.getName());
+	static final Logger LOGGER = Logger.getLogger(IXmlReader.class.getName());
 	
 	static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
 	static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";

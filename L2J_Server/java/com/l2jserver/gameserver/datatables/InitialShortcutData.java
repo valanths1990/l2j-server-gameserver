@@ -27,7 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.enums.MacroType;
 import com.l2jserver.gameserver.enums.ShortcutType;
 import com.l2jserver.gameserver.model.Macro;
@@ -43,7 +43,7 @@ import com.l2jserver.gameserver.network.serverpackets.ShortCutRegister;
  * What shortcuts get each newly created character.
  * @author Zoey76
  */
-public final class InitialShortcutData implements DocumentParser
+public final class InitialShortcutData implements IXmlReader
 {
 	private final Map<ClassId, List<Shortcut>> _initialShortcutData = new HashMap<>();
 	private final List<Shortcut> _initialGlobalShortcutList = new ArrayList<>();

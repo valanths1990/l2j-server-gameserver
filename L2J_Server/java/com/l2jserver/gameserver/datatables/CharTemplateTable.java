@@ -28,7 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.templates.L2PcTemplate;
@@ -38,7 +38,7 @@ import com.l2jserver.gameserver.model.base.ClassId;
  * This will be reworked Soon(tm).
  * @author Forsaiken, Zoey76, GKR
  */
-public final class CharTemplateTable implements DocumentParser
+public final class CharTemplateTable implements IXmlReader
 {
 	private static final Logger LOGGER = Logger.getLogger(CharTemplateTable.class.getName());
 	

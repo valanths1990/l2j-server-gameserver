@@ -33,7 +33,7 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.buylist.L2BuyList;
 import com.l2jserver.gameserver.model.buylist.Product;
 import com.l2jserver.gameserver.model.items.L2Item;
@@ -42,7 +42,7 @@ import com.l2jserver.util.file.filter.NumericNameFilter;
 /**
  * @author NosBit
  */
-public final class BuyListData implements DocumentParser
+public final class BuyListData implements IXmlReader
 {
 	private final Map<Integer, L2BuyList> _buyLists = new HashMap<>();
 	private static final FileFilter NUMERIC_FILTER = new NumericNameFilter();

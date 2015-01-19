@@ -36,7 +36,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.enums.AISkillScope;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
@@ -55,7 +55,7 @@ import com.l2jserver.gameserver.util.Util;
  * NPC data parser.
  * @author NosBit
  */
-public class NpcData implements DocumentParser
+public class NpcData implements IXmlReader
 {
 	private final Map<Integer, L2NpcTemplate> _npcs = new ConcurrentHashMap<>();
 	private final Map<String, Integer> _clans = new ConcurrentHashMap<>();
@@ -805,7 +805,7 @@ public class NpcData implements DocumentParser
 	 * Once Spawn System gets reworked delete this class<br>
 	 * @author Zealar
 	 */
-	private final class MinionData implements DocumentParser
+	private final class MinionData implements IXmlReader
 	{
 		public final Map<Integer, List<MinionHolder>> _tempMinions = new HashMap<>();
 		

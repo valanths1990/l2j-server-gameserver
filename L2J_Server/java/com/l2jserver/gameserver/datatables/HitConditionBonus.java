@@ -24,14 +24,14 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.actor.L2Character;
 
 /**
  * This class load, holds and calculates the hit condition bonuses.
  * @author Nik
  */
-public final class HitConditionBonus implements DocumentParser
+public final class HitConditionBonus implements IXmlReader
 {
 	private int frontBonus = 0;
 	private int sideBonus = 0;

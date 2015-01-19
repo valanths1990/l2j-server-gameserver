@@ -28,7 +28,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.items.PcItemTemplate;
@@ -38,7 +38,7 @@ import com.l2jserver.gameserver.model.items.PcItemTemplate;
  * What items get each newly created character and if this item is equipped upon creation (<b>Requires the item to be equippable</b>).
  * @author Zoey76
  */
-public final class InitialEquipmentData implements DocumentParser
+public final class InitialEquipmentData implements IXmlReader
 {
 	private static final String NORMAL = "data/stats/initialEquipment.xml";
 	private static final String EVENT = "data/stats/initialEquipmentEvent.xml";

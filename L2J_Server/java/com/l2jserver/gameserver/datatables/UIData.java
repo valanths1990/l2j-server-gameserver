@@ -27,14 +27,14 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.ActionKey;
 
 /**
  * UI Data parser.
  * @author Zoey76
  */
-public class UIData implements DocumentParser
+public class UIData implements IXmlReader
 {
 	private static final Logger LOGGER = Logger.getLogger(UIData.class.getName());
 	

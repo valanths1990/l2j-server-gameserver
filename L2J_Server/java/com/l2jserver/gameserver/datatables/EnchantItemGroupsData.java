@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.holders.RangeChanceHolder;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.enchant.EnchantItemGroup;
@@ -37,7 +37,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author UnAfraid
  */
-public final class EnchantItemGroupsData implements DocumentParser
+public final class EnchantItemGroupsData implements IXmlReader
 {
 	private final Map<String, EnchantItemGroup> _itemGroups = new HashMap<>();
 	private final Map<Integer, EnchantScrollGroup> _scrollGroups = new HashMap<>();

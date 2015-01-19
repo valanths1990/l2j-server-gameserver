@@ -29,14 +29,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.enums.CategoryType;
 
 /**
  * This class holds different categories containing class ids or npc ids.
  * @author NosBit, xban1x
  */
-public final class CategoryData implements DocumentParser
+public final class CategoryData implements IXmlReader
 {
 	private static final Logger LOGGER = Logger.getLogger(CategoryData.class.getName());
 	

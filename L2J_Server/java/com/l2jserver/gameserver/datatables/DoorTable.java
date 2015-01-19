@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
 import com.l2jserver.gameserver.instancemanager.MapRegionManager;
@@ -42,7 +42,7 @@ import com.l2jserver.gameserver.pathfinding.AbstractNodeLoc;
 /**
  * @author JIV, GodKratos, UnAfraid
  */
-public class DoorTable implements DocumentParser
+public class DoorTable implements IXmlReader
 {
 	private static final Map<String, Set<Integer>> _groups = new HashMap<>();
 	

@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.options.EnchantOptions;
 import com.l2jserver.gameserver.util.Util;
@@ -33,7 +33,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author UnAfraid
  */
-public class EnchantItemOptionsData implements DocumentParser
+public class EnchantItemOptionsData implements IXmlReader
 {
 	private final Map<Integer, Map<Integer, EnchantOptions>> _data = new HashMap<>();
 	

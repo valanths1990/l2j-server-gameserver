@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.items.enchant.EnchantScroll;
 import com.l2jserver.gameserver.model.items.enchant.EnchantSupportItem;
@@ -36,7 +36,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * This class holds the Enchant Item information.
  * @author UnAfraid
  */
-public class EnchantItemData implements DocumentParser
+public class EnchantItemData implements IXmlReader
 {
 	public static final Map<Integer, EnchantScroll> _scrolls = new HashMap<>();
 	public static final Map<Integer, EnchantSupportItem> _supports = new HashMap<>();

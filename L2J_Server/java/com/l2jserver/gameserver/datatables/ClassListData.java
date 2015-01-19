@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.base.ClassInfo;
 
@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.model.base.ClassInfo;
  * It's in <i>beta</i> state, so it's expected to change over time.
  * @author Zoey76
  */
-public final class ClassListData implements DocumentParser
+public final class ClassListData implements IXmlReader
 {
 	private static final Map<ClassId, ClassInfo> _classData = new HashMap<>();
 	

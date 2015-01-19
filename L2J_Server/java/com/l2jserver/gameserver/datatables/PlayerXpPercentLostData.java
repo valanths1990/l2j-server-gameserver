@@ -24,13 +24,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 
 /**
  * This class holds the Player Xp Percent Lost Data for each level for players.
  * @author Zealar
  */
-public final class PlayerXpPercentLostData implements DocumentParser
+public final class PlayerXpPercentLostData implements IXmlReader
 {
 	private final int _maxlevel = ExperienceTable.getInstance().getMaxLevel();
 	private final double[] _playerXpPercentLost = new double[_maxlevel + 1];

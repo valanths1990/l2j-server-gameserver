@@ -26,12 +26,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 
 /**
  * @author UnAfraid
  */
-public class KarmaData implements DocumentParser
+public class KarmaData implements IXmlReader
 {
 	private final Map<Integer, Double> _karmaTable = new HashMap<>();
 	

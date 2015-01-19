@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.fishing.L2FishingMonster;
 
@@ -33,7 +33,7 @@ import com.l2jserver.gameserver.model.fishing.L2FishingMonster;
  * This class holds the Fishing Monsters information.
  * @author nonom
  */
-public final class FishingMonstersData implements DocumentParser
+public final class FishingMonstersData implements IXmlReader
 {
 	private static final Map<Integer, L2FishingMonster> _fishingMonstersData = new HashMap<>();
 	

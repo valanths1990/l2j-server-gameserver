@@ -27,7 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.L2RecipeInstance;
 import com.l2jserver.gameserver.model.L2RecipeList;
 import com.l2jserver.gameserver.model.L2RecipeStatInstance;
@@ -38,7 +38,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * The Class RecipeData.
  * @author Zoey76
  */
-public class RecipeData implements DocumentParser
+public class RecipeData implements IXmlReader
 {
 	private static final Map<Integer, L2RecipeList> _recipes = new HashMap<>();
 	

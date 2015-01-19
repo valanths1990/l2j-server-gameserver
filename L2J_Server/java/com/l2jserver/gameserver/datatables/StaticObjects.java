@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2StaticObjectInstance;
@@ -36,7 +36,7 @@ import com.l2jserver.gameserver.model.actor.templates.L2CharTemplate;
  * This class loads and holds all static object data.
  * @author UnAfraid
  */
-public final class StaticObjects implements DocumentParser
+public final class StaticObjects implements IXmlReader
 {
 	private static final Map<Integer, L2StaticObjectInstance> _staticObjects = new HashMap<>();
 	

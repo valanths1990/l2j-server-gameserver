@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.fishing.L2FishingRod;
 
@@ -33,7 +33,7 @@ import com.l2jserver.gameserver.model.fishing.L2FishingRod;
  * This class holds the Fishing Rods information.
  * @author nonom
  */
-public final class FishingRodsData implements DocumentParser
+public final class FishingRodsData implements IXmlReader
 {
 	private static final Map<Integer, L2FishingRod> _fishingRods = new HashMap<>();
 	
