@@ -37,9 +37,9 @@ import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.EnchantItemOptionsData;
+import com.l2jserver.gameserver.data.xml.impl.EnchantItemOptionsData;
+import com.l2jserver.gameserver.data.xml.impl.OptionData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.OptionsData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.ItemLocation;
 import com.l2jserver.gameserver.enums.ShotType;
@@ -2209,7 +2209,7 @@ public final class L2ItemInstance extends L2Object
 		
 		for (int id : getEnchantOptions())
 		{
-			final Options options = OptionsData.getInstance().getOptions(id);
+			final Options options = OptionData.getInstance().getOptions(id);
 			if (options != null)
 			{
 				options.apply(player);

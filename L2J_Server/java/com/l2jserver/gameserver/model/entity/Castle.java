@@ -33,10 +33,10 @@ import javolution.util.FastMap;
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.DoorTable;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.CastleManorManager;
@@ -766,7 +766,7 @@ public final class Castle extends AbstractResidence
 	// This method loads castle door data from database
 	private void loadDoor()
 	{
-		for (L2DoorInstance door : DoorTable.getInstance().getDoors())
+		for (L2DoorInstance door : DoorData.getInstance().getDoors())
 		{
 			if ((door.getCastle() != null) && (door.getCastle().getResidenceId() == getResidenceId()))
 			{
@@ -818,7 +818,7 @@ public final class Castle extends AbstractResidence
 	
 	public void setDoorUpgrade(int doorId, int ratio, boolean save)
 	{
-		final L2DoorInstance door = (getDoors().isEmpty()) ? DoorTable.getInstance().getDoor(doorId) : getDoor(doorId);
+		final L2DoorInstance door = (getDoors().isEmpty()) ? DoorData.getInstance().getDoor(doorId) : getDoor(doorId);
 		if (door == null)
 		{
 			return;

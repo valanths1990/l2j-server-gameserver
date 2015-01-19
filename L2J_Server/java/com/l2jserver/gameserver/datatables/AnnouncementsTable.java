@@ -37,6 +37,7 @@ import com.l2jserver.gameserver.network.clientpackets.Say2;
 import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
 
 /**
+ * Loads announcements from database.
  * @author UnAfraid
  */
 public final class AnnouncementsTable
@@ -50,9 +51,6 @@ public final class AnnouncementsTable
 		load();
 	}
 	
-	/**
-	 * Loads all announcements from database.
-	 */
 	private void load()
 	{
 		_announcements.clear();

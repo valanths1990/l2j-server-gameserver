@@ -30,6 +30,7 @@ import java.util.regex.PatternSyntaxException;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 
 public class PetNameTable
 {
@@ -53,7 +54,7 @@ public class PetNameTable
 				cond.append(", ");
 			}
 			
-			cond.append(PetDataTable.getPetItemsByNpc(petNpcId));
+			cond.append(PetDataTable.getInstance().getPetItemsByNpc(petNpcId));
 			ps.setString(2, cond.toString());
 			try (ResultSet rs = ps.executeQuery())
 			{

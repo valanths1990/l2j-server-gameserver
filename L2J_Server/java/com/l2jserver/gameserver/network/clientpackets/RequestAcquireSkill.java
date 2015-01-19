@@ -21,8 +21,8 @@ package com.l2jserver.gameserver.network.clientpackets;
 import java.util.List;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
 import com.l2jserver.gameserver.instancemanager.QuestManager;
 import com.l2jserver.gameserver.model.ClanPrivilege;

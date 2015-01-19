@@ -66,23 +66,23 @@ import com.l2jserver.gameserver.ai.L2SummonAI;
 import com.l2jserver.gameserver.cache.WarehouseCacheManager;
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
-import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
+import com.l2jserver.gameserver.data.xml.impl.ClassListData;
+import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
+import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.xml.impl.FishData;
+import com.l2jserver.gameserver.data.xml.impl.HennaData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
+import com.l2jserver.gameserver.data.xml.impl.PlayerTemplateData;
+import com.l2jserver.gameserver.data.xml.impl.PlayerXpPercentLostData;
+import com.l2jserver.gameserver.data.xml.impl.RecipeData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.CharNameTable;
 import com.l2jserver.gameserver.datatables.CharSummonTable;
-import com.l2jserver.gameserver.datatables.CharTemplateTable;
 import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.ClassListData;
-import com.l2jserver.gameserver.datatables.EnchantSkillGroupsData;
-import com.l2jserver.gameserver.datatables.ExperienceTable;
-import com.l2jserver.gameserver.datatables.FishData;
-import com.l2jserver.gameserver.datatables.HennaData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
-import com.l2jserver.gameserver.datatables.PetDataTable;
-import com.l2jserver.gameserver.datatables.PlayerXpPercentLostData;
-import com.l2jserver.gameserver.datatables.RecipeData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.enums.HtmlActionScope;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
 import com.l2jserver.gameserver.enums.InstanceType;
@@ -1172,7 +1172,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public final L2PcTemplate getBaseTemplate()
 	{
-		return CharTemplateTable.getInstance().getTemplate(_baseClass);
+		return PlayerTemplateData.getInstance().getTemplate(_baseClass);
 	}
 	
 	/**
@@ -1189,7 +1189,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void setTemplate(ClassId newclass)
 	{
-		super.setTemplate(CharTemplateTable.getInstance().getTemplate(newclass));
+		super.setTemplate(PlayerTemplateData.getInstance().getTemplate(newclass));
 	}
 	
 	@Override
@@ -2695,7 +2695,7 @@ public final class L2PcInstance extends L2Playable
 		{
 			return getTemplate().getRace();
 		}
-		return CharTemplateTable.getInstance().getTemplate(_baseClass).getRace();
+		return PlayerTemplateData.getInstance().getTemplate(_baseClass).getRace();
 	}
 	
 	public L2Radar getRadar()
@@ -5612,13 +5612,13 @@ public final class L2PcInstance extends L2Playable
 		long lostExp = 0;
 		if (!L2Event.isParticipant(this))
 		{
-			if (lvl < ExperienceTable.getInstance().getMaxLevel())
+			if (lvl < ExperienceData.getInstance().getMaxLevel())
 			{
 				lostExp = Math.round(((getStat().getExpForLevel(lvl + 1) - getStat().getExpForLevel(lvl)) * percentLost) / 100);
 			}
 			else
 			{
-				lostExp = Math.round(((getStat().getExpForLevel(ExperienceTable.getInstance().getMaxLevel()) - getStat().getExpForLevel(ExperienceTable.getInstance().getMaxLevel() - 1)) * percentLost) / 100);
+				lostExp = Math.round(((getStat().getExpForLevel(ExperienceData.getInstance().getMaxLevel()) - getStat().getExpForLevel(ExperienceData.getInstance().getMaxLevel() - 1)) * percentLost) / 100);
 			}
 		}
 		
@@ -6553,7 +6553,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void setAccessLevel(int level)
 	{
-		_accessLevel = AdminTable.getInstance().getAccessLevel(level);
+		_accessLevel = AdminData.getInstance().getAccessLevel(level);
 		
 		getAppearance().setNameColor(_accessLevel.getNameColor());
 		getAppearance().setTitleColor(_accessLevel.getTitleColor());
@@ -6561,7 +6561,7 @@ public final class L2PcInstance extends L2Playable
 		
 		CharNameTable.getInstance().addName(this);
 		
-		if (!AdminTable.getInstance().hasAccessLevel(level))
+		if (!AdminData.getInstance().hasAccessLevel(level))
 		{
 			_log.warning("Tryed to set unregistered access level " + level + " for " + toString() + ". Setting access level without privileges!");
 		}
@@ -6584,7 +6584,7 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (Config.EVERYBODY_HAS_ADMIN_RIGHTS)
 		{
-			return AdminTable.getInstance().getMasterAccessLevel();
+			return AdminData.getInstance().getMasterAccessLevel();
 		}
 		else if (_accessLevel == null)
 		{
@@ -6775,7 +6775,7 @@ public final class L2PcInstance extends L2Playable
 				{
 					final int activeClassId = rset.getInt("classid");
 					final boolean female = rset.getInt("sex") != Sex.MALE.ordinal();
-					final L2PcTemplate template = CharTemplateTable.getInstance().getTemplate(activeClassId);
+					final L2PcTemplate template = PlayerTemplateData.getInstance().getTemplate(activeClassId);
 					PcAppearance app = new PcAppearance(rset.getByte("face"), rset.getByte("hairColor"), rset.getByte("hairStyle"), female);
 					
 					player = new L2PcInstance(objectId, template, rset.getString("account_name"), app);
@@ -10147,7 +10147,7 @@ public final class L2PcInstance extends L2Playable
 	{
 		_activeClass = classId;
 		
-		final L2PcTemplate pcTemplate = CharTemplateTable.getInstance().getTemplate(classId);
+		final L2PcTemplate pcTemplate = PlayerTemplateData.getInstance().getTemplate(classId);
 		if (pcTemplate == null)
 		{
 			_log.severe("Missing template for classId: " + classId);
@@ -11362,7 +11362,7 @@ public final class L2PcInstance extends L2Playable
 		{
 			try
 			{
-				AdminTable.getInstance().deleteGm(this);
+				AdminData.getInstance().deleteGm(this);
 			}
 			catch (Exception e)
 			{

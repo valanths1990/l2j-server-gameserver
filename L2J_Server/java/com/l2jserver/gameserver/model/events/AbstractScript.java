@@ -39,9 +39,9 @@ import javolution.util.FastSet;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.enums.QuestSound;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
@@ -2587,7 +2587,7 @@ public abstract class AbstractScript extends ManagedScript
 		L2DoorInstance door = null;
 		if (instanceId <= 0)
 		{
-			door = DoorTable.getInstance().getDoor(doorId);
+			door = DoorData.getInstance().getDoor(doorId);
 		}
 		else
 		{

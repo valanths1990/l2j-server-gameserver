@@ -29,9 +29,9 @@ import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
@@ -590,7 +590,7 @@ public class TvTEvent
 		L2DoorInstance door = null;
 		if (_TvTEventInstance <= 0)
 		{
-			door = DoorTable.getInstance().getDoor(doorId);
+			door = DoorData.getInstance().getDoor(doorId);
 		}
 		else
 		{
