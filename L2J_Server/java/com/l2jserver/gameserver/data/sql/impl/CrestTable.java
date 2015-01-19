@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.datatables;
+package com.l2jserver.gameserver.data.sql.impl;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -41,6 +41,7 @@ import com.l2jserver.gameserver.model.L2Crest.CrestType;
 import com.l2jserver.util.file.filter.BMPFilter;
 
 /**
+ * Loads and saves crests from database.
  * @author NosBit
  */
 public final class CrestTable

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.datatables;
+package com.l2jserver.gameserver.data.sql.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,8 +34,8 @@ import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * This class ...
- * @version $Revision: 1.3.2.2.2.1 $ $Date: 2005/03/27 15:29:18 $
+ * Loads name and access level for all players.
+ * @version 2005/03/27
  */
 public class CharNameTable
 {

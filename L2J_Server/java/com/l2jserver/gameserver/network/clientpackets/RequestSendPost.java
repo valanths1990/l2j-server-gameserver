@@ -22,8 +22,8 @@ import static com.l2jserver.gameserver.model.itemcontainer.Inventory.ADENA_ID;
 import static com.l2jserver.gameserver.model.itemcontainer.Inventory.MAX_ADENA;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
-import com.l2jserver.gameserver.datatables.CharNameTable;
 import com.l2jserver.gameserver.enums.PrivateStoreType;
 import com.l2jserver.gameserver.instancemanager.MailManager;
 import com.l2jserver.gameserver.model.BlockList;

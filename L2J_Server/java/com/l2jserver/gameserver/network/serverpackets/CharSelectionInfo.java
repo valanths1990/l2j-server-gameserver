@@ -29,8 +29,8 @@ import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
-import com.l2jserver.gameserver.datatables.ClanTable;
 import com.l2jserver.gameserver.model.CharSelectInfoPackage;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;

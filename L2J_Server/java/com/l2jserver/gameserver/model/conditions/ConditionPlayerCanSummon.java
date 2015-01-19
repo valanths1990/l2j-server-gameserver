@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.CharSummonTable;
+import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.L2Item;

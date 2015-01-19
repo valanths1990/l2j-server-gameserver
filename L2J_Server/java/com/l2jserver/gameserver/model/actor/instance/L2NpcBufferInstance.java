@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.NpcBufferTable;
-import com.l2jserver.gameserver.datatables.NpcBufferTable.NpcBufferData;
+import com.l2jserver.gameserver.data.sql.impl.NpcBufferTable;
+import com.l2jserver.gameserver.data.sql.impl.NpcBufferTable.NpcBufferData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.actor.L2Character;
