@@ -19,9 +19,12 @@
 package com.l2jserver.gameserver.model.actor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
@@ -86,10 +89,10 @@ public class L2Attackable extends L2Npc
 	private boolean _seeded = false;
 	private L2Seed _seed = null;
 	private int _seederObjId = 0;
-	private ItemHolder _harvestItem;
+	private final AtomicReference<ItemHolder> _harvestItem = new AtomicReference<>();
 	// Spoil
 	private int _spoilerObjectId;
-	private ItemHolder[] _sweepItems;
+	private final AtomicReference<Collection<ItemHolder>> _sweepItems = new AtomicReference<>();
 	// Over-hit
 	private boolean _overhit;
 	private double _overhitDamage;
@@ -983,14 +986,10 @@ public class L2Attackable extends L2Npc
 		
 		if (isSpoiled())
 		{
-			List<ItemHolder> sweepItems = npcTemplate.calculateDrops(DropListScope.CORPSE, this, player);
-			if ((sweepItems != null) && !sweepItems.isEmpty())
-			{
-				_sweepItems = sweepItems.toArray(new ItemHolder[sweepItems.size()]);
-			}
+			_sweepItems.set(npcTemplate.calculateDrops(DropListScope.CORPSE, this, player));
 		}
 		
-		List<ItemHolder> deathItems = npcTemplate.calculateDrops(DropListScope.DEATH, this, player);
+		Collection<ItemHolder> deathItems = npcTemplate.calculateDrops(DropListScope.DEATH, this, player);
 		if (deathItems != null)
 		{
 			for (ItemHolder drop : deathItems)
@@ -1138,7 +1137,7 @@ public class L2Attackable extends L2Npc
 	@Override
 	public boolean isSweepActive()
 	{
-		return _sweepItems != null;
+		return _sweepItems.get() != null;
 	}
 	
 	/**
@@ -1146,10 +1145,11 @@ public class L2Attackable extends L2Npc
 	 */
 	public List<L2Item> getSpoilLootItems()
 	{
-		final List<L2Item> lootItems = new ArrayList<>();
-		if (isSweepActive())
+		final Collection<ItemHolder> sweepItems = _sweepItems.get();
+		final List<L2Item> lootItems = new LinkedList<>();
+		if (sweepItems != null)
 		{
-			for (ItemHolder item : _sweepItems)
+			for (ItemHolder item : sweepItems)
 			{
 				lootItems.add(ItemTable.getInstance().getTemplate(item.getId()));
 			}
@@ -1160,21 +1160,17 @@ public class L2Attackable extends L2Npc
 	/**
 	 * @return table containing all L2ItemInstance that can be spoiled.
 	 */
-	public synchronized ItemHolder[] takeSweep()
+	public Collection<ItemHolder> takeSweep()
 	{
-		ItemHolder[] sweep = _sweepItems;
-		_sweepItems = null;
-		return sweep;
+		return _sweepItems.getAndSet(null);
 	}
 	
 	/**
 	 * @return table containing all L2ItemInstance that can be harvested.
 	 */
-	public synchronized ItemHolder takeHarvest()
+	public ItemHolder takeHarvest()
 	{
-		ItemHolder harvest = _harvestItem;
-		_harvestItem = null;
-		return harvest;
+		return _harvestItem.getAndSet(null);
 	}
 	
 	/**
@@ -1418,7 +1414,7 @@ public class L2Attackable extends L2Npc
 		// Clear all aggro char from list
 		clearAggroList();
 		// Clear Harvester reward
-		_harvestItem = null;
+		_harvestItem.set(null);
 		// Clear mod Seeded stat
 		_seeded = false;
 		_seed = null;
@@ -1426,7 +1422,7 @@ public class L2Attackable extends L2Npc
 		// Clear overhit value
 		overhitEnabled(false);
 		
-		_sweepItems = null;
+		_sweepItems.set(null);
 		resetAbsorbList();
 		
 		setWalking();
@@ -1516,7 +1512,7 @@ public class L2Attackable extends L2Npc
 			{
 				count += diff;
 			}
-			_harvestItem = new ItemHolder(_seed.getCropId(), count * Config.RATE_DROP_MANOR);
+			_harvestItem.set(new ItemHolder(_seed.getCropId(), count * Config.RATE_DROP_MANOR));
 		}
 	}
 	
