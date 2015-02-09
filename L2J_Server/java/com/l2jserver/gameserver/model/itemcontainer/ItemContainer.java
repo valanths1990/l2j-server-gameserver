@@ -239,7 +239,7 @@ public abstract class ItemContainer
 			item = olditem;
 			
 			// Updates database
-			float adenaRate = Config.RATE_DROP_AMOUNT_MULTIPLIER.containsKey(Inventory.ADENA_ID) ? Config.RATE_DROP_AMOUNT_MULTIPLIER.get(Inventory.ADENA_ID) : 1;
+			float adenaRate = Config.RATE_DROP_AMOUNT_MULTIPLIER.getOrDefault(Inventory.ADENA_ID, 1f);
 			if ((item.getId() == Inventory.ADENA_ID) && (count < (10000 * adenaRate)))
 			{
 				// Small adena changes won't be saved to database all the time
@@ -291,7 +291,7 @@ public abstract class ItemContainer
 			item.setLastChange(L2ItemInstance.MODIFIED);
 			// Updates database
 			// If Adena drop rate is not present it will be x1.
-			float adenaRate = Config.RATE_DROP_AMOUNT_MULTIPLIER.containsKey(Inventory.ADENA_ID) ? Config.RATE_DROP_AMOUNT_MULTIPLIER.get(Inventory.ADENA_ID) : 1;
+			float adenaRate = Config.RATE_DROP_AMOUNT_MULTIPLIER.getOrDefault(Inventory.ADENA_ID, 1f);
 			if ((itemId == Inventory.ADENA_ID) && (count < (10000 * adenaRate)))
 			{
 				// Small adena changes won't be saved to database all the time
