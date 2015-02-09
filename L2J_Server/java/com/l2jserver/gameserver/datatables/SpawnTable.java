@@ -26,12 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
-import javolution.util.FastSet;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -58,7 +56,7 @@ public final class SpawnTable implements IXmlReader
 	private static final String SELECT_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM spawnlist";
 	private static final String SELECT_CUSTOM_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM custom_spawnlist";
 	
-	private static final Map<Integer, Set<L2Spawn>> _spawnTable = new FastMap<Integer, Set<L2Spawn>>().shared();
+	private static final Map<Integer, Set<L2Spawn>> _spawnTable = new ConcurrentHashMap<>();
 	
 	private int _xmlSpawnCount = 0;
 	
@@ -356,43 +354,47 @@ public final class SpawnTable implements IXmlReader
 		return addSpawn(spawnInfo, null);
 	}
 	
+	/**
+	 * Gets the spawn data.
+	 * @return the spawn data
+	 */
 	public Map<Integer, Set<L2Spawn>> getSpawnTable()
 	{
 		return _spawnTable;
 	}
 	
 	/**
-	 * Get the spawns for the NPC Id.
+	 * Gets the spawns for the NPC Id.
 	 * @param npcId the NPC Id
 	 * @return the spawn set for the given npcId
 	 */
 	public Set<L2Spawn> getSpawns(int npcId)
 	{
-		return _spawnTable.containsKey(npcId) ? _spawnTable.get(npcId) : Collections.<L2Spawn> emptySet();
+		return _spawnTable.getOrDefault(npcId, Collections.emptySet());
 	}
 	
 	/**
-	 * Get the first NPC spawn.
-	 * @param npcId the NPC Id to search
-	 * @return the first not null spawn, if any
+	 * Gets the spawn count for the given NPC ID.
+	 * @param npcId the NPC Id
+	 * @return the spawn count
 	 */
-	public L2Spawn getFirstSpawn(int npcId)
+	public int getSpawnCount(int npcId)
 	{
-		if (_spawnTable.containsKey(npcId))
-		{
-			for (L2Spawn spawn : _spawnTable.get(npcId))
-			{
-				if (spawn != null)
-				{
-					return spawn;
-				}
-			}
-		}
-		return null;
+		return getSpawns(npcId).size();
 	}
 	
 	/**
-	 * Add a new spawn to the spawn table.
+	 * Gets a spawn for the given NPC ID.
+	 * @param npcId the NPC Id
+	 * @return a spawn for the given NPC ID or {@code null}
+	 */
+	public L2Spawn getAnySpawn(int npcId)
+	{
+		return getSpawns(npcId).stream().findFirst().orElse(null);
+	}
+	
+	/**
+	 * Adds a new spawn to the spawn table.
 	 * @param spawn the spawn to add
 	 * @param storeInDb if {@code true} it'll be saved in the database
 	 */
@@ -461,11 +463,7 @@ public final class SpawnTable implements IXmlReader
 	 */
 	private void addSpawn(L2Spawn spawn)
 	{
-		if (!_spawnTable.containsKey(spawn.getId()))
-		{
-			_spawnTable.put(spawn.getId(), new FastSet<L2Spawn>().shared());
-		}
-		_spawnTable.get(spawn.getId()).add(spawn);
+		_spawnTable.computeIfAbsent(spawn.getId(), k -> ConcurrentHashMap.newKeySet(1)).add(spawn);
 	}
 	
 	/**
@@ -475,9 +473,9 @@ public final class SpawnTable implements IXmlReader
 	 */
 	private boolean removeSpawn(L2Spawn spawn)
 	{
-		if (_spawnTable.containsKey(spawn.getId()))
+		final Set<L2Spawn> set = _spawnTable.get(spawn.getId());
+		if (set != null)
 		{
-			final Set<L2Spawn> set = _spawnTable.get(spawn.getId());
 			boolean removed = set.remove(spawn);
 			if (set.isEmpty())
 			{
