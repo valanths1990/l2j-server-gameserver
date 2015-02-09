@@ -86,7 +86,8 @@ public class MinionList
 			return;
 		}
 		
-		int minionCount, minionId, minionsToSpawn;
+		int minionCount, minionId;
+		long minionsToSpawn;
 		for (MinionHolder minion : minions)
 		{
 			minionCount = minion.getCount();
@@ -401,17 +402,9 @@ public class MinionList
 	
 	// Statistics part
 	
-	private final int countSpawnedMinionsById(int minionId)
+	private final long countSpawnedMinionsById(int minionId)
 	{
-		int count = 0;
-		for (L2MonsterInstance minion : _minionReferences)
-		{
-			if ((minion != null) && (minion.getId() == minionId))
-			{
-				count++;
-			}
-		}
-		return count;
+		return _minionReferences.stream().filter(npc -> npc.getId() == minionId).count();
 	}
 	
 	public final int countSpawnedMinions()
@@ -421,6 +414,6 @@ public class MinionList
 	
 	public final long lazyCountSpawnedMinionsGroups()
 	{
-		return _minionReferences.stream().distinct().count();
+		return _minionReferences.stream().map(L2MonsterInstance::getId).distinct().count();
 	}
 }
