@@ -20,11 +20,8 @@ package com.l2jserver.gameserver.util;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -46,7 +43,7 @@ public class MinionList
 	
 	protected final L2MonsterInstance _master;
 	/** List containing the current spawned minions */
-	private final List<L2MonsterInstance> _minionReferences;
+	private final List<L2MonsterInstance> _minionReferences = new CopyOnWriteArrayList<>();
 	/** List containing the cached deleted minions for reuse */
 	protected List<L2MonsterInstance> _reusedMinionReferences = null;
 	
@@ -56,9 +53,7 @@ public class MinionList
 		{
 			throw new NullPointerException("MinionList: master is null");
 		}
-		
 		_master = pMaster;
-		_minionReferences = new FastList<L2MonsterInstance>().shared();
 	}
 	
 	/**
@@ -156,7 +151,7 @@ public class MinionList
 		// if master has spawn and can respawn - try to reuse minions
 		if ((_reusedMinionReferences == null) && (_master.getTemplate().getParameters().getSet().get("SummonPrivateRate") == null) && !_master.getTemplate().getParameters().getMinionList("Privates").isEmpty() && (_master.getSpawn() != null) && _master.getSpawn().isRespawnEnabled())
 		{
-			_reusedMinionReferences = new FastList<L2MonsterInstance>().shared();
+			_reusedMinionReferences = new CopyOnWriteArrayList<>();
 		}
 	}
 	
@@ -424,18 +419,8 @@ public class MinionList
 		return _minionReferences.size();
 	}
 	
-	public final int lazyCountSpawnedMinionsGroups()
+	public final long lazyCountSpawnedMinionsGroups()
 	{
-		Set<Integer> seenGroups = new FastSet<>();
-		for (L2MonsterInstance minion : _minionReferences)
-		{
-			if (minion == null)
-			{
-				continue;
-			}
-			
-			seenGroups.add(minion.getId());
-		}
-		return seenGroups.size();
+		return _minionReferences.stream().distinct().count();
 	}
 }
