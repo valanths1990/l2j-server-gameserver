@@ -39,7 +39,6 @@ import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
-import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Party;
@@ -53,7 +52,6 @@ import com.l2jserver.gameserver.model.TeleportWhereType;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2FestivalMonsterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.NpcStringId;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -2152,12 +2150,10 @@ public class SevenSignsFestival implements SpawnListener
 				}
 			}
 			
-			L2NpcTemplate witchTemplate = NpcData.getInstance().getTemplate(_witchSpawn._npcId);
-			
 			// Spawn the festival witch for this arena
 			try
 			{
-				L2Spawn npcSpawn = new L2Spawn(witchTemplate);
+				L2Spawn npcSpawn = new L2Spawn(_witchSpawn._npcId);
 				
 				npcSpawn.setX(_witchSpawn._x);
 				npcSpawn.setY(_witchSpawn._y);
@@ -2277,11 +2273,9 @@ public class SevenSignsFestival implements SpawnListener
 					continue;
 				}
 				
-				L2NpcTemplate npcTemplate = NpcData.getInstance().getTemplate(currSpawn._npcId);
-				
 				try
 				{
-					L2Spawn npcSpawn = new L2Spawn(npcTemplate);
+					L2Spawn npcSpawn = new L2Spawn(currSpawn._npcId);
 					
 					npcSpawn.setX(currSpawn._x);
 					npcSpawn.setY(currSpawn._y);

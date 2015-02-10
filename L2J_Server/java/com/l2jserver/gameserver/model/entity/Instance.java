@@ -43,7 +43,6 @@ import org.w3c.dom.Node;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.data.xml.impl.DoorData;
-import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.enums.InstanceReenterType;
 import com.l2jserver.gameserver.enums.InstanceRemoveBuffType;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
@@ -59,7 +58,6 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2DoorTemplate;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.holders.InstanceReenterTimeHolder;
 import com.l2jserver.gameserver.model.instancezone.InstanceWorld;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -460,8 +458,6 @@ public final class Instance
 	
 	private void parseInstance(Node n) throws Exception
 	{
-		L2Spawn spawnDat;
-		L2NpcTemplate npcTemplate;
 		_name = n.getAttributes().getNamedItem("name").getNodeValue();
 		Node a = n.getAttributes().getNamedItem("ejectTime");
 		if (a != null)
@@ -596,49 +592,42 @@ public final class Instance
 								{
 									allowRandomWalk = Boolean.valueOf(d.getAttributes().getNamedItem("allowRandomWalk").getNodeValue());
 								}
-								npcTemplate = NpcData.getInstance().getTemplate(npcId);
-								if (npcTemplate != null)
+								
+								final L2Spawn spawnDat = new L2Spawn(npcId);
+								spawnDat.setX(x);
+								spawnDat.setY(y);
+								spawnDat.setZ(z);
+								spawnDat.setAmount(1);
+								spawnDat.setHeading(heading);
+								spawnDat.setRespawnDelay(respawn, respawnRandom);
+								if (respawn == 0)
 								{
-									spawnDat = new L2Spawn(npcTemplate);
-									spawnDat.setX(x);
-									spawnDat.setY(y);
-									spawnDat.setZ(z);
-									spawnDat.setAmount(1);
-									spawnDat.setHeading(heading);
-									spawnDat.setRespawnDelay(respawn, respawnRandom);
-									if (respawn == 0)
+									spawnDat.stopRespawn();
+								}
+								else
+								{
+									spawnDat.startRespawn();
+								}
+								spawnDat.setInstanceId(getId());
+								if (allowRandomWalk == null)
+								{
+									spawnDat.setIsNoRndWalk(!_allowRandomWalk);
+								}
+								else
+								{
+									spawnDat.setIsNoRndWalk(!allowRandomWalk);
+								}
+								if (spawnGroup.equals("general"))
+								{
+									L2Npc spawned = spawnDat.doSpawn();
+									if ((delay >= 0) && (spawned instanceof L2Attackable))
 									{
-										spawnDat.stopRespawn();
-									}
-									else
-									{
-										spawnDat.startRespawn();
-									}
-									spawnDat.setInstanceId(getId());
-									if (allowRandomWalk == null)
-									{
-										spawnDat.setIsNoRndWalk(!_allowRandomWalk);
-									}
-									else
-									{
-										spawnDat.setIsNoRndWalk(!allowRandomWalk);
-									}
-									if (spawnGroup.equals("general"))
-									{
-										L2Npc spawned = spawnDat.doSpawn();
-										if ((delay >= 0) && (spawned instanceof L2Attackable))
-										{
-											((L2Attackable) spawned).setOnKillDelay(delay);
-										}
-									}
-									else
-									{
-										manualSpawn.add(spawnDat);
+										((L2Attackable) spawned).setOnKillDelay(delay);
 									}
 								}
 								else
 								{
-									_log.warning("Instance: Data missing in NPC table for ID: " + npcId + " in Instance " + getId());
+									manualSpawn.add(spawnDat);
 								}
 							}
 						}

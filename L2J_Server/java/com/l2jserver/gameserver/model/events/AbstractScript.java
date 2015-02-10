@@ -1717,13 +1717,6 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		try
 		{
-			final L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
-			if (template == null)
-			{
-				_log.severe("Couldn't find NPC template for ID:" + npcId + "!");
-				return null;
-			}
-			
 			if ((x == 0) && (y == 0))
 			{
 				_log.log(Level.SEVERE, "addSpawn(): invalid spawn coordinates for NPC #" + npcId + "!");
@@ -1747,7 +1740,7 @@ public abstract class AbstractScript extends ManagedScript
 				y += offset;
 			}
 			
-			final L2Spawn spawn = new L2Spawn(template);
+			final L2Spawn spawn = new L2Spawn(npcId);
 			spawn.setInstanceId(instanceId);
 			spawn.setHeading(heading);
 			spawn.setX(x);

@@ -302,7 +302,7 @@ public final class SpawnTable implements IXmlReader
 		int ret = 0;
 		try
 		{
-			spawnDat = new L2Spawn(NpcData.getInstance().getTemplate(spawnInfo.getInt("npcTemplateid")));
+			spawnDat = new L2Spawn(spawnInfo.getInt("npcTemplateid"));
 			spawnDat.setAmount(spawnInfo.getInt("count", 1));
 			spawnDat.setX(spawnInfo.getInt("x", 0));
 			spawnDat.setY(spawnInfo.getInt("y", 0));

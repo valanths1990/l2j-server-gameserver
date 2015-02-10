@@ -34,6 +34,7 @@ import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.NpcPersonalAIData;
 import com.l2jserver.gameserver.enums.AISkillScope;
@@ -172,6 +173,15 @@ public class L2Npc extends L2Character
 		_currentCollisionRadius = getTemplate().getfCollisionRadius();
 		
 		setIsFlying(template.isFlying());
+	}
+	
+	/**
+	 * Creates a NPC.
+	 * @param npcId the NPC ID
+	 */
+	public L2Npc(int npcId)
+	{
+		this(NpcData.getInstance().getTemplate(npcId));
 	}
 	
 	public int getSoulShotChance()
