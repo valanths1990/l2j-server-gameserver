@@ -49,13 +49,12 @@ public class L2NpcBufferInstance extends L2Npc
 	private static final Map<Integer, Integer> pageVal = new HashMap<>();
 	
 	/**
-	 * Instantiates a new l2 npc buffer instance.
-	 * @param objectId the object id
+	 * Creates a NPC buffer.
 	 * @param template the template
 	 */
-	public L2NpcBufferInstance(int objectId, L2NpcTemplate template)
+	public L2NpcBufferInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2NpcBufferInstance);
 	}
 	

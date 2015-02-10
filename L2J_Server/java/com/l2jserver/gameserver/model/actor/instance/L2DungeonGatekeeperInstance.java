@@ -32,9 +32,13 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public class L2DungeonGatekeeperInstance extends L2Npc
 {
-	public L2DungeonGatekeeperInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a dungeon gatekeeper.
+	 * @param template the dungeon gatekeeper NPC template
+	 */
+	public L2DungeonGatekeeperInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DungeonGatekeeperInstance);
 	}
 	

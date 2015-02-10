@@ -35,19 +35,12 @@ public class L2FestivalMonsterInstance extends L2MonsterInstance
 	protected int _bonusMultiplier = 1;
 	
 	/**
-	 * Constructor of L2FestivalMonsterInstance (use L2Character and L2NpcInstance constructor).<br>
-	 * <B><U>Actions</U>:</B>
-	 * <ul>
-	 * <li>Call the L2Character constructor to set the _template of the L2FestivalMonsterInstance (copy skills from template to object and link _calculators to NPC_STD_CALCULATOR)</li>
-	 * <li>Set the name of the L2MonsterInstance</li>
-	 * <li>Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it</li>
-	 * </ul>
-	 * @param objectId the identifier of the object to initialized
-	 * @param template to apply to the NPC
+	 * Creates a festival monster.
+	 * @param template the festival monster NPC template
 	 */
-	public L2FestivalMonsterInstance(int objectId, L2NpcTemplate template)
+	public L2FestivalMonsterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2FestivalMonsterInstance);
 	}
 	

@@ -23,9 +23,13 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 
 public final class L2FlyNpcInstance extends L2NpcInstance
 {
-	public L2FlyNpcInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a flying NPC.
+	 * @param template the flying NPC template
+	 */
+	public L2FlyNpcInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2FlyNpcInstance);
 		setIsFlying(true);
 	}

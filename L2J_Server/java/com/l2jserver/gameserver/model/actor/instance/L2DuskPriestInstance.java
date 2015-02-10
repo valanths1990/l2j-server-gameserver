@@ -26,9 +26,13 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public class L2DuskPriestInstance extends L2SignsPriestInstance
 {
-	public L2DuskPriestInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a dusk priest.
+	 * @param template the dusk priest NPC template
+	 */
+	public L2DuskPriestInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DuskPriestInstance);
 	}
 	
