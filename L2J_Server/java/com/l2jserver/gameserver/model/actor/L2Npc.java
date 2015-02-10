@@ -170,6 +170,8 @@ public class L2Npc extends L2Character
 		// initialize the "current" collisions
 		_currentCollisionHeight = getTemplate().getfCollisionHeight();
 		_currentCollisionRadius = getTemplate().getfCollisionRadius();
+		
+		setIsFlying(template.isFlying());
 	}
 	
 	public int getSoulShotChance()
