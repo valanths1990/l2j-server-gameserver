@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.model.events;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.script.ScriptException;
 
 import javolution.util.FastList;
 import javolution.util.FastSet;
@@ -113,6 +116,7 @@ import com.l2jserver.gameserver.model.events.returns.AbstractEventReturn;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
+import com.l2jserver.gameserver.model.interfaces.INamable;
 import com.l2jserver.gameserver.model.interfaces.IPositionable;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.itemcontainer.PcInventory;
@@ -130,21 +134,26 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SpecialCamera;
 import com.l2jserver.gameserver.network.serverpackets.StatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.gameserver.scripting.ManagedScript;
+import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
+import com.l2jserver.gameserver.scripting.ScriptManager;
 import com.l2jserver.gameserver.util.MinionList;
 import com.l2jserver.util.Rnd;
 
 /**
- * @author UnAfraid
+ * Abstract script.
+ * @author KenM, UnAfraid, Zoey76
  */
-public abstract class AbstractScript extends ManagedScript
+public abstract class AbstractScript implements INamable
 {
+	private final File _scriptFile;
+	private boolean _isActive;
 	protected static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
 	private final Map<ListenerRegisterType, Set<Integer>> _registeredIds = new ConcurrentHashMap<>();
 	private final List<AbstractEventListener> _listeners = new FastList<AbstractEventListener>().shared();
 	
 	public AbstractScript()
 	{
+		_scriptFile = L2ScriptEngineManager.getInstance().getCurrentLoadingScript();
 		initializeAnnotationListeners();
 	}
 	
@@ -299,16 +308,46 @@ public abstract class AbstractScript extends ManagedScript
 		}
 	}
 	
+	public void setActive(boolean status)
+	{
+		_isActive = status;
+	}
+	
+	public boolean isActive()
+	{
+		return _isActive;
+	}
+	
+	public File getScriptFile()
+	{
+		return _scriptFile;
+	}
+	
+	public boolean reload()
+	{
+		try
+		{
+			L2ScriptEngineManager.getInstance().executeScript(getScriptFile());
+			return true;
+		}
+		catch (ScriptException e)
+		{
+			return false;
+		}
+	}
+	
 	/**
 	 * Unloads all listeners registered by this class.
+	 * @return {@code true}
 	 */
-	@Override
 	public boolean unload()
 	{
 		_listeners.forEach(AbstractEventListener::unregisterMe);
 		_listeners.clear();
 		return true;
 	}
+	
+	public abstract ScriptManager<?> getManager();
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
