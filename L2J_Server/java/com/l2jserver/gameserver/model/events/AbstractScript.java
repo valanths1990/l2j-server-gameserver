@@ -2350,24 +2350,34 @@ public abstract class AbstractScript implements INamable
 	 */
 	public static boolean takeItems(L2PcInstance player, int itemId, long amount)
 	{
-		// Get object item from player's inventory list
-		final L2ItemInstance item = player.getInventory().getItemByItemId(itemId);
-		if (item == null)
+		final List<L2ItemInstance> items = player.getInventory().getItemsByItemId(itemId);
+		if (amount < 0)
 		{
-			return false;
+			items.forEach(i -> takeItem(player, i, i.getCount()));
 		}
-		
-		// Tests on count value in order not to have negative value
-		if ((amount < 0) || (amount > item.getCount()))
+		else
 		{
-			amount = item.getCount();
+			long currentCount = 0;
+			for (L2ItemInstance i : items)
+			{
+				long toDelete = i.getCount();
+				if ((currentCount + toDelete) > amount)
+				{
+					toDelete = amount - currentCount;
+				}
+				takeItem(player, i, toDelete);
+				currentCount += toDelete;
+			}
 		}
-		
-		// Destroy the quantity of items wanted
+		return true;
+	}
+	
+	private static boolean takeItem(L2PcInstance player, L2ItemInstance item, long toDelete)
+	{
 		if (item.isEquipped())
 		{
 			final L2ItemInstance[] unequiped = player.getInventory().unEquipItemInBodySlotAndRecord(item.getItem().getBodyPart());
-			InventoryUpdate iu = new InventoryUpdate();
+			final InventoryUpdate iu = new InventoryUpdate();
 			for (L2ItemInstance itm : unequiped)
 			{
 				iu.addModifiedItem(itm);
@@ -2375,7 +2385,7 @@ public abstract class AbstractScript implements INamable
 			player.sendPacket(iu);
 			player.broadcastUserInfo();
 		}
-		return player.destroyItemByItemId("Quest", itemId, amount, player, true);
+		return player.destroyItemByItemId("Quest", item.getId(), toDelete, player, true);
 	}
 	
 	/**
