@@ -145,11 +145,11 @@ import com.l2jserver.util.Rnd;
  */
 public abstract class AbstractScript implements INamable
 {
-	private final File _scriptFile;
-	private boolean _isActive;
-	protected static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
+	public static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
 	private final Map<ListenerRegisterType, Set<Integer>> _registeredIds = new ConcurrentHashMap<>();
 	private final List<AbstractEventListener> _listeners = new FastList<AbstractEventListener>().shared();
+	private final File _scriptFile;
+	private boolean _isActive;
 	
 	public AbstractScript()
 	{
