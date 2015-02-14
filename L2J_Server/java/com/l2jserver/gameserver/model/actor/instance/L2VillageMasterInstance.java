@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.ClassListData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.ClassListData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
@@ -69,12 +69,12 @@ public class L2VillageMasterInstance extends L2NpcInstance
 	private static Logger _log = Logger.getLogger(L2VillageMasterInstance.class.getName());
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a village master.
+	 * @param template the village master NPC template
 	 */
-	public L2VillageMasterInstance(int objectId, L2NpcTemplate template)
+	public L2VillageMasterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2VillageMasterInstance);
 	}
 	

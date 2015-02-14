@@ -22,7 +22,7 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2SummonAI;
-import com.l2jserver.gameserver.datatables.ExperienceTable;
+import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
@@ -107,9 +107,14 @@ public abstract class L2Summon extends L2Playable
 		}
 	}
 	
-	public L2Summon(int objectId, L2NpcTemplate template, L2PcInstance owner)
+	/**
+	 * Creates an abstract summon.
+	 * @param template the summon NPC template
+	 * @param owner the owner
+	 */
+	public L2Summon(L2NpcTemplate template, L2PcInstance owner)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2Summon);
 		setInstanceId(owner.getInstanceId()); // set instance to same as owner
 		setShowSummonAnimation(true);
@@ -233,20 +238,20 @@ public abstract class L2Summon extends L2Playable
 	
 	public long getExpForThisLevel()
 	{
-		if (getLevel() >= ExperienceTable.getInstance().getMaxPetLevel())
+		if (getLevel() >= ExperienceData.getInstance().getMaxPetLevel())
 		{
 			return 0;
 		}
-		return ExperienceTable.getInstance().getExpForLevel(getLevel());
+		return ExperienceData.getInstance().getExpForLevel(getLevel());
 	}
 	
 	public long getExpForNextLevel()
 	{
-		if (getLevel() >= (ExperienceTable.getInstance().getMaxPetLevel() - 1))
+		if (getLevel() >= (ExperienceData.getInstance().getMaxPetLevel() - 1))
 		{
 			return 0;
 		}
-		return ExperienceTable.getInstance().getExpForLevel(getLevel() + 1);
+		return ExperienceData.getInstance().getExpForLevel(getLevel() + 1);
 	}
 	
 	@Override

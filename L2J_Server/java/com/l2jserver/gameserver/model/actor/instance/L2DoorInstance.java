@@ -28,7 +28,7 @@ import javolution.util.FastList;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2DoorAI;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
@@ -81,12 +81,12 @@ public class L2DoorInstance extends L2Character
 	private Future<?> _autoCloseTask;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a door.
+	 * @param template the door template
 	 */
-	public L2DoorInstance(int objectId, L2DoorTemplate template)
+	public L2DoorInstance(L2DoorTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DoorInstance);
 		setIsInvul(false);
 		setLethalable(false);
@@ -96,7 +96,7 @@ public class L2DoorInstance extends L2Character
 		
 		if (getGroupName() != null)
 		{
-			DoorTable.addDoorGroup(getGroupName(), getId());
+			DoorData.addDoorGroup(getGroupName(), getId());
 		}
 		
 		if (isOpenableByTime())
@@ -541,7 +541,7 @@ public class L2DoorInstance extends L2Character
 	
 	private void manageGroupOpen(boolean open, String groupName)
 	{
-		Set<Integer> set = DoorTable.getDoorsByGroup(groupName);
+		Set<Integer> set = DoorData.getDoorsByGroup(groupName);
 		L2DoorInstance first = null;
 		for (Integer id : set)
 		{
@@ -747,7 +747,7 @@ public class L2DoorInstance extends L2Character
 	{
 		if (getInstanceId() == 0)
 		{
-			return DoorTable.getInstance().getDoor(doorId);
+			return DoorData.getInstance().getDoor(doorId);
 		}
 		
 		Instance inst = InstanceManager.getInstance().getInstance(getInstanceId());

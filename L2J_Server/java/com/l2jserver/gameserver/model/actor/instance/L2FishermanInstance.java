@@ -20,8 +20,8 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.List;
 
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2SkillLearn;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
@@ -33,9 +33,13 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 public final class L2FishermanInstance extends L2MerchantInstance
 {
-	public L2FishermanInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a fisherman.
+	 * @param template the fisherman NPC template
+	 */
+	public L2FishermanInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2FishermanInstance);
 	}
 	

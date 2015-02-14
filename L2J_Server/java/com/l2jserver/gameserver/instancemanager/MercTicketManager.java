@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import javolution.util.FastList;
 
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.enums.ItemLocation;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.model.L2World;
@@ -354,7 +354,7 @@ public final class MercTicketManager
 		L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
 		if (template != null)
 		{
-			final L2DefenderInstance npc = new L2DefenderInstance(IdFactory.getInstance().getNextId(), template);
+			final L2DefenderInstance npc = new L2DefenderInstance(template);
 			npc.setCurrentHpMp(npc.getMaxHp(), npc.getMaxMp());
 			npc.setDecayed(false);
 			npc.spawnMe(x, y, (z + 20));

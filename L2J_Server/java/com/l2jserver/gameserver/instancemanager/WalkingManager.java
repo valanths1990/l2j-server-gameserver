@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.instancemanager.tasks.StartMovingTask;
 import com.l2jserver.gameserver.model.L2NpcWalkerNode;
 import com.l2jserver.gameserver.model.L2WalkRoute;
@@ -50,7 +50,7 @@ import com.l2jserver.gameserver.util.Broadcast;
  * This class manages walking monsters.
  * @author GKR
  */
-public final class WalkingManager implements DocumentParser
+public final class WalkingManager implements IXmlReader
 {
 	// Repeat style:
 	// 0 - go back
@@ -334,9 +334,9 @@ public final class WalkingManager implements DocumentParser
 	 */
 	public synchronized void cancelMoving(L2Npc npc)
 	{
-		if (_activeRoutes.containsKey(npc.getObjectId()))
+		final WalkInfo walk = _activeRoutes.remove(npc.getObjectId());
+		if (walk != null)
 		{
-			final WalkInfo walk = _activeRoutes.remove(npc.getObjectId());
 			walk.getWalkCheckTask().cancel(true);
 			npc.getKnownList().stopTrackingTask();
 		}
@@ -348,15 +348,13 @@ public final class WalkingManager implements DocumentParser
 	 */
 	public void resumeMoving(final L2Npc npc)
 	{
-		if (!_activeRoutes.containsKey(npc.getObjectId()))
-		{
-			return;
-		}
-		
 		final WalkInfo walk = _activeRoutes.get(npc.getObjectId());
-		walk.setSuspended(false);
-		walk.setStoppedByAttack(false);
-		startMoving(npc, walk.getRoute().getName());
+		if (walk != null)
+		{
+			walk.setSuspended(false);
+			walk.setStoppedByAttack(false);
+			startMoving(npc, walk.getRoute().getName());
+		}
 	}
 	
 	/**

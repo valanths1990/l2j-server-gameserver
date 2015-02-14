@@ -36,14 +36,13 @@ import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.holders.PlayerEventHolder;
 import com.l2jserver.gameserver.network.serverpackets.CharInfo;
 import com.l2jserver.gameserver.network.serverpackets.ExBrExtraUserInfo;
@@ -168,13 +167,9 @@ public class L2Event
 	 */
 	public static void spawnEventNpc(L2PcInstance target)
 	{
-		
-		L2NpcTemplate template = NpcData.getInstance().getTemplate(_npcId);
-		
 		try
 		{
-			L2Spawn spawn = new L2Spawn(template);
-			
+			final L2Spawn spawn = new L2Spawn(_npcId);
 			spawn.setX(target.getX() + 50);
 			spawn.setY(target.getY() + 50);
 			spawn.setZ(target.getZ());

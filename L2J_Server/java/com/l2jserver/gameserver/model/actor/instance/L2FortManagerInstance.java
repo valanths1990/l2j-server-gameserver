@@ -23,8 +23,8 @@ import java.util.StringTokenizer;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.TeleportLocationTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.L2TeleportLocation;
@@ -48,9 +48,13 @@ public class L2FortManagerInstance extends L2MerchantInstance
 	protected static final int COND_BUSY_BECAUSE_OF_SIEGE = 1;
 	protected static final int COND_OWNER = 2;
 	
-	public L2FortManagerInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a fort manager.
+	 * @param template the fort manager NPC template
+	 */
+	public L2FortManagerInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2FortManagerInstance);
 	}
 	

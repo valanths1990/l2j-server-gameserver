@@ -35,9 +35,8 @@ import javolution.util.FastList;
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.NpcData;
-import com.l2jserver.gameserver.datatables.SiegeScheduleData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.SiegeScheduleData;
 import com.l2jserver.gameserver.enums.SiegeTeleportWhoType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.MercTicketManager;
@@ -1508,7 +1507,7 @@ public class Siege implements Siegable
 		{
 			try
 			{
-				final L2Spawn spawn = new L2Spawn(NpcData.getInstance().getTemplate(ts.getId()));
+				final L2Spawn spawn = new L2Spawn(ts.getId());
 				spawn.setLocation(ts.getLocation());
 				_controlTowers.add((L2ControlTowerInstance) spawn.doSpawn());
 			}
@@ -1529,7 +1528,7 @@ public class Siege implements Siegable
 		{
 			try
 			{
-				final L2Spawn spawn = new L2Spawn(NpcData.getInstance().getTemplate(ts.getId()));
+				final L2Spawn spawn = new L2Spawn(ts.getId());
 				spawn.setLocation(ts.getLocation());
 				final L2FlameTowerInstance tower = (L2FlameTowerInstance) spawn.doSpawn();
 				tower.setUpgradeLevel(ts.getUpgradeLevel());

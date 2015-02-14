@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
-import com.l2jserver.gameserver.datatables.HitConditionBonus;
-import com.l2jserver.gameserver.datatables.KarmaData;
+import com.l2jserver.gameserver.data.xml.impl.HitConditionBonusData;
+import com.l2jserver.gameserver.data.xml.impl.KarmaData;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
@@ -1217,7 +1217,7 @@ public final class Formulas
 		int chance = (80 + (2 * (attacker.getAccuracy() - target.getEvasionRate(attacker)))) * 10;
 		
 		// Get additional bonus from the conditions when you are attacking
-		chance *= HitConditionBonus.getInstance().getConditionBonus(attacker, target);
+		chance *= HitConditionBonusData.getInstance().getConditionBonus(attacker, target);
 		
 		chance = Math.max(chance, 200);
 		chance = Math.min(chance, 980);
@@ -1670,13 +1670,34 @@ public final class Formulas
 			return false;
 		}
 		
-		double val = actor.getStat().calcStat(Stats.SKILL_MASTERY, 1, null, null);
-		if (actor.isPlayer())
+		final int val = (int) actor.getStat().calcStat(Stats.SKILL_CRITICAL, 0, null, null);
+		
+		if (val == 0)
 		{
-			val *= (actor.getActingPlayer().isMageClass() ? BaseStats.INT : BaseStats.STR).calcBonus(actor);
+			return false;
 		}
 		
-		return Rnd.get(100) < val;
+		if (actor.isPlayer())
+		{
+			double initVal = 0;
+			switch (val)
+			{
+				case 1:
+				{
+					initVal = (BaseStats.STR).calcBonus(actor);
+					break;
+				}
+				case 4:
+				{
+					initVal = (BaseStats.INT).calcBonus(actor);
+					break;
+				}
+			}
+			initVal *= actor.getStat().calcStat(Stats.SKILL_CRITICAL_PROBABILITY, 1, null, null);
+			return (Rnd.get(100) < initVal);
+		}
+		
+		return false;
 	}
 	
 	/**

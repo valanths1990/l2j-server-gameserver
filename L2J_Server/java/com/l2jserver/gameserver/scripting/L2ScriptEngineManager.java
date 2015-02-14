@@ -516,7 +516,7 @@ public final class L2ScriptEngineManager
 	/**
 	 * @return Returns the currentLoadingScript.
 	 */
-	protected File getCurrentLoadingScript()
+	public File getCurrentLoadingScript()
 	{
 		return _currentLoadingScript;
 	}

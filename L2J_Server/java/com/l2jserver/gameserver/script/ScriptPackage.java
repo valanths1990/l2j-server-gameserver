@@ -19,13 +19,12 @@
 package com.l2jserver.gameserver.script;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 
@@ -36,14 +35,12 @@ public class ScriptPackage
 {
 	private static final Logger _log = Logger.getLogger(ScriptPackage.class.getName());
 	
-	private final List<ScriptDocument> _scriptFiles;
-	private final List<String> _otherFiles;
+	private final List<ScriptDocument> _scriptFiles = new ArrayList<>();
+	private final List<String> _otherFiles = new ArrayList<>();
 	private final String _name;
 	
 	public ScriptPackage(ZipFile pack)
 	{
-		_scriptFiles = new FastList<>();
-		_otherFiles = new FastList<>();
 		_name = pack.getName();
 		addFiles(pack);
 	}
@@ -76,8 +73,7 @@ public class ScriptPackage
 			{
 				try
 				{
-					ScriptDocument newScript = new ScriptDocument(entry.getName(), pack.getInputStream(entry));
-					_scriptFiles.add(newScript);
+					_scriptFiles.add(new ScriptDocument(entry.getName(), pack.getInputStream(entry)));
 				}
 				catch (IOException io)
 				{

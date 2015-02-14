@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.RecipeData;
+import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 import com.l2jserver.gameserver.enums.PrivateStoreType;
 import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.L2RecipeList;

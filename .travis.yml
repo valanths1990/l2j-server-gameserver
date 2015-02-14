@@ -1,0 +1,4 @@
+language: java
+jdk:
+  - oraclejdk8
+script: cd L2J_Server && ant build

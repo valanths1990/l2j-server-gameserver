@@ -40,9 +40,9 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public class L2SignsPriestInstance extends L2Npc
 {
-	public L2SignsPriestInstance(int objectId, L2NpcTemplate template)
+	public L2SignsPriestInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2SignsPriestInstance);
 	}
 	

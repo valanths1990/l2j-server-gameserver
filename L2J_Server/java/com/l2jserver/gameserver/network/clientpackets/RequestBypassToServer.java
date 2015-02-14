@@ -23,7 +23,7 @@ import java.util.logging.Level;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.PlayerAction;
 import com.l2jserver.gameserver.handler.AdminCommandHandler;
@@ -143,14 +143,14 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					return;
 				}
 				
-				if (!AdminTable.getInstance().hasAccess(command, activeChar.getAccessLevel()))
+				if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel()))
 				{
 					activeChar.sendMessage("You don't have the access rights to use this command!");
 					_log.warning("Character " + activeChar.getName() + " tried to use admin command " + command + ", without proper access level!");
 					return;
 				}
 				
-				if (AdminTable.getInstance().requireConfirm(command))
+				if (AdminData.getInstance().requireConfirm(command))
 				{
 					activeChar.setAdminConfirmCmd(_command);
 					ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.S1);

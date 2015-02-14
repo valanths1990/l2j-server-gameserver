@@ -21,8 +21,7 @@ package com.l2jserver.loginserver;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
-
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.l2jserver.Config;
 
@@ -31,7 +30,7 @@ import com.l2jserver.Config;
  */
 public class GameServerListener extends FloodProtectedListener
 {
-	private static List<GameServerThread> _gameServers = new FastList<>();
+	private static List<GameServerThread> _gameServers = new CopyOnWriteArrayList<>();
 	
 	public GameServerListener() throws IOException
 	{

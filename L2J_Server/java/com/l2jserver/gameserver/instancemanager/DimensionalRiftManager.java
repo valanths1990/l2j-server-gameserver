@@ -37,13 +37,11 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.model.DimensionalRiftRoom;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.entity.DimensionalRift;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
@@ -144,8 +142,6 @@ public final class DimensionalRiftManager
 			NamedNodeMap attrs;
 			byte type, roomId;
 			int mobId, x, y, z, delay, count;
-			L2Spawn spawnDat;
-			L2NpcTemplate template;
 			
 			for (Node rift = doc.getFirstChild(); rift != null; rift = rift.getNextSibling())
 			{
@@ -174,11 +170,6 @@ public final class DimensionalRiftManager
 											delay = Integer.parseInt(attrs.getNamedItem("delay").getNodeValue());
 											count = Integer.parseInt(attrs.getNamedItem("count").getNodeValue());
 											
-											template = NpcData.getInstance().getTemplate(mobId);
-											if (template == null)
-											{
-												_log.warning("Template " + mobId + " not found!");
-											}
 											if (!_rooms.containsKey(type))
 											{
 												_log.warning("Type " + type + " not found!");
@@ -195,9 +186,9 @@ public final class DimensionalRiftManager
 												y = riftRoom.getRandomY();
 												z = riftRoom.getTeleportCoorinates().getZ();
 												
-												if ((template != null) && _rooms.containsKey(type) && _rooms.get(type).containsKey(roomId))
+												if (_rooms.containsKey(type) && _rooms.get(type).containsKey(roomId))
 												{
-													spawnDat = new L2Spawn(template);
+													final L2Spawn spawnDat = new L2Spawn(mobId);
 													spawnDat.setAmount(1);
 													spawnDat.setX(x);
 													spawnDat.setY(y);

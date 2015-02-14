@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
@@ -31,9 +31,13 @@ public final class L2ChestInstance extends L2MonsterInstance
 {
 	private volatile boolean _specialDrop;
 	
-	public L2ChestInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a chest.
+	 * @param template the chest NPC template
+	 */
+	public L2ChestInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2ChestInstance);
 		setIsNoRndWalk(true);
 		_specialDrop = false;

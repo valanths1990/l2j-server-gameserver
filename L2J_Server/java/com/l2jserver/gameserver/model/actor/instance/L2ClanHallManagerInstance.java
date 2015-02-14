@@ -23,8 +23,8 @@ import java.util.StringTokenizer;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.TeleportLocationTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
@@ -51,12 +51,12 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance
 	private int _clanHallId = -1;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates clan hall manager.
+	 * @param template the clan hall manager NPC template
 	 */
-	public L2ClanHallManagerInstance(int objectId, L2NpcTemplate template)
+	public L2ClanHallManagerInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2ClanHallManagerInstance);
 	}
 	

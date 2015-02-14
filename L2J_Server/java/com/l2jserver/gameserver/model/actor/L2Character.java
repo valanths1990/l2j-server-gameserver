@@ -47,14 +47,15 @@ import com.l2jserver.gameserver.ai.CtrlEvent;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2AttackableAI;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
-import com.l2jserver.gameserver.datatables.CategoryData;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.CategoryData;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.CategoryType;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.enums.Team;
+import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
 import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
@@ -277,6 +278,87 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	protected Future<?> _skillCast;
 	protected Future<?> _skillCast2;
 	
+	/**
+	 * Creates a creature.
+	 * @param template the creature template
+	 */
+	public L2Character(L2CharTemplate template)
+	{
+		this(IdFactory.getInstance().getNextId(), template);
+	}
+	
+	/**
+	 * Constructor of L2Character.<br>
+	 * <B><U>Concept</U>:</B><br>
+	 * Each L2Character owns generic and static properties (ex : all Keltir have the same number of HP...).<br>
+	 * All of those properties are stored in a different template for each type of L2Character. Each template is loaded once in the server cache memory (reduce memory use).<br>
+	 * When a new instance of L2Character is spawned, server just create a link between the instance and the template This link is stored in <B>_template</B><br>
+	 * <B><U> Actions</U>:</B>
+	 * <ul>
+	 * <li>Set the _template of the L2Character</li>
+	 * <li>Set _overloaded to false (the character can take more items)</li>
+	 * <li>If L2Character is a L2NPCInstance, copy skills from template to object</li>
+	 * <li>If L2Character is a L2NPCInstance, link _calculators to NPC_STD_CALCULATOR</li>
+	 * <li>If L2Character is NOT a L2NPCInstance, create an empty _skills slot</li>
+	 * <li>If L2Character is a L2PcInstance or L2Summon, copy basic Calculator set to object</li>
+	 * </ul>
+	 * @param objectId Identifier of the object to initialized
+	 * @param template The L2CharTemplate to apply to the object
+	 */
+	public L2Character(int objectId, L2CharTemplate template)
+	{
+		super(objectId);
+		if (template == null)
+		{
+			throw new NullPointerException("Template is null!");
+		}
+		
+		setInstanceType(InstanceType.L2Character);
+		initCharStat();
+		initCharStatus();
+		
+		// Set its template to the new L2Character
+		_template = template;
+		
+		if (isDoor())
+		{
+			_calculators = Formulas.getStdDoorCalculators();
+		}
+		else if (isNpc())
+		{
+			// Copy the Standard Calculators of the L2NPCInstance in _calculators
+			_calculators = NPC_STD_CALCULATOR;
+			
+			// Copy the skills of the L2NPCInstance from its template to the L2Character Instance
+			// The skills list can be affected by spell effects so it's necessary to make a copy
+			// to avoid that a spell affecting a L2NpcInstance, affects others L2NPCInstance of the same type too.
+			for (Skill skill : template.getSkills().values())
+			{
+				addSkill(skill);
+			}
+		}
+		else
+		{
+			// If L2Character is a L2PcInstance or a L2Summon, create the basic calculator set
+			_calculators = new Calculator[Stats.NUM_STATS];
+			
+			if (isSummon())
+			{
+				// Copy the skills of the L2Summon from its template to the L2Character Instance
+				// The skills list can be affected by spell effects so it's necessary to make a copy
+				// to avoid that a spell affecting a L2Summon, affects others L2Summon of the same type too.
+				for (Skill skill : template.getSkills().values())
+				{
+					addSkill(skill);
+				}
+			}
+			
+			Formulas.addFuncsToNewCharacter(this);
+		}
+		
+		setIsInvul(true);
+	}
+	
 	public final CharEffectList getEffectList()
 	{
 		return _effectList;
@@ -431,78 +513,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	public L2AccessLevel getAccessLevel()
 	{
 		return null;
-	}
-	
-	/**
-	 * Constructor of L2Character.<br>
-	 * <B><U>Concept</U>:</B><br>
-	 * Each L2Character owns generic and static properties (ex : all Keltir have the same number of HP...).<br>
-	 * All of those properties are stored in a different template for each type of L2Character. Each template is loaded once in the server cache memory (reduce memory use).<br>
-	 * When a new instance of L2Character is spawned, server just create a link between the instance and the template This link is stored in <B>_template</B><br>
-	 * <B><U> Actions</U>:</B>
-	 * <ul>
-	 * <li>Set the _template of the L2Character</li>
-	 * <li>Set _overloaded to false (the character can take more items)</li>
-	 * <li>If L2Character is a L2NPCInstance, copy skills from template to object</li>
-	 * <li>If L2Character is a L2NPCInstance, link _calculators to NPC_STD_CALCULATOR</li>
-	 * <li>If L2Character is NOT a L2NPCInstance, create an empty _skills slot</li>
-	 * <li>If L2Character is a L2PcInstance or L2Summon, copy basic Calculator set to object</li>
-	 * </ul>
-	 * @param objectId Identifier of the object to initialized
-	 * @param template The L2CharTemplate to apply to the object
-	 */
-	public L2Character(int objectId, L2CharTemplate template)
-	{
-		super(objectId);
-		if (template == null)
-		{
-			throw new NullPointerException("Template is null!");
-		}
-		
-		setInstanceType(InstanceType.L2Character);
-		initCharStat();
-		initCharStatus();
-		
-		// Set its template to the new L2Character
-		_template = template;
-		
-		if (isDoor())
-		{
-			_calculators = Formulas.getStdDoorCalculators();
-		}
-		else if (isNpc())
-		{
-			// Copy the Standard Calculators of the L2NPCInstance in _calculators
-			_calculators = NPC_STD_CALCULATOR;
-			
-			// Copy the skills of the L2NPCInstance from its template to the L2Character Instance
-			// The skills list can be affected by spell effects so it's necessary to make a copy
-			// to avoid that a spell affecting a L2NpcInstance, affects others L2NPCInstance of the same type too.
-			for (Skill skill : template.getSkills().values())
-			{
-				addSkill(skill);
-			}
-		}
-		else
-		{
-			// If L2Character is a L2PcInstance or a L2Summon, create the basic calculator set
-			_calculators = new Calculator[Stats.NUM_STATS];
-			
-			if (isSummon())
-			{
-				// Copy the skills of the L2Summon from its template to the L2Character Instance
-				// The skills list can be affected by spell effects so it's necessary to make a copy
-				// to avoid that a spell affecting a L2Summon, affects others L2Summon of the same type too.
-				for (Skill skill : template.getSkills().values())
-				{
-					addSkill(skill);
-				}
-			}
-			
-			Formulas.addFuncsToNewCharacter(this);
-		}
-		
-		setIsInvul(true);
 	}
 	
 	protected void initCharStatusUpdateValues()
@@ -781,6 +791,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	public void teleToLocation(ILocational loc, int randomOffset)
 	{
 		teleToLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getHeading(), loc.getInstanceId(), randomOffset);
+	}
+	
+	public void teleToLocation(ILocational loc, int instanceId, int randomOffset)
+	{
+		teleToLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getHeading(), instanceId, randomOffset);
 	}
 	
 	public void teleToLocation(ILocational loc, boolean randomOffset)
@@ -4158,7 +4173,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		final boolean isFloating = isFlying() || isInsideZone(ZoneId.WATER);
 		
 		// Z coordinate will follow geodata or client values
-		if ((Config.GEODATA > 0) && (Config.COORD_SYNCHRONIZE == 2) && !isFloating && !m.disregardingGeodata && ((GameTimeController.getInstance().getGameTicks() % 10) == 0 // once a second to reduce possible cpu load
+		if ((Config.COORD_SYNCHRONIZE == 2) && !isFloating && !m.disregardingGeodata && ((GameTimeController.getInstance().getGameTicks() % 10) == 0 // once a second to reduce possible cpu load
 		) && GeoData.getInstance().hasGeo(xPrev, yPrev))
 		{
 			int geoHeight = GeoData.getInstance().getSpawnHeight(xPrev, yPrev, zPrev);
@@ -4434,7 +4449,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		// make water move short and use no geodata checks for swimming chars
 		// distance in a click can easily be over 3000
-		if ((Config.GEODATA > 0) && isInsideZone(ZoneId.WATER) && (distance > 700))
+		if (isInsideZone(ZoneId.WATER) && (distance > 700))
 		{
 			double divider = 700 / distance;
 			x = curX + (int) (divider * dx);
@@ -4502,7 +4517,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		m.onGeodataPathIndex = -1; // Initialize not on geodata path
 		m.disregardingGeodata = false;
 		
-		if ((Config.GEODATA > 0) && !isFlying() // flying chars not checked - even canSeeTarget doesn't work yet
+		if (!isFlying() // flying chars not checked - even canSeeTarget doesn't work yet
 			&& (!isInsideZone(ZoneId.WATER) || isInsideZone(ZoneId.SIEGE))) // swimming also not checked unless in siege zone - but distance is limited
 		{
 			final boolean isInVehicle = isPlayer() && (getActingPlayer().getVehicle() != null);
@@ -4519,9 +4534,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			int gty = (originalY - L2World.MAP_MIN_Y) >> 4;
 			
 			// Movement checks:
-			// when geodata == 2, for all characters except mobs returning home (could be changed later to teleport if pathfinding fails)
-			// when geodata == 1, for L2Playable and L2RiftInvaderInstance only
-			if (((Config.GEODATA == 2) && !(isAttackable() && ((L2Attackable) this).isReturningToSpawnPoint())) || (isPlayer() && !(isInVehicle && (distance > 1500))) || (isSummon() && !(getAI().getIntention() == AI_INTENTION_FOLLOW)) // assuming intention_follow only when following owner
+			// when PATHFINDING > 0, for all characters except mobs returning home (could be changed later to teleport if pathfinding fails)
+			if (((Config.PATHFINDING > 0) && (!(isAttackable() && ((L2Attackable) this).isReturningToSpawnPoint()))) || (isPlayer() && !(isInVehicle && (distance > 1500))) || (isSummon() && !(getAI().getIntention() == AI_INTENTION_FOLLOW)) // assuming intention_follow only when following owner
 				|| isAfraid() || (this instanceof L2RiftInvaderInstance))
 			{
 				if (isOnGeodataPath())
@@ -4572,7 +4586,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			// Pathfinding checks. Only when geodata setting is 2, the LoS check gives shorter result
 			// than the original movement was and the LoS gives a shorter distance than 2000
 			// This way of detecting need for pathfinding could be changed.
-			if ((Config.GEODATA == 2) && ((originalDistance - distance) > 30) && (distance < 2000) && !isAfraid())
+			if ((Config.PATHFINDING > 0) && ((originalDistance - distance) > 30) && (distance < 2000) && !isAfraid())
 			{
 				// Path calculation
 				// Overrides previous movement check
@@ -4614,7 +4628,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 						z = m.geoPath.get(m.onGeodataPathIndex).getZ();
 						
 						// check for doors in the route
-						if (DoorTable.getInstance().checkIfDoorsBetween(curX, curY, curZ, x, y, z, getInstanceId()))
+						if (DoorData.getInstance().checkIfDoorsBetween(curX, curY, curZ, x, y, z, getInstanceId()))
 						{
 							m.geoPath = null;
 							getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
@@ -4622,7 +4636,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 						}
 						for (int i = 0; i < (m.geoPath.size() - 1); i++)
 						{
-							if (DoorTable.getInstance().checkIfDoorsBetween(m.geoPath.get(i), m.geoPath.get(i + 1), getInstanceId()))
+							if (DoorData.getInstance().checkIfDoorsBetween(m.geoPath.get(i), m.geoPath.get(i + 1), getInstanceId()))
 							{
 								m.geoPath = null;
 								getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
@@ -4640,7 +4654,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				}
 			}
 			// If no distance to go through, the movement is canceled
-			if ((distance < 1) && ((Config.GEODATA == 2) || isPlayable() || (this instanceof L2RiftInvaderInstance) || isAfraid()))
+			if ((distance < 1) && ((Config.PATHFINDING > 0) || isPlayable() || (this instanceof L2RiftInvaderInstance) || isAfraid()))
 			{
 				if (isSummon())
 				{
@@ -5531,7 +5545,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 						_skiprange++;
 						continue;
 					}
-					if ((escapeRange > 0) && (Config.GEODATA > 0) && !GeoData.getInstance().canSeeTarget(this, target))
+					if ((escapeRange > 0) && !GeoData.getInstance().canSeeTarget(this, target))
 					{
 						_skipgeo++;
 						continue;

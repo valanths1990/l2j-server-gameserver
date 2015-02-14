@@ -41,12 +41,12 @@ public final class L2FestivalGuideInstance extends L2Npc
 	private final int _redStonesNeeded;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a festival guide.
+	 * @param template the festival guide NPC template
 	 */
-	public L2FestivalGuideInstance(int objectId, L2NpcTemplate template)
+	public L2FestivalGuideInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2FestivalGiudeInstance);
 		
 		switch (getId())

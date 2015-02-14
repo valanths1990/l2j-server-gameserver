@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.model.events;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,17 +38,18 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
 import javolution.util.FastList;
 import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.enums.QuestSound;
-import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
@@ -121,9 +123,11 @@ import com.l2jserver.gameserver.model.events.returns.AbstractEventReturn;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
+import com.l2jserver.gameserver.model.interfaces.INamable;
 import com.l2jserver.gameserver.model.interfaces.IPositionable;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.itemcontainer.PcInventory;
+import com.l2jserver.gameserver.model.items.L2EtcItem;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.olympiad.Olympiad;
@@ -137,23 +141,27 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SpecialCamera;
 import com.l2jserver.gameserver.network.serverpackets.StatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.gameserver.scripting.ManagedScript;
+import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
+import com.l2jserver.gameserver.scripting.ScriptManager;
 import com.l2jserver.gameserver.util.MinionList;
 import com.l2jserver.util.Rnd;
 import com.l2jserver.util.Util;
 
 /**
- * @author UnAfraid
+ * Abstract script.
+ * @author KenM, UnAfraid, Zoey76
  */
-public abstract class AbstractScript extends ManagedScript
+public abstract class AbstractScript implements INamable
 {
-	
+	private final File _scriptFile;
+	private boolean _isActive;
 	protected static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
 	private final Map<ListenerRegisterType, Set<Integer>> _registeredIds = new ConcurrentHashMap<>();
 	private final List<AbstractEventListener> _listeners = new FastList<AbstractEventListener>().shared();
 	
 	public AbstractScript()
 	{
+		_scriptFile = L2ScriptEngineManager.getInstance().getCurrentLoadingScript();
 		initializeAnnotationListeners();
 	}
 	
@@ -308,16 +316,46 @@ public abstract class AbstractScript extends ManagedScript
 		}
 	}
 	
+	public void setActive(boolean status)
+	{
+		_isActive = status;
+	}
+	
+	public boolean isActive()
+	{
+		return _isActive;
+	}
+	
+	public File getScriptFile()
+	{
+		return _scriptFile;
+	}
+	
+	public boolean reload()
+	{
+		try
+		{
+			L2ScriptEngineManager.getInstance().executeScript(getScriptFile());
+			return true;
+		}
+		catch (ScriptException e)
+		{
+			return false;
+		}
+	}
+	
 	/**
 	 * Unloads all listeners registered by this class.
+	 * @return {@code true}
 	 */
-	@Override
 	public boolean unload()
 	{
 		_listeners.forEach(AbstractEventListener::unregisterMe);
 		_listeners.clear();
 		return true;
 	}
+	
+	public abstract ScriptManager<?> getManager();
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
@@ -1726,13 +1764,6 @@ public abstract class AbstractScript extends ManagedScript
 	{
 		try
 		{
-			final L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
-			if (template == null)
-			{
-				_log.severe("Couldn't find NPC template for ID:" + npcId + "!");
-				return null;
-			}
-			
 			if ((x == 0) && (y == 0))
 			{
 				_log.log(Level.SEVERE, "addSpawn(): invalid spawn coordinates for NPC #" + npcId + "!");
@@ -1756,7 +1787,7 @@ public abstract class AbstractScript extends ManagedScript
 				y += offset;
 			}
 			
-			final L2Spawn spawn = new L2Spawn(template);
+			final L2Spawn spawn = new L2Spawn(npcId);
 			spawn.setInstanceId(instanceId);
 			spawn.setHeading(heading);
 			spawn.setX(x);
@@ -1797,7 +1828,7 @@ public abstract class AbstractScript extends ManagedScript
 	public L2TrapInstance addTrap(int trapId, int x, int y, int z, int heading, Skill skill, int instanceId)
 	{
 		final L2NpcTemplate npcTemplate = NpcData.getInstance().getTemplate(trapId);
-		L2TrapInstance trap = new L2TrapInstance(IdFactory.getInstance().getNextId(), npcTemplate, instanceId, -1);
+		L2TrapInstance trap = new L2TrapInstance(npcTemplate, instanceId, -1);
 		trap.setCurrentHp(trap.getMaxHp());
 		trap.setCurrentMp(trap.getMaxMp());
 		trap.setIsInvul(true);
@@ -2024,8 +2055,8 @@ public abstract class AbstractScript extends ManagedScript
 			return;
 		}
 		
-		final L2ItemInstance _tmpItem = ItemTable.getInstance().createDummyItem(itemId);
-		if (_tmpItem == null)
+		final L2Item item = ItemTable.getInstance().getTemplate(itemId);
+		if (item == null)
 		{
 			return;
 		}
@@ -2038,9 +2069,9 @@ public abstract class AbstractScript extends ManagedScript
 			}
 			else if (Config.RATE_QUEST_REWARD_USE_MULTIPLIERS)
 			{
-				if (_tmpItem.isEtcItem())
+				if (item instanceof L2EtcItem)
 				{
-					switch (_tmpItem.getEtcItem().getItemType())
+					switch (((L2EtcItem) item).getItemType())
 					{
 						case POTION:
 							count *= Config.RATE_QUEST_REWARD_POTION;
@@ -2072,13 +2103,13 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		
 		// Add items to player's inventory
-		L2ItemInstance item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-		if (item == null)
+		final L2ItemInstance itemInstance = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
+		if (itemInstance == null)
 		{
 			return;
 		}
 		
-		sendItemGetMessage(player, item, count);
+		sendItemGetMessage(player, itemInstance, count);
 	}
 	
 	/**
@@ -3090,7 +3121,7 @@ public abstract class AbstractScript extends ManagedScript
 		L2DoorInstance door = null;
 		if (instanceId <= 0)
 		{
-			door = DoorTable.getInstance().getDoor(doorId);
+			door = DoorData.getInstance().getDoor(doorId);
 		}
 		else
 		{
@@ -3151,6 +3182,17 @@ public abstract class AbstractScript extends ManagedScript
 		}
 		npc.setIsRunning(true);
 		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+	}
+	
+	/**
+	 * Adds desire to move to the given NPC.
+	 * @param npc the NPC
+	 * @param loc the location
+	 * @param desire the desire
+	 */
+	protected void addMoveToDesire(L2Npc npc, Location loc, int desire)
+	{
+		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, loc);
 	}
 	
 	/**
@@ -3264,5 +3306,35 @@ public abstract class AbstractScript extends ManagedScript
 	public static final void specialCamera3(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle, int unk)
 	{
 		player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle, unk));
+	}
+	
+	/**
+	 * @param player
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public static void addRadar(L2PcInstance player, int x, int y, int z)
+	{
+		player.getRadar().addMarker(x, y, z);
+	}
+	
+	/**
+	 * @param player
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void removeRadar(L2PcInstance player, int x, int y, int z)
+	{
+		player.getRadar().removeMarker(x, y, z);
+	}
+	
+	/**
+	 * @param player
+	 */
+	public void clearRadar(L2PcInstance player)
+	{
+		player.getRadar().removeAllMarkers();
 	}
 }

@@ -20,16 +20,12 @@ package com.l2jserver.gameserver.util;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.NpcData;
-import com.l2jserver.gameserver.idfactory.IdFactory;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2MonsterInstance;
@@ -46,7 +42,7 @@ public class MinionList
 	
 	protected final L2MonsterInstance _master;
 	/** List containing the current spawned minions */
-	private final List<L2MonsterInstance> _minionReferences;
+	private final List<L2MonsterInstance> _minionReferences = new CopyOnWriteArrayList<>();
 	/** List containing the cached deleted minions for reuse */
 	protected List<L2MonsterInstance> _reusedMinionReferences = null;
 	
@@ -56,9 +52,7 @@ public class MinionList
 		{
 			throw new NullPointerException("MinionList: master is null");
 		}
-		
 		_master = pMaster;
-		_minionReferences = new FastList<L2MonsterInstance>().shared();
 	}
 	
 	/**
@@ -91,7 +85,8 @@ public class MinionList
 			return;
 		}
 		
-		int minionCount, minionId, minionsToSpawn;
+		int minionCount, minionId;
+		long minionsToSpawn;
 		for (MinionHolder minion : minions)
 		{
 			minionCount = minion.getCount();
@@ -156,7 +151,7 @@ public class MinionList
 		// if master has spawn and can respawn - try to reuse minions
 		if ((_reusedMinionReferences == null) && (_master.getTemplate().getParameters().getSet().get("SummonPrivateRate") == null) && !_master.getTemplate().getParameters().getMinionList("Privates").isEmpty() && (_master.getSpawn() != null) && _master.getSpawn().isRespawnEnabled())
 		{
-			_reusedMinionReferences = new FastList<L2MonsterInstance>().shared();
+			_reusedMinionReferences = new CopyOnWriteArrayList<>();
 		}
 	}
 	
@@ -348,10 +343,7 @@ public class MinionList
 		{
 			return null;
 		}
-		
-		// Create and Init the Minion and generate its Identifier
-		L2MonsterInstance minion = new L2MonsterInstance(IdFactory.getInstance().getNextId(), minionTemplate);
-		return initializeNpcInstance(master, minion);
+		return initializeNpcInstance(master, new L2MonsterInstance(minionTemplate));
 	}
 	
 	protected static final L2MonsterInstance initializeNpcInstance(L2MonsterInstance master, L2MonsterInstance minion)
@@ -406,17 +398,9 @@ public class MinionList
 	
 	// Statistics part
 	
-	private final int countSpawnedMinionsById(int minionId)
+	private final long countSpawnedMinionsById(int minionId)
 	{
-		int count = 0;
-		for (L2MonsterInstance minion : _minionReferences)
-		{
-			if ((minion != null) && (minion.getId() == minionId))
-			{
-				count++;
-			}
-		}
-		return count;
+		return _minionReferences.stream().filter(npc -> npc.getId() == minionId).count();
 	}
 	
 	public final int countSpawnedMinions()
@@ -424,18 +408,8 @@ public class MinionList
 		return _minionReferences.size();
 	}
 	
-	public final int lazyCountSpawnedMinionsGroups()
+	public final long lazyCountSpawnedMinionsGroups()
 	{
-		Set<Integer> seenGroups = new FastSet<>();
-		for (L2MonsterInstance minion : _minionReferences)
-		{
-			if (minion == null)
-			{
-				continue;
-			}
-			
-			seenGroups.add(minion.getId());
-		}
-		return seenGroups.size();
+		return _minionReferences.stream().map(L2MonsterInstance::getId).distinct().count();
 	}
 }

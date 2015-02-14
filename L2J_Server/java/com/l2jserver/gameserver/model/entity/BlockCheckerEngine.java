@@ -28,7 +28,6 @@ import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.enums.Team;
@@ -38,7 +37,6 @@ import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2BlockInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.itemcontainer.PcInventory;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
@@ -477,15 +475,13 @@ public final class BlockCheckerEngine
 			// random % 2, if == 0 will spawn a red block
 			// if != 0, will spawn a blue block
 			byte random = 2;
-			// common template
-			final L2NpcTemplate template = NpcData.getInstance().getTemplate(18672);
 			// Spawn blocks
 			try
 			{
 				// Creates 50 new blocks
 				for (int i = 0; i < _numOfBoxes; i++)
 				{
-					L2Spawn spawn = new L2Spawn(template);
+					final L2Spawn spawn = new L2Spawn(18672);
 					spawn.setX(_arenaCoordinates[_arena][4] + Rnd.get(-400, 400));
 					spawn.setY(_arenaCoordinates[_arena][5] + Rnd.get(-400, 400));
 					spawn.setZ(_zCoord);
@@ -518,10 +514,9 @@ public final class BlockCheckerEngine
 			// Spawn the block carrying girl
 			if ((_round == 1) || (_round == 2))
 			{
-				L2NpcTemplate girl = NpcData.getInstance().getTemplate(18676);
 				try
 				{
-					final L2Spawn girlSpawn = new L2Spawn(girl);
+					final L2Spawn girlSpawn = new L2Spawn(18676);
 					girlSpawn.setX(_arenaCoordinates[_arena][4] + Rnd.get(-400, 400));
 					girlSpawn.setY(_arenaCoordinates[_arena][5] + Rnd.get(-400, 400));
 					girlSpawn.setZ(_zCoord);

@@ -30,9 +30,9 @@ import javolution.util.FastList;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.data.sql.impl.TerritoryTable;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.NpcPersonalAIData;
-import com.l2jserver.gameserver.datatables.TerritoryTable;
-import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
@@ -145,7 +145,20 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 		String className = "com.l2jserver.gameserver.model.actor.instance." + _template.getType() + "Instance";
 		
 		// Create the generic constructor of L2Npc managed by this L2Spawn
-		_constructor = Class.forName(className).asSubclass(L2Npc.class).getConstructor(int.class, L2NpcTemplate.class);
+		_constructor = Class.forName(className).asSubclass(L2Npc.class).getConstructor(L2NpcTemplate.class);
+	}
+	
+	/**
+	 * Creates a spawn.
+	 * @param npcId the NPC ID
+	 * @throws ClassCastException
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws SecurityException
+	 */
+	public L2Spawn(int npcId) throws SecurityException, ClassNotFoundException, NoSuchMethodException, ClassCastException
+	{
+		this(NpcData.getInstance().getTemplate(npcId));
 	}
 	
 	/**
@@ -527,7 +540,7 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 			}
 			
 			// Call the constructor of the L2Npc
-			L2Npc npc = _constructor.newInstance(IdFactory.getInstance().getNextId(), _template);
+			L2Npc npc = _constructor.newInstance(_template);
 			npc.setInstanceId(getInstanceId()); // Must be done before object is spawned into visible world
 			if (isSummonSpawn)
 			{

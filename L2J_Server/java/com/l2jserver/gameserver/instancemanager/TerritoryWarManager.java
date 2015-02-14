@@ -36,10 +36,9 @@ import javolution.util.FastMap;
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2SiegeClan;
 import com.l2jserver.gameserver.model.L2SkillLearn;
@@ -51,7 +50,6 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2SiegeFlagInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Fort;
 import com.l2jserver.gameserver.model.entity.Siegable;
@@ -769,29 +767,21 @@ public final class TerritoryWarManager implements Siegable
 	
 	public L2Npc spawnNPC(int npcId, Location loc)
 	{
-		L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
-		if (template != null)
+		L2Spawn spawnDat;
+		try
 		{
-			L2Spawn spawnDat;
-			try
-			{
-				spawnDat = new L2Spawn(template);
-				spawnDat.setAmount(1);
-				spawnDat.setX(loc.getX());
-				spawnDat.setY(loc.getY());
-				spawnDat.setZ(loc.getZ());
-				spawnDat.setHeading(loc.getHeading());
-				spawnDat.stopRespawn();
-				return spawnDat.spawnOne(false);
-			}
-			catch (Exception e)
-			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": " + e.getMessage(), e);
-			}
+			spawnDat = new L2Spawn(npcId);
+			spawnDat.setAmount(1);
+			spawnDat.setX(loc.getX());
+			spawnDat.setY(loc.getY());
+			spawnDat.setZ(loc.getZ());
+			spawnDat.setHeading(loc.getHeading());
+			spawnDat.stopRespawn();
+			return spawnDat.spawnOne(false);
 		}
-		else
+		catch (Exception e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Data missing in NPC table for ID: " + npcId + ".");
+			_log.log(Level.WARNING, getClass().getSimpleName() + ": " + e.getMessage(), e);
 		}
 		return null;
 	}

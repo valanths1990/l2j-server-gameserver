@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import com.l2jserver.gameserver.datatables.BuyListData;
+import com.l2jserver.gameserver.data.xml.impl.BuyListData;
 import com.l2jserver.gameserver.datatables.MerchantPriceConfigTable;
 import com.l2jserver.gameserver.datatables.MerchantPriceConfigTable.MerchantPriceConfig;
 import com.l2jserver.gameserver.enums.InstanceType;
@@ -37,12 +37,12 @@ public class L2MerchantInstance extends L2NpcInstance
 	private MerchantPriceConfig _mpc;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a merchant,
+	 * @param template the merchant NPC template
 	 */
-	public L2MerchantInstance(int objectId, L2NpcTemplate template)
+	public L2MerchantInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2MerchantInstance);
 	}
 	

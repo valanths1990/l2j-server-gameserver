@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.NpcBufferTable;
-import com.l2jserver.gameserver.datatables.NpcBufferTable.NpcBufferData;
+import com.l2jserver.gameserver.data.sql.impl.NpcBufferTable;
+import com.l2jserver.gameserver.data.sql.impl.NpcBufferTable.NpcBufferData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -49,13 +49,12 @@ public class L2NpcBufferInstance extends L2Npc
 	private static final Map<Integer, Integer> pageVal = new HashMap<>();
 	
 	/**
-	 * Instantiates a new l2 npc buffer instance.
-	 * @param objectId the object id
+	 * Creates a NPC buffer.
 	 * @param template the template
 	 */
-	public L2NpcBufferInstance(int objectId, L2NpcTemplate template)
+	public L2NpcBufferInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2NpcBufferInstance);
 	}
 	

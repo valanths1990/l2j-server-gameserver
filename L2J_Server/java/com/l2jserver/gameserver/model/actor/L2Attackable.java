@@ -19,9 +19,12 @@
 package com.l2jserver.gameserver.model.actor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
@@ -86,11 +89,10 @@ public class L2Attackable extends L2Npc
 	private boolean _seeded = false;
 	private L2Seed _seed = null;
 	private int _seederObjId = 0;
-	private ItemHolder _harvestItem;
+	private final AtomicReference<ItemHolder> _harvestItem = new AtomicReference<>();
 	// Spoil
-	private boolean _isSpoil = false;
-	private int _isSpoiledBy = 0;
-	private ItemHolder[] _sweepItems;
+	private int _spoilerObjectId;
+	private final AtomicReference<Collection<ItemHolder>> _sweepItems = new AtomicReference<>();
 	// Over-hit
 	private boolean _overhit;
 	private double _overhitDamage;
@@ -107,17 +109,12 @@ public class L2Attackable extends L2Npc
 	protected int _onKillDelay = 5000;
 	
 	/**
-	 * Constructor of L2Attackable (use L2Character and L2NpcInstance constructor).<br>
-	 * Actions:<br>
-	 * Call the L2Character constructor to set the _template of the L2Attackable (copy skills from template to object and link _calculators to NPC_STD_CALCULATOR)<br>
-	 * Set the name of the L2Attackable<br>
-	 * Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it.
-	 * @param objectId identifier of the object initialized.
-	 * @param template the template to apply to the NPC.
+	 * Creates an attackable NPC.
+	 * @param template the attackable NPC template
 	 */
-	public L2Attackable(int objectId, L2NpcTemplate template)
+	public L2Attackable(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2Attackable);
 		setIsInvul(false);
 		_mustGiveExpSp = true;
@@ -412,16 +409,8 @@ public class L2Attackable extends L2Npc
 						totalDamage += damage;
 						
 						// Calculate real damages (Summoners should get own damage plus summon's damage)
-						DamageDoneInfo reward = rewards.get(attacker);
-						if (reward == null)
-						{
-							reward = new DamageDoneInfo(attacker, damage);
-							rewards.put(attacker, reward);
-						}
-						else
-						{
-							reward.addDamage(damage);
-						}
+						final DamageDoneInfo reward = rewards.computeIfAbsent(attacker, DamageDoneInfo::new);
+						reward.addDamage(damage);
 						
 						if (reward.getDamage() > maxDamage)
 						{
@@ -688,12 +677,7 @@ public class L2Attackable extends L2Npc
 		
 		final L2PcInstance targetPlayer = attacker.getActingPlayer();
 		// Get the AggroInfo of the attacker L2Character from the _aggroList of the L2Attackable
-		AggroInfo ai = getAggroList().get(attacker);
-		if (ai == null)
-		{
-			ai = new AggroInfo(attacker);
-			getAggroList().put(attacker, ai);
-		}
+		final AggroInfo ai = getAggroList().computeIfAbsent(attacker, AggroInfo::new);
 		ai.addDamage(damage);
 		// traps does not cause aggro
 		// making this hack because not possible to determine if damage made by trap
@@ -982,16 +966,12 @@ public class L2Attackable extends L2Npc
 		
 		CursedWeaponsManager.getInstance().checkDrop(this, player);
 		
-		if (isSpoil())
+		if (isSpoiled())
 		{
-			List<ItemHolder> sweepItems = npcTemplate.calculateDrops(DropListScope.CORPSE, this, player);
-			if ((sweepItems != null) && !sweepItems.isEmpty())
-			{
-				_sweepItems = sweepItems.toArray(new ItemHolder[sweepItems.size()]);
-			}
+			_sweepItems.set(npcTemplate.calculateDrops(DropListScope.CORPSE, this, player));
 		}
 		
-		List<ItemHolder> deathItems = npcTemplate.calculateDrops(DropListScope.DEATH, this, player);
+		Collection<ItemHolder> deathItems = npcTemplate.calculateDrops(DropListScope.DEATH, this, player);
 		if (deathItems != null)
 		{
 			for (ItemHolder drop : deathItems)
@@ -1139,7 +1119,7 @@ public class L2Attackable extends L2Npc
 	@Override
 	public boolean isSweepActive()
 	{
-		return _sweepItems != null;
+		return _sweepItems.get() != null;
 	}
 	
 	/**
@@ -1147,12 +1127,13 @@ public class L2Attackable extends L2Npc
 	 */
 	public List<L2Item> getSpoilLootItems()
 	{
-		final List<L2Item> lootItems = new ArrayList<>();
-		if (isSweepActive())
+		final Collection<ItemHolder> sweepItems = _sweepItems.get();
+		final List<L2Item> lootItems = new LinkedList<>();
+		if (sweepItems != null)
 		{
-			for (ItemHolder item : _sweepItems)
+			for (ItemHolder item : sweepItems)
 			{
-				lootItems.add(ItemTable.getInstance().createDummyItem(item.getId()).getItem());
+				lootItems.add(ItemTable.getInstance().getTemplate(item.getId()));
 			}
 		}
 		return lootItems;
@@ -1161,21 +1142,17 @@ public class L2Attackable extends L2Npc
 	/**
 	 * @return table containing all L2ItemInstance that can be spoiled.
 	 */
-	public synchronized ItemHolder[] takeSweep()
+	public Collection<ItemHolder> takeSweep()
 	{
-		ItemHolder[] sweep = _sweepItems;
-		_sweepItems = null;
-		return sweep;
+		return _sweepItems.getAndSet(null);
 	}
 	
 	/**
 	 * @return table containing all L2ItemInstance that can be harvested.
 	 */
-	public synchronized ItemHolder takeHarvest()
+	public ItemHolder takeHarvest()
 	{
-		ItemHolder harvest = _harvestItem;
-		_harvestItem = null;
-		return harvest;
+		return _harvestItem.getAndSet(null);
 	}
 	
 	/**
@@ -1205,7 +1182,7 @@ public class L2Attackable extends L2Npc
 	 */
 	public boolean checkSpoilOwner(L2PcInstance sweeper, boolean sendMessage)
 	{
-		if ((sweeper.getObjectId() != getIsSpoiledBy()) && !sweeper.isInLooterParty(getIsSpoiledBy()))
+		if ((sweeper.getObjectId() != getSpoilerObjectId()) && !sweeper.isInLooterParty(getSpoilerObjectId()))
 		{
 			if (sendMessage)
 			{
@@ -1415,11 +1392,11 @@ public class L2Attackable extends L2Npc
 	{
 		super.onSpawn();
 		// Clear mob spoil, seed
-		setSpoil(false);
+		setSpoilerObjectId(0);
 		// Clear all aggro char from list
 		clearAggroList();
 		// Clear Harvester reward
-		_harvestItem = null;
+		_harvestItem.set(null);
 		// Clear mod Seeded stat
 		_seeded = false;
 		_seed = null;
@@ -1427,7 +1404,7 @@ public class L2Attackable extends L2Npc
 		// Clear overhit value
 		overhitEnabled(false);
 		
-		_sweepItems = null;
+		_sweepItems.set(null);
 		resetAbsorbList();
 		
 		setWalking();
@@ -1443,30 +1420,30 @@ public class L2Attackable extends L2Npc
 	}
 	
 	/**
-	 * @return True if this L2NpcInstance has drops that can be sweeped.
+	 * Checks if its spoiled.
+	 * @return {@code true} if its spoiled, {@code false} otherwise
 	 */
-	public boolean isSpoil()
+	public final boolean isSpoiled()
 	{
-		return _isSpoil;
+		return _spoilerObjectId != 0;
 	}
 	
 	/**
-	 * Set the spoil state of this L2NpcInstance.
-	 * @param isSpoil
+	 * Gets the spoiler object id.
+	 * @return the spoiler object id if its spoiled, 0 otherwise
 	 */
-	public void setSpoil(boolean isSpoil)
+	public final int getSpoilerObjectId()
 	{
-		_isSpoil = isSpoil;
+		return _spoilerObjectId;
 	}
 	
-	public final int getIsSpoiledBy()
+	/**
+	 * Sets the spoiler object id.
+	 * @param spoilerObjectId the spoiler object id
+	 */
+	public final void setSpoilerObjectId(int spoilerObjectId)
 	{
-		return _isSpoiledBy;
-	}
-	
-	public final void setIsSpoiledBy(int value)
-	{
-		_isSpoiledBy = value;
+		_spoilerObjectId = spoilerObjectId;
 	}
 	
 	/**
@@ -1517,7 +1494,7 @@ public class L2Attackable extends L2Npc
 			{
 				count += diff;
 			}
-			_harvestItem = new ItemHolder(_seed.getCropId(), count * Config.RATE_DROP_MANOR);
+			_harvestItem.set(new ItemHolder(_seed.getCropId(), count * Config.RATE_DROP_MANOR));
 		}
 	}
 	

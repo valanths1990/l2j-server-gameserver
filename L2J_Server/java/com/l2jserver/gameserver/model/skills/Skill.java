@@ -31,8 +31,8 @@ import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.handler.ITargetTypeHandler;
@@ -1225,7 +1225,7 @@ public final class Skill implements IIdentifiable
 			}
 		}
 		
-		if ((Config.GEODATA > 0) && !GeoData.getInstance().canSeeTarget(caster, target))
+		if (!GeoData.getInstance().canSeeTarget(caster, target))
 		{
 			return false;
 		}

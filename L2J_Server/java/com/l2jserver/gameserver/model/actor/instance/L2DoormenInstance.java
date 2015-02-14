@@ -20,27 +20,23 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.StringTokenizer;
 
-import com.l2jserver.gameserver.datatables.DoorTable;
-import com.l2jserver.gameserver.datatables.TeleportLocationTable;
+import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2TeleportLocation;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
-/**
- * This class ...
- * @version $Revision$ $Date$
- */
 public class L2DoormenInstance extends L2NpcInstance
 {
 	/**
-	 * @param objectID
-	 * @param template
+	 * Creates a doorman.
+	 * @param template the doorman NPC template
 	 */
-	public L2DoormenInstance(int objectID, L2NpcTemplate template)
+	public L2DoormenInstance(L2NpcTemplate template)
 	{
-		super(objectID, template);
+		super(template);
 		setInstanceType(InstanceType.L2DoormenInstance);
 	}
 	
@@ -120,7 +116,7 @@ public class L2DoormenInstance extends L2NpcInstance
 		
 		while (st.hasMoreTokens())
 		{
-			DoorTable.getInstance().getDoor(Integer.parseInt(st.nextToken())).openMe();
+			DoorData.getInstance().getDoor(Integer.parseInt(st.nextToken())).openMe();
 		}
 	}
 	
@@ -131,7 +127,7 @@ public class L2DoormenInstance extends L2NpcInstance
 		
 		while (st.hasMoreTokens())
 		{
-			DoorTable.getInstance().getDoor(Integer.parseInt(st.nextToken())).closeMe();
+			DoorData.getInstance().getDoor(Integer.parseInt(st.nextToken())).closeMe();
 		}
 	}
 	

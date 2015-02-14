@@ -66,23 +66,23 @@ import com.l2jserver.gameserver.ai.L2SummonAI;
 import com.l2jserver.gameserver.cache.WarehouseCacheManager;
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
-import com.l2jserver.gameserver.datatables.AdminTable;
-import com.l2jserver.gameserver.datatables.CharNameTable;
-import com.l2jserver.gameserver.datatables.CharSummonTable;
-import com.l2jserver.gameserver.datatables.CharTemplateTable;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.ClassListData;
-import com.l2jserver.gameserver.datatables.EnchantSkillGroupsData;
-import com.l2jserver.gameserver.datatables.ExperienceTable;
-import com.l2jserver.gameserver.datatables.FishData;
-import com.l2jserver.gameserver.datatables.HennaData;
+import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
+import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
+import com.l2jserver.gameserver.data.xml.impl.ClassListData;
+import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
+import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.xml.impl.FishData;
+import com.l2jserver.gameserver.data.xml.impl.HennaData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
+import com.l2jserver.gameserver.data.xml.impl.PlayerTemplateData;
+import com.l2jserver.gameserver.data.xml.impl.PlayerXpPercentLostData;
+import com.l2jserver.gameserver.data.xml.impl.RecipeData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
-import com.l2jserver.gameserver.datatables.PetDataTable;
-import com.l2jserver.gameserver.datatables.PlayerXpPercentLostData;
-import com.l2jserver.gameserver.datatables.RecipeData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
 import com.l2jserver.gameserver.enums.HtmlActionScope;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
 import com.l2jserver.gameserver.enums.InstanceType;
@@ -843,6 +843,49 @@ public final class L2PcInstance extends L2Playable
 	
 	private volatile int _actionMask;
 	
+	/**
+	 * Creates a player.
+	 * @param objectId the object ID
+	 * @param template the player template
+	 * @param accountName the account name
+	 * @param app the player appearance
+	 */
+	private L2PcInstance(int objectId, L2PcTemplate template, String accountName, PcAppearance app)
+	{
+		super(objectId, template);
+		setInstanceType(InstanceType.L2PcInstance);
+		super.initCharStatusUpdateValues();
+		initPcStatusUpdateValues();
+		
+		for (int i = 0; i < _htmlActionCaches.length; ++i)
+		{
+			_htmlActionCaches[i] = new LinkedList<>();
+		}
+		
+		_accountName = accountName;
+		app.setOwner(this);
+		_appearance = app;
+		
+		// Create an AI
+		getAI();
+		
+		// Create a L2Radar object
+		_radar = new L2Radar(this);
+		
+		startVitalityTask();
+	}
+	
+	/**
+	 * Creates a player.
+	 * @param template the player template
+	 * @param accountName the account name
+	 * @param app the player appearance
+	 */
+	private L2PcInstance(L2PcTemplate template, String accountName, PcAppearance app)
+	{
+		this(IdFactory.getInstance().getNextId(), template, accountName, app);
+	}
+	
 	public void setPvpFlagLasts(long time)
 	{
 		_pvpFlagLasts = time;
@@ -915,7 +958,7 @@ public final class L2PcInstance extends L2Playable
 	public static L2PcInstance create(L2PcTemplate template, String accountName, String name, PcAppearance app)
 	{
 		// Create a new L2PcInstance with an account name
-		L2PcInstance player = new L2PcInstance(IdFactory.getInstance().getNextId(), template, accountName, app);
+		L2PcInstance player = new L2PcInstance(template, accountName, app);
 		// Set the name of the L2PcInstance
 		player.setName(name);
 		// Set Character's create time
@@ -1088,44 +1131,6 @@ public final class L2PcInstance extends L2Playable
 		_mpUpdateDecCheck = getMaxMp() - _mpUpdateInterval;
 	}
 	
-	/**
-	 * Constructor of L2PcInstance (use L2Character constructor).<br>
-	 * <B><U> Actions</U> :</B>
-	 * <ul>
-	 * <li>Call the L2Character constructor to create an empty _skills slot and copy basic Calculator set to this L2PcInstance</li>
-	 * <li>Set the name of the L2PcInstance</li>
-	 * </ul>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method SET the level of the L2PcInstance to 1</B></FONT>
-	 * @param objectId Identifier of the object to initialized
-	 * @param template The L2PcTemplate to apply to the L2PcInstance
-	 * @param accountName The name of the account including this L2PcInstance
-	 * @param app
-	 */
-	private L2PcInstance(int objectId, L2PcTemplate template, String accountName, PcAppearance app)
-	{
-		super(objectId, template);
-		setInstanceType(InstanceType.L2PcInstance);
-		super.initCharStatusUpdateValues();
-		initPcStatusUpdateValues();
-		
-		for (int i = 0; i < _htmlActionCaches.length; ++i)
-		{
-			_htmlActionCaches[i] = new LinkedList<>();
-		}
-		
-		_accountName = accountName;
-		app.setOwner(this);
-		_appearance = app;
-		
-		// Create an AI
-		getAI();
-		
-		// Create a L2Radar object
-		_radar = new L2Radar(this);
-		
-		startVitalityTask();
-	}
-	
 	@Override
 	public final PcKnownList getKnownList()
 	{
@@ -1172,7 +1177,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public final L2PcTemplate getBaseTemplate()
 	{
-		return CharTemplateTable.getInstance().getTemplate(_baseClass);
+		return PlayerTemplateData.getInstance().getTemplate(_baseClass);
 	}
 	
 	/**
@@ -1189,7 +1194,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void setTemplate(ClassId newclass)
 	{
-		super.setTemplate(CharTemplateTable.getInstance().getTemplate(newclass));
+		super.setTemplate(PlayerTemplateData.getInstance().getTemplate(newclass));
 	}
 	
 	@Override
@@ -2695,7 +2700,7 @@ public final class L2PcInstance extends L2Playable
 		{
 			return getTemplate().getRace();
 		}
-		return CharTemplateTable.getInstance().getTemplate(_baseClass).getRace();
+		return PlayerTemplateData.getInstance().getTemplate(_baseClass).getRace();
 	}
 	
 	public L2Radar getRadar()
@@ -3267,18 +3272,14 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (count > 0)
 		{
-			L2ItemInstance item = null;
-			if (ItemTable.getInstance().getTemplate(itemId) != null)
-			{
-				item = ItemTable.getInstance().createDummyItem(itemId);
-			}
-			else
+			final L2Item item = ItemTable.getInstance().getTemplate(itemId);
+			if (item == null)
 			{
 				_log.log(Level.SEVERE, "Item doesn't exist so cannot be added. Item ID: " + itemId);
 				return null;
 			}
 			// Sends message to client if requested
-			if (sendMessage && ((!isCastingNow() && item.getItem().hasExImmediateEffect()) || !item.getItem().hasExImmediateEffect()))
+			if (sendMessage && ((!isCastingNow() && item.hasExImmediateEffect()) || !item.hasExImmediateEffect()))
 			{
 				if (count > 1)
 				{
@@ -3315,9 +3316,9 @@ public final class L2PcInstance extends L2Playable
 			}
 			
 			// Auto-use herbs.
-			if (item.getItem().hasExImmediateEffect())
+			if (item.hasExImmediateEffect())
 			{
-				final IItemHandler handler = ItemHandler.getInstance().getHandler(item.getEtcItem());
+				final IItemHandler handler = ItemHandler.getInstance().getHandler(item instanceof L2EtcItem ? (L2EtcItem) item : null);
 				if (handler == null)
 				{
 					_log.warning("No item handler registered for Herb ID " + item.getId() + "!");
@@ -3340,14 +3341,6 @@ public final class L2PcInstance extends L2Playable
 				else if (CursedWeaponsManager.getInstance().isCursed(createdItem.getId()))
 				{
 					CursedWeaponsManager.getInstance().activate(this, createdItem);
-				}
-				else if (FortSiegeManager.getInstance().isCombat(createdItem.getId()))
-				{
-					if (FortSiegeManager.getInstance().activateCombatFlag(this, item))
-					{
-						Fort fort = FortManager.getInstance().getFort(this);
-						fort.getSiege().announceToPlayer(SystemMessage.getSystemMessage(SystemMessageId.C1_ACQUIRED_THE_FLAG), getName());
-					}
 				}
 				// Territory Ward
 				else if ((createdItem.getId() >= 13560) && (createdItem.getId() <= 13568))
@@ -5624,13 +5617,13 @@ public final class L2PcInstance extends L2Playable
 		long lostExp = 0;
 		if (!L2Event.isParticipant(this))
 		{
-			if (lvl < ExperienceTable.getInstance().getMaxLevel())
+			if (lvl < ExperienceData.getInstance().getMaxLevel())
 			{
 				lostExp = Math.round(((getStat().getExpForLevel(lvl + 1) - getStat().getExpForLevel(lvl)) * percentLost) / 100);
 			}
 			else
 			{
-				lostExp = Math.round(((getStat().getExpForLevel(ExperienceTable.getInstance().getMaxLevel()) - getStat().getExpForLevel(ExperienceTable.getInstance().getMaxLevel() - 1)) * percentLost) / 100);
+				lostExp = Math.round(((getStat().getExpForLevel(ExperienceData.getInstance().getMaxLevel()) - getStat().getExpForLevel(ExperienceData.getInstance().getMaxLevel() - 1)) * percentLost) / 100);
 			}
 		}
 		
@@ -6565,7 +6558,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void setAccessLevel(int level)
 	{
-		_accessLevel = AdminTable.getInstance().getAccessLevel(level);
+		_accessLevel = AdminData.getInstance().getAccessLevel(level);
 		
 		getAppearance().setNameColor(_accessLevel.getNameColor());
 		getAppearance().setTitleColor(_accessLevel.getTitleColor());
@@ -6573,7 +6566,7 @@ public final class L2PcInstance extends L2Playable
 		
 		CharNameTable.getInstance().addName(this);
 		
-		if (!AdminTable.getInstance().hasAccessLevel(level))
+		if (!AdminData.getInstance().hasAccessLevel(level))
 		{
 			_log.warning("Tryed to set unregistered access level " + level + " for " + toString() + ". Setting access level without privileges!");
 		}
@@ -6596,7 +6589,7 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (Config.EVERYBODY_HAS_ADMIN_RIGHTS)
 		{
-			return AdminTable.getInstance().getMasterAccessLevel();
+			return AdminData.getInstance().getMasterAccessLevel();
 		}
 		else if (_accessLevel == null)
 		{
@@ -6787,7 +6780,7 @@ public final class L2PcInstance extends L2Playable
 				{
 					final int activeClassId = rset.getInt("classid");
 					final boolean female = rset.getInt("sex") != Sex.MALE.ordinal();
-					final L2PcTemplate template = CharTemplateTable.getInstance().getTemplate(activeClassId);
+					final L2PcTemplate template = PlayerTemplateData.getInstance().getTemplate(activeClassId);
 					PcAppearance app = new PcAppearance(rset.getByte("face"), rset.getByte("hairColor"), rset.getByte("hairStyle"), female);
 					
 					player = new L2PcInstance(objectId, template, rset.getString("account_name"), app);
@@ -8829,7 +8822,7 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		
-		if ((skill.getFlyType() == FlyType.CHARGE) && (Config.GEODATA > 0) && !GeoData.getInstance().canMove(this, target))
+		if ((skill.getFlyType() == FlyType.CHARGE) && !GeoData.getInstance().canMove(this, target))
 		{
 			sendPacket(SystemMessageId.THE_TARGET_IS_LOCATED_WHERE_YOU_CANNOT_CHARGE);
 			return false;
@@ -10159,7 +10152,7 @@ public final class L2PcInstance extends L2Playable
 	{
 		_activeClass = classId;
 		
-		final L2PcTemplate pcTemplate = CharTemplateTable.getInstance().getTemplate(classId);
+		final L2PcTemplate pcTemplate = PlayerTemplateData.getInstance().getTemplate(classId);
 		if (pcTemplate == null)
 		{
 			_log.severe("Missing template for classId: " + classId);
@@ -11374,7 +11367,7 @@ public final class L2PcInstance extends L2Playable
 		{
 			try
 			{
-				AdminTable.getInstance().deleteGm(this);
+				AdminData.getInstance().deleteGm(this);
 			}
 			catch (Exception e)
 			{
@@ -13490,6 +13483,12 @@ public final class L2PcInstance extends L2Playable
 		
 		final int deltaZ = getZ() - z;
 		if (deltaZ <= getBaseTemplate().getSafeFallHeight())
+		{
+			return false;
+		}
+		
+		// If there is no geodata loaded for the place we are client Z correction might cause falling damage.
+		if (!GeoData.getInstance().hasGeo(getX(), getY()))
 		{
 			return false;
 		}

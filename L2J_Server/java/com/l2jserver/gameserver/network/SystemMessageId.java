@@ -12318,19 +12318,19 @@ public final class SystemMessageId
 	 * ID: 2096<br>
 	 * Message: $c1 is in a location which cannot be entered, therefore it cannot be processed.
 	 */
-	public static final SystemMessageId C1_IS_IN_LOCATION_THAT_CANNOT_BE_ENTERED;
+	public static final SystemMessageId C1_IS_IN_A_LOCATION_WHICH_CANNOT_BE_ENTERED_THEREFORE_IT_CANNOT_BE_PROCESSED;
 	
 	/**
 	 * ID: 2097<br>
 	 * Message: $c1's level requirement is not sufficient and cannot be entered.
 	 */
-	public static final SystemMessageId C1_LEVEL_REQUIREMENT_NOT_SUFFICIENT;
+	public static final SystemMessageId C1_S_LEVEL_REQUIREMENT_IS_NOT_SUFFICIENT_AND_CANNOT_BE_ENTERED;
 	
 	/**
 	 * ID: 2098<br>
 	 * Message: $c1's quest requirement is not sufficient and cannot be entered.
 	 */
-	public static final SystemMessageId C1_QUEST_REQUIREMENT_NOT_SUFFICIENT;
+	public static final SystemMessageId C1_S_QUEST_REQUIREMENT_IS_NOT_SUFFICIENT_AND_CANNOT_BE_ENTERED;
 	
 	/**
 	 * ID: 2099<br>
@@ -12342,7 +12342,7 @@ public final class SystemMessageId
 	 * ID: 2100<br>
 	 * Message: $c1 may not re-enter yet.
 	 */
-	public static final SystemMessageId C1_MAY_NOT_REENTER_YET;
+	public static final SystemMessageId C1_MAY_NOT_RE_ENTER_YET;
 	
 	/**
 	 * ID: 2101<br>
@@ -12372,7 +12372,7 @@ public final class SystemMessageId
 	 * ID: 2105<br>
 	 * Message: You have entered another instance zone, therefore you cannot enter corresponding dungeon.
 	 */
-	public static final SystemMessageId ALREADY_ENTERED_ANOTHER_INSTANCE_CANT_ENTER;
+	public static final SystemMessageId YOU_HAVE_ENTERED_ANOTHER_INSTANT_ZONE_THEREFORE_YOU_CANNOT_ENTER_CORRESPONDING_DUNGEON;
 	
 	/**
 	 * ID: 2106<br>
@@ -14161,7 +14161,7 @@ public final class SystemMessageId
 	 * ID: 2720<br>
 	 * Message: Instant zone from here: $s1's entry has been restricted.
 	 */
-	public static final SystemMessageId INSTANT_ZONE_S1_RESTRICTED;
+	public static final SystemMessageId INSTANT_ZONE_FROM_HERE_S1_S_ENTRY_HAS_BEEN_RESTRICTED;
 	
 	/**
 	 * ID: 2721<br>
@@ -14730,7 +14730,7 @@ public final class SystemMessageId
 	 * ID: 3031<br>
 	 * Message: By using the skill of Einhasad's holy sword, defeat the evil Lilims!
 	 */
-	public static final SystemMessageId USING_EINHASAD_HOLY_SWORD_DEFEAT_LILIMS;
+	public static final SystemMessageId BY_USING_THE_SKILL_OF_EINHASAD_S_HOLY_SWORD_DEFEAT_THE_EVIL_LILIMS;
 	
 	/**
 	 * ID: 3033<br>
@@ -17264,16 +17264,16 @@ public final class SystemMessageId
 		PASSED_IN_PRICE_IS_S1_ADENA_WOULD_YOU_LIKE_TO_RETURN_IT = new SystemMessageId(2093);
 		ANOTHER_USER_PURCHASING_TRY_AGAIN_LATER = new SystemMessageId(2094);
 		ACCOUNT_CANNOT_SHOUT = new SystemMessageId(2095);
-		C1_IS_IN_LOCATION_THAT_CANNOT_BE_ENTERED = new SystemMessageId(2096);
-		C1_LEVEL_REQUIREMENT_NOT_SUFFICIENT = new SystemMessageId(2097);
-		C1_QUEST_REQUIREMENT_NOT_SUFFICIENT = new SystemMessageId(2098);
+		C1_IS_IN_A_LOCATION_WHICH_CANNOT_BE_ENTERED_THEREFORE_IT_CANNOT_BE_PROCESSED = new SystemMessageId(2096);
+		C1_S_LEVEL_REQUIREMENT_IS_NOT_SUFFICIENT_AND_CANNOT_BE_ENTERED = new SystemMessageId(2097);
+		C1_S_QUEST_REQUIREMENT_IS_NOT_SUFFICIENT_AND_CANNOT_BE_ENTERED = new SystemMessageId(2098);
 		C1_ITEM_REQUIREMENT_NOT_SUFFICIENT = new SystemMessageId(2099);
-		C1_MAY_NOT_REENTER_YET = new SystemMessageId(2100);
+		C1_MAY_NOT_RE_ENTER_YET = new SystemMessageId(2100);
 		NOT_IN_PARTY_CANT_ENTER = new SystemMessageId(2101);
 		PARTY_EXCEEDED_THE_LIMIT_CANT_ENTER = new SystemMessageId(2102);
 		NOT_IN_COMMAND_CHANNEL_CANT_ENTER = new SystemMessageId(2103);
 		MAXIMUM_INSTANCE_ZONE_NUMBER_EXCEEDED_CANT_ENTER = new SystemMessageId(2104);
-		ALREADY_ENTERED_ANOTHER_INSTANCE_CANT_ENTER = new SystemMessageId(2105);
+		YOU_HAVE_ENTERED_ANOTHER_INSTANT_ZONE_THEREFORE_YOU_CANNOT_ENTER_CORRESPONDING_DUNGEON = new SystemMessageId(2105);
 		DUNGEON_EXPIRES_IN_S1_MINUTES = new SystemMessageId(2106);
 		INSTANCE_ZONE_TERMINATES_IN_S1_MINUTES = new SystemMessageId(2107);
 		ILLEGAL_USE24 = new SystemMessageId(2108);
@@ -17566,7 +17566,7 @@ public final class SystemMessageId
 		LOC_IN_SEED_INFINITY_S1_S2_S3 = new SystemMessageId(2711);
 		LOC_OUT_SEED_INFINITY_S1_S2_S3 = new SystemMessageId(2712);
 		LOC_CLEFT_S1_S2_S3 = new SystemMessageId(2716);
-		INSTANT_ZONE_S1_RESTRICTED = new SystemMessageId(2720);
+		INSTANT_ZONE_FROM_HERE_S1_S_ENTRY_HAS_BEEN_RESTRICTED = new SystemMessageId(2720);
 		TOO_HIGH_TO_PERFORM_THIS_ACTION = new SystemMessageId(2721);
 		ANOTHER_AIRSHIP_ALREADY_SUMMONED = new SystemMessageId(2722);
 		YOU_CANNOT_BOARD_NOT_MEET_REQUEIREMENTS = new SystemMessageId(2727);
@@ -17661,7 +17661,7 @@ public final class SystemMessageId
 		YOU_CANNOT_USE_SKILL_ENCHANT_ATTACKING_TRANSFORMED_BOAT = new SystemMessageId(3028);
 		S1_RETURNED_MAIL = new SystemMessageId(3029);
 		YOU_CANT_CANCEL_RECEIVED_MAIL = new SystemMessageId(3030);
-		USING_EINHASAD_HOLY_SWORD_DEFEAT_LILIMS = new SystemMessageId(3031);
+		BY_USING_THE_SKILL_OF_EINHASAD_S_HOLY_SWORD_DEFEAT_THE_EVIL_LILIMS = new SystemMessageId(3031);
 		SNEAK_INTO_DAWNS_DOCUMENT_STORAGE = new SystemMessageId(3033);
 		MALE_GUARDS_CAN_DETECT_FEMALES_DONT = new SystemMessageId(3037);
 		FEMALE_GUARDS_NOTICE_BETTER_THAN_MALE = new SystemMessageId(3038);

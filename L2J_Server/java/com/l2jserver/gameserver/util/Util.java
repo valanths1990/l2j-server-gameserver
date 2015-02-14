@@ -24,14 +24,12 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
+import java.util.StringJoiner;
 import java.util.logging.Logger;
-
-import javolution.text.TextBuilder;
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
@@ -302,23 +300,15 @@ public final class Util
 	
 	/**
 	 * (Based on implode() in PHP)
-	 * @param strArray - an array of strings to concatenate
-	 * @param strDelim - the delimiter to put between the strings
+	 * @param strings an array of strings to concatenate
+	 * @param delimiter the delimiter to put between the strings
 	 * @return a delimited string for a given array of string elements.
 	 */
-	public static String implodeString(Iterable<String> strArray, String strDelim)
+	public static String implodeString(Iterable<String> strings, String delimiter)
 	{
-		final TextBuilder sbString = TextBuilder.newInstance();
-		
-		for (String strValue : strArray)
-		{
-			sbString.append(strValue);
-			sbString.append(strDelim);
-		}
-		
-		String result = sbString.toString();
-		TextBuilder.recycle(sbString);
-		return result;
+		final StringJoiner sj = new StringJoiner(delimiter);
+		strings.forEach(sj::add);
+		return sj.toString();
 	}
 	
 	/**
@@ -713,26 +703,7 @@ public final class Util
 	 */
 	public static void fillMultiEditContent(L2PcInstance activeChar, String text)
 	{
-		text = text.replaceAll("<br>", Config.EOL);
-		List<String> arg = new FastList<>();
-		arg.add("0");
-		arg.add("0");
-		arg.add("0");
-		arg.add("0");
-		arg.add("0");
-		arg.add("0");
-		arg.add(activeChar.getName());
-		arg.add(Integer.toString(activeChar.getObjectId()));
-		arg.add(activeChar.getAccountName());
-		arg.add("9");
-		arg.add(" ");
-		arg.add(" ");
-		arg.add(text);
-		arg.add("0");
-		arg.add("0");
-		arg.add("0");
-		arg.add("0");
-		activeChar.sendPacket(new ShowBoard(arg));
+		activeChar.sendPacket(new ShowBoard(Arrays.asList("0", "0", "0", "0", "0", "0", activeChar.getName(), Integer.toString(activeChar.getObjectId()), activeChar.getAccountName(), "9", " ", " ", text.replaceAll("<br>", Config.EOL), "0", "0", "0", "0")));
 	}
 	
 	/**
