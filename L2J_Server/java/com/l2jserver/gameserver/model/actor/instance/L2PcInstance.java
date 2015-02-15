@@ -694,6 +694,7 @@ public final class L2PcInstance extends L2Playable
 	private boolean _exchangeRefusal = false; // Exchange refusal
 	
 	private L2Party _party;
+	PartyDistributionType _partyDistributionType;
 	
 	// this is needed to find the inviting player for Party response
 	// there can only be one active party request at once
@@ -6541,6 +6542,16 @@ public final class L2PcInstance extends L2Playable
 	public L2Party getParty()
 	{
 		return _party;
+	}
+	
+	public void setPartyDistributionType(PartyDistributionType pdt)
+	{
+		_partyDistributionType = pdt;
+	}
+	
+	public PartyDistributionType getPartyDistributionType()
+	{
+		return _partyDistributionType;
 	}
 	
 	/**
