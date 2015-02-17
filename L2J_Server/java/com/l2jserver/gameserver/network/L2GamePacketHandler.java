@@ -731,11 +731,11 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 								 */
 								// TODO: RequestJoinMpccRoom chdd
 								break;
-							case 0x5E:
-								// TODO: RequestManageMpccRoom chdddddS
-								break;
 							case 0x5D:
 								// TODO: RequestListMpccWaiting chddd
+								break;
+							case 0x5E:
+								// TODO: RequestManageMpccRoom chdddddS
 								break;
 							case 0x06:
 								msg = new RequestExAskJoinMPCC();
