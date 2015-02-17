@@ -1958,6 +1958,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				{
 					if (item.isEquipped())
 					{
+						if (item.getMana() < item.useSkillDisTime())
+						{
+							abortCast();
+							return;
+						}
 						item.decreaseMana(false, item.useSkillDisTime());
 						break;
 					}
