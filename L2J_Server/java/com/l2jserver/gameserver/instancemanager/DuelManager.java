@@ -18,9 +18,9 @@
  */
 package com.l2jserver.gameserver.instancemanager;
 
-import java.util.List;
-
-import javolution.util.FastList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Duel;
@@ -29,34 +29,17 @@ import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 
 public final class DuelManager
 {
-	private final List<Duel> _duels;
-	private int _currentDuelId = 0x90;
+	private final Map<Integer, Duel> _duels = new ConcurrentHashMap<>();
+	private final AtomicInteger _currentDuelId = new AtomicInteger();
 	
 	protected DuelManager()
 	{
-		_duels = new FastList<>();
-	}
-	
-	private int getNextDuelId()
-	{
-		// In case someone wants to run the server forever :)
-		if (++_currentDuelId >= 2147483640)
-		{
-			_currentDuelId = 1;
-		}
-		return _currentDuelId;
+		
 	}
 	
 	public Duel getDuel(int duelId)
 	{
-		for (Duel duel : _duels)
-		{
-			if (duel.getId() == duelId)
-			{
-				return duel;
-			}
-		}
-		return null;
+		return _duels.get(duelId);
 	}
 	
 	public void addDuel(L2PcInstance playerA, L2PcInstance playerB, int partyDuel)
@@ -113,9 +96,8 @@ public final class DuelManager
 				return;
 			}
 		}
-		
-		final Duel duel = new Duel(playerA, playerB, partyDuel, getNextDuelId());
-		_duels.add(duel);
+		final int duelId = _currentDuelId.incrementAndGet();
+		_duels.put(duelId, new Duel(playerA, playerB, partyDuel, duelId));
 	}
 	
 	public void removeDuel(Duel duel)
