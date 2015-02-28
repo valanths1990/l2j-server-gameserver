@@ -102,8 +102,6 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		return 1;
 	}
 	
-	// ************************************/
-	
 	public void setExpMultiplier(float expMultiplier)
 	{
 		_expMultiplier = expMultiplier;
@@ -114,8 +112,6 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		return _expMultiplier;
 	}
 	
-	// ************************************/
-	
 	public void setItemConsume(ItemHolder item)
 	{
 		_itemConsume = item;
@@ -125,8 +121,6 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	{
 		return _itemConsume;
 	}
-	
-	// ************************************/
 	
 	public void setItemConsumeInterval(int interval)
 	{
@@ -139,8 +133,6 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		return _consumeItemInterval;
 	}
 	
-	// ************************************/
-	
 	public void setLifeTime(int lifeTime)
 	{
 		_lifeTime = lifeTime;
@@ -152,8 +144,6 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		return _lifeTime;
 	}
 	
-	// ************************************/
-	
 	public void setLifeTimeRemaining(int time)
 	{
 		_lifeTimeRemaining = time;
@@ -163,8 +153,6 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	{
 		return _lifeTimeRemaining;
 	}
-	
-	// ************************************/
 	
 	public void setReferenceSkill(int skillId)
 	{
@@ -191,6 +179,12 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		
 		CharSummonTable.getInstance().removeServitor(getOwner());
 		return true;
+		
+	}
+	
+	@Override
+	public void doPickupItem(L2Object object)
+	{
 		
 	}
 	

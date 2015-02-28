@@ -392,42 +392,6 @@ public final class L2PcInstance extends L2Playable
 	
 	private final List<IEventListener> _eventListeners = new FastList<IEventListener>().shared();
 	
-	public class AIAccessor extends L2Character.AIAccessor
-	{
-		public L2PcInstance getPlayer()
-		{
-			return L2PcInstance.this;
-		}
-		
-		public void doPickupItem(L2Object object)
-		{
-			L2PcInstance.this.doPickupItem(object);
-		}
-		
-		public void doInteract(L2Character target)
-		{
-			L2PcInstance.this.doInteract(target);
-		}
-		
-		@Override
-		public void doAttack(L2Character target)
-		{
-			super.doAttack(target);
-			
-			// cancel the recent fake-death protection instantly if the player attacks or casts spells
-			getPlayer().setRecentFakeDeath(false);
-		}
-		
-		@Override
-		public void doCast(Skill skill)
-		{
-			super.doCast(skill);
-			
-			// cancel the recent fake-death protection instantly if the player attacks or casts spells
-			getPlayer().setRecentFakeDeath(false);
-		}
-	}
-	
 	private L2GameClient _client;
 	
 	private final String _accountName;
@@ -1201,7 +1165,7 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	protected L2CharacterAI initAI()
 	{
-		return new L2PlayerAI(new L2PcInstance.AIAccessor());
+		return new L2PlayerAI(this);
 	}
 	
 	/** Return the Level of the L2PcInstance. */
@@ -4445,7 +4409,8 @@ public final class L2PcInstance extends L2Playable
 	 * current weight</li> <FONT COLOR=#FF0000><B> <U>Caution</U> : If a Party is in progress, distribute Items between party members</B></FONT>
 	 * @param object The L2ItemInstance to pick up
 	 */
-	protected void doPickupItem(L2Object object)
+	@Override
+	public void doPickupItem(L2Object object)
 	{
 		if (isAlikeDead() || isFakeDeath())
 		{
@@ -4631,6 +4596,20 @@ public final class L2PcInstance extends L2Playable
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void doAttack(L2Character target)
+	{
+		super.doAttack(target);
+		setRecentFakeDeath(false);
+	}
+	
+	@Override
+	public void doCast(Skill skill)
+	{
+		super.doCast(skill);
+		setRecentFakeDeath(false);
 	}
 	
 	public boolean canOpenPrivateStore()
