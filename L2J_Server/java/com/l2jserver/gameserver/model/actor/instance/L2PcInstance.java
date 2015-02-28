@@ -9741,11 +9741,13 @@ public final class L2PcInstance extends L2Playable
 		return _inOlympiadMode;
 	}
 	
+	@Override
 	public boolean isInDuel()
 	{
 		return _isInDuel;
 	}
 	
+	@Override
 	public int getDuelId()
 	{
 		return _duelId;
@@ -14323,7 +14325,7 @@ public final class L2PcInstance extends L2Playable
 	 * @param target the target
 	 * @return {@code true} if this player got war with the target, {@code false} otherwise.
 	 */
-	public boolean atWarWith(L2Playable target)
+	public boolean atWarWith(L2Character target)
 	{
 		if (target == null)
 		{
@@ -14337,5 +14339,75 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player in same party with the target, {@code false} otherwise.
+	 */
+	public boolean inPartyWith(L2Character target)
+	{
+		if (!isInParty() || !target.isInParty())
+		{
+			return false;
+		}
+		return getParty().getLeaderObjectId() == target.getParty().getLeaderObjectId();
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player in same command channel with the target, {@code false} otherwise.
+	 */
+	public boolean inCommandChannelWith(L2Character target)
+	{
+		if (!isInParty() || !target.isInParty())
+		{
+			return false;
+		}
+		
+		if (!getParty().isInCommandChannel() || !target.getParty().isInCommandChannel())
+		{
+			return false;
+		}
+		return getParty().getCommandChannel().getLeaderObjectId() == target.getParty().getCommandChannel().getLeaderObjectId();
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player in same clan with the target, {@code false} otherwise.
+	 */
+	public boolean inClanWith(L2Character target)
+	{
+		if ((getClanId() == 0) || (target.getClanId() == 0))
+		{
+			return false;
+		}
+		return getClanId() == target.getClanId();
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player in same ally with the target, {@code false} otherwise.
+	 */
+	public boolean inAllyWith(L2Character target)
+	{
+		if ((getAllyId() == 0) || (target.getAllyId() == 0))
+		{
+			return false;
+		}
+		return getAllyId() == target.getAllyId();
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player at duel with the target, {@code false} otherwise.
+	 */
+	public boolean atDuelWith(L2Character target)
+	{
+		if (!isInDuel() || !target.isInDuel())
+		{
+			return false;
+		}
+		return getDuelId() == target.getDuelId();
 	}
 }
