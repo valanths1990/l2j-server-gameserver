@@ -70,7 +70,7 @@ public class EnchantItemHPBonusData implements IXmlReader
 						{
 							if ("bonus".equalsIgnoreCase(e.getNodeName()))
 							{
-								bonuses.add(parseInt(e));
+								bonuses.add(Integer.parseInt(e.getTextContent()));
 							}
 						}
 						_armorHPBonuses.put(parseEnum(d.getAttributes(), CrystalType.class, "grade"), bonuses);
