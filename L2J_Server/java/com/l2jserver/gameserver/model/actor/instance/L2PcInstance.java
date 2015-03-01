@@ -1613,6 +1613,7 @@ public final class L2PcInstance extends L2Playable
 	 * Get the siege state of the L2PcInstance.
 	 * @return 1 = attacker, 2 = defender, 0 = not involved
 	 */
+	@Override
 	public byte getSiegeState()
 	{
 		return _siegeState;
@@ -1636,6 +1637,7 @@ public final class L2PcInstance extends L2Playable
 		return true;
 	}
 	
+	@Override
 	public int getSiegeSide()
 	{
 		return _siegeSide;
@@ -14387,5 +14389,14 @@ public final class L2PcInstance extends L2Playable
 			return false;
 		}
 		return getDuelId() == target.getDuelId();
+	}
+	
+	/**
+	 * @param target the target
+	 * @return {@code true} if this player is on same siege side with the target, {@code false} otherwise.
+	 */
+	public boolean isOnSameSiegeSideWith(L2Character target)
+	{
+		return (getSiegeState() > 0) && isInsideZone(ZoneId.SIEGE) && (getSiegeState() == target.getSiegeState()) && (getSiegeSide() == target.getSiegeSide());
 	}
 }

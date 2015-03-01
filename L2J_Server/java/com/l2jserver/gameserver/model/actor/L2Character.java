@@ -6933,4 +6933,14 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	{
 		return 0;
 	}
+	
+	public byte getSiegeState()
+	{
+		return 0;
+	}
+	
+	public int getSiegeSide()
+	{
+		return 0;
+	}
 }
