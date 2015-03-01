@@ -5012,18 +5012,12 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 				}
 			}
-		}
-		
-		// Launch weapon Special ability effect if available
-		if (crit)
-		{
-			L2Weapon activeWeapon = getActiveWeaponItem();
-			if (activeWeapon != null)
+			// Launch weapon onCritical Special ability effect if available
+			if (crit && (weapon != null))
 			{
-				activeWeapon.castOnCriticalSkill(this, target);
+				weapon.castOnCriticalSkill(this, target);
 			}
 		}
-		
 		// Recharge any active auto-soulshot tasks for current creature.
 		rechargeShots(true, false);
 	}

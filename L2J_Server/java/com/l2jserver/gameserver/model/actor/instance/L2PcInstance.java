@@ -5218,7 +5218,7 @@ public final class L2PcInstance extends L2Playable
 					// If player is Lucky shouldn't get penalized.
 					if (!isLucky() && !insidePvpZone)
 					{
-						calculateDeathExpPenalty(killer, atWarWith(pk));
+						calculateDeathExpPenalty(killer, isAtWarWith(pk));
 					}
 				}
 			}
@@ -14297,22 +14297,21 @@ public final class L2PcInstance extends L2Playable
 	public boolean hasCharmOfCourage()
 	{
 		return _hasCharmOfCourage;
-		
 	}
 	
 	/**
 	 * @param target the target
 	 * @return {@code true} if this player got war with the target, {@code false} otherwise.
 	 */
-	public boolean atWarWith(L2Character target)
+	public boolean isAtWarWith(L2Character target)
 	{
 		if (target == null)
 		{
 			return false;
 		}
-		if ((_clan != null) && !isAcademyMember()) // Current player
+		if ((_clan != null) && !isAcademyMember())
 		{
-			if ((target.getClan() != null) && !target.isAcademyMember()) // Target player
+			if ((target.getClan() != null) && !target.isAcademyMember())
 			{
 				return _clan.isAtWarWith(target.getClan());
 			}
@@ -14324,7 +14323,7 @@ public final class L2PcInstance extends L2Playable
 	 * @param target the target
 	 * @return {@code true} if this player in same party with the target, {@code false} otherwise.
 	 */
-	public boolean inPartyWith(L2Character target)
+	public boolean isInPartyWith(L2Character target)
 	{
 		if (!isInParty() || !target.isInParty())
 		{
@@ -14337,7 +14336,7 @@ public final class L2PcInstance extends L2Playable
 	 * @param target the target
 	 * @return {@code true} if this player in same command channel with the target, {@code false} otherwise.
 	 */
-	public boolean inCommandChannelWith(L2Character target)
+	public boolean isInCommandChannelWith(L2Character target)
 	{
 		if (!isInParty() || !target.isInParty())
 		{
@@ -14355,7 +14354,7 @@ public final class L2PcInstance extends L2Playable
 	 * @param target the target
 	 * @return {@code true} if this player in same clan with the target, {@code false} otherwise.
 	 */
-	public boolean inClanWith(L2Character target)
+	public boolean isInClanWith(L2Character target)
 	{
 		if ((getClanId() == 0) || (target.getClanId() == 0))
 		{
@@ -14368,7 +14367,7 @@ public final class L2PcInstance extends L2Playable
 	 * @param target the target
 	 * @return {@code true} if this player in same ally with the target, {@code false} otherwise.
 	 */
-	public boolean inAllyWith(L2Character target)
+	public boolean isInAllyWith(L2Character target)
 	{
 		if ((getAllyId() == 0) || (target.getAllyId() == 0))
 		{
@@ -14381,7 +14380,7 @@ public final class L2PcInstance extends L2Playable
 	 * @param target the target
 	 * @return {@code true} if this player at duel with the target, {@code false} otherwise.
 	 */
-	public boolean atDuelWith(L2Character target)
+	public boolean isInDuelWith(L2Character target)
 	{
 		if (!isInDuel() || !target.isInDuel())
 		{
