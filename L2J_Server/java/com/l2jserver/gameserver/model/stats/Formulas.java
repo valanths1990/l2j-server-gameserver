@@ -1573,16 +1573,17 @@ public final class Formulas
 		{
 			if (attacker.isPlayer())
 			{
-				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_RESISTED_YOUR_S2);
+				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DAMAGE_DECREASED_BECAUSE_C1_RESISTED_C2_MAGIC);
 				sm.addCharName(target);
-				sm.addSkillName(skill);
+				sm.addCharName(attacker);
 				attacker.sendPacket(sm);
 				damage /= 2;
 			}
 			
 			if (target.isPlayer())
 			{
-				SystemMessage sm2 = SystemMessage.getSystemMessage(SystemMessageId.RESISTED_C1_MAGIC);
+				SystemMessage sm2 = SystemMessage.getSystemMessage(SystemMessageId.C1_WEAKLY_RESISTED_C2_MAGIC);
+				sm2.addCharName(target);
 				sm2.addCharName(attacker);
 				target.sendPacket(sm2);
 			}

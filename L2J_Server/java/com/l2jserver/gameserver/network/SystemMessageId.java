@@ -13416,6 +13416,7 @@ public final class SystemMessageId
 	/**
 	 * ID: 2280 Message: Damage is decreased because $c1 resisted $c2's magic.
 	 */
+	public static final SystemMessageId DAMAGE_DECREASED_BECAUSE_C1_RESISTED_C2_MAGIC;
 	
 	/**
 	 * ID: 2281 Message: $c1 hit you for $s3 damage and hit your servitor for $s4.
@@ -17443,6 +17444,7 @@ public final class SystemMessageId
 		USE_SHORTCUT_CONFIRM = new SystemMessageId(2272);
 		SKILL_NOT_FOR_SUBCLASS = new SystemMessageId(2273);
 		NPCS_RECAPTURED_FORTRESS = new SystemMessageId(2276);
+		DAMAGE_DECREASED_BECAUSE_C1_RESISTED_C2_MAGIC = new SystemMessageId(2280);
 		CANNOT_TRANSFORM_WHILE_SITTING = new SystemMessageId(2283);
 		CAN_OPERATE_MACHINE_WHEN_IN_PARTY = new SystemMessageId(2291);
 		LOC_IN_STEEL_CITADEL_S1_S2_S3 = new SystemMessageId(2293);
