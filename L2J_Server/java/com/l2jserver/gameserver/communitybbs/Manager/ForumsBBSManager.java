@@ -22,10 +22,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
@@ -34,7 +33,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 public class ForumsBBSManager extends BaseBBSManager
 {
 	private static Logger _log = Logger.getLogger(ForumsBBSManager.class.getName());
-	private final List<Forum> _table;
+	private final List<Forum> _table = new CopyOnWriteArrayList<>();
 	private int _lastid = 1;
 	
 	/**
@@ -42,7 +41,6 @@ public class ForumsBBSManager extends BaseBBSManager
 	 */
 	protected ForumsBBSManager()
 	{
-		_table = new FastList<>();
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			Statement s = con.createStatement();
 			ResultSet rs = s.executeQuery("SELECT forum_id FROM forums WHERE forum_type = 0"))
@@ -65,10 +63,7 @@ public class ForumsBBSManager extends BaseBBSManager
 	 */
 	public void initRoot()
 	{
-		for (Forum f : _table)
-		{
-			f.vload();
-		}
+		_table.forEach(f -> f.vload());
 		_log.info("Loaded " + _table.size() + " forums. Last forum id used: " + _lastid);
 	}
 	
@@ -103,14 +98,7 @@ public class ForumsBBSManager extends BaseBBSManager
 	 */
 	public Forum getForumByName(String name)
 	{
-		for (Forum f : _table)
-		{
-			if (f.getName().equals(name))
-			{
-				return f;
-			}
-		}
-		return null;
+		return _table.stream().filter(f -> f.getName().equals(name)).findFirst().orElse(null);
 	}
 	
 	/**
@@ -145,14 +133,7 @@ public class ForumsBBSManager extends BaseBBSManager
 	 */
 	public Forum getForumByID(int idf)
 	{
-		for (Forum f : _table)
-		{
-			if (f.getID() == idf)
-			{
-				return f;
-			}
-		}
-		return null;
+		return _table.stream().filter(f -> f.getID() == idf).findFirst().orElse(null);
 	}
 	
 	@Override

@@ -22,13 +22,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.InstanceListManager;
@@ -44,7 +43,7 @@ public final class CastleManager implements InstanceListManager
 {
 	private static final Logger _log = Logger.getLogger(CastleManager.class.getName());
 	
-	private List<Castle> _castles;
+	private final List<Castle> _castles = new ArrayList<>();
 	
 	private final Map<Integer, Long> _castleSiegeDate = new ConcurrentHashMap<>();
 	
@@ -74,9 +73,9 @@ public final class CastleManager implements InstanceListManager
 		{
 			double distance;
 			Castle castle;
-			for (int i = 0; i < getCastles().size(); i++)
+			for (int i = 0; i < _castles.size(); i++)
 			{
-				castle = getCastles().get(i);
+				castle = _castles.get(i);
 				if (castle == null)
 				{
 					continue;
@@ -94,7 +93,7 @@ public final class CastleManager implements InstanceListManager
 	
 	public final Castle getCastleById(int castleId)
 	{
-		for (Castle temp : getCastles())
+		for (Castle temp : _castles)
 		{
 			if (temp.getResidenceId() == castleId)
 			{
@@ -106,7 +105,7 @@ public final class CastleManager implements InstanceListManager
 	
 	public final Castle getCastleByOwner(L2Clan clan)
 	{
-		for (Castle temp : getCastles())
+		for (Castle temp : _castles)
 		{
 			if (temp.getOwnerId() == clan.getId())
 			{
@@ -118,7 +117,7 @@ public final class CastleManager implements InstanceListManager
 	
 	public final Castle getCastle(String name)
 	{
-		for (Castle temp : getCastles())
+		for (Castle temp : _castles)
 		{
 			if (temp.getName().equalsIgnoreCase(name.trim()))
 			{
@@ -130,7 +129,7 @@ public final class CastleManager implements InstanceListManager
 	
 	public final Castle getCastle(int x, int y, int z)
 	{
-		for (Castle temp : getCastles())
+		for (Castle temp : _castles)
 		{
 			if (temp.checkIfInZone(x, y, z))
 			{
@@ -148,9 +147,9 @@ public final class CastleManager implements InstanceListManager
 	public final int getCastleIndex(int castleId)
 	{
 		Castle castle;
-		for (int i = 0; i < getCastles().size(); i++)
+		for (int i = 0; i < _castles.size(); i++)
 		{
-			castle = getCastles().get(i);
+			castle = _castles.get(i);
 			if ((castle != null) && (castle.getResidenceId() == castleId))
 			{
 				return i;
@@ -167,9 +166,9 @@ public final class CastleManager implements InstanceListManager
 	public final int getCastleIndex(int x, int y, int z)
 	{
 		Castle castle;
-		for (int i = 0; i < getCastles().size(); i++)
+		for (int i = 0; i < _castles.size(); i++)
 		{
-			castle = getCastles().get(i);
+			castle = _castles.get(i);
 			if ((castle != null) && castle.checkIfInZone(x, y, z))
 			{
 				return i;
@@ -180,17 +179,13 @@ public final class CastleManager implements InstanceListManager
 	
 	public final List<Castle> getCastles()
 	{
-		if (_castles == null)
-		{
-			_castles = new FastList<>();
-		}
 		return _castles;
 	}
 	
 	public boolean hasOwnedCastle()
 	{
 		boolean hasOwnedCastle = false;
-		for (Castle castle : getCastles())
+		for (Castle castle : _castles)
 		{
 			if (castle.getOwnerId() > 0)
 			{
@@ -305,9 +300,9 @@ public final class CastleManager implements InstanceListManager
 		{
 			while (rs.next())
 			{
-				getCastles().add(new Castle(rs.getInt("id")));
+				_castles.add(new Castle(rs.getInt("id")));
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded: " + getCastles().size() + " castles");
+			_log.info(getClass().getSimpleName() + ": Loaded: " + _castles.size() + " castles");
 		}
 		catch (Exception e)
 		{

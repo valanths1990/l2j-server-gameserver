@@ -19,8 +19,7 @@
 package com.l2jserver.gameserver.model.multisell;
 
 import java.util.ArrayList;
-
-import javolution.util.FastList;
+import java.util.LinkedList;
 
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -65,8 +64,7 @@ public class PreparedListContainer extends ListContainer
 				items = player.getInventory().getUniqueItems(false, false, false);
 			}
 			
-			// size is not known - using FastList
-			_entries = new FastList<>();
+			_entries = new LinkedList<>();
 			for (L2ItemInstance item : items)
 			{
 				// only do the match up on equippable items that are not currently equipped

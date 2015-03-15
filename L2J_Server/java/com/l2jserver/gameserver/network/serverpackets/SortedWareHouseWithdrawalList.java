@@ -18,11 +18,10 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 import com.l2jserver.gameserver.model.L2RecipeList;
@@ -42,7 +41,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	public static final int FREIGHT = 4; // not sure
 	
 	private long _playerAdena;
-	private List<L2WarehouseItem> _objects = new FastList<>();
+	private List<L2WarehouseItem> _objects = new ArrayList<>();
 	private int _whType;
 	
 	public static enum WarehouseListType
@@ -419,14 +418,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createWeaponList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item.isWeapon() || (item.getItem().getType2() == L2Item.TYPE2_WEAPON) || (item.isEtcItem() && (item.getItemType() == EtcItemType.ARROW)) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -434,7 +433,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -444,14 +443,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createArmorList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item.isArmor() || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -459,7 +458,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -469,14 +468,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createEtcItemList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item.isEtcItem() || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -484,7 +483,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -494,14 +493,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createMatList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.MATERIAL)) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -509,7 +508,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -519,14 +518,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createRecipeList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.RECIPE)) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -534,7 +533,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -544,14 +543,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createAmulettList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (item.getItemName().toUpperCase().startsWith("AMULET"))) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -559,7 +558,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -569,14 +568,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createSpellbookList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (!item.getItemName().toUpperCase().startsWith("AMULET"))) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -584,7 +583,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -594,14 +593,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createConsumableList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && ((item.getEtcItem().getItemType() == EtcItemType.SCROLL) || (item.getEtcItem().getItemType() == EtcItemType.SHOT))) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -609,7 +608,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -619,14 +618,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createShotList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SHOT)) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -634,7 +633,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -644,14 +643,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createScrollList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SCROLL)) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -659,7 +658,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -669,14 +668,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createSeedList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SEED)) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -684,7 +683,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -694,14 +693,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createOtherList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item.isEtcItem() && ((item.getEtcItem().getItemType() != EtcItemType.MATERIAL) && (item.getEtcItem().getItemType() != EtcItemType.RECIPE) && (item.getEtcItem().getItemType() != EtcItemType.SCROLL) && (item.getEtcItem().getItemType() != EtcItemType.SHOT))) || (item.getItem().getType2() == L2Item.TYPE2_MONEY))
 			{
-				if (_list.size() < MAX_SORT_LIST_ITEMS)
+				if (list.size() < MAX_SORT_LIST_ITEMS)
 				{
-					_list.add(new L2WarehouseItem(item));
+					list.add(new L2WarehouseItem(item));
 				}
 				else
 				{
@@ -709,7 +708,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				}
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	/**
@@ -719,19 +718,19 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 */
 	private List<L2WarehouseItem> createAllList(L2ItemInstance[] _items)
 	{
-		List<L2WarehouseItem> _list = new FastList<>();
+		List<L2WarehouseItem> list = new ArrayList<>();
 		for (L2ItemInstance item : _items)
 		{
-			if (_list.size() < MAX_SORT_LIST_ITEMS)
+			if (list.size() < MAX_SORT_LIST_ITEMS)
 			{
-				_list.add(new L2WarehouseItem(item));
+				list.add(new L2WarehouseItem(item));
 			}
 			else
 			{
 				continue;
 			}
 		}
-		return _list;
+		return list;
 	}
 	
 	@Override

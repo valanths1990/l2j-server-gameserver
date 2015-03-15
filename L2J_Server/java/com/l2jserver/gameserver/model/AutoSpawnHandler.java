@@ -66,16 +66,13 @@ public class AutoSpawnHandler
 	private static final int DEFAULT_RESPAWN = 3600000; // 1 hour in millisecs
 	private static final int DEFAULT_DESPAWN = 3600000; // 1 hour in millisecs
 	
-	protected Map<Integer, AutoSpawnInstance> _registeredSpawns;
-	protected Map<Integer, ScheduledFuture<?>> _runningSpawns;
+	protected Map<Integer, AutoSpawnInstance> _registeredSpawns = new FastMap<>();
+	protected Map<Integer, ScheduledFuture<?>> _runningSpawns = new FastMap<>();
 	
 	protected boolean _activeState = true;
 	
 	protected AutoSpawnHandler()
 	{
-		_registeredSpawns = new FastMap<>();
-		_runningSpawns = new FastMap<>();
-		
 		restoreSpawnData();
 	}
 	
@@ -109,8 +106,8 @@ public class AutoSpawnHandler
 		}
 		
 		// create clean list
-		_registeredSpawns = new FastMap<>();
-		_runningSpawns = new FastMap<>();
+		_registeredSpawns.clear();
+		_runningSpawns.clear();
 		
 		// load
 		restoreSpawnData();

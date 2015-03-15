@@ -23,10 +23,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 
@@ -36,7 +35,7 @@ import com.l2jserver.Config;
 public abstract class FloodProtectedListener extends Thread
 {
 	private final Logger _log = Logger.getLogger(FloodProtectedListener.class.getName());
-	private final Map<String, ForeignConnection> _floodProtection = new FastMap<>();
+	private final Map<String, ForeignConnection> _floodProtection = new ConcurrentHashMap<>();
 	private ServerSocket _serverSocket;
 	
 	public FloodProtectedListener(String listenIp, int port) throws IOException

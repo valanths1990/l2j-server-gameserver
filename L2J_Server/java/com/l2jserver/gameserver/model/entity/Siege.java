@@ -541,10 +541,7 @@ public class Siege implements Siegable
 			L2Clan clan = ClanTable.getInstance().getClan(siegeClans.getClanId());
 			for (L2PcInstance member : clan.getOnlineMembers(0))
 			{
-				if (member != null)
-				{
-					member.sendPacket(message);
-				}
+				member.sendPacket(message);
 			}
 		}
 		
@@ -577,11 +574,6 @@ public class Siege implements Siegable
 			clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
 			for (L2PcInstance member : clan.getOnlineMembers(0))
 			{
-				if (member == null)
-				{
-					continue;
-				}
-				
 				if (clear)
 				{
 					member.setSiegeState((byte) 0);
@@ -789,11 +781,6 @@ public class Siege implements Siegable
 			clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
 			for (L2PcInstance player : clan.getOnlineMembers(0))
 			{
-				if (player == null)
-				{
-					continue;
-				}
-				
 				if (player.isInSiege())
 				{
 					players.add(player);
@@ -827,11 +814,6 @@ public class Siege implements Siegable
 			}
 			for (L2PcInstance player : clan.getOnlineMembers(0))
 			{
-				if (player == null)
-				{
-					continue;
-				}
-				
 				if (player.isInSiege())
 				{
 					players.add(player);

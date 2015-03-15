@@ -50,7 +50,7 @@ public class CellPathFinding extends PathFinding
 	private int _postFilterPasses = 0;
 	private long _postFilterElapsed = 0;
 	
-	private FastList<L2ItemInstance> _debugItems = null;
+	private List<L2ItemInstance> _debugItems = null;
 	
 	public static CellPathFinding getInstance()
 	{
@@ -138,7 +138,7 @@ public class CellPathFinding extends PathFinding
 			}
 		}
 		
-		FastList<AbstractNodeLoc> path = null;
+		List<AbstractNodeLoc> path = null;
 		try
 		{
 			CellNode result = buffer.findPath(gx, gy, gz, gtx, gty, gtz);
@@ -244,7 +244,7 @@ public class CellPathFinding extends PathFinding
 		return path;
 	}
 	
-	private FastList<AbstractNodeLoc> constructPath(AbstractNode node)
+	private List<AbstractNodeLoc> constructPath(AbstractNode node)
 	{
 		FastList<AbstractNodeLoc> path = new FastList<>();
 		int previousDirectionX = Integer.MIN_VALUE;

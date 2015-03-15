@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.script.jython.JythonScriptEngine;
@@ -60,8 +59,8 @@ public final class L2ScriptEngineManager
 		return SingletonHolder._instance;
 	}
 	
-	private final Map<String, ScriptEngine> _nameEngines = new FastMap<>();
-	private final Map<String, ScriptEngine> _extEngines = new FastMap<>();
+	private final Map<String, ScriptEngine> _nameEngines = new HashMap<>();
+	private final Map<String, ScriptEngine> _extEngines = new HashMap<>();
 	private final List<ScriptManager<?>> _scriptManagers = new LinkedList<>();
 	
 	private File _currentLoadingScript;

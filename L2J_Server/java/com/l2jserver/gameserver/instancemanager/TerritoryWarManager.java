@@ -239,9 +239,9 @@ public final class TerritoryWarManager implements Siegable
 		return _territoryList.get(castleId);
 	}
 	
-	public FastList<Territory> getAllTerritories()
+	public List<Territory> getAllTerritories()
 	{
-		FastList<Territory> ret = new FastList<>();
+		List<Territory> ret = new FastList<>();
 		for (Territory t : _territoryList.values())
 		{
 			if (t.getOwnerClan() != null)
@@ -1175,10 +1175,6 @@ public final class TerritoryWarManager implements Siegable
 			{
 				for (L2PcInstance player : clan.getOnlineMembers(0))
 				{
-					if (player == null)
-					{
-						continue;
-					}
 					if (clear)
 					{
 						player.setSiegeState((byte) 0);
@@ -1614,7 +1610,7 @@ public final class TerritoryWarManager implements Siegable
 			return null;
 		}
 		
-		public FastList<TerritoryNPCSpawn> getSpawnList()
+		public List<TerritoryNPCSpawn> getSpawnList()
 		{
 			return _spawnList;
 		}
@@ -1708,9 +1704,9 @@ public final class TerritoryWarManager implements Siegable
 			return _questDone;
 		}
 		
-		public FastList<Integer> getOwnedWardIds()
+		public List<Integer> getOwnedWardIds()
 		{
-			FastList<Integer> ret = new FastList<>();
+			List<Integer> ret = new FastList<>();
 			for (TerritoryNPCSpawn wardSpawn : _territoryWardSpawnPlaces)
 			{
 				if (wardSpawn.getId() > 0)

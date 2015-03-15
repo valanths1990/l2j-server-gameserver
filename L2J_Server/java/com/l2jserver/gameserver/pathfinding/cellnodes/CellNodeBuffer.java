@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.pathfinding.cellnodes;
 
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javolution.util.FastList;
@@ -113,9 +114,9 @@ public class CellNodeBuffer
 		return _lastElapsedTime;
 	}
 	
-	public final FastList<CellNode> debugPath()
+	public final List<CellNode> debugPath()
 	{
-		FastList<CellNode> result = new FastList<>();
+		List<CellNode> result = new FastList<>();
 		
 		for (CellNode n = _current; n.getParent() != null; n = (CellNode) n.getParent())
 		{
