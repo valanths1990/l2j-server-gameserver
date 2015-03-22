@@ -18,10 +18,11 @@
  */
 package com.l2jserver.gameserver.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Logger;
@@ -48,7 +49,7 @@ public final class L2WorldRegion
 	/** Map containing visible objects in this world region. */
 	private final Map<Integer, L2Object> _visibleObjects = new ConcurrentHashMap<>();
 	
-	private final List<L2WorldRegion> _surroundingRegions = new ArrayList<>();
+	private final Queue<L2WorldRegion> _surroundingRegions = new ConcurrentLinkedQueue<>();
 	private final int _tileX, _tileY;
 	private boolean _active = false;
 	private ScheduledFuture<?> _neighborsTask = null;
@@ -446,9 +447,9 @@ public final class L2WorldRegion
 	}
 	
 	/**
-	 * @return the FastList _surroundingRegions containing all L2WorldRegion around the current L2WorldRegion
+	 * @return the list containing all L2WorldRegion around the current world region
 	 */
-	public List<L2WorldRegion> getSurroundingRegions()
+	public Queue<L2WorldRegion> getSurroundingRegions()
 	{
 		return _surroundingRegions;
 	}
