@@ -19,8 +19,7 @@
 package com.l2jserver.gameserver.model;
 
 import java.util.Map;
-
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -36,7 +35,7 @@ public class PartyMatchRoomList
 	
 	protected PartyMatchRoomList()
 	{
-		_rooms = new FastMap<>();
+		_rooms = new ConcurrentHashMap<>();
 	}
 	
 	public synchronized void addPartyMatchRoom(int id, PartyMatchRoom room)

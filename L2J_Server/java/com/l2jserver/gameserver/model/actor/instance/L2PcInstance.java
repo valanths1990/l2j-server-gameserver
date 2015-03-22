@@ -47,9 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.GameTimeController;
@@ -467,7 +464,7 @@ public final class L2PcInstance extends L2Playable
 	
 	private int _bookmarkslot = 0; // The Teleport Bookmark Slot
 	
-	private final Map<Integer, TeleportBookmark> _tpbookmarks = new FastMap<>();
+	private final Map<Integer, TeleportBookmark> _tpbookmarks = new ConcurrentHashMap<>();
 	
 	private boolean _canFeed;
 	private boolean _isInSiege;
@@ -565,7 +562,7 @@ public final class L2PcInstance extends L2Playable
 	private int _questNpcObject = 0;
 	
 	/** The table containing all Quests began by the L2PcInstance */
-	private final Map<String, QuestState> _quests = new FastMap<>();
+	private final Map<String, QuestState> _quests = new ConcurrentHashMap<>();
 	
 	/** The list containing all shortCuts of this player. */
 	private final ShortCuts _shortCuts = new ShortCuts(this);
@@ -573,8 +570,8 @@ public final class L2PcInstance extends L2Playable
 	/** The list containing all macros of this player. */
 	private final MacroList _macros = new MacroList(this);
 	
-	private final List<L2PcInstance> _snoopListener = new FastList<>();
-	private final List<L2PcInstance> _snoopedPlayer = new FastList<>();
+	private final Set<L2PcInstance> _snoopListener = ConcurrentHashMap.newKeySet(1);
+	private final Set<L2PcInstance> _snoopedPlayer = ConcurrentHashMap.newKeySet(1);
 	
 	// hennas
 	private final L2Henna[] _henna = new L2Henna[3];
@@ -6640,8 +6637,7 @@ public final class L2PcInstance extends L2Playable
 		su.addAttribute(StatusUpdate.KARMA, getKarma());
 		sendPacket(su);
 		
-		Collection<L2PcInstance> plrs = getKnownList().getKnownPlayers().values();
-		for (L2PcInstance player : plrs)
+		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
 		{
 			player.sendPacket(new RelationChanged(this, getRelation(player), isAutoAttackable(player)));
 			if (hasSummon())
@@ -10865,10 +10861,7 @@ public final class L2PcInstance extends L2Playable
 	
 	public void addSnooper(L2PcInstance pci)
 	{
-		if (!_snoopListener.contains(pci))
-		{
-			_snoopListener.add(pci);
-		}
+		_snoopListener.add(pci);
 	}
 	
 	public void removeSnooper(L2PcInstance pci)
@@ -10878,10 +10871,7 @@ public final class L2PcInstance extends L2Playable
 	
 	public void addSnooped(L2PcInstance pci)
 	{
-		if (!_snoopedPlayer.contains(pci))
-		{
-			_snoopedPlayer.add(pci);
-		}
+		_snoopedPlayer.add(pci);
 	}
 	
 	public void removeSnooped(L2PcInstance pci)

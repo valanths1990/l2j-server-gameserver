@@ -24,8 +24,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.enums.DuelResult;
@@ -161,7 +159,7 @@ public class Duel
 		{
 			if (_debuffs == null)
 			{
-				_debuffs = new FastList<>();
+				_debuffs = new CopyOnWriteArrayList<>();
 			}
 			
 			_debuffs.add(debuff);
