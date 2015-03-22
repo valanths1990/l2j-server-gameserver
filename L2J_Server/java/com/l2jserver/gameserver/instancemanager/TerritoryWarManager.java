@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -84,15 +85,15 @@ public final class TerritoryWarManager implements Siegable
 	public static boolean PLAYER_WITH_WARD_CAN_BE_KILLED_IN_PEACEZONE;
 	public static boolean SPAWN_WARDS_WHEN_TW_IS_NOT_IN_PROGRESS;
 	public static boolean RETURN_WARDS_WHEN_TW_STARTS;
-	public final Map<Integer, Integer> TERRITORY_ITEM_IDS;
+	public final Map<Integer, Integer> TERRITORY_ITEM_IDS = new FastMap<>();
 	
 	// Territory War settings
-	private final FastMap<Integer, FastList<L2Clan>> _registeredClans;
-	private final FastMap<Integer, FastList<Integer>> _registeredMercenaries;
-	private final FastMap<Integer, Territory> _territoryList;
-	protected FastList<Integer> _disguisedPlayers;
-	private final FastList<TerritoryWard> _territoryWards;
-	private final FastMap<L2Clan, L2SiegeFlagInstance> _clanFlags;
+	private final Map<Integer, List<L2Clan>> _registeredClans = new FastMap<>();
+	private final Map<Integer, List<Integer>> _registeredMercenaries = new FastMap<>();
+	private final Map<Integer, Territory> _territoryList = new FastMap<>();
+	protected List<Integer> _disguisedPlayers = new FastList<>();
+	private final List<TerritoryWard> _territoryWards = new FastList<>();
+	private final Map<L2Clan, L2SiegeFlagInstance> _clanFlags = new FastMap<>();
 	private final Map<Integer, Integer[]> _participantPoints = new FastMap<>();
 	protected Calendar _startTWDate = Calendar.getInstance();
 	protected boolean _isRegistrationOver = true;
@@ -104,15 +105,6 @@ public final class TerritoryWarManager implements Siegable
 	
 	protected TerritoryWarManager()
 	{
-		// init lists
-		_registeredClans = new FastMap<>();
-		_registeredMercenaries = new FastMap<>();
-		_territoryList = new FastMap<>();
-		_territoryWards = new FastList<>();
-		_clanFlags = new FastMap<>();
-		_disguisedPlayers = new FastList<>();
-		TERRITORY_ITEM_IDS = new FastMap<>();
-		
 		// Constant data
 		TERRITORY_ITEM_IDS.put(81, 13757);
 		TERRITORY_ITEM_IDS.put(82, 13758);
@@ -124,13 +116,6 @@ public final class TerritoryWarManager implements Siegable
 		TERRITORY_ITEM_IDS.put(88, 13764);
 		TERRITORY_ITEM_IDS.put(89, 13765);
 		
-		_registeredClans.shared();
-		_registeredMercenaries.shared();
-		_territoryList.shared();
-		_territoryWards.shared();
-		_clanFlags.shared();
-		_disguisedPlayers.shared();
-		// load data from database
 		load();
 	}
 	
@@ -241,7 +226,7 @@ public final class TerritoryWarManager implements Siegable
 	
 	public List<Territory> getAllTerritories()
 	{
-		List<Territory> ret = new FastList<>();
+		List<Territory> ret = new LinkedList<>();
 		for (Territory t : _territoryList.values())
 		{
 			if (t.getOwnerClan() != null)
@@ -1458,7 +1443,7 @@ public final class TerritoryWarManager implements Siegable
 				}
 			}
 		}
-		for (FastList<L2Clan> list : _registeredClans.values())
+		for (List<L2Clan> list : _registeredClans.values())
 		{
 			for (L2Clan c : list)
 			{
@@ -1473,7 +1458,7 @@ public final class TerritoryWarManager implements Siegable
 			}
 		}
 		// broadcast to mercenaries
-		for (FastList<Integer> list : _registeredMercenaries.values())
+		for (List<Integer> list : _registeredMercenaries.values())
 		{
 			for (int objId : list)
 			{

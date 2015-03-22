@@ -27,9 +27,8 @@ import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-
-import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.loginserver.GameServerTable.GameServerInfo;
@@ -64,7 +63,7 @@ public class GameServerThread extends Thread
 	private GameServerInfo _gsi;
 	
 	/** Authed Clients on a GameServer */
-	private final Set<String> _accountsOnGameServer = new FastSet<>();
+	private final Set<String> _accountsOnGameServer = ConcurrentHashMap.newKeySet();
 	
 	private String _connectionIPAddress;
 	

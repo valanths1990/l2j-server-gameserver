@@ -109,7 +109,7 @@ public class Duel
 		private double _cp;
 		private boolean _paDuel;
 		private int _x, _y, _z;
-		private FastList<Skill> _debuffs;
+		private List<Skill> _debuffs;
 		
 		public PlayerCondition(L2PcInstance player, boolean partyDuel)
 		{

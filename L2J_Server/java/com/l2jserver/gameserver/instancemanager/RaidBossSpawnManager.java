@@ -24,11 +24,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -47,10 +46,10 @@ public class RaidBossSpawnManager
 {
 	private static final Logger _log = Logger.getLogger(RaidBossSpawnManager.class.getName());
 	
-	protected static final Map<Integer, L2RaidBossInstance> _bosses = new FastMap<>();
-	protected static final Map<Integer, L2Spawn> _spawns = new FastMap<>();
-	protected static final Map<Integer, StatsSet> _storedInfo = new FastMap<>();
-	protected static final Map<Integer, ScheduledFuture<?>> _schedules = new FastMap<>();
+	protected static final Map<Integer, L2RaidBossInstance> _bosses = new ConcurrentHashMap<>();
+	protected static final Map<Integer, L2Spawn> _spawns = new ConcurrentHashMap<>();
+	protected static final Map<Integer, StatsSet> _storedInfo = new ConcurrentHashMap<>();
+	protected static final Map<Integer, ScheduledFuture<?>> _schedules = new ConcurrentHashMap<>();
 	
 	public static enum StatusEnum
 	{

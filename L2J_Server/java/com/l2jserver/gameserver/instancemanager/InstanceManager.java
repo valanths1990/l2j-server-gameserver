@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javolution.util.FastMap;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -47,7 +45,7 @@ public final class InstanceManager implements IXmlReader
 	private int _dynamic = 300000;
 	// InstanceId Names
 	private static final Map<Integer, String> _instanceIdNames = new HashMap<>();
-	private final Map<Integer, Map<Integer, Long>> _playerInstanceTimes = new FastMap<>();
+	private final Map<Integer, Map<Integer, Long>> _playerInstanceTimes = new ConcurrentHashMap<>();
 	// SQL Queries
 	private static final String ADD_INSTANCE_TIME = "INSERT INTO character_instance_time (charId,instanceId,time) values (?,?,?) ON DUPLICATE KEY UPDATE time=?";
 	private static final String RESTORE_INSTANCE_TIMES = "SELECT instanceId,time FROM character_instance_time WHERE charId=?";
@@ -160,7 +158,7 @@ public final class InstanceManager implements IXmlReader
 		{
 			return; // already restored
 		}
-		_playerInstanceTimes.put(playerObjId, new FastMap<Integer, Long>());
+		_playerInstanceTimes.put(playerObjId, new ConcurrentHashMap<>());
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(RESTORE_INSTANCE_TIMES))
 		{

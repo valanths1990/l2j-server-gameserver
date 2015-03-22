@@ -21,13 +21,13 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -1026,7 +1026,7 @@ public class L2PetInstance extends L2Summon
 			
 			int buff_index = 0;
 			
-			final List<Integer> storedSkills = new FastList<>();
+			final List<Integer> storedSkills = new LinkedList<>();
 			
 			// Store all effect data along with calculated remaining
 			if (storeEffects)
@@ -1070,11 +1070,7 @@ public class L2PetInstance extends L2Summon
 					ps2.setInt(5, ++buff_index);
 					ps2.execute();
 					
-					if (!SummonEffectsTable.getInstance().getPetEffects().containsKey(getControlObjectId()))
-					{
-						SummonEffectsTable.getInstance().getPetEffects().put(getControlObjectId(), new FastList<SummonEffect>());
-					}
-					
+					SummonEffectsTable.getInstance().getPetEffects().putIfAbsent(getControlObjectId(), new ArrayList<>());
 					SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()).add(SummonEffectsTable.getInstance().new SummonEffect(skill, info.getTime()));
 				}
 			}
@@ -1111,7 +1107,7 @@ public class L2PetInstance extends L2Summon
 						{
 							if (!SummonEffectsTable.getInstance().getPetEffects().containsKey(getControlObjectId()))
 							{
-								SummonEffectsTable.getInstance().getPetEffects().put(getControlObjectId(), new FastList<SummonEffect>());
+								SummonEffectsTable.getInstance().getPetEffects().put(getControlObjectId(), new ArrayList<>());
 							}
 							
 							SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()).add(SummonEffectsTable.getInstance().new SummonEffect(skill, effectCurTime));

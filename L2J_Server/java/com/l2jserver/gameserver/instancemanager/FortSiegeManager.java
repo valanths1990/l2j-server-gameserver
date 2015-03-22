@@ -29,11 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -140,13 +138,13 @@ public final class FortSiegeManager
 		_suspiciousMerchantRespawnDelay = Integer.decode(siegeSettings.getProperty("SuspiciousMerchantRespawnDelay", "180"));
 		
 		// Siege spawns settings
-		_commanderSpawnList = new FastMap<>();
-		_flagList = new FastMap<>();
+		_commanderSpawnList = new ConcurrentHashMap<>();
+		_flagList = new ConcurrentHashMap<>();
 		
 		for (Fort fort : FortManager.getInstance().getForts())
 		{
-			List<FortSiegeSpawn> _commanderSpawns = new FastList<>();
-			List<CombatFlag> _flagSpawns = new FastList<>();
+			List<FortSiegeSpawn> commanderSpawns = new ArrayList<>();
+			List<CombatFlag> flagSpawns = new ArrayList<>();
 			for (int i = 1; i < 5; i++)
 			{
 				final String _spawnParams = siegeSettings.getProperty(fort.getName().replace(" ", "") + "Commander" + i, "");
@@ -164,7 +162,7 @@ public final class FortSiegeManager
 					int heading = Integer.parseInt(st.nextToken());
 					int npc_id = Integer.parseInt(st.nextToken());
 					
-					_commanderSpawns.add(new FortSiegeSpawn(fort.getResidenceId(), x, y, z, heading, npc_id, i));
+					commanderSpawns.add(new FortSiegeSpawn(fort.getResidenceId(), x, y, z, heading, npc_id, i));
 				}
 				catch (Exception e)
 				{
@@ -172,7 +170,7 @@ public final class FortSiegeManager
 				}
 			}
 			
-			_commanderSpawnList.put(fort.getResidenceId(), _commanderSpawns);
+			_commanderSpawnList.put(fort.getResidenceId(), commanderSpawns);
 			
 			for (int i = 1; i < 4; i++)
 			{
@@ -190,14 +188,14 @@ public final class FortSiegeManager
 					int z = Integer.parseInt(st.nextToken());
 					int flag_id = Integer.parseInt(st.nextToken());
 					
-					_flagSpawns.add(new CombatFlag(fort.getResidenceId(), x, y, z, 0, flag_id));
+					flagSpawns.add(new CombatFlag(fort.getResidenceId(), x, y, z, 0, flag_id));
 				}
 				catch (Exception e)
 				{
 					_log.warning("Error while loading flag(s) for " + fort.getName() + " fort.");
 				}
 			}
-			_flagList.put(fort.getResidenceId(), _flagSpawns);
+			_flagList.put(fort.getResidenceId(), flagSpawns);
 		}
 	}
 	

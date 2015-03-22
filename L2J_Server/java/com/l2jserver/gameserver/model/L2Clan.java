@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -2996,9 +2997,9 @@ public class L2Clan implements IIdentifiable, INamable
 		return false;
 	}
 	
-	public SubPledgeSkill[] getAllSubSkills()
+	public List<SubPledgeSkill> getAllSubSkills()
 	{
-		FastList<SubPledgeSkill> list = FastList.newInstance();
+		final List<SubPledgeSkill> list = new LinkedList<>();
 		for (Skill skill : _subPledgeSkills.values())
 		{
 			list.add(new SubPledgeSkill(0, skill.getId(), skill.getLevel()));
@@ -3010,9 +3011,7 @@ public class L2Clan implements IIdentifiable, INamable
 				list.add(new SubPledgeSkill(subunit.getId(), skill.getId(), skill.getLevel()));
 			}
 		}
-		SubPledgeSkill[] result = list.toArray(new SubPledgeSkill[list.size()]);
-		FastList.recycle(list);
-		return result;
+		return list;
 	}
 	
 	public void setNewLeaderId(int objectId, boolean storeInDb)

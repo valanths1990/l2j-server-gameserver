@@ -22,15 +22,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -66,8 +67,8 @@ public class AutoSpawnHandler
 	private static final int DEFAULT_RESPAWN = 3600000; // 1 hour in millisecs
 	private static final int DEFAULT_DESPAWN = 3600000; // 1 hour in millisecs
 	
-	protected Map<Integer, AutoSpawnInstance> _registeredSpawns = new FastMap<>();
-	protected Map<Integer, ScheduledFuture<?>> _runningSpawns = new FastMap<>();
+	protected Map<Integer, AutoSpawnInstance> _registeredSpawns = new ConcurrentHashMap<>();
+	protected Map<Integer, ScheduledFuture<?>> _runningSpawns = new ConcurrentHashMap<>();
 	
 	protected boolean _activeState = true;
 	
@@ -365,19 +366,17 @@ public class AutoSpawnHandler
 		return null;
 	}
 	
-	public Map<Integer, AutoSpawnInstance> getAutoSpawnInstances(int npcId)
+	public List<AutoSpawnInstance> getAutoSpawnInstances(int npcId)
 	{
-		Map<Integer, AutoSpawnInstance> spawnInstList = new FastMap<>();
-		
+		final List<AutoSpawnInstance> result = new LinkedList<>();
 		for (AutoSpawnInstance spawnInst : _registeredSpawns.values())
 		{
 			if (spawnInst.getId() == npcId)
 			{
-				spawnInstList.put(spawnInst.getObjectId(), spawnInst);
+				result.add(spawnInst);
 			}
 		}
-		
-		return spawnInstList;
+		return result;
 	}
 	
 	/**
@@ -593,9 +592,9 @@ public class AutoSpawnHandler
 		
 		protected int _lastLocIndex = -1;
 		
-		private final List<L2Npc> _npcList = new FastList<>();
+		private final List<L2Npc> _npcList = new CopyOnWriteArrayList<>();
 		
-		private final List<Location> _locList = new FastList<>();
+		private final List<Location> _locList = new CopyOnWriteArrayList<>();
 		
 		private boolean _spawnActive;
 		
@@ -678,16 +677,14 @@ public class AutoSpawnHandler
 			return ret;
 		}
 		
-		public L2Spawn[] getSpawns()
+		public List<L2Spawn> getSpawns()
 		{
-			List<L2Spawn> npcSpawns = new FastList<>();
-			
+			final List<L2Spawn> npcSpawns = new ArrayList<>();
 			for (L2Npc npcInst : _npcList)
 			{
 				npcSpawns.add(npcInst.getSpawn());
 			}
-			
-			return npcSpawns.toArray(new L2Spawn[npcSpawns.size()]);
+			return npcSpawns;
 		}
 		
 		public void setSpawnCount(int spawnCount)

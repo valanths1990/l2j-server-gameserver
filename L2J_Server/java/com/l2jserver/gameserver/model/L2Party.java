@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.model;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -695,36 +696,27 @@ public class L2Party extends AbstractPlayerGroup
 	 */
 	public void distributeAdena(L2PcInstance player, long adena, L2Character target)
 	{
-		// Get all the party members
-		List<L2PcInstance> membersList = getMembers();
-		
 		// Check the number of party members that must be rewarded
 		// (The party member must be in range to receive its reward)
-		List<L2PcInstance> ToReward = FastList.newInstance();
-		for (L2PcInstance member : membersList)
+		final List<L2PcInstance> toReward = new LinkedList<>();
+		for (L2PcInstance member : getMembers())
 		{
-			if (!Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true))
+			if (Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true))
 			{
-				continue;
+				toReward.add(member);
 			}
-			ToReward.add(member);
 		}
 		
-		// Avoid null exceptions, if any
-		if (ToReward.isEmpty())
+		if (!toReward.isEmpty())
 		{
-			return;
+			// Now we can actually distribute the adena reward
+			// (Total adena splitted by the number of party members that are in range and must be rewarded)
+			long count = adena / toReward.size();
+			for (L2PcInstance member : toReward)
+			{
+				member.addAdena("Party", count, player, true);
+			}
 		}
-		
-		// Now we can actually distribute the adena reward
-		// (Total adena splitted by the number of party members that are in range and must be rewarded)
-		long count = adena / ToReward.size();
-		for (L2PcInstance member : ToReward)
-		{
-			member.addAdena("Party", count, player, true);
-		}
-		
-		FastList.recycle((FastList<?>) ToReward);
 	}
 	
 	/**

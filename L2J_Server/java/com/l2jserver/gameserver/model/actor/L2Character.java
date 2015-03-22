@@ -35,10 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-import javolution.util.WeakFastSet;
-
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.GeoData;
@@ -214,7 +210,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	/** Table of Calculators containing all used calculator */
 	private Calculator[] _calculators;
 	/** Map containing all skills of this character. */
-	private final Map<Integer, Skill> _skills = new FastMap<Integer, Skill>().shared();
+	private final Map<Integer, Skill> _skills = new ConcurrentHashMap<>();
 	/** Map containing the skill reuse time stamps. */
 	private volatile Map<Integer, TimeStamp> _reuseTimeStampsSkills = null;
 	/** Map containing the item reuse time stamps. */
@@ -2719,7 +2715,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				if (_attackByList == null)
 				{
-					_attackByList = new WeakFastSet<>(true);
+					_attackByList = ConcurrentHashMap.newKeySet();
 				}
 			}
 		}
@@ -5454,7 +5450,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			int _skiprange = 0;
 			int _skipgeo = 0;
 			int _skippeace = 0;
-			List<L2Character> targetList = new FastList<>(targets.length);
+			final List<L2Object> targetList = new ArrayList<>();
 			for (L2Object target : targets)
 			{
 				if (target instanceof L2Character)
@@ -5488,7 +5484,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 							}
 						}
 					}
-					targetList.add((L2Character) target);
+					targetList.add(target);
 				}
 			}
 			if (targetList.isEmpty())
@@ -5511,7 +5507,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				abortCast();
 				return;
 			}
-			mut.setTargets(targetList.toArray(new L2Character[targetList.size()]));
+			mut.setTargets(targetList.toArray(new L2Object[targetList.size()]));
 		}
 		
 		// Ensure that a cast is in progress

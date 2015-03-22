@@ -51,7 +51,8 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
 
 /**
- * @since $Revision: 1.3.4.1 $ $Date: 2005/03/27 15:29:32 $ This ancient thingie got reworked by Nik at $Date: 2011/05/17 21:51:39 $ Yeah, for 6 years no one bothered reworking this buggy event engine.
+ * @author Nik
+ * @Since 2011/05/17 21:51:39
  */
 public class L2Event
 {
@@ -65,7 +66,6 @@ public class L2Event
 	public static final List<L2PcInstance> _registeredPlayers = new FastList<>();
 	public static final Map<Integer, List<L2PcInstance>> _teams = new FastMap<>();
 	public static int _npcId = 0;
-	// public static final List<L2Npc> _npcs = new FastList<L2Npc>();
 	private static final Map<L2PcInstance, PlayerEventHolder> _connectionLossData = new FastMap<>();
 	
 	public enum EventState
@@ -382,7 +382,7 @@ public class L2Event
 				_eventInfo = br.readLine();
 			}
 			
-			List<L2PcInstance> temp = new FastList<>();
+			List<L2PcInstance> temp = new LinkedList<>();
 			for (L2PcInstance player : L2World.getInstance().getPlayers())
 			{
 				if (!player.isOnline())

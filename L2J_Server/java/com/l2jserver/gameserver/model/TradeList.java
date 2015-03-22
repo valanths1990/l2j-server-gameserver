@@ -20,11 +20,11 @@ package com.l2jserver.gameserver.model;
 
 import static com.l2jserver.gameserver.model.itemcontainer.Inventory.MAX_ADENA;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.datatables.ItemTable;
@@ -49,7 +49,7 @@ public class TradeList
 	
 	private final L2PcInstance _owner;
 	private L2PcInstance _partner;
-	private final List<TradeItem> _items;
+	private final List<TradeItem> _items = new CopyOnWriteArrayList<>();
 	private String _title;
 	private boolean _packaged;
 	
@@ -58,7 +58,6 @@ public class TradeList
 	
 	public TradeList(L2PcInstance owner)
 	{
-		_items = new FastList<>();
 		_owner = owner;
 	}
 	
@@ -120,18 +119,16 @@ public class TradeList
 	 * @param inventory
 	 * @return L2ItemInstance : items in inventory
 	 */
-	public TradeItem[] getAvailableItems(PcInventory inventory)
+	public List<TradeItem> getAvailableItems(PcInventory inventory)
 	{
-		FastList<TradeItem> list = FastList.newInstance();
+		final List<TradeItem> list = new LinkedList<>();
 		for (TradeItem item : _items)
 		{
 			item = new TradeItem(item, item.getCount(), item.getPrice());
 			inventory.adjustAvailableItem(item);
 			list.add(item);
 		}
-		TradeItem[] result = list.toArray(new TradeItem[list.size()]);
-		FastList.recycle(list);
-		return result;
+		return list;
 	}
 	
 	/**

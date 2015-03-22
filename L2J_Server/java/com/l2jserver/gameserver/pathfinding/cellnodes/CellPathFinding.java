@@ -19,12 +19,12 @@
 package com.l2jserver.gameserver.pathfinding.cellnodes;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
@@ -121,16 +121,12 @@ public class CellPathFinding extends PathFinding
 		{
 			if (_debugItems == null)
 			{
-				_debugItems = new FastList<>();
+				_debugItems = new CopyOnWriteArrayList<>();
 			}
 			else
 			{
 				for (L2ItemInstance item : _debugItems)
 				{
-					if (item == null)
-					{
-						continue;
-					}
 					item.decayMe();
 				}
 				
@@ -246,7 +242,7 @@ public class CellPathFinding extends PathFinding
 	
 	private List<AbstractNodeLoc> constructPath(AbstractNode node)
 	{
-		FastList<AbstractNodeLoc> path = new FastList<>();
+		final LinkedList<AbstractNodeLoc> path = new LinkedList<>();
 		int previousDirectionX = Integer.MIN_VALUE;
 		int previousDirectionY = Integer.MIN_VALUE;
 		int directionX, directionY;
@@ -286,7 +282,6 @@ public class CellPathFinding extends PathFinding
 			
 			node = node.getParent();
 		}
-		
 		return path;
 	}
 	
