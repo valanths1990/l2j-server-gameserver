@@ -19,9 +19,11 @@
 package com.l2jserver.gameserver.model;
 
 import java.lang.reflect.Constructor;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,7 +82,7 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 	/** If true then spawn is custom */
 	private boolean _customSpawn;
 	private static List<SpawnListener> _spawnListeners = new CopyOnWriteArrayList<>();
-	private final List<L2Npc> _spawnedNpcs = new CopyOnWriteArrayList<>();
+	private final Deque<L2Npc> _spawnedNpcs = new ConcurrentLinkedDeque<>();
 	private Map<Integer, Location> _lastSpawnPoints;
 	private boolean _isNoRndWalk = false; // Is no random walk
 	
@@ -761,10 +763,10 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 	
 	public L2Npc getLastSpawn()
 	{
-		return _spawnedNpcs.get(_spawnedNpcs.size() - 1);
+		return _spawnedNpcs.peekLast();
 	}
 	
-	public final List<L2Npc> getSpawnedNpcs()
+	public final Deque<L2Npc> getSpawnedNpcs()
 	{
 		return _spawnedNpcs;
 	}
