@@ -21,11 +21,10 @@ package com.l2jserver.gameserver.instancemanager;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.InstanceListManager;
@@ -37,7 +36,7 @@ public final class FortManager implements InstanceListManager
 {
 	protected static final Logger _log = Logger.getLogger(FortManager.class.getName());
 	
-	private List<Fort> _forts;
+	private final List<Fort> _forts = new ArrayList<>();
 	
 	public final int findNearestFortIndex(L2Object obj)
 	{
@@ -51,9 +50,9 @@ public final class FortManager implements InstanceListManager
 		{
 			double distance;
 			Fort fort;
-			for (int i = 0; i < getForts().size(); i++)
+			for (int i = 0; i < _forts.size(); i++)
 			{
-				fort = getForts().get(i);
+				fort = _forts.get(i);
 				if (fort == null)
 				{
 					continue;
@@ -71,7 +70,7 @@ public final class FortManager implements InstanceListManager
 	
 	public final Fort getFortById(int fortId)
 	{
-		for (Fort f : getForts())
+		for (Fort f : _forts)
 		{
 			if (f.getResidenceId() == fortId)
 			{
@@ -83,7 +82,7 @@ public final class FortManager implements InstanceListManager
 	
 	public final Fort getFortByOwner(L2Clan clan)
 	{
-		for (Fort f : getForts())
+		for (Fort f : _forts)
 		{
 			if (f.getOwnerClan() == clan)
 			{
@@ -95,7 +94,7 @@ public final class FortManager implements InstanceListManager
 	
 	public final Fort getFort(String name)
 	{
-		for (Fort f : getForts())
+		for (Fort f : _forts)
 		{
 			if (f.getName().equalsIgnoreCase(name.trim()))
 			{
@@ -107,7 +106,7 @@ public final class FortManager implements InstanceListManager
 	
 	public final Fort getFort(int x, int y, int z)
 	{
-		for (Fort f : getForts())
+		for (Fort f : _forts)
 		{
 			if (f.checkIfInZone(x, y, z))
 			{
@@ -125,9 +124,9 @@ public final class FortManager implements InstanceListManager
 	public final int getFortIndex(int fortId)
 	{
 		Fort fort;
-		for (int i = 0; i < getForts().size(); i++)
+		for (int i = 0; i < _forts.size(); i++)
 		{
-			fort = getForts().get(i);
+			fort = _forts.get(i);
 			if ((fort != null) && (fort.getResidenceId() == fortId))
 			{
 				return i;
@@ -144,9 +143,9 @@ public final class FortManager implements InstanceListManager
 	public final int getFortIndex(int x, int y, int z)
 	{
 		Fort fort;
-		for (int i = 0; i < getForts().size(); i++)
+		for (int i = 0; i < _forts.size(); i++)
 		{
-			fort = getForts().get(i);
+			fort = _forts.get(i);
 			if ((fort != null) && fort.checkIfInZone(x, y, z))
 			{
 				return i;
@@ -157,10 +156,6 @@ public final class FortManager implements InstanceListManager
 	
 	public final List<Fort> getForts()
 	{
-		if (_forts == null)
-		{
-			_forts = new FastList<>();
-		}
 		return _forts;
 	}
 	
@@ -173,11 +168,11 @@ public final class FortManager implements InstanceListManager
 		{
 			while (rs.next())
 			{
-				getForts().add(new Fort(rs.getInt("id")));
+				_forts.add(new Fort(rs.getInt("id")));
 			}
 			
-			_log.info(getClass().getSimpleName() + ": Loaded: " + getForts().size() + " fortress");
-			for (Fort fort : getForts())
+			_log.info(getClass().getSimpleName() + ": Loaded: " + _forts.size() + " fortress");
+			for (Fort fort : _forts)
 			{
 				fort.getSiege().getSiegeGuardManager().loadSiegeGuard();
 			}

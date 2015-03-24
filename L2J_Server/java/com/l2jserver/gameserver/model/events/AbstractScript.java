@@ -29,15 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.ScriptException;
-
-import javolution.util.FastList;
-import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
@@ -147,7 +145,7 @@ public abstract class AbstractScript implements INamable
 {
 	public static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
 	private final Map<ListenerRegisterType, Set<Integer>> _registeredIds = new ConcurrentHashMap<>();
-	private final List<AbstractEventListener> _listeners = new FastList<AbstractEventListener>().shared();
+	private final List<AbstractEventListener> _listeners = new CopyOnWriteArrayList<>();
 	private final File _scriptFile;
 	private boolean _isActive;
 	
@@ -296,10 +294,8 @@ public abstract class AbstractScript implements INamable
 				
 				if (!ids.isEmpty())
 				{
-					if (!_registeredIds.containsKey(type))
-					{
-						_registeredIds.put(type, new FastSet<Integer>().shared());
-					}
+					_registeredIds.putIfAbsent(type, ConcurrentHashMap.newKeySet(ids.size()));
+					
 					_registeredIds.get(type).addAll(ids);
 				}
 				
@@ -1373,10 +1369,7 @@ public abstract class AbstractScript implements INamable
 					}
 				}
 				
-				if (!_registeredIds.containsKey(registerType))
-				{
-					_registeredIds.put(registerType, new FastSet<Integer>().shared());
-				}
+				_registeredIds.putIfAbsent(registerType, ConcurrentHashMap.newKeySet(1));
 				_registeredIds.get(registerType).add(id);
 			}
 		}
@@ -1488,10 +1481,8 @@ public abstract class AbstractScript implements INamable
 					}
 				}
 			}
-			if (!_registeredIds.containsKey(registerType))
-			{
-				_registeredIds.put(registerType, new FastSet<Integer>().shared());
-			}
+			
+			_registeredIds.putIfAbsent(registerType, ConcurrentHashMap.newKeySet(ids.size()));
 			_registeredIds.get(registerType).addAll(ids);
 		}
 		else

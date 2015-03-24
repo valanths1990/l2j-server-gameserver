@@ -19,9 +19,8 @@
 package com.l2jserver.gameserver.model.instancezone;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -37,7 +36,7 @@ public class InstanceWorld
 {
 	private int _instanceId;
 	private int _templateId = -1;
-	private final List<Integer> _allowed = new FastList<>();
+	private final List<Integer> _allowed = new CopyOnWriteArrayList<>();
 	private final AtomicInteger _status = new AtomicInteger();
 	
 	public List<Integer> getAllowed()

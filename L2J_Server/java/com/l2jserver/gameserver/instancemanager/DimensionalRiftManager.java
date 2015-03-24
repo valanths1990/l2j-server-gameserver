@@ -22,14 +22,14 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import javolution.util.FastList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -360,7 +360,7 @@ public final class DimensionalRiftManager
 		}
 		
 		byte room;
-		FastList<Byte> emptyRooms;
+		List<Byte> emptyRooms;
 		do
 		{
 			emptyRooms = getFreeRooms(type);
@@ -450,9 +450,9 @@ public final class DimensionalRiftManager
 		return (count < (_rooms.get(type).size() - 1));
 	}
 	
-	public FastList<Byte> getFreeRooms(byte type)
+	public List<Byte> getFreeRooms(byte type)
 	{
-		FastList<Byte> list = new FastList<>();
+		List<Byte> list = new ArrayList<>();
 		for (DimensionalRiftRoom room : _rooms.get(type).values())
 		{
 			if (!room.isPartyInside())

@@ -23,13 +23,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -294,7 +294,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 			
 			int buff_index = 0;
 			
-			final List<Integer> storedSkills = new FastList<>();
+			final List<Integer> storedSkills = new LinkedList<>();
 			
 			// Store all effect data along with calculated remaining
 			if (storeEffects)
@@ -353,7 +353,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 						}
 						if (!SummonEffectsTable.getInstance().getServitorEffects(getOwner()).containsKey(getReferenceSkill()))
 						{
-							SummonEffectsTable.getInstance().getServitorEffects(getOwner()).put(getReferenceSkill(), new FastList<SummonEffect>());
+							SummonEffectsTable.getInstance().getServitorEffects(getOwner()).put(getReferenceSkill(), new CopyOnWriteArrayList<SummonEffect>());
 						}
 						
 						SummonEffectsTable.getInstance().getServitorEffects(getOwner()).get(getReferenceSkill()).add(SummonEffectsTable.getInstance().new SummonEffect(skill, info.getTime()));
@@ -409,7 +409,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 								}
 								if (!SummonEffectsTable.getInstance().getServitorEffects(getOwner()).containsKey(getReferenceSkill()))
 								{
-									SummonEffectsTable.getInstance().getServitorEffects(getOwner()).put(getReferenceSkill(), new FastList<SummonEffect>());
+									SummonEffectsTable.getInstance().getServitorEffects(getOwner()).put(getReferenceSkill(), new CopyOnWriteArrayList<SummonEffect>());
 								}
 								
 								SummonEffectsTable.getInstance().getServitorEffects(getOwner()).get(getReferenceSkill()).add(SummonEffectsTable.getInstance().new SummonEffect(skill, effectCurTime));

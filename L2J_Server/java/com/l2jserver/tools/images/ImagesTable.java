@@ -18,11 +18,10 @@
  */
 package com.l2jserver.tools.images;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-
-import javolution.util.FastMap;
 
 /**
  * Usage of this class causes images to be loaded and kept in memory, and therefore should only be used by helper applications.<br>
@@ -31,7 +30,7 @@ import javolution.util.FastMap;
  */
 public class ImagesTable
 {
-	private static final Map<String, ImageIcon> IMAGES = new FastMap<>();
+	private static final Map<String, ImageIcon> IMAGES = new HashMap<>();
 	
 	public static final String IMAGES_DIRECTORY = "../images/";
 	

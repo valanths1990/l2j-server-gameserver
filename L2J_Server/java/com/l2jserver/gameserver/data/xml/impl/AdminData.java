@@ -23,15 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-
-import javolution.util.FastMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.L2AccessLevel;
 import com.l2jserver.gameserver.model.L2AdminCommandAccessRight;
 import com.l2jserver.gameserver.model.StatsSet;
@@ -39,6 +37,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * Loads administrator access levels and commands.
@@ -48,7 +47,7 @@ public final class AdminData implements IXmlReader
 {
 	private final Map<Integer, L2AccessLevel> _accessLevels = new HashMap<>();
 	private final Map<String, L2AdminCommandAccessRight> _adminCommandAccessRights = new HashMap<>();
-	private final Map<L2PcInstance, Boolean> _gmList = new FastMap<L2PcInstance, Boolean>().shared();
+	private final Map<L2PcInstance, Boolean> _gmList = new ConcurrentHashMap<>();
 	private int _highestLevel = 0;
 	
 	protected AdminData()

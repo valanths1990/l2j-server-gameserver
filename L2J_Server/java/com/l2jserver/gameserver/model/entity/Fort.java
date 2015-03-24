@@ -28,13 +28,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -79,14 +78,14 @@ public final class Fort extends AbstractResidence
 	private int _state = 0;
 	private int _castleId = 0;
 	private int _supplyLvL = 0;
-	private final FastMap<Integer, FortFunction> _function;
+	private final Map<Integer, FortFunction> _function;
 	private final ScheduledFuture<?>[] _FortUpdater = new ScheduledFuture<?>[2];
 	
 	// Spawn Data
 	private boolean _isSuspiciousMerchantSpawned = false;
-	private final FastList<L2Spawn> _siegeNpcs = new FastList<>();
-	private final FastList<L2Spawn> _npcCommanders = new FastList<>();
-	private final FastList<L2Spawn> _specialEnvoys = new FastList<>();
+	private final List<L2Spawn> _siegeNpcs = new CopyOnWriteArrayList<>();
+	private final List<L2Spawn> _npcCommanders = new CopyOnWriteArrayList<>();
+	private final List<L2Spawn> _specialEnvoys = new CopyOnWriteArrayList<>();
 	
 	private final Map<Integer, Integer> _envoyCastles = new HashMap<>(2);
 	private final Set<Integer> _availableCastles = new HashSet<>(1);
@@ -245,7 +244,7 @@ public final class Fort extends AbstractResidence
 		super(fortId);
 		load();
 		loadFlagPoles();
-		_function = new FastMap<>();
+		_function = new ConcurrentHashMap<>();
 		if (getOwnerClan() != null)
 		{
 			setVisibleFlag(true);
@@ -271,11 +270,7 @@ public final class Fort extends AbstractResidence
 	 */
 	public FortFunction getFunction(int type)
 	{
-		if (_function.get(type) != null)
-		{
-			return _function.get(type);
-		}
-		return null;
+		return _function.get(type);
 	}
 	
 	public void endOfSiege(L2Clan clan)
