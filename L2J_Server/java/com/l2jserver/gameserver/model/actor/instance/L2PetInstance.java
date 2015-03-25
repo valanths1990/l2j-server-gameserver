@@ -21,8 +21,6 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -35,7 +33,6 @@ import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
 import com.l2jserver.gameserver.data.sql.impl.SummonEffectsTable;
-import com.l2jserver.gameserver.data.sql.impl.SummonEffectsTable.SummonEffect;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -929,17 +926,7 @@ public class L2PetInstance extends L2Summon
 	public final void stopSkillEffects(boolean removed, int skillId)
 	{
 		super.stopSkillEffects(removed, skillId);
-		List<SummonEffect> effects = SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId());
-		if ((effects != null) && !effects.isEmpty())
-		{
-			for (SummonEffect effect : effects)
-			{
-				if (effect.getSkill().getId() == skillId)
-				{
-					SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()).remove(effect);
-				}
-			}
-		}
+		SummonEffectsTable.getInstance().removePetEffects(getControlObjectId(), skillId);
 	}
 	
 	@Override
@@ -1014,7 +1001,7 @@ public class L2PetInstance extends L2Summon
 		}
 		
 		// Clear list for overwrite
-		SummonEffectsTable.getInstance().getPetEffects().getOrDefault(getControlObjectId(), Collections.emptyList()).clear();
+		SummonEffectsTable.getInstance().clearPetEffects(getControlObjectId());
 		
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement ps1 = con.prepareStatement(DELETE_SKILL_SAVE);
@@ -1070,8 +1057,7 @@ public class L2PetInstance extends L2Summon
 					ps2.setInt(5, ++buff_index);
 					ps2.execute();
 					
-					SummonEffectsTable.getInstance().getPetEffects().putIfAbsent(getControlObjectId(), new ArrayList<>());
-					SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()).add(SummonEffectsTable.getInstance().new SummonEffect(skill, info.getTime()));
+					SummonEffectsTable.getInstance().addPetEffect(getControlObjectId(), skill, info.getTime());
 				}
 			}
 		}
@@ -1088,7 +1074,7 @@ public class L2PetInstance extends L2Summon
 			PreparedStatement ps1 = con.prepareStatement(RESTORE_SKILL_SAVE);
 			PreparedStatement ps2 = con.prepareStatement(DELETE_SKILL_SAVE))
 		{
-			if (!SummonEffectsTable.getInstance().getPetEffects().containsKey(getControlObjectId()))
+			if (!SummonEffectsTable.getInstance().containsPetId(getControlObjectId()))
 			{
 				ps1.setInt(1, getControlObjectId());
 				try (ResultSet rset = ps1.executeQuery())
@@ -1105,12 +1091,7 @@ public class L2PetInstance extends L2Summon
 						
 						if (skill.hasEffects(EffectScope.GENERAL))
 						{
-							if (!SummonEffectsTable.getInstance().getPetEffects().containsKey(getControlObjectId()))
-							{
-								SummonEffectsTable.getInstance().getPetEffects().put(getControlObjectId(), new ArrayList<>());
-							}
-							
-							SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()).add(SummonEffectsTable.getInstance().new SummonEffect(skill, effectCurTime));
+							SummonEffectsTable.getInstance().addPetEffect(getControlObjectId(), skill, effectCurTime);
 						}
 					}
 				}
@@ -1125,18 +1106,7 @@ public class L2PetInstance extends L2Summon
 		}
 		finally
 		{
-			if (SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()) == null)
-			{
-				return;
-			}
-			
-			for (SummonEffect se : SummonEffectsTable.getInstance().getPetEffects().get(getControlObjectId()))
-			{
-				if (se != null)
-				{
-					se.getSkill().applyEffects(this, this, false, se.getEffectCurTime());
-				}
-			}
+			SummonEffectsTable.getInstance().applyPetEffects(this, getControlObjectId());
 		}
 	}
 	
