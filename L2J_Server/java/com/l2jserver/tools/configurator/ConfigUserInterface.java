@@ -226,8 +226,15 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 	
 	private void loadConfigs()
 	{
-		File configsDir = new File("config");
-		for (File file : configsDir.listFiles())
+		final File configsDir = new File("config");
+		final File[] files = configsDir.listFiles();
+		if (files == null)
+		{
+			JOptionPane.showMessageDialog(ConfigUserInterface.this, getBundle().getString("errorReading") + "config", getBundle().getString("error"), JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		for (File file : files)
 		{
 			if (file.getName().endsWith(".properties") && file.isFile() && file.canWrite())
 			{
