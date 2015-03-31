@@ -115,7 +115,7 @@ public class PostBBSManager extends BaseBBSManager
 			final Post p = getGPosttByTopic(topic);
 			if ((forum == null) || (p == null))
 			{
-				CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error: This forum or post does not exxist!</center></body></html>", activeChar);
+				CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error: This forum or post does not exist!</center></body></html>", activeChar);
 			}
 			else
 			{
