@@ -155,7 +155,7 @@ public class GeoPathFinding extends PathFinding
 			
 			i++;
 			visited.add(node);
-			node.attachNeighbors();
+			node.attachNeighbors(readNeighbors(node));
 			GeoNode[] neighbors = node.getNeighbors();
 			if (neighbors == null)
 			{
@@ -216,8 +216,15 @@ public class GeoPathFinding extends PathFinding
 		return path;
 	}
 	
-	public GeoNode[] readNeighbors(GeoNode n, int idx)
+	private GeoNode[] readNeighbors(GeoNode n)
 	{
+		if (n.getLoc() == null)
+		{
+			return null;
+		}
+		
+		int idx = n.getNeighborsIdx();
+		
 		int node_x = n.getLoc().getNodeX();
 		int node_y = n.getLoc().getNodeY();
 		// short node_z = n.getLoc().getZ();
