@@ -194,11 +194,12 @@ public class CellPathFinding extends PathFinding
 			
 			remove = false;
 			final Iterator<AbstractNodeLoc> endPoint = path.iterator();
+			endPoint.next();
 			int currentX = x;
 			int currentY = y;
 			int currentZ = z;
 			
-			for (int i = 0; i < path.size(); i++)
+			for (int i = 0; i < path.size() - 1; i++)
 			{
 				AbstractNodeLoc locMiddle = path.get(i);
 				AbstractNodeLoc locEnd = endPoint.next();
