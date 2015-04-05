@@ -232,7 +232,7 @@ public class CellPathFinding extends PathFinding
 		return path;
 	}
 	
-	private List<AbstractNodeLoc> constructPath(AbstractNode node)
+	private List<AbstractNodeLoc> constructPath(AbstractNode<NodeLoc> node)
 	{
 		final List<AbstractNodeLoc> path = new CopyOnWriteArrayList<>();
 		int previousDirectionX = Integer.MIN_VALUE;

@@ -23,7 +23,7 @@ import com.l2jserver.gameserver.pathfinding.AbstractNode;
 /**
  * @author -Nemesiss-
  */
-public class GeoNode extends AbstractNode
+public class GeoNode extends AbstractNode<GeoNodeLoc>
 {
 	private final int _neighborsIdx;
 	private short _cost;
