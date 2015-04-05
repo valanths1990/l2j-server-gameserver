@@ -10632,6 +10632,7 @@ public final class L2PcInstance extends L2Playable
 				}
 			}
 		}
+		_revivePet = false;
 		_reviveRequested = 0;
 		_revivePower = 0;
 	}
