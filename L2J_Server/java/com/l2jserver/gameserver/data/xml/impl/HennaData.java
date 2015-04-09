@@ -27,10 +27,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.items.L2Henna;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class holds the henna related information.<br>
@@ -87,7 +87,6 @@ public final class HennaData implements IXmlReader
 		final List<ClassId> wearClassIds = new ArrayList<>();
 		NamedNodeMap attrs = d.getAttributes();
 		Node attr;
-		String name;
 		for (int i = 0; i < attrs.getLength(); i++)
 		{
 			attr = attrs.item(i);
@@ -96,7 +95,7 @@ public final class HennaData implements IXmlReader
 		
 		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
 		{
-			name = c.getNodeName();
+			final String name = c.getNodeName();
 			attrs = c.getAttributes();
 			switch (name)
 			{

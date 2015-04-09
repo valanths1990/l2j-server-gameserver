@@ -32,7 +32,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -50,6 +49,7 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.interfaces.ISkillsHolder;
 import com.l2jserver.gameserver.model.skills.CommonSkill;
 import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class loads and manage the characters and pledges skills trees.<br>
@@ -144,11 +144,7 @@ public final class SkillTreesData implements IXmlReader
 	@Override
 	public void parseDocument(Document doc)
 	{
-		NamedNodeMap attrs;
-		Node attr;
-		String type = null;
 		int cId = -1;
-		int parentClassId = -1;
 		ClassId classId = null;
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
@@ -160,9 +156,8 @@ public final class SkillTreesData implements IXmlReader
 					{
 						final Map<Integer, L2SkillLearn> classSkillTree = new HashMap<>();
 						final Map<Integer, L2SkillLearn> trasferSkillTree = new HashMap<>();
-						
-						type = d.getAttributes().getNamedItem("type").getNodeValue();
-						attr = d.getAttributes().getNamedItem("classId");
+						final String type = d.getAttributes().getNamedItem("type").getNodeValue();
+						Node attr = d.getAttributes().getNamedItem("classId");
 						if (attr != null)
 						{
 							cId = Integer.parseInt(attr.getNodeValue());
@@ -176,7 +171,7 @@ public final class SkillTreesData implements IXmlReader
 						attr = d.getAttributes().getNamedItem("parentClassId");
 						if (attr != null)
 						{
-							parentClassId = Integer.parseInt(attr.getNodeValue());
+							final int parentClassId = Integer.parseInt(attr.getNodeValue());
 							if ((cId > -1) && (cId != parentClassId) && (parentClassId > -1) && !_parentClassMap.containsKey(classId))
 							{
 								_parentClassMap.put(classId, ClassId.values()[parentClassId]);
@@ -188,7 +183,7 @@ public final class SkillTreesData implements IXmlReader
 							if ("skill".equalsIgnoreCase(c.getNodeName()))
 							{
 								final StatsSet learnSkillSet = new StatsSet();
-								attrs = c.getAttributes();
+								NamedNodeMap attrs = c.getAttributes();
 								for (int i = 0; i < attrs.getLength(); i++)
 								{
 									attr = attrs.item(i);

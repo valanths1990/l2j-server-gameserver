@@ -21,11 +21,11 @@ package com.l2jserver.gameserver.instancemanager;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
@@ -45,10 +45,10 @@ public final class ClanHallManager
 {
 	protected static final Logger _log = Logger.getLogger(ClanHallManager.class.getName());
 	
-	private final Map<Integer, AuctionableHall> _clanHall;
-	private final Map<Integer, AuctionableHall> _freeClanHall;
-	private final Map<Integer, AuctionableHall> _allAuctionableClanHalls;
-	private static Map<Integer, ClanHall> _allClanHalls = new FastMap<>();
+	private final Map<Integer, AuctionableHall> _clanHall = new ConcurrentHashMap<>();
+	private final Map<Integer, AuctionableHall> _freeClanHall = new ConcurrentHashMap<>();
+	private final Map<Integer, AuctionableHall> _allAuctionableClanHalls = new HashMap<>();
+	private static Map<Integer, ClanHall> _allClanHalls = new HashMap<>();
 	private boolean _loaded = false;
 	
 	public boolean loaded()
@@ -58,9 +58,6 @@ public final class ClanHallManager
 	
 	protected ClanHallManager()
 	{
-		_clanHall = new FastMap<>();
-		_freeClanHall = new FastMap<>();
-		_allAuctionableClanHalls = new FastMap<>();
 		load();
 	}
 	
@@ -217,7 +214,7 @@ public final class ClanHallManager
 	 */
 	public final ClanHall getClanHall(int x, int y, int z)
 	{
-		for (ClanHall temp : getAllClanHalls().values())
+		for (ClanHall temp : _allClanHalls.values())
 		{
 			if (temp.checkIfInZone(x, y, z))
 			{

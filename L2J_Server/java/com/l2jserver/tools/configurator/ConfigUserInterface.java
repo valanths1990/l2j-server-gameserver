@@ -36,6 +36,7 @@ import java.io.Writer;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -62,8 +63,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
-import javolution.util.FastList;
-
 import com.l2jserver.tools.configurator.ConfigUserInterface.ConfigFile.ConfigComment;
 import com.l2jserver.tools.configurator.ConfigUserInterface.ConfigFile.ConfigProperty;
 import com.l2jserver.tools.i18n.LanguageControl;
@@ -80,7 +79,7 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 	
 	private final JTabbedPane _tabPane = new JTabbedPane();
 	
-	private List<ConfigFile> _configs = new FastList<>();
+	private List<ConfigFile> _configs = new ArrayList<>();
 	
 	private ResourceBundle _bundle;
 	
@@ -227,8 +226,15 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 	
 	private void loadConfigs()
 	{
-		File configsDir = new File("config");
-		for (File file : configsDir.listFiles())
+		final File configsDir = new File("config");
+		final File[] files = configsDir.listFiles();
+		if (files == null)
+		{
+			JOptionPane.showMessageDialog(ConfigUserInterface.this, getBundle().getString("errorReading") + "config", getBundle().getString("error"), JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		for (File file : files)
 		{
 			if (file.getName().endsWith(".properties") && file.isFile() && file.canWrite())
 			{
@@ -369,7 +375,7 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 	{
 		private final File _file;
 		private String _name;
-		private final List<ConfigComment> _configs = new FastList<>();
+		private final List<ConfigComment> _configs = new ArrayList<>();
 		
 		public ConfigFile(File file)
 		{

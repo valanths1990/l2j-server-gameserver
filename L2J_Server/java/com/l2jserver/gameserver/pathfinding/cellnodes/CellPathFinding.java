@@ -19,12 +19,11 @@
 package com.l2jserver.gameserver.pathfinding.cellnodes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
@@ -50,7 +49,7 @@ public class CellPathFinding extends PathFinding
 	private int _postFilterPasses = 0;
 	private long _postFilterElapsed = 0;
 	
-	private FastList<L2ItemInstance> _debugItems = null;
+	private List<L2ItemInstance> _debugItems = null;
 	
 	public static CellPathFinding getInstance()
 	{
@@ -121,16 +120,12 @@ public class CellPathFinding extends PathFinding
 		{
 			if (_debugItems == null)
 			{
-				_debugItems = new FastList<>();
+				_debugItems = new CopyOnWriteArrayList<>();
 			}
 			else
 			{
 				for (L2ItemInstance item : _debugItems)
 				{
-					if (item == null)
-					{
-						continue;
-					}
 					item.decayMe();
 				}
 				
@@ -138,7 +133,7 @@ public class CellPathFinding extends PathFinding
 			}
 		}
 		
-		FastList<AbstractNodeLoc> path = null;
+		List<AbstractNodeLoc> path = null;
 		try
 		{
 			CellNode result = buffer.findPath(gx, gy, gz, gtx, gty, gtz);
@@ -190,8 +185,6 @@ public class CellPathFinding extends PathFinding
 			_postFilterPlayableUses++;
 		}
 		
-		int currentX, currentY, currentZ;
-		ListIterator<AbstractNodeLoc> middlePoint, endPoint;
 		boolean remove;
 		int pass = 0;
 		do
@@ -200,19 +193,19 @@ public class CellPathFinding extends PathFinding
 			_postFilterPasses++;
 			
 			remove = false;
-			middlePoint = path.listIterator();
-			endPoint = path.listIterator(1);
-			currentX = x;
-			currentY = y;
-			currentZ = z;
+			final Iterator<AbstractNodeLoc> endPoint = path.iterator();
+			endPoint.next();
+			int currentX = x;
+			int currentY = y;
+			int currentZ = z;
 			
-			while (endPoint.hasNext())
+			for (int i = 0; i < path.size() - 1; i++)
 			{
+				AbstractNodeLoc locMiddle = path.get(i);
 				AbstractNodeLoc locEnd = endPoint.next();
-				AbstractNodeLoc locMiddle = middlePoint.next();
 				if (GeoData.getInstance().canMove(currentX, currentY, currentZ, locEnd.getX(), locEnd.getY(), locEnd.getZ(), instanceId))
 				{
-					middlePoint.remove();
+					path.remove(i);
 					remove = true;
 					if (debug)
 					{
@@ -232,11 +225,7 @@ public class CellPathFinding extends PathFinding
 		
 		if (debug)
 		{
-			middlePoint = path.listIterator();
-			while (middlePoint.hasNext())
-			{
-				dropDebugItem(65, 1, middlePoint.next());
-			}
+			path.forEach(n -> dropDebugItem(65, 1, n));
 		}
 		
 		_findSuccess++;
@@ -244,9 +233,9 @@ public class CellPathFinding extends PathFinding
 		return path;
 	}
 	
-	private FastList<AbstractNodeLoc> constructPath(AbstractNode node)
+	private List<AbstractNodeLoc> constructPath(AbstractNode<NodeLoc> node)
 	{
-		FastList<AbstractNodeLoc> path = new FastList<>();
+		final List<AbstractNodeLoc> path = new CopyOnWriteArrayList<>();
 		int previousDirectionX = Integer.MIN_VALUE;
 		int previousDirectionY = Integer.MIN_VALUE;
 		int directionX, directionY;
@@ -280,13 +269,12 @@ public class CellPathFinding extends PathFinding
 				previousDirectionX = directionX;
 				previousDirectionY = directionY;
 				
-				path.addFirst(node.getLoc());
+				path.add(0, node.getLoc());
 				node.setLoc(null);
 			}
 			
 			node = node.getParent();
 		}
-		
 		return path;
 	}
 	
@@ -354,7 +342,7 @@ public class CellPathFinding extends PathFinding
 	{
 		final int mapSize;
 		final int count;
-		ArrayList<CellNodeBuffer> bufs;
+		List<CellNodeBuffer> bufs;
 		int uses = 0;
 		int playableUses = 0;
 		int overflows = 0;

@@ -20,9 +20,8 @@ package com.l2jserver.gameserver.model.zone.type;
 
 import java.util.List;
 import java.util.Map;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.l2jserver.gameserver.GameServer;
 import com.l2jserver.gameserver.instancemanager.GrandBossManager;
@@ -57,13 +56,13 @@ public class L2BossZone extends L2ZoneType
 		// track the times that players got disconnected. Players are allowed
 		// to log back into the zone as long as their log-out was within _timeInvade time...
 		// <player objectId, expiration time in milliseconds>
-		private final Map<Integer, Long> _playerAllowedReEntryTimes = new FastMap<>();
+		private final Map<Integer, Long> _playerAllowedReEntryTimes = new ConcurrentHashMap<>();
 		
 		// track the players admitted to the zone who should be allowed back in
 		// after reboot/server downtime (outside of their control), within 30 of server restart
-		private final List<Integer> _playersAllowed = new FastList<>();
+		private final List<Integer> _playersAllowed = new CopyOnWriteArrayList<>();
 		
-		private final List<L2Character> _raidList = new FastList<>();
+		private final List<L2Character> _raidList = new CopyOnWriteArrayList<>();
 		
 		protected Settings()
 		{

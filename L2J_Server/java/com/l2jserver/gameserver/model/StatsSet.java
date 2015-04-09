@@ -20,12 +20,11 @@ package com.l2jserver.gameserver.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.gameserver.model.holders.MinionHolder;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
@@ -46,7 +45,7 @@ public class StatsSet implements IParserAdvUtils
 	
 	public StatsSet()
 	{
-		this(new FastMap<String, Object>());
+		this(new LinkedHashMap<>());
 	}
 	
 	public StatsSet(Map<String, Object> map)

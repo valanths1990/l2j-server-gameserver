@@ -18,15 +18,14 @@
  */
 package com.l2jserver.gameserver.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -45,29 +44,24 @@ public final class L2WorldRegion
 	private static final Logger _log = Logger.getLogger(L2WorldRegion.class.getName());
 	
 	/** Map containing all playable characters in game in this world region. */
-	private final Map<Integer, L2Playable> _allPlayable;
+	private final Map<Integer, L2Playable> _allPlayable = new ConcurrentHashMap<>();
 	
 	/** Map containing visible objects in this world region. */
-	private final Map<Integer, L2Object> _visibleObjects;
+	private final Map<Integer, L2Object> _visibleObjects = new ConcurrentHashMap<>();
 	
-	private final List<L2WorldRegion> _surroundingRegions;
+	private final Queue<L2WorldRegion> _surroundingRegions = new ConcurrentLinkedQueue<>();
 	private final int _tileX, _tileY;
 	private boolean _active = false;
 	private ScheduledFuture<?> _neighborsTask = null;
-	private final List<L2ZoneType> _zones;
+	private final List<L2ZoneType> _zones = new CopyOnWriteArrayList<>();
 	
 	public L2WorldRegion(int pTileX, int pTileY)
 	{
-		_allPlayable = new FastMap<Integer, L2Playable>().shared();
-		_visibleObjects = new FastMap<Integer, L2Object>().shared();
-		_surroundingRegions = new ArrayList<>();
-		
 		_tileX = pTileX;
 		_tileY = pTileY;
 		
 		// default a newly initialized region to inactive, unless always on is specified
 		_active = Config.GRIDS_ALWAYS_ON;
-		_zones = new FastList<>();
 	}
 	
 	public List<L2ZoneType> getZones()
@@ -235,8 +229,7 @@ public final class L2WorldRegion
 		int c = 0;
 		if (!isOn)
 		{
-			Collection<L2Object> vObj = _visibleObjects.values();
-			for (L2Object o : vObj)
+			for (L2Object o : _visibleObjects.values())
 			{
 				if (o instanceof L2Attackable)
 				{
@@ -274,9 +267,7 @@ public final class L2WorldRegion
 		}
 		else
 		{
-			Collection<L2Object> vObj = _visibleObjects.values();
-			
-			for (L2Object o : vObj)
+			for (L2Object o : _visibleObjects.values())
 			{
 				if (o instanceof L2Attackable)
 				{
@@ -456,9 +447,9 @@ public final class L2WorldRegion
 	}
 	
 	/**
-	 * @return the FastList _surroundingRegions containing all L2WorldRegion around the current L2WorldRegion
+	 * @return the list containing all L2WorldRegion around the current world region
 	 */
-	public List<L2WorldRegion> getSurroundingRegions()
+	public Queue<L2WorldRegion> getSurroundingRegions()
 	{
 		return _surroundingRegions;
 	}
@@ -484,8 +475,7 @@ public final class L2WorldRegion
 	public void deleteVisibleNpcSpawns()
 	{
 		_log.fine("Deleting all visible NPC's in Region: " + getName());
-		Collection<L2Object> vNPC = _visibleObjects.values();
-		for (L2Object obj : vNPC)
+		for (L2Object obj : _visibleObjects.values())
 		{
 			if (obj instanceof L2Npc)
 			{

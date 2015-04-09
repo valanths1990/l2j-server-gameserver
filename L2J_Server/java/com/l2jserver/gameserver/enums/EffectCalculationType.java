@@ -16,30 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.tools.images;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.ImageIcon;
+package com.l2jserver.gameserver.enums;
 
 /**
- * Usage of this class causes images to be loaded and kept in memory, and therefore should only be used by helper applications.<br>
- * Some icons from famfamfam (http://www.famfamfam.com/) credit *MUST* be given.
- * @author KenM
+ * @author Zealar
  */
-public class ImagesTable
+public enum EffectCalculationType
 {
-	private static final Map<String, ImageIcon> IMAGES = new HashMap<>();
-	
-	public static final String IMAGES_DIRECTORY = "../images/";
-	
-	public static ImageIcon getImage(String name)
-	{
-		if (!IMAGES.containsKey(name))
-		{
-			IMAGES.put(name, new ImageIcon(IMAGES_DIRECTORY + name));
-		}
-		return IMAGES.get(name);
-	}
+	DIFF,
+	PER
 }

@@ -26,13 +26,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.options.Options;
 import com.l2jserver.gameserver.model.options.OptionsSkillHolder;
 import com.l2jserver.gameserver.model.options.OptionsSkillType;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author UnAfraid
@@ -57,8 +57,6 @@ public class OptionData implements IXmlReader
 	@Override
 	public void parseDocument(Document doc)
 	{
-		int id;
-		Options op;
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
@@ -67,8 +65,8 @@ public class OptionData implements IXmlReader
 				{
 					if ("option".equalsIgnoreCase(d.getNodeName()))
 					{
-						id = parseInteger(d.getAttributes(), "id");
-						op = new Options(id);
+						final int id = parseInteger(d.getAttributes(), "id");
+						final Options op = new Options(id);
 						
 						for (Node cd = d.getFirstChild(); cd != null; cd = cd.getNextSibling())
 						{

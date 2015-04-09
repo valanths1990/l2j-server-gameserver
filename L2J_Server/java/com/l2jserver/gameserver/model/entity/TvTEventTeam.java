@@ -19,8 +19,7 @@
 package com.l2jserver.gameserver.model.entity;
 
 import java.util.Map;
-
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
@@ -35,8 +34,8 @@ public class TvTEventTeam
 	private int[] _coordinates = new int[3];
 	/** The points of the team<br> */
 	private short _points;
-	/** Name and instance of all participated players in FastMap<br> */
-	private Map<Integer, L2PcInstance> _participatedPlayers = new FastMap<>();
+	/** Name and instance of all participated players in map. */
+	private final Map<Integer, L2PcInstance> _participatedPlayers = new ConcurrentHashMap<>();
 	
 	/**
 	 * C'tor initialize the team<br>
@@ -64,10 +63,7 @@ public class TvTEventTeam
 			return false;
 		}
 		
-		synchronized (_participatedPlayers)
-		{
-			_participatedPlayers.put(playerInstance.getObjectId(), playerInstance);
-		}
+		_participatedPlayers.put(playerInstance.getObjectId(), playerInstance);
 		
 		return true;
 	}
@@ -78,10 +74,7 @@ public class TvTEventTeam
 	 */
 	public void removePlayer(int playerObjectId)
 	{
-		synchronized (_participatedPlayers)
-		{
-			_participatedPlayers.remove(playerObjectId);
-		}
+		_participatedPlayers.remove(playerObjectId);
 	}
 	
 	/**
@@ -98,7 +91,6 @@ public class TvTEventTeam
 	public void cleanMe()
 	{
 		_participatedPlayers.clear();
-		_participatedPlayers = new FastMap<>();
 		_points = 0;
 	}
 	
@@ -109,14 +101,7 @@ public class TvTEventTeam
 	 */
 	public boolean containsPlayer(int playerObjectId)
 	{
-		boolean containsPlayer;
-		
-		synchronized (_participatedPlayers)
-		{
-			containsPlayer = _participatedPlayers.containsKey(playerObjectId);
-		}
-		
-		return containsPlayer;
+		return _participatedPlayers.containsKey(playerObjectId);
 	}
 	
 	/**
@@ -156,14 +141,7 @@ public class TvTEventTeam
 	 */
 	public Map<Integer, L2PcInstance> getParticipatedPlayers()
 	{
-		Map<Integer, L2PcInstance> participatedPlayers = null;
-		
-		synchronized (_participatedPlayers)
-		{
-			participatedPlayers = _participatedPlayers;
-		}
-		
-		return participatedPlayers;
+		return _participatedPlayers;
 	}
 	
 	/**
@@ -173,13 +151,6 @@ public class TvTEventTeam
 	 */
 	public int getParticipatedPlayerCount()
 	{
-		int participatedPlayerCount;
-		
-		synchronized (_participatedPlayers)
-		{
-			participatedPlayerCount = _participatedPlayers.size();
-		}
-		
-		return participatedPlayerCount;
+		return _participatedPlayers.size();
 	}
 }

@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class holds the Experience points for each level for players and pets.
@@ -65,12 +65,11 @@ public final class ExperienceData implements IXmlReader
 		MAX_LEVEL = (byte) (Byte.parseByte(tableAttr.getNamedItem("maxLevel").getNodeValue()) + 1);
 		MAX_PET_LEVEL = (byte) (Byte.parseByte(tableAttr.getNamedItem("maxPetLevel").getNodeValue()) + 1);
 		
-		NamedNodeMap attrs;
 		for (Node n = table.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("experience".equals(n.getNodeName()))
 			{
-				attrs = n.getAttributes();
+				NamedNodeMap attrs = n.getAttributes();
 				_expTable.put(parseInteger(attrs, "level"), parseLong(attrs, "tolevel"));
 			}
 		}

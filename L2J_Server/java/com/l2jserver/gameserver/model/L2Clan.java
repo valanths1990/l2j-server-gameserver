@@ -22,15 +22,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -113,7 +115,7 @@ public class L2Clan implements IIdentifiable, INamable
 	private String _name;
 	private int _clanId;
 	private L2ClanMember _leader;
-	private final Map<Integer, L2ClanMember> _members = new FastMap<>();
+	private final Map<Integer, L2ClanMember> _members = new ConcurrentHashMap<>();
 	
 	private String _allyName;
 	private int _allyId;
@@ -134,16 +136,16 @@ public class L2Clan implements IIdentifiable, INamable
 	private int _bloodOathCount;
 	
 	private final ItemContainer _warehouse = new ClanWarehouse(this);
-	private final List<Integer> _atWarWith = new FastList<>();
-	private final List<Integer> _atWarAttackers = new FastList<>();
+	private final List<Integer> _atWarWith = new CopyOnWriteArrayList<>();
+	private final List<Integer> _atWarAttackers = new CopyOnWriteArrayList<>();
 	
 	private Forum _forum;
 	
-	/** FastMap(Integer, L2Skill) containing all skills of the L2Clan */
-	private final Map<Integer, Skill> _skills = new FastMap<>();
-	private final Map<Integer, RankPrivs> _privs = new FastMap<>();
-	private final Map<Integer, SubPledge> _subPledges = new FastMap<>();
-	private final Map<Integer, Skill> _subPledgeSkills = new FastMap<>();
+	/** Map(Integer, L2Skill) containing all skills of the L2Clan */
+	private final Map<Integer, Skill> _skills = new ConcurrentHashMap<>();
+	private final Map<Integer, RankPrivs> _privs = new ConcurrentHashMap<>();
+	private final Map<Integer, SubPledge> _subPledges = new ConcurrentHashMap<>();
+	private final Map<Integer, Skill> _subPledgeSkills = new ConcurrentHashMap<>();
 	
 	private int _reputationScore = 0;
 	private int _rank = 0;
@@ -613,9 +615,9 @@ public class L2Clan implements IIdentifiable, INamable
 	 * @param exclude the object Id to exclude from list.
 	 * @return all online members excluding the one with object id {code exclude}.
 	 */
-	public FastList<L2PcInstance> getOnlineMembers(int exclude)
+	public List<L2PcInstance> getOnlineMembers(int exclude)
 	{
-		final FastList<L2PcInstance> onlineMembers = new FastList<>();
+		final List<L2PcInstance> onlineMembers = new ArrayList<>();
 		for (L2ClanMember temp : _members.values())
 		{
 			if ((temp != null) && temp.isOnline() && (temp.getObjectId() != exclude))
@@ -1600,59 +1602,32 @@ public class L2Clan implements IIdentifiable, INamable
 	
 	public boolean isAtWarWith(Integer id)
 	{
-		if (!_atWarWith.isEmpty())
-		{
-			if (_atWarWith.contains(id))
-			{
-				return true;
-			}
-		}
-		return false;
+		return _atWarWith.contains(id);
 	}
 	
 	public boolean isAtWarWith(L2Clan clan)
 	{
-		if (clan == null)
-		{
-			return false;
-		}
-		if (!_atWarWith.isEmpty())
-		{
-			if (_atWarWith.contains(clan.getId()))
-			{
-				return true;
-			}
-		}
-		return false;
+		return _atWarWith.contains(clan.getId());
 	}
 	
-	public boolean isAtWarAttacker(Integer id)
+	public boolean isAtWarAttacker(int id)
 	{
-		if ((_atWarAttackers != null) && !_atWarAttackers.isEmpty())
-		{
-			if (_atWarAttackers.contains(id))
-			{
-				return true;
-			}
-		}
-		return false;
+		return _atWarAttackers.contains(id);
 	}
 	
 	public void setEnemyClan(L2Clan clan)
 	{
-		Integer id = clan.getId();
-		_atWarWith.add(id);
+		_atWarWith.add(clan.getId());
 	}
 	
-	public void setEnemyClan(Integer clan)
+	public void setEnemyClan(int id)
 	{
-		_atWarWith.add(clan);
+		_atWarWith.add(id);
 	}
 	
 	public void setAttackerClan(L2Clan clan)
 	{
-		Integer id = clan.getId();
-		_atWarAttackers.add(id);
+		_atWarAttackers.add(clan.getId());
 	}
 	
 	public void setAttackerClan(Integer clan)
@@ -1662,14 +1637,12 @@ public class L2Clan implements IIdentifiable, INamable
 	
 	public void deleteEnemyClan(L2Clan clan)
 	{
-		Integer id = clan.getId();
-		_atWarWith.remove(id);
+		_atWarWith.remove(clan.getId());
 	}
 	
 	public void deleteAttackerClan(L2Clan clan)
 	{
-		Integer id = clan.getId();
-		_atWarAttackers.remove(id);
+		_atWarAttackers.remove(clan.getId());
 	}
 	
 	public int getHiredGuards()
@@ -1684,11 +1657,7 @@ public class L2Clan implements IIdentifiable, INamable
 	
 	public boolean isAtWar()
 	{
-		if ((_atWarWith != null) && !_atWarWith.isEmpty())
-		{
-			return true;
-		}
-		return false;
+		return (_atWarWith != null) && !_atWarWith.isEmpty();
 	}
 	
 	public List<Integer> getWarList()
@@ -1715,7 +1684,7 @@ public class L2Clan implements IIdentifiable, INamable
 		private final int _id;
 		private String _subPledgeName;
 		private int _leaderId;
-		private final Map<Integer, Skill> _subPledgeSkills = new FastMap<>();
+		private final Map<Integer, Skill> _subPledgeSkills = new HashMap<>();
 		
 		public SubPledge(int id, String name, int leaderId)
 		{
@@ -1875,11 +1844,6 @@ public class L2Clan implements IIdentifiable, INamable
 	 */
 	public final SubPledge[] getAllSubPledges()
 	{
-		if (_subPledges == null)
-		{
-			return new SubPledge[0];
-		}
-		
 		return _subPledges.values().toArray(new SubPledge[_subPledges.values().size()]);
 	}
 	
@@ -2040,11 +2004,9 @@ public class L2Clan implements IIdentifiable, INamable
 	
 	public void initializePrivs()
 	{
-		RankPrivs privs;
 		for (int i = 1; i < 10; i++)
 		{
-			privs = new RankPrivs(i, 0, new EnumIntBitmask<>(ClanPrivilege.class, false));
-			_privs.put(i, privs);
+			_privs.put(i, new RankPrivs(i, 0, new EnumIntBitmask<>(ClanPrivilege.class, false)));
 		}
 	}
 	
@@ -2993,9 +2955,9 @@ public class L2Clan implements IIdentifiable, INamable
 		return false;
 	}
 	
-	public SubPledgeSkill[] getAllSubSkills()
+	public List<SubPledgeSkill> getAllSubSkills()
 	{
-		FastList<SubPledgeSkill> list = FastList.newInstance();
+		final List<SubPledgeSkill> list = new LinkedList<>();
 		for (Skill skill : _subPledgeSkills.values())
 		{
 			list.add(new SubPledgeSkill(0, skill.getId(), skill.getLevel()));
@@ -3007,9 +2969,7 @@ public class L2Clan implements IIdentifiable, INamable
 				list.add(new SubPledgeSkill(subunit.getId(), skill.getId(), skill.getLevel()));
 			}
 		}
-		SubPledgeSkill[] result = list.toArray(new SubPledgeSkill[list.size()]);
-		FastList.recycle(list);
-		return result;
+		return list;
 	}
 	
 	public void setNewLeaderId(int objectId, boolean storeInDb)

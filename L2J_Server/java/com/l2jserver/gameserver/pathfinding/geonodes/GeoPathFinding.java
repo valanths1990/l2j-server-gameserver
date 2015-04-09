@@ -28,14 +28,13 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
@@ -53,8 +52,8 @@ import com.l2jserver.gameserver.util.Util;
 public class GeoPathFinding extends PathFinding
 {
 	private static Logger _log = Logger.getLogger(GeoPathFinding.class.getName());
-	private static Map<Short, ByteBuffer> _pathNodes = new FastMap<>();
-	private static Map<Short, IntBuffer> _pathNodesIndex = new FastMap<>();
+	private static Map<Short, ByteBuffer> _pathNodes = new HashMap<>();
+	private static Map<Short, IntBuffer> _pathNodesIndex = new HashMap<>();
 	
 	public static GeoPathFinding getInstance()
 	{
@@ -156,7 +155,7 @@ public class GeoPathFinding extends PathFinding
 			
 			i++;
 			visited.add(node);
-			node.attachNeighbors();
+			node.attachNeighbors(readNeighbors(node));
 			GeoNode[] neighbors = node.getNeighbors();
 			if (neighbors == null)
 			{
@@ -192,7 +191,7 @@ public class GeoPathFinding extends PathFinding
 		return null;
 	}
 	
-	public List<AbstractNodeLoc> constructPath2(AbstractNode node)
+	public List<AbstractNodeLoc> constructPath2(AbstractNode<GeoNodeLoc> node)
 	{
 		LinkedList<AbstractNodeLoc> path = new LinkedList<>();
 		int previousDirectionX = -1000;
@@ -217,8 +216,15 @@ public class GeoPathFinding extends PathFinding
 		return path;
 	}
 	
-	public GeoNode[] readNeighbors(GeoNode n, int idx)
+	private GeoNode[] readNeighbors(GeoNode n)
 	{
+		if (n.getLoc() == null)
+		{
+			return null;
+		}
+		
+		int idx = n.getNeighborsIdx();
+		
 		int node_x = n.getLoc().getNodeX();
 		int node_y = n.getLoc().getNodeY();
 		// short node_z = n.getLoc().getZ();
@@ -226,7 +232,7 @@ public class GeoPathFinding extends PathFinding
 		short regoffset = getRegionOffset(getRegionX(node_x), getRegionY(node_y));
 		ByteBuffer pn = _pathNodes.get(regoffset);
 		
-		List<AbstractNode> Neighbors = new FastList<>(8);
+		List<AbstractNode<GeoNodeLoc>> neighbors = new ArrayList<>(8);
 		GeoNode newNode;
 		short new_node_x, new_node_y;
 		
@@ -240,7 +246,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // NE
@@ -252,7 +258,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // E
@@ -264,7 +270,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // SE
@@ -276,7 +282,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // S
@@ -288,7 +294,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // SW
@@ -300,7 +306,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // W
@@ -312,7 +318,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // NW
@@ -324,11 +330,11 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
-		GeoNode[] result = new GeoNode[Neighbors.size()];
-		return Neighbors.toArray(result);
+		GeoNode[] result = new GeoNode[neighbors.size()];
+		return neighbors.toArray(result);
 	}
 	
 	// Private

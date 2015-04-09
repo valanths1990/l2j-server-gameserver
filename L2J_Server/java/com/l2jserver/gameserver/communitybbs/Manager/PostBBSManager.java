@@ -23,8 +23,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
 import com.l2jserver.gameserver.communitybbs.BB.Post;
@@ -36,7 +35,7 @@ import com.l2jserver.util.StringUtil;
 
 public class PostBBSManager extends BaseBBSManager
 {
-	private final Map<Topic, Post> _postByTopic = new FastMap<>();
+	private final Map<Topic, Post> _postByTopic = new ConcurrentHashMap<>();
 	
 	public Post getGPosttByTopic(Topic t)
 	{
@@ -107,14 +106,21 @@ public class PostBBSManager extends BaseBBSManager
 	
 	private void showEditPost(Topic topic, Forum forum, L2PcInstance activeChar, int idp)
 	{
-		Post p = getGPosttByTopic(topic);
-		if ((forum == null) || (topic == null) || (p == null))
+		if (topic == null)
 		{
-			CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error, this forum, topic or post does not exit !</center><br><br></body></html>", activeChar);
+			CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error: This topic does not exist!</center></body></html>", activeChar);
 		}
 		else
 		{
-			showHtmlEditPost(topic, activeChar, forum, p);
+			final Post p = getGPosttByTopic(topic);
+			if ((forum == null) || (p == null))
+			{
+				CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error: This forum or post does not exist!</center></body></html>", activeChar);
+			}
+			else
+			{
+				showHtmlEditPost(topic, activeChar, forum, p);
+			}
 		}
 	}
 	
@@ -122,7 +128,7 @@ public class PostBBSManager extends BaseBBSManager
 	{
 		if ((forum == null) || (topic == null))
 		{
-			CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error, this forum is not implemented yet</center><br><br></body></html>", activeChar);
+			CommunityBoardHandler.separateAndSend("<html><body><br><br><center>Error: This forum is not implemented yet!</center></body></html>", activeChar);
 		}
 		else if (forum.getType() == Forum.MEMO)
 		{
@@ -130,7 +136,7 @@ public class PostBBSManager extends BaseBBSManager
 		}
 		else
 		{
-			CommunityBoardHandler.separateAndSend("<html><body><br><br><center>the forum: " + forum.getName() + " is not implemented yet</center><br><br></body></html>", activeChar);
+			CommunityBoardHandler.separateAndSend("<html><body><br><br><center>The forum: " + forum.getName() + " is not implemented yet!</center></body></html>", activeChar);
 		}
 	}
 	
@@ -143,7 +149,6 @@ public class PostBBSManager extends BaseBBSManager
 	
 	private void showMemoPost(Topic topic, L2PcInstance activeChar, Forum forum)
 	{
-		//
 		Post p = getGPosttByTopic(topic);
 		Locale locale = Locale.getDefault();
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.FULL, locale);

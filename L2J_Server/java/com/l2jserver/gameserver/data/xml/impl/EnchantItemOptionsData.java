@@ -25,10 +25,10 @@ import java.util.logging.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.options.EnchantOptions;
 import com.l2jserver.gameserver.util.Util;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author UnAfraid
@@ -52,9 +52,7 @@ public class EnchantItemOptionsData implements IXmlReader
 	@Override
 	public void parseDocument(Document doc)
 	{
-		Node att = null;
 		int counter = 0;
-		EnchantOptions op = null;
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
@@ -72,12 +70,12 @@ public class EnchantItemOptionsData implements IXmlReader
 						{
 							if ("options".equalsIgnoreCase(cd.getNodeName()))
 							{
-								op = new EnchantOptions(parseInteger(cd.getAttributes(), "level"));
+								final EnchantOptions op = new EnchantOptions(parseInteger(cd.getAttributes(), "level"));
 								_data.get(itemId).put(op.getLevel(), op);
 								
 								for (byte i = 0; i < 3; i++)
 								{
-									att = cd.getAttributes().getNamedItem("option" + (i + 1));
+									final Node att = cd.getAttributes().getNamedItem("option" + (i + 1));
 									if ((att != null) && Util.isDigit(att.getNodeValue()))
 									{
 										op.setOption(i, parseInteger(att));

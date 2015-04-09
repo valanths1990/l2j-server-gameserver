@@ -55,7 +55,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
@@ -64,6 +63,7 @@ import com.l2jserver.gameserver.util.FloodProtectorConfig;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.PropertiesParser;
 import com.l2jserver.util.StringUtil;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class loads all the game server related configurations from files.<br>

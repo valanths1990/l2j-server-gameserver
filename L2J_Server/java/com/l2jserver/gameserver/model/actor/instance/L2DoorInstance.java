@@ -18,12 +18,12 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
@@ -116,45 +116,10 @@ public class L2DoorInstance extends L2Character
 		}
 	}
 	
-	/** This class may be created only by L2Character and only for AI */
-	public class AIAccessor extends L2Character.AIAccessor
-	{
-		@Override
-		public L2DoorInstance getActor()
-		{
-			return L2DoorInstance.this;
-		}
-		
-		@Override
-		public void moveTo(int x, int y, int z, int offset)
-		{
-		}
-		
-		@Override
-		public void moveTo(int x, int y, int z)
-		{
-		}
-		
-		@Override
-		public void stopMove(Location loc)
-		{
-		}
-		
-		@Override
-		public void doAttack(L2Character target)
-		{
-		}
-		
-		@Override
-		public void doCast(Skill skill)
-		{
-		}
-	}
-	
 	@Override
 	protected L2CharacterAI initAI()
 	{
-		return new L2DoorAI(new AIAccessor());
+		return new L2DoorAI(this);
 	}
 	
 	private void startTimerOpen()
@@ -616,19 +581,16 @@ public class L2DoorInstance extends L2Character
 		return getTemplate().getNodeZ() + getTemplate().getHeight();
 	}
 	
-	public Collection<L2DefenderInstance> getKnownDefenders()
+	public List<L2DefenderInstance> getKnownDefenders()
 	{
-		FastList<L2DefenderInstance> result = new FastList<>();
-		
-		Collection<L2Object> objs = getKnownList().getKnownObjects().values();
-		for (L2Object obj : objs)
+		final List<L2DefenderInstance> result = new ArrayList<>();
+		for (L2Object obj : getKnownList().getKnownObjects().values())
 		{
 			if (obj instanceof L2DefenderInstance)
 			{
 				result.add((L2DefenderInstance) obj);
 			}
 		}
-		
 		return result;
 	}
 	
@@ -705,6 +667,26 @@ public class L2DoorInstance extends L2Character
 			broadcastPacket(SystemMessage.getSystemMessage(SystemMessageId.CASTLE_GATE_BROKEN_DOWN));
 		}
 		return true;
+	}
+	
+	@Override
+	public void moveToLocation(int x, int y, int z, int offset)
+	{
+	}
+	
+	@Override
+	public void stopMove(Location loc)
+	{
+	}
+	
+	@Override
+	public void doAttack(L2Character target)
+	{
+	}
+	
+	@Override
+	public void doCast(Skill skill)
+	{
 	}
 	
 	@Override

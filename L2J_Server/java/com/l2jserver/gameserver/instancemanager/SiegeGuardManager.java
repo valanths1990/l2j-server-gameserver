@@ -21,11 +21,10 @@ package com.l2jserver.gameserver.instancemanager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.model.L2Spawn;
@@ -37,7 +36,7 @@ public final class SiegeGuardManager
 	private static Logger _log = Logger.getLogger(SiegeGuardManager.class.getName());
 	
 	private final Castle _castle;
-	private final List<L2Spawn> _siegeGuardSpawn = new FastList<>();
+	private final List<L2Spawn> _siegeGuardSpawn = new ArrayList<>();
 	
 	public SiegeGuardManager(Castle castle)
 	{
@@ -149,7 +148,7 @@ public final class SiegeGuardManager
 			int hiredCount = 0, hiredMax = MercTicketManager.getInstance().getMaxAllowedMerc(_castle.getResidenceId());
 			boolean isHired = (getCastle().getOwnerId() > 0) ? true : false;
 			loadSiegeGuard();
-			for (L2Spawn spawn : getSiegeGuardSpawn())
+			for (L2Spawn spawn : _siegeGuardSpawn)
 			{
 				if (spawn != null)
 				{
@@ -176,7 +175,7 @@ public final class SiegeGuardManager
 	 */
 	public void unspawnSiegeGuard()
 	{
-		for (L2Spawn spawn : getSiegeGuardSpawn())
+		for (L2Spawn spawn : _siegeGuardSpawn)
 		{
 			if ((spawn != null) && (spawn.getLastSpawn() != null))
 			{
@@ -185,7 +184,7 @@ public final class SiegeGuardManager
 			}
 		}
 		
-		getSiegeGuardSpawn().clear();
+		_siegeGuardSpawn.clear();
 	}
 	
 	/**

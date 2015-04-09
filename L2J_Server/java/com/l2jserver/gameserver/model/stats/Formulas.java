@@ -474,50 +474,28 @@ public final class Formulas
 	}
 	
 	/**
-	 * Calculate the CP regen rate (base + modifiers).
-	 * @param cha
-	 * @return
+	 * Calculates the CP regeneration rate (base + modifiers).
+	 * @param player the player
+	 * @return the CP regeneration rate
 	 */
-	public static final double calcCpRegen(L2Character cha)
+	public static final double calcCpRegen(L2PcInstance player)
 	{
-		double init = cha.isPlayer() ? cha.getActingPlayer().getTemplate().getBaseCpRegen(cha.getLevel()) : cha.getTemplate().getBaseHpReg();
+		// With CON bonus
+		final double init = player.getActingPlayer().getTemplate().getBaseCpRegen(player.getLevel()) * player.getLevelMod() * BaseStats.CON.calcBonus(player);
 		double cpRegenMultiplier = Config.CP_REGEN_MULTIPLIER;
-		double cpRegenBonus = 0;
-		
-		if (cha.isPlayer())
+		if (player.isSitting())
 		{
-			L2PcInstance player = cha.getActingPlayer();
-			
-			// Calculate Movement bonus
-			if (player.isSitting())
-			{
-				cpRegenMultiplier *= 1.5; // Sitting
-			}
-			else if (!player.isMoving())
-			{
-				cpRegenMultiplier *= 1.1; // Staying
-			}
-			else if (player.isRunning())
-			{
-				cpRegenMultiplier *= 0.7; // Running
-			}
+			cpRegenMultiplier *= 1.5; // Sitting
 		}
-		else
+		else if (!player.isMoving())
 		{
-			// Calculate Movement bonus
-			if (!cha.isMoving())
-			{
-				cpRegenMultiplier *= 1.1; // Staying
-			}
-			else if (cha.isRunning())
-			{
-				cpRegenMultiplier *= 0.7; // Running
-			}
+			cpRegenMultiplier *= 1.1; // Staying
 		}
-		
-		// Apply CON bonus
-		init *= cha.getLevelMod() * BaseStats.CON.calcBonus(cha);
-		return (cha.calcStat(Stats.REGENERATE_CP_RATE, Math.max(1, init), null, null) * cpRegenMultiplier) + cpRegenBonus;
+		else if (player.isRunning())
+		{
+			cpRegenMultiplier *= 0.7; // Running
+		}
+		return player.calcStat(Stats.REGENERATE_CP_RATE, Math.max(1, init), null, null) * cpRegenMultiplier;
 	}
 	
 	public static final double calcFestivalRegenModifier(L2PcInstance activeChar)
@@ -1595,16 +1573,17 @@ public final class Formulas
 		{
 			if (attacker.isPlayer())
 			{
-				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_RESISTED_YOUR_S2);
+				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DAMAGE_DECREASED_BECAUSE_C1_RESISTED_C2_MAGIC);
 				sm.addCharName(target);
-				sm.addSkillName(skill);
+				sm.addCharName(attacker);
 				attacker.sendPacket(sm);
 				damage /= 2;
 			}
 			
 			if (target.isPlayer())
 			{
-				SystemMessage sm2 = SystemMessage.getSystemMessage(SystemMessageId.RESISTED_C1_MAGIC);
+				SystemMessage sm2 = SystemMessage.getSystemMessage(SystemMessageId.C1_WEAKLY_RESISTED_C2_MAGIC);
+				sm2.addCharName(target);
 				sm2.addCharName(attacker);
 				target.sendPacket(sm2);
 			}
@@ -2000,14 +1979,14 @@ public final class Formulas
 				}
 				
 				// Prevent initialization.
-				final List<BuffInfo> buffs = target.getEffectList().hasBuffs() ? new ArrayList<>(target.getEffectList().getBuffs().values()) : new ArrayList<>(1);
+				final List<BuffInfo> buffs = target.getEffectList().hasBuffs() ? new ArrayList<>(target.getEffectList().getBuffs()) : new ArrayList<>(1);
 				if (target.getEffectList().hasTriggered())
 				{
-					buffs.addAll(target.getEffectList().getTriggered().values());
+					buffs.addAll(target.getEffectList().getTriggered());
 				}
 				if (target.getEffectList().hasDances())
 				{
-					buffs.addAll(target.getEffectList().getDances().values());
+					buffs.addAll(target.getEffectList().getDances());
 				}
 				for (int i = buffs.size() - 1; i >= 0; i--) // reverse order
 				{
@@ -2026,7 +2005,7 @@ public final class Formulas
 			}
 			case "debuff":
 			{
-				final List<BuffInfo> debuffs = new ArrayList<>(target.getEffectList().getDebuffs().values());
+				final List<BuffInfo> debuffs = new ArrayList<>(target.getEffectList().getDebuffs());
 				for (int i = debuffs.size() - 1; i >= 0; i--)
 				{
 					BuffInfo info = debuffs.get(i);

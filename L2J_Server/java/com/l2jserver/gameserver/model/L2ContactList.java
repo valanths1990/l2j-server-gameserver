@@ -22,10 +22,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
@@ -44,7 +43,7 @@ public class L2ContactList
 {
 	private final Logger _log = Logger.getLogger(getClass().getName());
 	private final L2PcInstance activeChar;
-	private final List<String> _contacts;
+	private final List<String> _contacts = new CopyOnWriteArrayList<>();
 	
 	private static final String QUERY_ADD = "INSERT INTO character_contacts (charId, contactId) VALUES (?, ?)";
 	private static final String QUERY_REMOVE = "DELETE FROM character_contacts WHERE charId = ? and contactId = ?";
@@ -53,7 +52,6 @@ public class L2ContactList
 	public L2ContactList(L2PcInstance player)
 	{
 		activeChar = player;
-		_contacts = new FastList<String>().shared();
 		restore();
 	}
 	

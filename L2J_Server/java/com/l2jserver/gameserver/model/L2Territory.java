@@ -19,9 +19,8 @@
 package com.l2jserver.gameserver.model;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.util.Rnd;
 
@@ -47,7 +46,7 @@ public class L2Territory
 		}
 	}
 	
-	private final List<Point> _points;
+	private final List<Point> _points = new CopyOnWriteArrayList<>();
 	private final int _terr;
 	private int _xMin;
 	private int _xMax;
@@ -59,7 +58,6 @@ public class L2Territory
 	
 	public L2Territory(int terr)
 	{
-		_points = new FastList<>();
 		_terr = terr;
 		_xMin = 999999;
 		_xMax = -999999;
@@ -98,14 +96,6 @@ public class L2Territory
 			_zMax = zmax;
 		}
 		_procMax += proc;
-	}
-	
-	public void print()
-	{
-		for (Point p : _points)
-		{
-			_log.info("(" + p._x + "," + p._y + ")");
-		}
 	}
 	
 	public boolean isIntersect(int x, int y, Point p1, Point p2)

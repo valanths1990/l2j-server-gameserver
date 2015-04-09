@@ -35,7 +35,7 @@ import com.l2jserver.loginserver.GameServerTable;
 import com.l2jserver.loginserver.L2LoginServer;
 import com.l2jserver.loginserver.LoginController;
 
-public class LoginStatusThread extends Thread
+public final class LoginStatusThread extends Thread
 {
 	private static final Logger _log = Logger.getLogger(LoginStatusThread.class.getName());
 	

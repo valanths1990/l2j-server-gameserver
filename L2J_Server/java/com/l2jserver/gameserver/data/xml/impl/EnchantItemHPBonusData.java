@@ -27,7 +27,6 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.StatFunction;
 import com.l2jserver.gameserver.model.items.L2Item;
@@ -35,6 +34,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.CrystalType;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class holds the Enchant HP Bonus Data.
@@ -65,12 +65,12 @@ public class EnchantItemHPBonusData implements IXmlReader
 				{
 					if ("enchantHP".equalsIgnoreCase(d.getNodeName()))
 					{
-						List<Integer> bonuses = new ArrayList<>();
+						final List<Integer> bonuses = new ArrayList<>(12);
 						for (Node e = d.getFirstChild(); e != null; e = e.getNextSibling())
 						{
 							if ("bonus".equalsIgnoreCase(e.getNodeName()))
 							{
-								bonuses.add(Integer.valueOf(e.getTextContent()));
+								bonuses.add(Integer.parseInt(e.getTextContent()));
 							}
 						}
 						_armorHPBonuses.put(parseEnum(d.getAttributes(), CrystalType.class, "grade"), bonuses);
@@ -82,12 +82,11 @@ public class EnchantItemHPBonusData implements IXmlReader
 		if (!_armorHPBonuses.isEmpty())
 		{
 			final ItemTable it = ItemTable.getInstance();
-			L2Item item;
 			// Armors
 			final Collection<Integer> armorIds = it.getAllArmorsId();
 			for (Integer itemId : armorIds)
 			{
-				item = it.getTemplate(itemId);
+				L2Item item = it.getTemplate(itemId);
 				if ((item != null) && (item.getCrystalType() != CrystalType.NONE))
 				{
 					switch (item.getBodyPart())

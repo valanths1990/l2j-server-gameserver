@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author UnAfraid
@@ -51,7 +51,6 @@ public class KarmaData implements IXmlReader
 	@Override
 	public void parseDocument(Document doc)
 	{
-		NamedNodeMap attrs;
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("pcKarmaIncrease".equalsIgnoreCase(n.getNodeName()))
@@ -60,7 +59,7 @@ public class KarmaData implements IXmlReader
 				{
 					if ("increase".equalsIgnoreCase(d.getNodeName()))
 					{
-						attrs = d.getAttributes();
+						final NamedNodeMap attrs = d.getAttributes();
 						_karmaTable.put(parseInteger(attrs, "lvl"), parseDouble(attrs, "val"));
 					}
 				}

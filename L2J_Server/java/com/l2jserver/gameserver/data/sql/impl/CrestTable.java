@@ -165,7 +165,13 @@ public final class CrestTable
 		final File crestDir = new File(Config.DATAPACK_ROOT, "data/crests/");
 		if (crestDir.exists())
 		{
-			for (File file : crestDir.listFiles(new BMPFilter()))
+			final File[] files = crestDir.listFiles(new BMPFilter());
+			if (files == null)
+			{
+				return;
+			}
+			
+			for (File file : files)
 			{
 				try
 				{

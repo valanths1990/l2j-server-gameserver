@@ -28,9 +28,8 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_MOVE_TO;
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_PICK_UP;
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_REST;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.GeoData;
@@ -121,11 +120,11 @@ public class L2CharacterAI extends AbstractAI
 	
 	/**
 	 * Constructor of L2CharacterAI.
-	 * @param accessor The AI accessor of the L2Character
+	 * @param creature the creature
 	 */
-	public L2CharacterAI(L2Character.AIAccessor accessor)
+	public L2CharacterAI(L2Character creature)
 	{
-		super(accessor);
+		super(creature);
 	}
 	
 	public IntentionCommand getNextIntention()
@@ -728,16 +727,16 @@ public class L2CharacterAI extends AbstractAI
 	@Override
 	protected void onEvtArrived()
 	{
-		_accessor.getActor().revalidateZone(true);
+		_actor.revalidateZone(true);
 		
-		if (_accessor.getActor().moveToNextRoutePoint())
+		if (_actor.moveToNextRoutePoint())
 		{
 			return;
 		}
 		
-		if (_accessor.getActor() instanceof L2Attackable)
+		if (_actor instanceof L2Attackable)
 		{
-			((L2Attackable) _accessor.getActor()).setisReturningToSpawnPoint(false);
+			((L2Attackable) _actor).setisReturningToSpawnPoint(false);
 		}
 		clientStoppedMoving();
 		
@@ -1205,19 +1204,19 @@ public class L2CharacterAI extends AbstractAI
 		public boolean isHealer = false;
 		public boolean isFighter = false;
 		public boolean cannotMoveOnLand = false;
-		public List<Skill> generalSkills = new FastList<>();
-		public List<Skill> buffSkills = new FastList<>();
+		public List<Skill> generalSkills = new ArrayList<>();
+		public List<Skill> buffSkills = new ArrayList<>();
 		public int lastBuffTick = 0;
-		public List<Skill> debuffSkills = new FastList<>();
+		public List<Skill> debuffSkills = new ArrayList<>();
 		public int lastDebuffTick = 0;
-		public List<Skill> cancelSkills = new FastList<>();
-		public List<Skill> healSkills = new FastList<>();
-		// public List<L2Skill> trickSkills = new FastList<>();
-		public List<Skill> generalDisablers = new FastList<>();
-		public List<Skill> sleepSkills = new FastList<>();
-		public List<Skill> rootSkills = new FastList<>();
-		public List<Skill> muteSkills = new FastList<>();
-		public List<Skill> resurrectSkills = new FastList<>();
+		public List<Skill> cancelSkills = new ArrayList<>();
+		public List<Skill> healSkills = new ArrayList<>();
+		// public List<L2Skill> trickSkills = new ArrayList<>();
+		public List<Skill> generalDisablers = new ArrayList<>();
+		public List<Skill> sleepSkills = new ArrayList<>();
+		public List<Skill> rootSkills = new ArrayList<>();
+		public List<Skill> muteSkills = new ArrayList<>();
+		public List<Skill> resurrectSkills = new ArrayList<>();
 		public boolean hasHealOrResurrect = false;
 		public boolean hasLongRangeSkills = false;
 		public boolean hasLongRangeDamageSkills = false;

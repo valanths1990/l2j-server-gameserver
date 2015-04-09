@@ -18,7 +18,6 @@
  */
 package com.l2jserver.gameserver.util;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -38,7 +37,7 @@ import com.l2jserver.util.Rnd;
  */
 public class MinionList
 {
-	private static Logger _log = Logger.getLogger(MinionList.class.getName());
+	private static final Logger _log = Logger.getLogger(MinionList.class.getName());
 	
 	protected final L2MonsterInstance _master;
 	/** List containing the current spawned minions */
@@ -273,22 +272,16 @@ public class MinionList
 		{
 			return;
 		}
-		
 		// searching in reused minions
-		if ((_reusedMinionReferences != null) && !_reusedMinionReferences.isEmpty())
+		if (_reusedMinionReferences != null)
 		{
-			L2MonsterInstance minion;
-			Iterator<L2MonsterInstance> iter = _reusedMinionReferences.iterator();
-			while (iter.hasNext())
+			final L2MonsterInstance minion = _reusedMinionReferences.stream().filter(m -> (m.getId() == minionId)).findFirst().orElse(null);
+			if (minion != null)
 			{
-				minion = iter.next();
-				if ((minion != null) && (minion.getId() == minionId))
-				{
-					iter.remove();
-					minion.refreshID();
-					initializeNpcInstance(_master, minion);
-					return;
-				}
+				_reusedMinionReferences.remove(minion);
+				minion.refreshID();
+				initializeNpcInstance(_master, minion);
+				return;
 			}
 		}
 		// not found in cache

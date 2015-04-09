@@ -26,7 +26,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.transform.Transform;
@@ -36,6 +35,7 @@ import com.l2jserver.gameserver.model.holders.AdditionalItemHolder;
 import com.l2jserver.gameserver.model.holders.AdditionalSkillHolder;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.network.serverpackets.ExBasicActionList;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author UnAfraid
@@ -60,9 +60,6 @@ public final class TransformData implements IXmlReader
 	@Override
 	public void parseDocument(Document doc)
 	{
-		NamedNodeMap attrs;
-		Node att;
-		StatsSet set;
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
@@ -71,11 +68,11 @@ public final class TransformData implements IXmlReader
 				{
 					if ("transform".equalsIgnoreCase(d.getNodeName()))
 					{
-						attrs = d.getAttributes();
-						set = new StatsSet();
+						NamedNodeMap attrs = d.getAttributes();
+						StatsSet set = new StatsSet();
 						for (int i = 0; i < attrs.getLength(); i++)
 						{
-							att = attrs.item(i);
+							Node att = attrs.item(i);
 							set.set(att.getNodeName(), att.getNodeValue());
 						}
 						final Transform transform = new Transform(set);
@@ -105,7 +102,7 @@ public final class TransformData implements IXmlReader
 														attrs = s.getAttributes();
 														for (int i = 0; i < attrs.getLength(); i++)
 														{
-															att = attrs.item(i);
+															Node att = attrs.item(i);
 															set.set(att.getNodeName(), att.getNodeValue());
 														}
 														break;
@@ -202,7 +199,7 @@ public final class TransformData implements IXmlReader
 													attrs = s.getAttributes();
 													for (int i = 0; i < attrs.getLength(); i++)
 													{
-														att = attrs.item(i);
+														Node att = attrs.item(i);
 														levelsSet.set(att.getNodeName(), att.getNodeValue());
 													}
 												}

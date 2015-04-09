@@ -24,14 +24,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -767,41 +766,29 @@ public class SevenSignsFestival implements SpawnListener
 	protected long _nextFestivalStart;
 	protected boolean _festivalInitialized;
 	protected boolean _festivalInProgress;
-	protected List<Integer> _accumulatedBonuses; // The total bonus available (in Ancient Adena)
+	protected List<Integer> _accumulatedBonuses = new ArrayList<>(); // The total bonus available (in Ancient Adena)
 	
 	boolean _noPartyRegister;
 	private L2Npc _dawnChatGuide;
 	private L2Npc _duskChatGuide;
 	
-	protected Map<Integer, List<Integer>> _dawnFestivalParticipants;
-	protected Map<Integer, List<Integer>> _duskFestivalParticipants;
+	protected Map<Integer, List<Integer>> _dawnFestivalParticipants = new HashMap<>();
+	protected Map<Integer, List<Integer>> _duskFestivalParticipants = new HashMap<>();
 	
-	protected Map<Integer, List<Integer>> _dawnPreviousParticipants;
-	protected Map<Integer, List<Integer>> _duskPreviousParticipants;
+	protected Map<Integer, List<Integer>> _dawnPreviousParticipants = new HashMap<>();
+	protected Map<Integer, List<Integer>> _duskPreviousParticipants = new HashMap<>();
 	
-	private Map<Integer, Long> _dawnFestivalScores;
-	private Map<Integer, Long> _duskFestivalScores;
+	private final Map<Integer, Long> _dawnFestivalScores = new HashMap<>();
+	private final Map<Integer, Long> _duskFestivalScores = new HashMap<>();
 	
 	/**
 	 * _festivalData is essentially an instance of the seven_signs_festival table and should be treated as such. Data is initially accessed by the related Seven Signs cycle, with _signsCycle representing data for the current round of Festivals. The actual table data is stored as a series of StatsSet
 	 * constructs. These are accessed by the use of an offset based on the number of festivals, thus: offset = FESTIVAL_COUNT + festivalId (Data for Dawn is always accessed by offset > FESTIVAL_COUNT)
 	 */
-	private Map<Integer, Map<Integer, StatsSet>> _festivalData;
+	private final Map<Integer, Map<Integer, StatsSet>> _festivalData = new HashMap<>();
 	
 	protected SevenSignsFestival()
 	{
-		_accumulatedBonuses = new FastList<>();
-		
-		_dawnFestivalParticipants = new FastMap<>();
-		_dawnPreviousParticipants = new FastMap<>();
-		_dawnFestivalScores = new FastMap<>();
-		
-		_duskFestivalParticipants = new FastMap<>();
-		_duskPreviousParticipants = new FastMap<>();
-		_duskFestivalScores = new FastMap<>();
-		
-		_festivalData = new FastMap<>();
-		
 		restoreFestivalData();
 		
 		if (SevenSigns.getInstance().isSealValidationPeriod())
@@ -960,13 +947,7 @@ public class SevenSignsFestival implements SpawnListener
 					festivalId += FESTIVAL_COUNT;
 				}
 				
-				Map<Integer, StatsSet> tempData = _festivalData.get(festivalCycle);
-				
-				if (tempData == null)
-				{
-					tempData = new FastMap<>();
-				}
-				
+				final Map<Integer, StatsSet> tempData = _festivalData.getOrDefault(festivalCycle, new HashMap<>());
 				tempData.put(festivalId, festivalDat);
 				_festivalData.put(festivalCycle, tempData);
 			}
@@ -1195,7 +1176,7 @@ public class SevenSignsFestival implements SpawnListener
 		_duskFestivalScores.clear();
 		
 		// Set up a new data set for the current cycle of festivals
-		Map<Integer, StatsSet> newData = new FastMap<>();
+		Map<Integer, StatsSet> newData = new HashMap<>();
 		
 		for (int i = 0; i < (FESTIVAL_COUNT * 2); i++)
 		{
@@ -1680,9 +1661,10 @@ public class SevenSignsFestival implements SpawnListener
 			return 0;
 		}
 		
-		if (_festivalData.get(_signsCycle) != null)
+		final Map<Integer, StatsSet> festivalDataMap = _festivalData.get(_signsCycle);
+		if (festivalDataMap != null)
 		{
-			for (StatsSet festivalData : _festivalData.get(_signsCycle).values())
+			for (StatsSet festivalData : festivalDataMap.values())
 			{
 				if (festivalData.getString("members").indexOf(playerName) > -1)
 				{
@@ -1782,7 +1764,7 @@ public class SevenSignsFestival implements SpawnListener
 		
 		public FestivalManager()
 		{
-			_festivalInstances = new FastMap<>();
+			_festivalInstances = new HashMap<>();
 			
 			// Increment the cycle counter.
 			_festivalCycle++;
@@ -2060,17 +2042,15 @@ public class SevenSignsFestival implements SpawnListener
 		private FestivalSpawn _witchSpawn;
 		
 		private L2Npc _witchInst;
-		List<L2FestivalMonsterInstance> _npcInsts;
+		List<L2FestivalMonsterInstance> _npcInsts = new ArrayList<>();
 		
 		private List<Integer> _participants;
-		private final Map<Integer, FestivalSpawn> _originalLocations;
+		private final Map<Integer, FestivalSpawn> _originalLocations = new ConcurrentHashMap<>();
 		
 		protected L2DarknessFestival(int cabal, int levelRange)
 		{
 			_cabal = cabal;
 			_levelRange = levelRange;
-			_originalLocations = new FastMap<>();
-			_npcInsts = new FastList<>();
 			
 			if (cabal == SevenSigns.CABAL_DAWN)
 			{
@@ -2387,16 +2367,13 @@ public class SevenSignsFestival implements SpawnListener
 				SpawnTable.getInstance().deleteSpawn(_witchInst.getSpawn(), false);
 			}
 			
-			if (_npcInsts != null)
+			for (L2FestivalMonsterInstance monsterInst : _npcInsts)
 			{
-				for (L2FestivalMonsterInstance monsterInst : _npcInsts)
+				if (monsterInst != null)
 				{
-					if (monsterInst != null)
-					{
-						monsterInst.getSpawn().stopRespawn();
-						monsterInst.deleteMe();
-						SpawnTable.getInstance().deleteSpawn(monsterInst.getSpawn(), false);
-					}
+					monsterInst.getSpawn().stopRespawn();
+					monsterInst.deleteMe();
+					SpawnTable.getInstance().deleteSpawn(monsterInst.getSpawn(), false);
 				}
 			}
 		}

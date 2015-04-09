@@ -32,12 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.StampedLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
-import javolution.util.WeakFastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
@@ -214,7 +211,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	/** Table of Calculators containing all used calculator */
 	private Calculator[] _calculators;
 	/** Map containing all skills of this character. */
-	private final Map<Integer, Skill> _skills = new FastMap<Integer, Skill>().shared();
+	private final Map<Integer, Skill> _skills = new ConcurrentHashMap<>();
 	/** Map containing the skill reuse time stamps. */
 	private volatile Map<Integer, TimeStamp> _reuseTimeStampsSkills = null;
 	/** Map containing the item reuse time stamps. */
@@ -229,7 +226,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	private L2Character _debugger = null;
 	
 	private final ReentrantLock _teleportLock = new ReentrantLock();
-	private final ReentrantLock _attackLock = new ReentrantLock();
+	private final StampedLock _attackLock = new StampedLock();
 	
 	private Team _team = Team.NONE;
 	
@@ -827,12 +824,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * </ul>
 	 * @param target The L2Character targeted
 	 */
-	protected void doAttack(L2Character target)
+	public void doAttack(L2Character target)
 	{
-		if (!_attackLock.tryLock())
-		{
-			return;
-		}
+		final long stamp = _attackLock.tryWriteLock();
 		try
 		{
 			if ((target == null) || isAttackingDisabled())
@@ -943,9 +937,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			
 			stopEffectsOnAction();
 			
-			// Get the active weapon item corresponding to the active weapon instance (always equipped in the right hand)
-			L2Weapon weaponItem = getActiveWeaponItem();
-			
 			// GeoData Los Check here (or dz > 1000)
 			if (!GeoData.getInstance().canSeeTarget(this, target))
 			{
@@ -956,6 +947,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			}
 			
 			// BOW and CROSSBOW checks
+			// Get the active weapon item corresponding to the active weapon instance (always equipped in the right hand)
+			L2Weapon weaponItem = getActiveWeaponItem();
 			if ((weaponItem != null) && !isTransformed())
 			{
 				if (weaponItem.getItemType() == WeaponType.BOW)
@@ -1211,7 +1204,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		finally
 		{
-			_attackLock.unlock();
+			_attackLock.unlockWrite(stamp);
 		}
 	}
 	
@@ -1958,6 +1951,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				{
 					if (item.isEquipped())
 					{
+						if (item.getMana() < item.useSkillDisTime())
+						{
+							abortCast();
+							return;
+						}
 						item.decreaseMana(false, item.useSkillDisTime());
 						break;
 					}
@@ -2534,10 +2532,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		stopAllEffectsExceptThoseThatLastThroughDeath();
 		
-		if (isPlayer() && (getActingPlayer().getAgathionId() != 0))
-		{
-			getActingPlayer().setAgathionId(0);
-		}
 		calculateRewards(killer);
 		
 		// Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
@@ -2573,6 +2567,15 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			getAI().stopAITask();
 		}
 		return true;
+	}
+	
+	public void detachAI()
+	{
+		if (isWalker())
+		{
+			return;
+		}
+		setAI(null);
 	}
 	
 	protected void calculateRewards(L2Character killer)
@@ -2652,7 +2655,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	protected L2CharacterAI initAI()
 	{
-		return new L2CharacterAI(new AIAccessor());
+		return new L2CharacterAI(this);
 	}
 	
 	public void setAI(L2CharacterAI newAI)
@@ -2709,7 +2712,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				if (_attackByList == null)
 				{
-					_attackByList = new WeakFastSet<>(true);
+					_attackByList = ConcurrentHashMap.newKeySet();
 				}
 			}
 		}
@@ -3460,93 +3463,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	public boolean isAffectedBySkill(int skillId)
 	{
 		return _effectList.isAffectedBySkill(skillId);
-	}
-	
-	// TODO: NEED TO ORGANIZE AND MOVE TO PROPER PLACE
-	/** This class permit to the L2Character AI to obtain informations and uses L2Character method */
-	public class AIAccessor
-	{
-		/**
-		 * @return the L2Character managed by this Accessor AI.
-		 */
-		public L2Character getActor()
-		{
-			return L2Character.this;
-		}
-		
-		/**
-		 * Accessor to L2Character moveToLocation() method with an interaction area.
-		 * @param x
-		 * @param y
-		 * @param z
-		 * @param offset
-		 */
-		public void moveTo(int x, int y, int z, int offset)
-		{
-			moveToLocation(x, y, z, offset);
-		}
-		
-		/**
-		 * Accessor to L2Character moveToLocation() method without interaction area.
-		 * @param x
-		 * @param y
-		 * @param z
-		 */
-		public void moveTo(int x, int y, int z)
-		{
-			moveToLocation(x, y, z, 0);
-		}
-		
-		/**
-		 * Accessor to L2Character stopMove() method.
-		 * @param loc
-		 */
-		public void stopMove(Location loc)
-		{
-			L2Character.this.stopMove(loc);
-		}
-		
-		/**
-		 * Accessor to L2Character doAttack() method.
-		 * @param target
-		 */
-		public void doAttack(L2Character target)
-		{
-			L2Character.this.doAttack(target);
-		}
-		
-		/**
-		 * Accessor to L2Character doCast() method.
-		 * @param skill
-		 */
-		public void doCast(Skill skill)
-		{
-			L2Character.this.doCast(skill);
-		}
-		
-		/**
-		 * Create a NotifyAITask.
-		 * @param evt
-		 * @return
-		 */
-		public NotifyAITask newNotifyTask(CtrlEvent evt)
-		{
-			return new NotifyAITask(getActor(), evt);
-		}
-		
-		/**
-		 * Cancel the AI.
-		 */
-		public void detachAI()
-		{
-			// Skip character, if it is controlled by Walking Manager
-			if (isWalker())
-			{
-				return;
-			}
-			
-			setAI(null);
-		}
 	}
 	
 	/**
@@ -4393,7 +4309,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		return _target;
 	}
 	
-	// called from AIAccessor only
 	/**
 	 * Calculate movement data for a move to location action and add the L2Character to movingObjects of GameTimeController (only called by AI Accessor).<br>
 	 * <B><U>Concept</U>:</B><br>
@@ -4420,7 +4335,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * @param z The Y position of the destination
 	 * @param offset The size of the interaction area of the L2Character targeted
 	 */
-	protected void moveToLocation(int x, int y, int z, int offset)
+	public void moveToLocation(int x, int y, int z, int offset)
 	{
 		// Get the Move Speed of the L2Charcater
 		double speed = getMoveSpeed();
@@ -5086,15 +5001,12 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 				}
 			}
+			// Launch weapon onCritical Special ability effect if available
+			if (crit && (weapon != null))
+			{
+				weapon.castOnCriticalSkill(this, target);
+			}
 		}
-		
-		// Launch weapon Special ability effect if available
-		L2Weapon activeWeapon = getActiveWeaponItem();
-		if (activeWeapon != null)
-		{
-			activeWeapon.castOnCriticalSkill(this, target);
-		}
-		
 		// Recharge any active auto-soulshot tasks for current creature.
 		rechargeShots(true, false);
 	}
@@ -5535,7 +5447,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			int _skiprange = 0;
 			int _skipgeo = 0;
 			int _skippeace = 0;
-			List<L2Character> targetList = new FastList<>(targets.length);
+			final List<L2Object> targetList = new ArrayList<>();
 			for (L2Object target : targets)
 			{
 				if (target instanceof L2Character)
@@ -5569,7 +5481,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 							}
 						}
 					}
-					targetList.add((L2Character) target);
+					targetList.add(target);
 				}
 			}
 			if (targetList.isEmpty())
@@ -5592,7 +5504,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				abortCast();
 				return;
 			}
-			mut.setTargets(targetList.toArray(new L2Character[targetList.size()]));
+			mut.setTargets(targetList.toArray(new L2Object[targetList.size()]));
 		}
 		
 		// Ensure that a cast is in progress
@@ -6999,5 +6911,25 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	public Race getRace()
 	{
 		return getTemplate().getRace();
+	}
+	
+	public boolean isInDuel()
+	{
+		return false;
+	}
+	
+	public int getDuelId()
+	{
+		return 0;
+	}
+	
+	public byte getSiegeState()
+	{
+		return 0;
+	}
+	
+	public int getSiegeSide()
+	{
+		return 0;
 	}
 }

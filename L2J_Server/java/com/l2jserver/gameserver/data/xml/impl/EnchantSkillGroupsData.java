@@ -27,13 +27,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.data.xml.IXmlReader;
 import com.l2jserver.gameserver.model.L2EnchantSkillGroup;
 import com.l2jserver.gameserver.model.L2EnchantSkillGroup.EnchantSkillHolder;
 import com.l2jserver.gameserver.model.L2EnchantSkillLearn;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class holds the Enchant Groups information.
@@ -77,11 +77,6 @@ public class EnchantSkillGroupsData implements IXmlReader
 	@Override
 	public void parseDocument(Document doc)
 	{
-		NamedNodeMap attrs;
-		StatsSet set;
-		Node att;
-		int id = 0;
-		L2EnchantSkillGroup group;
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
@@ -90,10 +85,9 @@ public class EnchantSkillGroupsData implements IXmlReader
 				{
 					if ("group".equalsIgnoreCase(d.getNodeName()))
 					{
-						attrs = d.getAttributes();
-						id = parseInteger(attrs, "id");
-						
-						group = _enchantSkillGroups.get(id);
+						NamedNodeMap attrs = d.getAttributes();
+						final int id = parseInteger(attrs, "id");
+						L2EnchantSkillGroup group = _enchantSkillGroups.get(id);
 						if (group == null)
 						{
 							group = new L2EnchantSkillGroup(id);
@@ -105,11 +99,11 @@ public class EnchantSkillGroupsData implements IXmlReader
 							if ("enchant".equalsIgnoreCase(b.getNodeName()))
 							{
 								attrs = b.getAttributes();
-								set = new StatsSet();
+								StatsSet set = new StatsSet();
 								
 								for (int i = 0; i < attrs.getLength(); i++)
 								{
-									att = attrs.item(i);
+									Node att = attrs.item(i);
 									set.set(att.getNodeName(), att.getNodeValue());
 								}
 								group.addEnchantDetail(new EnchantSkillHolder(set));

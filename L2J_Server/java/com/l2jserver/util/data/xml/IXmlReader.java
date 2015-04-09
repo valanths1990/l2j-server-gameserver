@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.data.xml;
+package com.l2jserver.util.data.xml;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -35,7 +35,7 @@ import com.l2jserver.Config;
 import com.l2jserver.util.file.filter.XMLFilter;
 
 /**
- * Abstract class for XML parsers.
+ * Interface for XML parsers.
  * @author Zoey76
  */
 public interface IXmlReader
@@ -144,16 +144,19 @@ public interface IXmlReader
 			return false;
 		}
 		
-		final File[] listOfFiles = dir.listFiles();
-		for (File f : listOfFiles)
+		final File[] files = dir.listFiles();
+		if (files != null)
 		{
-			if (recursive && f.isDirectory())
+			for (File f : files)
 			{
-				parseDirectory(f, recursive);
-			}
-			else if (getCurrentFileFilter().accept(f))
-			{
-				parseFile(f);
+				if (recursive && f.isDirectory())
+				{
+					parseDirectory(f, recursive);
+				}
+				else if (getCurrentFileFilter().accept(f))
+				{
+					parseFile(f);
+				}
 			}
 		}
 		return true;
@@ -642,7 +645,7 @@ public interface IXmlReader
 	 * Simple XML error handler.
 	 * @author Zoey76
 	 */
-	class XMLErrorHandler implements ErrorHandler
+	static class XMLErrorHandler implements ErrorHandler
 	{
 		@Override
 		public void warning(SAXParseException e) throws SAXParseException

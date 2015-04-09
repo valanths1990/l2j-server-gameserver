@@ -24,13 +24,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -127,11 +126,10 @@ public class SevenSigns
 	protected int _previousWinner;
 	protected Calendar _lastSave = Calendar.getInstance();
 	
-	protected Map<Integer, StatsSet> _signsPlayerData;
-	
-	private final Map<Integer, Integer> _signsSealOwners;
-	private final Map<Integer, Integer> _signsDuskSealTotals;
-	private final Map<Integer, Integer> _signsDawnSealTotals;
+	protected Map<Integer, StatsSet> _signsPlayerData = new LinkedHashMap<>();
+	private final Map<Integer, Integer> _signsSealOwners = new LinkedHashMap<>();
+	private final Map<Integer, Integer> _signsDuskSealTotals = new LinkedHashMap<>();
+	private final Map<Integer, Integer> _signsDawnSealTotals = new LinkedHashMap<>();
 	
 	private static final String LOAD_DATA = "SELECT charId, cabal, seal, red_stones, green_stones, blue_stones, " + "ancient_adena_amount, contribution_score FROM seven_signs";
 	
@@ -145,11 +143,6 @@ public class SevenSigns
 	
 	protected SevenSigns()
 	{
-		_signsPlayerData = new FastMap<>();
-		_signsSealOwners = new FastMap<>();
-		_signsDuskSealTotals = new FastMap<>();
-		_signsDawnSealTotals = new FastMap<>();
-		
 		try
 		{
 			restoreSevenSignsData();
@@ -250,15 +243,15 @@ public class SevenSigns
 		final AutoSpawnInstance blacksmithSpawn = AutoSpawnHandler.getInstance().getAutoSpawnInstance(MAMMON_BLACKSMITH_ID, false);
 		final AutoSpawnInstance lilithSpawn = AutoSpawnHandler.getInstance().getAutoSpawnInstance(LILITH_NPC_ID, false);
 		final AutoSpawnInstance anakimSpawn = AutoSpawnHandler.getInstance().getAutoSpawnInstance(ANAKIM_NPC_ID, false);
-		final Map<Integer, AutoSpawnInstance> crestOfDawnSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(CREST_OF_DAWN_ID);
-		final Map<Integer, AutoSpawnInstance> crestOfDuskSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(CREST_OF_DUSK_ID);
-		final Map<Integer, AutoSpawnInstance> oratorSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(ORATOR_NPC_ID);
-		final Map<Integer, AutoSpawnInstance> preacherSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(PREACHER_NPC_ID);
-		final Map<Integer, AutoSpawnInstance> marketeerSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(MAMMON_MARKETEER_ID);
+		final List<AutoSpawnInstance> crestOfDawnSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(CREST_OF_DAWN_ID);
+		final List<AutoSpawnInstance> crestOfDuskSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(CREST_OF_DUSK_ID);
+		final List<AutoSpawnInstance> oratorSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(ORATOR_NPC_ID);
+		final List<AutoSpawnInstance> preacherSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(PREACHER_NPC_ID);
+		final List<AutoSpawnInstance> marketeerSpawns = AutoSpawnHandler.getInstance().getAutoSpawnInstances(MAMMON_MARKETEER_ID);
 		
 		if (isSealValidationPeriod() || isCompResultsPeriod())
 		{
-			for (AutoSpawnInstance spawnInst : marketeerSpawns.values())
+			for (AutoSpawnInstance spawnInst : marketeerSpawns)
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, true);
 			}
@@ -275,7 +268,7 @@ public class SevenSigns
 					AutoSpawnHandler.getInstance().setSpawnActive(blacksmithSpawn, true);
 				}
 				
-				for (AutoSpawnInstance spawnInst : oratorSpawns.values())
+				for (AutoSpawnInstance spawnInst : oratorSpawns)
 				{
 					if (!AutoSpawnHandler.getInstance().getAutoSpawnInstance(spawnInst.getObjectId(), true).isSpawnActive())
 					{
@@ -283,7 +276,7 @@ public class SevenSigns
 					}
 				}
 				
-				for (AutoSpawnInstance spawnInst : preacherSpawns.values())
+				for (AutoSpawnInstance spawnInst : preacherSpawns)
 				{
 					if (!AutoSpawnHandler.getInstance().getAutoSpawnInstance(spawnInst.getObjectId(), true).isSpawnActive())
 					{
@@ -295,12 +288,12 @@ public class SevenSigns
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(blacksmithSpawn, false);
 				
-				for (AutoSpawnInstance spawnInst : oratorSpawns.values())
+				for (AutoSpawnInstance spawnInst : oratorSpawns)
 				{
 					AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, false);
 				}
 				
-				for (AutoSpawnInstance spawnInst : preacherSpawns.values())
+				for (AutoSpawnInstance spawnInst : preacherSpawns)
 				{
 					AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, false);
 				}
@@ -328,7 +321,7 @@ public class SevenSigns
 						
 						AutoSpawnHandler.getInstance().setSpawnActive(anakimSpawn, false);
 						
-						for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns.values())
+						for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns)
 						{
 							if (!AutoSpawnHandler.getInstance().getAutoSpawnInstance(dawnCrest.getObjectId(), true).isSpawnActive())
 							{
@@ -336,7 +329,7 @@ public class SevenSigns
 							}
 						}
 						
-						for (AutoSpawnInstance duskCrest : crestOfDuskSpawns.values())
+						for (AutoSpawnInstance duskCrest : crestOfDuskSpawns)
 						{
 							AutoSpawnHandler.getInstance().setSpawnActive(duskCrest, false);
 						}
@@ -350,7 +343,7 @@ public class SevenSigns
 						
 						AutoSpawnHandler.getInstance().setSpawnActive(lilithSpawn, false);
 						
-						for (AutoSpawnInstance duskCrest : crestOfDuskSpawns.values())
+						for (AutoSpawnInstance duskCrest : crestOfDuskSpawns)
 						{
 							if (!AutoSpawnHandler.getInstance().getAutoSpawnInstance(duskCrest.getObjectId(), true).isSpawnActive())
 							{
@@ -358,7 +351,7 @@ public class SevenSigns
 							}
 						}
 						
-						for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns.values())
+						for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns)
 						{
 							AutoSpawnHandler.getInstance().setSpawnActive(dawnCrest, false);
 						}
@@ -370,11 +363,11 @@ public class SevenSigns
 				AutoSpawnHandler.getInstance().setSpawnActive(merchantSpawn, false);
 				AutoSpawnHandler.getInstance().setSpawnActive(lilithSpawn, false);
 				AutoSpawnHandler.getInstance().setSpawnActive(anakimSpawn, false);
-				for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns.values())
+				for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns)
 				{
 					AutoSpawnHandler.getInstance().setSpawnActive(dawnCrest, false);
 				}
-				for (AutoSpawnInstance duskCrest : crestOfDuskSpawns.values())
+				for (AutoSpawnInstance duskCrest : crestOfDuskSpawns)
 				{
 					AutoSpawnHandler.getInstance().setSpawnActive(duskCrest, false);
 				}
@@ -386,25 +379,25 @@ public class SevenSigns
 			AutoSpawnHandler.getInstance().setSpawnActive(blacksmithSpawn, false);
 			AutoSpawnHandler.getInstance().setSpawnActive(lilithSpawn, false);
 			AutoSpawnHandler.getInstance().setSpawnActive(anakimSpawn, false);
-			for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns.values())
+			for (AutoSpawnInstance dawnCrest : crestOfDawnSpawns)
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(dawnCrest, false);
 			}
-			for (AutoSpawnInstance duskCrest : crestOfDuskSpawns.values())
+			for (AutoSpawnInstance duskCrest : crestOfDuskSpawns)
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(duskCrest, false);
 			}
-			for (AutoSpawnInstance spawnInst : oratorSpawns.values())
+			for (AutoSpawnInstance spawnInst : oratorSpawns)
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, false);
 			}
 			
-			for (AutoSpawnInstance spawnInst : preacherSpawns.values())
+			for (AutoSpawnInstance spawnInst : preacherSpawns)
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, false);
 			}
 			
-			for (AutoSpawnInstance spawnInst : marketeerSpawns.values())
+			for (AutoSpawnInstance spawnInst : marketeerSpawns)
 			{
 				AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, false);
 			}
@@ -968,19 +961,13 @@ public class SevenSigns
 	 */
 	protected void resetPlayerData()
 	{
-		int charObjId;
-		
 		// Reset each player's contribution data as well as seal and cabal.
 		for (StatsSet sevenDat : _signsPlayerData.values())
 		{
-			charObjId = sevenDat.getInt("charId");
-			
 			// Reset the player's cabal and seal information
 			sevenDat.set("cabal", "");
 			sevenDat.set("seal", SEAL_NULL);
 			sevenDat.set("contribution_score", 0);
-			
-			_signsPlayerData.put(charObjId, sevenDat);
 		}
 	}
 	
