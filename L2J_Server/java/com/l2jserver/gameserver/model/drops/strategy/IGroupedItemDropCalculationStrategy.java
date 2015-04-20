@@ -109,7 +109,7 @@ public interface IGroupedItemDropCalculationStrategy
 			rolls++;
 		}
 		List<ItemHolder> dropped = new ArrayList<>(rolls);
-		for (; rolls > 0; rolls--)
+		for (int i = 0; i < rolls; i++)
 		{
 			// As further normalizing on already normalized drop group does nothing, we can just pass the calculation to DEFAULT_STRATEGY with precise calculation disabled as we handle it.
 			dropped.addAll(normalized.calculateDrops(victim, killer));
