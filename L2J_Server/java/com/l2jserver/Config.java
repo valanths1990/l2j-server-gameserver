@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2004-2015 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -771,7 +771,6 @@ public final class Config
 	public static int L2JMOD_DUALBOX_CHECK_MAX_L2EVENT_PARTICIPANTS_PER_IP;
 	public static Map<Integer, Integer> L2JMOD_DUALBOX_CHECK_WHITELIST;
 	public static boolean L2JMOD_ALLOW_CHANGE_PASSWORD;
-	public static boolean L2JMOD_OLD_DROP_BEHAVIOR;
 	// --------------------------------------------------
 	// NPC Settings
 	// --------------------------------------------------
@@ -780,6 +779,8 @@ public final class Config
 	public static boolean ALT_ATTACKABLE_NPCS;
 	public static boolean ALT_GAME_VIEWNPC;
 	public static int MAX_DRIFT_RANGE;
+	public static boolean DEEPBLUE_DROP_RULES;
+	public static boolean DEEPBLUE_DROP_RULES_RAID;
 	public static boolean SHOW_NPC_LVL;
 	public static boolean SHOW_CREST_WITHOUT_QUEST;
 	public static boolean ENABLE_RANDOM_ENCHANT_EFFECT;
@@ -855,9 +856,11 @@ public final class Config
 	public static float RATE_DEATH_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_CORPSE_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_HERB_DROP_AMOUNT_MULTIPLIER;
+	public static float RATE_RAID_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_DEATH_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_HERB_DROP_CHANCE_MULTIPLIER;
+	public static float RATE_RAID_DROP_CHANCE_MULTIPLIER;
 	public static Map<Integer, Float> RATE_DROP_AMOUNT_MULTIPLIER;
 	public static Map<Integer, Float> RATE_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_KARMA_LOST;
@@ -1800,6 +1803,7 @@ public final class Config
 			SAVE_DROPPED_ITEM_INTERVAL = General.getInt("SaveDroppedItemInterval", 60) * 60000;
 			CLEAR_DROPPED_ITEM_TABLE = General.getBoolean("ClearDroppedItemTable", false);
 			AUTODELETE_INVALID_QUEST_DATA = General.getBoolean("AutoDeleteInvalidQuestData", false);
+			PRECISE_DROP_CALCULATION = General.getBoolean("PreciseDropCalculation", true);
 			MULTIPLE_ITEM_DROP = General.getBoolean("MultipleItemDrop", true);
 			FORCE_INVENTORY_UPDATE = General.getBoolean("ForceInventoryUpdate", false);
 			LAZY_CACHE = General.getBoolean("LazyCache", true);
@@ -1964,6 +1968,8 @@ public final class Config
 			ALT_ATTACKABLE_NPCS = NPC.getBoolean("AltAttackableNpcs", true);
 			ALT_GAME_VIEWNPC = NPC.getBoolean("AltGameViewNpc", false);
 			MAX_DRIFT_RANGE = NPC.getInt("MaxDriftRange", 300);
+			DEEPBLUE_DROP_RULES = NPC.getBoolean("UseDeepBlueDropRules", true);
+			DEEPBLUE_DROP_RULES_RAID = NPC.getBoolean("UseDeepBlueDropRulesRaid", true);
 			SHOW_NPC_LVL = NPC.getBoolean("ShowNpcLevel", false);
 			SHOW_CREST_WITHOUT_QUEST = NPC.getBoolean("ShowCrestWithoutQuest", false);
 			ENABLE_RANDOM_ENCHANT_EFFECT = NPC.getBoolean("EnableRandomEnchantEffect", false);
@@ -2087,9 +2093,11 @@ public final class Config
 			RATE_DEATH_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("DeathDropAmountMultiplier", 1);
 			RATE_CORPSE_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("CorpseDropAmountMultiplier", 1);
 			RATE_HERB_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("HerbDropAmountMultiplier", 1);
+			RATE_RAID_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("RaidDropAmountMultiplier", 1);
 			RATE_DEATH_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("DeathDropChanceMultiplier", 1);
 			RATE_CORPSE_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("CorpseDropChanceMultiplier", 1);
 			RATE_HERB_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("HerbDropChanceMultiplier", 1);
+			RATE_RAID_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("RaidDropChanceMultiplier", 1);
 			String[] dropAmountMultiplier = RatesSettings.getString("DropAmountMultiplierByItemId", "").split(";");
 			RATE_DROP_AMOUNT_MULTIPLIER = new HashMap<>(dropAmountMultiplier.length);
 			if (!dropAmountMultiplier[0].isEmpty())
@@ -2188,8 +2196,6 @@ public final class Config
 			
 			L2JMOD_ENABLE_WAREHOUSESORTING_CLAN = L2JModSettings.getBoolean("EnableWarehouseSortingClan", false);
 			L2JMOD_ENABLE_WAREHOUSESORTING_PRIVATE = L2JModSettings.getBoolean("EnableWarehouseSortingPrivate", false);
-			
-			L2JMOD_OLD_DROP_BEHAVIOR = L2JModSettings.getBoolean("OldDropBehavior", false);
 			
 			if (TVT_EVENT_PARTICIPATION_NPC_ID == 0)
 			{
@@ -2955,6 +2961,9 @@ public final class Config
 			case "cleardroppeditemtable":
 				CLEAR_DROPPED_ITEM_TABLE = Boolean.parseBoolean(pValue);
 				break;
+			case "precisedropcalculation":
+				PRECISE_DROP_CALCULATION = Boolean.parseBoolean(pValue);
+				break;
 			case "multipleitemdrop":
 				MULTIPLE_ITEM_DROP = Boolean.parseBoolean(pValue);
 				break;
@@ -3097,6 +3106,12 @@ public final class Config
 				break;
 			case "maxdriftrange":
 				MAX_DRIFT_RANGE = Integer.parseInt(pValue);
+				break;
+			case "usedeepbluedroprules":
+				DEEPBLUE_DROP_RULES = Boolean.parseBoolean(pValue);
+				break;
+			case "usedeepbluedroprulesraid":
+				DEEPBLUE_DROP_RULES_RAID = Boolean.parseBoolean(pValue);
 				break;
 			case "guardattackaggromob":
 				GUARD_ATTACK_AGGRO_MOB = Boolean.parseBoolean(pValue);
