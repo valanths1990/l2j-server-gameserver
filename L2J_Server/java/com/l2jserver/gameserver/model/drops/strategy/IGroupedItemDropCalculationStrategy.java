@@ -61,7 +61,7 @@ public interface IGroupedItemDropCalculationStrategy
 			GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer);
 			if (normalized.getChance() > (Rnd.nextDouble() * 100))
 			{
-				double random = (Rnd.nextDouble() * 100);
+				final double random = (Rnd.nextDouble() * 100);
 				double totalChance = 0;
 				for (GeneralDropItem item2 : normalized.getItems())
 				{
@@ -79,9 +79,7 @@ public interface IGroupedItemDropCalculationStrategy
 							}
 						}
 						
-						long amount = Rnd.get(item2.getMin(victim), item2.getMax(victim)) * amountMultiply;
-						
-						return Collections.singletonList(new ItemHolder(item2.getItemId(), amount));
+						return Collections.singletonList(new ItemHolder(item2.getItemId(), Rnd.get(item2.getMin(victim), item2.getMax(victim)) * amountMultiply));
 					}
 				}
 			}

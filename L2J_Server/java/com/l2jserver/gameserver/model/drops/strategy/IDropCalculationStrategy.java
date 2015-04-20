@@ -46,9 +46,7 @@ public interface IDropCalculationStrategy
 				}
 			}
 			
-			long amount = Rnd.get(item.getMin(victim), item.getMax(victim)) * amountMultiply;
-			
-			return Collections.singletonList(new ItemHolder(item.getItemId(), amount));
+			return Collections.singletonList(new ItemHolder(item.getItemId(), Rnd.get(item.getMin(victim), item.getMax(victim)) * amountMultiply));
 		}
 		
 		return null;
