@@ -771,7 +771,6 @@ public final class Config
 	public static int L2JMOD_DUALBOX_CHECK_MAX_L2EVENT_PARTICIPANTS_PER_IP;
 	public static Map<Integer, Integer> L2JMOD_DUALBOX_CHECK_WHITELIST;
 	public static boolean L2JMOD_ALLOW_CHANGE_PASSWORD;
-	public static boolean L2JMOD_OLD_DROP_BEHAVIOR;
 	// --------------------------------------------------
 	// NPC Settings
 	// --------------------------------------------------
@@ -2197,8 +2196,6 @@ public final class Config
 			
 			L2JMOD_ENABLE_WAREHOUSESORTING_CLAN = L2JModSettings.getBoolean("EnableWarehouseSortingClan", false);
 			L2JMOD_ENABLE_WAREHOUSESORTING_PRIVATE = L2JModSettings.getBoolean("EnableWarehouseSortingPrivate", false);
-			
-			L2JMOD_OLD_DROP_BEHAVIOR = L2JModSettings.getBoolean("OldDropBehavior", false);
 			
 			if (TVT_EVENT_PARTICIPATION_NPC_ID == 0)
 			{
