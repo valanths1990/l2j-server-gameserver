@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.model.drops.strategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.drops.GeneralDropItem;
@@ -37,43 +39,54 @@ public interface IGroupedItemDropCalculationStrategy
 	/**
 	 * The default strategy used in L2J to calculate drops. When the group's chance raises over 100% and group has precise calculation, the dropped item's amount increases.
 	 */
-	public static final IGroupedItemDropCalculationStrategy DEFAULT_STRATEGY = (dropItem, victim, killer) ->
+	public static final IGroupedItemDropCalculationStrategy DEFAULT_STRATEGY = new IGroupedItemDropCalculationStrategy()
 	{
-		if (dropItem.getItems().size() == 1)
+		private final Map<GroupedGeneralDropItem, GeneralDropItem> singleItemCache = new ConcurrentHashMap<>();
+		
+		private GeneralDropItem getSingleItem(GroupedGeneralDropItem dropItem)
 		{
-			
 			final GeneralDropItem item1 = dropItem.getItems().iterator().next();
-			return new GeneralDropItem(item1.getItemId(), item1.getMin(), item1.getMax(), (item1.getChance() * dropItem.getChance()) / 100, item1.getAmountStrategy(), item1.getChanceStrategy(), dropItem.getPreciseStrategy(), dropItem.getKillerChanceModifierStrategy(), item1.getDropCalculationStrategy()).calculateDrops(victim, killer);
+			singleItemCache.putIfAbsent(dropItem, new GeneralDropItem(item1.getItemId(), item1.getMin(), item1.getMax(), (item1.getChance() * dropItem.getChance()) / 100, item1.getAmountStrategy(), item1.getChanceStrategy(), dropItem.getPreciseStrategy(), dropItem.getKillerChanceModifierStrategy(), item1.getDropCalculationStrategy()));
+			return singleItemCache.get(dropItem);
 		}
 		
-		GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer);
-		if (normalized.getChance() > (Rnd.nextDouble() * 100))
+		@Override
+		public List<ItemHolder> calculateDrops(GroupedGeneralDropItem dropItem, L2Character victim, L2Character killer)
 		{
-			double random = (Rnd.nextDouble() * 100);
-			double totalChance = 0;
-			for (GeneralDropItem item2 : normalized.getItems())
+			if (dropItem.getItems().size() == 1)
 			{
-				// Grouped item chance rates should not be modified (the whole magic was already done by normalizing thus the items' chance sum is always 100%).
-				totalChance += item2.getChance();
-				if (totalChance > random)
+				return getSingleItem(dropItem).calculateDrops(victim, killer);
+			}
+			
+			GroupedGeneralDropItem normalized = dropItem.normalizeMe(victim, killer);
+			if (normalized.getChance() > (Rnd.nextDouble() * 100))
+			{
+				double random = (Rnd.nextDouble() * 100);
+				double totalChance = 0;
+				for (GeneralDropItem item2 : normalized.getItems())
 				{
-					int amountMultiply = 1;
-					if (dropItem.isPreciseCalculated() && (normalized.getChance() >= 100))
+					// Grouped item chance rates should not be modified (the whole magic was already done by normalizing thus the items' chance sum is always 100%).
+					totalChance += item2.getChance();
+					if (totalChance > random)
 					{
-						amountMultiply = (int) (normalized.getChance()) / 100;
-						if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))
+						int amountMultiply = 1;
+						if (dropItem.isPreciseCalculated() && (normalized.getChance() >= 100))
 						{
-							amountMultiply++;
+							amountMultiply = (int) (normalized.getChance()) / 100;
+							if ((normalized.getChance() % 100) > (Rnd.nextDouble() * 100))
+							{
+								amountMultiply++;
+							}
 						}
+						
+						long amount = Rnd.get(item2.getMin(victim) * amountMultiply, item2.getMax(victim) * amountMultiply);
+						
+						return Collections.singletonList(new ItemHolder(item2.getItemId(), amount));
 					}
-					
-					long amount = Rnd.get(item2.getMin(victim) * amountMultiply, item2.getMax(victim) * amountMultiply);
-					
-					return Collections.singletonList(new ItemHolder(item2.getItemId(), amount));
 				}
 			}
+			return null;
 		}
-		return null;
 	};
 	
 	/**
