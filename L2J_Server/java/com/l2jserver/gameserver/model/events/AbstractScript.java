@@ -2670,7 +2670,7 @@ public abstract class AbstractScript implements INamable
 		{
 			toDrop = new GroupedGeneralDropItem(items.getChance(), items.getDropCalculationStrategy(), items.getKillerChanceModifierStrategy(), items.getPreciseStrategy());
 			List<GeneralDropItem> dropItems = new LinkedList<>(items.getItems());
-			itemLoop: for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)
+			ITEM_LOOP: for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)
 			{
 				GeneralDropItem item = it.next();
 				for (L2PcInstance player : players)
@@ -2679,7 +2679,7 @@ public abstract class AbstractScript implements INamable
 					if (player.getInventory().getInventoryItemCount(itemId, -1, true) < avoidNull(limit, itemId))
 					{
 						// we can give this item to this player
-						continue itemLoop;
+						continue ITEM_LOOP;
 					}
 				}
 				// there's nobody to give this item to
@@ -2740,7 +2740,7 @@ public abstract class AbstractScript implements INamable
 		{
 			rewardedCounts.put(player, new HashMap<Integer, Long>());
 		}
-		nextItem: for (ItemHolder item : items)
+		NEXT_ITEM: for (ItemHolder item : items)
 		{
 			long equaldist = item.getCount() / players.size();
 			long randomdist = item.getCount() % players.size();
@@ -2767,7 +2767,7 @@ public abstract class AbstractScript implements INamable
 				if (toDist.isEmpty())
 				{
 					// there's no one to give items anymore, all players will be full when we give the items
-					continue nextItem;
+					continue NEXT_ITEM;
 				}
 				equaldist = randomdist / toDist.size(); // the rest of items may be allowed to be equally distributed between remaining players
 				randomdist %= toDist.size();
@@ -2778,7 +2778,7 @@ public abstract class AbstractScript implements INamable
 				if (toDist.isEmpty())
 				{
 					// we don't have any player left
-					continue nextItem;
+					continue NEXT_ITEM;
 				}
 				L2PcInstance player = toDist.get(getRandom(toDist.size()));
 				// avoid null return
