@@ -33,13 +33,14 @@ public interface IDropCalculationStrategy
 {
 	public static final IDropCalculationStrategy DEFAULT_STRATEGY = (item, victim, killer) ->
 	{
-		if (item.getChance(victim, killer) > (Rnd.nextDouble() * 100))
+		double chance = item.getChance(victim, killer);
+		if (chance > (Rnd.nextDouble() * 100))
 		{
 			int amountMultiply = 1;
-			if (item.isPreciseCalculated() && (item.getChance(victim, killer) > 100))
+			if (item.isPreciseCalculated() && (chance > 100))
 			{
-				amountMultiply = (int) item.getChance(victim, killer) / 100;
-				if ((item.getChance(victim, killer) % 100) > (Rnd.nextDouble() * 100))
+				amountMultiply = (int) chance / 100;
+				if ((chance % 100) > (Rnd.nextDouble() * 100))
 				{
 					amountMultiply++;
 				}
