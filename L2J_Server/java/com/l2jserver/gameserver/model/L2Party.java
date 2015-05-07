@@ -618,20 +618,27 @@ public class L2Party extends AbstractPlayerGroup
 		target.addItem("Party", item, player, true);
 		
 		// Send messages to other party members about reward
-		if (item.getCount() > 1)
+		if (item.getCount() > 0)
 		{
-			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S3_S2);
-			msg.addString(target.getName());
-			msg.addItemName(item);
-			msg.addLong(item.getCount());
-			broadcastToPartyMembers(target, msg);
+			if (item.getCount() > 1)
+			{
+				SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S3_S2);
+				msg.addString(target.getName());
+				msg.addItemName(item);
+				msg.addLong(item.getCount());
+				broadcastToPartyMembers(target, msg);
+			}
+			else
+			{
+				SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S2);
+				msg.addString(target.getName());
+				msg.addItemName(item);
+				broadcastToPartyMembers(target, msg);
+			}
 		}
 		else
 		{
-			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S2);
-			msg.addString(target.getName());
-			msg.addItemName(item);
-			broadcastToPartyMembers(target, msg);
+			// nothing, for AutoLoot
 		}
 	}
 	
@@ -656,20 +663,27 @@ public class L2Party extends AbstractPlayerGroup
 		looter.addItem(spoil ? "Sweeper Party" : "Party", itemId, itemCount, target, true);
 		
 		// Send messages to other party members about reward
-		if (itemCount > 1)
+		if (itemCount > 0)
 		{
-			SystemMessage msg = spoil ? SystemMessage.getSystemMessage(SystemMessageId.C1_SWEEPED_UP_S3_S2) : SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S3_S2);
-			msg.addString(looter.getName());
-			msg.addItemName(itemId);
-			msg.addLong(itemCount);
-			broadcastToPartyMembers(looter, msg);
+			if (itemCount > 1)
+			{
+				SystemMessage msg = spoil ? SystemMessage.getSystemMessage(SystemMessageId.C1_SWEEPED_UP_S3_S2) : SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S3_S2);
+				msg.addString(looter.getName());
+				msg.addItemName(itemId);
+				msg.addLong(itemCount);
+				broadcastToPartyMembers(looter, msg);
+			}
+			else
+			{
+				SystemMessage msg = spoil ? SystemMessage.getSystemMessage(SystemMessageId.C1_SWEEPED_UP_S2) : SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S2);
+				msg.addString(looter.getName());
+				msg.addItemName(itemId);
+				broadcastToPartyMembers(looter, msg);
+			}
 		}
 		else
 		{
-			SystemMessage msg = spoil ? SystemMessage.getSystemMessage(SystemMessageId.C1_SWEEPED_UP_S2) : SystemMessage.getSystemMessage(SystemMessageId.C1_OBTAINED_S2);
-			msg.addString(looter.getName());
-			msg.addItemName(itemId);
-			broadcastToPartyMembers(looter, msg);
+			// nothing, for AutoLoot
 		}
 	}
 	
