@@ -1098,8 +1098,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			// Get the Attack Speed of the L2Character (delay (in milliseconds) before next attack)
 			final int timeAtk = calculateTimeBetweenAttacks(target, weaponItem);
 			// the hit is calculated to happen halfway to the animation - might need further tuning e.g. in bow case
-			final int timeToHit = timeAtk / 2;
-			_attackEndTime = System.currentTimeMillis() + timeAtk;
+			final int timeToHit = timeAtk * 500;
+			_attackEndTime = System.nanoTime() + timeAtk;
 			final int ssGrade = (weaponItem != null) ? weaponItem.getItemGradeSPlus().getId() : 0;
 			// Create a Server->Client packet Attack
 			Attack attack = new Attack(this, target, wasSSCharged, ssGrade);
@@ -3959,11 +3959,12 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * @return True if the L2Character is attacking.
+	 * Verifies if the creature is attacking now.
+	 * @return {@code true} if the creature is attacking now, {@code false} otherwise
 	 */
 	public final boolean isAttackingNow()
 	{
-		return _attackEndTime > System.currentTimeMillis();
+		return _attackEndTime > System.nanoTime();
 	}
 	
 	/**
