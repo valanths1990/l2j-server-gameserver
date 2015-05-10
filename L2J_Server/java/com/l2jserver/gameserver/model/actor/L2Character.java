@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.StampedLock;
 import java.util.logging.Level;
@@ -1098,8 +1099,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			// Get the Attack Speed of the L2Character (delay (in milliseconds) before next attack)
 			final int timeAtk = calculateTimeBetweenAttacks(target, weaponItem);
 			// the hit is calculated to happen halfway to the animation - might need further tuning e.g. in bow case
-			final int timeToHit = timeAtk * 500;
-			_attackEndTime = System.nanoTime() + timeAtk;
+			final int timeToHit = timeAtk / 2;
+			_attackEndTime = System.nanoTime() + TimeUnit.NANOSECONDS.convert(timeAtk, TimeUnit.MILLISECONDS);
 			final int ssGrade = (weaponItem != null) ? weaponItem.getItemGradeSPlus().getId() : 0;
 			// Create a Server->Client packet Attack
 			Attack attack = new Attack(this, target, wasSSCharged, ssGrade);
