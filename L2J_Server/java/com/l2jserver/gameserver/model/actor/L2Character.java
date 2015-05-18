@@ -259,8 +259,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	/** This creature's target. */
 	private L2Object _target;
-	
-	// set by the start of attack, in game ticks
+	/** Represents the time where the attack should end, in nanoseconds. */
 	private volatile long _attackEndTime;
 	private int _disableBowAttackEndTime;
 	private int _disableCrossBowAttackEndTime;
