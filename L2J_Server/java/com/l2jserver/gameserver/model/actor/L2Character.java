@@ -5447,9 +5447,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		if ((targets.length > 0) && (escapeRange > 0))
 		{
-			int _skiprange = 0;
-			int _skipgeo = 0;
-			int _skippeace = 0;
+			int skipRange = 0;
+			int skipLOS = 0;
+			int skipPeaceZone = 0;
 			final List<L2Object> targetList = new ArrayList<>();
 			for (L2Object target : targets)
 			{
@@ -5457,21 +5457,25 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				{
 					if (!isInsideRadius(target.getX(), target.getY(), target.getZ(), escapeRange + getTemplate().getCollisionRadius(), true, false))
 					{
-						_skiprange++;
+						skipRange++;
 						continue;
 					}
-					if ((escapeRange > 0) && !GeoData.getInstance().canSeeTarget(this, target))
+					
+					// Healing party members should ignore LOS.
+					if (((skill.getTargetType() != L2TargetType.PARTY) || !skill.hasEffectType(L2EffectType.HEAL)) //
+						&& !GeoData.getInstance().canSeeTarget(this, target))
 					{
-						_skipgeo++;
+						skipLOS++;
 						continue;
 					}
+					
 					if (skill.isBad())
 					{
 						if (isPlayer())
 						{
 							if (((L2Character) target).isInsidePeaceZone(getActingPlayer()))
 							{
-								_skippeace++;
+								skipPeaceZone++;
 								continue;
 							}
 						}
@@ -5479,7 +5483,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 						{
 							if (((L2Character) target).isInsidePeaceZone(this, target))
 							{
-								_skippeace++;
+								skipPeaceZone++;
 								continue;
 							}
 						}
@@ -5491,15 +5495,15 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				if (isPlayer())
 				{
-					if (_skiprange > 0)
+					if (skipRange > 0)
 					{
 						sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
 					}
-					else if (_skipgeo > 0)
+					else if (skipLOS > 0)
 					{
 						sendPacket(SystemMessageId.CANT_SEE_TARGET);
 					}
-					else if (_skippeace > 0)
+					else if (skipPeaceZone > 0)
 					{
 						sendPacket(SystemMessageId.A_MALICIOUS_SKILL_CANNOT_BE_USED_IN_PEACE_ZONE);
 					}
