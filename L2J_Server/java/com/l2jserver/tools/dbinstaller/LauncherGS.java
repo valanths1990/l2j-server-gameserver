@@ -29,13 +29,19 @@ import com.l2jserver.tools.dbinstaller.gui.DBConfigGUI;
  * Contains main class for Database Installer If system doesn't support the graphical UI, start the installer in console mode.
  * @author mrTJO
  */
-public class LauncherGS
+public class LauncherGS extends AbstractDBLauncher
 {
 	public static void main(String[] args)
 	{
-		String mode = "l2jgs";
+		String defDatabase = "l2jgs";
 		String dir = "../sql/game/";
-		String cleanUp = "gs_cleanup.sql";
+		String cleanUpScript = "gs_cleanup.sql";
+		
+		if ((args != null) && (args.length > 0))
+		{
+			new DBInstallerConsole(defDatabase, dir, cleanUpScript, getArg("-h", args), getArg("-p", args), getArg("-u", args), getArg("-pw", args), getArg("-d", args), getArg("-m", args));
+			return;
+		}
 		
 		try
 		{
@@ -48,11 +54,11 @@ public class LauncherGS
 		
 		try
 		{
-			new DBConfigGUI(mode, dir, cleanUp);
+			new DBConfigGUI(defDatabase, dir, cleanUpScript);
 		}
 		catch (HeadlessException e)
 		{
-			new DBInstallerConsole(mode, dir, cleanUp);
+			new DBInstallerConsole(defDatabase, dir, cleanUpScript);
 		}
 	}
 }
