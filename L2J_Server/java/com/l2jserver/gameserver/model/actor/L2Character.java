@@ -5960,8 +5960,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 				}
 			}
+			
 			// Notify AI
-			if (skill.isBad() && (skill.getTargetType() != L2TargetType.SELF) && !skill.hasEffectType(L2EffectType.HATE))
+			if (skill.isBad() && !skill.hasEffectType(L2EffectType.HATE))
 			{
 				for (L2Object target : targets)
 				{
@@ -5970,7 +5971,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 						final L2Character creature = (L2Character) target;
 						if (creature.hasAI())
 						{
-							// notify target AI about the attack
+							// Notify target AI about the attack
 							creature.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, this);
 						}
 					}
