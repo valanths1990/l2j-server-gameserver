@@ -171,7 +171,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	@Override
 	public int getId()
 	{
-		return new QuestState(this, player, _initialState);
+		return _questId;
 	}
 	
 	/**
@@ -179,7 +179,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 * @param player the owner of the newly created quest state
 	 * @return the newly created {@link QuestState} object
 	 */
-	public QuestState getQuestState(L2PcInstance player, boolean initIfNone)
+	public QuestState newQuestState(L2PcInstance player)
 	{
 		return new QuestState(this, player, _initialState);
 	}
@@ -253,10 +253,6 @@ public class Quest extends AbstractScript implements IIdentifiable
 					_questTimers = new ConcurrentHashMap<>(1);
 				}
 			}
-			finally
-			{
-				_readLock.unlock();
-			}
 		}
 		return _questTimers;
 	}
@@ -319,17 +315,13 @@ public class Quest extends AbstractScript implements IIdentifiable
 						}
 					}
 				}
-				timers.clear();
-			}
-			finally
-			{
-				_writeLock.unlock();
 			}
 			finally
 			{
 				_readLock.unlock();
 			}
 		}
+		return null;
 	}
 	
 	/**
@@ -2658,23 +2650,16 @@ public class Quest extends AbstractScript implements IIdentifiable
 				npcReply.replace("%playername%", player.getName());
 				player.sendPacket(npcReply);
 			}
-		}
-		else
-		{
-			int highestRoll = 0;
-			
-			for (L2PcInstance member : party.getMembers())
+			else
 			{
 				final NpcHtmlMessage npcReply = new NpcHtmlMessage(npc != null ? npc.getObjectId() : 0, content);
 				npcReply.replace("%playername%", player.getName());
 				player.sendPacket(npcReply);
 			}
+			player.sendPacket(ActionFailed.STATIC_PACKET);
 		}
-		if ((luckyPlayer != null) && checkDistanceToTarget(luckyPlayer, npc))
-		{
-			return luckyPlayer;
-		}
-		return null;
+		
+		return content;
 	}
 	
 	/**
@@ -2682,22 +2667,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 * @param fileName the html file to be get.
 	 * @return the HTML file contents
 	 */
-	public boolean checkPartyMember(L2PcInstance player, L2Npc npc)
-	{
-		return true;
-	}
-	
-	/**
-	 * Get a random party member from the player's party who has this quest at the specified quest progress.<br>
-	 * If the player is not in a party, only the player himself is checked.
-	 * @param player the player whose random party member state to get
-	 * @param condition the quest progress step the random member should be at (-1 = check only if quest is started)
-	 * @param playerChance how many times more chance does the player get compared to other party members (3 - 3x more chance).<br>
-	 *            On retail servers, the killer usually gets 2-3x more chance than other party members
-	 * @param target the NPC to use for the distance check (can be null)
-	 * @return the {@link QuestState} object of the random party member or {@code null} if none matched the condition
-	 */
-	public QuestState getRandomPartyMemberState(L2PcInstance player, int condition, int playerChance, L2Npc target)
+	public String getHtm(String prefix, String fileName)
 	{
 		final HtmCache hc = HtmCache.getInstance();
 		String content = hc.getHtm(prefix, fileName.startsWith("data/") ? fileName : "data/scripts/" + getDescr().toLowerCase() + "/" + getName() + "/" + fileName);
@@ -2847,7 +2817,6 @@ public class Quest extends AbstractScript implements IIdentifiable
 					_startCondition = new LinkedHashMap<>(1);
 				}
 			}
-			player.sendPacket(ActionFailed.STATIC_PACKET);
 		}
 		return _startCondition;
 	}

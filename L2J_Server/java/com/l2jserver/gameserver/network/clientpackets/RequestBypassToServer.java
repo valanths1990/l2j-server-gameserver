@@ -272,7 +272,7 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					EventDispatcher.getInstance().notifyEventAsync(new OnNpcManorBypass(activeChar, lastNpc, ask, state, time), lastNpc);
 				}
 			}
-			else if (_command.startsWith("_olympiad?command"))
+			else
 			{
 				final IBypassHandler handler = BypassHandler.getInstance().getHandler(_command);
 				if (handler != null)

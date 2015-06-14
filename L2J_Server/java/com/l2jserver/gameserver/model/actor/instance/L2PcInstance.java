@@ -1135,13 +1135,13 @@ public final class L2PcInstance extends L2Playable
 	
 	public final PcAppearance getAppearance()
 	{
-		return (L2PcTemplate) super.getTemplate();
+		return _appearance;
 	}
 	
 	/**
 	 * @return the base L2PcTemplate link to the L2PcInstance.
 	 */
-	public void setTemplate(ClassId newclass)
+	public final L2PcTemplate getBaseTemplate()
 	{
 		return PlayerTemplateData.getInstance().getTemplate(_baseClass);
 	}
@@ -3655,69 +3655,6 @@ public final class L2PcInstance extends L2Playable
 				sendPacket(SystemMessageId.WEIGHT_LIMIT_EXCEEDED);
 			}
 			return false;
-		}
-		
-		if (destroyItemByItemId(process, coinId, cost, reference, sendMessage))
-		{
-			addItem(process, rewardId, count, reference, sendMessage);
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Drop item from inventory and send a Server->Client InventoryUpdate packet to the L2PcInstance.
-	 * @param process String Identifier of process triggering this action
-	 * @param item L2ItemInstance to be dropped
-	 * @param reference L2Object Object referencing current action like NPC selling item or previous item in transformation
-	 * @param sendMessage boolean Specifies whether to send message to Client about this action
-	 * @param protectItem whether or not dropped item must be protected temporary against other players
-	 * @return boolean informing if the action was successful
-	 */
-	public boolean dropItem(String process, L2ItemInstance item, L2Object reference, boolean sendMessage, boolean protectItem)
-	{
-		final PcInventory inv = getInventory();
-		if (!inv.validateCapacityByItemId(rewardId, count))
-		{
-			if (sendMessage)
-			{
-				sendPacket(SystemMessageId.NOT_ENOUGH_ITEMS);
-			}
-			
-			return false;
-		}
-		
-		item.dropMe(this, (getX() + Rnd.get(50)) - 25, (getY() + Rnd.get(50)) - 25, getZ() + 20);
-		
-		if ((Config.AUTODESTROY_ITEM_AFTER > 0) && Config.DESTROY_DROPPED_PLAYER_ITEM && !Config.LIST_PROTECTED_ITEMS.contains(item.getId()))
-		{
-			if ((item.isEquipable() && Config.DESTROY_EQUIPABLE_PLAYER_ITEM) || !item.isEquipable())
-			{
-				ItemsAutoDestroy.getInstance().addItem(item);
-			}
-		}
-		
-		// protection against auto destroy dropped item
-		if (Config.DESTROY_DROPPED_PLAYER_ITEM)
-		{
-			if (!item.isEquipable() || (item.isEquipable() && Config.DESTROY_EQUIPABLE_PLAYER_ITEM))
-			{
-				item.setProtected(false);
-			}
-			else
-			{
-				item.setProtected(true);
-			}
-		}
-		else
-		{
-			item.setProtected(true);
-		}
-		
-		// retail drop protection
-		if (protectItem)
-		{
-			item.getDropProtection().protect(this);
 		}
 		
 		if (destroyItemByItemId(process, coinId, cost, reference, sendMessage))
@@ -7520,11 +7457,7 @@ public final class L2PcInstance extends L2Playable
 						continue;
 					}
 					
-					// Dances and songs are not kept in retail.
-					if (skill.isDance() && !Config.ALT_STORE_DANCES)
-					{
-						continue;
-					}
+					storedSkills.add(skill.getReuseHashCode());
 					
 					statement.setInt(1, getObjectId());
 					statement.setInt(2, skill.getId());
@@ -7570,22 +7503,6 @@ public final class L2PcInstance extends L2Playable
 						statement.setInt(9, ++buff_index);
 						statement.execute();
 					}
-					
-					storedSkills.add(skill.getReuseHashCode());
-					
-					statement.setInt(1, getObjectId());
-					statement.setInt(2, skill.getId());
-					statement.setInt(3, skill.getLevel());
-					statement.setInt(4, info.getTime());
-					
-					final TimeStamp t = getSkillReuseTimeStamp(skill.getReuseHashCode());
-					statement.setLong(5, (t != null) && t.hasNotPassed() ? t.getReuse() : 0);
-					statement.setDouble(6, (t != null) && t.hasNotPassed() ? t.getStamp() : 0);
-					
-					statement.setInt(7, 0); // Store type 0, active buffs/debuffs.
-					statement.setInt(8, getClassIndex());
-					statement.setInt(9, ++buff_index);
-					statement.execute();
 				}
 			}
 		}
@@ -7975,7 +7892,6 @@ public final class L2PcInstance extends L2Playable
 							}
 						}
 					}
-					_henna[slot - 1] = HennaData.getInstance().getHenna(symbolId);
 				}
 			}
 			
@@ -9892,46 +9808,6 @@ public final class L2PcInstance extends L2Playable
 		}
 		if (isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.PEACE) || isInsideZone(ZoneId.SIEGE))
 		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_CURRENTLY_ENGAGED_IN_BATTLE;
-			return false;
-		}
-		if (isDead() || isAlikeDead() || ((getCurrentHp() < (getMaxHp() / 2)) || (getCurrentMp() < (getMaxMp() / 2))))
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_HP_OR_MP_IS_BELOW_50_PERCENT;
-			return false;
-		}
-		if (isInDuel())
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_ALREADY_ENGAGED_IN_A_DUEL;
-			return false;
-		}
-		if (isInOlympiadMode())
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_PARTICIPATING_IN_THE_OLYMPIAD;
-			return false;
-		}
-		if (isCursedWeaponEquipped())
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_IN_A_CHAOTIC_STATE;
-			return false;
-		}
-		if (getPrivateStoreType() != PrivateStoreType.NONE)
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_CURRENTLY_ENGAGED_IN_A_PRIVATE_STORE_OR_MANUFACTURE;
-			return false;
-		}
-		if (isMounted() || isInBoat())
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_CURRENTLY_RIDING_A_BOAT_STEED_OR_STRIDER;
-			return false;
-		}
-		if (isFishing())
-		{
-			_noDuelReason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_CURRENTLY_FISHING;
-			return false;
-		}
-		if (isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.PEACE) || isInsideZone(ZoneId.SIEGE))
-		{
 			_noDuelReason = SystemMessageId.C1_CANNOT_MAKE_A_CHALLANGE_TO_A_DUEL_BECAUSE_C1_IS_CURRENTLY_IN_A_DUEL_PROHIBITED_AREA;
 			return false;
 		}
@@ -10096,8 +9972,6 @@ public final class L2PcInstance extends L2Playable
 			{
 				sl.addSkill(transformSkill.getKey(), transformSkill.getValue(), false, false, false);
 			}
-			
-			sl.addSkill(s.getDisplayId(), s.getDisplayLevel(), s.isPassive(), isDisabled, isEnchantable);
 		}
 		sendPacket(sl);
 	}
@@ -14532,330 +14406,5 @@ public final class L2PcInstance extends L2Playable
 	public boolean isOnSameSiegeSideWith(L2Character target)
 	{
 		return (getSiegeState() > 0) && isInsideZone(ZoneId.SIEGE) && (getSiegeState() == target.getSiegeState()) && (getSiegeSide() == target.getSiegeSide());
-	}
-	
-	public void setLastPetitionGmName(String gmName)
-	{
-		_lastPetitionGmName = gmName;
-	}
-	
-	public String getLastPetitionGmName()
-	{
-		return _lastPetitionGmName;
-	}
-	
-	public L2ContactList getContactList()
-	{
-		return _contactList;
-	}
-	
-	public void setEventStatus()
-	{
-		eventStatus = new PlayerEventHolder(this);
-	}
-	
-	public void setEventStatus(PlayerEventHolder pes)
-	{
-		eventStatus = pes;
-	}
-	
-	public PlayerEventHolder getEventStatus()
-	{
-		return eventStatus;
-	}
-	
-	public long getNotMoveUntil()
-	{
-		return _notMoveUntil;
-	}
-	
-	public void updateNotMoveUntil()
-	{
-		_notMoveUntil = System.currentTimeMillis() + Config.PLAYER_MOVEMENT_BLOCK_TIME;
-	}
-	
-	@Override
-	public boolean isPlayer()
-	{
-		return true;
-	}
-	
-	@Override
-	public boolean isChargedShot(ShotType type)
-	{
-		final L2ItemInstance weapon = getActiveWeaponInstance();
-		return (weapon != null) && weapon.isChargedShot(type);
-	}
-	
-	@Override
-	public void setChargedShot(ShotType type, boolean charged)
-	{
-		final L2ItemInstance weapon = getActiveWeaponInstance();
-		if (weapon != null)
-		{
-			weapon.setChargedShot(type, charged);
-		}
-	}
-	
-	/**
-	 * @param skillId the display skill Id
-	 * @return the custom skill
-	 */
-	public final Skill getCustomSkill(int skillId)
-	{
-		return (_customSkills != null) ? _customSkills.get(skillId) : null;
-	}
-	
-	/**
-	 * Add a skill level to the custom skills map.
-	 * @param skill the skill to add
-	 */
-	private final void addCustomSkill(Skill skill)
-	{
-		if ((skill != null) && (skill.getDisplayId() != skill.getId()))
-		{
-			if (_customSkills == null)
-			{
-				_customSkills = new FastMap<Integer, Skill>().shared();
-			}
-			_customSkills.put(skill.getDisplayId(), skill);
-		}
-	}
-	
-	/**
-	 * Remove a skill level from the custom skill map.
-	 * @param skill the skill to remove
-	 */
-	private final void removeCustomSkill(Skill skill)
-	{
-		if ((skill != null) && (_customSkills != null) && (skill.getDisplayId() != skill.getId()))
-		{
-			_customSkills.remove(skill.getDisplayId());
-		}
-	}
-	
-	/**
-	 * @return {@code true} if current player can revive and shows 'To Village' button upon death, {@code false} otherwise.
-	 */
-	@Override
-	public boolean canRevive()
-	{
-		for (IEventListener listener : _eventListeners)
-		{
-			if (listener.isOnEvent() && !listener.canRevive())
-			{
-				return false;
-			}
-		}
-		return _canRevive;
-	}
-	
-	/**
-	 * This method can prevent from displaying 'To Village' button upon death.
-	 * @param val
-	 */
-	@Override
-	public void setCanRevive(boolean val)
-	{
-		_canRevive = val;
-	}
-	
-	/**
-	 * @return {@code true} if player is on event, {@code false} otherwise.
-	 */
-	@Override
-	public boolean isOnEvent()
-	{
-		for (IEventListener listener : _eventListeners)
-		{
-			if (listener.isOnEvent())
-			{
-				return true;
-			}
-		}
-		return super.isOnEvent();
-	}
-	
-	public boolean isBlockedFromExit()
-	{
-		for (IEventListener listener : _eventListeners)
-		{
-			if (listener.isOnEvent() && listener.isBlockingExit())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean isBlockedFromDeathPenalty()
-	{
-		for (IEventListener listener : _eventListeners)
-		{
-			if (listener.isOnEvent() && listener.isBlockingDeathPenalty())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public void setOriginalCpHpMp(double cp, double hp, double mp)
-	{
-		_originalCp = cp;
-		_originalHp = hp;
-		_originalMp = mp;
-	}
-	
-	@Override
-	public void addOverrideCond(PcCondOverride... excs)
-	{
-		super.addOverrideCond(excs);
-		getVariables().set(COND_OVERRIDE_KEY, Long.toString(_exceptions));
-	}
-	
-	@Override
-	public void removeOverridedCond(PcCondOverride... excs)
-	{
-		super.removeOverridedCond(excs);
-		getVariables().set(COND_OVERRIDE_KEY, Long.toString(_exceptions));
-	}
-	
-	/**
-	 * @return {@code true} if {@link PlayerVariables} instance is attached to current player's scripts, {@code false} otherwise.
-	 */
-	public boolean hasVariables()
-	{
-		return getScript(PlayerVariables.class) != null;
-	}
-	
-	/**
-	 * @return {@link PlayerVariables} instance containing parameters regarding player.
-	 */
-	public PlayerVariables getVariables()
-	{
-		final PlayerVariables vars = getScript(PlayerVariables.class);
-		return vars != null ? vars : addScript(new PlayerVariables(getObjectId()));
-	}
-	
-	/**
-	 * @return {@code true} if {@link AccountVariables} instance is attached to current player's scripts, {@code false} otherwise.
-	 */
-	public boolean hasAccountVariables()
-	{
-		return getScript(AccountVariables.class) != null;
-	}
-	
-	/**
-	 * @return {@link AccountVariables} instance containing parameters regarding player.
-	 */
-	public AccountVariables getAccountVariables()
-	{
-		final AccountVariables vars = getScript(AccountVariables.class);
-		return vars != null ? vars : addScript(new AccountVariables(getAccountName()));
-	}
-	
-	/**
-	 * Adds a event listener.
-	 * @param listener
-	 */
-	public void addEventListener(IEventListener listener)
-	{
-		_eventListeners.add(listener);
-	}
-	
-	/**
-	 * Removes event listener
-	 * @param listener
-	 */
-	public void removeEventListener(IEventListener listener)
-	{
-		_eventListeners.remove(listener);
-	}
-	
-	public void removeEventListener(Class<? extends IEventListener> clazz)
-	{
-		final Iterator<IEventListener> it = _eventListeners.iterator();
-		IEventListener event;
-		while (it.hasNext())
-		{
-			event = it.next();
-			if (event.getClass() == clazz)
-			{
-				it.remove();
-			}
-		}
-	}
-	
-	public Collection<IEventListener> getEventListeners()
-	{
-		return _eventListeners;
-	}
-	
-	@Override
-	public int getId()
-	{
-		return getClassId().getId();
-	}
-	
-	public boolean isPartyBanned()
-	{
-		return PunishmentManager.getInstance().hasPunishment(getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.PARTY_BAN);
-	}
-	
-	/**
-	 * @param act
-	 * @return {@code true} if action was added successfully, {@code false} otherwise.
-	 */
-	public boolean addAction(PlayerAction act)
-	{
-		if (!hasAction(act))
-		{
-			_actionMask |= act.getMask();
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @param act
-	 * @return {@code true} if action was removed successfully, {@code false} otherwise.
-	 */
-	public boolean removeAction(PlayerAction act)
-	{
-		if (hasAction(act))
-		{
-			_actionMask &= ~act.getMask();
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @param act
-	 * @return {@code true} if action is present, {@code false} otherwise.
-	 */
-	public boolean hasAction(PlayerAction act)
-	{
-		return (_actionMask & act.getMask()) == act.getMask();
-	}
-	
-	/**
-	 * Set true/false if character got Charm of Courage
-	 * @param val true/false
-	 */
-	public void setCharmOfCourage(boolean val)
-	{
-		_hasCharmOfCourage = val;
-		
-	}
-	
-	/**
-	 * @return {@code true} if effect is present, {@code false} otherwise.
-	 */
-	public boolean hasCharmOfCourage()
-	{
-		return _hasCharmOfCourage;
-		
 	}
 }

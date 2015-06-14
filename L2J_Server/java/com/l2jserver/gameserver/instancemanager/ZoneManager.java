@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.instancemanager;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;

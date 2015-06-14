@@ -422,12 +422,6 @@ public abstract class AbstractAI implements Ctrl
 		{
 			_nextAction.doAction();
 		}
-		
-		// Do next action.
-		if ((_nextAction != null) && _nextAction.getEvents().contains(evt))
-		{
-			_nextAction.doAction();
-		}
 	}
 	
 	protected abstract void onIntentionIdle();

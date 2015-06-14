@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,7 +18,9 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionLogicAnd.
@@ -28,14 +30,6 @@ public class ConditionLogicAnd extends Condition
 {
 	private static Condition[] _emptyConditions = new Condition[0];
 	public Condition[] conditions = _emptyConditions;
-	
-	/**
-	 * Instantiates a new condition logic and.
-	 */
-	public ConditionLogicAnd()
-	{
-		super();
-	}
 	
 	/**
 	 * Adds the.
@@ -58,10 +52,6 @@ public class ConditionLogicAnd extends Condition
 		conditions = tmp;
 	}
 	
-	/**
-	 * Sets the listener.
-	 * @param listener the new listener
-	 */
 	@Override
 	void setListener(ConditionListener listener)
 	{
@@ -82,17 +72,12 @@ public class ConditionLogicAnd extends Condition
 		super.setListener(listener);
 	}
 	
-	/**
-	 * Test impl.
-	 * @param env the env
-	 * @return true, if successful
-	 */
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		for (Condition c : conditions)
 		{
-			if (!c.test(env))
+			if (!c.test(effector, effected, skill, item))
 			{
 				return false;
 			}

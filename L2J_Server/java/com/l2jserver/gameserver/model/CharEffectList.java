@@ -321,8 +321,6 @@ public final class CharEffectList
 					}
 				}
 			}
-			getToggles().clear();
-			update = true;
 		}
 		
 		if (hasTriggered())
@@ -340,8 +338,6 @@ public final class CharEffectList
 					}
 				}
 			}
-			getDebuffs().clear();
-			update = true;
 		}
 		
 		if (hasDances())
@@ -524,10 +520,7 @@ public final class CharEffectList
 			{
 				_owner.sendPacket(ShortBuffStatusUpdate.RESET_SHORT_BUFF);
 			}
-			
-			// Puts the effects in the list.
-			final BuffInfo infoToRemove = getPassives().put(skill.getId(), info);
-			if (infoToRemove != null)
+			else
 			{
 				_owner.sendPacket(new ShortBuffStatusUpdate(info.getSkill().getId(), info.getSkill().getLevel(), info.getTime()));
 			}

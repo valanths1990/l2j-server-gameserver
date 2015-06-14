@@ -779,6 +779,8 @@ public final class Config
 	public static boolean ALT_ATTACKABLE_NPCS;
 	public static boolean ALT_GAME_VIEWNPC;
 	public static int MAX_DRIFT_RANGE;
+	public static boolean DEEPBLUE_DROP_RULES;
+	public static boolean DEEPBLUE_DROP_RULES_RAID;
 	public static boolean SHOW_NPC_LVL;
 	public static boolean SHOW_CREST_WITHOUT_QUEST;
 	public static boolean ENABLE_RANDOM_ENCHANT_EFFECT;

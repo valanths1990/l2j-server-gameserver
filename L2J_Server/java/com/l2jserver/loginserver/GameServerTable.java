@@ -35,7 +35,6 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.loginserver.network.gameserverpackets.ServerStatus;
 import com.l2jserver.util.IPSubnet;
@@ -102,7 +101,6 @@ public final class GameServerTable implements IXmlReader
 			{
 				_keyPairs[i] = keyGen.genKeyPair();
 			}
-			xpp.close();
 		}
 		catch (Exception e)
 		{

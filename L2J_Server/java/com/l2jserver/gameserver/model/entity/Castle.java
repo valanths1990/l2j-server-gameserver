@@ -44,7 +44,6 @@ import com.l2jserver.gameserver.instancemanager.SiegeManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager.Territory;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
-import com.l2jserver.gameserver.model.CropProcure;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2SkillLearn;
@@ -1083,98 +1082,6 @@ public final class Castle extends AbstractResidence
 	public List<L2ArtefactInstance> getArtefacts()
 	{
 		return _artefacts;
-	}
-	
-	/**
-	 * @return the tickets exchanged for this castle
-	 */
-	public int getTicketBuyCount()
-	{
-		return _ticketBuyCount;
-	}
-	
-	/**
-	 * Set the exchanged tickets count.<br>
-	 * Performs database update.
-	 * @param count the ticket count to set
-	 */
-	public void setTicketBuyCount(int count)
-	{
-		_ticketBuyCount = count;
-		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("UPDATE castle SET ticketBuyCount = ? WHERE id = ?"))
-		{
-			ps.setInt(1, _ticketBuyCount);
-			ps.setInt(2, getResidenceId());
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			_log.log(Level.WARNING, e.getMessage(), e);
-		}
-	}
-	
-	public int getTrapUpgradeLevel(int towerIndex)
-	{
-		final TowerSpawn spawn = SiegeManager.getInstance().getFlameTowers(getResidenceId()).get(towerIndex);
-		return (spawn != null) ? spawn.getUpgradeLevel() : 0;
-	}
-	
-	public void setTrapUpgrade(int towerIndex, int level, boolean save)
-	{
-		if (save)
-		{
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement("REPLACE INTO castle_trapupgrade (castleId, towerIndex, level) values (?,?,?)"))
-			{
-				ps.setInt(1, getResidenceId());
-				ps.setInt(2, towerIndex);
-				ps.setInt(3, level);
-				ps.execute();
-			}
-			catch (Exception e)
-			{
-				_log.log(Level.WARNING, "Exception: setTrapUpgradeLevel(int towerIndex, int level, int castleId): " + e.getMessage(), e);
-			}
-		}
-		final TowerSpawn spawn = SiegeManager.getInstance().getFlameTowers(getResidenceId()).get(towerIndex);
-		if (spawn != null)
-		{
-			spawn.setUpgradeLevel(level);
-		}
-	}
-	
-	private void removeTrapUpgrade()
-	{
-		for (TowerSpawn ts : SiegeManager.getInstance().getFlameTowers(getResidenceId()))
-		{
-			ts.setUpgradeLevel(0);
-		}
-		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM castle_trapupgrade WHERE castleId=?"))
-		{
-			ps.setInt(1, getResidenceId());
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			_log.log(Level.WARNING, "Exception: removeDoorUpgrade(): " + e.getMessage(), e);
-		}
-	}
-	
-	@Override
-	protected void initResidenceZone()
-	{
-		for (L2CastleZone zone : ZoneManager.getInstance().getAllZones(L2CastleZone.class))
-		{
-			if (zone.getResidenceId() == getResidenceId())
-			{
-				setResidenceZone(zone);
-				break;
-			}
-		}
 	}
 	
 	/**

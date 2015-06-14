@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.entity.Castle;
 
 public final class SiegeGuardManager

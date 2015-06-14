@@ -193,38 +193,6 @@ public class Hero
 		}
 	}
 	
-	private void processHeros(PreparedStatement ps, int charId, StatsSet hero) throws SQLException
-	{
-		ps.setInt(1, charId);
-		try (ResultSet rs = ps.executeQuery())
-		{
-			if (rs.next())
-			{
-				int clanId = rs.getInt("clanid");
-				int allyId = rs.getInt("allyId");
-				String clanName = "";
-				String allyName = "";
-				int clanCrest = 0;
-				int allyCrest = 0;
-				if (clanId > 0)
-				{
-					clanName = ClanTable.getInstance().getClan(clanId).getName();
-					clanCrest = ClanTable.getInstance().getClan(clanId).getCrestId();
-					if (allyId > 0)
-					{
-						allyName = ClanTable.getInstance().getClan(clanId).getAllyName();
-						allyCrest = ClanTable.getInstance().getClan(clanId).getAllyCrestId();
-					}
-				}
-				hero.set(CLAN_CREST, clanCrest);
-				hero.set(CLAN_NAME, clanName);
-				hero.set(ALLY_CREST, allyCrest);
-				hero.set(ALLY_NAME, allyName);
-			}
-			ps.clearParameters();
-		}
-	}
-	
 	private String calcFightTime(long FightTime)
 	{
 		String format = String.format("%%0%dd", 2);

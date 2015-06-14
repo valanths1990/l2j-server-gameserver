@@ -38,7 +38,7 @@ import com.l2jserver.geodriver.GeoDriver;
 /**
  * @author -Nemesiss-, HorridoJoho
  */
-public class GeoData implements IGeoDriver
+public class GeoData
 {
 	private static final Logger LOGGER = Logger.getLogger(GeoData.class.getName());
 	private static final String FILE_NAME_FORMAT = "%d_%d.l2j";
@@ -48,11 +48,7 @@ public class GeoData implements IGeoDriver
 	
 	private final GeoDriver _driver = new GeoDriver();
 	
-	private static final Logger LOGGER = Logger.getLogger(GeoData.class.getName());
-	private static final int ELEVATED_SEE_OVER_DISTANCE = 2;
-	private static final int MAX_SEE_OVER_HEIGHT = 48;
-	
-	public static GeoData getInstance()
+	protected GeoData()
 	{
 		int loadedRegions = 0;
 		try
@@ -223,7 +219,7 @@ public class GeoData implements IGeoDriver
 	 * @param target the target
 	 * @return {@code true} if the character can see the target (LOS), {@code false} otherwise
 	 */
-	public int getSpawnHeight(int x, int y, int zmin, int zmax)
+	public boolean canSeeTarget(L2Object cha, L2Object target)
 	{
 		if (target.isDoor())
 		{
@@ -461,7 +457,7 @@ public class GeoData implements IGeoDriver
 	 * @param instanceId the instance id
 	 * @return the last Location (x,y,z) where player can walk - just before wall
 	 */
-	public boolean canSeeTarget(int x, int y, int z, int tx, int ty, int tz)
+	public Location moveCheck(int x, int y, int z, int tx, int ty, int tz, int instanceId)
 	{
 		int geoX = getGeoX(x);
 		int geoY = getGeoY(y);

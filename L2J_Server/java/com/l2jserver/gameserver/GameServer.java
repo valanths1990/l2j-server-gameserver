@@ -298,10 +298,6 @@ public final class GameServer
 		AirShipManager.getInstance();
 		GraciaSeedsManager.getInstance();
 		
-		CastleManager.getInstance().activateInstances();
-		FortManager.getInstance().activateInstances();
-		MerchantPriceConfigTable.getInstance().updateReferences();
-		
 		try
 		{
 			_log.info(getClass().getSimpleName() + ": Loading server scripts:");

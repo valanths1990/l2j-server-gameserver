@@ -873,50 +873,28 @@ public final class Instance
 		}
 	}
 	
-	public void cancelEjectDeadPlayer(L2PcInstance player)
+	public class CheckTimeUp implements Runnable
 	{
 		private final int _remaining;
 		
 		public CheckTimeUp(int remaining)
 		{
-			final ScheduledFuture<?> task = _ejectDeadTasks.remove(player.getObjectId());
-			if (task != null)
-			{
-				task.cancel(true);
-			}
+			_remaining = remaining;
 		}
 		
 		@Override
 		public void run()
 		{
-			_ejectDeadTasks.put(player.getObjectId(), ThreadPoolManager.getInstance().scheduleGeneral(() ->
-			{
-				if (player.isDead() && (player.getInstanceId() == getId()))
-				{
-					player.setInstanceId(0);
-					if (getSpawnLoc() != null)
-					{
-						player.teleToLocation(getSpawnLoc(), true);
-					}
-					else
-					{
-						player.teleToLocation(TeleportWhereType.TOWN);
-					}
-				}
-			}, _ejectTime));
+			doCheckTimeUp(_remaining);
 		}
 	}
 	
-	/**
-	 * @param killer the character that killed the {@code victim}
-	 * @param victim the character that was killed by the {@code killer}
-	 */
-	public final void notifyDeath(L2Character killer, L2Character victim)
+	public class TimeUp implements Runnable
 	{
 		@Override
 		public void run()
 		{
-			instance.onDeath(killer, victim);
+			InstanceManager.getInstance().destroyInstance(getId());
 		}
 	}
 	

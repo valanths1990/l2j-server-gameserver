@@ -172,8 +172,6 @@ public final class GameTimeController extends Thread
 				{
 					
 				}
-				
-				ai.notifyEvent(CtrlEvent.EVT_ARRIVED);
 			}
 			
 			if (isNight() != isNight)
