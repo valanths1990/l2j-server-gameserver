@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,26 +22,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.model.actor.L2Npc;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
+import com.l2jserver.gameserver.util.Broadcast;
 import com.l2jserver.util.Rnd;
 
 /**
@@ -68,16 +69,13 @@ public class AutoSpawnHandler
 	private static final int DEFAULT_RESPAWN = 3600000; // 1 hour in millisecs
 	private static final int DEFAULT_DESPAWN = 3600000; // 1 hour in millisecs
 	
-	protected Map<Integer, AutoSpawnInstance> _registeredSpawns;
-	protected Map<Integer, ScheduledFuture<?>> _runningSpawns;
+	protected Map<Integer, AutoSpawnInstance> _registeredSpawns = new ConcurrentHashMap<>();
+	protected Map<Integer, ScheduledFuture<?>> _runningSpawns = new ConcurrentHashMap<>();
 	
 	protected boolean _activeState = true;
 	
 	protected AutoSpawnHandler()
 	{
-		_registeredSpawns = new FastMap<>();
-		_runningSpawns = new FastMap<>();
-		
 		restoreSpawnData();
 	}
 	
@@ -111,8 +109,8 @@ public class AutoSpawnHandler
 		}
 		
 		// create clean list
-		_registeredSpawns = new FastMap<>();
-		_runningSpawns = new FastMap<>();
+		_registeredSpawns.clear();
+		_runningSpawns.clear();
 		
 		// load
 		restoreSpawnData();
@@ -370,19 +368,17 @@ public class AutoSpawnHandler
 		return null;
 	}
 	
-	public Map<Integer, AutoSpawnInstance> getAutoSpawnInstances(int npcId)
+	public List<AutoSpawnInstance> getAutoSpawnInstances(int npcId)
 	{
-		Map<Integer, AutoSpawnInstance> spawnInstList = new FastMap<>();
-		
+		final List<AutoSpawnInstance> result = new LinkedList<>();
 		for (AutoSpawnInstance spawnInst : _registeredSpawns.values())
 		{
 			if (spawnInst.getId() == npcId)
 			{
-				spawnInstList.put(spawnInst.getObjectId(), spawnInst);
+				result.add(spawnInst);
 			}
 		}
-		
-		return spawnInstList;
+		return result;
 	}
 	
 	/**
@@ -466,15 +462,7 @@ public class AutoSpawnHandler
 				final int z = locationList[locationIndex].getZ();
 				final int heading = locationList[locationIndex].getHeading();
 				
-				// Fetch the template for this NPC ID and create a new spawn.
-				L2NpcTemplate npcTemp = NpcData.getInstance().getTemplate(spawnInst.getId());
-				if (npcTemp == null)
-				{
-					_log.warning("Couldnt find NPC id" + spawnInst.getId() + " Try to update your DP");
-					return;
-				}
-				
-				L2Spawn newSpawn = new L2Spawn(npcTemp);
+				final L2Spawn newSpawn = new L2Spawn(spawnInst.getId());
 				newSpawn.setX(x);
 				newSpawn.setY(y);
 				newSpawn.setZ(z);
@@ -519,7 +507,7 @@ public class AutoSpawnHandler
 					// Announce to all players that the spawn has taken place, with the nearest town location.
 					if (spawnInst.isBroadcasting())
 					{
-						Announcements.getInstance().announceToAll("The " + npcInst.getName() + " has spawned near " + nearestTown + "!");
+						Broadcast.toAllOnlinePlayers("The " + npcInst.getName() + " has spawned near " + nearestTown + "!");
 					}
 				}
 				
@@ -566,11 +554,6 @@ public class AutoSpawnHandler
 				
 				for (L2Npc npcInst : spawnInst.getNPCInstanceList())
 				{
-					if (npcInst == null)
-					{
-						continue;
-					}
-					
 					npcInst.deleteMe();
 					SpawnTable.getInstance().deleteSpawn(npcInst.getSpawn(), false);
 					spawnInst.removeNpcInstance(npcInst);
@@ -606,9 +589,9 @@ public class AutoSpawnHandler
 		
 		protected int _lastLocIndex = -1;
 		
-		private final List<L2Npc> _npcList = new FastList<>();
+		private final Queue<L2Npc> _npcList = new ConcurrentLinkedQueue<>();
 		
-		private final List<Location> _locList = new FastList<>();
+		private final List<Location> _locList = new CopyOnWriteArrayList<>();
 		
 		private boolean _spawnActive;
 		
@@ -679,28 +662,19 @@ public class AutoSpawnHandler
 			return _locList.toArray(new Location[_locList.size()]);
 		}
 		
-		public L2Npc[] getNPCInstanceList()
+		public Queue<L2Npc> getNPCInstanceList()
 		{
-			L2Npc[] ret;
-			synchronized (_npcList)
-			{
-				ret = new L2Npc[_npcList.size()];
-				_npcList.toArray(ret);
-			}
-			
-			return ret;
+			return _npcList;
 		}
 		
-		public L2Spawn[] getSpawns()
+		public List<L2Spawn> getSpawns()
 		{
-			List<L2Spawn> npcSpawns = new FastList<>();
-			
+			final List<L2Spawn> npcSpawns = new ArrayList<>();
 			for (L2Npc npcInst : _npcList)
 			{
 				npcSpawns.add(npcInst.getSpawn());
 			}
-			
-			return npcSpawns.toArray(new L2Spawn[npcSpawns.size()]);
+			return npcSpawns;
 		}
 		
 		public void setSpawnCount(int spawnCount)

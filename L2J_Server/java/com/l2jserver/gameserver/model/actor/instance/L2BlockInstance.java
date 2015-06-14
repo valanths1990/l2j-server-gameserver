@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -38,12 +38,12 @@ public class L2BlockInstance extends L2MonsterInstance
 	private int _colorEffect;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a block.
+	 * @param template the block NPC template
 	 */
-	public L2BlockInstance(int objectId, L2NpcTemplate template)
+	public L2BlockInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 	}
 	
 	/**

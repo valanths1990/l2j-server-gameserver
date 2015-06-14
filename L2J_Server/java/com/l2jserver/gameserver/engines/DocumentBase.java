@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,6 +20,7 @@ package com.l2jserver.gameserver.engines;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import javolution.util.FastMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -60,6 +59,7 @@ import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanCreateBase;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanCreateOutpost;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanEscape;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanRefuelAirship;
+import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanResurrect;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanSummon;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanSummonSiegeGolem;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanSweep;
@@ -131,13 +131,8 @@ import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.AbnormalType;
 import com.l2jserver.gameserver.model.skills.EffectScope;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
-import com.l2jserver.gameserver.model.skills.funcs.Lambda;
-import com.l2jserver.gameserver.model.skills.funcs.LambdaCalc;
-import com.l2jserver.gameserver.model.skills.funcs.LambdaConst;
-import com.l2jserver.gameserver.model.skills.funcs.LambdaStats;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Stats;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 
 /**
  * @author mkizub
@@ -147,12 +142,11 @@ public abstract class DocumentBase
 	protected final Logger _log = Logger.getLogger(getClass().getName());
 	
 	private final File _file;
-	protected Map<String, String[]> _tables;
+	protected final Map<String, String[]> _tables = new HashMap<>();
 	
 	protected DocumentBase(File pFile)
 	{
 		_file = pFile;
-		_tables = new FastMap<>();
 	}
 	
 	public Document parse()
@@ -183,7 +177,7 @@ public abstract class DocumentBase
 	
 	protected void resetTable()
 	{
-		_tables = new FastMap<>();
+		_tables.clear();
 	}
 	
 	protected void setTable(String name, String[] table)
@@ -226,53 +220,10 @@ public abstract class DocumentBase
 		}
 		for (; n != null; n = n.getNextSibling())
 		{
-			switch (n.getNodeName().toLowerCase())
+			final String name = n.getNodeName().toLowerCase();
+			
+			switch (name)
 			{
-				case "add":
-				{
-					attachFunc(n, template, "Add", condition);
-					break;
-				}
-				case "sub":
-				{
-					attachFunc(n, template, "Sub", condition);
-					break;
-				}
-				case "mul":
-				{
-					attachFunc(n, template, "Mul", condition);
-					break;
-				}
-				case "basemul":
-				{
-					attachFunc(n, template, "BaseMul", condition);
-					break;
-				}
-				case "div":
-				{
-					attachFunc(n, template, "Div", condition);
-					break;
-				}
-				case "set":
-				{
-					attachFunc(n, template, "Set", condition);
-					break;
-				}
-				case "share":
-				{
-					attachFunc(n, template, "Share", condition);
-					break;
-				}
-				case "enchant":
-				{
-					attachFunc(n, template, "Enchant", condition);
-					break;
-				}
-				case "enchanthp":
-				{
-					attachFunc(n, template, "EnchantHp", condition);
-					break;
-				}
 				case "effect":
 				{
 					if (template instanceof AbstractEffect)
@@ -282,41 +233,56 @@ public abstract class DocumentBase
 					attachEffect(n, template, condition, effectScope);
 					break;
 				}
+				case "add":
+				case "sub":
+				case "mul":
+				case "div":
+				case "set":
+				case "share":
+				case "enchant":
+				case "enchanthp":
+				{
+					attachFunc(n, template, name, condition);
+				}
 			}
 		}
 	}
 	
-	protected void attachFunc(Node n, Object template, String name, Condition attachCond)
+	protected void attachFunc(Node n, Object template, String functionName, Condition attachCond)
 	{
 		Stats stat = Stats.valueOfXml(n.getAttributes().getNamedItem("stat").getNodeValue());
-		String order = n.getAttributes().getNamedItem("order").getNodeValue();
-		Lambda lambda = getLambda(n, template);
-		int ord = Integer.decode(getValue(order, template));
-		Condition applayCond = parseCondition(n.getFirstChild(), template);
-		FuncTemplate ft = new FuncTemplate(attachCond, applayCond, name, stat, ord, lambda);
+		int order = -1;
+		final Node orderNode = n.getAttributes().getNamedItem("order");
+		if (orderNode != null)
+		{
+			order = Integer.parseInt(orderNode.getNodeValue());
+		}
+		
+		String valueString = n.getAttributes().getNamedItem("val").getNodeValue();
+		double value;
+		if (valueString.charAt(0) == '#')
+		{
+			value = Double.parseDouble(getTableValue(valueString));
+		}
+		else
+		{
+			value = Double.parseDouble(valueString);
+		}
+		
+		final Condition applayCond = parseCondition(n.getFirstChild(), template);
+		final FuncTemplate ft = new FuncTemplate(attachCond, applayCond, functionName, order, stat, value);
 		if (template instanceof L2Item)
 		{
 			((L2Item) template).attach(ft);
-		}
-		else if (template instanceof Skill)
-		{
-			((Skill) template).attach(ft);
 		}
 		else if (template instanceof AbstractEffect)
 		{
 			((AbstractEffect) template).attach(ft);
 		}
-	}
-	
-	protected void attachLambdaFunc(Node n, Object template, LambdaCalc calc)
-	{
-		String name = n.getNodeName();
-		final StringBuilder sb = new StringBuilder(name);
-		sb.setCharAt(0, Character.toUpperCase(name.charAt(0)));
-		name = sb.toString();
-		Lambda lambda = getLambda(n, template);
-		FuncTemplate ft = new FuncTemplate(null, null, name, null, calc.funcs.length, lambda);
-		calc.addFunc(ft.getFunc(new Env(), calc));
+		else
+		{
+			throw new RuntimeException("Attaching stat to a non-effect template!!!");
+		}
 	}
 	
 	protected void attachEffect(Node n, Object template, Condition attachCond)
@@ -346,7 +312,7 @@ public abstract class DocumentBase
 		parseTemplate(n, effect);
 		if (template instanceof L2Item)
 		{
-			((L2Item) template).attach(effect);
+			_log.severe("Item " + template + " with effects!!!");
 		}
 		else if (template instanceof Skill)
 		{
@@ -870,6 +836,11 @@ public abstract class DocumentBase
 					cond = joinAnd(cond, new ConditionPlayerCanRefuelAirship(Integer.parseInt(a.getNodeValue())));
 					break;
 				}
+				case "canresurrect":
+				{
+					cond = joinAnd(cond, new ConditionPlayerCanResurrect(Boolean.parseBoolean(a.getNodeValue())));
+					break;
+				}
 				case "cansummon":
 				{
 					cond = joinAnd(cond, new ConditionPlayerCanSummon(Boolean.parseBoolean(a.getNodeValue())));
@@ -908,7 +879,7 @@ public abstract class DocumentBase
 				case "insidezoneid":
 				{
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
-					ArrayList<Integer> array = new ArrayList<>(st.countTokens());
+					List<Integer> array = new ArrayList<>(st.countTokens());
 					while (st.hasMoreTokens())
 					{
 						String item = st.nextToken().trim();
@@ -1004,7 +975,7 @@ public abstract class DocumentBase
 				case "class_id_restriction":
 				{
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
-					ArrayList<Integer> array = new ArrayList<>(st.countTokens());
+					List<Integer> array = new ArrayList<>(st.countTokens());
 					while (st.hasMoreTokens())
 					{
 						String item = st.nextToken().trim();
@@ -1088,7 +1059,7 @@ public abstract class DocumentBase
 				case "npcid":
 				{
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
-					ArrayList<Integer> array = new ArrayList<>(st.countTokens());
+					List<Integer> array = new ArrayList<>(st.countTokens());
 					while (st.hasMoreTokens())
 					{
 						String item = st.nextToken().trim();
@@ -1186,9 +1157,9 @@ public abstract class DocumentBase
 					{
 						int old = mask;
 						String item = st.nextToken().trim();
-						if (ItemTable._slots.containsKey(item))
+						if (ItemTable.SLOTS.containsKey(item))
 						{
-							mask |= ItemTable._slots.get(item);
+							mask |= ItemTable.SLOTS.get(item);
 						}
 						
 						if (old == mask)
@@ -1299,71 +1270,6 @@ public abstract class DocumentBase
 	protected void setExtractableSkillData(StatsSet set, String value)
 	{
 		set.set("capsuled_items_skill", value);
-	}
-	
-	protected Lambda getLambda(Node n, Object template)
-	{
-		Node nval = n.getAttributes().getNamedItem("val");
-		if (nval != null)
-		{
-			String val = nval.getNodeValue();
-			if (val.charAt(0) == '#')
-			{ // table by level
-				return new LambdaConst(Double.parseDouble(getTableValue(val)));
-			}
-			else if (val.charAt(0) == '$')
-			{
-				if (val.equalsIgnoreCase("$player_level"))
-				{
-					return new LambdaStats(LambdaStats.StatsType.PLAYER_LEVEL);
-				}
-				if (val.equalsIgnoreCase("$target_level"))
-				{
-					return new LambdaStats(LambdaStats.StatsType.TARGET_LEVEL);
-				}
-				if (val.equalsIgnoreCase("$player_max_hp"))
-				{
-					return new LambdaStats(LambdaStats.StatsType.PLAYER_MAX_HP);
-				}
-				if (val.equalsIgnoreCase("$player_max_mp"))
-				{
-					return new LambdaStats(LambdaStats.StatsType.PLAYER_MAX_MP);
-				}
-				// try to find value out of item fields
-				StatsSet set = getStatsSet();
-				String field = set.getString(val.substring(1));
-				if (field != null)
-				{
-					return new LambdaConst(Double.parseDouble(getValue(field, template)));
-				}
-				// failed
-				throw new IllegalArgumentException("Unknown value " + val);
-			}
-			else
-			{
-				return new LambdaConst(Double.parseDouble(val));
-			}
-		}
-		LambdaCalc calc = new LambdaCalc();
-		n = n.getFirstChild();
-		while ((n != null) && (n.getNodeType() != Node.ELEMENT_NODE))
-		{
-			n = n.getNextSibling();
-		}
-		if ((n == null) || !"val".equals(n.getNodeName()))
-		{
-			throw new IllegalArgumentException("Value not specified");
-		}
-		
-		for (n = n.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if (n.getNodeType() != Node.ELEMENT_NODE)
-			{
-				continue;
-			}
-			attachLambdaFunc(n, template, calc);
-		}
-		return calc;
 	}
 	
 	protected String getValue(String value, Object template)

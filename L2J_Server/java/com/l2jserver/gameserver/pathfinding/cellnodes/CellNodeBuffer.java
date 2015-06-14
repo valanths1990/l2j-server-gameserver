@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,9 @@
  */
 package com.l2jserver.gameserver.pathfinding.cellnodes;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 
@@ -113,10 +113,9 @@ public class CellNodeBuffer
 		return _lastElapsedTime;
 	}
 	
-	public final FastList<CellNode> debugPath()
+	public final List<CellNode> debugPath()
 	{
-		FastList<CellNode> result = new FastList<>();
-		
+		final List<CellNode> result = new LinkedList<>();
 		for (CellNode n = _current; n.getParent() != null; n = (CellNode) n.getParent())
 		{
 			result.add(n);
@@ -136,13 +135,12 @@ public class CellNodeBuffer
 				result.add(n);
 			}
 		}
-		
 		return result;
 	}
 	
 	private final void getNeighbors()
 	{
-		if (((NodeLoc) _current.getLoc()).canGoNone())
+		if (_current.getLoc().canGoNone())
 		{
 			return;
 		}
@@ -157,25 +155,25 @@ public class CellNodeBuffer
 		CellNode nodeN = null;
 		
 		// East
-		if (((NodeLoc) _current.getLoc()).canGoEast())
+		if (_current.getLoc().canGoEast())
 		{
 			nodeE = addNode(x + 1, y, z, false);
 		}
 		
 		// South
-		if (((NodeLoc) _current.getLoc()).canGoSouth())
+		if (_current.getLoc().canGoSouth())
 		{
 			nodeS = addNode(x, y + 1, z, false);
 		}
 		
 		// West
-		if (((NodeLoc) _current.getLoc()).canGoWest())
+		if (_current.getLoc().canGoWest())
 		{
 			nodeW = addNode(x - 1, y, z, false);
 		}
 		
 		// North
-		if (((NodeLoc) _current.getLoc()).canGoNorth())
+		if (_current.getLoc().canGoNorth())
 		{
 			nodeN = addNode(x, y - 1, z, false);
 		}
@@ -185,7 +183,7 @@ public class CellNodeBuffer
 			// SouthEast
 			if ((nodeE != null) && (nodeS != null))
 			{
-				if (((NodeLoc) nodeE.getLoc()).canGoSouth() && ((NodeLoc) nodeS.getLoc()).canGoEast())
+				if (nodeE.getLoc().canGoSouth() && nodeS.getLoc().canGoEast())
 				{
 					addNode(x + 1, y + 1, z, true);
 				}
@@ -194,7 +192,7 @@ public class CellNodeBuffer
 			// SouthWest
 			if ((nodeS != null) && (nodeW != null))
 			{
-				if (((NodeLoc) nodeW.getLoc()).canGoSouth() && ((NodeLoc) nodeS.getLoc()).canGoWest())
+				if (nodeW.getLoc().canGoSouth() && nodeS.getLoc().canGoWest())
 				{
 					addNode(x - 1, y + 1, z, true);
 				}
@@ -203,7 +201,7 @@ public class CellNodeBuffer
 			// NorthEast
 			if ((nodeN != null) && (nodeE != null))
 			{
-				if (((NodeLoc) nodeE.getLoc()).canGoNorth() && ((NodeLoc) nodeN.getLoc()).canGoEast())
+				if (nodeE.getLoc().canGoNorth() && nodeN.getLoc().canGoEast())
 				{
 					addNode(x + 1, y - 1, z, true);
 				}
@@ -212,7 +210,7 @@ public class CellNodeBuffer
 			// NorthWest
 			if ((nodeN != null) && (nodeW != null))
 			{
-				if (((NodeLoc) nodeW.getLoc()).canGoNorth() && ((NodeLoc) nodeN.getLoc()).canGoWest())
+				if (nodeW.getLoc().canGoNorth() && nodeN.getLoc().canGoWest())
 				{
 					addNode(x - 1, y - 1, z, true);
 				}
@@ -246,7 +244,7 @@ public class CellNodeBuffer
 			// reinit node if needed
 			if (result.getLoc() != null)
 			{
-				((NodeLoc) result.getLoc()).set(x, y, z);
+				result.getLoc().set(x, y, z);
 			}
 			else
 			{
@@ -274,7 +272,7 @@ public class CellNodeBuffer
 		final int stepZ = Math.abs(geoZ - _current.getLoc().getZ());
 		float weight = diagonal ? Config.DIAGONAL_WEIGHT : Config.LOW_WEIGHT;
 		
-		if (!((NodeLoc) newNode.getLoc()).canGoAll() || (stepZ > 16))
+		if (!newNode.getLoc().canGoAll() || (stepZ > 16))
 		{
 			weight = Config.HIGH_WEIGHT;
 		}
@@ -332,7 +330,7 @@ public class CellNodeBuffer
 			return true;
 		}
 		
-		if (!((NodeLoc) result.getLoc()).canGoAll())
+		if (!result.getLoc().canGoAll())
 		{
 			return true;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -37,9 +37,9 @@ import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.EnchantItemOptionsData;
+import com.l2jserver.gameserver.data.xml.impl.EnchantItemOptionsData;
+import com.l2jserver.gameserver.data.xml.impl.OptionData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.OptionsData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.ItemLocation;
 import com.l2jserver.gameserver.enums.ShotType;
@@ -73,7 +73,7 @@ import com.l2jserver.gameserver.model.items.type.ItemType;
 import com.l2jserver.gameserver.model.options.EnchantOptions;
 import com.l2jserver.gameserver.model.options.Options;
 import com.l2jserver.gameserver.model.quest.QuestState;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.DropItem;
 import com.l2jserver.gameserver.network.serverpackets.GetItem;
@@ -1423,7 +1423,7 @@ public final class L2ItemInstance extends L2Object
 	 * @param player the player
 	 * @return the functions list
 	 */
-	public List<Func> getStatFuncs(L2Character player)
+	public List<AbstractFunction> getStatFuncs(L2Character player)
 	{
 		return getItem().getStatFuncs(this, player);
 	}
@@ -1438,7 +1438,7 @@ public final class L2ItemInstance extends L2Object
 	
 	/**
 	 * Updates the database.<BR>
-	 * @param force if the update should necessarilly be done.
+	 * @param force if the update should necessarily be done.
 	 */
 	public void updateDatabase(boolean force)
 	{
@@ -1569,7 +1569,7 @@ public final class L2ItemInstance extends L2Object
 		{
 			assert _itm.getWorldRegion() == null;
 			
-			if ((Config.GEODATA > 0) && (_dropper != null))
+			if (_dropper != null)
 			{
 				Location dropDest = GeoData.getInstance().moveCheck(_dropper.getX(), _dropper.getY(), _dropper.getZ(), _x, _y, _z, _dropper.getInstanceId());
 				_x = dropDest.getX();
@@ -2209,7 +2209,7 @@ public final class L2ItemInstance extends L2Object
 		
 		for (int id : getEnchantOptions())
 		{
-			final Options options = OptionsData.getInstance().getOptions(id);
+			final Options options = OptionData.getInstance().getOptions(id);
 			if (options != null)
 			{
 				options.apply(player);

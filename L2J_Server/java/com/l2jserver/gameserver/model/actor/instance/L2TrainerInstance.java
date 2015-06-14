@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,9 +23,13 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 
 public class L2TrainerInstance extends L2NpcInstance
 {
-	public L2TrainerInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a trainer.
+	 * @param template the trainer NPC template
+	 */
+	public L2TrainerInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2TrainerInstance);
 	}
 	

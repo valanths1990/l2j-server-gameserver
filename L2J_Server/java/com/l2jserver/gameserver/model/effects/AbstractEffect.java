@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -27,14 +27,13 @@ import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.handler.EffectHandler;
-import com.l2jserver.gameserver.model.ChanceCondition;
 import com.l2jserver.gameserver.model.StatsSet;
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.conditions.Condition;
-import com.l2jserver.gameserver.model.interfaces.IChanceSkillTrigger;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 
 /**
  * Abstract effect implementation.<br>
@@ -44,7 +43,7 @@ import com.l2jserver.gameserver.model.stats.Env;
  * @since <a href="http://trac.l2jserver.com/changeset/6249">Changeset 6249</a> the "effect steal constructor" is deprecated.
  * @author Zoey76
  */
-public abstract class AbstractEffect implements IChanceSkillTrigger
+public abstract class AbstractEffect
 {
 	protected static final Logger _log = Logger.getLogger(AbstractEffect.class.getName());
 	
@@ -58,9 +57,6 @@ public abstract class AbstractEffect implements IChanceSkillTrigger
 	private final String _name;
 	/** Ticks. */
 	private final int _ticks;
-	private final int _triggeredId;
-	private final int _triggeredLevel;
-	private final ChanceCondition _chanceCondition;
 	
 	/**
 	 * Abstract effect constructor.
@@ -75,9 +71,6 @@ public abstract class AbstractEffect implements IChanceSkillTrigger
 		// _applyCond = applyCond;
 		_name = set.getString("name");
 		_ticks = set.getInt("ticks", 0);
-		_triggeredId = set.getInt("triggeredId", 0);
-		_triggeredLevel = set.getInt("triggeredLevel", 1);
-		_chanceCondition = ChanceCondition.parse(set.getString("chanceType", null), set.getInt("activationChance", -1), set.getInt("activationMinDamage", -1), set.getString("activationElements", null), set.getString("activationSkills", null), set.getBoolean("pvpChanceOnly", false));
 	}
 	
 	/**
@@ -122,12 +115,14 @@ public abstract class AbstractEffect implements IChanceSkillTrigger
 	
 	/**
 	 * Tests the attach condition.
-	 * @param env the data
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
 	 * @return {@code true} if there isn't a condition to test or it's passed, {@code false} otherwise
 	 */
-	public boolean testConditions(Env env)
+	public boolean testConditions(L2Character caster, L2Character target, Skill skill)
 	{
-		return (_attachCond == null) || _attachCond.test(env);
+		return (_attachCond == null) || _attachCond.test(caster, target, skill);
 	}
 	
 	/**
@@ -169,24 +164,6 @@ public abstract class AbstractEffect implements IChanceSkillTrigger
 	public List<FuncTemplate> getFuncTemplates()
 	{
 		return _funcTemplates;
-	}
-	
-	@Override
-	public int getTriggeredChanceId()
-	{
-		return _triggeredId;
-	}
-	
-	@Override
-	public int getTriggeredChanceLevel()
-	{
-		return _triggeredLevel;
-	}
-	
-	@Override
-	public ChanceCondition getTriggeredChanceCondition()
-	{
-		return _chanceCondition;
 	}
 	
 	/**
@@ -254,26 +231,28 @@ public abstract class AbstractEffect implements IChanceSkillTrigger
 	
 	/**
 	 * Get this effect's stats functions.
-	 * @param env the data
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
 	 * @return a list of stat functions.
 	 */
-	public List<Func> getStatFuncs(Env env)
+	public List<AbstractFunction> getStatFuncs(L2Character caster, L2Character target, Skill skill)
 	{
 		if (getFuncTemplates() == null)
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
-		final List<Func> funcs = new ArrayList<>(getFuncTemplates().size());
-		for (FuncTemplate t : getFuncTemplates())
+		final List<AbstractFunction> functions = new ArrayList<>(getFuncTemplates().size());
+		for (FuncTemplate functionTemplate : getFuncTemplates())
 		{
-			final Func f = t.getFunc(env, this);
-			if (f != null)
+			final AbstractFunction function = functionTemplate.getFunc(caster, target, skill, this);
+			if (function != null)
 			{
-				funcs.add(f);
+				functions.add(function);
 			}
 		}
-		return funcs;
+		return functions;
 	}
 	
 	/**
@@ -304,12 +283,6 @@ public abstract class AbstractEffect implements IChanceSkillTrigger
 	public boolean checkCondition(Object obj)
 	{
 		return true;
-	}
-	
-	@Override
-	public boolean triggersChanceSkill()
-	{
-		return _triggeredId > 0;
 	}
 	
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,8 +24,8 @@ import java.util.prefs.Preferences;
 
 import com.l2jserver.tools.dbinstaller.DBOutputInterface;
 import com.l2jserver.tools.dbinstaller.RunTasks;
+import com.l2jserver.tools.dbinstaller.util.CloseShieldedInputStream;
 import com.l2jserver.tools.dbinstaller.util.mysql.MySqlConnect;
-import com.l2jserver.util.CloseShieldedInputStream;
 
 /**
  * @author mrTJO
@@ -34,7 +34,7 @@ public class DBInstallerConsole implements DBOutputInterface
 {
 	Connection _con;
 	
-	public DBInstallerConsole(String db, String dir, String cleanUp)
+	public DBInstallerConsole(String db, String dir, String cleanUpScript)
 	{
 		System.out.println("Welcome to L2J DataBase installer");
 		Preferences prop = Preferences.userRoot();
@@ -71,12 +71,12 @@ public class DBInstallerConsole implements DBOutputInterface
 				System.out.print("Do you really want to destroy your db (Y/N)?");
 				if (scn.next().equalsIgnoreCase("y"))
 				{
-					rt = new RunTasks(this, db, dir, cleanUp, true);
+					rt = new RunTasks(this, db, dir, cleanUpScript, true);
 				}
 			}
 			else if (resp.equalsIgnoreCase("u"))
 			{
-				rt = new RunTasks(this, db, dir, cleanUp, false);
+				rt = new RunTasks(this, db, dir, cleanUpScript, false);
 			}
 		}
 		
@@ -87,6 +87,36 @@ public class DBInstallerConsole implements DBOutputInterface
 		else
 		{
 			System.exit(0);
+		}
+	}
+	
+	/**
+	 * Database Console Installer constructor.
+	 * @param defDatabase the default database name
+	 * @param dir the SQL script's directory
+	 * @param cleanUpScript the clean up SQL script
+	 * @param host the host name
+	 * @param port the port
+	 * @param user the user name
+	 * @param pass the password
+	 * @param database the database name
+	 * @param mode the mode, c: Clean, u:update
+	 */
+	public DBInstallerConsole(String defDatabase, String dir, String cleanUpScript, String host, String port, String user, String pass, String database, String mode)
+	{
+		if ((database == null) || database.isEmpty())
+		{
+			database = defDatabase;
+		}
+		
+		final MySqlConnect connector = new MySqlConnect(host, port, user, pass, database, true);
+		
+		_con = connector.getConnection();
+		
+		if ((mode != null) && ("c".equalsIgnoreCase(mode) || "u".equalsIgnoreCase(mode)))
+		{
+			final RunTasks rt = new RunTasks(this, database, dir, cleanUpScript, "c".equalsIgnoreCase(mode));
+			rt.run();
 		}
 	}
 	

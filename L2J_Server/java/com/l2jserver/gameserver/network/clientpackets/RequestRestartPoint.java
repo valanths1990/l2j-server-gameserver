@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -219,9 +219,14 @@ public final class RequestRestartPoint extends L2GameClientPacket
 				if (((siegeClan == null) || siegeClan.getFlag().isEmpty()) && (flag == null))
 				{
 					// Check if clan hall has inner spawns loc
-					if ((hall != null) && ((loc = hall.getSiege().getInnerSpawnLoc(activeChar)) != null))
+					if (hall != null)
 					{
-						break;
+						loc = hall.getSiege().getInnerSpawnLoc(activeChar);
+						
+						if (loc != null)
+						{
+							break;
+						}
 					}
 					
 					_log.warning("Player [" + activeChar.getName() + "] called RestartPointPacket - To Siege HQ and he doesn't have Siege HQ!");
@@ -232,7 +237,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
 			}
 			case 5: // Fixed or Player is a festival participant
 			{
-				if (!activeChar.isGM() && !activeChar.isFestivalParticipant())
+				if (!activeChar.isGM() && !activeChar.isFestivalParticipant() && !activeChar.getInventory().haveItemForSelfResurrection())
 				{
 					_log.warning("Player [" + activeChar.getName() + "] called RestartPointPacket - Fixed and he isn't festival participant!");
 					return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -96,7 +96,7 @@ public final class CubicAction implements Runnable
 			boolean useCubicCure = false;
 			if ((_cubic.getId() >= L2CubicInstance.SMART_CUBIC_EVATEMPLAR) && (_cubic.getId() <= L2CubicInstance.SMART_CUBIC_SPECTRALMASTER))
 			{
-				for (BuffInfo info : _cubic.getOwner().getEffectList().getDebuffs().values())
+				for (BuffInfo info : _cubic.getOwner().getEffectList().getDebuffs())
 				{
 					if (info.getSkill().canBeDispeled())
 					{

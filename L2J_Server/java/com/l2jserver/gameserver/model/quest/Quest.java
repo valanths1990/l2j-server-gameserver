@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,18 +23,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.function.Predicate;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.enums.CategoryType;
+import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.TrapAction;
 import com.l2jserver.gameserver.instancemanager.QuestManager;
 import com.l2jserver.gameserver.model.L2Object;
@@ -46,6 +50,7 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2TrapInstance;
 import com.l2jserver.gameserver.model.base.AcquireSkillType;
+import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.events.AbstractScript;
 import com.l2jserver.gameserver.model.events.EventType;
 import com.l2jserver.gameserver.model.events.listeners.AbstractEventListener;
@@ -70,13 +75,13 @@ import com.l2jserver.util.Util;
  */
 public class Quest extends AbstractScript implements IIdentifiable
 {
-	public static final Logger _log = Logger.getLogger(Quest.class.getName());
-	
 	/** Map containing lists of timers from the name of the timer. */
-	private final Map<String, List<QuestTimer>> _allEventTimers = new ConcurrentHashMap<>();
+	private volatile Map<String, List<QuestTimer>> _questTimers = null;
 	private final ReentrantReadWriteLock _rwLock = new ReentrantReadWriteLock();
 	private final WriteLock _writeLock = _rwLock.writeLock();
 	private final ReadLock _readLock = _rwLock.readLock();
+	/** Map containing all the start conditions. */
+	private volatile Map<Predicate<L2PcInstance>, String> _startCondition = null;
 	
 	private final int _questId;
 	private final String _name;
@@ -95,22 +100,6 @@ public class Quest extends AbstractScript implements IIdentifiable
 	
 	private static final int RESET_HOUR = 6;
 	private static final int RESET_MINUTES = 30;
-	
-	/**
-	 * @return the reset hour for a daily quest, could be overridden on a script.
-	 */
-	public int getResetHour()
-	{
-		return RESET_HOUR;
-	}
-	
-	/**
-	 * @return the reset minutes for a daily quest, could be overridden on a script.
-	 */
-	public int getResetMinutes()
-	{
-		return RESET_MINUTES;
-	}
 	
 	/**
 	 * The Quest object constructor.<br>
@@ -134,6 +123,24 @@ public class Quest extends AbstractScript implements IIdentifiable
 		}
 		
 		loadGlobalData();
+	}
+	
+	/**
+	 * Gets the reset hour for a daily quest.
+	 * @return the reset hour
+	 */
+	public int getResetHour()
+	{
+		return RESET_HOUR;
+	}
+	
+	/**
+	 * Gets the reset minutes for a daily quest.
+	 * @return the reset minutes
+	 */
+	public int getResetMinutes()
+	{
+		return RESET_MINUTES;
 	}
 	
 	/**
@@ -164,7 +171,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	@Override
 	public int getId()
 	{
-		return _questId;
+		return new QuestState(this, player, _initialState);
 	}
 	
 	/**
@@ -172,7 +179,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 * @param player the owner of the newly created quest state
 	 * @return the newly created {@link QuestState} object
 	 */
-	public QuestState newQuestState(L2PcInstance player)
+	public QuestState getQuestState(L2PcInstance player, boolean initIfNone)
 	{
 		return new QuestState(this, player, _initialState);
 	}
@@ -204,9 +211,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		return _initialState;
 	}
 	
-	/**
-	 * @return the name of the quest
-	 */
+	@Override
 	public String getName()
 	{
 		return _name;
@@ -234,6 +239,29 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	/**
+	 * Gets the quest timers.
+	 * @return the quest timers
+	 */
+	public final Map<String, List<QuestTimer>> getQuestTimers()
+	{
+		if (_questTimers == null)
+		{
+			synchronized (this)
+			{
+				if (_questTimers == null)
+				{
+					_questTimers = new ConcurrentHashMap<>(1);
+				}
+			}
+			finally
+			{
+				_readLock.unlock();
+			}
+		}
+		return _questTimers;
+	}
+	
+	/**
 	 * Add a timer to the quest (if it doesn't exist already) and start it.
 	 * @param name the name of the timer (also passed back as "event" in {@link #onAdvEvent(String, L2Npc, L2PcInstance)})
 	 * @param time time in ms for when to fire the timer
@@ -244,7 +272,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void startQuestTimer(String name, long time, L2Npc npc, L2PcInstance player, boolean repeating)
 	{
-		final List<QuestTimer> timers = _allEventTimers.computeIfAbsent(name, k -> new ArrayList<>());
+		final List<QuestTimer> timers = getQuestTimers().computeIfAbsent(name, k -> new ArrayList<>(1));
 		// if there exists a timer with this name, allow the timer only if the [npc, player] set is unique
 		// nulls act as wildcards
 		if (getQuestTimer(name, npc, player) == null)
@@ -270,7 +298,12 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public QuestTimer getQuestTimer(String name, L2Npc npc, L2PcInstance player)
 	{
-		final List<QuestTimer> timers = _allEventTimers.get(name);
+		if (_questTimers == null)
+		{
+			return null;
+		}
+		
+		final List<QuestTimer> timers = getQuestTimers().get(name);
 		if (timers != null)
 		{
 			_readLock.lock();
@@ -286,13 +319,17 @@ public class Quest extends AbstractScript implements IIdentifiable
 						}
 					}
 				}
+				timers.clear();
+			}
+			finally
+			{
+				_writeLock.unlock();
 			}
 			finally
 			{
 				_readLock.unlock();
 			}
 		}
-		return null;
 	}
 	
 	/**
@@ -301,7 +338,12 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void cancelQuestTimers(String name)
 	{
-		final List<QuestTimer> timers = _allEventTimers.get(name);
+		if (_questTimers == null)
+		{
+			return;
+		}
+		
+		final List<QuestTimer> timers = getQuestTimers().get(name);
 		if (timers != null)
 		{
 			_writeLock.lock();
@@ -345,9 +387,9 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void removeQuestTimer(QuestTimer timer)
 	{
-		if (timer != null)
+		if ((timer != null) && (_questTimers != null))
 		{
-			final List<QuestTimer> timers = _allEventTimers.get(timer.getName());
+			final List<QuestTimer> timers = getQuestTimers().get(timer.getName());
 			if (timers != null)
 			{
 				_writeLock.lock();
@@ -361,11 +403,6 @@ public class Quest extends AbstractScript implements IIdentifiable
 				}
 			}
 		}
-	}
-	
-	public Map<String, List<QuestTimer>> getQuestTimers()
-	{
-		return _allEventTimers;
 	}
 	
 	// These are methods to call within the core to call the quest events.
@@ -407,6 +444,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(qs.getPlayer(), e);
+			return;
 		}
 		showResult(qs.getPlayer(), res);
 	}
@@ -425,6 +463,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(player, e);
+			return;
 		}
 		showResult(player, res);
 	}
@@ -444,6 +483,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(player, e);
+			return;
 		}
 		showResult(player, res);
 	}
@@ -492,12 +532,26 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	/**
+	 * @param npc the teleport NPC
+	 */
+	public final void notifyTeleport(L2Npc npc)
+	{
+		try
+		{
+			onTeleport(npc);
+		}
+		catch (Exception e)
+		{
+			_log.log(Level.WARNING, "Exception on onTeleport() in notifyTeleport(): " + e.getMessage(), e);
+		}
+	}
+	
+	/**
 	 * @param event
 	 * @param npc
 	 * @param player
-	 * @return {@code false} if there was an error or the message was sent, {@code true} otherwise
 	 */
-	public final boolean notifyEvent(String event, L2Npc npc, L2PcInstance player)
+	public final void notifyEvent(String event, L2Npc npc, L2PcInstance player)
 	{
 		String res = null;
 		try
@@ -506,9 +560,10 @@ public class Quest extends AbstractScript implements IIdentifiable
 		}
 		catch (Exception e)
 		{
-			return showError(player, e);
+			showError(player, e);
+			return;
 		}
-		return showResult(player, res, npc);
+		showResult(player, res, npc);
 	}
 	
 	/**
@@ -524,6 +579,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(player, e);
+			return;
 		}
 		showResult(player, res);
 	}
@@ -543,28 +599,37 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(killer, e);
+			return;
 		}
 		showResult(killer, res);
 	}
 	
 	/**
 	 * @param npc
-	 * @param activeChar
-	 * @return {@code false} if there was an error or the message was sent, {@code true} otherwise
+	 * @param player
 	 */
-	public final boolean notifyTalk(L2Npc npc, L2PcInstance activeChar)
+	public final void notifyTalk(L2Npc npc, L2PcInstance player)
 	{
 		String res = null;
 		try
 		{
-			res = onTalk(npc, activeChar);
+			final String startConditionHtml = getStartConditionHtml(player);
+			if (!player.hasQuestState(_name) && (startConditionHtml != null))
+			{
+				res = startConditionHtml;
+			}
+			else
+			{
+				res = onTalk(npc, player);
+			}
 		}
 		catch (Exception e)
 		{
-			return showError(activeChar, e);
+			showError(player, e);
+			return;
 		}
-		activeChar.setLastQuestNpcObject(npc.getObjectId());
-		return showResult(activeChar, res, npc);
+		player.setLastQuestNpcObject(npc.getObjectId());
+		showResult(player, res, npc);
 	}
 	
 	/**
@@ -583,6 +648,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(player, e);
+			return;
 		}
 		showResult(player, res, npc);
 	}
@@ -604,6 +670,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(player, e);
+			return;
 		}
 		showResult(player, res);
 	}
@@ -611,31 +678,20 @@ public class Quest extends AbstractScript implements IIdentifiable
 	/**
 	 * @param item
 	 * @param player
-	 * @return
 	 */
-	public final boolean notifyItemTalk(L2ItemInstance item, L2PcInstance player)
+	public final void notifyItemTalk(L2ItemInstance item, L2PcInstance player)
 	{
 		String res = null;
 		try
 		{
 			res = onItemTalk(item, player);
-			if (res != null)
-			{
-				if (res.equalsIgnoreCase("true"))
-				{
-					return true;
-				}
-				else if (res.equalsIgnoreCase("false"))
-				{
-					return false;
-				}
-			}
 		}
 		catch (Exception e)
 		{
-			return showError(player, e);
+			showError(player, e);
+			return;
 		}
-		return showResult(player, res);
+		showResult(player, res);
 	}
 	
 	/**
@@ -652,9 +708,8 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 * @param item
 	 * @param player
 	 * @param event
-	 * @return
 	 */
-	public final boolean notifyItemEvent(L2ItemInstance item, L2PcInstance player, String event)
+	public final void notifyItemEvent(L2ItemInstance item, L2PcInstance player, String event)
 	{
 		String res = null;
 		try
@@ -662,21 +717,18 @@ public class Quest extends AbstractScript implements IIdentifiable
 			res = onItemEvent(item, player, event);
 			if (res != null)
 			{
-				if (res.equalsIgnoreCase("true"))
+				if (res.equalsIgnoreCase("true") || res.equalsIgnoreCase("false"))
 				{
-					return true;
-				}
-				else if (res.equalsIgnoreCase("false"))
-				{
-					return false;
+					return;
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			return showError(player, e);
+			showError(player, e);
+			return;
 		}
-		return showResult(player, res);
+		showResult(player, res);
 	}
 	
 	/**
@@ -696,6 +748,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(caster, e);
+			return;
 		}
 		showResult(caster, res);
 	}
@@ -716,6 +769,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(attacker, e);
+			return;
 		}
 		showResult(attacker, res);
 	}
@@ -735,6 +789,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		catch (Exception e)
 		{
 			showError(player, e);
+			return;
 		}
 		showResult(player, res);
 	}
@@ -762,6 +817,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 			{
 				showError(player, e);
 			}
+			return;
 		}
 		if (player != null)
 		{
@@ -805,6 +861,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 			{
 				showError(player, e);
 			}
+			return;
 		}
 		if (player != null)
 		{
@@ -830,6 +887,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 			{
 				showError(player, e);
 			}
+			return;
 		}
 		if (player != null)
 		{
@@ -1175,6 +1233,14 @@ public class Quest extends AbstractScript implements IIdentifiable
 	public String onSpawn(L2Npc npc)
 	{
 		return null;
+	}
+	
+	/**
+	 * This function is called whenever an NPC is teleport.<br>
+	 * @param npc this parameter contains a reference to the exact instance of the NPC who just teleport.
+	 */
+	protected void onTeleport(L2Npc npc)
+	{
 	}
 	
 	/**
@@ -1896,6 +1962,24 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	/**
+	 * Add this quest to the list of quests that the passed npc will respond to for Teleport Events.
+	 * @param npcIds the IDs of the NPCs to register
+	 */
+	public void addTeleportId(int... npcIds)
+	{
+		setNpcTeleportId(event -> notifyTeleport(event.getNpc()), npcIds);
+	}
+	
+	/**
+	 * Add this quest to the list of quests that the passed npc will respond to for Teleport Events.
+	 * @param npcIds the IDs of the NPCs to register
+	 */
+	public void addTeleportId(Collection<Integer> npcIds)
+	{
+		setNpcTeleportId(event -> notifyTeleport(event.getNpc()), npcIds);
+	}
+	
+	/**
 	 * Add this quest to the list of quests that the passed npc will respond to for spawn events.
 	 * @param npcIds the IDs of the NPCs to register
 	 */
@@ -2564,7 +2648,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		{
 			if (npc != null)
 			{
-				content = content.replaceAll("%objectId%", Integer.toString(npc.getObjectId()));
+				content = content.replaceAll("%objectId%", String.valueOf(npc.getObjectId()));
 			}
 			
 			if (questwindow && (questId > 0) && (questId < 20000) && (questId != 999))
@@ -2574,16 +2658,23 @@ public class Quest extends AbstractScript implements IIdentifiable
 				npcReply.replace("%playername%", player.getName());
 				player.sendPacket(npcReply);
 			}
-			else
+		}
+		else
+		{
+			int highestRoll = 0;
+			
+			for (L2PcInstance member : party.getMembers())
 			{
 				final NpcHtmlMessage npcReply = new NpcHtmlMessage(npc != null ? npc.getObjectId() : 0, content);
 				npcReply.replace("%playername%", player.getName());
 				player.sendPacket(npcReply);
 			}
-			player.sendPacket(ActionFailed.STATIC_PACKET);
 		}
-		
-		return content;
+		if ((luckyPlayer != null) && checkDistanceToTarget(luckyPlayer, npc))
+		{
+			return luckyPlayer;
+		}
+		return null;
 	}
 	
 	/**
@@ -2591,7 +2682,22 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 * @param fileName the html file to be get.
 	 * @return the HTML file contents
 	 */
-	public String getHtm(String prefix, String fileName)
+	public boolean checkPartyMember(L2PcInstance player, L2Npc npc)
+	{
+		return true;
+	}
+	
+	/**
+	 * Get a random party member from the player's party who has this quest at the specified quest progress.<br>
+	 * If the player is not in a party, only the player himself is checked.
+	 * @param player the player whose random party member state to get
+	 * @param condition the quest progress step the random member should be at (-1 = check only if quest is started)
+	 * @param playerChance how many times more chance does the player get compared to other party members (3 - 3x more chance).<br>
+	 *            On retail servers, the killer usually gets 2-3x more chance than other party members
+	 * @param target the NPC to use for the distance check (can be null)
+	 * @return the {@link QuestState} object of the random party member or {@code null} if none matched the condition
+	 */
+	public QuestState getRandomPartyMemberState(L2PcInstance player, int condition, int playerChance, L2Npc target)
 	{
 		final HtmCache hc = HtmCache.getInstance();
 		String content = hc.getHtm(prefix, fileName.startsWith("data/") ? fileName : "data/scripts/" + getDescr().toLowerCase() + "/" + getName() + "/" + fileName);
@@ -2633,12 +2739,6 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	@Override
-	public String getScriptName()
-	{
-		return getName();
-	}
-	
-	@Override
 	public void setActive(boolean status)
 	{
 		// TODO: Implement me.
@@ -2667,23 +2767,26 @@ public class Quest extends AbstractScript implements IIdentifiable
 		// cancel all pending timers before reloading.
 		// if timers ought to be restarted, the quest can take care of it
 		// with its code (example: save global data indicating what timer must be restarted).
-		for (List<QuestTimer> timers : _allEventTimers.values())
+		if (_questTimers != null)
 		{
-			_readLock.lock();
-			try
+			for (List<QuestTimer> timers : getQuestTimers().values())
 			{
-				for (QuestTimer timer : timers)
+				_readLock.lock();
+				try
 				{
-					timer.cancel();
+					for (QuestTimer timer : timers)
+					{
+						timer.cancel();
+					}
 				}
+				finally
+				{
+					_readLock.unlock();
+				}
+				timers.clear();
 			}
-			finally
-			{
-				_readLock.unlock();
-			}
-			timers.clear();
+			getQuestTimers().clear();
 		}
-		_allEventTimers.clear();
 		
 		if (removeFromList)
 		{
@@ -2693,7 +2796,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	@Override
-	public ScriptManager<?> getScriptManager()
+	public ScriptManager<?> getManager()
 	{
 		return QuestManager.getInstance();
 	}
@@ -2721,10 +2824,194 @@ public class Quest extends AbstractScript implements IIdentifiable
 	}
 	
 	/**
+	 * Verifies if this is a custom quest.
 	 * @return {@code true} if the quest script is a custom quest, {@code false} otherwise.
 	 */
 	public boolean isCustomQuest()
 	{
 		return _isCustom;
+	}
+	
+	/**
+	 * Gets the start conditions.
+	 * @return the start conditions
+	 */
+	private Map<Predicate<L2PcInstance>, String> getStartConditions()
+	{
+		if (_startCondition == null)
+		{
+			synchronized (this)
+			{
+				if (_startCondition == null)
+				{
+					_startCondition = new LinkedHashMap<>(1);
+				}
+			}
+			player.sendPacket(ActionFailed.STATIC_PACKET);
+		}
+		return _startCondition;
+	}
+	
+	/**
+	 * Verifies if the player meets all the start conditions.
+	 * @param player the player
+	 * @return {@code true} if all conditions are met
+	 */
+	public boolean canStartQuest(L2PcInstance player)
+	{
+		if (_startCondition == null)
+		{
+			return true;
+		}
+		
+		for (Predicate<L2PcInstance> cond : _startCondition.keySet())
+		{
+			if (!cond.test(player))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Gets the HTML for the first starting condition not met.
+	 * @param player the player
+	 * @return the HTML
+	 */
+	public String getStartConditionHtml(L2PcInstance player)
+	{
+		if (_startCondition == null)
+		{
+			return null;
+		}
+		
+		for (Entry<Predicate<L2PcInstance>, String> startRequirement : _startCondition.entrySet())
+		{
+			if (!startRequirement.getKey().test(player))
+			{
+				return startRequirement.getValue();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Adds a predicate to the start conditions.
+	 * @param questStartRequirement the predicate condition
+	 * @param html the HTML to display if that condition is not met
+	 */
+	public void addCondStart(Predicate<L2PcInstance> questStartRequirement, String html)
+	{
+		getStartConditions().put(questStartRequirement, html);
+	}
+	
+	/**
+	 * Adds a minimum/maximum level start condition to the quest.
+	 * @param minLevel the minimum player's level to start the quest
+	 * @param maxLevel the maximum player's level to start the quest
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondLevel(int minLevel, int maxLevel, String html)
+	{
+		getStartConditions().put(p -> (p.getLevel() >= minLevel) && (p.getLevel() <= maxLevel), html);
+	}
+	
+	/**
+	 * Adds a minimum level start condition to the quest.
+	 * @param minLevel the minimum player's level to start the quest
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondMinLevel(int minLevel, String html)
+	{
+		getStartConditions().put(p -> p.getLevel() >= minLevel, html);
+	}
+	
+	/**
+	 * Adds a minimum/maximum level start condition to the quest.
+	 * @param maxLevel the maximum player's level to start the quest
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondMaxLevel(int maxLevel, String html)
+	{
+		getStartConditions().put(p -> p.getLevel() <= maxLevel, html);
+	}
+	
+	/**
+	 * Adds a race start condition to the quest.
+	 * @param race the race
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondRace(Race race, String html)
+	{
+		getStartConditions().put(p -> p.getRace() == race, html);
+	}
+	
+	/**
+	 * Adds a not-race start condition to the quest.
+	 * @param race the race
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondNotRace(Race race, String html)
+	{
+		getStartConditions().put(p -> p.getRace() != race, html);
+	}
+	
+	/**
+	 * Adds a quest completed start condition to the quest.
+	 * @param name the quest name
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondCompletedQuest(String name, String html)
+	{
+		getStartConditions().put(p -> p.hasQuestState(name) && p.getQuestState(name).isCompleted(), html);
+	}
+	
+	/**
+	 * Adds a class ID start condition to the quest.
+	 * @param classId the class ID
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondClassId(ClassId classId, String html)
+	{
+		getStartConditions().put(p -> p.getClassId() == classId, html);
+	}
+	
+	/**
+	 * Adds a not-class ID start condition to the quest.
+	 * @param classId the class ID
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondNotClassId(ClassId classId, String html)
+	{
+		getStartConditions().put(p -> p.getClassId() != classId, html);
+	}
+	
+	/**
+	 * Adds a subclass active start condition to the quest.
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondIsSubClassActive(String html)
+	{
+		getStartConditions().put(p -> p.isSubClassActive(), html);
+	}
+	
+	/**
+	 * Adds a not-subclass active start condition to the quest.
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondIsNotSubClassActive(String html)
+	{
+		getStartConditions().put(p -> !p.isSubClassActive(), html);
+	}
+	
+	/**
+	 * Adds a category start condition to the quest.
+	 * @param categoryType the category type
+	 * @param html the HTML to display if the condition is not met
+	 */
+	public void addCondInCategory(CategoryType categoryType, String html)
+	{
+		getStartConditions().put(p -> p.isInCategory(categoryType), html);
 	}
 }

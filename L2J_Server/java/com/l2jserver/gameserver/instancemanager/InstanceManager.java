@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,9 +23,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import javolution.util.FastMap;
-
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -34,18 +34,19 @@ import com.l2jserver.gameserver.engines.DocumentParser;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Instance;
 import com.l2jserver.gameserver.model.instancezone.InstanceWorld;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author evill33t, GodKratos
  */
-public final class InstanceManager extends DocumentParser
+public final class InstanceManager implements IXmlReader
 {
-	private static final Map<Integer, Instance> _instanceList = new FastMap<>();
-	private final Map<Integer, InstanceWorld> _instanceWorlds = new FastMap<>();
+	private static final Map<Integer, Instance> INSTANCES = new ConcurrentHashMap<>();
+	private final Map<Integer, InstanceWorld> _instanceWorlds = new ConcurrentHashMap<>();
 	private int _dynamic = 300000;
 	// InstanceId Names
 	private static final Map<Integer, String> _instanceIdNames = new HashMap<>();
-	private final Map<Integer, Map<Integer, Long>> _playerInstanceTimes = new FastMap<>();
+	private final Map<Integer, Map<Integer, Long>> _playerInstanceTimes = new ConcurrentHashMap<>();
 	// SQL Queries
 	private static final String ADD_INSTANCE_TIME = "INSERT INTO character_instance_time (charId,instanceId,time) values (?,?,?) ON DUPLICATE KEY UPDATE time=?";
 	private static final String RESTORE_INSTANCE_TIMES = "SELECT instanceId,time FROM character_instance_time WHERE charId=?";
@@ -54,11 +55,11 @@ public final class InstanceManager extends DocumentParser
 	protected InstanceManager()
 	{
 		// Creates the multiverse.
-		_instanceList.put(-1, new Instance(-1, "multiverse"));
-		_log.info(getClass().getSimpleName() + ": Multiverse Instance created.");
+		INSTANCES.put(-1, new Instance(-1, "multiverse"));
+		LOGGER.info(getClass().getSimpleName() + ": Multiverse Instance created.");
 		// Creates the universe.
-		_instanceList.put(0, new Instance(0, "universe"));
-		_log.info(getClass().getSimpleName() + ": Universe Instance created.");
+		INSTANCES.put(0, new Instance(0, "universe"));
+		LOGGER.info(getClass().getSimpleName() + ": Universe Instance created.");
 		load();
 	}
 	
@@ -67,7 +68,7 @@ public final class InstanceManager extends DocumentParser
 	{
 		_instanceIdNames.clear();
 		parseDatapackFile("data/instancenames.xml");
-		_log.info(getClass().getSimpleName() + ": Loaded " + _instanceIdNames.size() + " instance names.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _instanceIdNames.size() + " instance names.");
 	}
 	
 	/**
@@ -125,7 +126,7 @@ public final class InstanceManager extends DocumentParser
 		}
 		catch (Exception e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Could not insert character instance time data: " + e.getMessage());
+			LOGGER.warning(getClass().getSimpleName() + ": Could not insert character instance time data: " + e.getMessage());
 		}
 	}
 	
@@ -145,7 +146,7 @@ public final class InstanceManager extends DocumentParser
 		}
 		catch (Exception e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Could not delete character instance time data: " + e.getMessage());
+			LOGGER.warning(getClass().getSimpleName() + ": Could not delete character instance time data: " + e.getMessage());
 		}
 	}
 	
@@ -158,7 +159,7 @@ public final class InstanceManager extends DocumentParser
 		{
 			return; // already restored
 		}
-		_playerInstanceTimes.put(playerObjId, new FastMap<Integer, Long>());
+		_playerInstanceTimes.put(playerObjId, new ConcurrentHashMap<>());
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(RESTORE_INSTANCE_TIMES))
 		{
@@ -182,7 +183,7 @@ public final class InstanceManager extends DocumentParser
 		}
 		catch (Exception e)
 		{
-			_log.warning(getClass().getSimpleName() + ": Could not delete character instance time data: " + e.getMessage());
+			LOGGER.warning(getClass().getSimpleName() + ": Could not delete character instance time data: " + e.getMessage());
 		}
 	}
 	
@@ -200,9 +201,9 @@ public final class InstanceManager extends DocumentParser
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equals(n.getNodeName()))
 			{
@@ -262,18 +263,15 @@ public final class InstanceManager extends DocumentParser
 		{
 			return;
 		}
-		final Instance temp = _instanceList.get(instanceid);
+		final Instance temp = INSTANCES.get(instanceid);
 		if (temp != null)
 		{
 			temp.removeNpcs();
 			temp.removePlayers();
 			temp.removeDoors();
 			temp.cancelTimer();
-			_instanceList.remove(instanceid);
-			if (_instanceWorlds.containsKey(instanceid))
-			{
-				_instanceWorlds.remove(instanceid);
-			}
+			INSTANCES.remove(instanceid);
+			_instanceWorlds.remove(instanceid);
 		}
 	}
 	
@@ -283,7 +281,7 @@ public final class InstanceManager extends DocumentParser
 	 */
 	public Instance getInstance(int instanceid)
 	{
-		return _instanceList.get(instanceid);
+		return INSTANCES.get(instanceid);
 	}
 	
 	/**
@@ -291,7 +289,7 @@ public final class InstanceManager extends DocumentParser
 	 */
 	public Map<Integer, Instance> getInstances()
 	{
-		return _instanceList;
+		return INSTANCES;
 	}
 	
 	/**
@@ -300,7 +298,7 @@ public final class InstanceManager extends DocumentParser
 	 */
 	public int getPlayerInstance(int objectId)
 	{
-		for (Instance temp : _instanceList.values())
+		for (Instance temp : INSTANCES.values())
 		{
 			if (temp == null)
 			{
@@ -328,7 +326,7 @@ public final class InstanceManager extends DocumentParser
 		}
 		
 		final Instance instance = new Instance(id);
-		_instanceList.put(id, instance);
+		INSTANCES.put(id, instance);
 		return true;
 	}
 	
@@ -345,7 +343,7 @@ public final class InstanceManager extends DocumentParser
 		}
 		
 		final Instance instance = new Instance(id);
-		_instanceList.put(id, instance);
+		INSTANCES.put(id, instance);
 		instance.loadInstanceTemplate(template);
 		return true;
 	}
@@ -362,12 +360,12 @@ public final class InstanceManager extends DocumentParser
 			_dynamic++;
 			if (_dynamic == Integer.MAX_VALUE)
 			{
-				_log.warning(getClass().getSimpleName() + ": More then " + (Integer.MAX_VALUE - 300000) + " instances created");
+				LOGGER.warning(getClass().getSimpleName() + ": More then " + (Integer.MAX_VALUE - 300000) + " instances created");
 				_dynamic = 300000;
 			}
 		}
 		final Instance instance = new Instance(_dynamic);
-		_instanceList.put(_dynamic, instance);
+		INSTANCES.put(_dynamic, instance);
 		if (template != null)
 		{
 			instance.loadInstanceTemplate(template);

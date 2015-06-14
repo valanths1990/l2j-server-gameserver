@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -25,8 +25,9 @@ import java.util.logging.Logger;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
-import com.l2jserver.gameserver.datatables.HitConditionBonus;
-import com.l2jserver.gameserver.datatables.KarmaData;
+import com.l2jserver.gameserver.data.xml.impl.HitConditionBonusData;
+import com.l2jserver.gameserver.data.xml.impl.KarmaData;
+import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
@@ -53,24 +54,24 @@ import com.l2jserver.gameserver.model.items.type.ArmorType;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncArmorSet;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncAtkAccuracy;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncAtkCritical;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncAtkEvasion;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncGatesMDefMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncGatesPDefMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncHenna;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMAtkCritical;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMAtkMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMAtkSpeed;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMDefMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMaxCpMul;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMaxHpMul;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMaxMpMul;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncMoveSpeed;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncPAtkMod;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncPAtkSpeed;
-import com.l2jserver.gameserver.model.skills.funcs.formulas.FuncPDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncArmorSet;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncAtkAccuracy;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncAtkCritical;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncAtkEvasion;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncGatesMDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncGatesPDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncHenna;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMAtkCritical;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMAtkMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMAtkSpeed;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMDefMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMaxCpMul;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMaxHpMul;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMaxMpMul;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncMoveSpeed;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncPAtkMod;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncPAtkSpeed;
+import com.l2jserver.gameserver.model.stats.functions.formulas.FuncPDefMod;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2CastleZone;
 import com.l2jserver.gameserver.model.zone.type.L2ClanHallZone;
@@ -473,50 +474,28 @@ public final class Formulas
 	}
 	
 	/**
-	 * Calculate the CP regen rate (base + modifiers).
-	 * @param cha
-	 * @return
+	 * Calculates the CP regeneration rate (base + modifiers).
+	 * @param player the player
+	 * @return the CP regeneration rate
 	 */
-	public static final double calcCpRegen(L2Character cha)
+	public static final double calcCpRegen(L2PcInstance player)
 	{
-		double init = cha.isPlayer() ? cha.getActingPlayer().getTemplate().getBaseCpRegen(cha.getLevel()) : cha.getTemplate().getBaseHpReg();
+		// With CON bonus
+		final double init = player.getActingPlayer().getTemplate().getBaseCpRegen(player.getLevel()) * player.getLevelMod() * BaseStats.CON.calcBonus(player);
 		double cpRegenMultiplier = Config.CP_REGEN_MULTIPLIER;
-		double cpRegenBonus = 0;
-		
-		if (cha.isPlayer())
+		if (player.isSitting())
 		{
-			L2PcInstance player = cha.getActingPlayer();
-			
-			// Calculate Movement bonus
-			if (player.isSitting())
-			{
-				cpRegenMultiplier *= 1.5; // Sitting
-			}
-			else if (!player.isMoving())
-			{
-				cpRegenMultiplier *= 1.1; // Staying
-			}
-			else if (player.isRunning())
-			{
-				cpRegenMultiplier *= 0.7; // Running
-			}
+			cpRegenMultiplier *= 1.5; // Sitting
 		}
-		else
+		else if (!player.isMoving())
 		{
-			// Calculate Movement bonus
-			if (!cha.isMoving())
-			{
-				cpRegenMultiplier *= 1.1; // Staying
-			}
-			else if (cha.isRunning())
-			{
-				cpRegenMultiplier *= 0.7; // Running
-			}
+			cpRegenMultiplier *= 1.1; // Staying
 		}
-		
-		// Apply CON bonus
-		init *= cha.getLevelMod() * BaseStats.CON.calcBonus(cha);
-		return (cha.calcStat(Stats.REGENERATE_CP_RATE, Math.max(1, init), null, null) * cpRegenMultiplier) + cpRegenBonus;
+		else if (player.isRunning())
+		{
+			cpRegenMultiplier *= 0.7; // Running
+		}
+		return player.calcStat(Stats.REGENERATE_CP_RATE, Math.max(1, init), null, null) * cpRegenMultiplier;
 	}
 	
 	public static final double calcFestivalRegenModifier(L2PcInstance activeChar)
@@ -1216,7 +1195,7 @@ public final class Formulas
 		int chance = (80 + (2 * (attacker.getAccuracy() - target.getEvasionRate(attacker)))) * 10;
 		
 		// Get additional bonus from the conditions when you are attacking
-		chance *= HitConditionBonus.getInstance().getConditionBonus(attacker, target);
+		chance *= HitConditionBonusData.getInstance().getConditionBonus(attacker, target);
 		
 		chance = Math.max(chance, 200);
 		chance = Math.min(chance, 980);
@@ -1340,21 +1319,19 @@ public final class Formulas
 	
 	/**
 	 * Calculates the effect landing success.<br>
-	 * @param env the data transfer object
+	 * @param attacker the attacker
+	 * @param target the target
+	 * @param skill the skill
 	 * @return {@code true} if the effect lands
 	 */
-	public static boolean calcEffectSuccess(Env env)
+	public static boolean calcEffectSuccess(L2Character attacker, L2Character target, Skill skill)
 	{
-		final L2Character target = env.getTarget();
-		
 		// StaticObjects can not receive continuous effects.
 		if (target.isDoor() || (target instanceof L2SiegeFlagInstance) || (target instanceof L2StaticObjectInstance))
 		{
 			return false;
 		}
 		
-		final L2Character attacker = env.getCharacter();
-		final Skill skill = env.getSkill();
 		if (skill.isDebuff() && (target.calcStat(Stats.DEBUFF_IMMUNITY, 0, attacker, skill) > 0))
 		{
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_RESISTED_YOUR_S2);
@@ -1409,7 +1386,7 @@ public final class Formulas
 		{
 			double mAtk = attacker.getMAtk(null, null);
 			double val = 0;
-			if (env.isBlessedSpiritShot())// only blessed spiritshot!
+			if (attacker.isChargedShot(ShotType.BLESSED_SPIRITSHOTS))
 			{
 				val = mAtk * 3.0;// 3.0 is the blessed spiritshot multiplier
 			}
@@ -1466,7 +1443,7 @@ public final class Formulas
 		}
 		
 		// if target reflect this skill then the effect will fail
-		if (!calcBuffDebuffReflection(target, skill))
+		if (calcBuffDebuffReflection(target, skill))
 		{
 			return false;
 		}
@@ -1596,16 +1573,17 @@ public final class Formulas
 		{
 			if (attacker.isPlayer())
 			{
-				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_RESISTED_YOUR_S2);
+				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DAMAGE_DECREASED_BECAUSE_C1_RESISTED_C2_MAGIC);
 				sm.addCharName(target);
-				sm.addSkillName(skill);
+				sm.addCharName(attacker);
 				attacker.sendPacket(sm);
 				damage /= 2;
 			}
 			
 			if (target.isPlayer())
 			{
-				SystemMessage sm2 = SystemMessage.getSystemMessage(SystemMessageId.RESISTED_C1_MAGIC);
+				SystemMessage sm2 = SystemMessage.getSystemMessage(SystemMessageId.C1_WEAKLY_RESISTED_C2_MAGIC);
+				sm2.addCharName(target);
 				sm2.addCharName(attacker);
 				target.sendPacket(sm2);
 			}
@@ -1671,13 +1649,34 @@ public final class Formulas
 			return false;
 		}
 		
-		double val = actor.getStat().calcStat(Stats.SKILL_MASTERY, 1, null, null);
-		if (actor.isPlayer())
+		final int val = (int) actor.getStat().calcStat(Stats.SKILL_CRITICAL, 0, null, null);
+		
+		if (val == 0)
 		{
-			val *= (actor.getActingPlayer().isMageClass() ? BaseStats.INT : BaseStats.STR).calcBonus(actor);
+			return false;
 		}
 		
-		return Rnd.get(100) < val;
+		if (actor.isPlayer())
+		{
+			double initVal = 0;
+			switch (val)
+			{
+				case 1:
+				{
+					initVal = (BaseStats.STR).calcBonus(actor);
+					break;
+				}
+				case 4:
+				{
+					initVal = (BaseStats.INT).calcBonus(actor);
+					break;
+				}
+			}
+			initVal *= actor.getStat().calcStat(Stats.SKILL_CRITICAL_PROBABILITY, 1, null, null);
+			return (Rnd.get(100) < initVal);
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -1980,14 +1979,14 @@ public final class Formulas
 				}
 				
 				// Prevent initialization.
-				final List<BuffInfo> buffs = target.getEffectList().hasBuffs() ? new ArrayList<>(target.getEffectList().getBuffs().values()) : new ArrayList<>(1);
+				final List<BuffInfo> buffs = target.getEffectList().hasBuffs() ? new ArrayList<>(target.getEffectList().getBuffs()) : new ArrayList<>(1);
 				if (target.getEffectList().hasTriggered())
 				{
-					buffs.addAll(target.getEffectList().getTriggered().values());
+					buffs.addAll(target.getEffectList().getTriggered());
 				}
 				if (target.getEffectList().hasDances())
 				{
-					buffs.addAll(target.getEffectList().getDances().values());
+					buffs.addAll(target.getEffectList().getDances());
 				}
 				for (int i = buffs.size() - 1; i >= 0; i--) // reverse order
 				{
@@ -2006,7 +2005,7 @@ public final class Formulas
 			}
 			case "debuff":
 			{
-				final List<BuffInfo> debuffs = new ArrayList<>(target.getEffectList().getDebuffs().values());
+				final List<BuffInfo> debuffs = new ArrayList<>(target.getEffectList().getDebuffs());
 				for (int i = debuffs.size() - 1; i >= 0; i--)
 				{
 					BuffInfo info = debuffs.get(i);
@@ -2035,14 +2034,13 @@ public final class Formulas
 	/**
 	 * Calculates the abnormal time for an effect.<br>
 	 * The abnormal time is taken from the skill definition, and it's global for all effects present in the skills.
-	 * @param env the data transfer object with required information
+	 * @param caster the caster
+	 * @param target the target
+	 * @param skill the skill
 	 * @return the time that the effect will last
 	 */
-	public static int calcEffectAbnormalTime(Env env)
+	public static int calcEffectAbnormalTime(L2Character caster, L2Character target, Skill skill)
 	{
-		final L2Character caster = env.getCharacter();
-		final L2Character target = env.getTarget();
-		final Skill skill = env.getSkill();
 		int time = skill.isPassive() || skill.isToggle() ? -1 : skill.getAbnormalTime();
 		
 		// An herb buff will affect both master and servitor, but the buff duration will be half of the normal duration.
@@ -2053,7 +2051,7 @@ public final class Formulas
 		}
 		
 		// If the skill is a mastery skill, the effect will last twice the default time.
-		if (env.isSkillMastery())
+		if (Formulas.calcSkillMastery(caster, skill))
 		{
 			time *= 2;
 		}
@@ -2106,7 +2104,7 @@ public final class Formulas
 		{
 			exp /= Config.RATE_KARMA_LOST;
 		}
-		return (int) ((Math.abs(exp) / karmaLooseMul) / 15);
+		return (int) ((Math.abs(exp) / karmaLooseMul) / 30);
 	}
 	
 	/**

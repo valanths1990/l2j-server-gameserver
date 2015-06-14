@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -27,9 +27,8 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 import com.l2jserver.gameserver.network.serverpackets.SkillCoolTime;
 
 /**
@@ -63,26 +62,22 @@ public class Options
 		return !_funcs.isEmpty();
 	}
 	
-	public List<Func> getStatFuncs(L2ItemInstance item, L2Character player)
+	public List<AbstractFunction> getStatFuncs(L2ItemInstance item, L2Character player)
 	{
 		if (_funcs.isEmpty())
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
-		final List<Func> funcs = new ArrayList<>(_funcs.size());
-		final Env env = new Env();
-		env.setCharacter(player);
-		env.setTarget(player);
-		env.setItem(item);
-		for (FuncTemplate t : _funcs)
+		final List<AbstractFunction> funcs = new ArrayList<>(_funcs.size());
+		for (FuncTemplate fuctionTemplate : _funcs)
 		{
-			Func f = t.getFunc(env, this);
-			if (f != null)
+			AbstractFunction fuction = fuctionTemplate.getFunc(player, player, item, this);
+			if (fuction != null)
 			{
-				funcs.add(f);
+				funcs.add(fuction);
 			}
-			player.sendDebugMessage("Adding stats: " + t.stat + " val: " + t.lambda.calc(env));
+			player.sendDebugMessage("Adding stats: " + fuctionTemplate.getStat() + " val: " + fuctionTemplate.getValue());
 		}
 		return funcs;
 	}

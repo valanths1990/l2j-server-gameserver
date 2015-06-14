@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -46,7 +46,7 @@ public final class EventDispatcher
 	 */
 	public <T extends AbstractEventReturn> T notifyEvent(IBaseEvent event)
 	{
-		return Containers.Global().hasListener(event.getType()) ? notifyEvent(event, null, null) : null;
+		return notifyEvent(event, null, null);
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public final class EventDispatcher
 	 */
 	public <T extends AbstractEventReturn> T notifyEvent(IBaseEvent event, Class<T> callbackClass)
 	{
-		return Containers.Global().hasListener(event.getType()) ? notifyEvent(event, null, callbackClass) : null;
+		return notifyEvent(event, null, callbackClass);
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public final class EventDispatcher
 	 */
 	public <T extends AbstractEventReturn> T notifyEvent(IBaseEvent event, ListenersContainer container)
 	{
-		return Containers.Global().hasListener(event.getType()) ? notifyEvent(event, container, null) : null;
+		return notifyEvent(event, container, null);
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public final class EventDispatcher
 	{
 		try
 		{
-			return Containers.Global().hasListener(event.getType()) || container.hasListener(event.getType()) ? notifyEventImpl(event, container, callbackClass) : null;
+			return Containers.Global().hasListener(event.getType()) || ((container != null) && container.hasListener(event.getType())) ? notifyEventImpl(event, container, callbackClass) : null;
 		}
 		catch (Exception e)
 		{
@@ -160,13 +160,13 @@ public final class EventDispatcher
 	 */
 	private <T extends AbstractEventReturn> T notifyEventToMultipleContainers(IBaseEvent event, ListenersContainer[] containers, Class<T> callbackClass)
 	{
+		if (event == null)
+		{
+			throw new NullPointerException("Event cannot be null!");
+		}
+		
 		try
 		{
-			if (event == null)
-			{
-				throw new NullPointerException("Event cannot be null!");
-			}
-			
 			T callback = null;
 			if (containers != null)
 			{

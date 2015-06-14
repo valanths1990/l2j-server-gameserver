@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  *
  * This file is part of L2J Server.
  *
@@ -21,10 +21,12 @@ package com.l2jserver.gameserver.model.conditions;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Fort;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
@@ -42,23 +44,27 @@ public class ConditionPlayerCanCreateOutpost extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
+		if ((effector == null) || !effector.isPlayer())
+		{
+			return !_val;
+		}
+		
+		final L2PcInstance player = effector.getActingPlayer();
 		boolean canCreateOutpost = true;
-		if ((env.getPlayer() == null) || env.getPlayer().isAlikeDead() || env.getPlayer().isCursedWeaponEquipped() || (env.getPlayer().getClan() == null))
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || (player.getClan() == null))
 		{
 			canCreateOutpost = false;
 		}
 		
-		final Castle castle = CastleManager.getInstance().getCastle(env.getPlayer());
-		final Fort fort = FortManager.getInstance().getFort(env.getPlayer());
-		
+		final Castle castle = CastleManager.getInstance().getCastle(player);
+		final Fort fort = FortManager.getInstance().getFort(player);
 		if ((castle == null) && (fort == null))
 		{
 			canCreateOutpost = false;
 		}
 		
-		L2PcInstance player = env.getPlayer().getActingPlayer();
 		if (((fort != null) && (fort.getResidenceId() == 0)) || ((castle != null) && (castle.getResidenceId() == 0)))
 		{
 			player.sendMessage("You must be on fort or castle ground to construct an outpost or flag.");

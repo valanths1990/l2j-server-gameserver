@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -31,14 +31,14 @@ import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
+import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.handler.ITargetTypeHandler;
 import com.l2jserver.gameserver.handler.TargetHandler;
 import com.l2jserver.gameserver.instancemanager.HandysBlockCheckerManager;
 import com.l2jserver.gameserver.model.ArenaParticipantsHolder;
-import com.l2jserver.gameserver.model.ChanceCondition;
 import com.l2jserver.gameserver.model.L2ExtractableProductItem;
 import com.l2jserver.gameserver.model.L2ExtractableSkill;
 import com.l2jserver.gameserver.model.L2Object;
@@ -55,22 +55,21 @@ import com.l2jserver.gameserver.model.effects.AbstractEffect;
 import com.l2jserver.gameserver.model.effects.L2EffectType;
 import com.l2jserver.gameserver.model.entity.TvTEvent;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
-import com.l2jserver.gameserver.model.interfaces.IChanceSkillTrigger;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
-import com.l2jserver.gameserver.model.skills.funcs.Func;
-import com.l2jserver.gameserver.model.skills.funcs.FuncTemplate;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.TraitType;
+import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
+import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 import com.l2jserver.gameserver.model.zone.ZoneId;
+import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.FlyToLocation.FlyType;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
 
-public final class Skill implements IChanceSkillTrigger, IIdentifiable
+public final class Skill implements IIdentifiable
 {
 	private static final Logger _log = Logger.getLogger(Skill.class.getName());
 	
@@ -128,7 +127,7 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 	/** If {@code true} this skill's effect recovery HP/MP or CP from herb. */
 	private final boolean _isRecoveryHerb;
 	
-	private final int _refId;
+	private int _refId;
 	// all times in milliseconds
 	private final int _hitTime;
 	// private final int _skillInterruptTime;
@@ -172,9 +171,6 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 	
 	private final int _minPledgeClass;
 	private final int _chargeConsume;
-	private final int _triggeredId;
-	private final int _triggeredLevel;
-	private final String _chanceType;
 	private final int _soulMaxConsume;
 	
 	private final boolean _isHeroSkill; // If true the skill is a Hero Skill
@@ -188,12 +184,11 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 	// Condition lists
 	private List<Condition> _preCondition;
 	private List<Condition> _itemPreCondition;
+	private Set<MountType> _rideState;
 	// Function lists
 	private List<FuncTemplate> _funcTemplates;
 	
 	private final Map<EffectScope, List<AbstractEffect>> _effectLists = new EnumMap<>(EffectScope.class);
-	
-	protected ChanceCondition _chanceCondition = null;
 	
 	// Flying support
 	private final FlyType _flyType;
@@ -228,7 +223,6 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 	{
 		_id = set.getInt("skill_id");
 		_level = set.getInt("level");
-		_refId = set.getInt("referenceId", 0);
 		_displayId = set.getInt("displayId", _id);
 		_displayLevel = set.getInt("displayLevel", _level);
 		_name = set.getString("name", "");
@@ -292,6 +286,26 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		
 		_affectRange = set.getInt("affectRange", 0);
 		
+		final String rideState = set.getString("rideState", null);
+		if (rideState != null)
+		{
+			String[] state = rideState.split(";");
+			if (state.length > 0)
+			{
+				_rideState = new HashSet<>(state.length);
+				for (String s : state)
+				{
+					try
+					{
+						_rideState.add(MountType.valueOf(s));
+					}
+					catch (Exception e)
+					{
+						_log.warning("Bad data in rideState for skill " + this + " !\n" + e);
+					}
+				}
+			}
+		}
 		final String affectLimit = set.getString("affectLimit", null);
 		if (affectLimit != null)
 		{
@@ -307,7 +321,7 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			}
 		}
 		
-		_targetType = set.getEnum("targetType", L2TargetType.class);
+		_targetType = set.getEnum("targetType", L2TargetType.class, L2TargetType.SELF);
 		_power = set.getFloat("power", 0.f);
 		_pvpPower = set.getFloat("pvpPower", (float) getPower());
 		_pvePower = set.getFloat("pvePower", (float) getPower());
@@ -335,13 +349,6 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		
 		_minPledgeClass = set.getInt("minPledgeClass", 0);
 		_chargeConsume = set.getInt("chargeConsume", 0);
-		_triggeredId = set.getInt("triggeredId", 0);
-		_triggeredLevel = set.getInt("triggeredLevel", 1);
-		_chanceType = set.getString("chanceType", "");
-		if (!_chanceType.isEmpty())
-		{
-			_chanceCondition = ChanceCondition.parse(set);
-		}
 		
 		_soulMaxConsume = set.getInt("soulMaxConsumeCount", 0);
 		_blowChance = set.getInt("blowChance", 0);
@@ -437,11 +444,6 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 	public boolean isSuicideAttack()
 	{
 		return _isSuicideAttack;
-	}
-	
-	public boolean allowOnTransform()
-	{
-		return isPassive();
 	}
 	
 	/**
@@ -715,21 +717,6 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		return _displayLevel;
 	}
 	
-	public int getTriggeredId()
-	{
-		return _triggeredId;
-	}
-	
-	public int getTriggeredLevel()
-	{
-		return _triggeredLevel;
-	}
-	
-	public boolean triggerAnotherSkill()
-	{
-		return _triggeredId > 1;
-	}
-	
 	/**
 	 * Return skill basicProperty base stat (STR, INT ...).
 	 * @return
@@ -896,11 +883,6 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		return (_operateType != null) && _operateType.isSelfContinuous();
 	}
 	
-	public boolean isChance()
-	{
-		return (_chanceCondition != null) && isPassive();
-	}
-	
 	public boolean isChanneling()
 	{
 		return (_operateType != null) && _operateType.isChanneling();
@@ -1019,11 +1001,19 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		return _effectPoint < 0;
 	}
 	
-	public boolean checkCondition(L2Character activeChar, L2Object target, boolean itemOrWeapon)
+	public boolean checkCondition(L2Character activeChar, L2Object object, boolean itemOrWeapon)
 	{
 		if (activeChar.canOverrideCond(PcCondOverride.SKILL_CONDITIONS) && !Config.GM_SKILL_RESTRICTION)
 		{
 			return true;
+		}
+		
+		if (activeChar.isPlayer() && !canBeUseWhileRiding((L2PcInstance) activeChar))
+		{
+			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
+			sm.addSkillName(_id);
+			activeChar.sendPacket(sm);
+			return false;
 		}
 		
 		final List<Condition> preCondition = itemOrWeapon ? _itemPreCondition : _preCondition;
@@ -1032,17 +1022,10 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			return true;
 		}
 		
-		final Env env = new Env();
-		env.setCharacter(activeChar);
-		if (target instanceof L2Character)
-		{
-			env.setTarget((L2Character) target);
-		}
-		env.setSkill(this);
-		
+		final L2Character target = (object instanceof L2Character) ? (L2Character) object : null;
 		for (Condition cond : preCondition)
 		{
-			if (!cond.test(env))
+			if (!cond.test(activeChar, target, this))
 			{
 				final String msg = cond.getMessage();
 				final int msgId = cond.getMessageId();
@@ -1063,6 +1046,16 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Checks if a player can use this skill while riding.
+	 * @param player the player
+	 * @return {@code true} if the player can use this skill, {@code false} otherwise
+	 */
+	public boolean canBeUseWhileRiding(final L2PcInstance player)
+	{
+		return (_rideState == null) || _rideState.contains(player.getMountType());
 	}
 	
 	public L2Object[] getTargetList(L2Character activeChar, boolean onlyFirst)
@@ -1226,7 +1219,7 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			}
 		}
 		
-		if ((Config.GEODATA > 0) && !GeoData.getInstance().canSeeTarget(caster, target))
+		if (!GeoData.getInstance().canSeeTarget(caster, target))
 		{
 			return false;
 		}
@@ -1256,25 +1249,22 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		return true;
 	}
 	
-	public List<Func> getStatFuncs(AbstractEffect effect, L2Character player)
+	public List<AbstractFunction> getStatFuncs(AbstractEffect effect, L2Character player)
 	{
 		if (_funcTemplates == null)
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
 		if (!(player instanceof L2Playable) && !(player instanceof L2Attackable))
 		{
-			return Collections.<Func> emptyList();
+			return Collections.<AbstractFunction> emptyList();
 		}
 		
-		final List<Func> funcs = new ArrayList<>(_funcTemplates.size());
-		final Env env = new Env();
-		env.setCharacter(player);
-		env.setSkill(this);
+		final List<AbstractFunction> funcs = new ArrayList<>(_funcTemplates.size());
 		for (FuncTemplate t : _funcTemplates)
 		{
-			Func f = t.getFunc(env, this); // skill is owner
+			AbstractFunction f = t.getFunc(player, null, this, this); // skill is owner
 			if (f != null)
 			{
 				funcs.add(f);
@@ -1392,16 +1382,10 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			return;
 		}
 		
-		final Env env = new Env();
-		env.setSkillMastery(Formulas.calcSkillMastery(effector, this));
-		env.setCharacter(effector);
-		env.setCubic(cubic);
-		env.setTarget(effected);
-		env.setSkill(this);
-		boolean addContinuousEffects = !passive && (_operateType.isToggle() || (_operateType.isContinuous() && Formulas.calcEffectSuccess(env)));
+		boolean addContinuousEffects = !passive && (_operateType.isToggle() || (_operateType.isContinuous() && Formulas.calcEffectSuccess(effector, effected, this)));
 		if (!self && !passive)
 		{
-			final BuffInfo info = new BuffInfo(env);
+			final BuffInfo info = new BuffInfo(effector, effected, this);
 			if (addContinuousEffects && (abnormalTime > 0))
 			{
 				info.setAbnormalTime(abnormalTime);
@@ -1431,10 +1415,9 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		
 		if (self)
 		{
-			addContinuousEffects = !passive && (_operateType.isToggle() || ((_operateType.isContinuous() || _operateType.isSelfContinuous()) && Formulas.calcEffectSuccess(env)));
+			addContinuousEffects = !passive && (_operateType.isToggle() || ((_operateType.isContinuous() || _operateType.isSelfContinuous()) && Formulas.calcEffectSuccess(effector, effector, this)));
 			
-			env.setTarget(effector);
-			final BuffInfo info = new BuffInfo(env);
+			final BuffInfo info = new BuffInfo(effector, effector, this);
 			if (addContinuousEffects && (abnormalTime > 0))
 			{
 				info.setAbnormalTime(abnormalTime);
@@ -1458,8 +1441,7 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		
 		if (passive)
 		{
-			env.setTarget(effector);
-			final BuffInfo info = new BuffInfo(env);
+			final BuffInfo info = new BuffInfo(effector, effector, this);
 			applyEffectScope(EffectScope.PASSIVE, info, false, true);
 			effector.getEffectList().add(info);
 		}
@@ -1509,20 +1491,16 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			}
 			default:
 			{
-				for (L2Character target : (L2Character[]) targets)
+				for (L2Object obj : targets)
 				{
+					final L2Character target = (L2Character) obj;
 					if (Formulas.calcBuffDebuffReflection(target, this))
 					{
 						// if skill is reflected instant effects should be casted on target
 						// and continuous effects on caster
 						applyEffects(target, caster, false, 0);
 						
-						final Env env = new Env();
-						env.setCharacter(caster);
-						env.setTarget(target);
-						env.setSkill(this);
-						
-						final BuffInfo info = new BuffInfo(env);
+						final BuffInfo info = new BuffInfo(caster, target, this);
 						applyEffectScope(EffectScope.GENERAL, info, true, false);
 						
 						EffectScope pvpOrPveEffectScope = caster.isPlayable() && target.isAttackable() ? EffectScope.PVE : caster.isPlayable() && target.isPlayable() ? EffectScope.PVP : null;
@@ -1627,28 +1605,9 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 		return _refId;
 	}
 	
-	@Override
-	public boolean triggersChanceSkill()
+	public void setReferenceItemId(int val)
 	{
-		return (_triggeredId > 0) && isChance();
-	}
-	
-	@Override
-	public int getTriggeredChanceId()
-	{
-		return _triggeredId;
-	}
-	
-	@Override
-	public int getTriggeredChanceLevel()
-	{
-		return _triggeredLevel;
-	}
-	
-	@Override
-	public ChanceCondition getTriggeredChanceCondition()
-	{
-		return _chanceCondition;
+		_refId = val;
 	}
 	
 	public String getAttributeName()
@@ -1720,23 +1679,21 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 			}
 			List<ItemHolder> items = null;
 			double chance = 0;
-			int prodId = 0;
-			int quantity = 0;
-			final int lenght = prodData.length - 1;
+			final int length = prodData.length - 1;
 			try
 			{
-				items = new ArrayList<>(lenght / 2);
-				for (int j = 0; j < lenght; j++)
+				items = new ArrayList<>(length / 2);
+				for (int j = 0; j < length; j += 2)
 				{
-					prodId = Integer.parseInt(prodData[j]);
-					quantity = Integer.parseInt(prodData[j += 1]);
+					final int prodId = Integer.parseInt(prodData[j]);
+					final int quantity = Integer.parseInt(prodData[j + 1]);
 					if ((prodId <= 0) || (quantity <= 0))
 					{
 						_log.warning("Extractable skills data: Error in Skill Id: " + skillId + " Level: " + skillLvl + " wrong production Id: " + prodId + " or wrond quantity: " + quantity + "!");
 					}
 					items.add(new ItemHolder(prodId, quantity));
 				}
-				chance = Double.parseDouble(prodData[lenght]);
+				chance = Double.parseDouble(prodData[length]);
 			}
 			catch (Exception e)
 			{
@@ -1886,5 +1843,10 @@ public final class Skill implements IChanceSkillTrigger, IIdentifiable
 	public int getChannelingTickInitialDelay()
 	{
 		return _channelingTickInitialDelay;
+	}
+	
+	public Set<MountType> getRideState()
+	{
+		return _rideState;
 	}
 }

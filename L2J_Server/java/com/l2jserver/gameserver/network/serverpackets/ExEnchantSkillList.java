@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javolution.util.FastList;
 
 public class ExEnchantSkillList extends L2GameServerPacket
 {
@@ -55,7 +54,7 @@ public class ExEnchantSkillList extends L2GameServerPacket
 	public ExEnchantSkillList(EnchantSkillType type)
 	{
 		_type = type;
-		_skills = new FastList<>();
+		_skills = new ArrayList<>();
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -30,11 +30,11 @@ public abstract class L2VehicleAI extends L2CharacterAI
 {
 	/**
 	 * Simple AI for vehicles
-	 * @param accessor
+	 * @param creature
 	 */
-	public L2VehicleAI(L2Vehicle.AIAccessor accessor)
+	public L2VehicleAI(L2Vehicle creature)
 	{
-		super(accessor);
+		super(creature);
 	}
 	
 	@Override

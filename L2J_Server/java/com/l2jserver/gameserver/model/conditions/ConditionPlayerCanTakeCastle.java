@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  *
  * This file is part of L2J Server.
  *
@@ -19,8 +19,11 @@
 package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.instancemanager.CastleManager;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Castle;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
@@ -39,35 +42,37 @@ public class ConditionPlayerCanTakeCastle extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		boolean canTakeCastle = true;
-		if ((env.getPlayer() == null) || env.getPlayer().isAlikeDead() || env.getPlayer().isCursedWeaponEquipped())
+		if ((effector == null) || !effector.isPlayer())
 		{
-			canTakeCastle = false;
+			return !_val;
 		}
-		else if ((env.getPlayer().getClan() == null) || (env.getPlayer().getClan().getLeaderId() != env.getPlayer().getObjectId()))
+		
+		final L2PcInstance player = effector.getActingPlayer();
+		boolean canTakeCastle = true;
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || !player.isClanLeader())
 		{
 			canTakeCastle = false;
 		}
 		
-		Castle castle = CastleManager.getInstance().getCastle(env.getPlayer());
+		Castle castle = CastleManager.getInstance().getCastle(player);
 		SystemMessage sm;
-		if ((castle == null) || (castle.getResidenceId() <= 0) || !castle.getSiege().isInProgress() || (castle.getSiege().getAttackerClan(env.getPlayer().getClan()) == null))
+		if ((castle == null) || (castle.getResidenceId() <= 0) || !castle.getSiege().isInProgress() || (castle.getSiege().getAttackerClan(player.getClan()) == null))
 		{
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-			sm.addSkillName(env.getSkill());
-			env.getPlayer().sendPacket(sm);
+			sm.addSkillName(skill);
+			player.sendPacket(sm);
 			canTakeCastle = false;
 		}
-		else if (!castle.getArtefacts().contains(env.getTarget()))
+		else if (!castle.getArtefacts().contains(effected))
 		{
-			env.getPlayer().sendPacket(SystemMessageId.INCORRECT_TARGET);
+			player.sendPacket(SystemMessageId.INCORRECT_TARGET);
 			canTakeCastle = false;
 		}
-		else if (!Util.checkIfInRange(env.getSkill().getCastRange(), env.getPlayer(), env.getTarget(), true))
+		else if (!Util.checkIfInRange(skill.getCastRange(), player, effected, true))
 		{
-			env.getPlayer().sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
+			player.sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
 			canTakeCastle = false;
 		}
 		return (_val == canTakeCastle);

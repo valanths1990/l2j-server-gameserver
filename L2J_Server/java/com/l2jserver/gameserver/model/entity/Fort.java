@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -28,24 +28,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.FortUpdater;
 import com.l2jserver.gameserver.FortUpdater.UpdaterType;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.DoorTable;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
+import com.l2jserver.gameserver.data.xml.impl.StaticObjectData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
-import com.l2jserver.gameserver.datatables.StaticObjects;
 import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
@@ -57,7 +55,6 @@ import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2StaticObjectInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.zone.type.L2FortZone;
 import com.l2jserver.gameserver.model.zone.type.L2SiegeZone;
@@ -81,14 +78,14 @@ public final class Fort extends AbstractResidence
 	private int _state = 0;
 	private int _castleId = 0;
 	private int _supplyLvL = 0;
-	private final FastMap<Integer, FortFunction> _function;
+	private final Map<Integer, FortFunction> _function;
 	private final ScheduledFuture<?>[] _FortUpdater = new ScheduledFuture<?>[2];
 	
 	// Spawn Data
 	private boolean _isSuspiciousMerchantSpawned = false;
-	private final FastList<L2Spawn> _siegeNpcs = new FastList<>();
-	private final FastList<L2Spawn> _npcCommanders = new FastList<>();
-	private final FastList<L2Spawn> _specialEnvoys = new FastList<>();
+	private final List<L2Spawn> _siegeNpcs = new CopyOnWriteArrayList<>();
+	private final List<L2Spawn> _npcCommanders = new CopyOnWriteArrayList<>();
+	private final List<L2Spawn> _specialEnvoys = new CopyOnWriteArrayList<>();
 	
 	private final Map<Integer, Integer> _envoyCastles = new HashMap<>(2);
 	private final Set<Integer> _availableCastles = new HashSet<>(1);
@@ -247,7 +244,7 @@ public final class Fort extends AbstractResidence
 		super(fortId);
 		load();
 		loadFlagPoles();
-		_function = new FastMap<>();
+		_function = new ConcurrentHashMap<>();
 		if (getOwnerClan() != null)
 		{
 			setVisibleFlag(true);
@@ -273,11 +270,7 @@ public final class Fort extends AbstractResidence
 	 */
 	public FortFunction getFunction(int type)
 	{
-		if (_function.get(type) != null)
-		{
-			return _function.get(type);
-		}
-		return null;
+		return _function.get(type);
 	}
 	
 	public void endOfSiege(L2Clan clan)
@@ -729,7 +722,7 @@ public final class Fort extends AbstractResidence
 	// This method loads fort door data from database
 	private void loadDoor()
 	{
-		for (L2DoorInstance door : DoorTable.getInstance().getDoors())
+		for (L2DoorInstance door : DoorData.getInstance().getDoors())
 		{
 			if ((door.getFort() != null) && (door.getFort().getResidenceId() == getResidenceId()))
 			{
@@ -740,7 +733,7 @@ public final class Fort extends AbstractResidence
 	
 	private void loadFlagPoles()
 	{
-		for (L2StaticObjectInstance obj : StaticObjects.getInstance().getStaticObjects())
+		for (L2StaticObjectInstance obj : StaticObjectData.getInstance().getStaticObjects())
 		{
 			if ((obj.getType() == 3) && obj.getName().startsWith(getName()))
 			{
@@ -921,7 +914,7 @@ public final class Fort extends AbstractResidence
 			{
 				if (_siege == null)
 				{
-					return _siege = new FortSiege(this);
+					_siege = new FortSiege(this);
 				}
 			}
 		}
@@ -1171,28 +1164,18 @@ public final class Fort extends AbstractResidence
 			ps.setInt(2, 0);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				L2Spawn spawnDat;
-				L2NpcTemplate template;
 				while (rs.next())
 				{
-					template = NpcData.getInstance().getTemplate(rs.getInt("npcId"));
-					if (template != null)
-					{
-						spawnDat = new L2Spawn(template);
-						spawnDat.setAmount(1);
-						spawnDat.setX(rs.getInt("x"));
-						spawnDat.setY(rs.getInt("y"));
-						spawnDat.setZ(rs.getInt("z"));
-						spawnDat.setHeading(rs.getInt("heading"));
-						spawnDat.setRespawnDelay(60);
-						SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-						spawnDat.doSpawn();
-						spawnDat.startRespawn();
-					}
-					else
-					{
-						_log.warning("Fort " + getResidenceId() + " initNpcs: Data missing in NPC table for ID: " + rs.getInt("npcId") + ".");
-					}
+					L2Spawn spawnDat = new L2Spawn(rs.getInt("npcId"));
+					spawnDat.setAmount(1);
+					spawnDat.setX(rs.getInt("x"));
+					spawnDat.setY(rs.getInt("y"));
+					spawnDat.setZ(rs.getInt("z"));
+					spawnDat.setHeading(rs.getInt("heading"));
+					spawnDat.setRespawnDelay(60);
+					SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+					spawnDat.doSpawn();
+					spawnDat.startRespawn();
 				}
 			}
 		}
@@ -1212,26 +1195,16 @@ public final class Fort extends AbstractResidence
 			ps.setInt(2, 2);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				L2Spawn spawnDat;
-				L2NpcTemplate template;
 				while (rs.next())
 				{
-					template = NpcData.getInstance().getTemplate(rs.getInt("npcId"));
-					if (template != null)
-					{
-						spawnDat = new L2Spawn(template);
-						spawnDat.setAmount(1);
-						spawnDat.setX(rs.getInt("x"));
-						spawnDat.setY(rs.getInt("y"));
-						spawnDat.setZ(rs.getInt("z"));
-						spawnDat.setHeading(rs.getInt("heading"));
-						spawnDat.setRespawnDelay(60);
-						_siegeNpcs.add(spawnDat);
-					}
-					else
-					{
-						_log.warning("Fort " + getResidenceId() + " initSiegeNpcs: Data missing in NPC table for ID: " + rs.getInt("npcId") + ".");
-					}
+					final L2Spawn spawnDat = new L2Spawn(rs.getInt("npcId"));
+					spawnDat.setAmount(1);
+					spawnDat.setX(rs.getInt("x"));
+					spawnDat.setY(rs.getInt("y"));
+					spawnDat.setZ(rs.getInt("z"));
+					spawnDat.setHeading(rs.getInt("heading"));
+					spawnDat.setRespawnDelay(60);
+					_siegeNpcs.add(spawnDat);
 				}
 			}
 		}
@@ -1251,26 +1224,16 @@ public final class Fort extends AbstractResidence
 			ps.setInt(2, 1);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				L2Spawn spawnDat;
-				L2NpcTemplate template;
 				while (rs.next())
 				{
-					template = NpcData.getInstance().getTemplate(rs.getInt("npcId"));
-					if (template != null)
-					{
-						spawnDat = new L2Spawn(template);
-						spawnDat.setAmount(1);
-						spawnDat.setX(rs.getInt("x"));
-						spawnDat.setY(rs.getInt("y"));
-						spawnDat.setZ(rs.getInt("z"));
-						spawnDat.setHeading(rs.getInt("heading"));
-						spawnDat.setRespawnDelay(60);
-						_npcCommanders.add(spawnDat);
-					}
-					else
-					{
-						_log.warning("Fort " + getResidenceId() + " initNpcCommanders: Data missing in NPC table for ID: " + rs.getInt("npcId") + ".");
-					}
+					final L2Spawn spawnDat = new L2Spawn(rs.getInt("npcId"));
+					spawnDat.setAmount(1);
+					spawnDat.setX(rs.getInt("x"));
+					spawnDat.setY(rs.getInt("y"));
+					spawnDat.setZ(rs.getInt("z"));
+					spawnDat.setHeading(rs.getInt("heading"));
+					spawnDat.setRespawnDelay(60);
+					_npcCommanders.add(spawnDat);
 				}
 			}
 		}
@@ -1293,30 +1256,19 @@ public final class Fort extends AbstractResidence
 			ps.setInt(2, 3);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				L2Spawn spawnDat;
-				L2NpcTemplate template;
 				while (rs.next())
 				{
-					int castleId = rs.getInt("castleId");
-					int npcId = rs.getInt("npcId");
-					template = NpcData.getInstance().getTemplate(npcId);
-					if (template != null)
-					{
-						spawnDat = new L2Spawn(template);
-						spawnDat.setAmount(1);
-						spawnDat.setX(rs.getInt("x"));
-						spawnDat.setY(rs.getInt("y"));
-						spawnDat.setZ(rs.getInt("z"));
-						spawnDat.setHeading(rs.getInt("heading"));
-						spawnDat.setRespawnDelay(60);
-						_specialEnvoys.add(spawnDat);
-						_envoyCastles.put(npcId, castleId);
-						_availableCastles.add(castleId);
-					}
-					else
-					{
-						_log.warning("Fort " + getResidenceId() + " initSpecialEnvoys: Data missing in NPC table for ID: " + rs.getInt("npcId") + ".");
-					}
+					final int castleId = rs.getInt("castleId");
+					final L2Spawn spawnDat = new L2Spawn(rs.getInt("npcId"));
+					spawnDat.setAmount(1);
+					spawnDat.setX(rs.getInt("x"));
+					spawnDat.setY(rs.getInt("y"));
+					spawnDat.setZ(rs.getInt("z"));
+					spawnDat.setHeading(rs.getInt("heading"));
+					spawnDat.setRespawnDelay(60);
+					_specialEnvoys.add(spawnDat);
+					_envoyCastles.put(spawnDat.getId(), castleId);
+					_availableCastles.add(castleId);
 				}
 			}
 		}

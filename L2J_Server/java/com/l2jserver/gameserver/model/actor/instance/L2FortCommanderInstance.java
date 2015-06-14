@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import javolution.util.FastList;
+import java.util.List;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -37,12 +37,15 @@ import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 
 public class L2FortCommanderInstance extends L2DefenderInstance
 {
-	
 	private boolean _canTalk;
 	
-	public L2FortCommanderInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a fort commander.
+	 * @param template the fort commander NPC template
+	 */
+	public L2FortCommanderInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2FortCommanderInstance);
 		_canTalk = true;
 	}
@@ -124,7 +127,7 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 		L2Spawn spawn = getSpawn();
 		if ((spawn != null) && canTalk())
 		{
-			FastList<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(getFort().getResidenceId());
+			List<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(getFort().getResidenceId());
 			for (FortSiegeSpawn spawn2 : commanders)
 			{
 				if (spawn2.getId() == spawn.getId())

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,9 +19,8 @@
 package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2Spawn;
@@ -36,9 +35,13 @@ public class L2ControlTowerInstance extends L2Tower
 {
 	private volatile List<L2Spawn> _guards;
 	
-	public L2ControlTowerInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a control tower.
+	 * @param template the control tower NPC template
+	 */
+	public L2ControlTowerInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2ControlTowerInstance);
 	}
 	
@@ -53,10 +56,6 @@ public class L2ControlTowerInstance extends L2Tower
 			{
 				for (L2Spawn spawn : _guards)
 				{
-					if (spawn == null)
-					{
-						continue;
-					}
 					try
 					{
 						spawn.stopRespawn();
@@ -86,7 +85,7 @@ public class L2ControlTowerInstance extends L2Tower
 			{
 				if (_guards == null)
 				{
-					_guards = new FastList<>();
+					_guards = new CopyOnWriteArrayList<>();
 				}
 			}
 		}

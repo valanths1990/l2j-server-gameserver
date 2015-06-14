@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,7 +19,7 @@
 package com.l2jserver.util;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  * @param <E> The enum type
  */
 public final class EnumIntBitmask<E extends Enum<E>> implements Cloneable

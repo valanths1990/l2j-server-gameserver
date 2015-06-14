@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 /**
  * Simplifies loading of property files and adds logging if a non existing property is requested.
- * @author Nos
+ * @author NosBit
  */
 public final class PropertiesParser
 {

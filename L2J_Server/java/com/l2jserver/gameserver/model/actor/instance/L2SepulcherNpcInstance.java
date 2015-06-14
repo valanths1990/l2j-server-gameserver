@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
 import com.l2jserver.gameserver.model.L2World;
@@ -54,9 +54,13 @@ public class L2SepulcherNpcInstance extends L2Npc
 	private static final String HTML_FILE_PATH = "data/html/SepulcherNpc/";
 	private static final int HALLS_KEY = 7260;
 	
-	public L2SepulcherNpcInstance(int objectID, L2NpcTemplate template)
+	/**
+	 * Creates a sepulcher.
+	 * @param template the sepulcher NPC template
+	 */
+	public L2SepulcherNpcInstance(L2NpcTemplate template)
 	{
-		super(objectID, template);
+		super(template);
 		setInstanceType(InstanceType.L2SepulcherNpcInstance);
 		setShowSummonAnimation(true);
 		
@@ -354,7 +358,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 	public void openNextDoor(int npcId)
 	{
 		int doorId = FourSepulchersManager.getInstance().getHallGateKeepers().get(npcId);
-		DoorTable _doorTable = DoorTable.getInstance();
+		DoorData _doorTable = DoorData.getInstance();
 		_doorTable.getDoor(doorId).openMe();
 		
 		if (_closeTask != null)
@@ -371,7 +375,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 	
 	private static class CloseNextDoor implements Runnable
 	{
-		final DoorTable _DoorTable = DoorTable.getInstance();
+		final DoorData _DoorTable = DoorData.getInstance();
 		
 		private final int _DoorId;
 		

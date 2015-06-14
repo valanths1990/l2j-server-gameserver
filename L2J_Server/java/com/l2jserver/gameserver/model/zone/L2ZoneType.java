@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
@@ -48,7 +47,7 @@ public abstract class L2ZoneType extends ListenersContainer
 	
 	private final int _id;
 	protected L2ZoneForm _zone;
-	protected FastMap<Integer, L2Character> _characterList;
+	protected Map<Integer, L2Character> _characterList;
 	
 	/** Parameters to affect specific characters */
 	private boolean _checkAffected = false;
@@ -68,8 +67,7 @@ public abstract class L2ZoneType extends ListenersContainer
 	protected L2ZoneType(int id)
 	{
 		_id = id;
-		_characterList = new FastMap<>();
-		_characterList.shared();
+		_characterList = new ConcurrentHashMap<>();
 		
 		_minLvl = 0;
 		_maxLvl = 0xFF;
@@ -244,7 +242,7 @@ public abstract class L2ZoneType extends ListenersContainer
 				
 				for (int element : _race)
 				{
-					if (((L2PcInstance) character).getRace().ordinal() == element)
+					if (character.getRace().ordinal() == element)
 					{
 						ok = true;
 						break;

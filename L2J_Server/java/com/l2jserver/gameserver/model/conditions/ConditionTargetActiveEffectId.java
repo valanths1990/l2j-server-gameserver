@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,8 +18,10 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionTargetActiveEffectId.
@@ -51,9 +53,9 @@ public class ConditionTargetActiveEffectId extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		final BuffInfo info = env.getTarget().getEffectList().getBuffInfoBySkillId(_effectId);
+		final BuffInfo info = effected.getEffectList().getBuffInfoBySkillId(_effectId);
 		if ((info != null) && ((_effectLvl == -1) || (_effectLvl <= info.getSkill().getLevel())))
 		{
 			return true;

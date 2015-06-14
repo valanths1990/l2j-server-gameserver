@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,7 +20,8 @@ package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionTargetInvSize.
@@ -40,12 +41,11 @@ public class ConditionTargetInvSize extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		final L2Character targetObj = env.getTarget();
-		if ((targetObj != null) && targetObj.isPlayer())
+		if ((effected != null) && effected.isPlayer())
 		{
-			final L2PcInstance target = targetObj.getActingPlayer();
+			final L2PcInstance target = effected.getActingPlayer();
 			return target.getInventory().getSize(false) <= (target.getInventoryLimit() - _size);
 		}
 		return false;

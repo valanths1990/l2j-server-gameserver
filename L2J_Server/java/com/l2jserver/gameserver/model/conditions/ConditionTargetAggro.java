@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,7 +21,8 @@ package com.l2jserver.gameserver.model.conditions;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2MonsterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionTargetAggro.
@@ -42,16 +43,15 @@ public class ConditionTargetAggro extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		final L2Character target = env.getTarget();
-		if (target instanceof L2MonsterInstance)
+		if (effected instanceof L2MonsterInstance)
 		{
-			return ((L2MonsterInstance) target).isAggressive() == _isAggro;
+			return ((L2MonsterInstance) effected).isAggressive() == _isAggro;
 		}
-		if (target instanceof L2PcInstance)
+		if (effected instanceof L2PcInstance)
 		{
-			return ((L2PcInstance) target).getKarma() > 0;
+			return ((L2PcInstance) effected).getKarma() > 0;
 		}
 		return false;
 	}

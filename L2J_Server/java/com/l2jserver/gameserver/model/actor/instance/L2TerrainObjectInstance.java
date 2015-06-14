@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -25,9 +25,13 @@ import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
 public final class L2TerrainObjectInstance extends L2Npc
 {
-	public L2TerrainObjectInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a terrain object.
+	 * @param template the terrain object NPC template
+	 */
+	public L2TerrainObjectInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2TerrainObjectInstance);
 	}
 	

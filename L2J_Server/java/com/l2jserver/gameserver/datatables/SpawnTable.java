@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,44 +26,42 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-import javolution.util.FastSet;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.engines.DocumentParser;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.instancemanager.DayNightSpawnManager;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * Spawn data retriever.
  * @author Zoey76
  */
-public final class SpawnTable extends DocumentParser
+public final class SpawnTable implements IXmlReader
 {
-	private static final Logger _log = Logger.getLogger(SpawnTable.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(SpawnTable.class.getName());
 	// SQL
 	private static final String SELECT_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM spawnlist";
 	private static final String SELECT_CUSTOM_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM custom_spawnlist";
 	
-	private static final Map<Integer, Set<L2Spawn>> _spawnTable = new FastMap<Integer, Set<L2Spawn>>().shared();
+	private static final Map<Integer, Set<L2Spawn>> _spawnTable = new ConcurrentHashMap<>();
 	
 	private int _xmlSpawnCount = 0;
-	
-	protected SpawnTable()
-	{
-		load();
-	}
 	
 	/**
 	 * Wrapper to load all spawns.
@@ -75,25 +73,30 @@ public final class SpawnTable extends DocumentParser
 		{
 			fillSpawnTable(false);
 			final int spawnCount = _spawnTable.size();
-			_log.info(getClass().getSimpleName() + ": Loaded " + spawnCount + " npc spawns.");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded " + spawnCount + " npc spawns.");
 			if (Config.CUSTOM_SPAWNLIST_TABLE)
 			{
 				fillSpawnTable(true);
-				_log.info(getClass().getSimpleName() + ": Loaded " + (_spawnTable.size() - spawnCount) + " custom npc spawns.");
+				LOGGER.info(getClass().getSimpleName() + ": Loaded " + (_spawnTable.size() - spawnCount) + " custom npc spawns.");
 			}
 			
 			// Load XML list
 			parseDatapackDirectory("data/spawnlist", false);
-			_log.info(getClass().getSimpleName() + ": Loaded " + _xmlSpawnCount + " npc spawns from XML.");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded " + _xmlSpawnCount + " npc spawns from XML.");
 		}
 	}
 	
+	/**
+	 * Verifies if the template exists and it's spawnable.
+	 * @param npcId the NPC ID
+	 * @return {@code true} if the NPC ID belongs to an spawnable tempalte, {@code false} otherwise
+	 */
 	private boolean checkTemplate(int npcId)
 	{
 		L2NpcTemplate npcTemplate = NpcData.getInstance().getTemplate(npcId);
 		if (npcTemplate == null)
 		{
-			_log.warning(getClass().getSimpleName() + ": Data missing in NPC table for ID: " + npcId + ".");
+			LOGGER.warning(getClass().getSimpleName() + ": Data missing in NPC table for ID: " + npcId + ".");
 			return false;
 		}
 		
@@ -107,10 +110,10 @@ public final class SpawnTable extends DocumentParser
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
-		for (Node list = getCurrentDocument().getFirstChild(); list != null; list = list.getNextSibling())
+		for (Node list = doc.getFirstChild(); list != null; list = list.getNextSibling())
 		{
 			if (list.getNodeName().equalsIgnoreCase("list"))
 			{
@@ -194,7 +197,7 @@ public final class SpawnTable extends DocumentParser
 								
 								if ((x == 0) && (y == 0) && (territoryName == null)) // Both coordinates and zone are unspecified
 								{
-									_log.warning("XML Spawnlist: Spawn could not be initialized, both coordinates and zone are unspecified for ID " + templateId);
+									LOGGER.warning("XML Spawnlist: Spawn could not be initialized, both coordinates and zone are unspecified for ID " + templateId);
 									continue;
 								}
 								
@@ -285,7 +288,7 @@ public final class SpawnTable extends DocumentParser
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Spawn could not be initialized: " + e.getMessage(), e);
+			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Spawn could not be initialized: " + e.getMessage(), e);
 		}
 		return npcSpawnCount;
 	}
@@ -302,7 +305,7 @@ public final class SpawnTable extends DocumentParser
 		int ret = 0;
 		try
 		{
-			spawnDat = new L2Spawn(NpcData.getInstance().getTemplate(spawnInfo.getInt("npcTemplateid")));
+			spawnDat = new L2Spawn(spawnInfo.getInt("npcTemplateid"));
 			spawnDat.setAmount(spawnInfo.getInt("count", 1));
 			spawnDat.setX(spawnInfo.getInt("x", 0));
 			spawnDat.setY(spawnInfo.getInt("y", 0));
@@ -343,7 +346,7 @@ public final class SpawnTable extends DocumentParser
 		catch (Exception e)
 		{
 			// problem with initializing spawn, go to next one
-			_log.log(Level.WARNING, "Spawn could not be initialized: " + e.getMessage(), e);
+			LOGGER.log(Level.WARNING, "Spawn could not be initialized: " + e.getMessage(), e);
 		}
 		
 		return ret;
@@ -359,43 +362,47 @@ public final class SpawnTable extends DocumentParser
 		return addSpawn(spawnInfo, null);
 	}
 	
+	/**
+	 * Gets the spawn data.
+	 * @return the spawn data
+	 */
 	public Map<Integer, Set<L2Spawn>> getSpawnTable()
 	{
 		return _spawnTable;
 	}
 	
 	/**
-	 * Get the spawns for the NPC Id.
+	 * Gets the spawns for the NPC Id.
 	 * @param npcId the NPC Id
 	 * @return the spawn set for the given npcId
 	 */
 	public Set<L2Spawn> getSpawns(int npcId)
 	{
-		return _spawnTable.containsKey(npcId) ? _spawnTable.get(npcId) : Collections.<L2Spawn> emptySet();
+		return _spawnTable.getOrDefault(npcId, Collections.emptySet());
 	}
 	
 	/**
-	 * Get the first NPC spawn.
-	 * @param npcId the NPC Id to search
-	 * @return the first not null spawn, if any
+	 * Gets the spawn count for the given NPC ID.
+	 * @param npcId the NPC Id
+	 * @return the spawn count
 	 */
-	public L2Spawn getFirstSpawn(int npcId)
+	public int getSpawnCount(int npcId)
 	{
-		if (_spawnTable.containsKey(npcId))
-		{
-			for (L2Spawn spawn : _spawnTable.get(npcId))
-			{
-				if (spawn != null)
-				{
-					return spawn;
-				}
-			}
-		}
-		return null;
+		return getSpawns(npcId).size();
 	}
 	
 	/**
-	 * Add a new spawn to the spawn table.
+	 * Finds a spawn for the given NPC ID.
+	 * @param npcId the NPC Id
+	 * @return a spawn for the given NPC ID or {@code null}
+	 */
+	public L2Spawn findAny(int npcId)
+	{
+		return getSpawns(npcId).stream().findFirst().orElse(null);
+	}
+	
+	/**
+	 * Adds a new spawn to the spawn table.
 	 * @param spawn the spawn to add
 	 * @param storeInDb if {@code true} it'll be saved in the database
 	 */
@@ -422,7 +429,7 @@ public final class SpawnTable extends DocumentParser
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not store spawn in the DB:" + e.getMessage(), e);
+				LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not store spawn in the DB:" + e.getMessage(), e);
 			}
 		}
 	}
@@ -453,7 +460,7 @@ public final class SpawnTable extends DocumentParser
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Spawn " + spawn + " could not be removed from DB: " + e.getMessage(), e);
+				LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Spawn " + spawn + " could not be removed from DB: " + e.getMessage(), e);
 			}
 		}
 	}
@@ -464,11 +471,7 @@ public final class SpawnTable extends DocumentParser
 	 */
 	private void addSpawn(L2Spawn spawn)
 	{
-		if (!_spawnTable.containsKey(spawn.getId()))
-		{
-			_spawnTable.put(spawn.getId(), new FastSet<L2Spawn>().shared());
-		}
-		_spawnTable.get(spawn.getId()).add(spawn);
+		_spawnTable.computeIfAbsent(spawn.getId(), k -> ConcurrentHashMap.newKeySet(1)).add(spawn);
 	}
 	
 	/**
@@ -478,9 +481,9 @@ public final class SpawnTable extends DocumentParser
 	 */
 	private boolean removeSpawn(L2Spawn spawn)
 	{
-		if (_spawnTable.containsKey(spawn.getId()))
+		final Set<L2Spawn> set = _spawnTable.get(spawn.getId());
+		if (set != null)
 		{
-			final Set<L2Spawn> set = _spawnTable.get(spawn.getId());
 			boolean removed = set.remove(spawn);
 			if (set.isEmpty())
 			{

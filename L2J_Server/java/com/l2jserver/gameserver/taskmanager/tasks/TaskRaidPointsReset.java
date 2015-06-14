@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,9 +20,10 @@ package com.l2jserver.gameserver.taskmanager.tasks;
 
 import java.util.Calendar;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.instancemanager.RaidBossPointsManager;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.taskmanager.Task;
@@ -50,7 +51,7 @@ public class TaskRaidPointsReset extends Task
 			Map<Integer, Integer> rankList = RaidBossPointsManager.getInstance().getRankList();
 			for (L2Clan c : ClanTable.getInstance().getClans())
 			{
-				for (Map.Entry<Integer, Integer> entry : rankList.entrySet())
+				for (Entry<Integer, Integer> entry : rankList.entrySet())
 				{
 					if ((entry.getValue() <= 100) && c.isMember(entry.getKey()))
 					{

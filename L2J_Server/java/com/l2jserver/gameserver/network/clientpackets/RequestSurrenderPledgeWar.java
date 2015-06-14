@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import com.l2jserver.gameserver.datatables.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -30,8 +30,6 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
 	private static final String _C__07_REQUESTSURRENDERPLEDGEWAR = "[C] 07 RequestSurrenderPledgeWar";
 	
 	private String _pledgeName;
-	private L2Clan _clan;
-	private L2PcInstance _activeChar;
 	
 	@Override
 	protected void readImpl()
@@ -42,12 +40,12 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
 	@Override
 	protected void runImpl()
 	{
-		_activeChar = getClient().getActiveChar();
-		if (_activeChar == null)
+		L2PcInstance activeChar = getClient().getActiveChar();
+		if (activeChar == null)
 		{
 			return;
 		}
-		_clan = _activeChar.getClan();
+		L2Clan _clan = activeChar.getClan();
 		if (_clan == null)
 		{
 			return;
@@ -56,8 +54,8 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
 		
 		if (clan == null)
 		{
-			_activeChar.sendMessage("No such clan.");
-			_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
+			activeChar.sendMessage("No such clan.");
+			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
@@ -65,16 +63,14 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
 		
 		if (!_clan.isAtWarWith(clan.getId()))
 		{
-			_activeChar.sendMessage("You aren't at war with this clan.");
-			_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
+			activeChar.sendMessage("You aren't at war with this clan.");
+			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_SURRENDERED_TO_THE_S1_CLAN);
 		msg.addString(_pledgeName);
-		_activeChar.sendPacket(msg);
-		msg = null;
-		_activeChar.deathPenalty(false, false, false);
+		activeChar.sendPacket(msg);
 		ClanTable.getInstance().deleteclanswars(_clan.getId(), clan.getId());
 		// Zoey76: TODO: Implement or cleanup.
 		// L2PcInstance leader = L2World.getInstance().getPlayer(clan.getLeaderName());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,17 +18,17 @@
  */
 package com.l2jserver.gameserver.model.entity;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.enums.Team;
@@ -63,15 +63,15 @@ public final class BlockCheckerEngine
 	// The object which holds all basic members info
 	protected ArenaParticipantsHolder _holder;
 	// Maps to hold player of each team and his points
-	protected FastMap<L2PcInstance, Integer> _redTeamPoints = new FastMap<>();
-	protected FastMap<L2PcInstance, Integer> _blueTeamPoints = new FastMap<>();
+	protected Map<L2PcInstance, Integer> _redTeamPoints = new ConcurrentHashMap<>();
+	protected Map<L2PcInstance, Integer> _blueTeamPoints = new ConcurrentHashMap<>();
 	// The initial points of the event
 	protected int _redPoints = 15;
 	protected int _bluePoints = 15;
 	// Current used arena
 	protected int _arena = -1;
 	// All blocks
-	protected FastList<L2Spawn> _spawns = new FastList<>();
+	protected List<L2Spawn> _spawns = new CopyOnWriteArrayList<>();
 	// Sets if the red team won the event at the end of this (used for packets)
 	protected boolean _isRedWinner;
 	// Time when the event starts. Used on packet sending
@@ -120,7 +120,7 @@ public final class BlockCheckerEngine
 	// Common z coordinate
 	private static final int _zCoord = -2405;
 	// List of dropped items in event (for later deletion)
-	protected FastList<L2ItemInstance> _drops = new FastList<>();
+	protected List<L2ItemInstance> _drops = new CopyOnWriteArrayList<>();
 	// Default arena
 	private static final byte DEFAULT_ARENA = -1;
 	// Event is started
@@ -477,15 +477,13 @@ public final class BlockCheckerEngine
 			// random % 2, if == 0 will spawn a red block
 			// if != 0, will spawn a blue block
 			byte random = 2;
-			// common template
-			final L2NpcTemplate template = NpcData.getInstance().getTemplate(18672);
 			// Spawn blocks
 			try
 			{
 				// Creates 50 new blocks
 				for (int i = 0; i < _numOfBoxes; i++)
 				{
-					L2Spawn spawn = new L2Spawn(template);
+					final L2Spawn spawn = new L2Spawn(18672);
 					spawn.setX(_arenaCoordinates[_arena][4] + Rnd.get(-400, 400));
 					spawn.setY(_arenaCoordinates[_arena][5] + Rnd.get(-400, 400));
 					spawn.setZ(_zCoord);
@@ -518,10 +516,9 @@ public final class BlockCheckerEngine
 			// Spawn the block carrying girl
 			if ((_round == 1) || (_round == 2))
 			{
-				L2NpcTemplate girl = NpcData.getInstance().getTemplate(18676);
 				try
 				{
-					final L2Spawn girlSpawn = new L2Spawn(girl);
+					final L2Spawn girlSpawn = new L2Spawn(18676);
 					girlSpawn.setX(_arenaCoordinates[_arena][4] + Rnd.get(-400, 400));
 					girlSpawn.setY(_arenaCoordinates[_arena][5] + Rnd.get(-400, 400));
 					girlSpawn.setZ(_zCoord);
@@ -596,18 +593,11 @@ public final class BlockCheckerEngine
 				spawn.stopRespawn();
 				spawn.getLastSpawn().deleteMe();
 				SpawnTable.getInstance().deleteSpawn(spawn, false);
-				spawn = null;
 			}
 			_spawns.clear();
 			
 			for (L2ItemInstance item : _drops)
 			{
-				// npe
-				if (item == null)
-				{
-					continue;
-				}
-				
 				// a player has it, it will be deleted later
 				if (!item.isVisible() || (item.getOwnerId() != 0))
 				{
@@ -656,12 +646,12 @@ public final class BlockCheckerEngine
 		}
 		
 		/**
-		 * Reward the speicifed team as a winner team 1) Higher score - 8 extra 2) Higher score - 5 extra
+		 * Reward the specified team as a winner team 1) Higher score - 8 extra 2) Higher score - 5 extra
 		 * @param isRed
 		 */
 		private void rewardAsWinner(boolean isRed)
 		{
-			FastMap<L2PcInstance, Integer> tempPoints = isRed ? _redTeamPoints : _blueTeamPoints;
+			Map<L2PcInstance, Integer> tempPoints = isRed ? _redTeamPoints : _blueTeamPoints;
 			
 			// Main give
 			for (Entry<L2PcInstance, Integer> points : tempPoints.entrySet())
@@ -718,7 +708,7 @@ public final class BlockCheckerEngine
 		 */
 		private void rewardAsLooser(boolean isRed)
 		{
-			FastMap<L2PcInstance, Integer> tempPoints = isRed ? _redTeamPoints : _blueTeamPoints;
+			Map<L2PcInstance, Integer> tempPoints = isRed ? _redTeamPoints : _blueTeamPoints;
 			
 			for (Entry<L2PcInstance, Integer> entry : tempPoints.entrySet())
 			{
@@ -731,7 +721,7 @@ public final class BlockCheckerEngine
 		}
 		
 		/**
-		 * Telport players back, give status back and send final packet
+		 * Teleport players back, give status back and send final packet
 		 */
 		private void setPlayersBack()
 		{

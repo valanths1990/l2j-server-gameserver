@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,9 +24,9 @@ import java.util.logging.Logger;
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.UPnPService;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.OfflineTradersTable;
 import com.l2jserver.gameserver.datatables.BotReportTable;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.OfflineTradersTable;
 import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManorManager;
 import com.l2jserver.gameserver.instancemanager.CursedWeaponsManager;
@@ -42,7 +42,6 @@ import com.l2jserver.gameserver.model.entity.Hero;
 import com.l2jserver.gameserver.model.olympiad.Olympiad;
 import com.l2jserver.gameserver.network.L2GameClient;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
 import com.l2jserver.gameserver.network.gameserverpackets.ServerStatus;
 import com.l2jserver.gameserver.network.serverpackets.ServerClose;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
@@ -141,8 +140,7 @@ public class Shutdown extends Thread
 		if (_counterInstance != null)
 		{
 			_counterInstance._abort();
-			Announcements _an = Announcements.getInstance();
-			_an.announceToAll("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!");
+			Broadcast.toAllOnlinePlayers("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!", false);
 		}
 	}
 	
@@ -239,16 +237,6 @@ public class Shutdown extends Thread
 			{
 				ThreadPoolManager.getInstance().shutdown();
 				_log.info("Thread Pool Manager: Manager has been shut down(" + tc.getEstimatedTimeAndRestartCounter() + "ms).");
-			}
-			catch (Throwable t)
-			{
-				// ignore
-			}
-			
-			try
-			{
-				CommunityServerThread.getInstance().interrupt();
-				_log.info("Community Server Thread: Thread interruped(" + tc.getEstimatedTimeAndRestartCounter() + "ms).");
 			}
 			catch (Throwable t)
 			{
@@ -391,8 +379,7 @@ public class Shutdown extends Thread
 		if (_counterInstance != null)
 		{
 			_counterInstance._abort();
-			Announcements _an = Announcements.getInstance();
-			_an.announceToAll("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!");
+			Broadcast.toAllOnlinePlayers("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!", false);
 		}
 	}
 	
@@ -549,8 +536,11 @@ public class Shutdown extends Thread
 		_log.info("Cursed Weapons Manager: Data saved(" + tc.getEstimatedTimeAndRestartCounter() + "ms).");
 		
 		// Save all manor data
-		CastleManorManager.getInstance().save();
-		_log.info("Castle Manor Manager: Data saved(" + tc.getEstimatedTimeAndRestartCounter() + "ms).");
+		if (!Config.ALT_MANOR_SAVE_ALL_ACTIONS)
+		{
+			CastleManorManager.getInstance().storeMe();
+			_log.info("Castle Manor Manager: Data saved(" + tc.getEstimatedTimeAndRestartCounter() + "ms).");
+		}
 		
 		CHSiegeManager.getInstance().onServerShutDown();
 		_log.info("CHSiegeManager: Siegable hall attacker lists saved!");
@@ -581,8 +571,7 @@ public class Shutdown extends Thread
 		
 		try
 		{
-			int delay = 5000;
-			Thread.sleep(delay);
+			Thread.sleep(5000);
 		}
 		catch (InterruptedException e)
 		{

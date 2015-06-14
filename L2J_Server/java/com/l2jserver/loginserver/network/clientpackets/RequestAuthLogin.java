@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -155,8 +155,8 @@ public class RequestAuthLogin extends L2LoginClientPacket
 				client.close(new AccountKicked(AccountKickedReason.REASON_PERMANENTLY_BANNED));
 				return;
 			case ALREADY_ON_LS:
-				L2LoginClient oldClient;
-				if ((oldClient = lc.getAuthedClient(info.getLogin())) != null)
+				L2LoginClient oldClient = lc.getAuthedClient(info.getLogin());
+				if (oldClient != null)
 				{
 					// kick the other client
 					oldClient.close(LoginFailReason.REASON_ACCOUNT_IN_USE);
@@ -166,8 +166,8 @@ public class RequestAuthLogin extends L2LoginClientPacket
 				client.close(LoginFailReason.REASON_ACCOUNT_IN_USE);
 				break;
 			case ALREADY_ON_GS:
-				GameServerInfo gsi;
-				if ((gsi = lc.getAccountOnGameServer(info.getLogin())) != null)
+				GameServerInfo gsi = lc.getAccountOnGameServer(info.getLogin());
+				if (gsi != null)
 				{
 					client.close(LoginFailReason.REASON_ACCOUNT_IN_USE);
 					

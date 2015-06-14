@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.TerritoryTable;
-import com.l2jserver.gameserver.idfactory.IdFactory;
+import com.l2jserver.gameserver.data.sql.impl.TerritoryTable;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2ControllableMobInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
@@ -52,7 +51,9 @@ public class L2GroupSpawn extends L2Spawn
 				return null;
 			}
 			
-			int newlocx, newlocy, newlocz;
+			int newlocx = 0;
+			int newlocy = 0;
+			int newlocz = 0;
 			
 			if ((getX() == 0) && (getY() == 0))
 			{
@@ -61,10 +62,13 @@ public class L2GroupSpawn extends L2Spawn
 					return null;
 				}
 				
-				int p[] = TerritoryTable.getInstance().getRandomPoint(getLocationId());
-				newlocx = p[0];
-				newlocy = p[1];
-				newlocz = p[2];
+				final Location location = TerritoryTable.getInstance().getRandomPoint(getLocationId());
+				if (location != null)
+				{
+					newlocx = location.getX();
+					newlocy = location.getY();
+					newlocz = location.getZ();
+				}
 			}
 			else
 			{
@@ -73,7 +77,7 @@ public class L2GroupSpawn extends L2Spawn
 				newlocz = getZ();
 			}
 			
-			final L2Npc mob = new L2ControllableMobInstance(IdFactory.getInstance().getNextId(), _template);
+			final L2Npc mob = new L2ControllableMobInstance(_template);
 			mob.setCurrentHpMp(mob.getMaxHp(), mob.getMaxMp());
 			
 			if (getHeading() == -1)

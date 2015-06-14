@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,14 +26,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.enums.AuctionItemType;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.AuctionManager;
@@ -41,6 +40,7 @@ import com.l2jserver.gameserver.instancemanager.ClanHallManager;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.itemcontainer.ItemContainer;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
 public class Auction
@@ -62,7 +62,7 @@ public class Auction
 	private long _currentBid = 0;
 	private long _startingBid = 0;
 	
-	private final Map<Integer, Bidder> _bidders = new FastMap<>();
+	private final Map<Integer, Bidder> _bidders = new ConcurrentHashMap<>();
 	
 	private static final String[] ItemTypeName =
 	{
@@ -289,23 +289,37 @@ public class Auction
 	}
 	
 	/**
-	 * Return Item in WHC
-	 * @param Clan
-	 * @param quantity
-	 * @param penalty
+	 * Returns the item to the clan warehouse.
+	 * @param clanName the clan name
+	 * @param quantity the Adena value
+	 * @param penalty if {@code true} fees are applied
 	 */
-	private void returnItem(String Clan, long quantity, boolean penalty)
+	private void returnItem(String clanName, long quantity, boolean penalty)
 	{
 		if (penalty)
 		{
 			quantity *= 0.9; // take 10% tax fee if needed
 		}
 		
+		final L2Clan clan = ClanTable.getInstance().getClanByName(clanName);
+		if (clan == null)
+		{
+			_log.warning("Clan " + clanName + " doesn't exist!");
+			return;
+		}
+		
+		final ItemContainer cwh = clan.getWarehouse();
+		if (cwh == null)
+		{
+			_log.warning("There has been a problem with " + clanName + "'s clan warehouse!");
+			return;
+		}
+		
 		// avoid overflow on return
-		final long limit = MAX_ADENA - ClanTable.getInstance().getClanByName(Clan).getWarehouse().getAdena();
+		final long limit = MAX_ADENA - cwh.getAdena();
 		quantity = Math.min(quantity, limit);
 		
-		ClanTable.getInstance().getClanByName(Clan).getWarehouse().addItem("Outbidded", ADENA_ID, quantity, null, null);
+		cwh.addItem("Outbidded", ADENA_ID, quantity, null, null);
 	}
 	
 	/**
@@ -334,7 +348,7 @@ public class Auction
 	{
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
 		{
-			if (getBidders().get(bidder.getClanId()) != null)
+			if (_bidders.get(bidder.getClanId()) != null)
 			{
 				try (PreparedStatement statement = con.prepareStatement("UPDATE auction_bid SET bidderId=?, bidderName=?, maxBid=?, time_bid=? WHERE auctionId=? AND bidderId=?"))
 				{

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,6 +23,7 @@ import com.l2jserver.gameserver.model.itemcontainer.ItemContainer;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
 /**
+ * ExReplySentPost packet implementation.
  * @author Migi, DS
  */
 public class ExReplySentPost extends AbstractItemPacket
@@ -72,6 +73,7 @@ public class ExReplySentPost extends AbstractItemPacket
 		else
 		{
 			writeD(0x00);
+			writeQ(_msg.getReqAdena());
 		}
 	}
 }

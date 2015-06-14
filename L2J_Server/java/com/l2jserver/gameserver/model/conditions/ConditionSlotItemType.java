@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,10 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import com.l2jserver.gameserver.model.itemcontainer.Inventory;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionSlotItemType.
@@ -42,18 +43,18 @@ public final class ConditionSlotItemType extends ConditionInventory
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getPlayer() == null)
+		if ((effector == null) || !effector.isPlayer())
 		{
 			return false;
 		}
-		final Inventory inv = env.getPlayer().getInventory();
-		final L2ItemInstance item = inv.getPaperdollItem(_slot);
-		if (item == null)
+		
+		final L2ItemInstance itemSlot = effector.getInventory().getPaperdollItem(_slot);
+		if (itemSlot == null)
 		{
 			return false;
 		}
-		return (item.getItem().getItemMask() & _mask) != 0;
+		return (itemSlot.getItem().getItemMask() & _mask) != 0;
 	}
 }

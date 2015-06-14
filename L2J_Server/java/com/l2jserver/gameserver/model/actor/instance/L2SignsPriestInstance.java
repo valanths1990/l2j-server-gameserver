@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,8 +21,6 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
-import javolution.text.TextBuilder;
-
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.cache.HtmCache;
@@ -40,9 +38,9 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public class L2SignsPriestInstance extends L2Npc
 {
-	public L2SignsPriestInstance(int objectId, L2NpcTemplate template)
+	public L2SignsPriestInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2SignsPriestInstance);
 	}
 	
@@ -888,8 +886,7 @@ public class L2SignsPriestInstance extends L2Npc
 					showChatWindow(player, val, fileSuffix, false);
 					break;
 				case 20: // Seal Status (for when joining a cabal)
-					TextBuilder contentBuffer = new TextBuilder();
-					
+					StringBuilder contentBuffer = new StringBuilder();
 					if (this instanceof L2DawnPriestInstance)
 					{
 						contentBuffer.append("<html><body>Priest of Dawn:<br><font color=\"LEVEL\">[ Seal Status ]</font><br>");

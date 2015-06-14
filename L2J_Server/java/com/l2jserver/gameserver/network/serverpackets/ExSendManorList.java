@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,33 +18,30 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
+import java.util.Comparator;
 import java.util.List;
 
-import javolution.util.FastList;
+import com.l2jserver.gameserver.instancemanager.CastleManager;
+import com.l2jserver.gameserver.model.entity.Castle;
 
 /**
  * @author l3x
  */
-public class ExSendManorList extends L2GameServerPacket
+public final class ExSendManorList extends L2GameServerPacket
 {
-	private final List<String> _manors;
-	
-	public ExSendManorList(FastList<String> manors)
-	{
-		_manors = manors;
-	}
-	
 	@Override
 	protected void writeImpl()
 	{
+		final List<Castle> castles = CastleManager.getInstance().getCastles();
+		castles.sort(Comparator.comparing(Castle::getResidenceId));
+		
 		writeC(0xFE);
 		writeH(0x22);
-		writeD(_manors.size());
-		int i = 1;
-		for (String manor : _manors)
+		writeD(castles.size());
+		for (Castle castle : castles)
 		{
-			writeD(i++);
-			writeS(manor);
+			writeD(castle.getResidenceId());
+			writeS(castle.getName().toLowerCase());
 		}
 	}
 }

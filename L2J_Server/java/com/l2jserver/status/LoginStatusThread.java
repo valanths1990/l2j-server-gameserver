@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -35,7 +35,7 @@ import com.l2jserver.loginserver.GameServerTable;
 import com.l2jserver.loginserver.L2LoginServer;
 import com.l2jserver.loginserver.LoginController;
 
-public class LoginStatusThread extends Thread
+public final class LoginStatusThread extends Thread
 {
 	private static final Logger _log = Logger.getLogger(LoginStatusThread.class.getName());
 	

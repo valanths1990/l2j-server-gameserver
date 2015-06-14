@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -35,9 +35,14 @@ public abstract class L2Decoy extends L2Character
 {
 	private final L2PcInstance _owner;
 	
-	public L2Decoy(int objectId, L2CharTemplate template, L2PcInstance owner)
+	/**
+	 * Creates an abstract decoy.
+	 * @param template the decoy template
+	 * @param owner the owner
+	 */
+	public L2Decoy(L2CharTemplate template, L2PcInstance owner)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2Decoy);
 		_owner = owner;
 		setXYZInvisible(owner.getX(), owner.getY(), owner.getZ());

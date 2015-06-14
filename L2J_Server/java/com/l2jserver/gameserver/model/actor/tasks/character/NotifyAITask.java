@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -41,7 +41,7 @@ public final class NotifyAITask implements Runnable
 	{
 		if (_character != null)
 		{
-			_character.getAI().notifyEvent(_event, null);
+			_character.getAI().notifyEvent(_event);
 		}
 	}
 }

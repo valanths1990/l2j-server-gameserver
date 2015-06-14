@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
@@ -38,7 +38,7 @@ public class Die extends L2GameServerPacket
 	private final int _charObjId;
 	private final boolean _canTeleport;
 	private final boolean _sweepable;
-	private L2AccessLevel _access = AdminTable.getInstance().getAccessLevel(0);
+	private L2AccessLevel _access = AdminData.getInstance().getAccessLevel(0);
 	private L2Clan _clan;
 	private final L2Character _activeChar;
 	private boolean _isJailed;
@@ -70,7 +70,6 @@ public class Die extends L2GameServerPacket
 		{
 			
 			_staticRes = _activeChar.getInventory().haveItemForSelfResurrection();
-			
 		}
 		
 		if (_canTeleport && (_clan != null) && !_isJailed)
@@ -110,7 +109,7 @@ public class Die extends L2GameServerPacket
 			writeD((_clan.getCastleId() > 0) || isInCastleDefense ? 0x01 : 0x00); // 6d 02 00 00 00 - to castle
 			writeD((TerritoryWarManager.getInstance().getHQForClan(_clan) != null) || ((siegeClan != null) && !isInCastleDefense && !isInFortDefense && !siegeClan.getFlag().isEmpty()) || ((hall != null) && hall.getSiege().checkIsAttacker(_clan)) ? 0x01 : 0x00); // 6d 03 00 00 00 - to siege HQ
 			writeD(_sweepable ? 0x01 : 0x00); // sweepable (blue glow)
-			writeD(_access.allowFixedRes() ? 0x01 : 0x00); // 6d 04 00 00 00 - to FIXED
+			writeD(_staticRes ? 0x01 : 0x00); // 6d 04 00 00 00 - to FIXED
 			writeD((_clan.getFortId() > 0) || isInFortDefense ? 0x01 : 0x00); // 6d 05 00 00 00 - to fortress
 		}
 		else

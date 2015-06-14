@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,14 +22,14 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import javolution.util.FastList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -37,7 +37,6 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.model.DimensionalRiftRoom;
 import com.l2jserver.gameserver.model.L2Spawn;
@@ -58,7 +57,7 @@ public final class DimensionalRiftManager
 {
 	private static Logger _log = Logger.getLogger(DimensionalRiftManager.class.getName());
 	private final Map<Byte, Map<Byte, DimensionalRiftRoom>> _rooms = new HashMap<>(7);
-	private final int DIMENSIONAL_FRAGMENT_ITEM_ID = 7079;
+	private static final int DIMENSIONAL_FRAGMENT_ITEM_ID = 7079;
 	
 	public static DimensionalRiftManager getInstance()
 	{
@@ -144,8 +143,6 @@ public final class DimensionalRiftManager
 			NamedNodeMap attrs;
 			byte type, roomId;
 			int mobId, x, y, z, delay, count;
-			L2Spawn spawnDat;
-			L2NpcTemplate template;
 			
 			for (Node rift = doc.getFirstChild(); rift != null; rift = rift.getNextSibling())
 			{
@@ -174,11 +171,6 @@ public final class DimensionalRiftManager
 											delay = Integer.parseInt(attrs.getNamedItem("delay").getNodeValue());
 											count = Integer.parseInt(attrs.getNamedItem("count").getNodeValue());
 											
-											template = NpcData.getInstance().getTemplate(mobId);
-											if (template == null)
-											{
-												_log.warning("Template " + mobId + " not found!");
-											}
 											if (!_rooms.containsKey(type))
 											{
 												_log.warning("Type " + type + " not found!");
@@ -193,11 +185,11 @@ public final class DimensionalRiftManager
 												final DimensionalRiftRoom riftRoom = _rooms.get(type).get(roomId);
 												x = riftRoom.getRandomX();
 												y = riftRoom.getRandomY();
-												z = riftRoom.getTeleportCoorinates()[2];
+												z = riftRoom.getTeleportCoorinates().getZ();
 												
-												if ((template != null) && _rooms.containsKey(type) && _rooms.get(type).containsKey(roomId))
+												if (_rooms.containsKey(type) && _rooms.get(type).containsKey(roomId))
 												{
-													spawnDat = new L2Spawn(template);
+													final L2Spawn spawnDat = new L2Spawn(mobId);
 													spawnDat.setAmount(1);
 													spawnDat.setX(x);
 													spawnDat.setY(y);
@@ -261,8 +253,7 @@ public final class DimensionalRiftManager
 	
 	public void teleportToWaitingRoom(L2PcInstance player)
 	{
-		int[] coords = getRoom((byte) 0, (byte) 0).getTeleportCoorinates();
-		player.teleToLocation(coords[0], coords[1], coords[2]);
+		player.teleToLocation(getRoom((byte) 0, (byte) 0).getTeleportCoorinates());
 	}
 	
 	public synchronized void start(L2PcInstance player, byte type, L2Npc npc)
@@ -370,7 +361,7 @@ public final class DimensionalRiftManager
 		}
 		
 		byte room;
-		FastList<Byte> emptyRooms;
+		List<Byte> emptyRooms;
 		do
 		{
 			emptyRooms = getFreeRooms(type);
@@ -460,9 +451,9 @@ public final class DimensionalRiftManager
 		return (count < (_rooms.get(type).size() - 1));
 	}
 	
-	public FastList<Byte> getFreeRooms(byte type)
+	public List<Byte> getFreeRooms(byte type)
 	{
-		FastList<Byte> list = new FastList<>();
+		List<Byte> list = new ArrayList<>();
 		for (DimensionalRiftRoom room : _rooms.get(type).values())
 		{
 			if (!room.isPartyInside())

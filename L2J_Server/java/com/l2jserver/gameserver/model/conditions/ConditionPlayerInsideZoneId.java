@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,10 +18,12 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.zone.L2ZoneType;
 
 /**
@@ -29,22 +31,22 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
  */
 public class ConditionPlayerInsideZoneId extends Condition
 {
-	private final ArrayList<Integer> _zones;
+	private final List<Integer> _zones;
 	
-	public ConditionPlayerInsideZoneId(ArrayList<Integer> zones)
+	public ConditionPlayerInsideZoneId(List<Integer> zones)
 	{
 		_zones = zones;
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getPlayer() == null)
+		if (effector.getActingPlayer() == null)
 		{
 			return false;
 		}
 		
-		for (L2ZoneType zone : ZoneManager.getInstance().getZones(env.getCharacter()))
+		for (L2ZoneType zone : ZoneManager.getInstance().getZones(effector))
 		{
 			if (_zones.contains(zone.getId()))
 			{

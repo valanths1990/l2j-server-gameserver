@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,14 +20,12 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.concurrent.ScheduledFuture;
 
-import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.knownlist.MonsterKnownList;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.util.MinionList;
-import com.l2jserver.util.Rnd;
 
 /**
  * This class manages all Monsters. L2MonsterInstance:
@@ -39,6 +37,8 @@ import com.l2jserver.util.Rnd;
  */
 public class L2MonsterInstance extends L2Attackable
 {
+	private static final int MONSTER_MAINTENANCE_INTERVAL = 1000;
+	
 	protected boolean _enableMinions = true;
 	
 	private L2MonsterInstance _master = null;
@@ -46,22 +46,13 @@ public class L2MonsterInstance extends L2Attackable
 	
 	protected ScheduledFuture<?> _maintenanceTask = null;
 	
-	private static final int MONSTER_MAINTENANCE_INTERVAL = 1000;
-	
 	/**
-	 * Constructor of L2MonsterInstance (use L2Character and L2NpcInstance constructor).<br>
-	 * <B><U> Actions</U> :</B>
-	 * <ul>
-	 * <li>Call the L2Character constructor to set the _template of the L2MonsterInstance (copy skills from template to object and link _calculators to NPC_STD_CALCULATOR)</li>
-	 * <li>Set the name of the L2MonsterInstance</li>
-	 * <li>Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it</li>
-	 * </ul>
-	 * @param objectId the identifier of the object to initialized
-	 * @param template to apply to the NPC
+	 * Creates a monster.
+	 * @param template the monster NPC template
 	 */
-	public L2MonsterInstance(int objectId, L2NpcTemplate template)
+	public L2MonsterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2MonsterInstance);
 		setAutoAttackable(true);
 	}
@@ -137,27 +128,8 @@ public class L2MonsterInstance extends L2Attackable
 		return MONSTER_MAINTENANCE_INTERVAL;
 	}
 	
-	/**
-	 * Spawn all minions at a regular interval
-	 */
 	protected void startMaintenanceTask()
 	{
-		// maintenance task now used only for minions spawn
-		if (getTemplate().getMinionData() == null)
-		{
-			return;
-		}
-		
-		if (_maintenanceTask == null)
-		{
-			_maintenanceTask = ThreadPoolManager.getInstance().scheduleGeneral(() ->
-			{
-				if (_enableMinions)
-				{
-					getMinionList().spawnMinions();
-				}
-			}, getMaintenanceInterval() + Rnd.get(1000));
-		}
 	}
 	
 	@Override

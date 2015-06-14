@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,7 +22,7 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2SummonAI;
-import com.l2jserver.gameserver.datatables.ExperienceTable;
+import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
@@ -67,6 +67,7 @@ import com.l2jserver.gameserver.network.serverpackets.PetStatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.RelationChanged;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.TeleportToLocation;
+import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.taskmanager.DecayTaskManager;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
@@ -89,32 +90,17 @@ public abstract class L2Summon extends L2Playable
 	};
 	// @formatter:on
 	
-	public class AIAccessor extends L2Character.AIAccessor
+	/**
+	 * Creates an abstract summon.
+	 * @param template the summon NPC template
+	 * @param owner the owner
+	 */
+	public L2Summon(L2NpcTemplate template, L2PcInstance owner)
 	{
-		public L2Summon getSummon()
-		{
-			return L2Summon.this;
-		}
-		
-		public boolean isAutoFollow()
-		{
-			return getFollowStatus();
-		}
-		
-		public void doPickupItem(L2Object object)
-		{
-			L2Summon.this.doPickupItem(object);
-		}
-	}
-	
-	public L2Summon(int objectId, L2NpcTemplate template, L2PcInstance owner)
-	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2Summon);
-		
 		setInstanceId(owner.getInstanceId()); // set instance to same as owner
-		
-		_showSummonAnimation = true;
+		setShowSummonAnimation(true);
 		_owner = owner;
 		getAI();
 		
@@ -190,7 +176,7 @@ public abstract class L2Summon extends L2Playable
 	@Override
 	protected L2CharacterAI initAI()
 	{
-		return new L2SummonAI(new L2Summon.AIAccessor());
+		return new L2SummonAI(this);
 	}
 	
 	@Override
@@ -235,20 +221,20 @@ public abstract class L2Summon extends L2Playable
 	
 	public long getExpForThisLevel()
 	{
-		if (getLevel() >= ExperienceTable.getInstance().getMaxPetLevel())
+		if (getLevel() >= ExperienceData.getInstance().getMaxPetLevel())
 		{
 			return 0;
 		}
-		return ExperienceTable.getInstance().getExpForLevel(getLevel());
+		return ExperienceData.getInstance().getExpForLevel(getLevel());
 	}
 	
 	public long getExpForNextLevel()
 	{
-		if (getLevel() >= (ExperienceTable.getInstance().getMaxPetLevel() - 1))
+		if (getLevel() >= (ExperienceData.getInstance().getMaxPetLevel() - 1))
 		{
 			return 0;
 		}
-		return ExperienceTable.getInstance().getExpForLevel(getLevel() + 1);
+		return ExperienceData.getInstance().getExpForLevel(getLevel() + 1);
 	}
 	
 	@Override
@@ -333,7 +319,7 @@ public abstract class L2Summon extends L2Playable
 				// get the mobs which have aggro on the this instance
 				if (TgMob instanceof L2Attackable)
 				{
-					if (((L2Attackable) TgMob).isDead())
+					if (TgMob.isDead())
 					{
 						continue;
 					}
@@ -520,10 +506,6 @@ public abstract class L2Summon extends L2Playable
 		return null;
 	}
 	
-	protected void doPickupItem(L2Object object)
-	{
-	}
-	
 	public void setRestoreSummon(boolean val)
 	{
 	}
@@ -675,6 +657,12 @@ public abstract class L2Summon extends L2Playable
 		{
 			// Send a System Message to the caster
 			sendPacket(SystemMessageId.NOT_ENOUGH_HP);
+			return false;
+		}
+		
+		if ((this != target) && skill.isPhysical() && (Config.PATHFINDING > 0) && (PathFinding.getInstance().findPath(getX(), getY(), getZ(), target.getX(), target.getY(), target.getZ(), getInstanceId(), true) == null))
+		{
+			sendPacket(SystemMessageId.CANT_SEE_TARGET);
 			return false;
 		}
 		

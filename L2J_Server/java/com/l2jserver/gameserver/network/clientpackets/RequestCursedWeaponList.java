@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.instancemanager.CursedWeaponsManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -50,7 +49,7 @@ public class RequestCursedWeaponList extends L2GameClientPacket
 		}
 		
 		// send a ExCursedWeaponList :p
-		List<Integer> list = new FastList<>();
+		List<Integer> list = new ArrayList<>();
 		for (int id : CursedWeaponsManager.getInstance().getCursedWeaponsIds())
 		{
 			list.add(id);

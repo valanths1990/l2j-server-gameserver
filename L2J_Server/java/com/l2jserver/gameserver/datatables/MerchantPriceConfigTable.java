@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,14 +20,13 @@ package com.l2jserver.gameserver.datatables;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import javolution.util.FastMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -44,7 +43,8 @@ import com.l2jserver.gameserver.model.entity.Castle;
  */
 public class MerchantPriceConfigTable implements InstanceListManager
 {
-	private static Logger _log = Logger.getLogger(MerchantPriceConfigTable.class.getName());
+	// Zoey76: TODO: Implement using IXmlReader.
+	private static Logger LOGGER = Logger.getLogger(MerchantPriceConfigTable.class.getName());
 	
 	public static MerchantPriceConfigTable getInstance()
 	{
@@ -53,7 +53,7 @@ public class MerchantPriceConfigTable implements InstanceListManager
 	
 	private static final String MPCS_FILE = "MerchantPriceConfig.xml";
 	
-	private final Map<Integer, MerchantPriceConfig> _mpcs = new FastMap<>();
+	private final Map<Integer, MerchantPriceConfig> _mpcs = new HashMap<>();
 	private MerchantPriceConfig _defaultMpc;
 	
 	public MerchantPriceConfig getMerchantPriceConfig(L2MerchantInstance npc)
@@ -165,11 +165,11 @@ public class MerchantPriceConfigTable implements InstanceListManager
 		try
 		{
 			loadXML();
-			_log.info(getClass().getSimpleName() + ": Loaded " + _mpcs.size() + " merchant price configs.");
+			LOGGER.info(getClass().getSimpleName() + ": Loaded " + _mpcs.size() + " merchant price configs.");
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Failed loading MerchantPriceConfigTable. Reason: " + e.getMessage(), e);
+			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Failed loading MerchantPriceConfigTable. Reason: " + e.getMessage(), e);
 		}
 	}
 	

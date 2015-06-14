@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,10 +23,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 
@@ -36,22 +35,18 @@ import com.l2jserver.Config;
 public abstract class FloodProtectedListener extends Thread
 {
 	private final Logger _log = Logger.getLogger(FloodProtectedListener.class.getName());
-	private final Map<String, ForeignConnection> _floodProtection = new FastMap<>();
-	private final String _listenIp;
-	private final int _port;
+	private final Map<String, ForeignConnection> _floodProtection = new ConcurrentHashMap<>();
 	private ServerSocket _serverSocket;
 	
 	public FloodProtectedListener(String listenIp, int port) throws IOException
 	{
-		_port = port;
-		_listenIp = listenIp;
-		if (_listenIp.equals("*"))
+		if (listenIp.equals("*"))
 		{
-			_serverSocket = new ServerSocket(_port);
+			_serverSocket = new ServerSocket(port);
 		}
 		else
 		{
-			_serverSocket = new ServerSocket(_port, 50, InetAddress.getByName(_listenIp));
+			_serverSocket = new ServerSocket(port, 50, InetAddress.getByName(listenIp));
 		}
 	}
 	

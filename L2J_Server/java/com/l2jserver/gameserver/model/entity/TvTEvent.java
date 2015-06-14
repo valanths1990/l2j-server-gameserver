@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.model.entity;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,10 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
@@ -45,7 +43,6 @@ import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2ServitorInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.events.OnTvTEventFinish;
 import com.l2jserver.gameserver.model.events.impl.events.OnTvTEventKill;
@@ -64,7 +61,7 @@ import com.l2jserver.util.Rnd;
 import com.l2jserver.util.StringUtil;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public class TvTEvent
 {
@@ -92,11 +89,9 @@ public class TvTEvent
 	/** Instance id<br> */
 	private static int _TvTEventInstance = 0;
 	
-	/**
-	 * No instance of this class!<br>
-	 */
 	private TvTEvent()
 	{
+		// Prevent external initialization.
 	}
 	
 	/**
@@ -118,17 +113,9 @@ public class TvTEvent
 	 */
 	public static boolean startParticipation()
 	{
-		L2NpcTemplate tmpl = NpcData.getInstance().getTemplate(Config.TVT_EVENT_PARTICIPATION_NPC_ID);
-		
-		if (tmpl == null)
-		{
-			_log.warning("TvTEventEngine[TvTEvent.startParticipation()]: L2NpcTemplate is a NullPointer -> Invalid npc id in configs?");
-			return false;
-		}
-		
 		try
 		{
-			_npcSpawn = new L2Spawn(tmpl);
+			_npcSpawn = new L2Spawn(Config.TVT_EVENT_PARTICIPATION_NPC_ID);
 			
 			_npcSpawn.setX(Config.TVT_EVENT_PARTICIPATION_NPC_COORDINATES[0]);
 			_npcSpawn.setY(Config.TVT_EVENT_PARTICIPATION_NPC_COORDINATES[1]);
@@ -176,7 +163,7 @@ public class TvTEvent
 	 * Starts the TvTEvent fight<br>
 	 * 1. Set state EventState.STARTING<br>
 	 * 2. Close doors specified in configs<br>
-	 * 3. Abort if not enought participants(return false)<br>
+	 * 3. Abort if not enough participants(return false)<br>
 	 * 4. Set state EventState.STARTED<br>
 	 * 5. Teleport all participants to team spot<br>
 	 * <br>
@@ -188,7 +175,7 @@ public class TvTEvent
 		setState(EventState.STARTING);
 		
 		// Randomize and balance team distribution
-		Map<Integer, L2PcInstance> allParticipants = new FastMap<>();
+		Map<Integer, L2PcInstance> allParticipants = new HashMap<>();
 		allParticipants.putAll(_teams[0].getParticipatedPlayers());
 		allParticipants.putAll(_teams[1].getParticipatedPlayers());
 		_teams[0].cleanMe();
@@ -386,7 +373,7 @@ public class TvTEvent
 				PcInventory inv = playerInstance.getInventory();
 				
 				// Check for stackable item, non stackabe items need to be added one by one
-				if (ItemTable.getInstance().createDummyItem(reward[0]).isStackable())
+				if (ItemTable.getInstance().getTemplate(reward[0]).isStackable())
 				{
 					inv.addItem("TvT Event", reward[0], reward[1], playerInstance, playerInstance);
 					
@@ -590,7 +577,7 @@ public class TvTEvent
 		L2DoorInstance door = null;
 		if (_TvTEventInstance <= 0)
 		{
-			door = DoorTable.getInstance().getDoor(doorId);
+			door = DoorData.getInstance().getDoor(doorId);
 		}
 		else
 		{

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,17 +18,17 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 
-import javolution.util.FastList;
-
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2DoorAI;
-import com.l2jserver.gameserver.datatables.DoorTable;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
@@ -81,12 +81,12 @@ public class L2DoorInstance extends L2Character
 	private Future<?> _autoCloseTask;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a door.
+	 * @param template the door template
 	 */
-	public L2DoorInstance(int objectId, L2DoorTemplate template)
+	public L2DoorInstance(L2DoorTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DoorInstance);
 		setIsInvul(false);
 		setLethalable(false);
@@ -96,7 +96,7 @@ public class L2DoorInstance extends L2Character
 		
 		if (getGroupName() != null)
 		{
-			DoorTable.addDoorGroup(getGroupName(), getId());
+			DoorData.addDoorGroup(getGroupName(), getId());
 		}
 		
 		if (isOpenableByTime())
@@ -116,45 +116,10 @@ public class L2DoorInstance extends L2Character
 		}
 	}
 	
-	/** This class may be created only by L2Character and only for AI */
-	public class AIAccessor extends L2Character.AIAccessor
-	{
-		@Override
-		public L2DoorInstance getActor()
-		{
-			return L2DoorInstance.this;
-		}
-		
-		@Override
-		public void moveTo(int x, int y, int z, int offset)
-		{
-		}
-		
-		@Override
-		public void moveTo(int x, int y, int z)
-		{
-		}
-		
-		@Override
-		public void stopMove(Location loc)
-		{
-		}
-		
-		@Override
-		public void doAttack(L2Character target)
-		{
-		}
-		
-		@Override
-		public void doCast(Skill skill)
-		{
-		}
-	}
-	
 	@Override
 	protected L2CharacterAI initAI()
 	{
-		return new L2DoorAI(new AIAccessor());
+		return new L2DoorAI(this);
 	}
 	
 	private void startTimerOpen()
@@ -541,7 +506,7 @@ public class L2DoorInstance extends L2Character
 	
 	private void manageGroupOpen(boolean open, String groupName)
 	{
-		Set<Integer> set = DoorTable.getDoorsByGroup(groupName);
+		Set<Integer> set = DoorData.getDoorsByGroup(groupName);
 		L2DoorInstance first = null;
 		for (Integer id : set)
 		{
@@ -616,19 +581,16 @@ public class L2DoorInstance extends L2Character
 		return getTemplate().getNodeZ() + getTemplate().getHeight();
 	}
 	
-	public Collection<L2DefenderInstance> getKnownDefenders()
+	public List<L2DefenderInstance> getKnownDefenders()
 	{
-		FastList<L2DefenderInstance> result = new FastList<>();
-		
-		Collection<L2Object> objs = getKnownList().getKnownObjects().values();
-		for (L2Object obj : objs)
+		final List<L2DefenderInstance> result = new ArrayList<>();
+		for (L2Object obj : getKnownList().getKnownObjects().values())
 		{
 			if (obj instanceof L2DefenderInstance)
 			{
 				result.add((L2DefenderInstance) obj);
 			}
 		}
-		
 		return result;
 	}
 	
@@ -708,6 +670,26 @@ public class L2DoorInstance extends L2Character
 	}
 	
 	@Override
+	public void moveToLocation(int x, int y, int z, int offset)
+	{
+	}
+	
+	@Override
+	public void stopMove(Location loc)
+	{
+	}
+	
+	@Override
+	public void doAttack(L2Character target)
+	{
+	}
+	
+	@Override
+	public void doCast(Skill skill)
+	{
+	}
+	
+	@Override
 	public void sendInfo(L2PcInstance activeChar)
 	{
 		if (isVisibleFor(activeChar))
@@ -747,7 +729,7 @@ public class L2DoorInstance extends L2Character
 	{
 		if (getInstanceId() == 0)
 		{
-			return DoorTable.getInstance().getDoor(doorId);
+			return DoorData.getInstance().getDoor(doorId);
 		}
 		
 		Instance inst = InstanceManager.getInstance().getInstance(getInstanceId());

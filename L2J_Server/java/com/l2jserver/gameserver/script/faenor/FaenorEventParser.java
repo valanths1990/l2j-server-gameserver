@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -85,7 +85,7 @@ public class FaenorEventParser extends FaenorParser
 		try
 		{
 			String type = attribute(sysMsg, "Type");
-			String[] message = attribute(sysMsg, "Msg").split(Config.EOL);
+			String message = attribute(sysMsg, "Msg");
 			
 			if (type.equalsIgnoreCase("OnJoin"))
 			{

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,18 +22,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.enums.FortTeleportWhoType;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.FortSiegeGuardManager;
@@ -52,7 +51,6 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2FortCommanderInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.sieges.fort.OnFortSiegeFinish;
 import com.l2jserver.gameserver.model.events.impl.sieges.fort.OnFortSiegeStart;
@@ -228,10 +226,10 @@ public class FortSiege implements Siegable
 		}
 	}
 	
-	private final List<L2SiegeClan> _attackerClans = new FastList<>();
+	private final List<L2SiegeClan> _attackerClans = new CopyOnWriteArrayList<>();
 	
 	// Fort setting
-	protected FastList<L2Spawn> _commanders = new FastList<>();
+	protected List<L2Spawn> _commanders = new CopyOnWriteArrayList<>();
 	protected final Fort _fort;
 	private boolean _isInProgress = false;
 	private FortSiegeGuardManager _siegeGuardManager;
@@ -368,10 +366,7 @@ public class FortSiege implements Siegable
 			clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
 			for (L2PcInstance member : clan.getOnlineMembers(0))
 			{
-				if (member != null)
-				{
-					member.sendPacket(sm);
-				}
+				member.sendPacket(sm);
 			}
 		}
 		if (getFort().getOwnerClan() != null)
@@ -401,11 +396,6 @@ public class FortSiege implements Siegable
 			clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
 			for (L2PcInstance member : clan.getOnlineMembers(0))
 			{
-				if (member == null)
-				{
-					continue;
-				}
-				
 				if (clear)
 				{
 					member.setSiegeState((byte) 0);
@@ -554,18 +544,12 @@ public class FortSiege implements Siegable
 	@Override
 	public List<L2PcInstance> getAttackersInZone()
 	{
-		List<L2PcInstance> players = new FastList<>();
-		L2Clan clan;
+		final List<L2PcInstance> players = new LinkedList<>();
 		for (L2SiegeClan siegeclan : getAttackerClans())
 		{
-			clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
+			L2Clan clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
 			for (L2PcInstance player : clan.getOnlineMembers(0))
 			{
-				if (player == null)
-				{
-					continue;
-				}
-				
 				if (player.isInSiege())
 				{
 					players.add(player);
@@ -588,11 +572,10 @@ public class FortSiege implements Siegable
 	 */
 	public List<L2PcInstance> getOwnersInZone()
 	{
-		List<L2PcInstance> players = new FastList<>();
-		L2Clan clan;
+		final List<L2PcInstance> players = new LinkedList<>();
 		if (getFort().getOwnerClan() != null)
 		{
-			clan = ClanTable.getInstance().getClan(getFort().getOwnerClan().getId());
+			L2Clan clan = ClanTable.getInstance().getClan(getFort().getOwnerClan().getId());
 			if (clan != getFort().getOwnerClan())
 			{
 				return null;
@@ -600,11 +583,6 @@ public class FortSiege implements Siegable
 			
 			for (L2PcInstance player : clan.getOnlineMembers(0))
 			{
-				if (player == null)
-				{
-					continue;
-				}
-				
 				if (player.isInSiege())
 				{
 					players.add(player);
@@ -621,12 +599,12 @@ public class FortSiege implements Siegable
 	 */
 	public void killedCommander(L2FortCommanderInstance instance)
 	{
-		if ((_commanders != null) && (getFort() != null) && (_commanders.size() != 0))
+		if (!_commanders.isEmpty() && (getFort() != null))
 		{
 			L2Spawn spawn = instance.getSpawn();
 			if (spawn != null)
 			{
-				FastList<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(getFort().getResidenceId());
+				List<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(getFort().getResidenceId());
 				for (FortSiegeSpawn spawn2 : commanders)
 				{
 					if (spawn2.getId() == spawn.getId())
@@ -1110,28 +1088,18 @@ public class FortSiege implements Siegable
 		try
 		{
 			_commanders.clear();
-			L2Spawn spawnDat;
-			L2NpcTemplate template1;
 			for (FortSiegeSpawn _sp : FortSiegeManager.getInstance().getCommanderSpawnList(getFort().getResidenceId()))
 			{
-				template1 = NpcData.getInstance().getTemplate(_sp.getId());
-				if (template1 != null)
-				{
-					spawnDat = new L2Spawn(template1);
-					spawnDat.setAmount(1);
-					spawnDat.setX(_sp.getLocation().getX());
-					spawnDat.setY(_sp.getLocation().getY());
-					spawnDat.setZ(_sp.getLocation().getZ());
-					spawnDat.setHeading(_sp.getLocation().getHeading());
-					spawnDat.setRespawnDelay(60);
-					spawnDat.doSpawn();
-					spawnDat.stopRespawn();
-					_commanders.add(spawnDat);
-				}
-				else
-				{
-					_log.warning("FortSiege.spawnCommander: Data missing in NPC table for ID: " + _sp.getId() + ".");
-				}
+				final L2Spawn spawnDat = new L2Spawn(_sp.getId());
+				spawnDat.setAmount(1);
+				spawnDat.setX(_sp.getLocation().getX());
+				spawnDat.setY(_sp.getLocation().getY());
+				spawnDat.setZ(_sp.getLocation().getZ());
+				spawnDat.setHeading(_sp.getLocation().getHeading());
+				spawnDat.setRespawnDelay(60);
+				spawnDat.doSpawn();
+				spawnDat.stopRespawn();
+				_commanders.add(spawnDat);
 			}
 		}
 		catch (Exception e)

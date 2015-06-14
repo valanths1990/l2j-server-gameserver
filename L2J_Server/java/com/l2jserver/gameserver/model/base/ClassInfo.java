@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -28,26 +28,23 @@ public final class ClassInfo
 {
 	private final ClassId _classId;
 	private final String _className;
-	private final String _classServName;
 	private final ClassId _parentClassId;
 	
 	/**
 	 * Constructor for ClassInfo.
-	 * @param classId the class Id.
-	 * @param className the in game class name.
-	 * @param classServName the server side class name.
-	 * @param parentClassId the parent class for the given {@code classId}.
+	 * @param classId the class ID
+	 * @param className the in game class name
+	 * @param parentClassId the parent class for the given {@code classId}
 	 */
-	public ClassInfo(ClassId classId, String className, String classServName, ClassId parentClassId)
+	public ClassInfo(ClassId classId, String className, ClassId parentClassId)
 	{
 		_classId = classId;
 		_className = className;
-		_classServName = classServName;
 		_parentClassId = parentClassId;
 	}
 	
 	/**
-	 * @return the class Id.
+	 * @return the class ID
 	 */
 	public ClassId getClassId()
 	{
@@ -55,7 +52,7 @@ public final class ClassInfo
 	}
 	
 	/**
-	 * @return the hardcoded in-game class name.
+	 * @return the hardcoded in-game class name
 	 */
 	public String getClassName()
 	{
@@ -63,7 +60,7 @@ public final class ClassInfo
 	}
 	
 	/**
-	 * @return the class client Id.
+	 * @return the class client ID
 	 */
 	private int getClassClientId()
 	{
@@ -84,7 +81,7 @@ public final class ClassInfo
 	}
 	
 	/**
-	 * @return the class client Id formatted to be displayed on a HTML.
+	 * @return the class client ID formatted to be displayed on a HTML.
 	 */
 	public String getClientCode()
 	{
@@ -92,7 +89,7 @@ public final class ClassInfo
 	}
 	
 	/**
-	 * @return the escaped class client Id formatted to be displayed on a HTML.
+	 * @return the escaped class client ID formatted to be displayed on a HTML
 	 */
 	public String getEscapedClientCode()
 	{
@@ -100,15 +97,7 @@ public final class ClassInfo
 	}
 	
 	/**
-	 * @return the server side class name.
-	 */
-	public String getClassServName()
-	{
-		return _classServName;
-	}
-	
-	/**
-	 * @return the parent class Id.
+	 * @return the parent class ID
 	 */
 	public ClassId getParentClassId()
 	{

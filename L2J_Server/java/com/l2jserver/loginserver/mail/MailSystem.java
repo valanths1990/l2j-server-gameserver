@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,13 +22,12 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import javolution.util.FastMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -41,7 +40,7 @@ import com.l2jserver.Config;
 public class MailSystem
 {
 	private static final Logger _log = Logger.getLogger(MailSystem.class.getName());
-	private final Map<String, MailContent> _mailData = new FastMap<>();
+	private final Map<String, MailContent> _mailData = new HashMap<>();
 	
 	public static MailSystem getInstance()
 	{

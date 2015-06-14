@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,13 +21,13 @@ package com.l2jserver.gameserver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.RecipeData;
 import com.l2jserver.gameserver.enums.StatType;
 import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.L2RecipeInstance;
@@ -56,11 +56,11 @@ import com.l2jserver.util.Rnd;
 
 public class RecipeController
 {
-	protected static final FastMap<Integer, RecipeItemMaker> _activeMakers = new FastMap<>();
+	protected static final Map<Integer, RecipeItemMaker> _activeMakers = new ConcurrentHashMap<>();
 	
 	protected RecipeController()
 	{
-		_activeMakers.shared();
+		// Prevent external initialization.
 	}
 	
 	public void requestBookOpen(L2PcInstance player, boolean isDwarvenCraft)
@@ -262,7 +262,8 @@ public class RecipeController
 			}
 			
 			// make temporary items
-			if ((_items = listItems(false)) == null)
+			_items = listItems(false);
+			if (_items == null)
 			{
 				abort();
 				return;
@@ -402,8 +403,10 @@ public class RecipeController
 				}
 			}
 			
-			if ((_items = listItems(true)) == null) // this line actually takes materials from inventory
-			{ // handle possible cheaters here
+			_items = listItems(true); // this line actually takes materials from inventory
+			if (_items == null)
+			{
+				// handle possible cheaters here
 				// (they click craft then try to get rid of items in order to get free craft)
 			}
 			else if (Rnd.get(100) < _recipeList.getSuccessRate())

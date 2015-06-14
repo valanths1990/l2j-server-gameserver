@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,10 +20,9 @@ package com.l2jserver.gameserver.model;
 
 import java.awt.Polygon;
 import java.awt.Shape;
+import java.util.ArrayList;
+import java.util.List;
 
-import javolution.util.FastList;
-
-import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.util.Rnd;
 
 /**
@@ -40,11 +39,10 @@ public final class DimensionalRiftRoom
 	private final int _yMax;
 	private final int _zMin;
 	private final int _zMax;
-	private final int[] _teleportCoords;
+	private final Location _teleportCoords;
 	private final Shape _s;
 	private final boolean _isBossRoom;
-	private final FastList<L2Spawn> _roomSpawns;
-	protected final FastList<L2Npc> _roomMobs;
+	private final List<L2Spawn> _roomSpawns = new ArrayList<>();
 	private boolean _partyInside = false;
 	
 	public DimensionalRiftRoom(byte type, byte room, int xMin, int xMax, int yMin, int yMax, int zMin, int zMax, int xT, int yT, int zT, boolean isBossRoom)
@@ -57,15 +55,8 @@ public final class DimensionalRiftRoom
 		_yMax = (yMax - 128);
 		_zMin = zMin;
 		_zMax = zMax;
-		_teleportCoords = new int[]
-		{
-			xT,
-			yT,
-			zT
-		};
+		_teleportCoords = new Location(xT, yT, zT);
 		_isBossRoom = isBossRoom;
-		_roomSpawns = new FastList<>();
-		_roomMobs = new FastList<>();
 		_s = new Polygon(new int[]
 		{
 			xMin,
@@ -101,7 +92,7 @@ public final class DimensionalRiftRoom
 		return Rnd.get(_yMin, _yMax);
 	}
 	
-	public int[] getTeleportCoorinates()
+	public Location getTeleportCoorinates()
 	{
 		return _teleportCoords;
 	}
@@ -116,7 +107,7 @@ public final class DimensionalRiftRoom
 		return _isBossRoom;
 	}
 	
-	public FastList<L2Spawn> getSpawns()
+	public List<L2Spawn> getSpawns()
 	{
 		return _roomSpawns;
 	}

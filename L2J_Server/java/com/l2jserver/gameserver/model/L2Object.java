@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,9 +19,8 @@
 package com.l2jserver.gameserver.model;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.ShotType;
@@ -525,12 +524,11 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	{
 		if (_scripts == null)
 		{
-			// Double-checked locking
 			synchronized (this)
 			{
 				if (_scripts == null)
 				{
-					_scripts = new FastMap<String, Object>().shared();
+					_scripts = new ConcurrentHashMap<>();
 				}
 			}
 		}

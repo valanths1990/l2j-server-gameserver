@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,24 +18,23 @@
  */
 package com.l2jserver.gameserver.pathfinding.geonodes;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.LineNumberReader;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GeoData;
@@ -45,6 +44,7 @@ import com.l2jserver.gameserver.pathfinding.AbstractNode;
 import com.l2jserver.gameserver.pathfinding.AbstractNodeLoc;
 import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.pathfinding.utils.FastNodeList;
+import com.l2jserver.gameserver.util.Util;
 
 /**
  * @author -Nemesiss-
@@ -52,8 +52,8 @@ import com.l2jserver.gameserver.pathfinding.utils.FastNodeList;
 public class GeoPathFinding extends PathFinding
 {
 	private static Logger _log = Logger.getLogger(GeoPathFinding.class.getName());
-	private static Map<Short, ByteBuffer> _pathNodes = new FastMap<>();
-	private static Map<Short, IntBuffer> _pathNodesIndex = new FastMap<>();
+	private static Map<Short, ByteBuffer> _pathNodes = new HashMap<>();
+	private static Map<Short, IntBuffer> _pathNodesIndex = new HashMap<>();
 	
 	public static GeoPathFinding getInstance()
 	{
@@ -155,7 +155,7 @@ public class GeoPathFinding extends PathFinding
 			
 			i++;
 			visited.add(node);
-			node.attachNeighbors();
+			node.attachNeighbors(readNeighbors(node));
 			GeoNode[] neighbors = node.getNeighbors();
 			if (neighbors == null)
 			{
@@ -191,7 +191,7 @@ public class GeoPathFinding extends PathFinding
 		return null;
 	}
 	
-	public List<AbstractNodeLoc> constructPath2(AbstractNode node)
+	public List<AbstractNodeLoc> constructPath2(AbstractNode<GeoNodeLoc> node)
 	{
 		LinkedList<AbstractNodeLoc> path = new LinkedList<>();
 		int previousDirectionX = -1000;
@@ -216,8 +216,15 @@ public class GeoPathFinding extends PathFinding
 		return path;
 	}
 	
-	public GeoNode[] readNeighbors(GeoNode n, int idx)
+	private GeoNode[] readNeighbors(GeoNode n)
 	{
+		if (n.getLoc() == null)
+		{
+			return null;
+		}
+		
+		int idx = n.getNeighborsIdx();
+		
 		int node_x = n.getLoc().getNodeX();
 		int node_y = n.getLoc().getNodeY();
 		// short node_z = n.getLoc().getZ();
@@ -225,7 +232,7 @@ public class GeoPathFinding extends PathFinding
 		short regoffset = getRegionOffset(getRegionX(node_x), getRegionY(node_y));
 		ByteBuffer pn = _pathNodes.get(regoffset);
 		
-		List<AbstractNode> Neighbors = new FastList<>(8);
+		List<AbstractNode<GeoNodeLoc>> neighbors = new ArrayList<>(8);
 		GeoNode newNode;
 		short new_node_x, new_node_y;
 		
@@ -239,7 +246,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // NE
@@ -251,7 +258,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // E
@@ -263,7 +270,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // SE
@@ -275,7 +282,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // S
@@ -287,7 +294,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // SW
@@ -299,7 +306,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // W
@@ -311,7 +318,7 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
 		neighbor = pn.get(idx++); // NW
@@ -323,11 +330,11 @@ public class GeoPathFinding extends PathFinding
 			newNode = readNode(new_node_x, new_node_y, neighbor);
 			if (newNode != null)
 			{
-				Neighbors.add(newNode);
+				neighbors.add(newNode);
 			}
 		}
-		GeoNode[] result = new GeoNode[Neighbors.size()];
-		return Neighbors.toArray(result);
+		GeoNode[] result = new GeoNode[neighbors.size()];
+		return neighbors.toArray(result);
 	}
 	
 	// Private
@@ -388,29 +395,34 @@ public class GeoPathFinding extends PathFinding
 	
 	protected GeoPathFinding()
 	{
-		final File file = new File(Config.PATHNODE_DIR, "pn_index.txt");
-		try (FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			LineNumberReader lnr = new LineNumberReader(br))
+		try
 		{
 			_log.info("Path Engine: - Loading Path Nodes...");
-			String line;
-			while ((line = lnr.readLine()) != null)
-			{
-				if (line.trim().isEmpty())
-				{
-					continue;
-				}
-				StringTokenizer st = new StringTokenizer(line, "_");
-				byte rx = Byte.parseByte(st.nextToken());
-				byte ry = Byte.parseByte(st.nextToken());
-				LoadPathNodeFile(rx, ry);
-			}
+			//@formatter:off
+			Files.lines(Paths.get(Config.PATHNODE_DIR.getPath(), "pn_index.txt"), StandardCharsets.UTF_8)
+				.map(String::trim)
+				.filter(l -> !l.isEmpty())
+				.forEach(line -> {
+					final String[] parts = line.split("_");
+					
+					if ((parts.length < 2)
+						|| !Util.isDigit(parts[0])
+						|| !Util.isDigit(parts[1]))
+					{
+						_log.warning("Invalid pathnode entry: '" + line + "', must be in format 'XX_YY', where X and Y - integers");
+						return;
+					}
+					
+					byte rx = Byte.parseByte(parts[0]);
+					byte ry = Byte.parseByte(parts[1]);
+					LoadPathNodeFile(rx, ry);
+				});
+			//@formatter:on
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
 			_log.log(Level.WARNING, "", e);
-			throw new Error("Failed to Read pn_index File.");
+			throw new Error("Failed to read pn_index file.");
 		}
 	}
 	

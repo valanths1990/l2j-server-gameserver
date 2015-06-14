@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,9 +24,13 @@ import com.l2jserver.gameserver.model.base.PlayerClass;
 
 public final class L2VillageMasterDwarfInstance extends L2VillageMasterInstance
 {
-	public L2VillageMasterDwarfInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a village master.
+	 * @param template the village master NPC template
+	 */
+	public L2VillageMasterDwarfInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 	}
 	
 	@Override

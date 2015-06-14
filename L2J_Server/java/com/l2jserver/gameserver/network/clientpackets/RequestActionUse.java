@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -25,11 +25,10 @@ import com.l2jserver.gameserver.ai.CtrlEvent;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2SummonAI;
 import com.l2jserver.gameserver.ai.NextAction;
-import com.l2jserver.gameserver.ai.NextAction.NextActionCallback;
+import com.l2jserver.gameserver.data.sql.impl.SummonSkillsTable;
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.datatables.BotReportTable;
-import com.l2jserver.gameserver.datatables.PetDataTable;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.SummonSkillsTable;
 import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.enums.PrivateStoreType;
 import com.l2jserver.gameserver.instancemanager.AirShipManager;
@@ -147,7 +146,7 @@ public final class RequestActionUse extends L2GameClientPacket
 				{
 					// Sit when arrive using next action.
 					// Creating next action class.
-					final NextAction nextAction = new NextAction(CtrlEvent.EVT_ARRIVED, CtrlIntention.AI_INTENTION_MOVE_TO, (NextActionCallback) () -> useSit(activeChar, target));
+					final NextAction nextAction = new NextAction(CtrlEvent.EVT_ARRIVED, CtrlIntention.AI_INTENTION_MOVE_TO, () -> useSit(activeChar, target));
 					
 					// Binding next action to AI.
 					activeChar.getAI().setNextAction(nextAction);
@@ -188,6 +187,12 @@ public final class RequestActionUse extends L2GameClientPacket
 				}
 				break;
 			case 19: // Unsummon Pet
+				
+				if (!validateSummon(summon, true))
+				{
+					break;
+				}
+				
 				if (summon.isDead())
 				{
 					sendPacket(SystemMessageId.DEAD_PET_CANNOT_BE_RETURNED);
@@ -210,11 +215,6 @@ public final class RequestActionUse extends L2GameClientPacket
 					{
 						sendPacket(SystemMessageId.THE_HELPER_PET_CANNOT_BE_RETURNED);
 					}
-					break;
-				}
-				
-				if (!validateSummon(summon, true))
-				{
 					break;
 				}
 				
@@ -1160,14 +1160,14 @@ public final class RequestActionUse extends L2GameClientPacket
 		
 		if ((requester.getAI().getIntention() != CtrlIntention.AI_INTENTION_IDLE) || (partner.getAI().getIntention() != CtrlIntention.AI_INTENTION_IDLE))
 		{
-			final NextAction nextAction = new NextAction(CtrlEvent.EVT_ARRIVED, CtrlIntention.AI_INTENTION_MOVE_TO, (NextActionCallback) () -> partner.sendPacket(new ExAskCoupleAction(requester.getObjectId(), id)));
+			final NextAction nextAction = new NextAction(CtrlEvent.EVT_ARRIVED, CtrlIntention.AI_INTENTION_MOVE_TO, () -> partner.sendPacket(new ExAskCoupleAction(requester.getObjectId(), id)));
 			requester.getAI().setNextAction(nextAction);
 			return;
 		}
 		
 		if (requester.isCastingNow() || requester.isCastingSimultaneouslyNow())
 		{
-			final NextAction nextAction = new NextAction(CtrlEvent.EVT_FINISH_CASTING, CtrlIntention.AI_INTENTION_CAST, (NextActionCallback) () -> partner.sendPacket(new ExAskCoupleAction(requester.getObjectId(), id)));
+			final NextAction nextAction = new NextAction(CtrlEvent.EVT_FINISH_CASTING, CtrlIntention.AI_INTENTION_CAST, () -> partner.sendPacket(new ExAskCoupleAction(requester.getObjectId(), id)));
 			requester.getAI().setNextAction(nextAction);
 			return;
 		}

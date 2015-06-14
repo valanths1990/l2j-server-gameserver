@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,18 +19,19 @@
 package com.l2jserver.gameserver.model.actor.templates;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.enums.AISkillScope;
 import com.l2jserver.gameserver.enums.AIType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.Sex;
-import com.l2jserver.gameserver.model.L2MinionData;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.base.ClassId;
@@ -42,7 +43,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * NPC template.
- * @author Nos
+ * @author NosBit
  */
 public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 {
@@ -100,7 +101,6 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 	private double _collisionRadiusGrown;
 	private double _collisionHeightGrown;
 	
-	private final List<L2MinionData> _minions = new ArrayList<>();
 	private final List<ClassId> _teachInfo = new ArrayList<>();
 	
 	/**
@@ -218,11 +218,6 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 	public boolean isUsingServerSideTitle()
 	{
 		return _usingServerSideTitle;
-	}
-	
-	public boolean hasParameters()
-	{
-		return _parameters != null;
 	}
 	
 	public StatsSet getParameters()
@@ -552,7 +547,7 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 		return dropLists != null ? dropLists.get(dropListScope) : null;
 	}
 	
-	public List<ItemHolder> calculateDrops(DropListScope dropListScope, L2Character victim, L2Character killer)
+	public Collection<ItemHolder> calculateDrops(DropListScope dropListScope, L2Character victim, L2Character killer)
 	{
 		List<IDropItem> dropList = getDropList(dropListScope);
 		if (dropList == null)
@@ -560,10 +555,10 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 			return null;
 		}
 		
-		List<ItemHolder> calculatedDrops = null;
+		Collection<ItemHolder> calculatedDrops = null;
 		for (IDropItem dropItem : dropList)
 		{
-			List<ItemHolder> drops = dropItem.calculateDrops(victim, killer);
+			final Collection<ItemHolder> drops = dropItem.calculateDrops(victim, killer);
 			if ((drops == null) || drops.isEmpty())
 			{
 				continue;
@@ -571,7 +566,7 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 			
 			if (calculatedDrops == null)
 			{
-				calculatedDrops = new ArrayList<>(drops.size());
+				calculatedDrops = new LinkedList<>();
 			}
 			
 			calculatedDrops.addAll(drops);
@@ -633,11 +628,6 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 		return L2NpcTemplate.isAssignableTo(obj.getClass(), clazz);
 	}
 	
-	public void addMinionData(L2MinionData minion)
-	{
-		_minions.add(minion);
-	}
-	
 	public boolean canTeach(ClassId classId)
 	{
 		// If the player is on a third class, fetch the class teacher
@@ -647,14 +637,6 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 			return _teachInfo.contains(classId.getParent());
 		}
 		return _teachInfo.contains(classId);
-	}
-	
-	/**
-	 * @return the list of all Minions that must be spawn with the L2NpcInstance using this L2NpcTemplate.
-	 */
-	public List<L2MinionData> getMinionData()
-	{
-		return _minions;
 	}
 	
 	public List<ClassId> getTeachInfo()

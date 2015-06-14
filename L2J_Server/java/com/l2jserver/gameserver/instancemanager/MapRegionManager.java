@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.SevenSigns;
-import com.l2jserver.gameserver.engines.DocumentParser;
 import com.l2jserver.gameserver.model.L2MapRegion;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.Location;
@@ -42,11 +42,12 @@ import com.l2jserver.gameserver.model.entity.Instance;
 import com.l2jserver.gameserver.model.entity.clanhall.SiegableHall;
 import com.l2jserver.gameserver.model.zone.type.L2ClanHallZone;
 import com.l2jserver.gameserver.model.zone.type.L2RespawnZone;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author Nyaran
  */
-public final class MapRegionManager extends DocumentParser
+public final class MapRegionManager implements IXmlReader
 {
 	private static final Map<String, L2MapRegion> _regions = new HashMap<>();
 	private static final String defaultRespawn = "talking_island_town";
@@ -61,11 +62,11 @@ public final class MapRegionManager extends DocumentParser
 	{
 		_regions.clear();
 		parseDatapackDirectory("data/mapregion", false);
-		_log.info(getClass().getSimpleName() + ": Loaded " + _regions.size() + " map regions.");
+		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _regions.size() + " map regions.");
 	}
 	
 	@Override
-	protected void parseDocument()
+	public void parseDocument(Document doc)
 	{
 		NamedNodeMap attrs;
 		String name;
@@ -74,7 +75,7 @@ public final class MapRegionManager extends DocumentParser
 		int castle;
 		int bbs;
 		
-		for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{

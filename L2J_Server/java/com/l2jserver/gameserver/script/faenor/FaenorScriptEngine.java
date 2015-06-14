@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -48,15 +48,18 @@ public class FaenorScriptEngine extends ScriptEngine
 	{
 		final File packDirectory = new File(Config.DATAPACK_ROOT, PACKAGE_DIRECTORY);
 		final File[] files = packDirectory.listFiles(new XMLFilter());
-		for (File file : files)
+		if (files != null)
 		{
-			try (InputStream in = new FileInputStream(file))
+			for (File file : files)
 			{
-				parseScript(new ScriptDocument(file.getName(), in), null);
-			}
-			catch (IOException e)
-			{
-				_log.log(Level.WARNING, e.getMessage(), e);
+				try (InputStream in = new FileInputStream(file))
+				{
+					parseScript(new ScriptDocument(file.getName(), in), null);
+				}
+				catch (IOException e)
+				{
+					_log.log(Level.WARNING, e.getMessage(), e);
+				}
 			}
 		}
 	}

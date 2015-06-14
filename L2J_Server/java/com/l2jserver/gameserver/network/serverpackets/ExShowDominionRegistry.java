@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,8 +19,7 @@
 package com.l2jserver.gameserver.network.serverpackets;
 
 import java.util.Calendar;
-
-import javolution.util.FastList;
+import java.util.List;
 
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager.Territory;
@@ -97,7 +96,7 @@ public class ExShowDominionRegistry extends L2GameServerPacket
 		writeD(_isClanRegistered); // is Cancel clan registration
 		writeD(_isMercRegistered); // is Cancel mercenaries registration
 		writeD(0x01); // unknown
-		FastList<Territory> territoryList = TerritoryWarManager.getInstance().getAllTerritories();
+		List<Territory> territoryList = TerritoryWarManager.getInstance().getAllTerritories();
 		writeD(territoryList.size()); // Territory Count
 		for (Territory t : territoryList)
 		{

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,18 +21,17 @@ package com.l2jserver.gameserver.model.actor.instance;
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.effects.L2EffectType;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
@@ -64,16 +63,16 @@ public final class L2TamedBeastInstance extends L2FeedableBeastInstance
 	protected boolean _isFreyaBeast;
 	private List<Skill> _beastSkills = null;
 	
-	public L2TamedBeastInstance(int objectId, L2NpcTemplate template)
+	public L2TamedBeastInstance(int npcTemplateId)
 	{
-		super(objectId, template);
+		super(NpcData.getInstance().getTemplate(npcTemplateId));
 		setInstanceType(InstanceType.L2TamedBeastInstance);
 		setHome(this);
 	}
 	
-	public L2TamedBeastInstance(int objectId, L2NpcTemplate template, L2PcInstance owner, int foodSkillId, int x, int y, int z)
+	public L2TamedBeastInstance(int npcTemplateId, L2PcInstance owner, int foodSkillId, int x, int y, int z)
 	{
-		super(objectId, template);
+		super(NpcData.getInstance().getTemplate(npcTemplateId));
 		_isFreyaBeast = false;
 		setInstanceType(InstanceType.L2TamedBeastInstance);
 		setCurrentHp(getMaxHp());
@@ -81,12 +80,12 @@ public final class L2TamedBeastInstance extends L2FeedableBeastInstance
 		setOwner(owner);
 		setFoodType(foodSkillId);
 		setHome(x, y, z);
-		this.spawnMe(x, y, z);
+		spawnMe(x, y, z);
 	}
 	
-	public L2TamedBeastInstance(int objectId, L2NpcTemplate template, L2PcInstance owner, int food, int x, int y, int z, boolean isFreyaBeast)
+	public L2TamedBeastInstance(int npcTemplateId, L2PcInstance owner, int food, int x, int y, int z, boolean isFreyaBeast)
 	{
-		super(objectId, template);
+		super(NpcData.getInstance().getTemplate(npcTemplateId));
 		_isFreyaBeast = isFreyaBeast;
 		setInstanceType(InstanceType.L2TamedBeastInstance);
 		setCurrentHp(getMaxHp());
@@ -99,7 +98,6 @@ public final class L2TamedBeastInstance extends L2FeedableBeastInstance
 		{
 			getAI().setIntention(CtrlIntention.AI_INTENTION_FOLLOW, _owner);
 		}
-		
 	}
 	
 	public void onReceiveFood()
@@ -206,7 +204,7 @@ public final class L2TamedBeastInstance extends L2FeedableBeastInstance
 	{
 		if (_beastSkills == null)
 		{
-			_beastSkills = new FastList<>();
+			_beastSkills = new CopyOnWriteArrayList<>();
 		}
 		_beastSkills.add(skill);
 	}

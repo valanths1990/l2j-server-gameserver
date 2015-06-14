@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,9 +24,9 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 public class L2RiftInvaderInstance extends L2MonsterInstance
 {
 	// Not longer needed since rift monster targeting control now is handled by the room zones for any mob
-	public L2RiftInvaderInstance(int objectId, L2NpcTemplate template)
+	public L2RiftInvaderInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2RiftInvaderInstance);
 	}
 }

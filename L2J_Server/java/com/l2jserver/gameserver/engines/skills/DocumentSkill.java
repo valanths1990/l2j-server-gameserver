@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,16 +19,15 @@
 package com.l2jserver.gameserver.engines.skills;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
-import javolution.util.FastList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.datatables.EnchantSkillGroupsData;
+import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
 import com.l2jserver.gameserver.engines.DocumentBase;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.conditions.Condition;
@@ -54,12 +53,12 @@ public class DocumentSkill extends DocumentBase
 		public StatsSet[] enchsets7;
 		public StatsSet[] enchsets8;
 		public int currentLevel;
-		public List<Skill> skills = new FastList<>();
-		public List<Skill> currentSkills = new FastList<>();
+		public List<Skill> skills = new ArrayList<>();
+		public List<Skill> currentSkills = new ArrayList<>();
 	}
 	
 	private SkillInfo _currentSkill;
-	private final List<Skill> _skillsInFile = new FastList<>();
+	private final List<Skill> _skillsInFile = new ArrayList<>();
 	
 	public DocumentSkill(File file)
 	{
@@ -1491,7 +1490,7 @@ public class DocumentSkill extends DocumentBase
 	private void makeSkills()
 	{
 		int count = 0;
-		_currentSkill.currentSkills = new FastList<>(_currentSkill.sets.length + _currentSkill.enchsets1.length + _currentSkill.enchsets2.length + _currentSkill.enchsets3.length + _currentSkill.enchsets4.length + _currentSkill.enchsets5.length + _currentSkill.enchsets6.length + _currentSkill.enchsets7.length + _currentSkill.enchsets8.length);
+		_currentSkill.currentSkills = new ArrayList<>(_currentSkill.sets.length + _currentSkill.enchsets1.length + _currentSkill.enchsets2.length + _currentSkill.enchsets3.length + _currentSkill.enchsets4.length + _currentSkill.enchsets5.length + _currentSkill.enchsets6.length + _currentSkill.enchsets7.length + _currentSkill.enchsets8.length);
 		StatsSet set;
 		for (int i = 0; i < _currentSkill.sets.length; i++)
 		{

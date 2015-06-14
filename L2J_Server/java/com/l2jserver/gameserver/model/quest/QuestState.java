@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -638,12 +638,13 @@ public final class QuestState
 	
 	/**
 	 * Verifies if the given value is equal to the current memos state ex.
+	 * @param slot the slot where the value was saved
 	 * @param memoStateEx the value to verify
 	 * @return {@code true} if the values are equal, {@code false} otherwise
 	 */
-	public boolean isMemoStateEx(int memoStateEx)
+	public boolean isMemoStateEx(int slot, int memoStateEx)
 	{
-		return (getInt("memoStateEx") == memoStateEx);
+		return (getMemoStateEx(slot) == memoStateEx);
 	}
 	
 	/**

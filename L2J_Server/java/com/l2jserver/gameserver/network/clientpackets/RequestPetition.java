@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.network.clientpackets;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.instancemanager.PetitionManager;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -58,7 +58,7 @@ public final class RequestPetition extends L2GameClientPacket
 			return;
 		}
 		
-		if (!AdminTable.getInstance().isGmOnline(false))
+		if (!AdminData.getInstance().isGmOnline(false))
 		{
 			activeChar.sendPacket(SystemMessageId.NO_GM_PROVIDING_SERVICE_NOW);
 			return;
@@ -89,7 +89,6 @@ public final class RequestPetition extends L2GameClientPacket
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.WE_HAVE_RECEIVED_S1_PETITIONS_TODAY);
 			sm.addInt(totalPetitions);
 			activeChar.sendPacket(sm);
-			sm = null;
 			return;
 		}
 		
@@ -113,7 +112,6 @@ public final class RequestPetition extends L2GameClientPacket
 		sm = SystemMessage.getSystemMessage(SystemMessageId.S1_PETITION_ON_WAITING_LIST);
 		sm.addInt(PetitionManager.getInstance().getPendingPetitionCount());
 		activeChar.sendPacket(sm);
-		sm = null;
 	}
 	
 	@Override

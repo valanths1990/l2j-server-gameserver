@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,16 +21,15 @@ package com.l2jserver.gameserver.instancemanager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.model.L2Spawn;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.entity.Fort;
 
 public final class FortSiegeGuardManager
@@ -38,8 +37,7 @@ public final class FortSiegeGuardManager
 	private static final Logger _log = Logger.getLogger(FortSiegeGuardManager.class.getName());
 	
 	private final Fort _fort;
-	private final FastMap<Integer, FastList<L2Spawn>> _siegeGuards = new FastMap<>();
-	private FastList<L2Spawn> _siegeGuardsSpawns;
+	private final Map<Integer, List<L2Spawn>> _siegeGuards = new HashMap<>();
 	
 	public FortSiegeGuardManager(Fort fort)
 	{
@@ -53,7 +51,7 @@ public final class FortSiegeGuardManager
 	{
 		try
 		{
-			final FastList<L2Spawn> monsterList = getSiegeGuardSpawn().get(getFort().getResidenceId());
+			final List<L2Spawn> monsterList = _siegeGuards.get(getFort().getResidenceId());
 			if (monsterList != null)
 			{
 				for (L2Spawn spawnDat : monsterList)
@@ -83,8 +81,7 @@ public final class FortSiegeGuardManager
 	{
 		try
 		{
-			final FastList<L2Spawn> monsterList = getSiegeGuardSpawn().get(getFort().getResidenceId());
-			
+			final List<L2Spawn> monsterList = _siegeGuards.get(getFort().getResidenceId());
 			if (monsterList != null)
 			{
 				for (L2Spawn spawnDat : monsterList)
@@ -110,37 +107,27 @@ public final class FortSiegeGuardManager
 	{
 		_siegeGuards.clear();
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT * FROM fort_siege_guards Where fortId = ? "))
+			PreparedStatement ps = con.prepareStatement("SELECT npcId, x, y, z, heading, respawnDelay FROM fort_siege_guards WHERE fortId = ?"))
 		{
-			ps.setInt(1, getFort().getResidenceId());
+			final int fortId = getFort().getResidenceId();
+			ps.setInt(1, fortId);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				L2Spawn spawn1;
-				L2NpcTemplate template1;
-				_siegeGuardsSpawns = new FastList<>();
+				final List<L2Spawn> siegeGuardSpawns = new ArrayList<>();
 				while (rs.next())
 				{
-					int fortId = rs.getInt("fortId");
-					template1 = NpcData.getInstance().getTemplate(rs.getInt("npcId"));
-					if (template1 != null)
-					{
-						spawn1 = new L2Spawn(template1);
-						spawn1.setAmount(1);
-						spawn1.setX(rs.getInt("x"));
-						spawn1.setY(rs.getInt("y"));
-						spawn1.setZ(rs.getInt("z"));
-						spawn1.setHeading(rs.getInt("heading"));
-						spawn1.setRespawnDelay(rs.getInt("respawnDelay"));
-						spawn1.setLocationId(0);
-						
-						_siegeGuardsSpawns.add(spawn1);
-					}
-					else
-					{
-						_log.warning("Missing npc data in npc table for id: " + rs.getInt("npcId"));
-					}
-					_siegeGuards.put(fortId, _siegeGuardsSpawns);
+					final L2Spawn spawn = new L2Spawn(rs.getInt("npcId"));
+					spawn.setAmount(1);
+					spawn.setX(rs.getInt("x"));
+					spawn.setY(rs.getInt("y"));
+					spawn.setZ(rs.getInt("z"));
+					spawn.setHeading(rs.getInt("heading"));
+					spawn.setRespawnDelay(rs.getInt("respawnDelay"));
+					spawn.setLocationId(0);
+					
+					siegeGuardSpawns.add(spawn);
 				}
+				_siegeGuards.put(fortId, siegeGuardSpawns);
 			}
 		}
 		catch (Exception e)
@@ -154,7 +141,7 @@ public final class FortSiegeGuardManager
 		return _fort;
 	}
 	
-	public final FastMap<Integer, FastList<L2Spawn>> getSiegeGuardSpawn()
+	public final Map<Integer, List<L2Spawn>> getSiegeGuardSpawn()
 	{
 		return _siegeGuards;
 	}

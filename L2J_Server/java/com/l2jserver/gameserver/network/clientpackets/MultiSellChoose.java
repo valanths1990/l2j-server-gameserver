@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,12 +18,13 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.ArrayList;
+import static com.l2jserver.gameserver.model.actor.L2Npc.INTERACTION_DISTANCE;
 
-import javolution.util.FastList;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.MultisellData;
+import com.l2jserver.gameserver.data.xml.impl.MultisellData;
 import com.l2jserver.gameserver.model.Elementals;
 import com.l2jserver.gameserver.model.L2Augmentation;
 import com.l2jserver.gameserver.model.actor.L2Npc;
@@ -55,13 +56,13 @@ public class MultiSellChoose extends L2GameClientPacket
 	@SuppressWarnings("unused")
 	private int _unk3;
 	@SuppressWarnings("unused")
-	private int _unk7;
-	@SuppressWarnings("unused")
 	private int _unk4;
 	@SuppressWarnings("unused")
 	private int _unk5;
 	@SuppressWarnings("unused")
 	private int _unk6;
+	@SuppressWarnings("unused")
+	private int _unk7;
 	@SuppressWarnings("unused")
 	private int _unk8;
 	@SuppressWarnings("unused")
@@ -118,11 +119,20 @@ public class MultiSellChoose extends L2GameClientPacket
 			return;
 		}
 		
-		L2Npc target = player.getLastFolkNPC();
-		if (!player.isGM() && ((target == null) || !list.checkNpcObjectId(target.getObjectId()) || !target.canInteract(player)))
+		final L2Npc npc = player.getLastFolkNPC();
+		if (((npc != null) && !list.isNpcAllowed(npc.getId())) || ((npc == null) && list.isNpcOnly()))
 		{
 			player.setMultiSell(null);
 			return;
+		}
+		
+		if (!player.isGM() && (npc != null))
+		{
+			if (!player.isInsideRadius(npc, INTERACTION_DISTANCE, true, false) || (player.getInstanceId() != npc.getInstanceId()))
+			{
+				player.setMultiSell(null);
+				return;
+			}
 		}
 		
 		for (Entry entry : list.getEntries())
@@ -237,235 +247,223 @@ public class MultiSellChoose extends L2GameClientPacket
 					}
 				}
 				
-				FastList<L2Augmentation> augmentation = FastList.newInstance();
+				List<L2Augmentation> augmentation = new ArrayList<>();
 				Elementals[] elemental = null;
 				/** All ok, remove items and add final product */
-				
-				try
+				for (Ingredient e : entry.getIngredients())
 				{
-					for (Ingredient e : entry.getIngredients())
+					if (e.getItemId() < 0)
 					{
-						if (e.getItemId() < 0)
+						if (!MultisellData.takeSpecialIngredient(e.getItemId(), e.getItemCount() * _amount, player))
 						{
-							if (!MultisellData.takeSpecialIngredient(e.getItemId(), e.getItemCount() * _amount, player))
-							{
-								return;
-							}
+							return;
 						}
-						else
+					}
+					else
+					{
+						L2ItemInstance itemToTake = inv.getItemByItemId(e.getItemId()); // initialize and initial guess for the item to take.
+						if (itemToTake == null)
+						{ // this is a cheat, transaction will be aborted and if any items already taken will not be returned back to inventory!
+							_log.severe("Character: " + player.getName() + " is trying to cheat in multisell, id:" + _listId + ":" + _entryId);
+							player.setMultiSell(null);
+							return;
+						}
+						
+						// if (itemToTake.isEquipped())
+						// {
+						// this is a cheat, transaction will be aborted and if any items already taken will not be returned back to inventory!
+						// _log.severe("Character: " + player.getName() + " is trying to cheat in multisell, exchanging equipped item, merchatnt id:" + merchant.getNpcId());
+						// player.setMultiSell(null);
+						// return;
+						// }
+						
+						if (Config.ALT_BLACKSMITH_USE_RECIPES || !e.getMaintainIngredient())
 						{
-							L2ItemInstance itemToTake = inv.getItemByItemId(e.getItemId()); // initialize and initial guess for the item to take.
-							if (itemToTake == null)
-							{ // this is a cheat, transaction will be aborted and if any items already taken will not be returned back to inventory!
-								_log.severe("Character: " + player.getName() + " is trying to cheat in multisell, id:" + _listId + ":" + _entryId);
-								player.setMultiSell(null);
-								return;
-							}
-							
-							// if (itemToTake.isEquipped())
-							// {
-							// this is a cheat, transaction will be aborted and if any items already taken will not be returned back to inventory!
-							// _log.severe("Character: " + player.getName() + " is trying to cheat in multisell, exchanging equipped item, merchatnt id:" + merchant.getNpcId());
-							// player.setMultiSell(null);
-							// return;
-							// }
-							
-							if (Config.ALT_BLACKSMITH_USE_RECIPES || !e.getMaintainIngredient())
+							// if it's a stackable item, just reduce the amount from the first (only) instance that is found in the inventory
+							if (itemToTake.isStackable())
 							{
-								// if it's a stackable item, just reduce the amount from the first (only) instance that is found in the inventory
-								if (itemToTake.isStackable())
+								if (!player.destroyItem("Multisell", itemToTake.getObjectId(), (e.getItemCount() * _amount), player.getTarget(), true))
 								{
-									if (!player.destroyItem("Multisell", itemToTake.getObjectId(), (e.getItemCount() * _amount), player.getTarget(), true))
+									player.setMultiSell(null);
+									return;
+								}
+							}
+							else
+							{
+								// for non-stackable items, one of two scenaria are possible:
+								// a) list maintains enchantment: get the instances that exactly match the requested enchantment level
+								// b) list does not maintain enchantment: get the instances with the LOWEST enchantment level
+								
+								// a) if enchantment is maintained, then get a list of items that exactly match this enchantment
+								if (list.getMaintainEnchantment())
+								{
+									// loop through this list and remove (one by one) each item until the required amount is taken.
+									L2ItemInstance[] inventoryContents = inv.getAllItemsByItemId(e.getItemId(), e.getEnchantLevel(), false);
+									for (int i = 0; i < (e.getItemCount() * _amount); i++)
 									{
-										player.setMultiSell(null);
-										return;
+										if (inventoryContents[i].isAugmented())
+										{
+											augmentation.add(inventoryContents[i].getAugmentation());
+										}
+										if (inventoryContents[i].getElementals() != null)
+										{
+											elemental = inventoryContents[i].getElementals();
+										}
+										if (!player.destroyItem("Multisell", inventoryContents[i].getObjectId(), 1, player.getTarget(), true))
+										{
+											player.setMultiSell(null);
+											return;
+										}
 									}
 								}
 								else
+								// b) enchantment is not maintained. Get the instances with the LOWEST enchantment level
 								{
-									// for non-stackable items, one of two scenaria are possible:
-									// a) list maintains enchantment: get the instances that exactly match the requested enchantment level
-									// b) list does not maintain enchantment: get the instances with the LOWEST enchantment level
+									// NOTE: There are 2 ways to achieve the above goal.
+									// 1) Get all items that have the correct itemId, loop through them until the lowest enchantment
+									// level is found. Repeat all this for the next item until proper count of items is reached.
+									// 2) Get all items that have the correct itemId, sort them once based on enchantment level,
+									// and get the range of items that is necessary.
+									// Method 1 is faster for a small number of items to be exchanged.
+									// Method 2 is faster for large amounts.
+									//
+									// EXPLANATION:
+									// Worst case scenario for algorithm 1 will make it run in a number of cycles given by:
+									// m*(2n-m+1)/2 where m is the number of items to be exchanged and n is the total
+									// number of inventory items that have a matching id.
+									// With algorithm 2 (sort), sorting takes n*log(n) time and the choice is done in a single cycle
+									// for case b (just grab the m first items) or in linear time for case a (find the beginning of items
+									// with correct enchantment, index x, and take all items from x to x+m).
+									// Basically, whenever m > log(n) we have: m*(2n-m+1)/2 = (2nm-m*m+m)/2 >
+									// (2nlogn-logn*logn+logn)/2 = nlog(n) - log(n*n) + log(n) = nlog(n) + log(n/n*n) =
+									// nlog(n) + log(1/n) = nlog(n) - log(n) = (n-1)log(n)
+									// So for m < log(n) then m*(2n-m+1)/2 > (n-1)log(n) and m*(2n-m+1)/2 > nlog(n)
+									//
+									// IDEALLY:
+									// In order to best optimize the performance, choose which algorithm to run, based on whether 2^m > n
+									// if ( (2<<(e.getItemCount()// _amount)) < inventoryContents.length )
+									// // do Algorithm 1, no sorting
+									// else
+									// // do Algorithm 2, sorting
+									//
+									// CURRENT IMPLEMENTATION:
+									// In general, it is going to be very rare for a person to do a massive exchange of non-stackable items
+									// For this reason, we assume that algorithm 1 will always suffice and we keep things simple.
+									// If, in the future, it becomes necessary that we optimize, the above discussion should make it clear
+									// what optimization exactly is necessary (based on the comments under "IDEALLY").
+									//
 									
-									// a) if enchantment is maintained, then get a list of items that exactly match this enchantment
-									if (list.getMaintainEnchantment())
+									// choice 1. Small number of items exchanged. No sorting.
+									for (int i = 1; i <= (e.getItemCount() * _amount); i++)
 									{
-										// loop through this list and remove (one by one) each item until the required amount is taken.
-										L2ItemInstance[] inventoryContents = inv.getAllItemsByItemId(e.getItemId(), e.getEnchantLevel(), false);
-										for (int i = 0; i < (e.getItemCount() * _amount); i++)
-										{
-											if (inventoryContents[i].isAugmented())
-											{
-												augmentation.add(inventoryContents[i].getAugmentation());
-											}
-											if (inventoryContents[i].getElementals() != null)
-											{
-												elemental = inventoryContents[i].getElementals();
-											}
-											if (!player.destroyItem("Multisell", inventoryContents[i].getObjectId(), 1, player.getTarget(), true))
-											{
-												player.setMultiSell(null);
-												return;
-											}
-										}
-									}
-									else
-									// b) enchantment is not maintained. Get the instances with the LOWEST enchantment level
-									{
-										// NOTE: There are 2 ways to achieve the above goal.
-										// 1) Get all items that have the correct itemId, loop through them until the lowest enchantment
-										// level is found. Repeat all this for the next item until proper count of items is reached.
-										// 2) Get all items that have the correct itemId, sort them once based on enchantment level,
-										// and get the range of items that is necessary.
-										// Method 1 is faster for a small number of items to be exchanged.
-										// Method 2 is faster for large amounts.
-										//
-										// EXPLANATION:
-										// Worst case scenario for algorithm 1 will make it run in a number of cycles given by:
-										// m*(2n-m+1)/2 where m is the number of items to be exchanged and n is the total
-										// number of inventory items that have a matching id.
-										// With algorithm 2 (sort), sorting takes n*log(n) time and the choice is done in a single cycle
-										// for case b (just grab the m first items) or in linear time for case a (find the beginning of items
-										// with correct enchantment, index x, and take all items from x to x+m).
-										// Basically, whenever m > log(n) we have: m*(2n-m+1)/2 = (2nm-m*m+m)/2 >
-										// (2nlogn-logn*logn+logn)/2 = nlog(n) - log(n*n) + log(n) = nlog(n) + log(n/n*n) =
-										// nlog(n) + log(1/n) = nlog(n) - log(n) = (n-1)log(n)
-										// So for m < log(n) then m*(2n-m+1)/2 > (n-1)log(n) and m*(2n-m+1)/2 > nlog(n)
-										//
-										// IDEALLY:
-										// In order to best optimize the performance, choose which algorithm to run, based on whether 2^m > n
-										// if ( (2<<(e.getItemCount()// _amount)) < inventoryContents.length )
-										// // do Algorithm 1, no sorting
-										// else
-										// // do Algorithm 2, sorting
-										//
-										// CURRENT IMPLEMENTATION:
-										// In general, it is going to be very rare for a person to do a massive exchange of non-stackable items
-										// For this reason, we assume that algorithm 1 will always suffice and we keep things simple.
-										// If, in the future, it becomes necessary that we optimize, the above discussion should make it clear
-										// what optimization exactly is necessary (based on the comments under "IDEALLY").
-										//
+										L2ItemInstance[] inventoryContents = inv.getAllItemsByItemId(e.getItemId(), false);
 										
-										// choice 1. Small number of items exchanged. No sorting.
-										for (int i = 1; i <= (e.getItemCount() * _amount); i++)
+										itemToTake = inventoryContents[0];
+										// get item with the LOWEST enchantment level from the inventory...
+										// +0 is lowest by default...
+										if (itemToTake.getEnchantLevel() > 0)
 										{
-											L2ItemInstance[] inventoryContents = inv.getAllItemsByItemId(e.getItemId(), false);
-											
-											itemToTake = inventoryContents[0];
-											// get item with the LOWEST enchantment level from the inventory...
-											// +0 is lowest by default...
-											if (itemToTake.getEnchantLevel() > 0)
+											for (L2ItemInstance item : inventoryContents)
 											{
-												for (L2ItemInstance item : inventoryContents)
+												if (item.getEnchantLevel() < itemToTake.getEnchantLevel())
 												{
-													if (item.getEnchantLevel() < itemToTake.getEnchantLevel())
+													itemToTake = item;
+													// nothing will have enchantment less than 0. If a zero-enchanted
+													// item is found, just take it
+													if (itemToTake.getEnchantLevel() == 0)
 													{
-														itemToTake = item;
-														// nothing will have enchantment less than 0. If a zero-enchanted
-														// item is found, just take it
-														if (itemToTake.getEnchantLevel() == 0)
-														{
-															break;
-														}
+														break;
 													}
 												}
 											}
-											if (!player.destroyItem("Multisell", itemToTake.getObjectId(), 1, player.getTarget(), true))
-											{
-												player.setMultiSell(null);
-												return;
-											}
+										}
+										if (!player.destroyItem("Multisell", itemToTake.getObjectId(), 1, player.getTarget(), true))
+										{
+											player.setMultiSell(null);
+											return;
 										}
 									}
 								}
 							}
 						}
 					}
-					
-					// Generate the appropriate items
-					for (Ingredient e : entry.getProducts())
+				}
+				
+				// Generate the appropriate items
+				for (Ingredient e : entry.getProducts())
+				{
+					if (e.getItemId() < 0)
 					{
-						if (e.getItemId() < 0)
+						MultisellData.giveSpecialProduct(e.getItemId(), e.getItemCount() * _amount, player);
+					}
+					else
+					{
+						if (e.isStackable())
 						{
-							MultisellData.giveSpecialProduct(e.getItemId(), e.getItemCount() * _amount, player);
+							inv.addItem("Multisell", e.getItemId(), e.getItemCount() * _amount, player, player.getTarget());
 						}
 						else
 						{
-							if (e.isStackable())
+							L2ItemInstance product = null;
+							for (int i = 0; i < (e.getItemCount() * _amount); i++)
 							{
-								inv.addItem("Multisell", e.getItemId(), e.getItemCount() * _amount, player, player.getTarget());
-							}
-							else
-							{
-								L2ItemInstance product = null;
-								for (int i = 0; i < (e.getItemCount() * _amount); i++)
+								product = inv.addItem("Multisell", e.getItemId(), 1, player, player.getTarget());
+								if ((product != null) && list.getMaintainEnchantment())
 								{
-									product = inv.addItem("Multisell", e.getItemId(), 1, player, player.getTarget());
-									if ((product != null) && list.getMaintainEnchantment())
+									if (i < augmentation.size())
 									{
-										if (i < augmentation.size())
-										{
-											product.setAugmentation(new L2Augmentation(augmentation.get(i).getAugmentationId()));
-										}
-										if (elemental != null)
-										{
-											for (Elementals elm : elemental)
-											{
-												product.setElementAttr(elm.getElement(), elm.getValue());
-											}
-										}
-										product.setEnchantLevel(e.getEnchantLevel());
-										product.updateDatabase();
+										product.setAugmentation(new L2Augmentation(augmentation.get(i).getAugmentationId()));
 									}
+									if (elemental != null)
+									{
+										for (Elementals elm : elemental)
+										{
+											product.setElementAttr(elm.getElement(), elm.getValue());
+										}
+									}
+									product.setEnchantLevel(e.getEnchantLevel());
+									product.updateDatabase();
 								}
-							}
-							// msg part
-							SystemMessage sm;
-							
-							if ((e.getItemCount() * _amount) > 1)
-							{
-								sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S);
-								sm.addItemName(e.getItemId());
-								sm.addLong(e.getItemCount() * _amount);
-								player.sendPacket(sm);
-								sm = null;
-							}
-							else
-							{
-								if (list.getMaintainEnchantment() && (e.getEnchantLevel() > 0))
-								{
-									sm = SystemMessage.getSystemMessage(SystemMessageId.ACQUIRED_S1_S2);
-									sm.addLong(e.getEnchantLevel());
-									sm.addItemName(e.getItemId());
-								}
-								else
-								{
-									sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_ITEM_S1);
-									sm.addItemName(e.getItemId());
-								}
-								player.sendPacket(sm);
-								sm = null;
 							}
 						}
+						// msg part
+						SystemMessage sm;
+						
+						if ((e.getItemCount() * _amount) > 1)
+						{
+							sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S);
+							sm.addItemName(e.getItemId());
+							sm.addLong(e.getItemCount() * _amount);
+							player.sendPacket(sm);
+						}
+						else
+						{
+							if (list.getMaintainEnchantment() && (e.getEnchantLevel() > 0))
+							{
+								sm = SystemMessage.getSystemMessage(SystemMessageId.ACQUIRED_S1_S2);
+								sm.addLong(e.getEnchantLevel());
+								sm.addItemName(e.getItemId());
+							}
+							else
+							{
+								sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_ITEM_S1);
+								sm.addItemName(e.getItemId());
+							}
+							player.sendPacket(sm);
+						}
 					}
-					player.sendPacket(new ItemList(player, false));
-					
-					StatusUpdate su = new StatusUpdate(player);
-					su.addAttribute(StatusUpdate.CUR_LOAD, player.getCurrentLoad());
-					player.sendPacket(su);
-					su = null;
 				}
-				finally
-				{
-					FastList.recycle(augmentation);
-				}
+				player.sendPacket(new ItemList(player, false));
+				
+				StatusUpdate su = new StatusUpdate(player);
+				su.addAttribute(StatusUpdate.CUR_LOAD, player.getCurrentLoad());
+				player.sendPacket(su);
 				
 				// finally, give the tax to the castle...
-				if (entry.getTaxAmount() > 0)
+				if ((npc != null) && (entry.getTaxAmount() > 0))
 				{
-					target.getCastle().addToTreasury(entry.getTaxAmount() * _amount);
+					npc.getCastle().addToTreasury(entry.getTaxAmount() * _amount);
 				}
-				
 				break;
 			}
 		}

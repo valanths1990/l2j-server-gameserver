@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -29,10 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
-import javolution.util.FastSet;
 
 import com.l2jserver.Config;
 import com.l2jserver.util.StringUtil;
@@ -521,11 +517,6 @@ public class ThreadPoolManager
 			" |- PoolSize:        " + _eventThreadPool.getPoolSize(),
 			" |- CompletedTasks:  " + _eventThreadPool.getCompletedTaskCount(),
 			" |- QueuedTasks:     " + _eventThreadPool.getQueue().size(),
-			" | -------",
-			" + Javolution stats:",
-			" |- FastList:        " + FastList.report(),
-			" |- FastMap:        " + FastMap.report(),
-			" |- FastSet:        " + FastSet.report(),
 			" | -------"
 		};
 	}

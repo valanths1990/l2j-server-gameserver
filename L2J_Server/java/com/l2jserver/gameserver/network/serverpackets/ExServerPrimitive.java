@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -27,7 +27,7 @@ import com.l2jserver.gameserver.model.interfaces.ILocational;
 /**
  * A packet used to draw points and lines on client.<br/>
  * <b>Note:</b> Names in points and lines are bugged they will appear even when not looking at them.
- * @author Nos
+ * @author NosBit
  */
 public class ExServerPrimitive extends L2GameServerPacket
 {

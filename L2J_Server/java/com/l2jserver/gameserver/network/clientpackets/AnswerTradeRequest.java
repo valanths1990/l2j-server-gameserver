@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -62,20 +62,16 @@ public final class AnswerTradeRequest extends L2GameClientPacket
 		{
 			// Trade partner not found, cancel trade
 			player.sendPacket(new TradeDone(0));
-			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
-			player.sendPacket(msg);
+			player.sendPacket(SystemMessage.getSystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME));
 			player.setActiveRequester(null);
-			msg = null;
 			return;
 		}
 		else if (L2World.getInstance().getPlayer(partner.getObjectId()) == null)
 		{
 			// Trade partner not found, cancel trade
 			player.sendPacket(new TradeDone(0));
-			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
-			player.sendPacket(msg);
+			player.sendPacket(SystemMessage.getSystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME));
 			player.setActiveRequester(null);
-			msg = null;
 			return;
 		}
 		
@@ -88,7 +84,6 @@ public final class AnswerTradeRequest extends L2GameClientPacket
 			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.C1_DENIED_TRADE_REQUEST);
 			msg.addString(player.getName());
 			partner.sendPacket(msg);
-			msg = null;
 		}
 		
 		// Clears requesting status

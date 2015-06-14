@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,9 +26,13 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public class L2DawnPriestInstance extends L2SignsPriestInstance
 {
-	public L2DawnPriestInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a dawn priest.
+	 * @param template the dawn priest NPC template
+	 */
+	public L2DawnPriestInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DawnPriestInstance);
 	}
 	

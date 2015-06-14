@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,7 +19,9 @@
 package com.l2jserver.gameserver.model.conditions;
 
 import com.l2jserver.gameserver.enums.Race;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.actor.L2Character;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.util.Util;
 
 /**
@@ -40,12 +42,12 @@ public class ConditionPlayerRace extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if ((env.getCharacter() == null) || !env.getCharacter().isPlayer())
+		if ((effector == null) || !effector.isPlayer())
 		{
 			return false;
 		}
-		return Util.contains(_races, env.getPlayer().getRace());
+		return Util.contains(_races, effector.getActingPlayer().getRace());
 	}
 }

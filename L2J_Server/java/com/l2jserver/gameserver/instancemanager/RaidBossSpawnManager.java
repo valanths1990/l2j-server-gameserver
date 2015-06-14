@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,21 +24,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.util.Rnd;
 
 /**
@@ -49,10 +46,10 @@ public class RaidBossSpawnManager
 {
 	private static final Logger _log = Logger.getLogger(RaidBossSpawnManager.class.getName());
 	
-	protected static final Map<Integer, L2RaidBossInstance> _bosses = new FastMap<>();
-	protected static final Map<Integer, L2Spawn> _spawns = new FastMap<>();
-	protected static final Map<Integer, StatsSet> _storedInfo = new FastMap<>();
-	protected static final Map<Integer, ScheduledFuture<?>> _schedules = new FastMap<>();
+	protected static final Map<Integer, L2RaidBossInstance> _bosses = new ConcurrentHashMap<>();
+	protected static final Map<Integer, L2Spawn> _spawns = new ConcurrentHashMap<>();
+	protected static final Map<Integer, StatsSet> _storedInfo = new ConcurrentHashMap<>();
+	protected static final Map<Integer, ScheduledFuture<?>> _schedules = new ConcurrentHashMap<>();
 	
 	public static enum StatusEnum
 	{
@@ -83,29 +80,17 @@ public class RaidBossSpawnManager
 			PreparedStatement statement = con.prepareStatement("SELECT * FROM raidboss_spawnlist ORDER BY boss_id");
 			ResultSet rset = statement.executeQuery())
 		{
-			L2Spawn spawnDat;
-			L2NpcTemplate template;
-			long respawnTime;
 			while (rset.next())
 			{
-				template = getValidTemplate(rset.getInt("boss_id"));
-				if (template != null)
-				{
-					spawnDat = new L2Spawn(template);
-					spawnDat.setX(rset.getInt("loc_x"));
-					spawnDat.setY(rset.getInt("loc_y"));
-					spawnDat.setZ(rset.getInt("loc_z"));
-					spawnDat.setAmount(rset.getInt("amount"));
-					spawnDat.setHeading(rset.getInt("heading"));
-					spawnDat.setRespawnDelay(rset.getInt("respawn_delay"), rset.getInt("respawn_random"));
-					respawnTime = rset.getLong("respawn_time");
-					
-					addNewSpawn(spawnDat, respawnTime, rset.getDouble("currentHP"), rset.getDouble("currentMP"), false);
-				}
-				else
-				{
-					_log.warning(getClass().getSimpleName() + ": Could not load raidboss #" + rset.getInt("boss_id") + " from DB");
-				}
+				final L2Spawn spawnDat = new L2Spawn(rset.getInt("boss_id"));
+				spawnDat.setX(rset.getInt("loc_x"));
+				spawnDat.setY(rset.getInt("loc_y"));
+				spawnDat.setZ(rset.getInt("loc_z"));
+				spawnDat.setAmount(rset.getInt("amount"));
+				spawnDat.setHeading(rset.getInt("heading"));
+				spawnDat.setRespawnDelay(rset.getInt("respawn_delay"), rset.getInt("respawn_random"));
+				
+				addNewSpawn(spawnDat, rset.getLong("respawn_time"), rset.getDouble("currentHP"), rset.getDouble("currentMP"), false);
 			}
 			
 			_log.info(getClass().getSimpleName() + ": Loaded " + _bosses.size() + " Instances");
@@ -177,12 +162,11 @@ public class RaidBossSpawnManager
 	 */
 	public void updateStatus(L2RaidBossInstance boss, boolean isBossDead)
 	{
-		if (!_storedInfo.containsKey(boss.getId()))
+		final StatsSet info = _storedInfo.get(boss.getId());
+		if (info == null)
 		{
 			return;
 		}
-		
-		final StatsSet info = _storedInfo.get(boss.getId());
 		
 		if (isBossDead)
 		{
@@ -481,25 +465,6 @@ public class RaidBossSpawnManager
 		{
 			return StatusEnum.UNDEFINED;
 		}
-	}
-	
-	/**
-	 * Gets the valid template.
-	 * @param bossId the boss id
-	 * @return the valid template
-	 */
-	public L2NpcTemplate getValidTemplate(int bossId)
-	{
-		final L2NpcTemplate template = NpcData.getInstance().getTemplate(bossId);
-		if (template == null)
-		{
-			return null;
-		}
-		if (!template.isType("L2RaidBoss"))
-		{
-			return null;
-		}
-		return template;
 	}
 	
 	/**

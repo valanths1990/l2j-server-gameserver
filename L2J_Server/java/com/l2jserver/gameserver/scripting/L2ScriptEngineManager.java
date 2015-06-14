@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.script.jython.JythonScriptEngine;
@@ -60,8 +59,8 @@ public final class L2ScriptEngineManager
 		return SingletonHolder._instance;
 	}
 	
-	private final Map<String, ScriptEngine> _nameEngines = new FastMap<>();
-	private final Map<String, ScriptEngine> _extEngines = new FastMap<>();
+	private final Map<String, ScriptEngine> _nameEngines = new HashMap<>();
+	private final Map<String, ScriptEngine> _extEngines = new HashMap<>();
 	private final List<ScriptManager<?>> _scriptManagers = new LinkedList<>();
 	
 	private File _currentLoadingScript;
@@ -164,26 +163,20 @@ public final class L2ScriptEngineManager
 	
 	public void executeScriptList(File list) throws IOException
 	{
-		File file;
-		
-		if (!Config.ALT_DEV_NO_HANDLERS && Config.ALT_DEV_NO_QUESTS)
-		{
-			file = new File(SCRIPT_FOLDER, "handlers/MasterHandler.java");
-			
-			try
-			{
-				executeScript(file);
-				_log.info("Handlers loaded, all other scripts skipped");
-				return;
-			}
-			catch (ScriptException se)
-			{
-				_log.log(Level.WARNING, "", se);
-			}
-		}
-		
 		if (Config.ALT_DEV_NO_QUESTS)
 		{
+			if (!Config.ALT_DEV_NO_HANDLERS)
+			{
+				try
+				{
+					executeScript(new File(SCRIPT_FOLDER, "handlers/MasterHandler.java"));
+					_log.info("Handlers loaded, all other scripts skipped");
+				}
+				catch (ScriptException se)
+				{
+					_log.log(Level.WARNING, "", se);
+				}
+			}
 			return;
 		}
 		
@@ -216,7 +209,7 @@ public final class L2ScriptEngineManager
 							line = line.substring(0, line.length() - 2);
 						}
 						
-						file = new File(SCRIPT_FOLDER, line);
+						File file = new File(SCRIPT_FOLDER, line);
 						
 						if (file.isDirectory() && parts[0].endsWith("/**"))
 						{
@@ -265,7 +258,13 @@ public final class L2ScriptEngineManager
 	{
 		if (dir.isDirectory())
 		{
-			for (File file : dir.listFiles())
+			final File[] files = dir.listFiles();
+			if (files == null)
+			{
+				return;
+			}
+			
+			for (File file : files)
 			{
 				if (file.isDirectory() && recurseDown && (maxDepth > currentDepth))
 				{
@@ -522,7 +521,7 @@ public final class L2ScriptEngineManager
 	/**
 	 * @return Returns the currentLoadingScript.
 	 */
-	protected File getCurrentLoadingScript()
+	public File getCurrentLoadingScript()
 	{
 		return _currentLoadingScript;
 	}

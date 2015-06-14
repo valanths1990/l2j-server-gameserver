@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.util.StringTokenizer;
 
 import com.l2jserver.gameserver.SevenSigns;
-import com.l2jserver.gameserver.datatables.TeleportLocationTable;
+import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2TeleportLocation;
 import com.l2jserver.gameserver.model.actor.L2Npc;
@@ -32,9 +32,13 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public class L2DungeonGatekeeperInstance extends L2Npc
 {
-	public L2DungeonGatekeeperInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a dungeon gatekeeper.
+	 * @param template the dungeon gatekeeper NPC template
+	 */
+	public L2DungeonGatekeeperInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DungeonGatekeeperInstance);
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -220,11 +220,10 @@ public final class RequestJoinParty extends L2GameClientPacket
 		
 		if (!target.isProcessingRequest())
 		{
-			requestor.setParty(new L2Party(requestor, partyDistributionType));
-			
-			requestor.onTransactionRequest(target);
 			target.sendPacket(new AskJoinParty(requestor.getName(), partyDistributionType));
-			requestor.getParty().setPendingInvitation(true);
+			target.setActiveRequester(requestor);
+			requestor.onTransactionRequest(target);
+			requestor.setPartyDistributionType(partyDistributionType);
 			
 			if (Config.DEBUG)
 			{

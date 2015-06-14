@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -28,22 +28,15 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 public class OnNpcSpawn implements IBaseEvent
 {
 	private final L2Npc _npc;
-	private final boolean _isTeleporting;
 	
-	public OnNpcSpawn(L2Npc npc, boolean isTeleporting)
+	public OnNpcSpawn(L2Npc npc)
 	{
 		_npc = npc;
-		_isTeleporting = isTeleporting;
 	}
 	
 	public L2Npc getNpc()
 	{
 		return _npc;
-	}
-	
-	public boolean isTeleporting()
-	{
-		return _isTeleporting;
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -101,7 +101,7 @@ public class Debug
 	
 	private static String getBodyPart(int bodyPart)
 	{
-		for (Entry<String, Integer> entry : ItemTable._slots.entrySet())
+		for (Entry<String, Integer> entry : ItemTable.SLOTS.entrySet())
 		{
 			if ((entry.getValue() & bodyPart) == bodyPart)
 			{

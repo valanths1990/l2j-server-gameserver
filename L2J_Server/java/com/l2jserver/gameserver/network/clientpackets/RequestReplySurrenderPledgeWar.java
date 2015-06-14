@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import com.l2jserver.gameserver.datatables.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 public final class RequestReplySurrenderPledgeWar extends L2GameClientPacket
@@ -51,7 +51,6 @@ public final class RequestReplySurrenderPledgeWar extends L2GameClientPacket
 		
 		if (_answer == 1)
 		{
-			requestor.deathPenalty(false, false, false);
 			ClanTable.getInstance().deleteclanswars(requestor.getClanId(), activeChar.getClanId());
 		}
 		else

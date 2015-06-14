@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -44,13 +44,9 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 	private int _originX;
 	private int _originY;
 	private int _originZ;
-	private int _moveMovement;
 	
-	// For geodata
-	private int _curX;
-	private int _curY;
 	@SuppressWarnings("unused")
-	private int _curZ;
+	private int _moveMovement;
 	
 	@Override
 	protected void readImpl()
@@ -105,10 +101,6 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 		// Validate position packets sends head level.
 		_targetZ += activeChar.getTemplate().getCollisionHeight();
 		
-		_curX = activeChar.getX();
-		_curY = activeChar.getY();
-		_curZ = activeChar.getZ();
-		
 		if (activeChar.getTeleMode() > 0)
 		{
 			if (activeChar.getTeleMode() == 1)
@@ -120,23 +112,15 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 			return;
 		}
 		
-		// Disable keyboard movement when geodata is not enabled and player is not flying.
-		if ((_moveMovement == 0) && (Config.GEODATA < 1) && !activeChar.isFlying())
+		double dx = _targetX - activeChar.getX();
+		double dy = _targetY - activeChar.getY();
+		// Can't move if character is confused, or trying to move a huge distance
+		if (activeChar.isOutOfControl() || (((dx * dx) + (dy * dy)) > 98010000)) // 9900*9900
 		{
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
+			return;
 		}
-		else
-		{
-			double dx = _targetX - _curX;
-			double dy = _targetY - _curY;
-			// Can't move if character is confused, or trying to move a huge distance
-			if (activeChar.isOutOfControl() || (((dx * dx) + (dy * dy)) > 98010000)) // 9900*9900
-			{
-				activeChar.sendPacket(ActionFailed.STATIC_PACKET);
-				return;
-			}
-			activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, new Location(_targetX, _targetY, _targetZ));
-		}
+		activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, new Location(_targetX, _targetY, _targetZ));
 	}
 	
 	@Override

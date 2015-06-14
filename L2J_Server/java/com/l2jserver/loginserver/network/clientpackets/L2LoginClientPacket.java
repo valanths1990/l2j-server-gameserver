@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,9 +21,8 @@ package com.l2jserver.loginserver.network.clientpackets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.mmocore.network.ReceivablePacket;
-
 import com.l2jserver.loginserver.network.L2LoginClient;
+import com.l2jserver.mmocore.ReceivablePacket;
 
 /**
  * @author KenM

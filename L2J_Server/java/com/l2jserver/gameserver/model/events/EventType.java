@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,6 +20,7 @@ package com.l2jserver.gameserver.model.events;
 
 import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 import com.l2jserver.gameserver.model.events.impl.character.OnCreatureAttack;
+import com.l2jserver.gameserver.model.events.impl.character.OnCreatureAttackAvoid;
 import com.l2jserver.gameserver.model.events.impl.character.OnCreatureAttacked;
 import com.l2jserver.gameserver.model.events.impl.character.OnCreatureDamageDealt;
 import com.l2jserver.gameserver.model.events.impl.character.OnCreatureDamageReceived;
@@ -32,12 +33,14 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcCanBeSeen;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcCreatureSee;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcEventReceived;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcFirstTalk;
+import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcManorBypass;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcMoveFinished;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcMoveNodeArrived;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcMoveRouteFinished;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillFinished;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillSee;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSpawn;
+import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcTeleport;
 import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableAggroRangeEnter;
 import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableAttack;
 import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableFactionCall;
@@ -124,6 +127,7 @@ public enum EventType
 	
 	// Creature events
 	ON_CREATURE_ATTACK(OnCreatureAttack.class, void.class, TerminateReturn.class),
+	ON_CREATURE_ATTACK_AVOID(OnCreatureAttackAvoid.class, void.class, void.class),
 	ON_CREATURE_ATTACKED(OnCreatureAttacked.class, void.class, TerminateReturn.class),
 	ON_CREATURE_DAMAGE_RECEIVED(OnCreatureDamageReceived.class, void.class),
 	ON_CREATURE_DAMAGE_DEALT(OnCreatureDamageDealt.class, void.class),
@@ -156,6 +160,8 @@ public enum EventType
 	ON_NPC_SKILL_SEE(OnNpcSkillSee.class, void.class),
 	ON_NPC_SPAWN(OnNpcSpawn.class, void.class),
 	ON_NPC_TALK(null, void.class),
+	ON_NPC_TELEPORT(OnNpcTeleport.class, void.class),
+	ON_NPC_MANOR_BYPASS(OnNpcManorBypass.class, void.class),
 	
 	// Olympiad events
 	ON_OLYMPIAD_MATCH_RESULT(OnOlympiadMatchResult.class, void.class),

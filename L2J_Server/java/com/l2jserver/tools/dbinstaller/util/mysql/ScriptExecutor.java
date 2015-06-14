@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -51,14 +51,17 @@ public class ScriptExecutor
 	
 	public void execSqlBatch(File dir, boolean skipErrors)
 	{
-		File[] file = dir.listFiles(new SQLFilter());
-		Arrays.sort(file);
-		_frame.setProgressIndeterminate(false);
-		_frame.setProgressMaximum(file.length - 1);
-		for (int i = 0; i < file.length; i++)
+		final File[] files = dir.listFiles(new SQLFilter());
+		if (files != null)
 		{
-			_frame.setProgressValue(i);
-			execSqlFile(file[i], skipErrors);
+			Arrays.sort(files);
+			_frame.setProgressIndeterminate(false);
+			_frame.setProgressMaximum(files.length - 1);
+			for (int i = 0; i < files.length; i++)
+			{
+				_frame.setProgressValue(i);
+				execSqlFile(files[i], skipErrors);
+			}
 		}
 	}
 	

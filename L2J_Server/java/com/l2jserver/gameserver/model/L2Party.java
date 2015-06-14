@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,14 +21,13 @@ package com.l2jserver.gameserver.model;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
@@ -82,7 +81,7 @@ public class L2Party extends AbstractPlayerGroup
 	private static final Duration PARTY_POSITION_BROADCAST_INTERVAL = Duration.ofSeconds(12);
 	private static final Duration PARTY_DISTRIBUTION_TYPE_REQUEST_TIMEOUT = Duration.ofSeconds(15);
 	
-	private final FastList<L2PcInstance> _members;
+	private final List<L2PcInstance> _members = new CopyOnWriteArrayList<>();
 	private boolean _pendingInvitation = false;
 	private long _pendingInviteTimeout;
 	private int _partyLvl = 0;
@@ -115,7 +114,6 @@ public class L2Party extends AbstractPlayerGroup
 	 */
 	public L2Party(L2PcInstance leader, PartyDistributionType partyDistributionType)
 	{
-		_members = new FastList<L2PcInstance>().shared();
 		_members.add(leader);
 		_partyLvl = leader.getLevel();
 		_distributionType = partyDistributionType;
@@ -159,7 +157,7 @@ public class L2Party extends AbstractPlayerGroup
 	 */
 	private L2PcInstance getCheckedRandomMember(int itemId, L2Character target)
 	{
-		List<L2PcInstance> availableMembers = new FastList<>();
+		List<L2PcInstance> availableMembers = new ArrayList<>();
 		for (L2PcInstance member : getMembers())
 		{
 			if (member.getInventory().validateCapacityByItemId(itemId) && Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true))
@@ -655,7 +653,7 @@ public class L2Party extends AbstractPlayerGroup
 		
 		L2PcInstance looter = getActualLooter(player, itemId, spoil, target);
 		
-		looter.addItem(spoil ? "Sweeper Party" : "Party", itemId, itemCount, player, true);
+		looter.addItem(spoil ? "Sweeper Party" : "Party", itemId, itemCount, target, true);
 		
 		// Send messages to other party members about reward
 		if (itemCount > 1)
@@ -695,36 +693,27 @@ public class L2Party extends AbstractPlayerGroup
 	 */
 	public void distributeAdena(L2PcInstance player, long adena, L2Character target)
 	{
-		// Get all the party members
-		List<L2PcInstance> membersList = getMembers();
-		
 		// Check the number of party members that must be rewarded
 		// (The party member must be in range to receive its reward)
-		List<L2PcInstance> ToReward = FastList.newInstance();
-		for (L2PcInstance member : membersList)
+		final List<L2PcInstance> toReward = new LinkedList<>();
+		for (L2PcInstance member : getMembers())
 		{
-			if (!Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true))
+			if (Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true))
 			{
-				continue;
+				toReward.add(member);
 			}
-			ToReward.add(member);
 		}
 		
-		// Avoid null exceptions, if any
-		if (ToReward.isEmpty())
+		if (!toReward.isEmpty())
 		{
-			return;
+			// Now we can actually distribute the adena reward
+			// (Total adena splitted by the number of party members that are in range and must be rewarded)
+			long count = adena / toReward.size();
+			for (L2PcInstance member : toReward)
+			{
+				member.addAdena("Party", count, player, true);
+			}
 		}
-		
-		// Now we can actually distribute the adena reward
-		// (Total adena splitted by the number of party members that are in range and must be rewarded)
-		long count = adena / ToReward.size();
-		for (L2PcInstance member : ToReward)
-		{
-			member.addAdena("Party", count, player, true);
-		}
-		
-		FastList.recycle((FastList<?>) ToReward);
 	}
 	
 	/**
@@ -981,14 +970,7 @@ public class L2Party extends AbstractPlayerGroup
 	@Override
 	public L2PcInstance getLeader()
 	{
-		try
-		{
-			return _members.getFirst();
-		}
-		catch (NoSuchElementException e)
-		{
-			return null;
-		}
+		return _members.get(0);
 	}
 	
 	public synchronized void requestLootChange(PartyDistributionType partyDistributionType)

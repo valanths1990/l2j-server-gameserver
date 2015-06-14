@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,11 +19,9 @@
 package com.l2jserver.gameserver.instancemanager;
 
 import java.util.Map;
-
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.VehiclePathPoint;
@@ -34,7 +32,7 @@ import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 
 public class BoatManager
 {
-	private final Map<Integer, L2BoatInstance> _boats = new FastMap<>();
+	private final Map<Integer, L2BoatInstance> _boats = new ConcurrentHashMap<>();
 	private final boolean[] _docksBusy = new boolean[3];
 	
 	public static final int TALKING_ISLAND = 1;
@@ -104,12 +102,13 @@ public class BoatManager
 		npcDat.set("baseMpReg", 3.e-3f);
 		npcDat.set("basePDef", 100);
 		npcDat.set("baseMDef", 100);
-		L2CharTemplate template = new L2CharTemplate(npcDat);
-		L2BoatInstance boat = new L2BoatInstance(IdFactory.getInstance().getNextId(), template);
-		_boats.put(boat.getObjectId(), boat);
+		
+		final L2BoatInstance boat = new L2BoatInstance(new L2CharTemplate(npcDat));
 		boat.setHeading(heading);
 		boat.setXYZInvisible(x, y, z);
 		boat.spawnMe();
+		
+		_boats.put(boat.getObjectId(), boat);
 		return boat;
 	}
 	

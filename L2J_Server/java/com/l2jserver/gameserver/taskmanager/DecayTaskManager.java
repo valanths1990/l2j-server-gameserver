@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 
 /**
- * @author Nos
+ * @author NosBit
  */
 public final class DecayTaskManager
 {
@@ -63,7 +63,7 @@ public final class DecayTaskManager
 			delay = Config.DEFAULT_CORPSE_TIME;
 		}
 		
-		if ((character instanceof L2Attackable) && (((L2Attackable) character).isSpoil() || ((L2Attackable) character).isSeeded()))
+		if ((character instanceof L2Attackable) && (((L2Attackable) character).isSpoiled() || ((L2Attackable) character).isSeeded()))
 		{
 			delay += Config.SPOILED_CORPSE_EXTEND_TIME;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -30,9 +30,13 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 public final class L2TerritoryWardInstance extends L2Attackable
 {
-	public L2TerritoryWardInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates territory ward.
+	 * @param template the territory ward NPC template
+	 */
+	public L2TerritoryWardInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		
 		disableCoreAI(true);
 	}

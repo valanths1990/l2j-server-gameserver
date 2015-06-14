@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,25 +24,20 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.datatables.CharNameTable;
+import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-/**
- * This class ...
- * @version $Revision: 1.2 $ $Date: 2004/06/27 08:12:59 $
- */
 public class BlockList
 {
 	private static Logger _log = Logger.getLogger(BlockList.class.getName());
-	private static Map<Integer, List<Integer>> _offlineList = new FastMap<Integer, List<Integer>>().shared();
+	private static final Map<Integer, List<Integer>> OFFLINE_LIST = new ConcurrentHashMap<>();
 	
 	private final L2PcInstance _owner;
 	private List<Integer> _blockList;
@@ -50,7 +45,7 @@ public class BlockList
 	public BlockList(L2PcInstance owner)
 	{
 		_owner = owner;
-		_blockList = _offlineList.get(owner.getObjectId());
+		_blockList = OFFLINE_LIST.get(owner.getObjectId());
 		if (_blockList == null)
 		{
 			_blockList = loadList(_owner.getObjectId());
@@ -71,7 +66,7 @@ public class BlockList
 	
 	public void playerLogout()
 	{
-		_offlineList.put(_owner.getObjectId(), _blockList);
+		OFFLINE_LIST.put(_owner.getObjectId(), _blockList);
 	}
 	
 	private static List<Integer> loadList(int ObjId)
@@ -271,10 +266,10 @@ public class BlockList
 		{
 			return BlockList.isBlocked(player, targetId);
 		}
-		if (!_offlineList.containsKey(ownerId))
+		if (!OFFLINE_LIST.containsKey(ownerId))
 		{
-			_offlineList.put(ownerId, loadList(ownerId));
+			OFFLINE_LIST.put(ownerId, loadList(ownerId));
 		}
-		return _offlineList.get(ownerId).contains(targetId);
+		return OFFLINE_LIST.get(ownerId).contains(targetId);
 	}
 }

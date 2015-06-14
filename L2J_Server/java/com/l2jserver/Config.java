@@ -1,32 +1,28 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
- * 
+ * Copyright (C) 2004-2015 L2J Server
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.l2jserver;
 
-import info.tak11.subnet.Subnet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -38,6 +34,10 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -48,18 +48,22 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.engines.DocumentParser;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
+import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.util.FloodProtectorConfig;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.PropertiesParser;
 import com.l2jserver.util.StringUtil;
+import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * This class loads all the game server related configurations from files.<br>
@@ -73,7 +77,7 @@ public final class Config
 	// --------------------------------------------------
 	// Constants
 	// --------------------------------------------------
-	public static final String EOL = System.getProperty("line.separator");
+	public static final String EOL = System.lineSeparator();
 	
 	// --------------------------------------------------
 	// L2J Property File Definitions
@@ -97,12 +101,12 @@ public final class Config
 	public static final String FLOOD_PROTECTOR_FILE = "./config/FloodProtector.properties";
 	public static final String MMO_CONFIG_FILE = "./config/MMO.properties";
 	public static final String OLYMPIAD_CONFIG_FILE = "./config/Olympiad.properties";
-	public static final String COMMUNITY_CONFIGURATION_FILE = "./config/CommunityServer.properties";
 	public static final String GRANDBOSS_CONFIG_FILE = "./config/GrandBoss.properties";
 	public static final String GRACIASEEDS_CONFIG_FILE = "./config/GraciaSeeds.properties";
 	public static final String CHAT_FILTER_FILE = "./config/chatfilter.txt";
 	public static final String EMAIL_CONFIG_FILE = "./config/Email.properties";
 	public static final String CH_SIEGE_FILE = "./config/ConquerableHallSiege.properties";
+	public static final String GEODATA_FILE = "./config/GeoData.properties";
 	// --------------------------------------------------
 	// L2J Variable Definitions
 	// --------------------------------------------------
@@ -236,9 +240,6 @@ public final class Config
 	public static boolean RANDOM_RESPAWN_IN_TOWN_ENABLED;
 	public static boolean OFFSET_ON_TELEPORT_ENABLED;
 	public static int MAX_OFFSET_ON_TELEPORT;
-	public static boolean RESTORE_PLAYER_INSTANCE;
-	public static boolean ALLOW_SUMMON_TO_INSTANCE;
-	public static int EJECT_DEAD_PLAYER_TIME;
 	public static boolean PETITIONING_ALLOWED;
 	public static int MAX_PETITIONS_PER_PLAYER;
 	public static int MAX_PETITIONS_PENDING;
@@ -451,10 +452,10 @@ public final class Config
 	public static boolean SKILL_CHECK_REMOVE;
 	public static boolean SKILL_CHECK_GM;
 	public static boolean DEBUG;
+	public static boolean DEBUG_INSTANCES;
 	public static boolean HTML_ACTION_CACHE_DEBUG;
 	public static boolean PACKET_HANDLER_DEBUG;
 	public static boolean DEVELOPER;
-	public static boolean ACCEPT_GEOEDITOR_CONN;
 	public static boolean ALT_DEV_NO_HANDLERS;
 	public static boolean ALT_DEV_NO_QUESTS;
 	public static boolean ALT_DEV_NO_SPAWNS;
@@ -505,24 +506,10 @@ public final class Config
 	public static int MAX_NPC_ANIMATION;
 	public static int MIN_MONSTER_ANIMATION;
 	public static int MAX_MONSTER_ANIMATION;
-	public static int COORD_SYNCHRONIZE;
 	public static boolean ENABLE_FALLING_DAMAGE;
 	public static boolean GRIDS_ALWAYS_ON;
 	public static int GRID_NEIGHBOR_TURNON_TIME;
 	public static int GRID_NEIGHBOR_TURNOFF_TIME;
-	public static int GEODATA;
-	public static String GEODATA_DRIVER;
-	public static File PATHNODE_DIR;
-	public static boolean GEODATA_CELLFINDING;
-	public static String PATHFIND_BUFFERS;
-	public static float LOW_WEIGHT;
-	public static float MEDIUM_WEIGHT;
-	public static float HIGH_WEIGHT;
-	public static boolean ADVANCED_DIAGONAL_STRATEGY;
-	public static float DIAGONAL_WEIGHT;
-	public static int MAX_POSTFILTER_PASSES;
-	public static boolean DEBUG_PATH;
-	public static boolean FORCE_GEODATA;
 	public static boolean MOVE_BASED_KNOWNLIST;
 	public static long KNOWNLIST_UPDATE_INTERVAL;
 	public static int PEACE_ZONE_MODE;
@@ -537,6 +524,10 @@ public final class Config
 	public static boolean ALLOW_WEAR;
 	public static int WEAR_DELAY;
 	public static int WEAR_PRICE;
+	public static int INSTANCE_FINISH_TIME;
+	public static boolean RESTORE_PLAYER_INSTANCE;
+	public static boolean ALLOW_SUMMON_IN_INSTANCE;
+	public static int EJECT_DEAD_PLAYER_TIME;
 	public static boolean ALLOW_LOTTERY;
 	public static boolean ALLOW_RACE;
 	public static boolean ALLOW_WATER;
@@ -548,13 +539,8 @@ public final class Config
 	public static boolean ALLOW_MANOR;
 	public static boolean ALLOW_PET_WALKERS;
 	public static boolean SERVER_NEWS;
-	public static int COMMUNITY_TYPE;
-	public static boolean BBS_SHOW_PLAYERLIST;
+	public static boolean ENABLE_COMMUNITY_BOARD;
 	public static String BBS_DEFAULT;
-	public static boolean SHOW_LEVEL_COMMUNITYBOARD;
-	public static boolean SHOW_STATUS_COMMUNITYBOARD;
-	public static int NAME_PAGE_SIZE_COMMUNITYBOARD;
-	public static int NAME_PER_ROW_COMMUNITYBOARD;
 	public static boolean USE_SAY_FILTER;
 	public static String CHAT_FILTER_CHARS;
 	public static int[] BAN_CHAT_CHANNELS;
@@ -600,7 +586,7 @@ public final class Config
 	public static int ALT_MANOR_REFRESH_MIN;
 	public static int ALT_MANOR_APPROVE_TIME;
 	public static int ALT_MANOR_APPROVE_MIN;
-	public static int ALT_MANOR_MAINTENANCE_PERIOD;
+	public static int ALT_MANOR_MAINTENANCE_MIN;
 	public static boolean ALT_MANOR_SAVE_ALL_ACTIONS;
 	public static int ALT_MANOR_SAVE_PERIOD_RATE;
 	public static long ALT_LOTTERY_PRIZE;
@@ -868,9 +854,11 @@ public final class Config
 	public static float RATE_DEATH_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_CORPSE_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_HERB_DROP_AMOUNT_MULTIPLIER;
+	public static float RATE_RAID_DROP_AMOUNT_MULTIPLIER;
 	public static float RATE_DEATH_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_CORPSE_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_HERB_DROP_CHANCE_MULTIPLIER;
+	public static float RATE_RAID_DROP_CHANCE_MULTIPLIER;
 	public static Map<Integer, Float> RATE_DROP_AMOUNT_MULTIPLIER;
 	public static Map<Integer, Float> RATE_DROP_CHANCE_MULTIPLIER;
 	public static float RATE_KARMA_LOST;
@@ -893,7 +881,6 @@ public final class Config
 	public static int KARMA_RATE_DROP_ITEM;
 	public static int KARMA_RATE_DROP_EQUIP;
 	public static int KARMA_RATE_DROP_EQUIP_WEAPON;
-	public static double[] PLAYER_XP_PERCENT_LOST;
 	
 	// --------------------------------------------------
 	// Seven Signs Settings
@@ -951,15 +938,6 @@ public final class Config
 	public static List<Integer> PROTOCOL_LIST;
 	public static boolean LOGIN_SERVER_SCHEDULE_RESTART;
 	public static long LOGIN_SERVER_SCHEDULE_RESTART_TIME;
-	
-	// --------------------------------------------------
-	// CommunityServer Settings
-	// --------------------------------------------------
-	public static boolean ENABLE_COMMUNITY_BOARD;
-	public static String COMMUNITY_SERVER_ADDRESS;
-	public static int COMMUNITY_SERVER_PORT;
-	public static byte[] COMMUNITY_SERVER_HEX_ID;
-	public static int COMMUNITY_SERVER_SQL_DP_ID;
 	
 	// --------------------------------------------------
 	// MMO Settings
@@ -1085,7 +1063,7 @@ public final class Config
 	public static long SOD_STAGE_2_LENGTH;
 	
 	// chatfilter
-	public static ArrayList<String> FILTER_LIST;
+	public static List<String> FILTER_LIST;
 	
 	// Email
 	public static String EMAIL_SERVERINFO_NAME;
@@ -1109,6 +1087,23 @@ public final class Config
 	public static boolean CHS_ENABLE_FAME;
 	public static int CHS_FAME_AMOUNT;
 	public static int CHS_FAME_FREQUENCY;
+	
+	// GeoData Settings
+	public static int PATHFINDING;
+	public static File PATHNODE_DIR;
+	public static String PATHFIND_BUFFERS;
+	public static float LOW_WEIGHT;
+	public static float MEDIUM_WEIGHT;
+	public static float HIGH_WEIGHT;
+	public static boolean ADVANCED_DIAGONAL_STRATEGY;
+	public static float DIAGONAL_WEIGHT;
+	public static int MAX_POSTFILTER_PASSES;
+	public static boolean DEBUG_PATH;
+	public static boolean FORCE_GEODATA;
+	public static int COORD_SYNCHRONIZE;
+	public static Path GEODATA_PATH;
+	public static boolean TRY_LOAD_UNSPECIFIED_REGIONS;
+	public static Map<String, Boolean> GEODATA_REGIONS;
 	
 	/**
 	 * This class initializes all global variables for configuration.<br>
@@ -1189,15 +1184,6 @@ public final class Config
 			IPConfigData ipcd = new IPConfigData();
 			GAME_SERVER_SUBNETS = ipcd.getSubnets();
 			GAME_SERVER_HOSTS = ipcd.getHosts();
-			
-			// Load Community Properties file (if exists)
-			final PropertiesParser communityServerSettings = new PropertiesParser(COMMUNITY_CONFIGURATION_FILE);
-			
-			ENABLE_COMMUNITY_BOARD = communityServerSettings.getBoolean("EnableCommunityBoard", false);
-			COMMUNITY_SERVER_ADDRESS = communityServerSettings.getString("CommunityServerHostname", "localhost");
-			COMMUNITY_SERVER_PORT = communityServerSettings.getInt("CommunityServerPort", 9013);
-			COMMUNITY_SERVER_HEX_ID = new BigInteger(communityServerSettings.getString("CommunityServerHexId", "0"), 16).toByteArray();
-			COMMUNITY_SERVER_SQL_DP_ID = communityServerSettings.getInt("CommunityServerSqlDpId", 200);
 			
 			// Load Feature L2Properties file (if exists)
 			final PropertiesParser Feature = new PropertiesParser(FEATURE_CONFIG_FILE);
@@ -1668,9 +1654,6 @@ public final class Config
 			RANDOM_RESPAWN_IN_TOWN_ENABLED = Character.getBoolean("RandomRespawnInTownEnabled", true);
 			OFFSET_ON_TELEPORT_ENABLED = Character.getBoolean("OffsetOnTeleportEnabled", true);
 			MAX_OFFSET_ON_TELEPORT = Character.getInt("MaxOffsetOnTeleport", 50);
-			RESTORE_PLAYER_INSTANCE = Character.getBoolean("RestorePlayerInstance", false);
-			ALLOW_SUMMON_TO_INSTANCE = Character.getBoolean("AllowSummonToInstance", true);
-			EJECT_DEAD_PLAYER_TIME = 1000 * Character.getInt("EjectDeadPlayerTime", 60);
 			PETITIONING_ALLOWED = Character.getBoolean("PetitioningAllowed", true);
 			MAX_PETITIONS_PER_PLAYER = Character.getInt("MaxPetitionsPerPlayer", 5);
 			MAX_PETITIONS_PENDING = Character.getInt("MaxPetitionsPending", 25);
@@ -1760,10 +1743,10 @@ public final class Config
 			SKILL_CHECK_REMOVE = General.getBoolean("SkillCheckRemove", false);
 			SKILL_CHECK_GM = General.getBoolean("SkillCheckGM", true);
 			DEBUG = General.getBoolean("Debug", false);
+			DEBUG_INSTANCES = General.getBoolean("InstanceDebug", false);
 			HTML_ACTION_CACHE_DEBUG = General.getBoolean("HtmlActionCacheDebug", false);
 			PACKET_HANDLER_DEBUG = General.getBoolean("PacketHandlerDebug", false);
 			DEVELOPER = General.getBoolean("Developer", false);
-			ACCEPT_GEOEDITOR_CONN = General.getBoolean("AcceptGeoeditorConn", false);
 			ALT_DEV_NO_HANDLERS = General.getBoolean("AltDevNoHandlers", false) || Boolean.getBoolean("nohandlers");
 			ALT_DEV_NO_QUESTS = General.getBoolean("AltDevNoQuests", false) || Boolean.getBoolean("noquests");
 			ALT_DEV_NO_SPAWNS = General.getBoolean("AltDevNoSpawns", false) || Boolean.getBoolean("nospawns");
@@ -1818,6 +1801,7 @@ public final class Config
 			SAVE_DROPPED_ITEM_INTERVAL = General.getInt("SaveDroppedItemInterval", 60) * 60000;
 			CLEAR_DROPPED_ITEM_TABLE = General.getBoolean("ClearDroppedItemTable", false);
 			AUTODELETE_INVALID_QUEST_DATA = General.getBoolean("AutoDeleteInvalidQuestData", false);
+			PRECISE_DROP_CALCULATION = General.getBoolean("PreciseDropCalculation", true);
 			MULTIPLE_ITEM_DROP = General.getBoolean("MultipleItemDrop", true);
 			FORCE_INVENTORY_UPDATE = General.getBoolean("ForceInventoryUpdate", false);
 			LAZY_CACHE = General.getBoolean("LazyCache", true);
@@ -1831,32 +1815,6 @@ public final class Config
 			GRIDS_ALWAYS_ON = General.getBoolean("GridsAlwaysOn", false);
 			GRID_NEIGHBOR_TURNON_TIME = General.getInt("GridNeighborTurnOnTime", 1);
 			GRID_NEIGHBOR_TURNOFF_TIME = General.getInt("GridNeighborTurnOffTime", 90);
-			GEODATA = General.getInt("GeoData", 0);
-			GEODATA_DRIVER = General.getString("GeoDataDriver", "com.l2jserver.gameserver.geoengine.NullDriver");
-			try
-			{
-				PATHNODE_DIR = new File(General.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
-			}
-			catch (IOException e)
-			{
-				_log.log(Level.WARNING, "Error setting pathnode directory!", e);
-				PATHNODE_DIR = new File("data/pathnode");
-			}
-			GEODATA_CELLFINDING = General.getBoolean("CellPathFinding", false);
-			PATHFIND_BUFFERS = General.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
-			LOW_WEIGHT = General.getFloat("LowWeight", 0.5f);
-			MEDIUM_WEIGHT = General.getFloat("MediumWeight", 2);
-			HIGH_WEIGHT = General.getFloat("HighWeight", 3);
-			ADVANCED_DIAGONAL_STRATEGY = General.getBoolean("AdvancedDiagonalStrategy", true);
-			DIAGONAL_WEIGHT = General.getFloat("DiagonalWeight", 0.707f);
-			MAX_POSTFILTER_PASSES = General.getInt("MaxPostfilterPasses", 3);
-			DEBUG_PATH = General.getBoolean("DebugPath", false);
-			FORCE_GEODATA = General.getBoolean("ForceGeodata", true);
-			COORD_SYNCHRONIZE = General.getInt("CoordSynchronize", -1);
-			
-			String str = General.getString("EnableFallingDamage", "auto");
-			ENABLE_FALLING_DAMAGE = "auto".equalsIgnoreCase(str) ? GEODATA > 0 : Boolean.parseBoolean(str);
-			
 			PEACE_ZONE_MODE = General.getInt("PeaceZoneMode", 0);
 			DEFAULT_GLOBAL_CHAT = General.getString("GlobalChat", "ON");
 			DEFAULT_TRADE_CHAT = General.getString("TradeChat", "ON");
@@ -1869,6 +1827,10 @@ public final class Config
 			ALLOW_WEAR = General.getBoolean("AllowWear", true);
 			WEAR_DELAY = General.getInt("WearDelay", 5);
 			WEAR_PRICE = General.getInt("WearPrice", 10);
+			INSTANCE_FINISH_TIME = 1000 * General.getInt("DefaultFinishTime", 300);
+			RESTORE_PLAYER_INSTANCE = General.getBoolean("RestorePlayerInstance", false);
+			ALLOW_SUMMON_IN_INSTANCE = General.getBoolean("AllowSummonInInstance", false);
+			EJECT_DEAD_PLAYER_TIME = 1000 * General.getInt("EjectDeadPlayerTime", 60);
 			ALLOW_LOTTERY = General.getBoolean("AllowLottery", true);
 			ALLOW_RACE = General.getBoolean("AllowRace", true);
 			ALLOW_WATER = General.getBoolean("AllowWater", true);
@@ -1880,13 +1842,8 @@ public final class Config
 			ALLOW_CURSED_WEAPONS = General.getBoolean("AllowCursedWeapons", true);
 			ALLOW_PET_WALKERS = General.getBoolean("AllowPetWalkers", true);
 			SERVER_NEWS = General.getBoolean("ShowServerNews", false);
-			COMMUNITY_TYPE = General.getInt("CommunityType", 1);
-			BBS_SHOW_PLAYERLIST = General.getBoolean("BBSShowPlayerList", false);
+			ENABLE_COMMUNITY_BOARD = General.getBoolean("EnableCommunityBoard", true);
 			BBS_DEFAULT = General.getString("BBSDefault", "_bbshome");
-			SHOW_LEVEL_COMMUNITYBOARD = General.getBoolean("ShowLevelOnCommunityBoard", false);
-			SHOW_STATUS_COMMUNITYBOARD = General.getBoolean("ShowStatusOnCommunityBoard", false);
-			NAME_PAGE_SIZE_COMMUNITYBOARD = General.getInt("NamePageSizeOnCommunityBoard", 50);
-			NAME_PER_ROW_COMMUNITYBOARD = General.getInt("NamePerRowOnCommunityBoard", 5);
 			USE_SAY_FILTER = General.getBoolean("UseChatFilter", false);
 			CHAT_FILTER_CHARS = General.getString("ChatFilterChars", "^_^");
 			String[] propertySplit4 = General.getString("BanChatChannels", "0;1;8;17").trim().split(";");
@@ -1905,9 +1862,9 @@ public final class Config
 			}
 			ALT_MANOR_REFRESH_TIME = General.getInt("AltManorRefreshTime", 20);
 			ALT_MANOR_REFRESH_MIN = General.getInt("AltManorRefreshMin", 0);
-			ALT_MANOR_APPROVE_TIME = General.getInt("AltManorApproveTime", 6);
-			ALT_MANOR_APPROVE_MIN = General.getInt("AltManorApproveMin", 0);
-			ALT_MANOR_MAINTENANCE_PERIOD = General.getInt("AltManorMaintenancePeriod", 360000);
+			ALT_MANOR_APPROVE_TIME = General.getInt("AltManorApproveTime", 4);
+			ALT_MANOR_APPROVE_MIN = General.getInt("AltManorApproveMin", 30);
+			ALT_MANOR_MAINTENANCE_MIN = General.getInt("AltManorMaintenanceMin", 6);
 			ALT_MANOR_SAVE_ALL_ACTIONS = General.getBoolean("AltManorSaveAllActions", false);
 			ALT_MANOR_SAVE_PERIOD_RATE = General.getInt("AltManorSavePeriodRate", 2);
 			ALT_LOTTERY_PRIZE = General.getLong("AltLotteryPrize", 50000);
@@ -1994,6 +1951,7 @@ public final class Config
 			BOTREPORT_RESETPOINT_HOUR = General.getString("BotReportPointsResetHour", "00:00").split(":");
 			BOTREPORT_REPORT_DELAY = General.getInt("BotReportDelay", 30) * 60000;
 			BOTREPORT_ALLOW_REPORTS_FROM_SAME_CLAN_MEMBERS = General.getBoolean("AllowReportsFromSameClanMembers", false);
+			ENABLE_FALLING_DAMAGE = General.getBoolean("EnableFallingDamage", true);
 			
 			// Load FloodProtector L2Properties file
 			final PropertiesParser FloodProtectors = new PropertiesParser(FLOOD_PROTECTOR_FILE);
@@ -2008,6 +1966,8 @@ public final class Config
 			ALT_ATTACKABLE_NPCS = NPC.getBoolean("AltAttackableNpcs", true);
 			ALT_GAME_VIEWNPC = NPC.getBoolean("AltGameViewNpc", false);
 			MAX_DRIFT_RANGE = NPC.getInt("MaxDriftRange", 300);
+			DEEPBLUE_DROP_RULES = NPC.getBoolean("UseDeepBlueDropRules", true);
+			DEEPBLUE_DROP_RULES_RAID = NPC.getBoolean("UseDeepBlueDropRulesRaid", true);
 			SHOW_NPC_LVL = NPC.getBoolean("ShowNpcLevel", false);
 			SHOW_CREST_WITHOUT_QUEST = NPC.getBoolean("ShowCrestWithoutQuest", false);
 			ENABLE_RANDOM_ENCHANT_EFFECT = NPC.getBoolean("EnableRandomEnchantEffect", false);
@@ -2128,50 +2088,14 @@ public final class Config
 			KARMA_RATE_DROP_EQUIP = RatesSettings.getInt("KarmaRateDropEquip", 40);
 			KARMA_RATE_DROP_EQUIP_WEAPON = RatesSettings.getInt("KarmaRateDropEquipWeapon", 10);
 			
-			// Initializing table
-			PLAYER_XP_PERCENT_LOST = new double[Byte.MAX_VALUE + 1];
-			
-			// Default value
-			for (int i = 0; i <= Byte.MAX_VALUE; i++)
-			{
-				PLAYER_XP_PERCENT_LOST[i] = 1.;
-			}
-			
-			// Now loading into table parsed values
-			try
-			{
-				String[] values = RatesSettings.getString("PlayerXPPercentLost", "0,39-7.0;40,75-4.0;76,76-2.5;77,77-2.0;78,78-1.5").split(";");
-				
-				for (String s : values)
-				{
-					int min;
-					int max;
-					double val;
-					
-					String[] vals = s.split("-");
-					String[] mM = vals[0].split(",");
-					
-					min = Integer.parseInt(mM[0]);
-					max = Integer.parseInt(mM[1]);
-					val = Double.parseDouble(vals[1]);
-					
-					for (int i = min; i <= max; i++)
-					{
-						PLAYER_XP_PERCENT_LOST[i] = val;
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				_log.log(Level.WARNING, "Error while loading Player XP percent lost!", e);
-			}
-			
 			RATE_DEATH_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("DeathDropAmountMultiplier", 1);
 			RATE_CORPSE_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("CorpseDropAmountMultiplier", 1);
 			RATE_HERB_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("HerbDropAmountMultiplier", 1);
+			RATE_RAID_DROP_AMOUNT_MULTIPLIER = RatesSettings.getFloat("RaidDropAmountMultiplier", 1);
 			RATE_DEATH_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("DeathDropChanceMultiplier", 1);
 			RATE_CORPSE_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("CorpseDropChanceMultiplier", 1);
 			RATE_HERB_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("HerbDropChanceMultiplier", 1);
+			RATE_RAID_DROP_CHANCE_MULTIPLIER = RatesSettings.getFloat("RaidDropChanceMultiplier", 1);
 			String[] dropAmountMultiplier = RatesSettings.getString("DropAmountMultiplierByItemId", "").split(";");
 			RATE_DROP_AMOUNT_MULTIPLIER = new HashMap<>(dropAmountMultiplier.length);
 			if (!dropAmountMultiplier[0].isEmpty())
@@ -2716,28 +2640,19 @@ public final class Config
 			SOD_TIAT_KILL_COUNT = GraciaSeedsSettings.getInt("TiatKillCountForNextState", 10);
 			SOD_STAGE_2_LENGTH = GraciaSeedsSettings.getLong("Stage2Length", 720) * 60000;
 			
-			final File chat_filter = new File(CHAT_FILTER_FILE);
-			try (FileReader fr = new FileReader(chat_filter);
-				BufferedReader br = new BufferedReader(fr);
-				LineNumberReader lnr = new LineNumberReader(br))
+			try
 			{
-				FILTER_LIST = new ArrayList<>();
-				
-				String line = null;
-				while ((line = lnr.readLine()) != null)
-				{
-					if (line.trim().isEmpty() || (line.charAt(0) == '#'))
-					{
-						continue;
-					}
-					
-					FILTER_LIST.add(line.trim());
-				}
+				//@formatter:off
+				FILTER_LIST = Files.lines(Paths.get(CHAT_FILTER_FILE), StandardCharsets.UTF_8)
+					.map(String::trim)
+					.filter(line -> (!line.isEmpty() && (line.charAt(0) != '#')))
+					.collect(Collectors.toList());
+				//@formatter:on
 				_log.info("Loaded " + FILTER_LIST.size() + " Filter Words.");
 			}
-			catch (Exception e)
+			catch (IOException ioe)
 			{
-				_log.log(Level.WARNING, "Error while loading chat filter words!", e);
+				_log.log(Level.WARNING, "Error while loading chat filter words!", ioe);
 			}
 			
 			final PropertiesParser ClanHallSiege = new PropertiesParser(CH_SIEGE_FILE);
@@ -2748,6 +2663,44 @@ public final class Config
 			CHS_ENABLE_FAME = ClanHallSiege.getBoolean("EnableFame", false);
 			CHS_FAME_AMOUNT = ClanHallSiege.getInt("FameAmount", 0);
 			CHS_FAME_FREQUENCY = ClanHallSiege.getInt("FameFrequency", 0);
+			
+			final PropertiesParser geoData = new PropertiesParser(GEODATA_FILE);
+			
+			try
+			{
+				PATHNODE_DIR = new File(geoData.getString("PathnodeDirectory", "data/pathnode").replaceAll("\\\\", "/")).getCanonicalFile();
+			}
+			catch (IOException e)
+			{
+				_log.log(Level.WARNING, "Error setting pathnode directory!", e);
+				PATHNODE_DIR = new File("data/pathnode");
+			}
+			
+			PATHFINDING = geoData.getInt("PathFinding", 0);
+			PATHFIND_BUFFERS = geoData.getString("PathFindBuffers", "100x6;128x6;192x6;256x4;320x4;384x4;500x2");
+			LOW_WEIGHT = geoData.getFloat("LowWeight", 0.5f);
+			MEDIUM_WEIGHT = geoData.getFloat("MediumWeight", 2);
+			HIGH_WEIGHT = geoData.getFloat("HighWeight", 3);
+			ADVANCED_DIAGONAL_STRATEGY = geoData.getBoolean("AdvancedDiagonalStrategy", true);
+			DIAGONAL_WEIGHT = geoData.getFloat("DiagonalWeight", 0.707f);
+			MAX_POSTFILTER_PASSES = geoData.getInt("MaxPostfilterPasses", 3);
+			DEBUG_PATH = geoData.getBoolean("DebugPath", false);
+			FORCE_GEODATA = geoData.getBoolean("ForceGeoData", true);
+			COORD_SYNCHRONIZE = geoData.getInt("CoordSynchronize", -1);
+			GEODATA_PATH = Paths.get(geoData.getString("GeoDataPath", "./data/geodata"));
+			TRY_LOAD_UNSPECIFIED_REGIONS = geoData.getBoolean("TryLoadUnspecifiedRegions", true);
+			GEODATA_REGIONS = new HashMap<>();
+			for (int regionX = L2World.TILE_X_MIN; regionX <= L2World.TILE_X_MAX; regionX++)
+			{
+				for (int regionY = L2World.TILE_Y_MIN; regionY <= L2World.TILE_Y_MAX; regionY++)
+				{
+					String key = regionX + "_" + regionY;
+					if (geoData.containskey(regionX + "_" + regionY))
+					{
+						GEODATA_REGIONS.put(key, geoData.getBoolean(key, false));
+					}
+				}
+			}
 		}
 		else if (Server.serverMode == Server.MODE_LOGINSERVER)
 		{
@@ -3006,6 +2959,9 @@ public final class Config
 			case "cleardroppeditemtable":
 				CLEAR_DROPPED_ITEM_TABLE = Boolean.parseBoolean(pValue);
 				break;
+			case "precisedropcalculation":
+				PRECISE_DROP_CALCULATION = Boolean.parseBoolean(pValue);
+				break;
 			case "multipleitemdrop":
 				MULTIPLE_ITEM_DROP = Boolean.parseBoolean(pValue);
 				break;
@@ -3086,6 +3042,18 @@ public final class Config
 			case "wearprice":
 				WEAR_PRICE = Integer.parseInt(pValue);
 				break;
+			case "defaultfinishtime":
+				INSTANCE_FINISH_TIME = Integer.parseInt(pValue);
+				break;
+			case "restoreplayerinstance":
+				RESTORE_PLAYER_INSTANCE = Boolean.parseBoolean(pValue);
+				break;
+			case "allowsummonininstance":
+				ALLOW_SUMMON_IN_INSTANCE = Boolean.parseBoolean(pValue);
+				break;
+			case "ejectdeadplayertime":
+				EJECT_DEAD_PLAYER_TIME = Integer.parseInt(pValue);
+				break;
 			case "allowwater":
 				ALLOW_WATER = Boolean.parseBoolean(pValue);
 				break;
@@ -3104,26 +3072,11 @@ public final class Config
 			case "allowpetwalkers":
 				ALLOW_PET_WALKERS = Boolean.parseBoolean(pValue);
 				break;
-			case "communitytype":
-				COMMUNITY_TYPE = Integer.parseInt(pValue);
-				break;
-			case "bbsshowplayerlist":
-				BBS_SHOW_PLAYERLIST = Boolean.parseBoolean(pValue);
+			case "enablecommunityboard":
+				ENABLE_COMMUNITY_BOARD = Boolean.parseBoolean(pValue);
 				break;
 			case "bbsdefault":
 				BBS_DEFAULT = pValue;
-				break;
-			case "showleveloncommunityboard":
-				SHOW_LEVEL_COMMUNITYBOARD = Boolean.parseBoolean(pValue);
-				break;
-			case "showstatusoncommunityboard":
-				SHOW_STATUS_COMMUNITYBOARD = Boolean.parseBoolean(pValue);
-				break;
-			case "namepagesizeoncommunityboard":
-				NAME_PAGE_SIZE_COMMUNITYBOARD = Integer.parseInt(pValue);
-				break;
-			case "nameperrowoncommunityboard":
-				NAME_PER_ROW_COMMUNITYBOARD = Integer.parseInt(pValue);
 				break;
 			case "showservernews":
 				SERVER_NEWS = Boolean.parseBoolean(pValue);
@@ -3151,6 +3104,12 @@ public final class Config
 				break;
 			case "maxdriftrange":
 				MAX_DRIFT_RANGE = Integer.parseInt(pValue);
+				break;
+			case "usedeepbluedroprules":
+				DEEPBLUE_DROP_RULES = Boolean.parseBoolean(pValue);
+				break;
+			case "usedeepbluedroprulesraid":
+				DEEPBLUE_DROP_RULES_RAID = Boolean.parseBoolean(pValue);
 				break;
 			case "guardattackaggromob":
 				GUARD_ATTACK_AGGRO_MOB = Boolean.parseBoolean(pValue);
@@ -3274,12 +3233,6 @@ public final class Config
 				break;
 			case "playerfakedeathupprotection":
 				PLAYER_FAKEDEATH_UP_PROTECTION = Integer.parseInt(pValue);
-				break;
-			case "restoreplayerinstance":
-				RESTORE_PLAYER_INSTANCE = Boolean.parseBoolean(pValue);
-				break;
-			case "allowsummontoinstance":
-				ALLOW_SUMMON_TO_INSTANCE = Boolean.parseBoolean(pValue);
 				break;
 			case "partyxpcutoffmethod":
 				PARTY_XP_CUTOFF_METHOD = pValue;
@@ -3940,7 +3893,7 @@ public final class Config
 		return result;
 	}
 	
-	private static class IPConfigData extends DocumentParser
+	private static class IPConfigData implements IXmlReader
 	{
 		private static final List<String> _subnets = new ArrayList<>(5);
 		private static final List<String> _hosts = new ArrayList<>(5);
@@ -3956,22 +3909,22 @@ public final class Config
 			File f = new File(IP_CONFIG_FILE);
 			if (f.exists())
 			{
-				_log.log(Level.INFO, "Network Config: ipconfig.xml exists using manual configuration...");
+				LOGGER.log(Level.INFO, "Network Config: ipconfig.xml exists using manual configuration...");
 				parseFile(new File(IP_CONFIG_FILE));
 			}
 			else
 			// Auto configuration...
 			{
-				_log.log(Level.INFO, "Network Config: ipconfig.xml doesn't exists using automatic configuration...");
+				LOGGER.log(Level.INFO, "Network Config: ipconfig.xml doesn't exists using automatic configuration...");
 				autoIpConfig();
 			}
 		}
 		
 		@Override
-		protected void parseDocument()
+		public void parseDocument(Document doc)
 		{
 			NamedNodeMap attrs;
-			for (Node n = getCurrentDocument().getFirstChild(); n != null; n = n.getNextSibling())
+			for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
 			{
 				if ("gameserver".equalsIgnoreCase(n.getNodeName()))
 				{
@@ -3985,7 +3938,7 @@ public final class Config
 							
 							if (_hosts.size() != _subnets.size())
 							{
-								_log.log(Level.WARNING, "Failed to Load " + IP_CONFIG_FILE + " File - subnets does not match server addresses.");
+								LOGGER.log(Level.WARNING, "Failed to Load " + IP_CONFIG_FILE + " File - subnets does not match server addresses.");
 							}
 						}
 					}
@@ -3993,7 +3946,7 @@ public final class Config
 					Node att = n.getAttributes().getNamedItem("address");
 					if (att == null)
 					{
-						_log.log(Level.WARNING, "Failed to load " + IP_CONFIG_FILE + " file - default server address is missing.");
+						LOGGER.log(Level.WARNING, "Failed to load " + IP_CONFIG_FILE + " file - default server address is missing.");
 						_hosts.add("127.0.0.1");
 					}
 					else
@@ -4018,7 +3971,7 @@ public final class Config
 			}
 			catch (IOException e)
 			{
-				_log.log(Level.INFO, "Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
+				LOGGER.log(Level.INFO, "Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
 				externalIp = "127.0.0.1";
 			}
 			
@@ -4026,7 +3979,6 @@ public final class Config
 			{
 				Enumeration<NetworkInterface> niList = NetworkInterface.getNetworkInterfaces();
 				
-				Subnet sub = new Subnet();
 				while (niList.hasMoreElements())
 				{
 					NetworkInterface ni = niList.nextElement();
@@ -4048,14 +4000,18 @@ public final class Config
 							continue;
 						}
 						
-						sub.setIPAddress(ia.getAddress().getHostAddress());
-						sub.setMaskedBits(ia.getNetworkPrefixLength());
-						String subnet = sub.getSubnetAddress() + '/' + sub.getMaskedBits();
+						final String hostAddress = ia.getAddress().getHostAddress();
+						final int subnetPrefixLength = ia.getNetworkPrefixLength();
+						final int subnetMaskInt = IntStream.rangeClosed(1, subnetPrefixLength).reduce((r, e) -> (r << 1) + 1).orElse(0) << (32 - subnetPrefixLength);
+						final int hostAddressInt = Arrays.stream(hostAddress.split("\\.")).mapToInt(Integer::parseInt).reduce((r, e) -> (r << 8) + e).orElse(0);
+						final int subnetAddressInt = hostAddressInt & subnetMaskInt;
+						final String subnetAddress = ((subnetAddressInt >> 24) & 0xFF) + "." + ((subnetAddressInt >> 16) & 0xFF) + "." + ((subnetAddressInt >> 8) & 0xFF) + "." + (subnetAddressInt & 0xFF);
+						final String subnet = subnetAddress + '/' + subnetPrefixLength;
 						if (!_subnets.contains(subnet) && !subnet.equals("0.0.0.0/0"))
 						{
 							_subnets.add(subnet);
-							_hosts.add(sub.getIPAddress());
-							_log.log(Level.INFO, "Network Config: Adding new subnet: " + subnet + " address: " + sub.getIPAddress());
+							_hosts.add(hostAddress);
+							LOGGER.log(Level.INFO, "Network Config: Adding new subnet: " + subnet + " address: " + hostAddress);
 						}
 					}
 				}
@@ -4063,11 +4019,11 @@ public final class Config
 				// External host and subnet
 				_hosts.add(externalIp);
 				_subnets.add("0.0.0.0/0");
-				_log.log(Level.INFO, "Network Config: Adding new subnet: 0.0.0.0/0 address: " + externalIp);
+				LOGGER.log(Level.INFO, "Network Config: Adding new subnet: 0.0.0.0/0 address: " + externalIp);
 			}
 			catch (SocketException e)
 			{
-				_log.log(Level.INFO, "Network Config: Configuration failed please configure manually using ipconfig.xml", e);
+				LOGGER.log(Level.INFO, "Network Config: Configuration failed please configure manually using ipconfig.xml", e);
 				System.exit(0);
 			}
 		}

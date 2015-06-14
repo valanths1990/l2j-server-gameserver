@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,31 +20,29 @@ package com.l2jserver.gameserver.model.entity;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.DoorTable;
-import com.l2jserver.gameserver.datatables.NpcData;
-import com.l2jserver.gameserver.idfactory.IdFactory;
+import com.l2jserver.gameserver.data.xml.impl.DoorData;
+import com.l2jserver.gameserver.enums.InstanceReenterType;
+import com.l2jserver.gameserver.enums.InstanceRemoveBuffType;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.L2World;
@@ -58,12 +56,13 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2DoorTemplate;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
+import com.l2jserver.gameserver.model.holders.InstanceReenterTimeHolder;
 import com.l2jserver.gameserver.model.instancezone.InstanceWorld;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.clientpackets.Say2;
 import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * Main class for game instances.
@@ -78,8 +77,8 @@ public final class Instance
 	private int _ejectTime = Config.EJECT_DEAD_PLAYER_TIME;
 	/** Allow random walk for NPCs, global parameter. */
 	private boolean _allowRandomWalk = true;
-	private final List<Integer> _players = new FastList<Integer>().shared();
-	private final List<L2Npc> _npcs = new FastList<L2Npc>().shared();
+	private final List<Integer> _players = new CopyOnWriteArrayList<>();
+	private final List<L2Npc> _npcs = new CopyOnWriteArrayList<>();
 	private final Map<Integer, L2DoorInstance> _doors = new ConcurrentHashMap<>();
 	private final Map<String, List<L2Spawn>> _manualSpawn = new HashMap<>();
 	private Location _spawnLoc = null;
@@ -92,9 +91,15 @@ public final class Instance
 	private boolean _showTimer = false;
 	private boolean _isTimerIncrease = true;
 	private String _timerText = "";
+	// Instance reset data
+	private InstanceReenterType _type = InstanceReenterType.NONE;
+	private final List<InstanceReenterTimeHolder> _resetData = new ArrayList<>();
+	// Instance remove buffs data
+	private InstanceRemoveBuffType _removeBuffType = InstanceRemoveBuffType.NONE;
+	private final List<Integer> _exceptionList = new ArrayList<>();
 	
 	protected ScheduledFuture<?> _checkTimeUpTask = null;
-	protected final Map<Integer, ScheduledFuture<?>> _ejectDeadTasks = new FastMap<>();
+	protected final Map<Integer, ScheduledFuture<?>> _ejectDeadTasks = new ConcurrentHashMap<>();
 	
 	public Instance(int id)
 	{
@@ -265,7 +270,7 @@ public final class Instance
 			return;
 		}
 		
-		final L2DoorInstance newdoor = new L2DoorInstance(IdFactory.getInstance().getNextId(), new L2DoorTemplate(set));
+		final L2DoorInstance newdoor = new L2DoorInstance(new L2DoorTemplate(set));
 		newdoor.setInstanceId(getId());
 		newdoor.setCurrentHp(newdoor.getMaxHp());
 		newdoor.spawnMe(newdoor.getTemplate().getX(), newdoor.getTemplate().getY(), newdoor.getTemplate().getZ());
@@ -451,8 +456,6 @@ public final class Instance
 	
 	private void parseInstance(Node n) throws Exception
 	{
-		L2Spawn spawnDat;
-		L2NpcTemplate npcTemplate;
 		_name = n.getAttributes().getNamedItem("name").getNodeValue();
 		Node a = n.getAttributes().getNamedItem("ejectTime");
 		if (a != null)
@@ -539,7 +542,7 @@ public final class Instance
 					{
 						doorId = Integer.parseInt(d.getAttributes().getNamedItem("doorId").getNodeValue());
 						StatsSet set = new StatsSet();
-						set.add(DoorTable.getInstance().getDoorTemplate(doorId));
+						set.add(DoorData.getInstance().getDoorTemplate(doorId));
 						for (Node bean = d.getFirstChild(); bean != null; bean = bean.getNextSibling())
 						{
 							if ("set".equalsIgnoreCase(bean.getNodeName()))
@@ -587,49 +590,42 @@ public final class Instance
 								{
 									allowRandomWalk = Boolean.valueOf(d.getAttributes().getNamedItem("allowRandomWalk").getNodeValue());
 								}
-								npcTemplate = NpcData.getInstance().getTemplate(npcId);
-								if (npcTemplate != null)
+								
+								final L2Spawn spawnDat = new L2Spawn(npcId);
+								spawnDat.setX(x);
+								spawnDat.setY(y);
+								spawnDat.setZ(z);
+								spawnDat.setAmount(1);
+								spawnDat.setHeading(heading);
+								spawnDat.setRespawnDelay(respawn, respawnRandom);
+								if (respawn == 0)
 								{
-									spawnDat = new L2Spawn(npcTemplate);
-									spawnDat.setX(x);
-									spawnDat.setY(y);
-									spawnDat.setZ(z);
-									spawnDat.setAmount(1);
-									spawnDat.setHeading(heading);
-									spawnDat.setRespawnDelay(respawn, respawnRandom);
-									if (respawn == 0)
+									spawnDat.stopRespawn();
+								}
+								else
+								{
+									spawnDat.startRespawn();
+								}
+								spawnDat.setInstanceId(getId());
+								if (allowRandomWalk == null)
+								{
+									spawnDat.setIsNoRndWalk(!_allowRandomWalk);
+								}
+								else
+								{
+									spawnDat.setIsNoRndWalk(!allowRandomWalk);
+								}
+								if (spawnGroup.equals("general"))
+								{
+									L2Npc spawned = spawnDat.doSpawn();
+									if ((delay >= 0) && (spawned instanceof L2Attackable))
 									{
-										spawnDat.stopRespawn();
-									}
-									else
-									{
-										spawnDat.startRespawn();
-									}
-									spawnDat.setInstanceId(getId());
-									if (allowRandomWalk == null)
-									{
-										spawnDat.setIsNoRndWalk(!_allowRandomWalk);
-									}
-									else
-									{
-										spawnDat.setIsNoRndWalk(!allowRandomWalk);
-									}
-									if (spawnGroup.equals("general"))
-									{
-										L2Npc spawned = spawnDat.doSpawn();
-										if ((delay >= 0) && (spawned instanceof L2Attackable))
-										{
-											((L2Attackable) spawned).setOnKillDelay(delay);
-										}
-									}
-									else
-									{
-										manualSpawn.add(spawnDat);
+										((L2Attackable) spawned).setOnKillDelay(delay);
 									}
 								}
 								else
 								{
-									_log.warning("Instance: Data missing in NPC table for ID: " + npcId + " in Instance " + getId());
+									manualSpawn.add(spawnDat);
 								}
 							}
 						}
@@ -653,6 +649,78 @@ public final class Instance
 				{
 					_log.log(Level.WARNING, "Error parsing instance xml: " + e.getMessage(), e);
 					_spawnLoc = null;
+				}
+			}
+			else if ("reenter".equalsIgnoreCase(n.getNodeName()))
+			{
+				a = n.getAttributes().getNamedItem("additionStyle");
+				if (a != null)
+				{
+					_type = InstanceReenterType.valueOf(a.getNodeValue());
+				}
+				
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
+				{
+					long time = -1;
+					DayOfWeek day = null;
+					int hour = -1;
+					int minute = -1;
+					
+					if ("reset".equalsIgnoreCase(d.getNodeName()))
+					{
+						a = d.getAttributes().getNamedItem("time");
+						if (a != null)
+						{
+							time = Long.parseLong(a.getNodeValue());
+							
+							if (time > 0)
+							{
+								_resetData.add(new InstanceReenterTimeHolder(time));
+								break;
+							}
+						}
+						else if (time == -1)
+						{
+							a = d.getAttributes().getNamedItem("day");
+							if (a != null)
+							{
+								day = DayOfWeek.valueOf(a.getNodeValue().toUpperCase());
+							}
+							
+							a = d.getAttributes().getNamedItem("hour");
+							if (a != null)
+							{
+								hour = Integer.parseInt(a.getNodeValue());
+							}
+							
+							a = d.getAttributes().getNamedItem("minute");
+							if (a != null)
+							{
+								minute = Integer.parseInt(a.getNodeValue());
+							}
+							_resetData.add(new InstanceReenterTimeHolder(day, hour, minute));
+						}
+					}
+				}
+			}
+			else if ("removeBuffs".equalsIgnoreCase(n.getNodeName()))
+			{
+				a = n.getAttributes().getNamedItem("type");
+				if (a != null)
+				{
+					_removeBuffType = InstanceRemoveBuffType.valueOf(a.getNodeValue().toUpperCase());
+				}
+				
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
+				{
+					if ("skill".equalsIgnoreCase(d.getNodeName()))
+					{
+						a = d.getAttributes().getNamedItem("id");
+						if (a != null)
+						{
+							_exceptionList.add(Integer.parseInt(a.getNodeValue()));
+						}
+					}
 				}
 			}
 		}
@@ -705,7 +773,7 @@ public final class Instance
 			interval = 300000;
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DUNGEON_EXPIRES_IN_S1_MINUTES);
 			sm.addString(Integer.toString(timeLeft));
-			Announcements.getInstance().announceToInstance(sm, getId());
+			Broadcast.toPlayersInInstance(sm, getId());
 			remaining = remaining - 300000;
 		}
 		else if (remaining > 60000)
@@ -714,7 +782,7 @@ public final class Instance
 			interval = 60000;
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DUNGEON_EXPIRES_IN_S1_MINUTES);
 			sm.addString(Integer.toString(timeLeft));
-			Announcements.getInstance().announceToInstance(sm, getId());
+			Broadcast.toPlayersInInstance(sm, getId());
 			remaining = remaining - 60000;
 		}
 		else if (remaining > 30000)
@@ -763,13 +831,10 @@ public final class Instance
 	
 	public void cancelEjectDeadPlayer(L2PcInstance player)
 	{
-		if (_ejectDeadTasks.containsKey(player.getObjectId()))
+		final ScheduledFuture<?> task = _ejectDeadTasks.remove(player.getObjectId());
+		if (task != null)
 		{
-			final ScheduledFuture<?> task = _ejectDeadTasks.remove(player.getObjectId());
-			if (task != null)
-			{
-				task.cancel(true);
-			}
+			task.cancel(true);
 		}
 	}
 	
@@ -808,28 +873,80 @@ public final class Instance
 		}
 	}
 	
-	public class CheckTimeUp implements Runnable
+	public void cancelEjectDeadPlayer(L2PcInstance player)
 	{
 		private final int _remaining;
 		
 		public CheckTimeUp(int remaining)
 		{
-			_remaining = remaining;
+			final ScheduledFuture<?> task = _ejectDeadTasks.remove(player.getObjectId());
+			if (task != null)
+			{
+				task.cancel(true);
+			}
 		}
 		
 		@Override
 		public void run()
 		{
-			doCheckTimeUp(_remaining);
+			_ejectDeadTasks.put(player.getObjectId(), ThreadPoolManager.getInstance().scheduleGeneral(() ->
+			{
+				if (player.isDead() && (player.getInstanceId() == getId()))
+				{
+					player.setInstanceId(0);
+					if (getSpawnLoc() != null)
+					{
+						player.teleToLocation(getSpawnLoc(), true);
+					}
+					else
+					{
+						player.teleToLocation(TeleportWhereType.TOWN);
+					}
+				}
+			}, _ejectTime));
 		}
 	}
 	
-	public class TimeUp implements Runnable
+	/**
+	 * @param killer the character that killed the {@code victim}
+	 * @param victim the character that was killed by the {@code killer}
+	 */
+	public final void notifyDeath(L2Character killer, L2Character victim)
 	{
 		@Override
 		public void run()
 		{
-			InstanceManager.getInstance().destroyInstance(getId());
+			instance.onDeath(killer, victim);
 		}
+	}
+	
+	public InstanceReenterType getReenterType()
+	{
+		return _type;
+	}
+	
+	public void setReenterType(InstanceReenterType type)
+	{
+		_type = type;
+	}
+	
+	public List<InstanceReenterTimeHolder> getReenterData()
+	{
+		return _resetData;
+	}
+	
+	public boolean isRemoveBuffEnabled()
+	{
+		return getRemoveBuffType() != InstanceRemoveBuffType.NONE;
+	}
+	
+	public InstanceRemoveBuffType getRemoveBuffType()
+	{
+		return _removeBuffType;
+	}
+	
+	public List<Integer> getBuffExceptionList()
+	{
+		return _exceptionList;
 	}
 }

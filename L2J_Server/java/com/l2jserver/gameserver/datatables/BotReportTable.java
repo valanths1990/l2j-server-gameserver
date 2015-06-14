@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2004-2015 L2J Server
+ * 
+ * This file is part of L2J Server.
+ * 
+ * L2J Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * L2J Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.l2jserver.gameserver.datatables;
 
 import java.io.File;
@@ -5,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +53,8 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public final class BotReportTable
 {
-	private static final Logger _log = Logger.getLogger(BotReportTable.class.getName());
+	// Zoey76: TODO: Split XML parsing from SQL operations, use IXmlReader instead of SAXParser.
+	private static final Logger LOGGER = Logger.getLogger(BotReportTable.class.getName());
 	
 	private static final int COLUMN_BOT_ID = 1;
 	private static final int COLUMN_REPORTER_ID = 2;
@@ -77,7 +97,7 @@ public final class BotReportTable
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, "BotReportTable: Could not load punishments from /config/botreport_punishments.xml", e);
+				LOGGER.log(Level.WARNING, "BotReportTable: Could not load punishments from /config/botreport_punishments.xml", e);
 			}
 			
 			loadReportedCharData();
@@ -91,10 +111,10 @@ public final class BotReportTable
 	 */
 	private void loadReportedCharData()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+			Statement st = con.createStatement();
+			ResultSet rset = st.executeQuery(SQL_LOAD_REPORTED_CHAR_DATA))
 		{
-			PreparedStatement st = con.prepareStatement(SQL_LOAD_REPORTED_CHAR_DATA);
-			ResultSet rset = st.executeQuery();
 			long lastResetTime = 0;
 			try
 			{
@@ -133,8 +153,8 @@ public final class BotReportTable
 				
 				if (date > lastResetTime)
 				{
-					ReporterCharData rcd = null;
-					if ((rcd = _charRegistry.get(reporter)) != null)
+					ReporterCharData rcd = _charRegistry.get(reporter);
+					if (rcd != null)
 					{
 						rcd.setPoints(rcd.getPointsLeft() - 1);
 					}
@@ -147,14 +167,11 @@ public final class BotReportTable
 				}
 			}
 			
-			rset.close();
-			st.close();
-			
-			_log.info("BotReportTable: Loaded " + _reports.size() + " bot reports");
+			LOGGER.info("BotReportTable: Loaded " + _reports.size() + " bot reports");
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "BotReportTable: Could not load reported char data!", e);
+			LOGGER.log(Level.WARNING, "BotReportTable: Could not load reported char data!", e);
 		}
 	}
 	
@@ -164,29 +181,27 @@ public final class BotReportTable
 	 */
 	public void saveReportedCharData()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+			Statement st = con.createStatement();
+			PreparedStatement ps = con.prepareStatement(SQL_INSERT_REPORTED_CHAR_DATA))
 		{
-			PreparedStatement st = con.prepareStatement(SQL_CLEAR_REPORTED_CHAR_DATA);
-			st.execute();
+			st.execute(SQL_CLEAR_REPORTED_CHAR_DATA);
 			
-			st = con.prepareStatement(SQL_INSERT_REPORTED_CHAR_DATA);
 			for (Map.Entry<Integer, ReportedCharData> entrySet : _reports.entrySet())
 			{
 				Map<Integer, Long> reportTable = entrySet.getValue()._reporters;
 				for (int reporterId : reportTable.keySet())
 				{
-					st.setInt(1, entrySet.getKey());
-					st.setInt(2, reporterId);
-					st.setLong(3, reportTable.get(reporterId));
-					st.execute();
-					st.clearParameters();
+					ps.setInt(1, entrySet.getKey());
+					ps.setInt(2, reporterId);
+					ps.setLong(3, reportTable.get(reporterId));
+					ps.execute();
 				}
 			}
-			st.close();
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "BotReportTable: Could not update reported char data in database!", e);
+			LOGGER.log(Level.SEVERE, "BotReportTable: Could not update reported char data in database!", e);
 		}
 	}
 	
@@ -198,8 +213,15 @@ public final class BotReportTable
 	public boolean reportBot(L2PcInstance reporter)
 	{
 		L2Object target = reporter.getTarget();
-		L2PcInstance bot = null;
-		if ((target == null) || ((bot = target.getActingPlayer()) == null) || (target.getObjectId() == reporter.getObjectId()))
+		
+		if (target == null)
+		{
+			return false;
+		}
+		
+		L2PcInstance bot = target.getActingPlayer();
+		
+		if ((bot == null) || (target.getObjectId() == reporter.getObjectId()))
 		{
 			return false;
 		}
@@ -371,7 +393,7 @@ public final class BotReportTable
 		}
 		else
 		{
-			_log.warning("BotReportTable: Could not add punishment for " + neededReports + " report(s): Skill " + skillId + "-" + skillLevel + " does not exist!");
+			LOGGER.warning("BotReportTable: Could not add punishment for " + neededReports + " report(s): Skill " + skillId + "-" + skillLevel + " does not exist!");
 		}
 	}
 	
@@ -407,7 +429,7 @@ public final class BotReportTable
 		catch (Exception e)
 		{
 			ThreadPoolManager.getInstance().scheduleGeneral(new ResetPointTask(), 24 * 3600 * 1000);
-			_log.log(Level.WARNING, "BotReportTable: Could not properly schedule bot report points reset task. Scheduled in 24 hours.", e);
+			LOGGER.log(Level.WARNING, "BotReportTable: Could not properly schedule bot report points reset task. Scheduled in 24 hours.", e);
 		}
 	}
 	

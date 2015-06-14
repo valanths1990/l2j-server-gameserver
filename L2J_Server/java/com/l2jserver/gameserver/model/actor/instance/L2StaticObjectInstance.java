@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -46,39 +46,16 @@ public final class L2StaticObjectInstance extends L2Character
 	private int _type = -1; // 0 - map signs, 1 - throne , 2 - arena signs
 	private ShowTownMap _map;
 	
-	/** This class may be created only by L2Character and only for AI */
-	public class AIAccessor extends L2Character.AIAccessor
+	/**
+	 * Creates a static object.
+	 * @param template the static object
+	 * @param staticId the static ID
+	 */
+	public L2StaticObjectInstance(L2CharTemplate template, int staticId)
 	{
-		@Override
-		public L2StaticObjectInstance getActor()
-		{
-			return L2StaticObjectInstance.this;
-		}
-		
-		@Override
-		public void moveTo(int x, int y, int z, int offset)
-		{
-		}
-		
-		@Override
-		public void moveTo(int x, int y, int z)
-		{
-		}
-		
-		@Override
-		public void stopMove(Location loc)
-		{
-		}
-		
-		@Override
-		public void doAttack(L2Character target)
-		{
-		}
-		
-		@Override
-		public void doCast(Skill skill)
-		{
-		}
+		super(template);
+		setInstanceType(InstanceType.L2StaticObjectInstance);
+		_staticObjectId = staticId;
 	}
 	
 	@Override
@@ -95,18 +72,6 @@ public final class L2StaticObjectInstance extends L2Character
 	public int getId()
 	{
 		return _staticObjectId;
-	}
-	
-	/**
-	 * @param objectId
-	 * @param template
-	 * @param staticId
-	 */
-	public L2StaticObjectInstance(int objectId, L2CharTemplate template, int staticId)
-	{
-		super(objectId, template);
-		setInstanceType(InstanceType.L2StaticObjectInstance);
-		_staticObjectId = staticId;
 	}
 	
 	@Override
@@ -238,5 +203,25 @@ public final class L2StaticObjectInstance extends L2Character
 	public void sendInfo(L2PcInstance activeChar)
 	{
 		activeChar.sendPacket(new StaticObject(this));
+	}
+	
+	@Override
+	public void moveToLocation(int x, int y, int z, int offset)
+	{
+	}
+	
+	@Override
+	public void stopMove(Location loc)
+	{
+	}
+	
+	@Override
+	public void doAttack(L2Character target)
+	{
+	}
+	
+	@Override
+	public void doCast(Skill skill)
+	{
 	}
 }

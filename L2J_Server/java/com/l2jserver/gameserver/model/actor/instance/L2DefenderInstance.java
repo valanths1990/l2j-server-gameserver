@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -44,9 +44,13 @@ public class L2DefenderInstance extends L2Attackable
 	private Fort _fort = null; // the fortress which the instance should defend
 	private SiegableHall _hall = null; // the siegable hall which the instance should defend
 	
-	public L2DefenderInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates a defender.
+	 * @param template the defender NPC template
+	 */
+	public L2DefenderInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2DefenderInstance);
 	}
 	
@@ -67,13 +71,13 @@ public class L2DefenderInstance extends L2Attackable
 	{
 		if ((getConquerableHall() == null) && (getCastle(10000) == null))
 		{
-			return new L2FortSiegeGuardAI(new AIAccessor());
+			return new L2FortSiegeGuardAI(this);
 		}
 		else if (getCastle(10000) != null)
 		{
-			return new L2SiegeGuardAI(new AIAccessor());
+			return new L2SiegeGuardAI(this);
 		}
-		return new L2SpecialSiegeGuardAI(new AIAccessor());
+		return new L2SpecialSiegeGuardAI(this);
 	}
 	
 	/**

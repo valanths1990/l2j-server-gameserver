@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -43,9 +43,12 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 	protected Future<?> _changeImmortalTask = null;
 	protected Future<?> _onDeadEventTask = null;
 	
-	public L2SepulcherMonsterInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * @param template
+	 */
+	public L2SepulcherMonsterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2SepulcherMonsterInstance);
 		setShowSummonAnimation(true);
 		switch (template.getId())

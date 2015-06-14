@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,10 +19,9 @@
 package com.l2jserver.gameserver.model.holders;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javolution.util.FastList;
-
-import com.l2jserver.gameserver.datatables.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
@@ -51,7 +50,7 @@ public final class PlayerEventHolder
 	private final int _pkKills;
 	private final int _karma;
 	
-	private final List<L2PcInstance> _kills;
+	private final List<L2PcInstance> _kills = new CopyOnWriteArrayList<>();
 	private boolean _sitForced;
 	
 	public PlayerEventHolder(L2PcInstance player)
@@ -69,7 +68,7 @@ public final class PlayerEventHolder
 		_pvpKills = player.getPvpKills();
 		_pkKills = player.getPkKills();
 		_karma = player.getKarma();
-		_kills = new FastList<>();
+		
 		_sitForced = sitForced;
 	}
 	

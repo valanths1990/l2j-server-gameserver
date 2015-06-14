@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -3370,7 +3370,7 @@ public final class NpcStringId
 	 * ID: 19505<br>
 	 * Message: Who are you?! A new face like you can't approach this place!
 	 */
-	public static final NpcStringId WHO_ARE_YOU_A_NEW_FACE_LIKE_YOU_CANT_APPROACH_THIS_PLACE;
+	public static final NpcStringId WHO_ARE_YOU_A_NEW_FACE_LIKE_YOU_CAN_T_APPROACH_THIS_PLACE;
 	
 	/**
 	 * ID: 19506<br>
@@ -3466,7 +3466,7 @@ public final class NpcStringId
 	 * ID: 19618<br>
 	 * Message: You cannot be the match of Lilith. I'll teach you a lesson!
 	 */
-	public static final NpcStringId YOU_CANNOT_BE_THE_MATCH_OF_LILITH_ILL_TEACH_YOU_A_LESSON;
+	public static final NpcStringId YOU_CANNOT_BE_THE_MATCH_OF_LILITH_I_LL_TEACH_YOU_A_LESSON;
 	
 	/**
 	 * ID: 19619<br>
@@ -4925,6 +4925,12 @@ public final class NpcStringId
 	 * Message: $s1, I will remember you.
 	 */
 	public static final NpcStringId S1_I_WILL_REMEMBER_YOU;
+	
+	/**
+	 * ID: 71559<br>
+	 * Message: $s1 has become the lord of the Town of Goddard. May there be glory in the territory of Goddard!
+	 */
+	public static final NpcStringId S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_GODDARD_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_GODDARD;
 	
 	/**
 	 * ID: 71653<br>
@@ -22166,7 +22172,7 @@ public final class NpcStringId
 		NEXT_TIME_YOU_WILL_NOT_ESCAPE = new NpcStringId(19305);
 		S1_YOU_MAY_HAVE_WON_THIS_TIME_BUT_NEXT_TIME_I_WILL_SURELY_CAPTURE_YOU = new NpcStringId(19306);
 		INTRUDER_PROTECT_THE_PRIESTS_OF_DAWN = new NpcStringId(19504);
-		WHO_ARE_YOU_A_NEW_FACE_LIKE_YOU_CANT_APPROACH_THIS_PLACE = new NpcStringId(19505);
+		WHO_ARE_YOU_A_NEW_FACE_LIKE_YOU_CAN_T_APPROACH_THIS_PLACE = new NpcStringId(19505);
 		HOW_DARE_YOU_INTRUDE_WITH_THAT_TRANSFORMATION_GET_LOST = new NpcStringId(19506);
 		WHO_DARES_SUMMON_THE_MERCHANT_OF_MAMMON = new NpcStringId(19604);
 		THE_ANCIENT_PROMISE_TO_THE_EMPEROR_HAS_BEEN_FULFILLED = new NpcStringId(19605);
@@ -22182,7 +22188,7 @@ public final class NpcStringId
 		YOU_SUCH_A_FOOL_THE_VICTORY_OVER_THIS_WAR_BELONGS_TO_SHILIEN = new NpcStringId(19615);
 		HOW_DARE_YOU_TRY_TO_CONTEND_AGAINST_ME_IN_STRENGTH_RIDICULOUS = new NpcStringId(19616);
 		ANAKIM_IN_THE_NAME_OF_GREAT_SHILIEN_I_WILL_CUT_YOUR_THROAT = new NpcStringId(19617);
-		YOU_CANNOT_BE_THE_MATCH_OF_LILITH_ILL_TEACH_YOU_A_LESSON = new NpcStringId(19618);
+		YOU_CANNOT_BE_THE_MATCH_OF_LILITH_I_LL_TEACH_YOU_A_LESSON = new NpcStringId(19618);
 		I_MUST_GO_BACK_TO_SHILIEN_JUST_LIKE_THIS_OUTRAGEOUS = new NpcStringId(19619);
 		DEATH_TO_THE_ENEMIES_OF_THE_LORDS_OF_DAWN = new NpcStringId(19804);
 		WE_WILL_BE_WITH_YOU_ALWAYS = new NpcStringId(19805);
@@ -22426,6 +22432,7 @@ public final class NpcStringId
 		S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_ADEN_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_ADEN = new NpcStringId(71351);
 		S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_SCHUTTGART_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_SCHUTTGART = new NpcStringId(71459);
 		S1_I_WILL_REMEMBER_YOU = new NpcStringId(71551);
+		S1_HAS_BECOME_THE_LORD_OF_THE_TOWN_OF_GODDARD_MAY_THERE_BE_GLORY_IN_THE_TERRITORY_OF_GODDARD = new NpcStringId(71559);
 		FREDERICK_IS_LOOKING_FOR_YOU_MY_LIEGE = new NpcStringId(71653);
 		HO_HO_DID_YOU_THINK_YOU_COULD_REALLY_STOP_TRADING_WITH_US = new NpcStringId(71654);
 		YOU_HAVE_CHARGED_INTO_THE_TEMPLE = new NpcStringId(71655);

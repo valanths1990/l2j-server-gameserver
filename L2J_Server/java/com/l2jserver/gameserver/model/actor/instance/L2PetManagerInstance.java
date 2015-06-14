@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,9 +26,13 @@ import com.l2jserver.gameserver.util.Evolve;
 
 public class L2PetManagerInstance extends L2MerchantInstance
 {
-	public L2PetManagerInstance(int objectID, L2NpcTemplate template)
+	/**
+	 * Creates a pet manager.
+	 * @param template the pet manager NPC template.
+	 */
+	public L2PetManagerInstance(L2NpcTemplate template)
 	{
-		super(objectID, template);
+		super(template);
 		setInstanceType(InstanceType.L2PetManagerInstance);
 	}
 	

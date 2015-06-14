@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -131,9 +131,6 @@ public abstract class AbstractAI implements Ctrl
 	/** The character that this AI manages */
 	protected final L2Character _actor;
 	
-	/** An accessor for private methods of the actor */
-	protected final L2Character.AIAccessor _accessor;
-	
 	/** Current long-term intention */
 	protected CtrlIntention _intention = AI_INTENTION_IDLE;
 	/** Current long-term intention parameter */
@@ -166,14 +163,11 @@ public abstract class AbstractAI implements Ctrl
 	
 	/**
 	 * Constructor of AbstractAI.
-	 * @param accessor The AI accessor of the L2Character
+	 * @param creature the creature
 	 */
-	protected AbstractAI(L2Character.AIAccessor accessor)
+	protected AbstractAI(L2Character creature)
 	{
-		_accessor = accessor;
-		
-		// Get the L2Character managed by this Accessor AI
-		_actor = accessor.getActor();
+		_actor = creature;
 	}
 	
 	/**
@@ -334,11 +328,9 @@ public abstract class AbstractAI implements Ctrl
 	/**
 	 * Launch the L2CharacterAI onEvt method corresponding to the Event. <FONT COLOR=#FF0000><B> <U>Caution</U> : The current general intention won't be change (ex : If the character attack and is stunned, he will attack again after the stunned period)</B></FONT>
 	 * @param evt The event whose the AI must be notified
-	 * @param arg0 The first parameter of the Event (optional target)
-	 * @param arg1 The second parameter of the Event (optional target)
 	 */
 	@Override
-	public final void notifyEvent(CtrlEvent evt, Object arg0, Object arg1)
+	public final void notifyEvent(CtrlEvent evt, Object... args)
 	{
 		if ((!_actor.isVisible() && !_actor.isTeleporting()) || !_actor.hasAI())
 		{
@@ -351,31 +343,31 @@ public abstract class AbstractAI implements Ctrl
 				onEvtThink();
 				break;
 			case EVT_ATTACKED:
-				onEvtAttacked((L2Character) arg0);
+				onEvtAttacked((L2Character) args[0]);
 				break;
 			case EVT_AGGRESSION:
-				onEvtAggression((L2Character) arg0, ((Number) arg1).intValue());
+				onEvtAggression((L2Character) args[0], ((Number) args[1]).intValue());
 				break;
 			case EVT_STUNNED:
-				onEvtStunned((L2Character) arg0);
+				onEvtStunned((L2Character) args[0]);
 				break;
 			case EVT_PARALYZED:
-				onEvtParalyzed((L2Character) arg0);
+				onEvtParalyzed((L2Character) args[0]);
 				break;
 			case EVT_SLEEPING:
-				onEvtSleeping((L2Character) arg0);
+				onEvtSleeping((L2Character) args[0]);
 				break;
 			case EVT_ROOTED:
-				onEvtRooted((L2Character) arg0);
+				onEvtRooted((L2Character) args[0]);
 				break;
 			case EVT_CONFUSED:
-				onEvtConfused((L2Character) arg0);
+				onEvtConfused((L2Character) args[0]);
 				break;
 			case EVT_MUTED:
-				onEvtMuted((L2Character) arg0);
+				onEvtMuted((L2Character) args[0]);
 				break;
 			case EVT_EVADED:
-				onEvtEvaded((L2Character) arg0);
+				onEvtEvaded((L2Character) args[0]);
 				break;
 			case EVT_READY_TO_ACT:
 				if (!_actor.isCastingNow() && !_actor.isCastingSimultaneouslyNow())
@@ -384,7 +376,7 @@ public abstract class AbstractAI implements Ctrl
 				}
 				break;
 			case EVT_USER_CMD:
-				onEvtUserCmd(arg0, arg1);
+				onEvtUserCmd(args[0], args[1]);
 				break;
 			case EVT_ARRIVED:
 				// happens e.g. from stopmove but we don't process it if we're casting
@@ -401,10 +393,10 @@ public abstract class AbstractAI implements Ctrl
 				}
 				break;
 			case EVT_ARRIVED_BLOCKED:
-				onEvtArrivedBlocked((Location) arg0);
+				onEvtArrivedBlocked((Location) args[0]);
 				break;
 			case EVT_FORGET_OBJECT:
-				onEvtForgetObject((L2Object) arg0);
+				onEvtForgetObject((L2Object) args[0]);
 				break;
 			case EVT_CANCEL:
 				onEvtCancel();
@@ -418,6 +410,17 @@ public abstract class AbstractAI implements Ctrl
 			case EVT_FINISH_CASTING:
 				onEvtFinishCasting();
 				break;
+			case EVT_AFRAID:
+			{
+				onEvtAfraid((L2Character) args[0], (Boolean) args[1]);
+				break;
+			}
+		}
+		
+		// Do next action.
+		if ((_nextAction != null) && _nextAction.getEvents().contains(evt))
+		{
+			_nextAction.doAction();
 		}
 		
 		// Do next action.
@@ -485,6 +488,8 @@ public abstract class AbstractAI implements Ctrl
 	
 	protected abstract void onEvtFinishCasting();
 	
+	protected abstract void onEvtAfraid(L2Character effector, boolean start);
+	
 	/**
 	 * Cancel action client side by sending Server->Client packet ActionFailed to the L2PcInstance actor. <FONT COLOR=#FF0000><B> <U>Caution</U> : Low level function, used by AI subclasses</B></FONT>
 	 */
@@ -542,13 +547,13 @@ public abstract class AbstractAI implements Ctrl
 			_moveToPawnTimeout = GameTimeController.getInstance().getGameTicks();
 			_moveToPawnTimeout += 1000 / GameTimeController.MILLIS_IN_TICK;
 			
-			if ((pawn == null) || (_accessor == null))
+			if (pawn == null)
 			{
 				return;
 			}
 			
 			// Calculate movement data for a move to location action and add the actor to movingObjects of GameTimeController
-			_accessor.moveTo(pawn.getX(), pawn.getY(), pawn.getZ(), offset);
+			_actor.moveToLocation(pawn.getX(), pawn.getY(), pawn.getZ(), offset);
 			
 			if (!_actor.isMoving())
 			{
@@ -597,7 +602,7 @@ public abstract class AbstractAI implements Ctrl
 			_clientMovingToPawnOffset = 0;
 			
 			// Calculate movement data for a move to location action and add the actor to movingObjects of GameTimeController
-			_accessor.moveTo(x, y, z);
+			_actor.moveToLocation(x, y, z, 0);
 			
 			// Send a Server->Client packet CharMoveToLocation to the actor and all L2PcInstance in its _knownPlayers
 			_actor.broadcastPacket(new MoveToLocation(_actor));
@@ -619,7 +624,7 @@ public abstract class AbstractAI implements Ctrl
 		// Stop movement of the L2Character
 		if (_actor.isMoving())
 		{
-			_accessor.stopMove(loc);
+			_actor.stopMove(loc);
 		}
 		
 		_clientMovingToPawnOffset = 0;

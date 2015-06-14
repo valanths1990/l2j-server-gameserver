@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,8 +19,7 @@
 package com.l2jserver.gameserver.model.multisell;
 
 import java.util.ArrayList;
-
-import javolution.util.FastList;
+import java.util.LinkedList;
 
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -35,16 +34,15 @@ public class PreparedListContainer extends ListContainer
 	public PreparedListContainer(ListContainer template, boolean inventoryOnly, L2PcInstance player, L2Npc npc)
 	{
 		super(template.getListId());
-		_maintainEnchantment = template.getMaintainEnchantment();
-		
-		_applyTaxes = false;
+		setMaintainEnchantment(template.getMaintainEnchantment());
+		setApplyTaxes(false);
 		double taxRate = 0;
 		if (npc != null)
 		{
 			_npcObjectId = npc.getObjectId();
 			if (template.getApplyTaxes() && npc.getIsInTown() && (npc.getCastle().getOwnerId() > 0))
 			{
-				_applyTaxes = true;
+				setApplyTaxes(true);
 				taxRate = npc.getCastle().getTaxRate();
 			}
 		}
@@ -57,7 +55,7 @@ public class PreparedListContainer extends ListContainer
 			}
 			
 			final L2ItemInstance[] items;
-			if (_maintainEnchantment)
+			if (getMaintainEnchantment())
 			{
 				items = player.getInventory().getUniqueItemsByEnchantLevel(false, false, false);
 			}
@@ -66,8 +64,7 @@ public class PreparedListContainer extends ListContainer
 				items = player.getInventory().getUniqueItems(false, false, false);
 			}
 			
-			// size is not known - using FastList
-			_entries = new FastList<>();
+			_entries = new LinkedList<>();
 			for (L2ItemInstance item : items)
 			{
 				// only do the match up on equippable items that are not currently equipped
@@ -82,7 +79,7 @@ public class PreparedListContainer extends ListContainer
 						{
 							if (item.getId() == ing.getItemId())
 							{
-								_entries.add(new PreparedEntry(ent, item, _applyTaxes, _maintainEnchantment, taxRate));
+								_entries.add(new PreparedEntry(ent, item, getApplyTaxes(), getMaintainEnchantment(), taxRate));
 								break; // next entry
 							}
 						}
@@ -95,7 +92,7 @@ public class PreparedListContainer extends ListContainer
 			_entries = new ArrayList<>(template.getEntries().size());
 			for (Entry ent : template.getEntries())
 			{
-				_entries.add(new PreparedEntry(ent, null, _applyTaxes, false, taxRate));
+				_entries.add(new PreparedEntry(ent, null, getApplyTaxes(), false, taxRate));
 			}
 		}
 	}

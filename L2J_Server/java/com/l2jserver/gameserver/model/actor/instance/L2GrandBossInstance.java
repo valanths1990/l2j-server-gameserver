@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -38,13 +38,12 @@ public final class L2GrandBossInstance extends L2MonsterInstance
 	private boolean _useRaidCurse = true;
 	
 	/**
-	 * Constructor for L2GrandBossInstance. This represent all grandbosses.
-	 * @param objectId ID of the instance
-	 * @param template L2NpcTemplate of the instance
+	 * Creates a grand boss.
+	 * @param template the grand boss NPC template
 	 */
-	public L2GrandBossInstance(int objectId, L2NpcTemplate template)
+	public L2GrandBossInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2GrandBossInstance);
 		setIsRaid(true);
 		setLethalable(false);

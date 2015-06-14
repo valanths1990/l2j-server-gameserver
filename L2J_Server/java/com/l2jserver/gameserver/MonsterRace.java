@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,8 +22,7 @@ import java.lang.reflect.Constructor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.datatables.NpcData;
-import com.l2jserver.gameserver.idfactory.IdFactory;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.util.Rnd;
@@ -33,7 +32,6 @@ public class MonsterRace
 	protected static final Logger _log = Logger.getLogger(MonsterRace.class.getName());
 	
 	private final L2Npc[] _monsters;
-	private Constructor<?> _constructor;
 	private int[][] _speeds;
 	private final int[] _first, _second;
 	
@@ -73,9 +71,8 @@ public class MonsterRace
 			try
 			{
 				L2NpcTemplate template = NpcData.getInstance().getTemplate(id + random);
-				_constructor = Class.forName("com.l2jserver.gameserver.model.actor.instance." + template.getType() + "Instance").getConstructors()[0];
-				int objectId = IdFactory.getInstance().getNextId();
-				_monsters[i] = (L2Npc) _constructor.newInstance(objectId, template);
+				Constructor<?> constructor = Class.forName("com.l2jserver.gameserver.model.actor.instance." + template.getType() + "Instance").getConstructors()[0];
+				_monsters[i] = (L2Npc) constructor.newInstance(template);
 			}
 			catch (Exception e)
 			{

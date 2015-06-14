@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,21 +21,18 @@ package com.l2jserver.gameserver.model.entity.clanhall;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
 import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -47,13 +44,13 @@ import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.entity.Siegable;
 import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.network.NpcStringId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * @author BiggBoss
@@ -73,8 +70,8 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	
 	protected final Logger _log;
 	
-	private final FastMap<Integer, L2SiegeClan> _attackers = new FastMap<>();
-	private FastList<L2Spawn> _guards;
+	private final Map<Integer, L2SiegeClan> _attackers = new ConcurrentHashMap<>();
+	private List<L2Spawn> _guards;
 	
 	public SiegableHall _hall;
 	public ScheduledFuture<?> _siegeTask;
@@ -92,8 +89,6 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		_log.config(_hall.getName() + " siege scheduled for: " + getSiegeDate().getTime());
 		loadAttackers();
 	}
-	
-	// XXX Load methods -------------------------------
 	
 	public void loadAttackers()
 	{
@@ -125,11 +120,11 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 			delStatement.setInt(1, _hall.getId());
 			delStatement.execute();
 			
-			if (getAttackers().size() > 0)
+			if (_attackers.size() > 0)
 			{
 				try (PreparedStatement insert = con.prepareStatement(SQL_SAVE_ATTACKERS))
 				{
-					for (L2SiegeClan clan : getAttackers().values())
+					for (L2SiegeClan clan : _attackers.values())
 					{
 						insert.setInt(1, _hall.getId());
 						insert.setInt(2, clan.getClanId());
@@ -150,7 +145,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	{
 		if (_guards == null)
 		{
-			_guards = new FastList<>();
+			_guards = new ArrayList<>();
 			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 				PreparedStatement statement = con.prepareStatement(SQL_LOAD_GUARDS))
 			{
@@ -159,9 +154,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 				{
 					while (rset.next())
 					{
-						final int npcId = rset.getInt("npcId");
-						final L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
-						L2Spawn spawn = new L2Spawn(template);
+						final L2Spawn spawn = new L2Spawn(rset.getInt("npcId"));
 						spawn.setX(rset.getInt("x"));
 						spawn.setY(rset.getInt("y"));
 						spawn.setZ(rset.getInt("z"));
@@ -179,28 +172,23 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		}
 	}
 	
-	// XXX Npc Management methods ----------------------------
-	
 	private final void spawnSiegeGuards()
 	{
 		for (L2Spawn guard : _guards)
 		{
-			if (guard != null)
-			{
-				guard.init();
-			}
+			guard.init();
 		}
 	}
 	
 	private final void unSpawnSiegeGuards()
 	{
-		if ((_guards != null) && (_guards.size() > 0))
+		if (_guards != null)
 		{
 			for (L2Spawn guard : _guards)
 			{
-				if (guard != null)
+				guard.stopRespawn();
+				if (guard.getLastSpawn() != null)
 				{
-					guard.stopRespawn();
 					guard.getLastSpawn().deleteMe();
 				}
 			}
@@ -219,9 +207,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		return result;
 	}
 	
-	// XXX Attacker clans management -----------------------------
-	
-	public final FastMap<Integer, L2SiegeClan> getAttackers()
+	public final Map<Integer, L2SiegeClan> getAttackers()
 	{
 		return _attackers;
 	}
@@ -258,26 +244,21 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	@Override
 	public List<L2SiegeClan> getAttackerClans()
 	{
-		FastList<L2SiegeClan> result = new FastList<>();
-		result.addAll(_attackers.values());
-		return result;
+		return new ArrayList<>(_attackers.values());
 	}
 	
 	@Override
 	public List<L2PcInstance> getAttackersInZone()
 	{
-		final Collection<L2PcInstance> list = _hall.getSiegeZone().getPlayersInside();
-		List<L2PcInstance> attackers = new FastList<>();
-		
-		for (L2PcInstance pc : list)
+		final List<L2PcInstance> attackers = new ArrayList<>();
+		for (L2PcInstance pc : _hall.getSiegeZone().getPlayersInside())
 		{
 			final L2Clan clan = pc.getClan();
-			if ((clan != null) && getAttackers().containsKey(clan.getId()))
+			if ((clan != null) && _attackers.containsKey(clan.getId()))
 			{
 				attackers.add(pc);
 			}
 		}
-		
 		return attackers;
 	}
 	
@@ -299,21 +280,19 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		return null;
 	}
 	
-	// XXX Siege execution --------------------------
-	
 	public void prepareOwner()
 	{
 		if (_hall.getOwnerId() > 0)
 		{
 			final L2SiegeClan clan = new L2SiegeClan(_hall.getOwnerId(), SiegeClanType.ATTACKER);
-			getAttackers().put(clan.getClanId(), new L2SiegeClan(clan.getClanId(), SiegeClanType.ATTACKER));
+			_attackers.put(clan.getClanId(), new L2SiegeClan(clan.getClanId(), SiegeClanType.ATTACKER));
 		}
 		
 		_hall.free();
 		_hall.banishForeigners();
 		SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.REGISTRATION_TERM_FOR_S1_ENDED);
 		msg.addString(getName());
-		Announcements.getInstance().announceToAll(msg);
+		Broadcast.toAllOnlinePlayers(msg);
 		_hall.updateSiegeStatus(SiegeStatus.WAITING_BATTLE);
 		
 		_siegeTask = ThreadPoolManager.getInstance().scheduleGeneral(new SiegeStarts(), 3600000);
@@ -322,16 +301,16 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	@Override
 	public void startSiege()
 	{
-		if ((getAttackers().size() < 1) && (_hall.getId() != 21)) // Fortress of resistance dont have attacker list
+		if ((_attackers.size() < 1) && (_hall.getId() != 21)) // Fortress of resistance don't have attacker list
 		{
 			onSiegeEnds();
-			getAttackers().clear();
+			_attackers.clear();
 			_hall.updateNextSiege();
 			_siegeTask = ThreadPoolManager.getInstance().scheduleGeneral(new PrepareOwner(), _hall.getSiegeDate().getTimeInMillis());
 			_hall.updateSiegeStatus(SiegeStatus.WAITING_BATTLE);
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_OF_S1_HAS_BEEN_CANCELED_DUE_TO_LACK_OF_INTEREST);
 			sm.addString(_hall.getName());
-			Announcements.getInstance().announceToAll(sm);
+			Broadcast.toAllOnlinePlayers(sm);
 			return;
 		}
 		
@@ -341,7 +320,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		_hall.updateSiegeZone(true);
 		
 		final byte state = 1;
-		for (L2SiegeClan sClan : getAttackerClans())
+		for (L2SiegeClan sClan : _attackers.values())
 		{
 			final L2Clan clan = ClanTable.getInstance().getClan(sClan.getClanId());
 			if (clan == null)
@@ -351,12 +330,9 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 			
 			for (L2PcInstance pc : clan.getOnlineMembers(0))
 			{
-				if (pc != null)
-				{
-					pc.setSiegeState(state);
-					pc.broadcastUserInfo();
-					pc.setIsInHideoutSiege(true);
-				}
+				pc.setSiegeState(state);
+				pc.broadcastUserInfo();
+				pc.setIsInHideoutSiege(true);
 			}
 		}
 		
@@ -370,7 +346,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	{
 		SystemMessage end = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_OF_S1_HAS_ENDED);
 		end.addString(_hall.getName());
-		Announcements.getInstance().announceToAll(end);
+		Broadcast.toAllOnlinePlayers(end);
 		
 		L2Clan winner = getWinner();
 		SystemMessage finalMsg = null;
@@ -381,13 +357,13 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 			finalMsg = SystemMessage.getSystemMessage(SystemMessageId.CLAN_S1_VICTORIOUS_OVER_S2_S_SIEGE);
 			finalMsg.addString(winner.getName());
 			finalMsg.addString(_hall.getName());
-			Announcements.getInstance().announceToAll(finalMsg);
+			Broadcast.toAllOnlinePlayers(finalMsg);
 		}
 		else
 		{
 			finalMsg = SystemMessage.getSystemMessage(SystemMessageId.SIEGE_S1_DRAW);
 			finalMsg.addString(_hall.getName());
-			Announcements.getInstance().announceToAll(finalMsg);
+			Broadcast.toAllOnlinePlayers(finalMsg);
 		}
 		_missionAccomplished = false;
 		
@@ -397,7 +373,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		_hall.banishForeigners();
 		
 		final byte state = 0;
-		for (L2SiegeClan sClan : getAttackerClans())
+		for (L2SiegeClan sClan : _attackers.values())
 		{
 			final L2Clan clan = ClanTable.getInstance().getClan(sClan.getClanId());
 			if (clan == null)
@@ -422,7 +398,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 			}
 		}
 		
-		getAttackers().clear();
+		_attackers.clear();
 		
 		onSiegeEnds();
 		
@@ -455,8 +431,6 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		return _hall.getSiegeDate();
 	}
 	
-	// XXX Fame settings ---------------------------
-	
 	@Override
 	public boolean giveFame()
 	{
@@ -468,8 +442,6 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 	{
 		return Config.CHS_FAME_AMOUNT;
 	}
-	
-	// XXX Misc methods -----------------------------
 	
 	@Override
 	public int getFameFrequency()
@@ -490,7 +462,6 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable
 		}
 	}
 	
-	// XXX Siege task and abstract methods -------------------
 	public Location getInnerSpawnLoc(L2PcInstance player)
 	{
 		return null;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -28,8 +28,8 @@ import java.util.logging.Logger;
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.data.xml.impl.TransformData;
 import com.l2jserver.gameserver.datatables.SkillData;
-import com.l2jserver.gameserver.datatables.TransformData;
 import com.l2jserver.gameserver.instancemanager.CursedWeaponsManager;
 import com.l2jserver.gameserver.model.L2Party.messageType;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
@@ -336,9 +336,9 @@ public class CursedWeapon implements INamable
 		
 		// Void Burst, Void Flow
 		_player.addSkill(CommonSkill.VOID_BURST.getSkill(), false);
-		_player.addTransformSkill(CommonSkill.VOID_BURST.getId());
+		_player.addTransformSkill(CommonSkill.VOID_BURST.getSkill());
 		_player.addSkill(CommonSkill.VOID_FLOW.getSkill(), false);
-		_player.addTransformSkill(CommonSkill.VOID_FLOW.getId());
+		_player.addTransformSkill(CommonSkill.VOID_FLOW.getSkill());
 		_player.sendSkillList();
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -33,18 +34,14 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.mmocore.network.MMOClient;
-import org.mmocore.network.MMOConnection;
-import org.mmocore.network.ReceivablePacket;
-
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.LoginServerThread;
 import com.l2jserver.gameserver.LoginServerThread.SessionKey;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.CharNameTable;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.SecondaryAuthData;
+import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.SecondaryAuthData;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
 import com.l2jserver.gameserver.model.CharSelectInfoPackage;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -60,6 +57,9 @@ import com.l2jserver.gameserver.network.serverpackets.ServerClose;
 import com.l2jserver.gameserver.security.SecondaryPasswordAuth;
 import com.l2jserver.gameserver.util.FloodProtectors;
 import com.l2jserver.gameserver.util.Util;
+import com.l2jserver.mmocore.MMOClient;
+import com.l2jserver.mmocore.MMOConnection;
+import com.l2jserver.mmocore.ReceivablePacket;
 
 /**
  * Represents a client connected on Game Server.
@@ -95,7 +95,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 	
 	private boolean _isAuthedGG;
 	private final long _connectionStartTime;
-	private CharSelectInfoPackage[] _charSlotMapping = null;
+	private List<CharSelectInfoPackage> _charSlotMapping = null;
 	
 	// flood protectors
 	private final FloodProtectors _floodProtectors = new FloodProtectors(this);
@@ -630,20 +630,20 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 	}
 	
 	/**
-	 * @param chars
+	 * @param list
 	 */
-	public void setCharSelection(CharSelectInfoPackage[] chars)
+	public void setCharSelection(List<CharSelectInfoPackage> list)
 	{
-		_charSlotMapping = chars;
+		_charSlotMapping = list;
 	}
 	
 	public CharSelectInfoPackage getCharSelection(int charslot)
 	{
-		if ((_charSlotMapping == null) || (charslot < 0) || (charslot >= _charSlotMapping.length))
+		if ((_charSlotMapping == null) || (charslot < 0) || (charslot >= _charSlotMapping.size()))
 		{
 			return null;
 		}
-		return _charSlotMapping[charslot];
+		return _charSlotMapping.get(charslot);
 	}
 	
 	public SecondaryPasswordAuth getSecondaryAuth()

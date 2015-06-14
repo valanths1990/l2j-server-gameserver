@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,8 @@
  */
 package com.l2jserver.loginserver.network.serverpackets;
 
-import org.mmocore.network.SendablePacket;
-
 import com.l2jserver.loginserver.network.L2LoginClient;
+import com.l2jserver.mmocore.SendablePacket;
 
 /**
  * @author KenM

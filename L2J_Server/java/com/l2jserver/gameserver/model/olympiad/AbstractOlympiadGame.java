@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -398,7 +398,7 @@ public abstract class AbstractOlympiadGame
 		{
 			return;
 		}
-		
+		player.setIsPendingRevive(false);
 		player.setInstanceId(0);
 		player.teleToLocation(loc);
 		player.unsetLastLocation();

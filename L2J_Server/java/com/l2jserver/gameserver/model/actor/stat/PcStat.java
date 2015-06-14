@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,8 +21,8 @@ package com.l2jserver.gameserver.model.actor.stat;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ExperienceTable;
-import com.l2jserver.gameserver.datatables.PetDataTable;
+import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.model.L2PetLevelData;
 import com.l2jserver.gameserver.model.PcCondOverride;
 import com.l2jserver.gameserver.model.actor.instance.L2ClassMasterInstance;
@@ -245,7 +245,7 @@ public class PcStat extends PlayableStat
 	@Override
 	public final boolean addLevel(byte value)
 	{
-		if ((getLevel() + value) > (ExperienceTable.getInstance().getMaxLevel() - 1))
+		if ((getLevel() + value) > (ExperienceData.getInstance().getMaxLevel() - 1))
 		{
 			return false;
 		}
@@ -342,7 +342,7 @@ public class PcStat extends PlayableStat
 	@Override
 	public final long getExpForLevel(int level)
 	{
-		return ExperienceTable.getInstance().getExpForLevel(level);
+		return ExperienceData.getInstance().getExpForLevel(level);
 	}
 	
 	@Override
@@ -454,9 +454,9 @@ public class PcStat extends PlayableStat
 	@Override
 	public final void setLevel(byte value)
 	{
-		if (value > (ExperienceTable.getInstance().getMaxLevel() - 1))
+		if (value > (ExperienceData.getInstance().getMaxLevel() - 1))
 		{
-			value = (byte) (ExperienceTable.getInstance().getMaxLevel() - 1);
+			value = (byte) (ExperienceData.getInstance().getMaxLevel() - 1);
 		}
 		
 		if (getActiveChar().isSubClassActive())

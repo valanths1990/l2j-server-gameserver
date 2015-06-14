@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -53,7 +53,7 @@ public class ExManagePartyRoomMember extends L2GameServerPacket
 		writeS(_activeChar.getName());
 		writeD(_activeChar.getActiveClass());
 		writeD(_activeChar.getLevel());
-		writeD(0x00); // TODO: Closes town
+		writeD(_room.getLocation());
 		if (_room.getOwner().equals(_activeChar))
 		{
 			writeD(1);

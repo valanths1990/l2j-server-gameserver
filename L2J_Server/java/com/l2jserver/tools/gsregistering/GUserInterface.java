@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -56,7 +56,7 @@ import com.l2jserver.tools.images.ImagesTable;
 public class GUserInterface extends BaseGameServerRegister implements ActionListener
 {
 	private final JFrame _frame;
-	protected final JTableModel _dtm;
+	private final JTableModel _dtm;
 	protected final JProgressBar _progressBar;
 	
 	public JTable _gsTable;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,8 +21,10 @@ package com.l2jserver.gameserver.model.conditions;
 import java.util.ArrayList;
 
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.instancezone.InstanceWorld;
-import com.l2jserver.gameserver.model.stats.Env;
+import com.l2jserver.gameserver.model.items.L2Item;
+import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * The Class ConditionPlayerInstanceId.
@@ -41,20 +43,20 @@ public class ConditionPlayerInstanceId extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if (env.getPlayer() == null)
+		if (effector.getActingPlayer() == null)
 		{
 			return false;
 		}
 		
-		final int instanceId = env.getCharacter().getInstanceId();
+		final int instanceId = effector.getInstanceId();
 		if (instanceId <= 0)
 		{
 			return false; // player not in instance
 		}
 		
-		final InstanceWorld world = InstanceManager.getInstance().getPlayerWorld(env.getPlayer());
+		final InstanceWorld world = InstanceManager.getInstance().getPlayerWorld(effector.getActingPlayer());
 		if ((world == null) || (world.getInstanceId() != instanceId))
 		{
 			return false; // player in the different instance

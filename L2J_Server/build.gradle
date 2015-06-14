@@ -1,0 +1,131 @@
+apply plugin: 'java'
+apply plugin: 'distribution'
+
+defaultTasks('build')
+
+sourceCompatibility = '1.8'
+
+sourceSets {
+	main {
+		java {
+			srcDir('java')
+		}
+	}
+}
+
+dependencies {
+	compile(fileTree(dir: 'dist/libs', include: '*.jar'))
+}
+
+def generalManifest = manifest {
+	attributes('Built-By': System.getProperty('user.name'),
+			'Built-Date': new Date(),
+			'Implementation-URL': 'http://www.l2jserver.com/',
+			'Class-Path': configurations.runtime.collect({ '../libs/' + it.getName() }).join(' '))
+}
+
+jar {
+	archiveName = 'l2jserver.jar'
+	exclude('**/dbinstaller/**')
+	exclude('**/loginserver/**')
+	exclude('**/accountmanager/**')
+	exclude('**/gsregistering/**')
+	manifest {
+		from(generalManifest)
+		attributes 'Class-Path': configurations.compile.collect { it.getName() }.join(','),
+				'Main-Class': 'com.l2jserver.gameserver.GameServer'
+	}
+}
+
+task loginJar(type: Jar, dependsOn: classes) {
+	from(sourceSets.main.output)
+	archiveName = 'l2jlogin.jar'
+	exclude('**/dbinstaller/**')
+	exclude('**/gameserver/**')
+	manifest {
+		from(generalManifest)
+		attributes(//'Class-Path': '../libs/c3p0-0.9.5-pre10.jar ../libs/mail-1.5.2.jar ../libs/mmocore.jar ../libs/mysql-connector-java-5.1.31-bin.jar ../libs/weupnp-0.1.3.jar',
+				'Main-Class': 'com.l2jserver.loginserver.L2LoginServer')
+	}
+}
+
+task configuratorJar(type: Jar, dependsOn: classes) {
+	from(sourceSets.main.output)
+	archiveName = 'L2J_Configurator.jar'
+	include('**/configurator/**')
+	include('**/i18n/**')
+	include('**/images/**')
+	exclude('**/accountmanager/**')
+	exclude('**/dbinstaller/**')
+	exclude('**/gameserver/**')
+	exclude('**/gsregistering/**')
+	exclude('**/log/**')
+	exclude('**/loginserver/**')
+	exclude('**/status/**')
+	exclude('**/util/**')
+	exclude('**/Config/**')
+	exclude('**/L2DatabaseFactory/**')
+	exclude('**/Server/**')
+	manifest {
+		from(generalManifest)
+		attributes('Main-Class': 'com.l2jserver.tools.configurator.ConfigUserInterface')
+	}
+}
+
+task dbInstLsJar(type: Jar, dependsOn: classes) {
+	from(sourceSets.main.output)
+	archiveName = 'dbinst_ls.jar'
+	include '**/dbinstaller/**'
+	include '**/images/**'
+	include '**/util/**'
+	include '**/SQLFilter**'
+	exclude '**/LauncherGS*'
+	manifest {
+		from(generalManifest)
+		attributes('Main-Class': 'com.l2jserver.tools.dbinstaller.LauncherLS')
+	}
+}
+
+task dbInstGsJar(type: Jar, dependsOn: classes) {
+	from(sourceSets.main.output)
+	archiveName = 'dbinst_gs.jar'
+	include('**/dbinstaller/**')
+	include('**/images/**')
+	include('**/util/**')
+	include('**/SQLFilter**')
+	exclude('**/LauncherLS*')
+	manifest {
+		from(generalManifest)
+		attributes 'Main-Class': 'com.l2jserver.tools.dbinstaller.LauncherGS'
+	}
+}
+
+artifacts {
+	archives loginJar, configuratorJar, dbInstLsJar, dbInstGsJar
+}
+
+task zip(type: Zip, dependsOn: build) {
+	from('dist') {
+		exclude('libs')
+	}
+	into('libs') {
+		from(configurations.runtime)
+	}
+	into('game') {
+		from(jar)
+		from(configuratorJar)
+	}
+	into('login') {
+		from(loginJar)
+	}
+	into('tools') {
+		from(dbInstLsJar)
+		from(dbInstGsJar)
+	}
+}
+
+build.finalizedBy(zip) 
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.2.1'
+}

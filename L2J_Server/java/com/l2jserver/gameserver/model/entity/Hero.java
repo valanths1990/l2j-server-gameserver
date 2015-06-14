@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -24,25 +24,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.CharNameTable;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.ClassListData;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.ClassListData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2World;
@@ -78,14 +76,14 @@ public class Hero
 	// delete hero items
 	private static final String DELETE_ITEMS = "DELETE FROM items WHERE item_id IN (6842, 6611, 6612, 6613, 6614, 6615, 6616, 6617, 6618, 6619, 6620, 6621, 9388, 9389, 9390) AND owner_id NOT IN (SELECT charId FROM characters WHERE accesslevel > 0)";
 	
-	private static final Map<Integer, StatsSet> _heroes = new FastMap<>();
-	private static final Map<Integer, StatsSet> _completeHeroes = new FastMap<>();
+	private static final Map<Integer, StatsSet> HEROES = new ConcurrentHashMap<>();
+	private static final Map<Integer, StatsSet> COMPLETE_HEROS = new ConcurrentHashMap<>();
 	
-	private static final Map<Integer, StatsSet> _herocounts = new FastMap<>();
-	private static final Map<Integer, List<StatsSet>> _herofights = new FastMap<>();
+	private static final Map<Integer, StatsSet> HERO_COUNTS = new ConcurrentHashMap<>();
+	private static final Map<Integer, List<StatsSet>> HERO_FIGHTS = new ConcurrentHashMap<>();
 	
-	private static final Map<Integer, List<StatsSet>> _herodiary = new FastMap<>();
-	private static final Map<Integer, String> _heroMessage = new FastMap<>();
+	private static final Map<Integer, List<StatsSet>> HERO_DIARY = new ConcurrentHashMap<>();
+	private static final Map<Integer, String> HERO_MESSAGE = new ConcurrentHashMap<>();
 	
 	public static final String COUNT = "count";
 	public static final String PLAYED = "played";
@@ -99,11 +97,6 @@ public class Hero
 	public static final int ACTION_HERO_GAINED = 2;
 	public static final int ACTION_CASTLE_TAKEN = 3;
 	
-	public static Hero getInstance()
-	{
-		return SingletonHolder._instance;
-	}
-	
 	protected Hero()
 	{
 		init();
@@ -111,12 +104,12 @@ public class Hero
 	
 	private void init()
 	{
-		_heroes.clear();
-		_completeHeroes.clear();
-		_herocounts.clear();
-		_herofights.clear();
-		_herodiary.clear();
-		_heroMessage.clear();
+		HEROES.clear();
+		COMPLETE_HEROS.clear();
+		HERO_COUNTS.clear();
+		HERO_FIGHTS.clear();
+		HERO_DIARY.clear();
+		HERO_MESSAGE.clear();
 		
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			Statement s1 = con.createStatement();
@@ -141,7 +134,7 @@ public class Hero
 				
 				processHeros(ps, charId, hero);
 				
-				_heroes.put(charId, hero);
+				HEROES.put(charId, hero);
 			}
 			
 			while (rset2.next())
@@ -156,16 +149,48 @@ public class Hero
 				
 				processHeros(ps, charId, hero);
 				
-				_completeHeroes.put(charId, hero);
+				COMPLETE_HEROS.put(charId, hero);
 			}
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, "Hero System: Couldnt load Heroes", e);
+			_log.warning("Hero System: Couldnt load Heroes: " + e.getMessage());
 		}
 		
-		_log.info("Hero System: Loaded " + _heroes.size() + " Heroes.");
-		_log.info("Hero System: Loaded " + _completeHeroes.size() + " all time Heroes.");
+		_log.info("Hero System: Loaded " + HEROES.size() + " Heroes.");
+		_log.info("Hero System: Loaded " + COMPLETE_HEROS.size() + " all time Heroes.");
+	}
+	
+	private void processHeros(PreparedStatement ps, int charId, StatsSet hero) throws SQLException
+	{
+		ps.setInt(1, charId);
+		try (ResultSet rs = ps.executeQuery())
+		{
+			if (rs.next())
+			{
+				int clanId = rs.getInt("clanid");
+				int allyId = rs.getInt("allyId");
+				String clanName = "";
+				String allyName = "";
+				int clanCrest = 0;
+				int allyCrest = 0;
+				if (clanId > 0)
+				{
+					clanName = ClanTable.getInstance().getClan(clanId).getName();
+					clanCrest = ClanTable.getInstance().getClan(clanId).getCrestId();
+					if (allyId > 0)
+					{
+						allyName = ClanTable.getInstance().getClan(clanId).getAllyName();
+						allyCrest = ClanTable.getInstance().getClan(clanId).getAllyCrestId();
+					}
+				}
+				hero.set(CLAN_CREST, clanCrest);
+				hero.set(CLAN_NAME, clanName);
+				hero.set(ALLY_CREST, allyCrest);
+				hero.set(ALLY_NAME, allyName);
+			}
+			ps.clearParameters();
+		}
 	}
 	
 	private void processHeros(PreparedStatement ps, int charId, StatsSet hero) throws SQLException
@@ -224,19 +249,19 @@ public class Hero
 			{
 				if (rset.next())
 				{
-					_heroMessage.put(charId, rset.getString("message"));
+					HERO_MESSAGE.put(charId, rset.getString("message"));
 				}
 			}
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, "Hero System: Couldnt load Hero Message for CharId: " + charId, e);
+			_log.warning("Hero System: Couldnt load Hero Message for CharId: " + charId + ": " + e.getMessage());
 		}
 	}
 	
 	public void loadDiary(int charId)
 	{
-		final List<StatsSet> _diary = new FastList<>();
+		final List<StatsSet> diary = new ArrayList<>();
 		int diaryentries = 0;
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement("SELECT * FROM  heroes_diary WHERE charId=? ORDER BY time ASC"))
@@ -275,31 +300,31 @@ public class Hero
 							_diaryentry.set("action", castle.getName() + " Castle was successfuly taken");
 						}
 					}
-					_diary.add(_diaryentry);
+					diary.add(_diaryentry);
 					diaryentries++;
 				}
 			}
-			_herodiary.put(charId, _diary);
+			HERO_DIARY.put(charId, diary);
 			
 			_log.info("Hero System: Loaded " + diaryentries + " diary entries for Hero: " + CharNameTable.getInstance().getNameById(charId));
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, "Hero System: Couldnt load Hero Diary for CharId: " + charId, e);
+			_log.warning("Hero System: Couldnt load Hero Diary for CharId: " + charId + ": " + e.getMessage());
 		}
 	}
 	
 	public void loadFights(int charId)
 	{
-		final List<StatsSet> _fights = new FastList<>();
-		StatsSet _herocountdata = new StatsSet();
-		Calendar _data = Calendar.getInstance();
-		_data.set(Calendar.DAY_OF_MONTH, 1);
-		_data.set(Calendar.HOUR_OF_DAY, 0);
-		_data.set(Calendar.MINUTE, 0);
-		_data.set(Calendar.MILLISECOND, 0);
+		final List<StatsSet> fights = new ArrayList<>();
+		StatsSet heroCountData = new StatsSet();
+		Calendar data = Calendar.getInstance();
+		data.set(Calendar.DAY_OF_MONTH, 1);
+		data.set(Calendar.HOUR_OF_DAY, 0);
+		data.set(Calendar.MINUTE, 0);
+		data.set(Calendar.MILLISECOND, 0);
 		
-		long from = _data.getTimeInMillis();
+		long from = data.getTimeInMillis();
 		int numberoffights = 0;
 		int _victorys = 0;
 		int _losses = 0;
@@ -363,7 +388,7 @@ public class Hero
 								_draws++;
 							}
 							
-							_fights.add(fight);
+							fights.add(fight);
 							
 							numberoffights++;
 						}
@@ -399,7 +424,7 @@ public class Hero
 								_draws++;
 							}
 							
-							_fights.add(fight);
+							fights.add(fight);
 							
 							numberoffights++;
 						}
@@ -407,29 +432,29 @@ public class Hero
 				}
 			}
 			
-			_herocountdata.set("victory", _victorys);
-			_herocountdata.set("draw", _draws);
-			_herocountdata.set("loss", _losses);
+			heroCountData.set("victory", _victorys);
+			heroCountData.set("draw", _draws);
+			heroCountData.set("loss", _losses);
 			
-			_herocounts.put(charId, _herocountdata);
-			_herofights.put(charId, _fights);
+			HERO_COUNTS.put(charId, heroCountData);
+			HERO_FIGHTS.put(charId, fights);
 			
 			_log.info("Hero System: Loaded " + numberoffights + " fights for Hero: " + CharNameTable.getInstance().getNameById(charId));
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, "Hero System: Couldnt load Hero fights history for CharId: " + charId, e);
+			_log.warning("Hero System: Couldnt load Hero fights history for CharId: " + charId + ": " + e);
 		}
 	}
 	
 	public Map<Integer, StatsSet> getHeroes()
 	{
-		return _heroes;
+		return HEROES;
 	}
 	
 	public int getHeroByClass(int classid)
 	{
-		for (Entry<Integer, StatsSet> e : _heroes.entrySet())
+		for (Entry<Integer, StatsSet> e : HEROES.entrySet())
 		{
 			if (e.getValue().getInt(Olympiad.CLASS_ID) == classid)
 			{
@@ -441,42 +466,42 @@ public class Hero
 	
 	public void resetData()
 	{
-		_herodiary.clear();
-		_herofights.clear();
-		_herocounts.clear();
-		_heroMessage.clear();
+		HERO_DIARY.clear();
+		HERO_FIGHTS.clear();
+		HERO_COUNTS.clear();
+		HERO_MESSAGE.clear();
 	}
 	
 	public void showHeroDiary(L2PcInstance activeChar, int heroclass, int charid, int page)
 	{
 		final int perpage = 10;
 		
-		if (_herodiary.containsKey(charid))
+		final List<StatsSet> mainList = HERO_DIARY.get(charid);
+		if (mainList != null)
 		{
-			List<StatsSet> _mainlist = _herodiary.get(charid);
-			final NpcHtmlMessage DiaryReply = new NpcHtmlMessage();
+			final NpcHtmlMessage diaryReply = new NpcHtmlMessage();
 			final String htmContent = HtmCache.getInstance().getHtm(activeChar.getHtmlPrefix(), "data/html/olympiad/herodiary.htm");
-			if ((htmContent != null) && _heroMessage.containsKey(charid))
+			final String heroMessage = HERO_MESSAGE.get(charid);
+			if ((htmContent != null) && (heroMessage != null))
 			{
-				DiaryReply.setHtml(htmContent);
-				DiaryReply.replace("%heroname%", CharNameTable.getInstance().getNameById(charid));
-				DiaryReply.replace("%message%", _heroMessage.get(charid));
-				DiaryReply.disableValidation();
+				diaryReply.setHtml(htmContent);
+				diaryReply.replace("%heroname%", CharNameTable.getInstance().getNameById(charid));
+				diaryReply.replace("%message%", heroMessage);
+				diaryReply.disableValidation();
 				
-				if (!_mainlist.isEmpty())
+				if (!mainList.isEmpty())
 				{
-					FastList<StatsSet> _list = FastList.newInstance();
-					_list.addAll(_mainlist);
-					Collections.reverse(_list);
+					final List<StatsSet> list = new ArrayList<>(mainList);
+					Collections.reverse(list);
 					
 					boolean color = true;
 					final StringBuilder fList = new StringBuilder(500);
 					int counter = 0;
 					int breakat = 0;
-					for (int i = ((page - 1) * perpage); i < _list.size(); i++)
+					for (int i = ((page - 1) * perpage); i < list.size(); i++)
 					{
 						breakat = i;
-						StatsSet _diaryentry = _list.get(i);
+						StatsSet diaryEntry = list.get(i);
 						StringUtil.append(fList, "<tr><td>");
 						if (color)
 						{
@@ -486,8 +511,8 @@ public class Hero
 						{
 							StringUtil.append(fList, "<table width=270>");
 						}
-						StringUtil.append(fList, "<tr><td width=270><font color=\"LEVEL\">" + _diaryentry.getString("date") + ":xx</font></td></tr>");
-						StringUtil.append(fList, "<tr><td width=270>" + _diaryentry.getString("action") + "</td></tr>");
+						StringUtil.append(fList, "<tr><td width=270><font color=\"LEVEL\">" + diaryEntry.getString("date") + ":xx</font></td></tr>");
+						StringUtil.append(fList, "<tr><td width=270>" + diaryEntry.getString("action") + "</td></tr>");
 						StringUtil.append(fList, "<tr><td>&nbsp;</td></tr></table>");
 						StringUtil.append(fList, "</td></tr>");
 						color = !color;
@@ -498,36 +523,34 @@ public class Hero
 						}
 					}
 					
-					if (breakat < (_list.size() - 1))
+					if (breakat < (list.size() - 1))
 					{
-						DiaryReply.replace("%buttprev%", "<button value=\"Prev\" action=\"bypass _diary?class=" + heroclass + "&page=" + (page + 1) + "\" width=60 height=25 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
+						diaryReply.replace("%buttprev%", "<button value=\"Prev\" action=\"bypass _diary?class=" + heroclass + "&page=" + (page + 1) + "\" width=60 height=25 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
 					}
 					else
 					{
-						DiaryReply.replace("%buttprev%", "");
+						diaryReply.replace("%buttprev%", "");
 					}
 					
 					if (page > 1)
 					{
-						DiaryReply.replace("%buttnext%", "<button value=\"Next\" action=\"bypass _diary?class=" + heroclass + "&page=" + (page - 1) + "\" width=60 height=25 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
+						diaryReply.replace("%buttnext%", "<button value=\"Next\" action=\"bypass _diary?class=" + heroclass + "&page=" + (page - 1) + "\" width=60 height=25 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
 					}
 					else
 					{
-						DiaryReply.replace("%buttnext%", "");
+						diaryReply.replace("%buttnext%", "");
 					}
 					
-					DiaryReply.replace("%list%", fList.toString());
-					
-					FastList.recycle(_list);
+					diaryReply.replace("%list%", fList.toString());
 				}
 				else
 				{
-					DiaryReply.replace("%list%", "");
-					DiaryReply.replace("%buttprev%", "");
-					DiaryReply.replace("%buttnext%", "");
+					diaryReply.replace("%list%", "");
+					diaryReply.replace("%buttprev%", "");
+					diaryReply.replace("%buttnext%", "");
 				}
 				
-				activeChar.sendPacket(DiaryReply);
+				activeChar.sendPacket(diaryReply);
 			}
 		}
 	}
@@ -539,10 +562,9 @@ public class Hero
 		int _loss = 0;
 		int _draw = 0;
 		
-		if (_herofights.containsKey(charid))
+		final List<StatsSet> heroFights = HERO_FIGHTS.get(charid);
+		if (heroFights != null)
 		{
-			List<StatsSet> _list = _herofights.get(charid);
-			
 			final NpcHtmlMessage FightReply = new NpcHtmlMessage();
 			final String htmContent = HtmCache.getInstance().getHtm(activeChar.getHtmlPrefix(), "data/html/olympiad/herohistory.htm");
 			if (htmContent != null)
@@ -550,24 +572,24 @@ public class Hero
 				FightReply.setHtml(htmContent);
 				FightReply.replace("%heroname%", CharNameTable.getInstance().getNameById(charid));
 				
-				if (!_list.isEmpty())
+				if (!heroFights.isEmpty())
 				{
-					if (_herocounts.containsKey(charid))
+					final StatsSet heroCount = HERO_COUNTS.get(charid);
+					if (heroCount != null)
 					{
-						StatsSet _herocount = _herocounts.get(charid);
-						_win = _herocount.getInt("victory");
-						_loss = _herocount.getInt("loss");
-						_draw = _herocount.getInt("draw");
+						_win = heroCount.getInt("victory");
+						_loss = heroCount.getInt("loss");
+						_draw = heroCount.getInt("draw");
 					}
 					
 					boolean color = true;
 					final StringBuilder fList = new StringBuilder(500);
 					int counter = 0;
 					int breakat = 0;
-					for (int i = ((page - 1) * perpage); i < _list.size(); i++)
+					for (int i = ((page - 1) * perpage); i < heroFights.size(); i++)
 					{
 						breakat = i;
-						StatsSet fight = _list.get(i);
+						StatsSet fight = heroFights.get(i);
 						StringUtil.append(fList, "<tr><td>");
 						if (color)
 						{
@@ -589,7 +611,7 @@ public class Hero
 						}
 					}
 					
-					if (breakat < (_list.size() - 1))
+					if (breakat < (heroFights.size() - 1))
 					{
 						FightReply.replace("%buttprev%", "<button value=\"Prev\" action=\"bypass _match?class=" + heroclass + "&page=" + (page + 1) + "\" width=60 height=25 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
 					}
@@ -629,7 +651,7 @@ public class Hero
 	{
 		updateHeroes(true);
 		
-		for (Integer objectId : _heroes.keySet())
+		for (Integer objectId : HEROES.keySet())
 		{
 			final L2PcInstance player = L2World.getInstance().getPlayer(objectId);
 			if (player == null)
@@ -666,26 +688,27 @@ public class Hero
 			player.broadcastUserInfo();
 		}
 		
+		deleteItemsInDb();
+		
+		HEROES.clear();
+		
 		if (newHeroes.isEmpty())
 		{
-			_heroes.clear();
 			return;
 		}
-		
-		Map<Integer, StatsSet> heroes = new FastMap<>();
 		
 		for (StatsSet hero : newHeroes)
 		{
 			int charId = hero.getInt(Olympiad.CHAR_ID);
 			
-			if ((_completeHeroes != null) && _completeHeroes.containsKey(charId))
+			if (COMPLETE_HEROS.containsKey(charId))
 			{
-				StatsSet oldHero = _completeHeroes.get(charId);
+				StatsSet oldHero = COMPLETE_HEROS.get(charId);
 				int count = oldHero.getInt(COUNT);
 				oldHero.set(COUNT, count + 1);
 				oldHero.set(PLAYED, 1);
 				oldHero.set(CLAIMED, false);
-				heroes.put(charId, oldHero);
+				HEROES.put(charId, oldHero);
 			}
 			else
 			{
@@ -695,16 +718,9 @@ public class Hero
 				newHero.set(COUNT, 1);
 				newHero.set(PLAYED, 1);
 				newHero.set(CLAIMED, false);
-				heroes.put(charId, newHero);
+				HEROES.put(charId, newHero);
 			}
 		}
-		
-		deleteItemsInDb();
-		
-		_heroes.clear();
-		_heroes.putAll(heroes);
-		
-		heroes.clear();
 		
 		updateHeroes(false);
 	}
@@ -724,11 +740,11 @@ public class Hero
 			{
 				StatsSet hero;
 				int heroId;
-				for (Entry<Integer, StatsSet> entry : _heroes.entrySet())
+				for (Entry<Integer, StatsSet> entry : HEROES.entrySet())
 				{
 					hero = entry.getValue();
 					heroId = entry.getKey();
-					if (_completeHeroes.isEmpty() || !_completeHeroes.containsKey(heroId))
+					if (!COMPLETE_HEROS.containsKey(heroId))
 					{
 						try (PreparedStatement insert = con.prepareStatement(INSERT_HERO))
 						{
@@ -775,10 +791,9 @@ public class Hero
 								}
 							}
 						}
-						_heroes.remove(heroId);
-						_heroes.put(heroId, hero);
+						HEROES.put(heroId, hero);
 						
-						_completeHeroes.put(heroId, hero);
+						COMPLETE_HEROS.put(heroId, hero);
 					}
 					else
 					{
@@ -796,7 +811,7 @@ public class Hero
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, "Hero System: Couldnt update Heroes", e);
+			_log.warning("Hero System: Couldnt update Heroes: " + e.getMessage());
 		}
 	}
 	
@@ -809,23 +824,17 @@ public class Hero
 	{
 		setDiaryData(charId, ACTION_RAID_KILLED, npcId);
 		
-		L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
-		
-		if (_herodiary.containsKey(charId) && (template != null))
+		final L2NpcTemplate template = NpcData.getInstance().getTemplate(npcId);
+		final List<StatsSet> list = HERO_DIARY.get(charId);
+		if ((list != null) && (template != null))
 		{
-			// Get Data
-			List<StatsSet> _list = _herodiary.get(charId);
-			// Clear old data
-			_herodiary.remove(charId);
 			// Prepare new data
-			StatsSet _diaryentry = new StatsSet();
-			String date = (new SimpleDateFormat("yyyy-MM-dd HH")).format(new Date(System.currentTimeMillis()));
-			_diaryentry.set("date", date);
-			_diaryentry.set("action", template.getName() + " was defeated");
+			final StatsSet diaryEntry = new StatsSet();
+			final String date = (new SimpleDateFormat("yyyy-MM-dd HH")).format(new Date(System.currentTimeMillis()));
+			diaryEntry.set("date", date);
+			diaryEntry.set("action", template.getName() + " was defeated");
 			// Add to old list
-			_list.add(_diaryentry);
-			// Put new list into diary
-			_herodiary.put(charId, _list);
+			list.add(diaryEntry);
 		}
 	}
 	
@@ -833,22 +842,17 @@ public class Hero
 	{
 		setDiaryData(charId, ACTION_CASTLE_TAKEN, castleId);
 		
-		Castle castle = CastleManager.getInstance().getCastleById(castleId);
-		if ((castle != null) && _herodiary.containsKey(charId))
+		final Castle castle = CastleManager.getInstance().getCastleById(castleId);
+		final List<StatsSet> list = HERO_DIARY.get(charId);
+		if ((list != null) && (castle != null))
 		{
-			// Get Data
-			List<StatsSet> _list = _herodiary.get(charId);
-			// Clear old data
-			_herodiary.remove(charId);
 			// Prepare new data
-			StatsSet _diaryentry = new StatsSet();
-			String date = (new SimpleDateFormat("yyyy-MM-dd HH")).format(new Date(System.currentTimeMillis()));
-			_diaryentry.set("date", date);
-			_diaryentry.set("action", castle.getName() + " Castle was successfuly taken");
+			final StatsSet diaryEntry = new StatsSet();
+			final String date = (new SimpleDateFormat("yyyy-MM-dd HH")).format(new Date(System.currentTimeMillis()));
+			diaryEntry.set("date", date);
+			diaryEntry.set("action", castle.getName() + " Castle was successfuly taken");
 			// Add to old list
-			_list.add(_diaryentry);
-			// Put new list into diary
-			_herodiary.put(charId, _list);
+			list.add(diaryEntry);
 		}
 	}
 	
@@ -865,7 +869,7 @@ public class Hero
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, "SQL exception while saving DiaryData.", e);
+			_log.severe("SQL exception while saving DiaryData: " + e.getMessage());
 		}
 	}
 	
@@ -876,7 +880,7 @@ public class Hero
 	 */
 	public void setHeroMessage(L2PcInstance player, String message)
 	{
-		_heroMessage.put(player.getObjectId(), message);
+		HERO_MESSAGE.put(player.getObjectId(), message);
 	}
 	
 	/**
@@ -885,7 +889,7 @@ public class Hero
 	 */
 	public void saveHeroMessage(int charId)
 	{
-		if (_heroMessage.get(charId) == null)
+		if (HERO_MESSAGE.containsKey(charId))
 		{
 			return;
 		}
@@ -893,13 +897,13 @@ public class Hero
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement("UPDATE heroes SET message=? WHERE charId=?;"))
 		{
-			statement.setString(1, _heroMessage.get(charId));
+			statement.setString(1, HERO_MESSAGE.get(charId));
 			statement.setInt(2, charId);
 			statement.execute();
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, "SQL exception while saving HeroMessage.", e);
+			_log.severe("SQL exception while saving HeroMessage:" + e.getMessage());
 		}
 	}
 	
@@ -912,7 +916,7 @@ public class Hero
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, "", e);
+			_log.warning("Heroes: " + e.getMessage());
 		}
 	}
 	
@@ -922,29 +926,27 @@ public class Hero
 	 */
 	public void shutdown()
 	{
-		for (int charId : _heroMessage.keySet())
-		{
-			saveHeroMessage(charId);
-		}
-	}
-	
-	/**
-	 * @param objectId the player's object Id to verify.
-	 * @return {@code true} if there are heros and the player is in the list, {@code false} otherwise.
-	 */
-	public boolean isHero(int objectId)
-	{
-		return _heroes.containsKey(objectId) && _heroes.get(objectId).getBoolean(CLAIMED);
+		HERO_MESSAGE.keySet().forEach(c -> saveHeroMessage(c));
 	}
 	
 	/**
 	 * Verifies if the given object ID belongs to a claimed hero.
 	 * @param objectId the player's object ID to verify
-	 * @return {@code true} if the given object ID belongs to a claimed hero, {@code false} otherwise
+	 * @return {@code true} if there are heros and the player is in the list, {@code false} otherwise
 	 */
-	public boolean isClaimed(int objectId)
+	public boolean isHero(int objectId)
 	{
-		return _heroes.containsKey(objectId) && _heroes.get(objectId).getBoolean(CLAIMED);
+		return HEROES.containsKey(objectId) && HEROES.get(objectId).getBoolean(CLAIMED);
+	}
+	
+	/**
+	 * Verifies if the given object ID belongs to an unclaimed hero.
+	 * @param objectId the player's object ID to verify
+	 * @return {@code true} if player is unclaimed hero
+	 */
+	public boolean isUnclaimedHero(int objectId)
+	{
+		return HEROES.containsKey(objectId) && !HEROES.get(objectId).getBoolean(CLAIMED);
 	}
 	
 	/**
@@ -953,7 +955,14 @@ public class Hero
 	 */
 	public void claimHero(L2PcInstance player)
 	{
-		_heroes.get(player.getObjectId()).set(CLAIMED, true);
+		StatsSet hero = HEROES.get(player.getObjectId());
+		if (hero == null)
+		{
+			hero = new StatsSet();
+			HEROES.put(player.getObjectId(), hero);
+		}
+		
+		hero.set(CLAIMED, true);
 		
 		final L2Clan clan = player.getClan();
 		if ((clan != null) && (clan.getLevel() >= 5))
@@ -974,13 +983,18 @@ public class Hero
 		setHeroGained(player.getObjectId());
 		loadFights(player.getObjectId());
 		loadDiary(player.getObjectId());
-		_heroMessage.put(player.getObjectId(), "");
+		HERO_MESSAGE.put(player.getObjectId(), "");
 		
 		updateHeroes(false);
 	}
 	
+	public static Hero getInstance()
+	{
+		return SingletonHolder.INSTANCE;
+	}
+	
 	private static class SingletonHolder
 	{
-		protected static final Hero _instance = new Hero();
+		protected static final Hero INSTANCE = new Hero();
 	}
 }

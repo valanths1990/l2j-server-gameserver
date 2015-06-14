@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,9 +21,10 @@ package com.l2jserver.gameserver.model.conditions;
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
+import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.stats.Env;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
 /**
@@ -48,16 +49,15 @@ public class ConditionPlayerCanSweep extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(Env env)
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		boolean canSweep = false;
-		if (env.getPlayer() != null)
+		if (effector.getActingPlayer() != null)
 		{
-			final L2PcInstance sweeper = env.getPlayer();
-			final Skill sweep = env.getSkill();
-			if (sweep != null)
+			final L2PcInstance sweeper = effector.getActingPlayer();
+			if (skill != null)
 			{
-				final L2Object[] targets = sweep.getTargetList(sweeper);
+				final L2Object[] targets = skill.getTargetList(sweeper);
 				if (targets != null)
 				{
 					L2Attackable target;
@@ -68,7 +68,7 @@ public class ConditionPlayerCanSweep extends Condition
 							target = (L2Attackable) objTarget;
 							if (target.isDead())
 							{
-								if (target.isSpoil())
+								if (target.isSpoiled())
 								{
 									canSweep = target.checkSpoilOwner(sweeper, true);
 									canSweep &= !target.isOldCorpse(sweeper, Config.CORPSE_CONSUME_SKILL_ALLOWED_TIME_BEFORE_DECAY, true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,11 +20,13 @@ package com.l2jserver.gameserver.scripting;
 
 import java.util.Map;
 
+import com.l2jserver.gameserver.model.events.AbstractScript;
+
 /**
  * @author KenM
  * @param <S>
  */
-public abstract class ScriptManager<S extends ManagedScript>
+public abstract class ScriptManager<S extends AbstractScript>
 {
 	public abstract Map<String, S> getScripts();
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -20,13 +20,13 @@ package com.l2jserver.gameserver.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
+import com.l2jserver.gameserver.model.holders.MinionHolder;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.interfaces.IParserAdvUtils;
 
@@ -45,7 +45,7 @@ public class StatsSet implements IParserAdvUtils
 	
 	public StatsSet()
 	{
-		this(new FastMap<String, Object>());
+		this(new LinkedHashMap<>());
 	}
 	
 	public StatsSet(Map<String, Object> map)
@@ -575,6 +575,18 @@ public class StatsSet implements IParserAdvUtils
 		}
 		
 		return (SkillHolder) obj;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<MinionHolder> getMinionList(String key)
+	{
+		Object obj = _set.get(key);
+		if ((obj == null) || !(obj instanceof List<?>))
+		{
+			return Collections.EMPTY_LIST;
+		}
+		
+		return (List<MinionHolder>) obj;
 	}
 	
 	public void set(String name, Object value)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javolution.util.FastList;
 
 import com.l2jserver.gameserver.model.actor.L2Playable;
 
@@ -63,12 +62,12 @@ public final class RelationChanged extends L2GameServerPacket
 		_singled._autoAttackable = autoattackable ? 1 : 0;
 		_singled._karma = activeChar.getKarma();
 		_singled._pvpFlag = activeChar.getPvpFlag();
-		_invisible = activeChar.isInvisible();
+		setInvisible(activeChar.isInvisible());
 	}
 	
 	public RelationChanged()
 	{
-		_multi = FastList.newInstance();
+		_multi = new ArrayList<>();
 	}
 	
 	public void addRelation(L2Playable activeChar, int relation, boolean autoattackable)
@@ -102,7 +101,6 @@ public final class RelationChanged extends L2GameServerPacket
 			{
 				writeRelation(r);
 			}
-			FastList.recycle((FastList<?>) _multi);
 		}
 	}
 	

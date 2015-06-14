@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,10 +18,10 @@
  */
 package com.l2jserver.gameserver.model;
 
-import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
 
 /**
- * @author FBIagent<br>
+ * @author HorridoJoho
  */
 public class L2AccessLevel
 {
@@ -222,7 +222,7 @@ public class L2AccessLevel
 				return false;
 			}
 			
-			_childsAccessLevel = AdminTable.getInstance().getAccessLevel(_child);
+			_childsAccessLevel = AdminData.getInstance().getAccessLevel(_child);
 		}
 		return ((_childsAccessLevel.getLevel() == accessLevel.getLevel()) || _childsAccessLevel.hasChildAccess(accessLevel));
 	}

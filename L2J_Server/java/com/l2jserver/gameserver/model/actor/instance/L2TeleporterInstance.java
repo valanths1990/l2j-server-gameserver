@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.TeleportLocationTable;
+import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.SiegeManager;
@@ -47,12 +47,12 @@ public final class L2TeleporterInstance extends L2Npc
 	private static final int COND_REGULAR = 3;
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a teleporter.
+	 * @param template the teleporter NPC template
 	 */
-	public L2TeleporterInstance(int objectId, L2NpcTemplate template)
+	public L2TeleporterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2TeleporterInstance);
 	}
 	

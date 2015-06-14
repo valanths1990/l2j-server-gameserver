@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -112,7 +112,7 @@ public class ListenersContainer
 			{
 				if (_listeners == null)
 				{
-					return _listeners = new ConcurrentHashMap<>();
+					_listeners = new ConcurrentHashMap<>();
 				}
 			}
 		}

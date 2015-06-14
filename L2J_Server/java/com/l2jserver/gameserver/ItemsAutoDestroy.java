@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver;
 
-import java.util.List;
-
-import javolution.util.FastList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.enums.ItemLocation;
@@ -28,19 +27,12 @@ import com.l2jserver.gameserver.instancemanager.ItemsOnGroundManager;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class ItemsAutoDestroy
+public final class ItemsAutoDestroy
 {
-	protected List<L2ItemInstance> _items = null;
-	protected static long _sleep;
+	private final Map<Integer, L2ItemInstance> _items = new ConcurrentHashMap<>();
 	
 	protected ItemsAutoDestroy()
 	{
-		_items = new FastList<>();
-		_sleep = Config.AUTODESTROY_ITEM_AFTER * 1000;
-		if (_sleep == 0)
-		{
-			_sleep = 3600000;
-		}
 		ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(this::removeItems, 5000, 5000);
 	}
 	
@@ -52,22 +44,22 @@ public class ItemsAutoDestroy
 	public synchronized void addItem(L2ItemInstance item)
 	{
 		item.setDropTime(System.currentTimeMillis());
-		_items.add(item);
+		_items.put(item.getObjectId(), item);
 	}
 	
 	public synchronized void removeItems()
 	{
-		if (_items.isEmpty())
+		final long curtime = System.currentTimeMillis();
+		for (L2ItemInstance item : _items.values())
 		{
-			return;
-		}
-		
-		long curtime = System.currentTimeMillis();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item == null) || (item.getDropTime() == 0) || (item.getItemLocation() != ItemLocation.VOID))
+			if (item == null)
 			{
-				_items.remove(item);
+				continue;
+			}
+			
+			if ((item.getDropTime() == 0) || (item.getItemLocation() != ItemLocation.VOID))
+			{
+				_items.remove(item.getObjectId());
 			}
 			else
 			{
@@ -77,7 +69,7 @@ public class ItemsAutoDestroy
 					{
 						L2World.getInstance().removeVisibleObject(item, item.getWorldRegion());
 						L2World.getInstance().removeObject(item);
-						_items.remove(item);
+						_items.remove(item.getObjectId());
 						if (Config.SAVE_DROPPED_ITEM)
 						{
 							ItemsOnGroundManager.getInstance().removeObject(item);
@@ -90,21 +82,26 @@ public class ItemsAutoDestroy
 					{
 						L2World.getInstance().removeVisibleObject(item, item.getWorldRegion());
 						L2World.getInstance().removeObject(item);
-						_items.remove(item);
+						_items.remove(item.getObjectId());
 						if (Config.SAVE_DROPPED_ITEM)
 						{
 							ItemsOnGroundManager.getInstance().removeObject(item);
 						}
 					}
 				}
-				else if ((curtime - item.getDropTime()) > _sleep)
+				else
 				{
-					L2World.getInstance().removeVisibleObject(item, item.getWorldRegion());
-					L2World.getInstance().removeObject(item);
-					_items.remove(item);
-					if (Config.SAVE_DROPPED_ITEM)
+					final long sleep = ((Config.AUTODESTROY_ITEM_AFTER == 0) ? 3600000 : Config.AUTODESTROY_ITEM_AFTER * 1000);
+					
+					if ((curtime - item.getDropTime()) > sleep)
 					{
-						ItemsOnGroundManager.getInstance().removeObject(item);
+						L2World.getInstance().removeVisibleObject(item, item.getWorldRegion());
+						L2World.getInstance().removeObject(item);
+						_items.remove(item.getObjectId());
+						if (Config.SAVE_DROPPED_ITEM)
+						{
+							ItemsOnGroundManager.getInstance().removeObject(item);
+						}
 					}
 				}
 			}

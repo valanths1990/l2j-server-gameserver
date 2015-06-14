@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -32,7 +32,7 @@ public abstract class PathFinding
 {
 	public static PathFinding getInstance()
 	{
-		if (!Config.GEODATA_CELLFINDING)
+		if (Config.PATHFINDING == 1)
 		{
 			// Higher Memory Usage, Smaller Cpu Usage
 			return GeoPathFinding.getInstance();

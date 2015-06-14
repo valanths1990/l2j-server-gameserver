@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,7 +26,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.util.Util;
 
 /**
- * @author FBIagent
+ * @author HorridoJoho
  */
 public abstract class AbstractHtmlPacket extends L2GameServerPacket
 {
@@ -132,6 +132,11 @@ public abstract class AbstractHtmlPacket extends L2GameServerPacket
 	public final void runImpl()
 	{
 		L2PcInstance player = getClient().getActiveChar();
+		if (player == null)
+		{
+			return;
+		}
+		
 		player.clearHtmlActions(getScope());
 		
 		if (_disabledValidation)

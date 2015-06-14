@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,8 +21,8 @@ package com.l2jserver.gameserver.model.actor.stat;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ExperienceTable;
-import com.l2jserver.gameserver.datatables.PetDataTable;
+import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.actor.L2Playable;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -32,8 +32,6 @@ import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableE
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2SwampZone;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.WorldInfo;
 
 public class PlayableStat extends CharStat
 {
@@ -163,9 +161,9 @@ public class PlayableStat extends CharStat
 			setExp(getExpForLevel(getLevel()));
 		}
 		
-		if (!levelIncreased && (getActiveChar() instanceof L2PcInstance) && !((L2PcInstance) (getActiveChar())).isGM() && Config.DECREASE_SKILL_LEVEL)
+		if (!levelIncreased && (getActiveChar() instanceof L2PcInstance) && !getActiveChar().isGM() && Config.DECREASE_SKILL_LEVEL)
 		{
-			((L2PcInstance) (getActiveChar())).checkPlayerSkills();
+			((L2PcInstance) getActiveChar()).checkPlayerSkills();
 		}
 		
 		if (!levelIncreased)
@@ -175,10 +173,6 @@ public class PlayableStat extends CharStat
 		
 		getActiveChar().getStatus().setCurrentHp(getActiveChar().getStat().getMaxHp());
 		getActiveChar().getStatus().setCurrentMp(getActiveChar().getStat().getMaxMp());
-		if (getActiveChar() instanceof L2PcInstance)
-		{
-			CommunityServerThread.getInstance().sendPacket(new WorldInfo((L2PcInstance) getActiveChar(), null, WorldInfo.TYPE_UPDATE_PLAYER_DATA));
-		}
 		
 		return true;
 	}
@@ -257,6 +251,6 @@ public class PlayableStat extends CharStat
 	
 	public int getMaxLevel()
 	{
-		return ExperienceTable.getInstance().getMaxLevel();
+		return ExperienceData.getInstance().getMaxLevel();
 	}
 }

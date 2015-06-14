@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,14 +23,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.datatables.ClanTable;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
@@ -50,7 +49,6 @@ public abstract class ClanHall
 	private final String _desc;
 	private final String _location;
 	private L2ClanHallZone _zone;
-	protected final int _chRate = 604800000;
 	protected boolean _isFree = true;
 	private final Map<Integer, ClanHallFunction> _functions;
 	
@@ -214,7 +212,7 @@ public abstract class ClanHall
 		_ownerId = set.getInt("ownerId");
 		_desc = set.getString("desc");
 		_location = set.getString("location");
-		_functions = new FastMap<>();
+		_functions = new ConcurrentHashMap<>();
 		
 		if (_ownerId > 0)
 		{
@@ -308,11 +306,7 @@ public abstract class ClanHall
 	 */
 	public ClanHallFunction getFunction(int type)
 	{
-		if (_functions.get(type) != null)
-		{
-			return _functions.get(type);
-		}
-		return null;
+		return _functions.get(type);
 	}
 	
 	/**

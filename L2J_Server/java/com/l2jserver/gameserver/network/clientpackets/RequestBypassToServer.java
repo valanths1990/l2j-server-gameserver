@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -23,12 +23,12 @@ import java.util.logging.Level;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
-import com.l2jserver.gameserver.communitybbs.CommunityBoard;
-import com.l2jserver.gameserver.datatables.AdminTable;
+import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.PlayerAction;
 import com.l2jserver.gameserver.handler.AdminCommandHandler;
 import com.l2jserver.gameserver.handler.BypassHandler;
+import com.l2jserver.gameserver.handler.CommunityBoardHandler;
 import com.l2jserver.gameserver.handler.IAdminCommandHandler;
 import com.l2jserver.gameserver.handler.IBypassHandler;
 import com.l2jserver.gameserver.model.L2Object;
@@ -38,11 +38,10 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Hero;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
+import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcManorBypass;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerBypass;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.RequestShowCommunityBoard;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.ConfirmDlg;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
@@ -51,12 +50,12 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * RequestBypassToServer client packet implementation.
- * @author FBIagent
+ * @author HorridoJoho
  */
 public final class RequestBypassToServer extends L2GameClientPacket
 {
 	private static final String _C__23_REQUESTBYPASSTOSERVER = "[C] 23 RequestBypassToServer";
-	// FIXME: This is for compatibility, will be changed when bypass functionallity got an overhaul by Nos
+	// FIXME: This is for compatibility, will be changed when bypass functionality got an overhaul by NosBit
 	private static final String[] _possibleNonHtmlCommands =
 	{
 		"_bbs",
@@ -144,14 +143,14 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					return;
 				}
 				
-				if (!AdminTable.getInstance().hasAccess(command, activeChar.getAccessLevel()))
+				if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel()))
 				{
 					activeChar.sendMessage("You don't have the access rights to use this command!");
 					_log.warning("Character " + activeChar.getName() + " tried to use admin command " + command + ", without proper access level!");
 					return;
 				}
 				
-				if (AdminTable.getInstance().requireConfirm(command))
+				if (AdminData.getInstance().requireConfirm(command))
 				{
 					activeChar.setAdminConfirmCmd(_command);
 					ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.S1);
@@ -168,6 +167,10 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					
 					ach.useAdminCommand(_command, activeChar);
 				}
+			}
+			else if (CommunityBoardHandler.getInstance().isCommunityBoardCommand(_command))
+			{
+				CommunityBoardHandler.getInstance().handleParseCommand(_command, activeChar);
 			}
 			else if (_command.equals("come_here") && activeChar.isGM())
 			{
@@ -224,48 +227,6 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					_log.log(Level.WARNING, "NFE for command [" + _command + "]", nfe);
 				}
 			}
-			else if (_command.startsWith("_bbs"))
-			{
-				if (Config.ENABLE_COMMUNITY_BOARD)
-				{
-					if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), _command)))
-					{
-						activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-					}
-				}
-				else
-				{
-					CommunityBoard.getInstance().handleCommands(getClient(), _command);
-				}
-			}
-			else if (_command.startsWith("bbs"))
-			{
-				if (Config.ENABLE_COMMUNITY_BOARD)
-				{
-					if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), _command)))
-					{
-						activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-					}
-				}
-				else
-				{
-					CommunityBoard.getInstance().handleCommands(getClient(), _command);
-				}
-			}
-			else if (_command.startsWith("_mail"))
-			{
-				if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), "_bbsmail")))
-				{
-					activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-				}
-			}
-			else if (_command.startsWith("_friend"))
-			{
-				if (!CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), "_bbsfriend")))
-				{
-					activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-				}
-			}
 			else if (_command.startsWith("_match"))
 			{
 				String params = _command.substring(_command.indexOf("?") + 1);
@@ -301,31 +262,17 @@ public final class RequestBypassToServer extends L2GameClientPacket
 			}
 			else if (_command.startsWith("manor_menu_select"))
 			{
-				final IBypassHandler handler = BypassHandler.getInstance().getHandler("manor_menu_select");
-				if (handler == null)
+				final L2Npc lastNpc = activeChar.getLastFolkNPC();
+				if (Config.ALLOW_MANOR && (lastNpc != null) && lastNpc.canInteract(activeChar))
 				{
-					_log.warning("Manor menu select handler is not registered!");
-					return;
-				}
-				
-				if (bypassOriginId > 0)
-				{
-					L2Object bypassOrigin = activeChar.getKnownList().getKnownObjects().get(bypassOriginId);
-					if ((bypassOrigin != null) && bypassOrigin.isInstanceTypes(InstanceType.L2Character))
-					{
-						handler.useBypass(_command, activeChar, (L2Character) bypassOrigin);
-					}
-					else
-					{
-						handler.useBypass(_command, activeChar, null);
-					}
-				}
-				else
-				{
-					handler.useBypass(_command, activeChar, null);
+					final String[] split = _command.substring(_command.indexOf("?") + 1).split("&");
+					final int ask = Integer.parseInt(split[0].split("=")[1]);
+					final int state = Integer.parseInt(split[1].split("=")[1]);
+					final boolean time = split[2].split("=")[1].equals("1");
+					EventDispatcher.getInstance().notifyEventAsync(new OnNpcManorBypass(activeChar, lastNpc, ask, state, time), lastNpc);
 				}
 			}
-			else
+			else if (_command.startsWith("_olympiad?command"))
 			{
 				final IBypassHandler handler = BypassHandler.getInstance().getHandler(_command);
 				if (handler != null)

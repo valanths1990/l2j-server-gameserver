@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -35,12 +35,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
-
-import javolution.util.FastMap;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -62,14 +61,12 @@ public class LoginController
 	public static final int LOGIN_TIMEOUT = 60 * 1000;
 	
 	/** Authed Clients on LoginServer */
-	protected FastMap<String, L2LoginClient> _loginServerClients = new FastMap<String, L2LoginClient>().shared();
+	protected Map<String, L2LoginClient> _loginServerClients = new ConcurrentHashMap<>();
 	
 	private final Map<InetAddress, Integer> _failedLoginAttemps = new HashMap<>();
-	private final Map<InetAddress, Long> _bannedIps = new FastMap<InetAddress, Long>().shared();
+	private final Map<InetAddress, Long> _bannedIps = new ConcurrentHashMap<>();
 	
 	protected ScrambledKeyPair[] _keyPairs;
-	
-	private final Thread _purge;
 	
 	protected byte[][] _blowfishKeys;
 	private static final int BLOWFISH_KEYS = 20;
@@ -107,9 +104,9 @@ public class LoginController
 		// Store keys for blowfish communication
 		generateBlowFishKeys();
 		
-		_purge = new PurgeThread();
-		_purge.setDaemon(true);
-		_purge.start();
+		Thread purge = new PurgeThread();
+		purge.setDaemon(true);
+		purge.start();
 	}
 	
 	/**
@@ -330,21 +327,21 @@ public class LoginController
 		_bannedIps.putIfAbsent(address, System.currentTimeMillis() + duration);
 	}
 	
-	public boolean isBannedAddress(InetAddress address)
+	public boolean isBannedAddress(InetAddress address) throws UnknownHostException
 	{
 		String[] parts = address.getHostAddress().split("\\.");
 		Long bi = _bannedIps.get(address);
 		if (bi == null)
 		{
-			bi = _bannedIps.get(parts[0] + "." + parts[1] + "." + parts[2] + ".0");
+			bi = _bannedIps.get(InetAddress.getByName(parts[0] + "." + parts[1] + "." + parts[2] + ".0"));
 		}
 		if (bi == null)
 		{
-			bi = _bannedIps.get(parts[0] + "." + parts[1] + ".0.0");
+			bi = _bannedIps.get(InetAddress.getByName(parts[0] + "." + parts[1] + ".0.0"));
 		}
 		if (bi == null)
 		{
-			bi = _bannedIps.get(parts[0] + ".0.0.0");
+			bi = _bannedIps.get(InetAddress.getByName(parts[0] + ".0.0.0"));
 		}
 		if (bi != null)
 		{
@@ -371,7 +368,7 @@ public class LoginController
 	 */
 	public boolean removeBanForAddress(InetAddress address)
 	{
-		return _bannedIps.remove(address.getHostAddress()) != null;
+		return _bannedIps.remove(address) != null;
 	}
 	
 	/**

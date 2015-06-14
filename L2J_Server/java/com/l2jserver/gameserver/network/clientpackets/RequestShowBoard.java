@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -19,14 +19,11 @@
 package com.l2jserver.gameserver.network.clientpackets;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.communitybbs.CommunityBoard;
-import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.communityserver.CommunityServerThread;
-import com.l2jserver.gameserver.network.communityserver.writepackets.RequestShowCommunityBoard;
+import com.l2jserver.gameserver.handler.CommunityBoardHandler;
 
 /**
- * packet type id 0x57 sample 57 01 00 00 00 // unknown (always 1?) format: cd
+ * RequestShowBoard client packet implementation.
+ * @author Zoey76
  */
 public final class RequestShowBoard extends L2GameClientPacket
 {
@@ -44,28 +41,7 @@ public final class RequestShowBoard extends L2GameClientPacket
 	@Override
 	protected void runImpl()
 	{
-		if (Config.ENABLE_COMMUNITY_BOARD)
-		{
-			L2PcInstance activeChar = getClient().getActiveChar();
-			
-			if (activeChar == null)
-			{
-				return;
-			}
-			
-			if (CommunityServerThread.getInstance().isAuthed())
-			{
-				CommunityServerThread.getInstance().sendPacket(new RequestShowCommunityBoard(activeChar.getObjectId(), "_bbshome"), true);
-			}
-			else
-			{
-				activeChar.sendPacket(SystemMessageId.CB_OFFLINE);
-			}
-		}
-		else
-		{
-			CommunityBoard.getInstance().handleCommands(getClient(), Config.BBS_DEFAULT);
-		}
+		CommunityBoardHandler.getInstance().handleParseCommand(Config.BBS_DEFAULT, getActiveChar());
 	}
 	
 	@Override

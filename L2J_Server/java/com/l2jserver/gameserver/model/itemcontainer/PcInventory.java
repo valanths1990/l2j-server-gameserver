@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -21,11 +21,10 @@ package com.l2jserver.gameserver.model.itemcontainer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javolution.util.FastList;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -128,7 +127,7 @@ public class PcInventory extends Inventory
 	
 	public L2ItemInstance[] getUniqueItems(boolean allowAdena, boolean allowAncientAdena, boolean onlyAvailable)
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item == null)
@@ -157,11 +156,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -177,7 +172,7 @@ public class PcInventory extends Inventory
 	
 	public L2ItemInstance[] getUniqueItemsByEnchantLevel(boolean allowAdena, boolean allowAncientAdena, boolean onlyAvailable)
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item == null)
@@ -208,11 +203,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -232,7 +223,7 @@ public class PcInventory extends Inventory
 	 */
 	public L2ItemInstance[] getAllItemsByItemId(int itemId, boolean includeEquipped)
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item == null)
@@ -245,11 +236,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -271,7 +258,7 @@ public class PcInventory extends Inventory
 	 */
 	public L2ItemInstance[] getAllItemsByItemId(int itemId, int enchantment, boolean includeEquipped)
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if (item == null)
@@ -284,11 +271,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -299,7 +282,7 @@ public class PcInventory extends Inventory
 	 */
 	public L2ItemInstance[] getAvailableItems(boolean allowAdena, boolean allowNonTradeable, boolean feightable)
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item == null) || !item.isAvailable(getOwner(), allowAdena, allowNonTradeable) || !canManipulateWithItemId(item.getId()))
@@ -318,11 +301,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -331,7 +310,7 @@ public class PcInventory extends Inventory
 	 */
 	public L2ItemInstance[] getAugmentedItems()
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item != null) && item.isAugmented())
@@ -339,11 +318,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -352,7 +327,7 @@ public class PcInventory extends Inventory
 	 */
 	public L2ItemInstance[] getElementItems()
 	{
-		FastList<L2ItemInstance> list = FastList.newInstance();
+		List<L2ItemInstance> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item != null) && (item.getElementals() != null))
@@ -360,11 +335,7 @@ public class PcInventory extends Inventory
 				list.add(item);
 			}
 		}
-		
-		L2ItemInstance[] result = list.toArray(new L2ItemInstance[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new L2ItemInstance[list.size()]);
 	}
 	
 	/**
@@ -374,7 +345,7 @@ public class PcInventory extends Inventory
 	 */
 	public TradeItem[] getAvailableItems(TradeList tradeList)
 	{
-		FastList<TradeItem> list = FastList.newInstance();
+		List<TradeItem> list = new LinkedList<>();
 		for (L2ItemInstance item : _items)
 		{
 			if ((item != null) && item.isAvailable(getOwner(), false, false))
@@ -386,11 +357,7 @@ public class PcInventory extends Inventory
 				}
 			}
 		}
-		
-		TradeItem[] result = list.toArray(new TradeItem[list.size()]);
-		FastList.recycle(list);
-		
-		return result;
+		return list.toArray(new TradeItem[list.size()]);
 	}
 	
 	/**
@@ -539,40 +506,41 @@ public class PcInventory extends Inventory
 	@Override
 	public L2ItemInstance addItem(String process, int itemId, long count, L2PcInstance actor, Object reference)
 	{
-		L2ItemInstance item = super.addItem(process, itemId, count, actor, reference);
-		
-		if ((item != null) && (item.getId() == ADENA_ID) && !item.equals(_adena))
+		final L2ItemInstance item = super.addItem(process, itemId, count, actor, reference);
+		if (item != null)
 		{
-			_adena = item;
-		}
-		
-		if ((item != null) && (item.getId() == ANCIENT_ADENA_ID) && !item.equals(_ancientAdena))
-		{
-			_ancientAdena = item;
-		}
-		if ((item != null) && (actor != null))
-		{
-			// Send inventory update packet
-			if (!Config.FORCE_INVENTORY_UPDATE)
+			if ((item.getId() == ADENA_ID) && !item.equals(_adena))
 			{
-				InventoryUpdate playerIU = new InventoryUpdate();
-				playerIU.addItem(item);
-				actor.sendPacket(playerIU);
-			}
-			else
-			{
-				actor.sendPacket(new ItemList(actor, false));
+				_adena = item;
 			}
 			
-			// Update current load as well
-			StatusUpdate su = new StatusUpdate(actor);
-			su.addAttribute(StatusUpdate.CUR_LOAD, actor.getCurrentLoad());
-			actor.sendPacket(su);
-			
-			// Notify to scripts
-			EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemAdd(actor, item), item.getItem());
+			if ((item.getId() == ANCIENT_ADENA_ID) && !item.equals(_ancientAdena))
+			{
+				_ancientAdena = item;
+			}
+			if (actor != null)
+			{
+				// Send inventory update packet
+				if (!Config.FORCE_INVENTORY_UPDATE)
+				{
+					InventoryUpdate playerIU = new InventoryUpdate();
+					playerIU.addItem(item);
+					actor.sendPacket(playerIU);
+				}
+				else
+				{
+					actor.sendPacket(new ItemList(actor, false));
+				}
+				
+				// Update current load as well
+				StatusUpdate su = new StatusUpdate(actor);
+				su.addAttribute(StatusUpdate.CUR_LOAD, actor.getCurrentLoad());
+				actor.sendPacket(su);
+				
+				// Notify to scripts
+				EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemAdd(actor, item), item.getItem());
+			}
 		}
-		
 		return item;
 	}
 	
@@ -617,7 +585,7 @@ public class PcInventory extends Inventory
 	@Override
 	public L2ItemInstance destroyItem(String process, L2ItemInstance item, L2PcInstance actor, Object reference)
 	{
-		return this.destroyItem(process, item, item.getCount(), actor, reference);
+		return destroyItem(process, item, item.getCount(), actor, reference);
 	}
 	
 	/**

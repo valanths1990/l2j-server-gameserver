@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -28,22 +28,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.datatables.NpcData;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.SpawnTable;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.holders.PlayerEventHolder;
 import com.l2jserver.gameserver.network.serverpackets.CharInfo;
 import com.l2jserver.gameserver.network.serverpackets.ExBrExtraUserInfo;
@@ -52,7 +50,8 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
 
 /**
- * @since $Revision: 1.3.4.1 $ $Date: 2005/03/27 15:29:32 $ This ancient thingie got reworked by Nik at $Date: 2011/05/17 21:51:39 $ Yeah, for 6 years no one bothered reworking this buggy event engine.
+ * @author Nik
+ * @Since 2011/05/17 21:51:39
  */
 public class L2Event
 {
@@ -62,12 +61,11 @@ public class L2Event
 	public static String _eventCreator = "";
 	public static String _eventInfo = "";
 	public static int _teamsNumber = 0;
-	public static final Map<Integer, String> _teamNames = new FastMap<>();
-	public static final List<L2PcInstance> _registeredPlayers = new FastList<>();
-	public static final Map<Integer, List<L2PcInstance>> _teams = new FastMap<>();
+	public static final Map<Integer, String> _teamNames = new ConcurrentHashMap<>();
+	public static final List<L2PcInstance> _registeredPlayers = new CopyOnWriteArrayList<>();
+	public static final Map<Integer, List<L2PcInstance>> _teams = new ConcurrentHashMap<>();
 	public static int _npcId = 0;
-	// public static final List<L2Npc> _npcs = new FastList<L2Npc>();
-	private static final Map<L2PcInstance, PlayerEventHolder> _connectionLossData = new FastMap<>();
+	private static final Map<L2PcInstance, PlayerEventHolder> _connectionLossData = new ConcurrentHashMap<>();
 	
 	public enum EventState
 	{
@@ -168,13 +166,9 @@ public class L2Event
 	 */
 	public static void spawnEventNpc(L2PcInstance target)
 	{
-		
-		L2NpcTemplate template = NpcData.getInstance().getTemplate(_npcId);
-		
 		try
 		{
-			L2Spawn spawn = new L2Spawn(template);
-			
+			final L2Spawn spawn = new L2Spawn(_npcId);
 			spawn.setX(target.getX() + 50);
 			spawn.setY(target.getY() + 50);
 			spawn.setZ(target.getZ());
@@ -387,7 +381,7 @@ public class L2Event
 				_eventInfo = br.readLine();
 			}
 			
-			List<L2PcInstance> temp = new FastList<>();
+			List<L2PcInstance> temp = new LinkedList<>();
 			for (L2PcInstance player : L2World.getInstance().getPlayers())
 			{
 				if (!player.isOnline())
@@ -445,7 +439,7 @@ public class L2Event
 			// Insert empty lists at _teams.
 			for (int i = 0; i < _teamsNumber; i++)
 			{
-				_teams.put(i + 1, new FastList<L2PcInstance>());
+				_teams.put(i + 1, new CopyOnWriteArrayList<L2PcInstance>());
 			}
 			
 			int i = 0;
@@ -545,7 +539,7 @@ public class L2Event
 	{
 		final List<Entry<L2PcInstance, Integer>> list = new LinkedList<>(unsortMap.entrySet());
 		
-		list.sort(Comparator.comparing(Entry<L2PcInstance, Integer>::getValue));
+		list.sort(Comparator.comparing(Entry::getValue));
 		
 		final Map<L2PcInstance, Integer> sortedMap = new LinkedHashMap<>();
 		for (Entry<L2PcInstance, Integer> entry : list)

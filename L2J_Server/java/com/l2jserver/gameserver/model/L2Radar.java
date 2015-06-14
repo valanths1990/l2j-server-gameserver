@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,7 +18,8 @@
  */
 package com.l2jserver.gameserver.model;
 
-import javolution.util.FastList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.serverpackets.RadarControl;
@@ -29,12 +30,11 @@ import com.l2jserver.gameserver.network.serverpackets.RadarControl;
 public final class L2Radar
 {
 	private final L2PcInstance _player;
-	private final FastList<RadarMarker> _markers;
+	private final List<RadarMarker> _markers = new CopyOnWriteArrayList<>();
 	
 	public L2Radar(L2PcInstance player)
 	{
 		_player = player;
-		_markers = new FastList<>();
 	}
 	
 	// Add a marker to player's radar

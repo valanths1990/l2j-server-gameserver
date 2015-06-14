@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,7 +22,10 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
@@ -31,6 +34,7 @@ import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.NpcPersonalAIData;
 import com.l2jserver.gameserver.enums.AISkillScope;
@@ -54,10 +58,8 @@ import com.l2jserver.gameserver.model.L2WorldRegion;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2ClanHallManagerInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2DoormenInstance;
-import com.l2jserver.gameserver.model.actor.instance.L2FestivalGuideInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2FishermanInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2MerchantInstance;
-import com.l2jserver.gameserver.model.actor.instance.L2NpcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2TeleporterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2TrainerInstance;
@@ -75,6 +77,7 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcCanBeSeen;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcEventReceived;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillFinished;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSpawn;
+import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcTeleport;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.items.L2Item;
@@ -127,7 +130,7 @@ public class L2Npc extends L2Character
 	/** Time of last social packet broadcast */
 	private long _lastSocialBroadcast = 0;
 	/** Minimum interval between social packets */
-	private final int _minimalSocialInterval = 6000;
+	private static final int MINIMUM_SOCIAL_INTERVAL = 6000;
 	/** Support for random animation switching */
 	private boolean _isRandomAnimationEnabled = true;
 	private boolean _isTalking = true;
@@ -145,6 +148,41 @@ public class L2Npc extends L2Character
 	
 	private int _shotsMask = 0;
 	private int _killingBlowWeaponId;
+	/** Map of summoned NPCs by this NPC. */
+	private volatile Map<Integer, L2Npc> _summonedNpcs = null;
+	
+	/**
+	 * Creates a NPC.
+	 * @param template the NPC template
+	 */
+	public L2Npc(L2NpcTemplate template)
+	{
+		// Call the L2Character constructor to set the _template of the L2Character, copy skills from template to object
+		// and link _calculators to NPC_STD_CALCULATOR
+		super(template);
+		setInstanceType(InstanceType.L2Npc);
+		initCharStatusUpdateValues();
+		
+		// initialize the "current" equipment
+		_currentLHandId = getTemplate().getLHandId();
+		_currentRHandId = getTemplate().getRHandId();
+		_currentEnchant = Config.ENABLE_RANDOM_ENCHANT_EFFECT ? Rnd.get(4, 21) : getTemplate().getWeaponEnchant();
+		
+		// initialize the "current" collisions
+		_currentCollisionHeight = getTemplate().getfCollisionHeight();
+		_currentCollisionRadius = getTemplate().getfCollisionRadius();
+		
+		setIsFlying(template.isFlying());
+	}
+	
+	/**
+	 * Creates a NPC.
+	 * @param npcId the NPC ID
+	 */
+	public L2Npc(int npcId)
+	{
+		this(NpcData.getInstance().getTemplate(npcId));
+	}
 	
 	public int getSoulShotChance()
 	{
@@ -364,7 +402,7 @@ public class L2Npc extends L2Character
 	{
 		// Send a packet SocialAction to all L2PcInstance in the _KnownPlayers of the L2NpcInstance
 		long now = System.currentTimeMillis();
-		if ((now - _lastSocialBroadcast) > _minimalSocialInterval)
+		if ((now - _lastSocialBroadcast) > MINIMUM_SOCIAL_INTERVAL)
 		{
 			_lastSocialBroadcast = now;
 			broadcastPacket(new SocialAction(getObjectId(), animationId));
@@ -415,35 +453,6 @@ public class L2Npc extends L2Character
 	public boolean isRandomAnimationEnabled()
 	{
 		return _isRandomAnimationEnabled;
-	}
-	
-	/**
-	 * Constructor of L2NpcInstance (use L2Character constructor).<br>
-	 * <B><U>Actions</U>:</B>
-	 * <ul>
-	 * <li>Call the L2Character constructor to set the _template of the L2Character (copy skills from template to object and link _calculators to NPC_STD_CALCULATOR)</li>
-	 * <li>Set the name of the L2Character</li>
-	 * <li>Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it</li>
-	 * </ul>
-	 * @param objectId Identifier of the object to initialized
-	 * @param template The L2NpcTemplate to apply to the NPC
-	 */
-	public L2Npc(int objectId, L2NpcTemplate template)
-	{
-		// Call the L2Character constructor to set the _template of the L2Character, copy skills from template to object
-		// and link _calculators to NPC_STD_CALCULATOR
-		super(objectId, template);
-		setInstanceType(InstanceType.L2Npc);
-		initCharStatusUpdateValues();
-		
-		// initialize the "current" equipment
-		_currentLHandId = getTemplate().getLHandId();
-		_currentRHandId = getTemplate().getRHandId();
-		_currentEnchant = Config.ENABLE_RANDOM_ENCHANT_EFFECT ? Rnd.get(4, 21) : getTemplate().getWeaponEnchant();
-		
-		// initialize the "current" collisions
-		_currentCollisionHeight = getTemplate().getfCollisionHeight();
-		_currentCollisionRadius = getTemplate().getfCollisionRadius();
 	}
 	
 	@Override
@@ -569,53 +578,6 @@ public class L2Npc extends L2Character
 		}
 	}
 	
-	/**
-	 * <B><U>Values </U>:</B>
-	 * <ul>
-	 * <li>object is a L2FolkInstance : 0 (don't remember it)</li>
-	 * <li>object is a L2Character : 0 (don't remember it)</li>
-	 * <li>object is a L2Playable : 1500</li>
-	 * <li>others : 500</li>
-	 * <ul>
-	 * @param object The Object to add to _knownObject
-	 * @return the distance under which the object must be add to _knownObject in function of the object type.
-	 */
-	public int getDistanceToWatchObject(L2Object object)
-	{
-		if (object instanceof L2FestivalGuideInstance)
-		{
-			return 10000;
-		}
-		
-		if ((object instanceof L2NpcInstance) || !(object instanceof L2Character))
-		{
-			return 0;
-		}
-		
-		if (object instanceof L2Playable)
-		{
-			return 1500;
-		}
-		
-		return 500;
-	}
-	
-	/**
-	 * <B><U>Values</U>:</B>
-	 * <ul>
-	 * <li>object is not a L2Character : 0 (don't remember it)</li>
-	 * <li>object is a L2FolkInstance : 0 (don't remember it)</li>
-	 * <li>object is a L2Playable : 3000</li>
-	 * <li>others : 1000</li>
-	 * </ul>
-	 * @param object The Object to remove from _knownObject
-	 * @return the distance after which the object must be remove from _knownObject in function of the object type.
-	 */
-	public int getDistanceToForgetObject(L2Object object)
-	{
-		return 2 * getDistanceToWatchObject(object);
-	}
-	
 	public boolean isEventMob()
 	{
 		return _eventMob;
@@ -722,27 +684,27 @@ public class L2Npc extends L2Character
 		{
 			return false;
 		}
-		if (player.isDead() || player.isFakeDeath())
+		else if (player.isDead() || player.isFakeDeath())
 		{
 			return false;
 		}
-		if (player.isSitting())
+		else if (player.isSitting())
 		{
 			return false;
 		}
-		if (player.getPrivateStoreType() != PrivateStoreType.NONE)
+		else if (player.getPrivateStoreType() != PrivateStoreType.NONE)
 		{
 			return false;
 		}
-		if (!isInsideRadius(player, INTERACTION_DISTANCE, true, false))
+		else if (!isInsideRadius(player, INTERACTION_DISTANCE, true, false))
 		{
 			return false;
 		}
-		if ((player.getInstanceId() != getInstanceId()) && (player.getInstanceId() != -1))
+		else if ((player.getInstanceId() != getInstanceId()) && (player.getInstanceId() != -1))
 		{
 			return false;
 		}
-		if (isBusy())
+		else if (isBusy())
 		{
 			return false;
 		}
@@ -1392,7 +1354,14 @@ public class L2Npc extends L2Character
 		_spiritshotamount = getTemplate().getSpiritShot();
 		_killingBlowWeaponId = 0;
 		
-		EventDispatcher.getInstance().notifyEventAsync(new OnNpcSpawn(this, isTeleporting()), this);
+		if (isTeleporting())
+		{
+			EventDispatcher.getInstance().notifyEventAsync(new OnNpcTeleport(this), this);
+		}
+		else
+		{
+			EventDispatcher.getInstance().notifyEventAsync(new OnNpcSpawn(this), this);
+		}
 		
 		if (!isTeleporting())
 		{
@@ -1431,6 +1400,13 @@ public class L2Npc extends L2Character
 		
 		// Notify Walking Manager
 		WalkingManager.getInstance().onDeath(this);
+		
+		// Removes itself from the summoned list.
+		final L2Character summoner = getSummoner();
+		if ((summoner != null) && summoner.isNpc())
+		{
+			((L2Npc) summoner).removeSummonedNpc(getObjectId());
+		}
 	}
 	
 	/**
@@ -1447,8 +1423,6 @@ public class L2Npc extends L2Character
 	@Override
 	public boolean deleteMe()
 	{
-		L2WorldRegion oldRegion = getWorldRegion();
-		
 		try
 		{
 			onDecay();
@@ -1463,6 +1437,7 @@ public class L2Npc extends L2Character
 			getSkillChannelized().abortChannelization();
 		}
 		
+		final L2WorldRegion oldRegion = getWorldRegion();
 		if (oldRegion != null)
 		{
 			oldRegion.removeFromZones(this);
@@ -1636,20 +1611,14 @@ public class L2Npc extends L2Character
 	
 	public L2Npc scheduleDespawn(long delay)
 	{
-		ThreadPoolManager.getInstance().scheduleGeneral(new DespawnTask(), delay);
-		return this;
-	}
-	
-	protected class DespawnTask implements Runnable
-	{
-		@Override
-		public void run()
+		ThreadPoolManager.getInstance().scheduleGeneral(() ->
 		{
 			if (!isDecayed())
 			{
 				deleteMe();
 			}
-		}
+		}, delay);
+		return this;
 	}
 	
 	@Override
@@ -1689,6 +1658,408 @@ public class L2Npc extends L2Character
 	public int getColorEffect()
 	{
 		return 0;
+	}
+	
+	@Override
+	public boolean isNpc()
+	{
+		return true;
+	}
+	
+	@Override
+	public void setTeam(Team team)
+	{
+		super.setTeam(team);
+		broadcastInfo();
+	}
+	
+	/**
+	 * @return {@code true} if this L2Npc is registered in WalkingManager
+	 */
+	@Override
+	public boolean isWalker()
+	{
+		return WalkingManager.getInstance().isRegistered(this);
+	}
+	
+	@Override
+	public boolean isChargedShot(ShotType type)
+	{
+		return (_shotsMask & type.getMask()) == type.getMask();
+	}
+	
+	@Override
+	public void setChargedShot(ShotType type, boolean charged)
+	{
+		if (charged)
+		{
+			_shotsMask |= type.getMask();
+		}
+		else
+		{
+			_shotsMask &= ~type.getMask();
+		}
+	}
+	
+	@Override
+	public void rechargeShots(boolean physical, boolean magic)
+	{
+		if ((_soulshotamount > 0) || (_spiritshotamount > 0))
+		{
+			if (physical)
+			{
+				if (_soulshotamount == 0)
+				{
+					return;
+				}
+				else if (Rnd.get(100) > getSoulShotChance())
+				{
+					return;
+				}
+				_soulshotamount--;
+				Broadcast.toSelfAndKnownPlayersInRadius(this, new MagicSkillUse(this, this, 2154, 1, 0, 0), 600);
+				setChargedShot(ShotType.SOULSHOTS, true);
+			}
+			if (magic)
+			{
+				if (_spiritshotamount == 0)
+				{
+					return;
+				}
+				else if (Rnd.get(100) > getSpiritShotChance())
+				{
+					return;
+				}
+				_spiritshotamount--;
+				Broadcast.toSelfAndKnownPlayersInRadius(this, new MagicSkillUse(this, this, 2061, 1, 0, 0), 600);
+				setChargedShot(ShotType.SPIRITSHOTS, true);
+			}
+		}
+	}
+	
+	/**
+	 * Short wrapper for backward compatibility
+	 * @return stored script value
+	 */
+	public int getScriptValue()
+	{
+		return getVariables().getInt("SCRIPT_VAL");
+	}
+	
+	/**
+	 * Short wrapper for backward compatibility. Stores script value
+	 * @param val value to store
+	 */
+	public void setScriptValue(int val)
+	{
+		getVariables().set("SCRIPT_VAL", val);
+	}
+	
+	/**
+	 * Short wrapper for backward compatibility.
+	 * @param val value to store
+	 * @return {@code true} if stored script value equals given value, {@code false} otherwise
+	 */
+	public boolean isScriptValue(int val)
+	{
+		return getVariables().getInt("SCRIPT_VAL") == val;
+	}
+	
+	/**
+	 * @param paramName the parameter name to check
+	 * @return given AI parameter value
+	 */
+	public int getAIValue(final String paramName)
+	{
+		return hasAIValue(paramName) ? NpcPersonalAIData.getInstance().getAIValue(getSpawn().getName(), paramName) : -1;
+	}
+	
+	/**
+	 * @param paramName the parameter name to check
+	 * @return {@code true} if given parameter is set for NPC, {@code false} otherwise
+	 */
+	public boolean hasAIValue(final String paramName)
+	{
+		return (getSpawn() != null) && (getSpawn().getName() != null) && NpcPersonalAIData.getInstance().hasAIValue(getSpawn().getName(), paramName);
+	}
+	
+	/**
+	 * @param npc NPC to check
+	 * @return {@code true} if both given NPC and this NPC is in the same spawn group, {@code false} otherwise
+	 */
+	public boolean isInMySpawnGroup(L2Npc npc)
+	{
+		return ((getSpawn() != null) && (npc.getSpawn() != null) && (getSpawn().getName() != null) && (getSpawn().getName().equals(npc.getSpawn().getName())));
+	}
+	
+	/**
+	 * @return {@code true} if NPC currently located in own spawn point, {@code false} otherwise
+	 */
+	public boolean staysInSpawnLoc()
+	{
+		return ((getSpawn() != null) && (getSpawn().getX(this) == getX()) && (getSpawn().getY(this) == getY()));
+	}
+	
+	/**
+	 * @return {@code true} if {@link NpcVariables} instance is attached to current player's scripts, {@code false} otherwise.
+	 */
+	public boolean hasVariables()
+	{
+		return getScript(NpcVariables.class) != null;
+	}
+	
+	/**
+	 * @return {@link NpcVariables} instance containing parameters regarding NPC.
+	 */
+	public NpcVariables getVariables()
+	{
+		final NpcVariables vars = getScript(NpcVariables.class);
+		return vars != null ? vars : addScript(new NpcVariables());
+	}
+	
+	/**
+	 * Send an "event" to all NPC's within given radius
+	 * @param eventName - name of event
+	 * @param radius - radius to send event
+	 * @param reference - L2Object to pass, if needed
+	 */
+	public void broadcastEvent(String eventName, int radius, L2Object reference)
+	{
+		for (L2Object obj : L2World.getInstance().getVisibleObjects(this, radius))
+		{
+			if (obj.isNpc() && obj.hasListener(EventType.ON_NPC_EVENT_RECEIVED))
+			{
+				EventDispatcher.getInstance().notifyEventAsync(new OnNpcEventReceived(eventName, this, (L2Npc) obj, reference), obj);
+			}
+		}
+	}
+	
+	/**
+	 * Sends an event to a given object.
+	 * @param eventName the event name
+	 * @param receiver the receiver
+	 * @param reference the reference
+	 */
+	public void sendScriptEvent(String eventName, L2Object receiver, L2Object reference)
+	{
+		EventDispatcher.getInstance().notifyEventAsync(new OnNpcEventReceived(eventName, this, (L2Npc) receiver, reference), receiver);
+	}
+	
+	/**
+	 * Gets point in range between radiusMin and radiusMax from this NPC
+	 * @param radiusMin miminal range from NPC (not closer than)
+	 * @param radiusMax maximal range from NPC (not further than)
+	 * @return Location in given range from this NPC
+	 */
+	public Location getPointInRange(int radiusMin, int radiusMax)
+	{
+		if ((radiusMax == 0) || (radiusMax < radiusMin))
+		{
+			return new Location(getX(), getY(), getZ());
+		}
+		
+		final int radius = Rnd.get(radiusMin, radiusMax);
+		final double angle = Rnd.nextDouble() * 2 * Math.PI;
+		
+		return new Location((int) (getX() + (radius * Math.cos(angle))), (int) (getY() + (radius * Math.sin(angle))), getZ());
+	}
+	
+	/**
+	 * Drops an item.
+	 * @param player the last attacker or main damage dealer
+	 * @param itemId the item ID
+	 * @param itemCount the item count
+	 * @return the dropped item
+	 */
+	public L2ItemInstance dropItem(L2PcInstance player, int itemId, long itemCount)
+	{
+		L2ItemInstance item = null;
+		for (int i = 0; i < itemCount; i++)
+		{
+			// Randomize drop position.
+			final int newX = (getX() + Rnd.get((RANDOM_ITEM_DROP_LIMIT * 2) + 1)) - RANDOM_ITEM_DROP_LIMIT;
+			final int newY = (getY() + Rnd.get((RANDOM_ITEM_DROP_LIMIT * 2) + 1)) - RANDOM_ITEM_DROP_LIMIT;
+			final int newZ = getZ() + 20;
+			
+			if (ItemTable.getInstance().getTemplate(itemId) == null)
+			{
+				_log.log(Level.SEVERE, "Item doesn't exist so cannot be dropped. Item ID: " + itemId + " Quest: " + getName());
+				return null;
+			}
+			
+			item = ItemTable.getInstance().createItem("Loot", itemId, itemCount, player, this);
+			if (item == null)
+			{
+				return null;
+			}
+			
+			if (player != null)
+			{
+				item.getDropProtection().protect(player);
+			}
+			
+			item.dropMe(this, newX, newY, newZ);
+			
+			// Add drop to auto destroy item task.
+			if (!Config.LIST_PROTECTED_ITEMS.contains(itemId))
+			{
+				if (((Config.AUTODESTROY_ITEM_AFTER > 0) && !item.getItem().hasExImmediateEffect()) || ((Config.HERB_AUTO_DESTROY_TIME > 0) && item.getItem().hasExImmediateEffect()))
+				{
+					ItemsAutoDestroy.getInstance().addItem(item);
+				}
+			}
+			item.setProtected(false);
+			
+			// If stackable, end loop as entire count is included in 1 instance of item.
+			if (item.isStackable() || !Config.MULTIPLE_ITEM_DROP)
+			{
+				break;
+			}
+		}
+		return item;
+	}
+	
+	/**
+	 * Method overload for {@link L2Attackable#dropItem(L2PcInstance, int, long)}
+	 * @param player the last attacker or main damage dealer
+	 * @param item the item holder
+	 * @return the dropped item
+	 */
+	public L2ItemInstance dropItem(L2PcInstance player, ItemHolder item)
+	{
+		return dropItem(player, item.getId(), item.getCount());
+	}
+	
+	@Override
+	public final String getName()
+	{
+		return getTemplate().getName();
+	}
+	
+	@Override
+	public boolean isVisibleFor(L2PcInstance player)
+	{
+		if (hasListener(EventType.ON_NPC_CAN_BE_SEEN))
+		{
+			final TerminateReturn term = EventDispatcher.getInstance().notifyEvent(new OnNpcCanBeSeen(this, player), this, TerminateReturn.class);
+			if (term != null)
+			{
+				return term.terminate();
+			}
+		}
+		return super.isVisibleFor(player);
+	}
+	
+	/**
+	 * Sets if the players can talk with this npc or not
+	 * @param val {@code true} if the players can talk, {@code false} otherwise
+	 */
+	public void setTalking(boolean val)
+	{
+		_isTalking = val;
+	}
+	
+	/**
+	 * Checks if the players can talk to this npc.
+	 * @return {@code true} if the players can talk, {@code false} otherwise.
+	 */
+	public boolean isTalking()
+	{
+		return _isTalking;
+	}
+	
+	/**
+	 * Sets the weapon id with which this npc was killed.
+	 * @param weaponId
+	 */
+	public void setKillingBlowWeapon(int weaponId)
+	{
+		_killingBlowWeaponId = weaponId;
+	}
+	
+	/**
+	 * @return the id of the weapon with which player killed this npc.
+	 */
+	public int getKillingBlowWeapon()
+	{
+		return _killingBlowWeaponId;
+	}
+	
+	/**
+	 * Adds a summoned NPC.
+	 * @param npc the summoned NPC
+	 */
+	public final void addSummonedNpc(L2Npc npc)
+	{
+		if (_summonedNpcs == null)
+		{
+			synchronized (this)
+			{
+				if (_summonedNpcs == null)
+				{
+					_summonedNpcs = new ConcurrentHashMap<>();
+				}
+			}
+		}
+		
+		_summonedNpcs.put(npc.getObjectId(), npc);
+		
+		npc.setSummoner(this);
+	}
+	
+	/**
+	 * Removes a summoned NPC by object ID.
+	 * @param objectId the summoned NPC object ID
+	 */
+	public final void removeSummonedNpc(int objectId)
+	{
+		if (_summonedNpcs != null)
+		{
+			_summonedNpcs.remove(objectId);
+		}
+	}
+	
+	/**
+	 * Gets the summoned NPCs.
+	 * @return the summoned NPCs
+	 */
+	public final Collection<L2Npc> getSummonedNpcs()
+	{
+		return _summonedNpcs != null ? _summonedNpcs.values() : Collections.<L2Npc> emptyList();
+	}
+	
+	/**
+	 * Gets the summoned NPC by object ID.
+	 * @param objectId the summoned NPC object ID
+	 * @return the summoned NPC
+	 */
+	public final L2Npc getSummonedNpc(int objectId)
+	{
+		if (_summonedNpcs != null)
+		{
+			return _summonedNpcs.get(objectId);
+		}
+		return null;
+	}
+	
+	/**
+	 * Gets the summoned NPC count.
+	 * @return the summoned NPC count
+	 */
+	public final int getSummonedNpcCount()
+	{
+		return _summonedNpcs != null ? _summonedNpcs.size() : 0;
+	}
+	
+	/**
+	 * Resets the summoned NPCs list.
+	 */
+	public final void resetSummonedNpcs()
+	{
+		if (_summonedNpcs != null)
+		{
+			_summonedNpcs.clear();
+		}
 	}
 	
 	@Override

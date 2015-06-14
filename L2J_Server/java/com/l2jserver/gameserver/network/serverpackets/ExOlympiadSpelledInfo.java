@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -53,8 +53,8 @@ public class ExOlympiadSpelledInfo extends L2GameServerPacket
 		{
 			if ((info != null) && info.isInUse())
 			{
-				writeD(info.getSkill().getId());
-				writeH(info.getSkill().getLevel());
+				writeD(info.getSkill().getDisplayId());
+				writeH(info.getSkill().getDisplayLevel());
 				writeD(info.getTime());
 			}
 		}

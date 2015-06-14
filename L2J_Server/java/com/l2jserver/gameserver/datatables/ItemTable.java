@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -22,6 +22,7 @@ import static com.l2jserver.gameserver.model.itemcontainer.Inventory.ADENA_ID;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -29,11 +30,10 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javolution.util.FastMap;
-
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.data.xml.impl.EnchantItemHPBonusData;
 import com.l2jserver.gameserver.engines.DocumentEngine;
 import com.l2jserver.gameserver.enums.ItemLocation;
 import com.l2jserver.gameserver.idfactory.IdFactory;
@@ -56,54 +56,54 @@ import com.l2jserver.gameserver.util.GMAudit;
  */
 public class ItemTable
 {
-	private static Logger _log = Logger.getLogger(ItemTable.class.getName());
-	private static Logger _logItems = Logger.getLogger("item");
+	private static Logger LOGGER = Logger.getLogger(ItemTable.class.getName());
+	private static Logger LOGGER_ITEMS = Logger.getLogger("item");
 	
-	public static final Map<String, Integer> _slots = new FastMap<>();
+	public static final Map<String, Integer> SLOTS = new HashMap<>();
 	
 	private L2Item[] _allTemplates;
-	private final Map<Integer, L2EtcItem> _etcItems;
-	private final Map<Integer, L2Armor> _armors;
-	private final Map<Integer, L2Weapon> _weapons;
+	private final Map<Integer, L2EtcItem> _etcItems = new HashMap<>();
+	private final Map<Integer, L2Armor> _armors = new HashMap<>();
+	private final Map<Integer, L2Weapon> _weapons = new HashMap<>();
 	
 	static
 	{
-		_slots.put("shirt", L2Item.SLOT_UNDERWEAR);
-		_slots.put("lbracelet", L2Item.SLOT_L_BRACELET);
-		_slots.put("rbracelet", L2Item.SLOT_R_BRACELET);
-		_slots.put("talisman", L2Item.SLOT_DECO);
-		_slots.put("chest", L2Item.SLOT_CHEST);
-		_slots.put("fullarmor", L2Item.SLOT_FULL_ARMOR);
-		_slots.put("head", L2Item.SLOT_HEAD);
-		_slots.put("hair", L2Item.SLOT_HAIR);
-		_slots.put("hairall", L2Item.SLOT_HAIRALL);
-		_slots.put("underwear", L2Item.SLOT_UNDERWEAR);
-		_slots.put("back", L2Item.SLOT_BACK);
-		_slots.put("neck", L2Item.SLOT_NECK);
-		_slots.put("legs", L2Item.SLOT_LEGS);
-		_slots.put("feet", L2Item.SLOT_FEET);
-		_slots.put("gloves", L2Item.SLOT_GLOVES);
-		_slots.put("chest,legs", L2Item.SLOT_CHEST | L2Item.SLOT_LEGS);
-		_slots.put("belt", L2Item.SLOT_BELT);
-		_slots.put("rhand", L2Item.SLOT_R_HAND);
-		_slots.put("lhand", L2Item.SLOT_L_HAND);
-		_slots.put("lrhand", L2Item.SLOT_LR_HAND);
-		_slots.put("rear;lear", L2Item.SLOT_R_EAR | L2Item.SLOT_L_EAR);
-		_slots.put("rfinger;lfinger", L2Item.SLOT_R_FINGER | L2Item.SLOT_L_FINGER);
-		_slots.put("wolf", L2Item.SLOT_WOLF);
-		_slots.put("greatwolf", L2Item.SLOT_GREATWOLF);
-		_slots.put("hatchling", L2Item.SLOT_HATCHLING);
-		_slots.put("strider", L2Item.SLOT_STRIDER);
-		_slots.put("babypet", L2Item.SLOT_BABYPET);
-		_slots.put("none", L2Item.SLOT_NONE);
+		SLOTS.put("shirt", L2Item.SLOT_UNDERWEAR);
+		SLOTS.put("lbracelet", L2Item.SLOT_L_BRACELET);
+		SLOTS.put("rbracelet", L2Item.SLOT_R_BRACELET);
+		SLOTS.put("talisman", L2Item.SLOT_DECO);
+		SLOTS.put("chest", L2Item.SLOT_CHEST);
+		SLOTS.put("fullarmor", L2Item.SLOT_FULL_ARMOR);
+		SLOTS.put("head", L2Item.SLOT_HEAD);
+		SLOTS.put("hair", L2Item.SLOT_HAIR);
+		SLOTS.put("hairall", L2Item.SLOT_HAIRALL);
+		SLOTS.put("underwear", L2Item.SLOT_UNDERWEAR);
+		SLOTS.put("back", L2Item.SLOT_BACK);
+		SLOTS.put("neck", L2Item.SLOT_NECK);
+		SLOTS.put("legs", L2Item.SLOT_LEGS);
+		SLOTS.put("feet", L2Item.SLOT_FEET);
+		SLOTS.put("gloves", L2Item.SLOT_GLOVES);
+		SLOTS.put("chest,legs", L2Item.SLOT_CHEST | L2Item.SLOT_LEGS);
+		SLOTS.put("belt", L2Item.SLOT_BELT);
+		SLOTS.put("rhand", L2Item.SLOT_R_HAND);
+		SLOTS.put("lhand", L2Item.SLOT_L_HAND);
+		SLOTS.put("lrhand", L2Item.SLOT_LR_HAND);
+		SLOTS.put("rear;lear", L2Item.SLOT_R_EAR | L2Item.SLOT_L_EAR);
+		SLOTS.put("rfinger;lfinger", L2Item.SLOT_R_FINGER | L2Item.SLOT_L_FINGER);
+		SLOTS.put("wolf", L2Item.SLOT_WOLF);
+		SLOTS.put("greatwolf", L2Item.SLOT_GREATWOLF);
+		SLOTS.put("hatchling", L2Item.SLOT_HATCHLING);
+		SLOTS.put("strider", L2Item.SLOT_STRIDER);
+		SLOTS.put("babypet", L2Item.SLOT_BABYPET);
+		SLOTS.put("none", L2Item.SLOT_NONE);
 		
 		// retail compatibility
-		_slots.put("onepiece", L2Item.SLOT_FULL_ARMOR);
-		_slots.put("hair2", L2Item.SLOT_HAIR2);
-		_slots.put("dhair", L2Item.SLOT_HAIRALL);
-		_slots.put("alldress", L2Item.SLOT_ALLDRESS);
-		_slots.put("deco1", L2Item.SLOT_DECO);
-		_slots.put("waist", L2Item.SLOT_BELT);
+		SLOTS.put("onepiece", L2Item.SLOT_FULL_ARMOR);
+		SLOTS.put("hair2", L2Item.SLOT_HAIR2);
+		SLOTS.put("dhair", L2Item.SLOT_HAIRALL);
+		SLOTS.put("alldress", L2Item.SLOT_ALLDRESS);
+		SLOTS.put("deco1", L2Item.SLOT_DECO);
+		SLOTS.put("waist", L2Item.SLOT_BELT);
 	}
 	
 	/**
@@ -116,9 +116,6 @@ public class ItemTable
 	
 	protected ItemTable()
 	{
-		_etcItems = new FastMap<>();
-		_armors = new FastMap<>();
-		_weapons = new FastMap<>();
 		load();
 	}
 	
@@ -148,10 +145,10 @@ public class ItemTable
 			}
 		}
 		buildFastLookupTable(highest);
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _etcItems.size() + " Etc Items");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _armors.size() + " Armor Items");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _weapons.size() + " Weapon Items");
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + (_etcItems.size() + _armors.size() + _weapons.size()) + " Items in total.");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _etcItems.size() + " Etc Items");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _armors.size() + " Armor Items");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _weapons.size() + " Weapon Items");
+		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + (_etcItems.size() + _armors.size() + _weapons.size()) + " Items in total.");
 	}
 	
 	/**
@@ -161,7 +158,7 @@ public class ItemTable
 	private void buildFastLookupTable(int size)
 	{
 		// Create a FastLookUp Table called _allTemplates of size : value of the highest item ID
-		_log.info(getClass().getSimpleName() + ": Highest item id used:" + size);
+		LOGGER.info(getClass().getSimpleName() + ": Highest item id used:" + size);
 		_allTemplates = new L2Item[size + 1];
 		
 		// Insert armor item in Fast Look Up Table
@@ -237,7 +234,7 @@ public class ItemTable
 		
 		if (Config.DEBUG)
 		{
-			_log.fine(getClass().getSimpleName() + ": Item created  oid:" + item.getObjectId() + " itemid:" + itemId);
+			LOGGER.fine(getClass().getSimpleName() + ": Item created  oid:" + item.getObjectId() + " itemid:" + itemId);
 		}
 		
 		// Add the L2ItemInstance object to _allObjects of L2world
@@ -261,7 +258,7 @@ public class ItemTable
 					actor,
 					reference
 				});
-				_logItems.log(record);
+				LOGGER_ITEMS.log(record);
 			}
 		}
 		
@@ -294,24 +291,6 @@ public class ItemTable
 	public L2ItemInstance createItem(String process, int itemId, int count, L2PcInstance actor)
 	{
 		return createItem(process, itemId, count, actor, null);
-	}
-	
-	/**
-	 * Returns a dummy item.<br>
-	 * <U><I>Concept :</I></U><BR>
-	 * Dummy item is created by setting the ID of the object in the world at null value
-	 * @param itemId : int designating the item
-	 * @return L2ItemInstance designating the dummy item created
-	 */
-	public L2ItemInstance createDummyItem(int itemId)
-	{
-		L2Item item = getTemplate(itemId);
-		if (item == null)
-		{
-			return null;
-		}
-		L2ItemInstance temp = new L2ItemInstance(0, item);
-		return temp;
 	}
 	
 	/**
@@ -353,7 +332,7 @@ public class ItemTable
 						actor,
 						reference
 					});
-					_logItems.log(record);
+					LOGGER_ITEMS.log(record);
 				}
 			}
 			
@@ -390,7 +369,7 @@ public class ItemTable
 				}
 				catch (Exception e)
 				{
-					_log.log(Level.WARNING, "could not delete pet objectid:", e);
+					LOGGER.log(Level.WARNING, "could not delete pet objectid:", e);
 				}
 			}
 		}

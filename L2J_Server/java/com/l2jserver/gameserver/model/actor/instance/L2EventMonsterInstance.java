@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -33,12 +33,16 @@ public class L2EventMonsterInstance extends L2MonsterInstance
 	
 	// Event mobs should drop items to ground
 	// but item pickup must be protected to killer
-	// Todo: Some mobs need protect drop for spawner
+	// TODO: Some mobs need protect drop for spawner
 	public boolean drop_on_ground = false;
 	
-	public L2EventMonsterInstance(int objectId, L2NpcTemplate template)
+	/**
+	 * Creates an event monster.
+	 * @param template the event monster NPC template
+	 */
+	public L2EventMonsterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2EventMobInstance);
 	}
 	

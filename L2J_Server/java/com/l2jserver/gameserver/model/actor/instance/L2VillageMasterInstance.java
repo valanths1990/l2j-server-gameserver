@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
+ * Copyright (C) 2004-2015 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.datatables.ClanTable;
-import com.l2jserver.gameserver.datatables.ClassListData;
-import com.l2jserver.gameserver.datatables.SkillTreesData;
+import com.l2jserver.gameserver.data.sql.impl.ClanTable;
+import com.l2jserver.gameserver.data.xml.impl.ClassListData;
+import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
@@ -69,12 +69,12 @@ public class L2VillageMasterInstance extends L2NpcInstance
 	private static Logger _log = Logger.getLogger(L2VillageMasterInstance.class.getName());
 	
 	/**
-	 * @param objectId
-	 * @param template
+	 * Creates a village master.
+	 * @param template the village master NPC template
 	 */
-	public L2VillageMasterInstance(int objectId, L2NpcTemplate template)
+	public L2VillageMasterInstance(L2NpcTemplate template)
 	{
-		super(objectId, template);
+		super(template);
 		setInstanceType(InstanceType.L2VillageMasterInstance);
 	}
 	
@@ -943,10 +943,9 @@ public class L2VillageMasterInstance extends L2NpcInstance
 		clan.setDissolvingExpiryTime(System.currentTimeMillis() + (Config.ALT_CLAN_DISSOLVE_DAYS * 86400000L)); // 24*60*60*1000 = 86400000
 		clan.updateClanInDB();
 		
-		ClanTable.getInstance().scheduleRemoveClan(clan.getId());
-		
 		// The clan leader should take the XP penalty of a full death.
-		player.deathPenalty(false, false, false);
+		player.calculateDeathExpPenalty(null, false);
+		ClanTable.getInstance().scheduleRemoveClan(clan.getId());
 	}
 	
 	private static final void recoverClan(L2PcInstance player, int clanId)
@@ -1004,7 +1003,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_EXISTS);
 					sm.addString(clanName);
 					player.sendPacket(sm);
-					sm = null;
 				}
 				else
 				{
@@ -1164,7 +1162,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 		sm.addString(leaderName);
 		sm.addString(clanName);
 		clan.broadcastToOnlineMembers(sm);
-		sm = null;
 	}
 	
 	/**

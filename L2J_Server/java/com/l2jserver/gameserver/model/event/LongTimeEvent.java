@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2004-2014 L2J Server
- * 
+ * Copyright (C) 2004-2015 L2J Server
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,15 +32,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.Announcements;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.data.sql.impl.AnnouncementsTable;
+import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.EventDroplist;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.datatables.NpcData;
 import com.l2jserver.gameserver.model.Location;
+import com.l2jserver.gameserver.model.announce.EventAnnouncement;
+import com.l2jserver.gameserver.model.drops.DropListScope;
 import com.l2jserver.gameserver.model.drops.GeneralDropItem;
 import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.script.DateRange;
+import com.l2jserver.gameserver.util.Broadcast;
 
 /**
  * Parent class for long time events.<br>
@@ -107,7 +110,7 @@ public class LongTimeEvent extends Quest
 	 */
 	private void loadConfig()
 	{
-		File configFile = new File("data/scripts/events/" + getScriptName() + "/config.xml");
+		File configFile = new File("data/scripts/events/" + getName() + "/config.xml");
 		try
 		{
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -115,7 +118,7 @@ public class LongTimeEvent extends Quest
 			Document doc = db.parse(configFile);
 			if (!doc.getDocumentElement().getNodeName().equalsIgnoreCase("event"))
 			{
-				throw new NullPointerException("WARNING!!! " + getScriptName() + " event: bad config file!");
+				throw new NullPointerException("WARNING!!! " + getName() + " event: bad config file!");
 			}
 			_eventName = doc.getDocumentElement().getAttributes().getNamedItem("name").getNodeValue();
 			String period = doc.getDocumentElement().getAttributes().getNamedItem("active").getNodeValue();
@@ -138,7 +141,7 @@ public class LongTimeEvent extends Quest
 			
 			if (_eventPeriod == null)
 			{
-				throw new NullPointerException("WARNING!!! " + getScriptName() + " event: illegal event period");
+				throw new NullPointerException("WARNING!!! " + getName() + " event: illegal event period");
 			}
 			
 			Date today = new Date();
@@ -170,27 +173,27 @@ public class LongTimeEvent extends Quest
 									
 									if (ItemTable.getInstance().getTemplate(itemId) == null)
 									{
-										_log.warning(getScriptName() + " event: " + itemId + " is wrong item id, item was not added in droplist");
+										_log.warning(getName() + " event: " + itemId + " is wrong item id, item was not added in droplist");
 										continue;
 									}
 									
 									if (minCount > maxCount)
 									{
-										_log.warning(getScriptName() + " event: item " + itemId + " - min greater than max, item was not added in droplist");
+										_log.warning(getName() + " event: item " + itemId + " - min greater than max, item was not added in droplist");
 										continue;
 									}
 									
 									if ((finalChance < 10000) || (finalChance > 1000000))
 									{
-										_log.warning(getScriptName() + " event: item " + itemId + " - incorrect drop chance, item was not added in droplist");
+										_log.warning(getName() + " event: item " + itemId + " - incorrect drop chance, item was not added in droplist");
 										continue;
 									}
 									
-									_dropList.add(new GeneralDropItem(itemId, minCount, maxCount, finalChance));
+									_dropList.add((GeneralDropItem) DropListScope.STATIC.newDropItem(itemId, minCount, maxCount, finalChance));
 								}
 								catch (NumberFormatException nfe)
 								{
-									_log.warning("Wrong number format in config.xml droplist block for " + getScriptName() + " event");
+									_log.warning("Wrong number format in config.xml droplist block for " + getName() + " event");
 								}
 							}
 						}
@@ -212,7 +215,7 @@ public class LongTimeEvent extends Quest
 									
 									if (NpcData.getInstance().getTemplate(npcId) == null)
 									{
-										_log.warning(getScriptName() + " event: " + npcId + " is wrong NPC id, NPC was not added in spawnlist");
+										_log.warning(getName() + " event: " + npcId + " is wrong NPC id, NPC was not added in spawnlist");
 										continue;
 									}
 									
@@ -220,7 +223,7 @@ public class LongTimeEvent extends Quest
 								}
 								catch (NumberFormatException nfe)
 								{
-									_log.warning("Wrong number format in config.xml spawnlist block for " + getScriptName() + " event");
+									_log.warning("Wrong number format in config.xml spawnlist block for " + getName() + " event");
 								}
 							}
 						}
@@ -253,7 +256,7 @@ public class LongTimeEvent extends Quest
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, getScriptName() + " event: error reading " + configFile.getAbsolutePath() + " ! " + e.getMessage(), e);
+			_log.log(Level.WARNING, getName() + " event: error reading " + configFile.getAbsolutePath() + " ! " + e.getMessage(), e);
 		}
 	}
 	
@@ -282,10 +285,10 @@ public class LongTimeEvent extends Quest
 		}
 		
 		// Send message on begin
-		Announcements.getInstance().announceToAll(_onEnterMsg);
+		Broadcast.toAllOnlinePlayers(_onEnterMsg);
 		
 		// Add announce for entering players
-		Announcements.getInstance().addEventAnnouncement(_eventPeriod, _onEnterMsg);
+		AnnouncementsTable.getInstance().addAnnouncement(new EventAnnouncement(_eventPeriod, _onEnterMsg));
 		
 		// Schedule event end (now only for message sending)
 		ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEnd(), millisToEventEnd);
@@ -330,7 +333,7 @@ public class LongTimeEvent extends Quest
 		public void run()
 		{
 			// Send message on end
-			Announcements.getInstance().announceToAll(_endMsg);
+			Broadcast.toAllOnlinePlayers(_endMsg);
 		}
 	}
 }
