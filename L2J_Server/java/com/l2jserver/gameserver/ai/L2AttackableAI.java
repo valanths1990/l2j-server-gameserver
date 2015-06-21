@@ -1380,11 +1380,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				setAttackTarget(caster.getMostHated());
 			}
 		}
-		L2Character attackTarget = getAttackTarget();
+		
+		final L2Character attackTarget = getAttackTarget();
 		if (attackTarget == null)
 		{
 			return false;
 		}
+		
 		double dist = caster.calculateDistance(attackTarget, false, false);
 		double dist2 = dist - attackTarget.getTemplate().getCollisionRadius();
 		double range = caster.getPhysicalAttackRange() + caster.getTemplate().getCollisionRadius() + attackTarget.getTemplate().getCollisionRadius();
@@ -1401,10 +1403,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				if (!caster.isAffectedBySkill(sk.getId()))
 				{
 					clientStopMoving(null);
-					// L2Object target = attackTarget;
 					caster.setTarget(caster);
 					caster.doCast(sk);
-					// _actor.setTarget(target);
+					_actor.setTarget(attackTarget);
 					return true;
 				}
 				// ----------------------------------------
@@ -1419,20 +1420,18 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					if (target != null)
 					{
 						clientStopMoving(null);
-						L2Object targets = attackTarget;
 						caster.setTarget(target);
 						caster.doCast(sk);
-						caster.setTarget(targets);
+						caster.setTarget(attackTarget);
 						return true;
 					}
 				}
 				if (canParty(sk))
 				{
 					clientStopMoving(null);
-					L2Object targets = attackTarget;
 					caster.setTarget(caster);
 					caster.doCast(sk);
-					caster.setTarget(targets);
+					caster.setTarget(attackTarget);
 					return true;
 				}
 			}
@@ -1489,10 +1488,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				if (target != null)
 				{
 					clientStopMoving(null);
-					L2Object targets = attackTarget;
 					caster.setTarget(target);
 					caster.doCast(sk);
-					caster.setTarget(targets);
+					caster.setTarget(attackTarget);
 					return true;
 				}
 			}
@@ -1531,15 +1529,18 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 						clientStopMoving(null);
 						caster.setTarget(leader);
 						caster.doCast(sk);
+						caster.setTarget(attackTarget);
 						return true;
 					}
 				}
 			}
+			
 			if (Rnd.get(100) < ((100 - percentage) / 3))
 			{
 				clientStopMoving(null);
 				caster.setTarget(caster);
 				caster.doCast(sk);
+				caster.setTarget(attackTarget);
 				return true;
 			}
 			
@@ -1566,6 +1567,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							clientStopMoving(null);
 							caster.setTarget(obj);
 							caster.doCast(sk);
+							caster.setTarget(attackTarget);
 							return true;
 						}
 					}
@@ -1579,6 +1581,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					{
 						continue;
 					}
+					
 					L2Npc targets = ((L2Npc) obj);
 					if (targets.isInMyClan(caster))
 					{
@@ -1587,6 +1590,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							clientStopMoving(null);
 							caster.setTarget(caster);
 							caster.doCast(sk);
+							caster.setTarget(attackTarget);
 							return true;
 						}
 					}
@@ -1609,10 +1613,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				if (target != null)
 				{
 					clientStopMoving(null);
-					L2Object targets = attackTarget;
 					caster.setTarget(target);
 					caster.doCast(sk);
-					caster.setTarget(targets);
+					caster.setTarget(attackTarget);
 					return true;
 				}
 			}
@@ -1763,6 +1766,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							clientStopMoving(null);
 							caster.setTarget(leader);
 							caster.doCast(sk);
+							caster.setTarget(attackTarget);
 							return true;
 						}
 					}
@@ -1780,6 +1784,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					{
 						continue;
 					}
+					
 					if (Rnd.get(100) < 10)
 					{
 						if (GeoData.getInstance().canSeeTarget(caster, targets))
@@ -1787,6 +1792,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							clientStopMoving(null);
 							caster.setTarget(obj);
 							caster.doCast(sk);
+							caster.setTarget(attackTarget);
 							return true;
 						}
 					}
@@ -1808,6 +1814,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							clientStopMoving(null);
 							caster.setTarget(caster);
 							caster.doCast(sk);
+							caster.setTarget(attackTarget);
 							return true;
 						}
 					}
@@ -1829,10 +1836,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			if (target != null)
 			{
 				clientStopMoving(null);
-				L2Object targets = attackTarget;
 				caster.setTarget(target);
 				caster.doCast(sk);
-				caster.setTarget(targets);
+				caster.setTarget(attackTarget);
 				return true;
 			}
 		}
