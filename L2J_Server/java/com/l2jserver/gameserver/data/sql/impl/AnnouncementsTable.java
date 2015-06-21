@@ -112,7 +112,9 @@ public final class AnnouncementsTable
 		{
 			if (announce.isValid() && (announce.getType() == type))
 			{
-				player.sendPacket(new CreatureSay(0, Say2.ANNOUNCEMENT, player.getName(), announce.getContent()));
+				player.sendPacket(new CreatureSay(0, //
+				type == AnnouncementType.CRITICAL ? Say2.CRITICAL_ANNOUNCE : Say2.ANNOUNCEMENT, //
+				player.getName(), announce.getContent()));
 			}
 		}
 	}
