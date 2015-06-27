@@ -96,7 +96,7 @@ public class LongTimeEvent extends Quest
 			{
 				long delay = _eventPeriod.getStartDate().getTime() - System.currentTimeMillis();
 				ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStart(), delay);
-				_log.info("Event " + _eventName + " will be started at " + _eventPeriod.getEndDate());
+				_log.info("Event " + _eventName + " will be started at " + _eventPeriod.getStartDate());
 			}
 			else
 			{
