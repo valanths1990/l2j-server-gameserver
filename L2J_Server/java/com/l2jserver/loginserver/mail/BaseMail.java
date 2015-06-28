@@ -35,7 +35,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.loginserver.mail.MailSystem.MailContent;
 
 /**
@@ -127,7 +127,7 @@ public class BaseMail implements Runnable
 	
 	private String getUserMail(String username)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement(Config.EMAIL_SYS_SELECTQUERY))
 		{
 			statement.setString(1, username);

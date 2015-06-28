@@ -34,7 +34,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.instancemanager.tasks.GrandBossManagerStoreTask;
@@ -76,7 +76,7 @@ public final class GrandBossManager implements IStorable
 	
 	private void init()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement();
 			ResultSet rs = s.executeQuery("SELECT * from grandboss_data ORDER BY boss_id"))
 		{
@@ -141,7 +141,7 @@ public final class GrandBossManager implements IStorable
 			zones.put(zone.getId(), new ArrayList<>());
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement();
 			ResultSet rs = s.executeQuery("SELECT * from grandboss_list ORDER BY player_id"))
 		{
@@ -301,10 +301,10 @@ public final class GrandBossManager implements IStorable
 	@Override
 	public boolean storeMe()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement delete = con.prepareStatement(DELETE_GRAND_BOSS_LIST))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			Statement s = con.createStatement())
 		{
-			delete.executeUpdate();
+			s.executeUpdate(DELETE_GRAND_BOSS_LIST);
 			
 			try (PreparedStatement insert = con.prepareStatement(INSERT_GRAND_BOSS_LIST))
 			{
@@ -379,7 +379,7 @@ public final class GrandBossManager implements IStorable
 	
 	private void updateDb(int bossId, boolean statusOnly)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = ConnectionFactory.getInstance().getConnection())
 		{
 			L2GrandBossInstance boss = BOSSES.get(bossId);
 			StatsSet info = _storedInfo.get(bossId);

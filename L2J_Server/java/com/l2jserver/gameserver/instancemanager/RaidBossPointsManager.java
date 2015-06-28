@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
@@ -53,7 +53,7 @@ public class RaidBossPointsManager
 	
 	private final void init()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement();
 			ResultSet rs = s.executeQuery("SELECT `charId`,`boss_id`,`points` FROM `character_raid_points`"))
 		{
@@ -80,7 +80,7 @@ public class RaidBossPointsManager
 	
 	public final void updatePointsInDB(L2PcInstance player, int raidId, int points)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement("REPLACE INTO character_raid_points (`charId`,`boss_id`,`points`) VALUES (?,?,?)"))
 		{
 			ps.setInt(1, player.getObjectId());
@@ -124,10 +124,10 @@ public class RaidBossPointsManager
 	
 	public final void cleanUp()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("DELETE from character_raid_points WHERE charId > 0"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			Statement s = con.createStatement())
 		{
-			statement.executeUpdate();
+			s.executeUpdate("DELETE from character_raid_points WHERE charId > 0");
 			_list.clear();
 		}
 		catch (Exception e)

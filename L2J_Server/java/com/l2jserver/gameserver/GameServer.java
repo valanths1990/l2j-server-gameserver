@@ -31,9 +31,9 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
 import com.l2jserver.Server;
 import com.l2jserver.UPnPService;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.data.sql.impl.AnnouncementsTable;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
@@ -463,7 +463,7 @@ public final class GameServer
 		// Initialize config
 		Config.load();
 		printSection("Database");
-		L2DatabaseFactory.getInstance();
+		ConnectionFactory.getInstance();
 		gameServer = new GameServer();
 		
 		if (Config.IS_TELNET_ENABLED)
