@@ -64,7 +64,7 @@ task configuratorJar(type: Jar, dependsOn: classes) {
 	exclude('**/status/**')
 	exclude('**/util/**')
 	exclude('**/Config/**')
-	exclude('**/L2DatabaseFactory/**')
+	exclude('**/ConnectionFactory/**')
 	exclude('**/Server/**')
 	manifest {
 		from(generalManifest)
