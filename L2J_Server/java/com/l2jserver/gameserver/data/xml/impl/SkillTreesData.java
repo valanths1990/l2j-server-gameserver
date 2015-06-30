@@ -76,22 +76,22 @@ import com.l2jserver.util.data.xml.IXmlReader;
  */
 public final class SkillTreesData implements IXmlReader
 {
-	// ClassId, FastMap of Skill Hash Code, L2SkillLearn
-	private final Map<ClassId, Map<Integer, L2SkillLearn>> _classSkillTrees = new HashMap<>();
-	private final Map<ClassId, Map<Integer, L2SkillLearn>> _transferSkillTrees = new HashMap<>();
+	// ClassId, Map of Skill Hash Code, L2SkillLearn
+	private final Map<ClassId, Map<Integer, L2SkillLearn>> _classSkillTrees = new LinkedHashMap<>();
+	private final Map<ClassId, Map<Integer, L2SkillLearn>> _transferSkillTrees = new LinkedHashMap<>();
 	// Skill Hash Code, L2SkillLearn
-	private final Map<Integer, L2SkillLearn> _collectSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _fishingSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _pledgeSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _subClassSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _subPledgeSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _transformSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _commonSkillTree = new HashMap<>();
+	private final Map<Integer, L2SkillLearn> _collectSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _fishingSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _pledgeSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _subClassSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _subPledgeSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _transformSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _commonSkillTree = new LinkedHashMap<>();
 	// Other skill trees
-	private final Map<Integer, L2SkillLearn> _nobleSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _heroSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _gameMasterSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _gameMasterAuraSkillTree = new HashMap<>();
+	private final Map<Integer, L2SkillLearn> _nobleSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _heroSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _gameMasterSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _gameMasterAuraSkillTree = new LinkedHashMap<>();
 	
 	// Checker, sorted arrays of hash codes
 	private Map<Integer, int[]> _skillsByClassIdHashCodes; // Occupation skills
