@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.model.actor.instance;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6738,7 +6737,7 @@ public final class L2PcInstance extends L2Playable
 			statement.setInt(34, getNewbie());
 			statement.setInt(35, isNoble() ? 1 : 0);
 			statement.setLong(36, 0);
-			statement.setDate(37, new Date(getCreateDate().getTimeInMillis()));
+			statement.setLong(37, getCreateDate().getTimeInMillis());
 			statement.executeUpdate();
 		}
 		catch (Exception e)
@@ -6923,7 +6922,7 @@ public final class L2PcInstance extends L2Playable
 					player.setBookMarkSlot(rset.getInt("BookmarkSlot"));
 					
 					// character creation Time
-					player.getCreateDate().setTime(rset.getDate("createDate"));
+					player.getCreateDate().setTimeInMillis(rset.getLong("createDate"));
 					
 					// Language
 					player.setLang(rset.getString("language"));
