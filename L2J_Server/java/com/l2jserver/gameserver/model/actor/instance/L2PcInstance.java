@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -6737,7 +6738,7 @@ public final class L2PcInstance extends L2Playable
 			statement.setInt(34, getNewbie());
 			statement.setInt(35, isNoble() ? 1 : 0);
 			statement.setLong(36, 0);
-			statement.setLong(37, getCreateDate().getTimeInMillis());
+			statement.setTimestamp(37, new Timestamp(getCreateDate().getTimeInMillis()));
 			statement.executeUpdate();
 		}
 		catch (Exception e)
@@ -6922,7 +6923,7 @@ public final class L2PcInstance extends L2Playable
 					player.setBookMarkSlot(rset.getInt("BookmarkSlot"));
 					
 					// character creation Time
-					player.getCreateDate().setTimeInMillis(rset.getLong("createDate"));
+					player.getCreateDate().setTimeInMillis(rset.getTimestamp("createDate").getTime());
 					
 					// Language
 					player.setLang(rset.getString("language"));

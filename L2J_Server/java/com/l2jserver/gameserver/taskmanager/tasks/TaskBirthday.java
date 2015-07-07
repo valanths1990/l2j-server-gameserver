@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 import com.l2jserver.Config;
 import com.l2jserver.L2DatabaseFactory;
@@ -52,6 +53,7 @@ public class TaskBirthday extends Task
 	@Override
 	public void onTimeElapsed(ExecutedTask task)
 	{
+		// TODO(Zoey76): Fix first run.
 		final int birthdayGiftCount = giveBirthdayGifts(task.getLastActivation());
 		
 		_log.info("BirthdayManager: " + birthdayGiftCount + " gifts sent.");
@@ -63,7 +65,7 @@ public class TaskBirthday extends Task
 		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(SELECT_PENDING_BIRTHDAY_GIFTS))
 		{
-			ps.setLong(1, lastActivation);
+			ps.setLong(1, TimeUnit.SECONDS.convert(lastActivation, TimeUnit.MILLISECONDS));
 			try (ResultSet rs = ps.executeQuery())
 			{
 				while (rs.next())
