@@ -988,20 +988,13 @@ public class L2Attackable extends L2Npc
 				}
 				
 				// Broadcast message if RaidBoss was defeated
-				if (isRaid() && !isRaidMinion())
+				if (isRaid() && !isRaidMinion() && drop.getCount() > 0)
 				{
-					if (drop.getCount() > 0)
-					{
-						final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_DIED_DROPPED_S3_S2);
-						sm.addCharName(this);
-						sm.addItemName(item);
-						sm.addLong(drop.getCount());
-						broadcastPacket(sm);
-					}
-					else
-					{
-						// nothing, for AutoLoot
-					}
+					final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_DIED_DROPPED_S3_S2);
+					sm.addCharName(this);
+					sm.addItemName(item);
+					sm.addLong(drop.getCount());
+					broadcastPacket(sm);
 				}
 			}
 		}
