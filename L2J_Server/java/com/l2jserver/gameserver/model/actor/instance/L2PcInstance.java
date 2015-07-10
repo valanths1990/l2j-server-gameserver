@@ -12555,7 +12555,7 @@ public final class L2PcInstance extends L2Playable
 			{
 				if (_transformSkills == null)
 				{
-					_transformSkills = new HashMap<>();
+					_transformSkills = new ConcurrentHashMap<>();
 				}
 			}
 		}
@@ -12564,17 +12564,28 @@ public final class L2PcInstance extends L2Playable
 	
 	public Skill getTransformSkill(int id)
 	{
+		if (_transformSkills == null)
+		{
+			return null;
+		}
 		return _transformSkills.get(id);
 	}
 	
 	public boolean hasTransformSkill(int id)
 	{
+		if (_transformSkills == null)
+		{
+			return false;
+		}
 		return _transformSkills.containsKey(id);
 	}
 	
 	public synchronized void removeAllTransformSkills()
 	{
-		_transformSkills = null;
+		if (_transformSkills == null)
+		{
+			_transformSkills = null;
+		}
 	}
 	
 	protected void startFeed(int npcId)
