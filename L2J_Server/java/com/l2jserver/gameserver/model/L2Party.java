@@ -636,10 +636,6 @@ public class L2Party extends AbstractPlayerGroup
 				broadcastToPartyMembers(target, msg);
 			}
 		}
-		else
-		{
-			// nothing, for AutoLoot
-		}
 	}
 	
 	/**
@@ -680,10 +676,6 @@ public class L2Party extends AbstractPlayerGroup
 				msg.addItemName(itemId);
 				broadcastToPartyMembers(looter, msg);
 			}
-		}
-		else
-		{
-			// nothing, for AutoLoot
 		}
 	}
 	
