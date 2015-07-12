@@ -10336,6 +10336,13 @@ public final class L2PcInstance extends L2Playable
 			sendPacket(new SkillCoolTime(this));
 			sendPacket(new ExStorageMaxCount(this));
 			
+			if (Config.ALTERNATE_CLASS_MASTER)
+			{
+				if (Config.CLASS_MASTER_SETTINGS.isAllowed(getClassId().level() + 1) && Config.ALTERNATE_CLASS_MASTER && (((this.getClassId().level() == 1) && (this.getLevel() >= 40)) || ((this.getClassId().level() == 2) && (this.getLevel() >= 76))))
+				{
+					L2ClassMasterInstance.showQuestionMark(this);
+				}
+			}
 			return true;
 		}
 		finally
