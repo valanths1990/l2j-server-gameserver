@@ -640,7 +640,7 @@ public final class L2PcInstance extends L2Playable
 	
 	// charges
 	private final AtomicInteger _charges = new AtomicInteger();
-	private ScheduledFuture<?> _chargeTask = null;
+	private volatile ScheduledFuture<?> _chargeTask = null;
 	
 	// Absorbed Souls
 	private int _souls = 0;
@@ -12839,8 +12839,13 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (_chargeTask != null)
 		{
-			_chargeTask.cancel(false);
-			_chargeTask = null;
+			synchronized (this)
+			{
+				if (_chargeTask != null)
+				{
+					_chargeTask.cancel(false);
+				}
+			}
 		}
 		_chargeTask = ThreadPoolManager.getInstance().scheduleGeneral(new ResetChargesTask(this), 600000);
 	}
