@@ -13646,9 +13646,9 @@ public final class L2PcInstance extends L2Playable
 	{
 		try
 		{
-			for (L2BossZone _zone : GrandBossManager.getInstance().getZones())
+			for (L2BossZone zone : GrandBossManager.getInstance().getZones().values())
 			{
-				_zone.removePlayer(this);
+				zone.removePlayer(this);
 			}
 		}
 		catch (Exception e)
@@ -13662,10 +13662,9 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void checkPlayerSkills()
 	{
-		L2SkillLearn learn;
 		for (Entry<Integer, Skill> e : getSkills().entrySet())
 		{
-			learn = SkillTreesData.getInstance().getClassSkill(e.getKey(), e.getValue().getLevel() % 100, getClassId());
+			final L2SkillLearn learn = SkillTreesData.getInstance().getClassSkill(e.getKey(), e.getValue().getLevel() % 100, getClassId());
 			if (learn != null)
 			{
 				int lvlDiff = e.getKey() == CommonSkill.EXPERTISE.getId() ? 0 : 9;
