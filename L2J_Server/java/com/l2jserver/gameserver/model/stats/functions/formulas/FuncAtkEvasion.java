@@ -49,13 +49,14 @@ public class FuncAtkEvasion extends AbstractFunction
 		{
 			// [Square(DEX)] * 6 + lvl;
 			value += (Math.sqrt(effector.getDEX()) * 6) + level;
-			if (level > 77)
+			double diff = level - 69;
+			if (level >= 78)
 			{
-				value += level - 77;
+				diff *= 1.2;
 			}
-			if (level > 69)
+			if (level >= 70)
 			{
-				value += level - 69;
+				value += diff;
 			}
 		}
 		else
@@ -67,6 +68,6 @@ public class FuncAtkEvasion extends AbstractFunction
 				value += (level - 69) + 2;
 			}
 		}
-		return value;
+		return (int) value;
 	}
 }
