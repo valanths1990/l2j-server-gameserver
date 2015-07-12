@@ -7545,11 +7545,23 @@ public final class L2PcInstance extends L2Playable
 	
 	public int isOnlineInt()
 	{
-		if (_isOnline && (getClient() != null))
+		if (_isOnline && (_client != null))
 		{
-			return getClient().isDetached() ? 2 : 1;
+			return _client.isDetached() ? 2 : 1;
 		}
 		return 0;
+	}
+	
+	/**
+	 * Verifies if the player is in offline mode.<br>
+	 * The offline mode may happen for different reasons:<br>
+	 * Abnormally: Player gets abrouptaly disconnected from server.<br>
+	 * Normally: The player gets into offline shop mode, only avaiable by enabling the offline shop mod.
+	 * @return {@code true} if the player is in offline mode, {@code false} otherwise
+	 */
+	public boolean isInOfflineMode()
+	{
+		return (_client == null) || _client.isDetached();
 	}
 	
 	public boolean isIn7sDungeon()
