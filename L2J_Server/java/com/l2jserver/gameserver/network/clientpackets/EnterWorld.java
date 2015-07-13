@@ -61,6 +61,7 @@ import com.l2jserver.gameserver.model.quest.QuestState;
 import com.l2jserver.gameserver.model.skills.CommonSkill;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
+import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.Die;
 import com.l2jserver.gameserver.network.serverpackets.EtcStatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.ExBasicActionList;
@@ -564,11 +565,11 @@ public class EnterWorld extends L2GameClientPacket
 		{
 			activeChar.sendPacket(ExNotifyPremiumItem.STATIC_PACKET);
 		}
+		
+		// Unstuck players that had client open when server crashed.
+		activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
-	/**
-	 * @param cha
-	 */
 	private void engage(L2PcInstance cha)
 	{
 		int chaId = cha.getObjectId();
