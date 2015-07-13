@@ -12599,12 +12599,9 @@ public final class L2PcInstance extends L2Playable
 		return _transformSkills.containsKey(id);
 	}
 	
-	public synchronized void removeAllTransformSkills()
+	public void removeAllTransformSkills()
 	{
-		if (_transformSkills == null)
-		{
-			_transformSkills = null;
-		}
+		_transformSkills = null;
 	}
 	
 	protected void startFeed(int npcId)
