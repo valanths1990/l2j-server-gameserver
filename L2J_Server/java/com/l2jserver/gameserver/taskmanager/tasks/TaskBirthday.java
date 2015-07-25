@@ -25,7 +25,7 @@ import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.instancemanager.MailManager;
 import com.l2jserver.gameserver.model.entity.Message;
 import com.l2jserver.gameserver.taskmanager.Task;
@@ -62,7 +62,7 @@ public class TaskBirthday extends Task
 	private int giveBirthdayGifts(long lastActivation)
 	{
 		int birthdayGiftCount = 0;
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(SELECT_PENDING_BIRTHDAY_GIFTS))
 		{
 			ps.setLong(1, TimeUnit.SECONDS.convert(lastActivation, TimeUnit.MILLISECONDS));

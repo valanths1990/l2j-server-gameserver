@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.model.AutoSpawnHandler;
 import com.l2jserver.gameserver.model.AutoSpawnHandler.AutoSpawnInstance;
@@ -801,7 +801,7 @@ public class SevenSigns
 	 */
 	protected void restoreSevenSignsData()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = ConnectionFactory.getInstance().getConnection())
 		{
 			try (Statement s = con.createStatement();
 				ResultSet rs = s.executeQuery(LOAD_DATA))
@@ -868,7 +868,7 @@ public class SevenSigns
 	 */
 	public void saveSevenSignsData()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(UPDATE_PLAYER))
 		{
 			for (StatsSet sevenDat : _signsPlayerData.values())
@@ -899,7 +899,7 @@ public class SevenSigns
 			return;
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(UPDATE_PLAYER))
 		{
 			ps.setString(1, sevenDat.getString("cabal"));
@@ -920,7 +920,7 @@ public class SevenSigns
 	
 	public final void saveSevenSignsStatus()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(UPDATE_STATUS))
 		{
 			ps.setInt(1, _currentCycle);
@@ -1007,7 +1007,7 @@ public class SevenSigns
 			_signsPlayerData.put(objectId, currPlayerData);
 			
 			// Update data in database, as we have a new player signing up.
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
 				PreparedStatement ps = con.prepareStatement(INSERT_PLAYER))
 			{
 				ps.setInt(1, objectId);

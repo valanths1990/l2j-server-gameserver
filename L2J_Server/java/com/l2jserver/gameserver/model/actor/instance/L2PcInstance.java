@@ -49,7 +49,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ItemsAutoDestroy;
@@ -1349,14 +1349,14 @@ public final class L2PcInstance extends L2Playable
 	
 	private void insertNewRecipeData(int recipeId, boolean isDwarf)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("INSERT INTO character_recipebook (charId, id, classIndex, type) values(?,?,?,?)"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("INSERT INTO character_recipebook (charId, id, classIndex, type) values(?,?,?,?)"))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, recipeId);
-			statement.setInt(3, isDwarf ? _classIndex : 0);
-			statement.setInt(4, isDwarf ? 1 : 0);
-			statement.execute();
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, recipeId);
+			ps.setInt(3, isDwarf ? _classIndex : 0);
+			ps.setInt(4, isDwarf ? 1 : 0);
+			ps.execute();
 		}
 		catch (SQLException e)
 		{
@@ -1366,13 +1366,13 @@ public final class L2PcInstance extends L2Playable
 	
 	private void deleteRecipeData(int recipeId, boolean isDwarf)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("DELETE FROM character_recipebook WHERE charId=? AND id=? AND classIndex=?"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("DELETE FROM character_recipebook WHERE charId=? AND id=? AND classIndex=?"))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, recipeId);
-			statement.setInt(3, isDwarf ? _classIndex : 0);
-			statement.execute();
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, recipeId);
+			ps.setInt(3, isDwarf ? _classIndex : 0);
+			ps.execute();
 		}
 		catch (SQLException e)
 		{
@@ -6670,13 +6670,13 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void updateOnlineStatus()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("UPDATE characters SET online=?, lastAccess=? WHERE charId=?"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("UPDATE characters SET online=?, lastAccess=? WHERE charId=?"))
 		{
-			statement.setInt(1, isOnlineInt());
-			statement.setLong(2, System.currentTimeMillis());
-			statement.setInt(3, getObjectId());
-			statement.execute();
+			ps.setInt(1, isOnlineInt());
+			ps.setLong(2, System.currentTimeMillis());
+			ps.setInt(3, getObjectId());
+			ps.execute();
 		}
 		catch (Exception e)
 		{
@@ -6690,47 +6690,47 @@ public final class L2PcInstance extends L2Playable
 	 */
 	private boolean createDb()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(INSERT_CHARACTER))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(INSERT_CHARACTER))
 		{
-			statement.setString(1, _accountName);
-			statement.setInt(2, getObjectId());
-			statement.setString(3, getName());
-			statement.setInt(4, getLevel());
-			statement.setInt(5, getMaxHp());
-			statement.setDouble(6, getCurrentHp());
-			statement.setInt(7, getMaxCp());
-			statement.setDouble(8, getCurrentCp());
-			statement.setInt(9, getMaxMp());
-			statement.setDouble(10, getCurrentMp());
-			statement.setInt(11, getAppearance().getFace());
-			statement.setInt(12, getAppearance().getHairStyle());
-			statement.setInt(13, getAppearance().getHairColor());
-			statement.setInt(14, getAppearance().getSex() ? 1 : 0);
-			statement.setLong(15, getExp());
-			statement.setInt(16, getSp());
-			statement.setInt(17, getKarma());
-			statement.setInt(18, getFame());
-			statement.setInt(19, getPvpKills());
-			statement.setInt(20, getPkKills());
-			statement.setInt(21, getClanId());
-			statement.setInt(22, getRace().ordinal());
-			statement.setInt(23, getClassId().getId());
-			statement.setLong(24, getDeleteTimer());
-			statement.setInt(25, hasDwarvenCraft() ? 1 : 0);
-			statement.setString(26, getTitle());
-			statement.setInt(27, getAppearance().getTitleColor());
-			statement.setInt(28, getAccessLevel().getLevel());
-			statement.setInt(29, isOnlineInt());
-			statement.setInt(30, isIn7sDungeon() ? 1 : 0);
-			statement.setInt(31, getClanPrivileges().getBitmask());
-			statement.setInt(32, getWantsPeace());
-			statement.setInt(33, getBaseClass());
-			statement.setInt(34, getNewbie());
-			statement.setInt(35, isNoble() ? 1 : 0);
-			statement.setLong(36, 0);
-			statement.setTimestamp(37, new Timestamp(getCreateDate().getTimeInMillis()));
-			statement.executeUpdate();
+			ps.setString(1, _accountName);
+			ps.setInt(2, getObjectId());
+			ps.setString(3, getName());
+			ps.setInt(4, getLevel());
+			ps.setInt(5, getMaxHp());
+			ps.setDouble(6, getCurrentHp());
+			ps.setInt(7, getMaxCp());
+			ps.setDouble(8, getCurrentCp());
+			ps.setInt(9, getMaxMp());
+			ps.setDouble(10, getCurrentMp());
+			ps.setInt(11, getAppearance().getFace());
+			ps.setInt(12, getAppearance().getHairStyle());
+			ps.setInt(13, getAppearance().getHairColor());
+			ps.setInt(14, getAppearance().getSex() ? 1 : 0);
+			ps.setLong(15, getExp());
+			ps.setInt(16, getSp());
+			ps.setInt(17, getKarma());
+			ps.setInt(18, getFame());
+			ps.setInt(19, getPvpKills());
+			ps.setInt(20, getPkKills());
+			ps.setInt(21, getClanId());
+			ps.setInt(22, getRace().ordinal());
+			ps.setInt(23, getClassId().getId());
+			ps.setLong(24, getDeleteTimer());
+			ps.setInt(25, hasDwarvenCraft() ? 1 : 0);
+			ps.setString(26, getTitle());
+			ps.setInt(27, getAppearance().getTitleColor());
+			ps.setInt(28, getAccessLevel().getLevel());
+			ps.setInt(29, isOnlineInt());
+			ps.setInt(30, isIn7sDungeon() ? 1 : 0);
+			ps.setInt(31, getClanPrivileges().getBitmask());
+			ps.setInt(32, getWantsPeace());
+			ps.setInt(33, getBaseClass());
+			ps.setInt(34, getNewbie());
+			ps.setInt(35, isNoble() ? 1 : 0);
+			ps.setLong(36, 0);
+			ps.setTimestamp(37, new Timestamp(getCreateDate().getTimeInMillis()));
+			ps.executeUpdate();
 		}
 		catch (Exception e)
 		{
@@ -6752,12 +6752,12 @@ public final class L2PcInstance extends L2Playable
 		double currentCp = 0;
 		double currentHp = 0;
 		double currentMp = 0;
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_CHARACTER))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_CHARACTER))
 		{
 			// Retrieve the L2PcInstance from the characters table of the database
-			statement.setInt(1, objectId);
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, objectId);
+			try (ResultSet rset = ps.executeQuery())
 			{
 				if (rset.next())
 				{
@@ -7064,11 +7064,11 @@ public final class L2PcInstance extends L2Playable
 	 */
 	private static boolean restoreSubClassData(L2PcInstance player)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_CHAR_SUBCLASSES))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_CHAR_SUBCLASSES))
 		{
-			statement.setInt(1, player.getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, player.getObjectId());
+			try (ResultSet rset = ps.executeQuery())
 			{
 				while (rset.next())
 				{
@@ -7145,16 +7145,16 @@ public final class L2PcInstance extends L2Playable
 	private void restoreRecipeBook(boolean loadCommon)
 	{
 		final String sql = loadCommon ? "SELECT id, type, classIndex FROM character_recipebook WHERE charId=?" : "SELECT id FROM character_recipebook WHERE charId=? AND classIndex=? AND type = 1";
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(sql))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(sql))
 		{
-			statement.setInt(1, getObjectId());
+			ps.setInt(1, getObjectId());
 			if (!loadCommon)
 			{
-				statement.setInt(2, _classIndex);
+				ps.setInt(2, _classIndex);
 			}
 			
-			try (ResultSet rset = statement.executeQuery())
+			try (ResultSet rset = ps.executeQuery())
 			{
 				_dwarvenRecipeBook.clear();
 				
@@ -7198,11 +7198,11 @@ public final class L2PcInstance extends L2Playable
 	private void loadPremiumItemList()
 	{
 		final String sql = "SELECT itemNum, itemId, itemCount, itemSender FROM character_premium_items WHERE charId=?";
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(sql))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(sql))
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rset = ps.executeQuery())
 			{
 				while (rset.next())
 				{
@@ -7222,13 +7222,13 @@ public final class L2PcInstance extends L2Playable
 	
 	public void updatePremiumItem(int itemNum, long newcount)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("UPDATE character_premium_items SET itemCount=? WHERE charId=? AND itemNum=? "))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("UPDATE character_premium_items SET itemCount=? WHERE charId=? AND itemNum=? "))
 		{
-			statement.setLong(1, newcount);
-			statement.setInt(2, getObjectId());
-			statement.setInt(3, itemNum);
-			statement.execute();
+			ps.setLong(1, newcount);
+			ps.setInt(2, getObjectId());
+			ps.setInt(3, itemNum);
+			ps.execute();
 		}
 		catch (Exception e)
 		{
@@ -7238,12 +7238,12 @@ public final class L2PcInstance extends L2Playable
 	
 	public void deletePremiumItem(int itemNum)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("DELETE FROM character_premium_items WHERE charId=? AND itemNum=? "))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("DELETE FROM character_premium_items WHERE charId=? AND itemNum=? "))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, itemNum);
-			statement.execute();
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, itemNum);
+			ps.execute();
 		}
 		catch (Exception e)
 		{
@@ -7296,43 +7296,43 @@ public final class L2PcInstance extends L2Playable
 		long exp = getStat().getBaseExp();
 		int level = getStat().getBaseLevel();
 		int sp = getStat().getBaseSp();
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(UPDATE_CHARACTER))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_CHARACTER))
 		{
-			statement.setInt(1, level);
-			statement.setInt(2, getMaxHp());
-			statement.setDouble(3, getCurrentHp());
-			statement.setInt(4, getMaxCp());
-			statement.setDouble(5, getCurrentCp());
-			statement.setInt(6, getMaxMp());
-			statement.setDouble(7, getCurrentMp());
-			statement.setInt(8, getAppearance().getFace());
-			statement.setInt(9, getAppearance().getHairStyle());
-			statement.setInt(10, getAppearance().getHairColor());
-			statement.setInt(11, getAppearance().getSex() ? 1 : 0);
-			statement.setInt(12, getHeading());
-			statement.setInt(13, _observerMode ? _lastLoc.getX() : getX());
-			statement.setInt(14, _observerMode ? _lastLoc.getY() : getY());
-			statement.setInt(15, _observerMode ? _lastLoc.getZ() : getZ());
-			statement.setLong(16, exp);
-			statement.setLong(17, getExpBeforeDeath());
-			statement.setInt(18, sp);
-			statement.setInt(19, getKarma());
-			statement.setInt(20, getFame());
-			statement.setInt(21, getPvpKills());
-			statement.setInt(22, getPkKills());
-			statement.setInt(23, getClanId());
-			statement.setInt(24, getRace().ordinal());
-			statement.setInt(25, getClassId().getId());
-			statement.setLong(26, getDeleteTimer());
-			statement.setString(27, getTitle());
-			statement.setInt(28, getAppearance().getTitleColor());
-			statement.setInt(29, getAccessLevel().getLevel());
-			statement.setInt(30, isOnlineInt());
-			statement.setInt(31, isIn7sDungeon() ? 1 : 0);
-			statement.setInt(32, getClanPrivileges().getBitmask());
-			statement.setInt(33, getWantsPeace());
-			statement.setInt(34, getBaseClass());
+			ps.setInt(1, level);
+			ps.setInt(2, getMaxHp());
+			ps.setDouble(3, getCurrentHp());
+			ps.setInt(4, getMaxCp());
+			ps.setDouble(5, getCurrentCp());
+			ps.setInt(6, getMaxMp());
+			ps.setDouble(7, getCurrentMp());
+			ps.setInt(8, getAppearance().getFace());
+			ps.setInt(9, getAppearance().getHairStyle());
+			ps.setInt(10, getAppearance().getHairColor());
+			ps.setInt(11, getAppearance().getSex() ? 1 : 0);
+			ps.setInt(12, getHeading());
+			ps.setInt(13, _observerMode ? _lastLoc.getX() : getX());
+			ps.setInt(14, _observerMode ? _lastLoc.getY() : getY());
+			ps.setInt(15, _observerMode ? _lastLoc.getZ() : getZ());
+			ps.setLong(16, exp);
+			ps.setLong(17, getExpBeforeDeath());
+			ps.setInt(18, sp);
+			ps.setInt(19, getKarma());
+			ps.setInt(20, getFame());
+			ps.setInt(21, getPvpKills());
+			ps.setInt(22, getPkKills());
+			ps.setInt(23, getClanId());
+			ps.setInt(24, getRace().ordinal());
+			ps.setInt(25, getClassId().getId());
+			ps.setLong(26, getDeleteTimer());
+			ps.setString(27, getTitle());
+			ps.setInt(28, getAppearance().getTitleColor());
+			ps.setInt(29, getAccessLevel().getLevel());
+			ps.setInt(30, isOnlineInt());
+			ps.setInt(31, isIn7sDungeon() ? 1 : 0);
+			ps.setInt(32, getClanPrivileges().getBitmask());
+			ps.setInt(33, getWantsPeace());
+			ps.setInt(34, getBaseClass());
 			
 			long totalOnlineTime = _onlineTime;
 			if (_onlineBeginTime > 0)
@@ -7340,24 +7340,24 @@ public final class L2PcInstance extends L2Playable
 				totalOnlineTime += (System.currentTimeMillis() - _onlineBeginTime) / 1000;
 			}
 			
-			statement.setLong(35, totalOnlineTime);
-			statement.setInt(36, getNewbie());
-			statement.setInt(37, isNoble() ? 1 : 0);
-			statement.setInt(38, getPowerGrade());
-			statement.setInt(39, getPledgeType());
-			statement.setInt(40, getLvlJoinedAcademy());
-			statement.setLong(41, getApprentice());
-			statement.setLong(42, getSponsor());
-			statement.setLong(43, getClanJoinExpiryTime());
-			statement.setLong(44, getClanCreateExpiryTime());
-			statement.setString(45, getName());
-			statement.setLong(46, getDeathPenaltyBuffLevel());
-			statement.setInt(47, getBookMarkSlot());
-			statement.setInt(48, getVitalityPoints());
-			statement.setString(49, getLang());
-			statement.setInt(50, getObjectId());
+			ps.setLong(35, totalOnlineTime);
+			ps.setInt(36, getNewbie());
+			ps.setInt(37, isNoble() ? 1 : 0);
+			ps.setInt(38, getPowerGrade());
+			ps.setInt(39, getPledgeType());
+			ps.setInt(40, getLvlJoinedAcademy());
+			ps.setLong(41, getApprentice());
+			ps.setLong(42, getSponsor());
+			ps.setLong(43, getClanJoinExpiryTime());
+			ps.setLong(44, getClanCreateExpiryTime());
+			ps.setString(45, getName());
+			ps.setLong(46, getDeathPenaltyBuffLevel());
+			ps.setInt(47, getBookMarkSlot());
+			ps.setInt(48, getVitalityPoints());
+			ps.setString(49, getLang());
+			ps.setInt(50, getObjectId());
 			
-			statement.execute();
+			ps.execute();
 		}
 		catch (Exception e)
 		{
@@ -7372,20 +7372,21 @@ public final class L2PcInstance extends L2Playable
 			return;
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(UPDATE_CHAR_SUBCLASS))
+		// TODO(Zoey76): Refactor this to use batch.
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(UPDATE_CHAR_SUBCLASS))
 		{
 			for (SubClass subClass : getSubClasses().values())
 			{
-				statement.setLong(1, subClass.getExp());
-				statement.setInt(2, subClass.getSp());
-				statement.setInt(3, subClass.getLevel());
-				statement.setInt(4, subClass.getClassId());
-				statement.setInt(5, getObjectId());
-				statement.setInt(6, subClass.getClassIndex());
+				ps.setLong(1, subClass.getExp());
+				ps.setInt(2, subClass.getSp());
+				ps.setInt(3, subClass.getLevel());
+				ps.setInt(4, subClass.getClassId());
+				ps.setInt(5, getObjectId());
+				ps.setInt(6, subClass.getClassIndex());
 				
-				statement.execute();
-				statement.clearParameters();
+				ps.execute();
+				ps.clearParameters();
 			}
 		}
 		catch (Exception e)
@@ -7402,7 +7403,7 @@ public final class L2PcInstance extends L2Playable
 			return;
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement delete = con.prepareStatement(DELETE_SKILL_SAVE);
 			PreparedStatement statement = con.prepareStatement(ADD_SKILL_SAVE);)
 		{
@@ -7505,7 +7506,7 @@ public final class L2PcInstance extends L2Playable
 	
 	private void storeItemReuseDelay()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps1 = con.prepareStatement(DELETE_ITEM_REUSE_SAVE);
 			PreparedStatement ps2 = con.prepareStatement(ADD_ITEM_REUSE_SAVE))
 		{
@@ -7621,14 +7622,14 @@ public final class L2PcInstance extends L2Playable
 		final Skill oldSkill = super.removeSkill(skill, true);
 		if (oldSkill != null)
 		{
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement(DELETE_SKILL_FROM_CHAR))
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
+				PreparedStatement ps = con.prepareStatement(DELETE_SKILL_FROM_CHAR))
 			{
 				// Remove or update a L2PcInstance skill from the character_skills table of the database
-				statement.setInt(1, oldSkill.getId());
-				statement.setInt(2, getObjectId());
-				statement.setInt(3, getClassIndex());
-				statement.execute();
+				ps.setInt(1, oldSkill.getId());
+				ps.setInt(2, getObjectId());
+				ps.setInt(3, getClassIndex());
+				ps.execute();
 			}
 			catch (Exception e)
 			{
@@ -7664,7 +7665,7 @@ public final class L2PcInstance extends L2Playable
 	private void storeSkill(Skill newSkill, Skill oldSkill, int newClassIndex)
 	{
 		final int classIndex = (newClassIndex > -1) ? newClassIndex : _classIndex;
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = ConnectionFactory.getInstance().getConnection())
 		{
 			if ((oldSkill != null) && (newSkill != null))
 			{
@@ -7712,7 +7713,7 @@ public final class L2PcInstance extends L2Playable
 		}
 		
 		final int classIndex = (newClassIndex > -1) ? newClassIndex : _classIndex;
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(ADD_NEW_SKILLS))
 		{
 			con.setAutoCommit(false);
@@ -7739,18 +7740,18 @@ public final class L2PcInstance extends L2Playable
 	 */
 	private void restoreSkills()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_SKILLS_FOR_CHAR))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_SKILLS_FOR_CHAR))
 		{
 			// Retrieve all skills of this L2PcInstance from the database
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, getClassIndex());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, getClassIndex());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				while (rset.next())
+				while (rs.next())
 				{
-					final int id = rset.getInt("skill_id");
-					final int level = rset.getInt("skill_level");
+					final int id = rs.getInt("skill_id");
+					final int level = rs.getInt("skill_level");
 					
 					// Create a L2Skill object for each record
 					final Skill skill = SkillData.getInstance().getSkill(id, level);
@@ -7790,21 +7791,21 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void restoreEffects()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_SKILL_SAVE))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_SKILL_SAVE))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, getClassIndex());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, getClassIndex());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				while (rset.next())
+				while (rs.next())
 				{
-					int remainingTime = rset.getInt("remaining_time");
-					long reuseDelay = rset.getLong("reuse_delay");
-					long systime = rset.getLong("systime");
-					int restoreType = rset.getInt("restore_type");
+					int remainingTime = rs.getInt("remaining_time");
+					long reuseDelay = rs.getLong("reuse_delay");
+					long systime = rs.getLong("systime");
+					int restoreType = rs.getInt("restore_type");
 					
-					final Skill skill = SkillData.getInstance().getSkill(rset.getInt("skill_id"), rset.getInt("skill_level"));
+					final Skill skill = SkillData.getInstance().getSkill(rs.getInt("skill_id"), rs.getInt("skill_level"));
 					if (skill == null)
 					{
 						continue;
@@ -7847,12 +7848,12 @@ public final class L2PcInstance extends L2Playable
 	 */
 	private void restoreItemReuse()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_ITEM_REUSE_SAVE);
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_ITEM_REUSE_SAVE);
 			PreparedStatement delete = con.prepareStatement(DELETE_ITEM_REUSE_SAVE);)
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rs = ps.executeQuery())
 			{
 				int itemId;
 				@SuppressWarnings("unused")
@@ -7861,12 +7862,12 @@ public final class L2PcInstance extends L2Playable
 				long systime;
 				boolean isInInventory;
 				long remainingTime;
-				while (rset.next())
+				while (rs.next())
 				{
-					itemId = rset.getInt("itemId");
-					itemObjId = rset.getInt("itemObjId");
-					reuseDelay = rset.getLong("reuseDelay");
-					systime = rset.getLong("systime");
+					itemId = rs.getInt("itemId");
+					itemObjId = rs.getInt("itemObjId");
+					reuseDelay = rs.getLong("reuseDelay");
+					systime = rs.getLong("systime");
 					isInInventory = true;
 					
 					// Using item Id
@@ -7918,12 +7919,12 @@ public final class L2PcInstance extends L2Playable
 			_henna[i] = null;
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_CHAR_HENNAS))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_CHAR_HENNAS))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, getClassIndex());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, getClassIndex());
+			try (ResultSet rset = ps.executeQuery())
 			{
 				int slot;
 				int symbolId;
@@ -8006,13 +8007,13 @@ public final class L2PcInstance extends L2Playable
 		
 		_henna[slot] = null;
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(DELETE_CHAR_HENNA))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(DELETE_CHAR_HENNA))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, slot + 1);
-			statement.setInt(3, getClassIndex());
-			statement.execute();
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, slot + 1);
+			ps.setInt(3, getClassIndex());
+			ps.execute();
 		}
 		catch (Exception e)
 		{
@@ -8059,14 +8060,14 @@ public final class L2PcInstance extends L2Playable
 				// Calculate Henna modifiers of this L2PcInstance
 				recalcHennaStats();
 				
-				try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-					PreparedStatement statement = con.prepareStatement(ADD_CHAR_HENNA))
+				try (Connection con = ConnectionFactory.getInstance().getConnection();
+					PreparedStatement ps = con.prepareStatement(ADD_CHAR_HENNA))
 				{
-					statement.setInt(1, getObjectId());
-					statement.setInt(2, henna.getDyeId());
-					statement.setInt(3, i + 1);
-					statement.setInt(4, getClassIndex());
-					statement.execute();
+					ps.setInt(1, getObjectId());
+					ps.setInt(2, henna.getDyeId());
+					ps.setInt(3, i + 1);
+					ps.setInt(4, getClassIndex());
+					ps.execute();
 				}
 				catch (Exception e)
 				{
@@ -10011,17 +10012,17 @@ public final class L2PcInstance extends L2Playable
 			newClass.setClassId(classId);
 			newClass.setClassIndex(classIndex);
 			
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement(ADD_CHAR_SUBCLASS))
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
+				PreparedStatement ps = con.prepareStatement(ADD_CHAR_SUBCLASS))
 			{
 				// Store the basic info about this new sub-class.
-				statement.setInt(1, getObjectId());
-				statement.setInt(2, newClass.getClassId());
-				statement.setLong(3, newClass.getExp());
-				statement.setInt(4, newClass.getSp());
-				statement.setInt(5, newClass.getLevel());
-				statement.setInt(6, newClass.getClassIndex()); // <-- Added
-				statement.execute();
+				ps.setInt(1, getObjectId());
+				ps.setInt(2, newClass.getClassId());
+				ps.setLong(3, newClass.getExp());
+				ps.setInt(4, newClass.getSp());
+				ps.setInt(5, newClass.getLevel());
+				ps.setInt(6, newClass.getClassIndex()); // <-- Added
+				ps.execute();
 			}
 			catch (Exception e)
 			{
@@ -10076,7 +10077,7 @@ public final class L2PcInstance extends L2Playable
 		
 		try
 		{
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
 				PreparedStatement deleteHennas = con.prepareStatement(DELETE_CHAR_HENNAS);
 				PreparedStatement deleteShortcuts = con.prepareStatement(DELETE_CHAR_SHORTCUTS);
 				PreparedStatement deleteSkillReuse = con.prepareStatement(DELETE_SKILL_SAVE);
@@ -12721,14 +12722,13 @@ public final class L2PcInstance extends L2Playable
 	{
 		if ((_controlItemId != 0) && (petId != 0))
 		{
-			String req;
-			req = "UPDATE pets SET fed=? WHERE item_obj_id = ?";
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement(req))
+			final String req = "UPDATE pets SET fed=? WHERE item_obj_id = ?";
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
+				PreparedStatement ps = con.prepareStatement(req))
 			{
-				statement.setInt(1, getCurrentFeed());
-				statement.setInt(2, _controlItemId);
-				statement.executeUpdate();
+				ps.setInt(1, getCurrentFeed());
+				ps.setInt(2, _controlItemId);
+				ps.executeUpdate();
 				_controlItemId = 0;
 			}
 			catch (Exception e)
@@ -12875,15 +12875,15 @@ public final class L2PcInstance extends L2Playable
 			bookmark.setTag(tag);
 			bookmark.setName(name);
 			
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement(UPDATE_TP_BOOKMARK))
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
+				PreparedStatement ps = con.prepareStatement(UPDATE_TP_BOOKMARK))
 			{
-				statement.setInt(1, icon);
-				statement.setString(2, tag);
-				statement.setString(3, name);
-				statement.setInt(4, getObjectId());
-				statement.setInt(5, id);
-				statement.execute();
+				ps.setInt(1, icon);
+				ps.setString(2, tag);
+				ps.setString(3, name);
+				ps.setInt(4, getObjectId());
+				ps.setInt(5, id);
+				ps.execute();
 			}
 			catch (Exception e)
 			{
@@ -12898,12 +12898,12 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (_tpbookmarks.remove(id) != null)
 		{
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement(DELETE_TP_BOOKMARK))
+			try (Connection con = ConnectionFactory.getInstance().getConnection();
+				PreparedStatement ps = con.prepareStatement(DELETE_TP_BOOKMARK))
 			{
-				statement.setInt(1, getObjectId());
-				statement.setInt(2, id);
-				statement.execute();
+				ps.setInt(1, getObjectId());
+				ps.setInt(2, id);
+				ps.execute();
 			}
 			catch (Exception e)
 			{
@@ -13046,18 +13046,18 @@ public final class L2PcInstance extends L2Playable
 		sm.addItemName(20033);
 		sendPacket(sm);
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(INSERT_TP_BOOKMARK))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(INSERT_TP_BOOKMARK))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, id);
-			statement.setInt(3, x);
-			statement.setInt(4, y);
-			statement.setInt(5, z);
-			statement.setInt(6, icon);
-			statement.setString(7, tag);
-			statement.setString(8, name);
-			statement.execute();
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, id);
+			ps.setInt(3, x);
+			ps.setInt(4, y);
+			ps.setInt(5, z);
+			ps.setInt(6, icon);
+			ps.setString(7, tag);
+			ps.setString(8, name);
+			ps.execute();
 		}
 		catch (Exception e)
 		{
@@ -13068,15 +13068,15 @@ public final class L2PcInstance extends L2Playable
 	
 	public void restoreTeleportBookmark()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_TP_BOOKMARK))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_TP_BOOKMARK))
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				while (rset.next())
+				while (rs.next())
 				{
-					_tpbookmarks.put(rset.getInt("Id"), new TeleportBookmark(rset.getInt("Id"), rset.getInt("x"), rset.getInt("y"), rset.getInt("z"), rset.getInt("icon"), rset.getString("tag"), rset.getString("name")));
+					_tpbookmarks.put(rs.getInt("Id"), new TeleportBookmark(rs.getInt("Id"), rs.getInt("x"), rs.getInt("y"), rs.getInt("z"), rs.getInt("icon"), rs.getString("tag"), rs.getString("name")));
 				}
 			}
 		}
@@ -13290,15 +13290,15 @@ public final class L2PcInstance extends L2Playable
 		_friendList.clear();
 		
 		final String sqlQuery = "SELECT friendId FROM character_friends WHERE charId=? AND relation=0";
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(sqlQuery))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(sqlQuery))
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				while (rset.next())
+				while (rs.next())
 				{
-					int friendId = rset.getInt("friendId");
+					int friendId = rs.getInt("friendId");
 					if (friendId == getObjectId())
 					{
 						continue;
@@ -13380,28 +13380,26 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (hasManufactureShop())
 		{
-			try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+			try (Connection con = ConnectionFactory.getInstance().getConnection())
 			{
-				try (PreparedStatement st = con.prepareStatement(DELETE_CHAR_RECIPE_SHOP))
+				try (PreparedStatement ps = con.prepareStatement(DELETE_CHAR_RECIPE_SHOP))
 				{
-					st.setInt(1, getObjectId());
-					st.execute();
+					ps.setInt(1, getObjectId());
+					ps.execute();
 				}
 				
-				try (PreparedStatement st = con.prepareStatement(INSERT_CHAR_RECIPE_SHOP))
+				try (PreparedStatement ps = con.prepareStatement(INSERT_CHAR_RECIPE_SHOP))
 				{
 					AtomicInteger slot = new AtomicInteger(1);
-					con.setAutoCommit(false);
 					for (L2ManufactureItem item : _manufactureItems.values())
 					{
-						st.setInt(1, getObjectId());
-						st.setInt(2, item.getRecipeId());
-						st.setLong(3, item.getCost());
-						st.setInt(4, slot.getAndIncrement());
-						st.addBatch();
+						ps.setInt(1, getObjectId());
+						ps.setInt(2, item.getRecipeId());
+						ps.setLong(3, item.getCost());
+						ps.setInt(4, slot.getAndIncrement());
+						ps.addBatch();
 					}
-					st.executeBatch();
-					con.commit();
+					ps.executeBatch();
 				}
 			}
 			catch (Exception e)
@@ -13418,15 +13416,15 @@ public final class L2PcInstance extends L2Playable
 			_manufactureItems.clear();
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(RESTORE_CHAR_RECIPE_SHOP))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement(RESTORE_CHAR_RECIPE_SHOP))
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				while (rset.next())
+				while (rs.next())
 				{
-					getManufactureItems().put(rset.getInt("recipeId"), new L2ManufactureItem(rset.getInt("recipeId"), rset.getLong("price")));
+					getManufactureItems().put(rs.getInt("recipeId"), new L2ManufactureItem(rs.getInt("recipeId"), rs.getLong("price")));
 				}
 			}
 		}
@@ -13851,13 +13849,13 @@ public final class L2PcInstance extends L2Playable
 	 */
 	private void restorePetInventoryItems()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT object_id FROM `items` WHERE `owner_id`=? AND (`loc`='PET' OR `loc`='PET_EQUIP') LIMIT 1;"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("SELECT object_id FROM `items` WHERE `owner_id`=? AND (`loc`='PET' OR `loc`='PET_EQUIP') LIMIT 1;"))
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				setPetInvItems(rset.next() && (rset.getInt("object_id") > 0));
+				setPetInvItems(rs.next() && (rs.getInt("object_id") > 0));
 			}
 		}
 		catch (Exception e)
@@ -13893,17 +13891,17 @@ public final class L2PcInstance extends L2Playable
 	private long loadRecommendations()
 	{
 		long _time_left = 0;
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT rec_have,rec_left,time_left FROM character_reco_bonus WHERE charId=? LIMIT 1"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("SELECT rec_have,rec_left,time_left FROM character_reco_bonus WHERE charId=? LIMIT 1"))
 		{
-			statement.setInt(1, getObjectId());
-			try (ResultSet rset = statement.executeQuery())
+			ps.setInt(1, getObjectId());
+			try (ResultSet rs = ps.executeQuery())
 			{
-				if (rset.next())
+				if (rs.next())
 				{
-					setRecomHave(rset.getInt("rec_have"));
-					setRecomLeft(rset.getInt("rec_left"));
-					_time_left = rset.getLong("time_left");
+					setRecomHave(rs.getInt("rec_have"));
+					setRecomLeft(rs.getInt("rec_left"));
+					_time_left = rs.getLong("time_left");
 				}
 				else
 				{
@@ -13929,18 +13927,18 @@ public final class L2PcInstance extends L2Playable
 			recoTaskEnd = Math.max(0, _recoBonusTask.getDelay(TimeUnit.MILLISECONDS));
 		}
 		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("INSERT INTO character_reco_bonus (charId,rec_have,rec_left,time_left) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE rec_have=?, rec_left=?, time_left=?"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("INSERT INTO character_reco_bonus (charId,rec_have,rec_left,time_left) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE rec_have=?, rec_left=?, time_left=?"))
 		{
-			statement.setInt(1, getObjectId());
-			statement.setInt(2, getRecomHave());
-			statement.setInt(3, getRecomLeft());
-			statement.setLong(4, recoTaskEnd);
+			ps.setInt(1, getObjectId());
+			ps.setInt(2, getRecomHave());
+			ps.setInt(3, getRecomLeft());
+			ps.setLong(4, recoTaskEnd);
 			// Update part
-			statement.setInt(5, getRecomHave());
-			statement.setInt(6, getRecomLeft());
-			statement.setLong(7, recoTaskEnd);
-			statement.execute();
+			ps.setInt(5, getRecomHave());
+			ps.setInt(6, getRecomLeft());
+			ps.setLong(7, recoTaskEnd);
+			ps.execute();
 		}
 		catch (Exception e)
 		{

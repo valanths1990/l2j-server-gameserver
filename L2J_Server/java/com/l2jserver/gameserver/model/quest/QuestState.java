@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.enums.QuestSound;
 import com.l2jserver.gameserver.enums.QuestType;
@@ -402,13 +402,13 @@ public final class QuestState
 	// TODO: these methods should not be here, they could be used by other classes to save some variables, but they can't because they require to create a QuestState first.
 	public final void saveGlobalQuestVar(String var, String value)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("REPLACE INTO character_quest_global_data (charId, var, value) VALUES (?, ?, ?)"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("REPLACE INTO character_quest_global_data (charId, var, value) VALUES (?, ?, ?)"))
 		{
-			statement.setInt(1, _player.getObjectId());
-			statement.setString(2, var);
-			statement.setString(3, value);
-			statement.executeUpdate();
+			ps.setInt(1, _player.getObjectId());
+			ps.setString(2, var);
+			ps.setString(3, value);
+			ps.executeUpdate();
 		}
 		catch (Exception e)
 		{
@@ -429,7 +429,7 @@ public final class QuestState
 	public final String getGlobalQuestVar(String var)
 	{
 		String result = "";
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement("SELECT value FROM character_quest_global_data WHERE charId = ? AND var = ?"))
 		{
 			ps.setInt(1, _player.getObjectId());
@@ -455,12 +455,12 @@ public final class QuestState
 	 */
 	public final void deleteGlobalQuestVar(String var)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("DELETE FROM character_quest_global_data WHERE charId = ? AND var = ?"))
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("DELETE FROM character_quest_global_data WHERE charId = ? AND var = ?"))
 		{
-			statement.setInt(1, _player.getObjectId());
-			statement.setString(2, var);
-			statement.executeUpdate();
+			ps.setInt(1, _player.getObjectId());
+			ps.setString(2, var);
+			ps.executeUpdate();
 		}
 		catch (Exception e)
 		{

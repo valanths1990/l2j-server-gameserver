@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 
 /**
  * This class ...
@@ -174,7 +174,7 @@ public abstract class IdFactory
 	 */
 	private void setAllCharacterOffline()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement())
 		{
 			s.executeUpdate("UPDATE characters SET online = 0");
@@ -191,7 +191,7 @@ public abstract class IdFactory
 	 */
 	private void cleanUpDB()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement stmt = con.createStatement())
 		{
 			long cleanupStart = System.currentTimeMillis();
@@ -305,7 +305,7 @@ public abstract class IdFactory
 	
 	private void cleanInvalidWeddings()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement())
 		{
 			s.executeUpdate("DELETE FROM mods_wedding WHERE player1Id NOT IN (SELECT charId FROM characters)");
@@ -320,7 +320,7 @@ public abstract class IdFactory
 	
 	private void cleanUpTimeStamps()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		try (Connection con = ConnectionFactory.getInstance().getConnection())
 		{
 			int cleanCount = 0;
 			for (String line : TIMESTAMPS_CLEAN)
@@ -346,7 +346,7 @@ public abstract class IdFactory
 	protected final Integer[] extractUsedObjectIDTable() throws Exception
 	{
 		final List<Integer> temp = new ArrayList<>();
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement())
 		{
 			

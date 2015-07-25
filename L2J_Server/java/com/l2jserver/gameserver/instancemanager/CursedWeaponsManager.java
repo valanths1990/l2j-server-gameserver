@@ -38,7 +38,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.Config;
-import com.l2jserver.L2DatabaseFactory;
+import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.model.CursedWeapon;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -174,7 +174,7 @@ public final class CursedWeaponsManager
 	
 	private final void restore()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement s = con.createStatement();
 			ResultSet rs = s.executeQuery("SELECT itemId, charId, playerKarma, playerPkKills, nbKills, endTime FROM cursed_weapons"))
 		{
@@ -199,64 +199,62 @@ public final class CursedWeaponsManager
 	
 	private final void controlPlayers()
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
+		// TODO: See comments below...
+		// This entire for loop should NOT be necessary, since it is already handled by
+		// CursedWeapon.endOfLife(). However, if we indeed *need* to duplicate it for safety,
+		// then we'd better make sure that it FULLY cleans up inactive cursed weapons!
+		// Undesired effects result otherwise, such as player with no zariche but with karma
+		// or a lost-child entry in the cursed weapons table, without a corresponding one in items...
+		
+		// Retrieve the L2PcInstance from the characters table of the database
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
+			PreparedStatement ps = con.prepareStatement("SELECT owner_id FROM items WHERE item_id=?"))
 		{
-			// TODO: See comments below...
-			// This entire for loop should NOT be necessary, since it is already handled by
-			// CursedWeapon.endOfLife(). However, if we indeed *need* to duplicate it for safety,
-			// then we'd better make sure that it FULLY cleans up inactive cursed weapons!
-			// Undesired effects result otherwise, such as player with no zariche but with karma
-			// or a lost-child entry in the cursed weapons table, without a corresponding one in items...
-			
-			// Retrieve the L2PcInstance from the characters table of the database
-			try (PreparedStatement ps = con.prepareStatement("SELECT owner_id FROM items WHERE item_id=?"))
+			for (CursedWeapon cw : _cursedWeapons.values())
 			{
-				for (CursedWeapon cw : _cursedWeapons.values())
+				if (cw.isActivated())
 				{
-					if (cw.isActivated())
-					{
-						continue;
-					}
-					
-					// Do an item check to be sure that the cursed weapon isn't hold by someone
-					int itemId = cw.getItemId();
-					ps.setInt(1, itemId);
-					try (ResultSet rset = ps.executeQuery())
-					{
-						if (rset.next())
-						{
-							// A player has the cursed weapon in his inventory ...
-							int playerId = rset.getInt("owner_id");
-							_log.info("PROBLEM : Player " + playerId + " owns the cursed weapon " + itemId + " but he shouldn't.");
-							
-							// Delete the item
-							try (PreparedStatement delete = con.prepareStatement("DELETE FROM items WHERE owner_id=? AND item_id=?"))
-							{
-								delete.setInt(1, playerId);
-								delete.setInt(2, itemId);
-								if (delete.executeUpdate() != 1)
-								{
-									_log.warning("Error while deleting cursed weapon " + itemId + " from userId " + playerId);
-								}
-							}
-							
-							// Restore the player's old karma and pk count
-							try (PreparedStatement update = con.prepareStatement("UPDATE characters SET karma=?, pkkills=? WHERE charId=?"))
-							{
-								update.setInt(1, cw.getPlayerKarma());
-								update.setInt(2, cw.getPlayerPkKills());
-								update.setInt(3, playerId);
-								if (update.executeUpdate() != 1)
-								{
-									_log.warning("Error while updating karma & pkkills for userId " + cw.getPlayerId());
-								}
-							}
-							// clean up the cursed weapons table.
-							removeFromDb(itemId);
-						}
-					}
-					ps.clearParameters();
+					continue;
 				}
+				
+				// Do an item check to be sure that the cursed weapon isn't hold by someone
+				int itemId = cw.getItemId();
+				ps.setInt(1, itemId);
+				try (ResultSet rset = ps.executeQuery())
+				{
+					if (rset.next())
+					{
+						// A player has the cursed weapon in his inventory ...
+						int playerId = rset.getInt("owner_id");
+						_log.info("PROBLEM : Player " + playerId + " owns the cursed weapon " + itemId + " but he shouldn't.");
+						
+						// Delete the item
+						try (PreparedStatement delete = con.prepareStatement("DELETE FROM items WHERE owner_id=? AND item_id=?"))
+						{
+							delete.setInt(1, playerId);
+							delete.setInt(2, itemId);
+							if (delete.executeUpdate() != 1)
+							{
+								_log.warning("Error while deleting cursed weapon " + itemId + " from userId " + playerId);
+							}
+						}
+						
+						// Restore the player's old karma and pk count
+						try (PreparedStatement update = con.prepareStatement("UPDATE characters SET karma=?, pkkills=? WHERE charId=?"))
+						{
+							update.setInt(1, cw.getPlayerKarma());
+							update.setInt(2, cw.getPlayerPkKills());
+							update.setInt(3, playerId);
+							if (update.executeUpdate() != 1)
+							{
+								_log.warning("Error while updating karma & pkkills for userId " + cw.getPlayerId());
+							}
+						}
+						// clean up the cursed weapons table.
+						removeFromDb(itemId);
+					}
+				}
+				ps.clearParameters();
 			}
 		}
 		catch (Exception e)
@@ -375,7 +373,7 @@ public final class CursedWeaponsManager
 	
 	public static void removeFromDb(int itemId)
 	{
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection();
+		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement("DELETE FROM cursed_weapons WHERE itemId = ?"))
 		{
 			ps.setInt(1, itemId);

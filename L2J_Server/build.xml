@@ -90,7 +90,7 @@
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Built-Date" value="${time.stamp}" />
 				<attribute name="Implementation-URL" value="http://www.l2jserver.com/" />
-				<attribute name="Class-Path" value="../libs/c3p0-0.9.5.jar ../libs/mail-1.5.2.jar ../libs/mmocore.jar ../libs/mysql-connector-java-5.1.34-bin.jar ../libs/weupnp-0.1.3.jar" />
+				<attribute name="Class-Path" value="${manifest.libs}" />
 				<attribute name="Main-Class" value="com.l2jserver.loginserver.L2LoginServer" />
 			</manifest>
 		</jar>
@@ -108,7 +108,7 @@
 				<exclude name="**/status/**" />
 				<exclude name="**/util/**" />
 				<exclude name="**/Config/**" />
-				<exclude name="**/L2DatabaseFactory/**" />
+				<exclude name="**/ConnectionFactory/**" />
 				<exclude name="**/Server/**" />
 			</fileset>
 			<manifest>
@@ -148,7 +148,7 @@
 				<exclude name="**/status/**" />
 				<exclude name="**/util/**" />
 				<exclude name="**/Config/**" />
-				<exclude name="**/L2DatabaseFactory/**" />
+				<exclude name="**/ConnectionFactory/**" />
 				<exclude name="**/Server/**" />
 			</fileset>
 			<manifest>
