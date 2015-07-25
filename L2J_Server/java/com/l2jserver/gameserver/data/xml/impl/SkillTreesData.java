@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -74,22 +76,22 @@ import com.l2jserver.util.data.xml.IXmlReader;
  */
 public final class SkillTreesData implements IXmlReader
 {
-	// ClassId, FastMap of Skill Hash Code, L2SkillLearn
-	private final Map<ClassId, Map<Integer, L2SkillLearn>> _classSkillTrees = new HashMap<>();
-	private final Map<ClassId, Map<Integer, L2SkillLearn>> _transferSkillTrees = new HashMap<>();
+	// ClassId, Map of Skill Hash Code, L2SkillLearn
+	private final Map<ClassId, Map<Integer, L2SkillLearn>> _classSkillTrees = new LinkedHashMap<>();
+	private final Map<ClassId, Map<Integer, L2SkillLearn>> _transferSkillTrees = new LinkedHashMap<>();
 	// Skill Hash Code, L2SkillLearn
-	private final Map<Integer, L2SkillLearn> _collectSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _fishingSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _pledgeSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _subClassSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _subPledgeSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _transformSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _commonSkillTree = new HashMap<>();
+	private final Map<Integer, L2SkillLearn> _collectSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _fishingSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _pledgeSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _subClassSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _subPledgeSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _transformSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _commonSkillTree = new LinkedHashMap<>();
 	// Other skill trees
-	private final Map<Integer, L2SkillLearn> _nobleSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _heroSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _gameMasterSkillTree = new HashMap<>();
-	private final Map<Integer, L2SkillLearn> _gameMasterAuraSkillTree = new HashMap<>();
+	private final Map<Integer, L2SkillLearn> _nobleSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _heroSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _gameMasterSkillTree = new LinkedHashMap<>();
+	private final Map<Integer, L2SkillLearn> _gameMasterAuraSkillTree = new LinkedHashMap<>();
 	
 	// Checker, sorted arrays of hash codes
 	private Map<Integer, int[]> _skillsByClassIdHashCodes; // Occupation skills
@@ -98,8 +100,8 @@ public final class SkillTreesData implements IXmlReader
 	
 	private boolean _loading = true;
 	
-	/** Parent class Ids are read from XML and stored in this map, to allow easy customization. */
-	private final Map<ClassId, ClassId> _parentClassMap = new HashMap<>();
+	/** Parent class IDs are read from XML and stored in this map, to allow easy customization. */
+	private final Map<ClassId, ClassId> _parentClassMap = new LinkedHashMap<>();
 	
 	/**
 	 * Instantiates a new skill trees data.
@@ -325,13 +327,24 @@ public final class SkillTreesData implements IXmlReader
 	 */
 	public Map<Integer, L2SkillLearn> getCompleteClassSkillTree(ClassId classId)
 	{
-		final Map<Integer, L2SkillLearn> skillTree = new HashMap<>();
+		final Map<Integer, L2SkillLearn> skillTree = new LinkedHashMap<>();
 		// Add all skills that belong to all classes.
 		skillTree.putAll(_commonSkillTree);
-		while ((classId != null) && (_classSkillTrees.get(classId) != null))
+		
+		final LinkedList<ClassId> classSequence = new LinkedList<>();
+		while (classId != null)
 		{
-			skillTree.putAll(_classSkillTrees.get(classId));
+			classSequence.addFirst(classId);
 			classId = _parentClassMap.get(classId);
+		}
+		
+		for (ClassId cid : classSequence)
+		{
+			final Map<Integer, L2SkillLearn> classSkillTree = _classSkillTrees.get(cid);
+			if (classSkillTree != null)
+			{
+				skillTree.putAll(classSkillTree);
+			}
 		}
 		return skillTree;
 	}
@@ -735,7 +748,7 @@ public final class SkillTreesData implements IXmlReader
 				final Skill oldSkill = clan.getSkills().get(skill.getSkillId());
 				if (oldSkill != null)
 				{
-					if (oldSkill.getLevel() < skill.getSkillLevel())
+					if ((oldSkill.getLevel() + 1) == skill.getSkillLevel())
 					{
 						result.add(skill);
 					}
