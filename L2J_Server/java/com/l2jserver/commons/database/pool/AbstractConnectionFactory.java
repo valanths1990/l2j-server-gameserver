@@ -20,7 +20,9 @@ package com.l2jserver.commons.database.pool;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract Connection Factory.
@@ -29,7 +31,7 @@ import java.util.logging.Logger;
 public abstract class AbstractConnectionFactory implements IConnectionFactory
 {
 	/** The logger. */
-	protected static final Logger LOG = Logger.getLogger(AbstractConnectionFactory.class.getName());
+	protected static final Logger LOG = LoggerFactory.getLogger(AbstractConnectionFactory.class);
 	
 	@Override
 	public Connection getConnection()
@@ -43,7 +45,7 @@ public abstract class AbstractConnectionFactory implements IConnectionFactory
 			}
 			catch (SQLException e)
 			{
-				LOG.warning(getClass().getSimpleName() + ": Unable to get a connection: " + e.getMessage());
+				LOG.warn("{}: Unable to get a connection!", getClass().getSimpleName(), e);
 			}
 		}
 		return con;

@@ -54,7 +54,7 @@ final class HikariCPConnectionFactory extends AbstractConnectionFactory
 		}
 		catch (Exception e)
 		{
-			LOG.info(e.getMessage());
+			LOG.warn("There has been a problem closing the data source!", e);
 		}
 	}
 	
