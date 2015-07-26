@@ -291,7 +291,7 @@ public final class SkillTreesData implements IXmlReader
 									}
 									default:
 									{
-										LOGGER.warning(getClass().getSimpleName() + ": Unknown Skill Tree type: " + type + "!");
+										LOGGER.warn("{}: Unknown Skill Tree type: {}!", getClass().getSimpleName(), type);
 									}
 								}
 							}
@@ -517,7 +517,7 @@ public final class SkillTreesData implements IXmlReader
 		if (skills.isEmpty())
 		{
 			// The Skill Tree for this class is undefined.
-			LOGGER.warning(getClass().getSimpleName() + ": Skilltree for class " + classId + " is not defined!");
+			LOGGER.warn("{}: Skilltree for class {} is not defined!", getClass().getSimpleName(), classId);
 			return result;
 		}
 		
@@ -578,7 +578,7 @@ public final class SkillTreesData implements IXmlReader
 		if (skills.isEmpty())
 		{
 			// The Skill Tree for this class is undefined, so we return an empty list.
-			LOGGER.warning(getClass().getSimpleName() + ": Skill Tree for this class Id(" + player.getClassId() + ") is not defined!");
+			LOGGER.warn("{}: Skill Tree for class ID {} is not defined!", getClass().getSimpleName(), player.getClassId());
 			return result;
 		}
 		
@@ -1034,7 +1034,7 @@ public final class SkillTreesData implements IXmlReader
 		int minLevel = 0;
 		if (skillTree.isEmpty())
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": SkillTree is not defined for getMinLevelForNewSkill!");
+			LOGGER.warn("{}: SkillTree is not defined for getMinLevelForNewSkill!", getClass().getSimpleName());
 		}
 		else
 		{
@@ -1312,22 +1312,22 @@ public final class SkillTreesData implements IXmlReader
 		}
 		
 		final String className = getClass().getSimpleName();
-		LOGGER.info(className + ": Loaded " + classSkillTreeCount + " Class Skills for " + _classSkillTrees.size() + " Class Skill Trees.");
-		LOGGER.info(className + ": Loaded " + _subClassSkillTree.size() + " Sub-Class Skills.");
-		LOGGER.info(className + ": Loaded " + trasferSkillTreeCount + " Transfer Skills for " + _transferSkillTrees.size() + " Transfer Skill Trees.");
-		LOGGER.info(className + ": Loaded " + _fishingSkillTree.size() + " Fishing Skills, " + dwarvenOnlyFishingSkillCount + " Dwarven only Fishing Skills.");
-		LOGGER.info(className + ": Loaded " + _collectSkillTree.size() + " Collect Skills.");
-		LOGGER.info(className + ": Loaded " + _pledgeSkillTree.size() + " Pledge Skills, " + (_pledgeSkillTree.size() - resSkillCount) + " for Pledge and " + resSkillCount + " Residential.");
-		LOGGER.info(className + ": Loaded " + _subPledgeSkillTree.size() + " Sub-Pledge Skills.");
-		LOGGER.info(className + ": Loaded " + _transformSkillTree.size() + " Transform Skills.");
-		LOGGER.info(className + ": Loaded " + _nobleSkillTree.size() + " Noble Skills.");
-		LOGGER.info(className + ": Loaded " + _heroSkillTree.size() + " Hero Skills.");
-		LOGGER.info(className + ": Loaded " + _gameMasterSkillTree.size() + " Game Master Skills.");
-		LOGGER.info(className + ": Loaded " + _gameMasterAuraSkillTree.size() + " Game Master Aura Skills.");
+		LOGGER.info("{}: Loaded {} Class Skills for {} Class Skill Trees.", className, classSkillTreeCount, _classSkillTrees.size());
+		LOGGER.info("{}: Loaded {} Sub-Class Skills.", className, _subClassSkillTree.size());
+		LOGGER.info("{}: Loaded {} Transfer Skills for {} Transfer Skill Trees.", className, trasferSkillTreeCount, _transferSkillTrees.size());
+		LOGGER.info("{}: Loaded {} Fishing Skills, {} Dwarven only Fishing Skills.", className, _fishingSkillTree.size(), dwarvenOnlyFishingSkillCount);
+		LOGGER.info("{}: Loaded {} Collect Skills.", className, _collectSkillTree.size());
+		LOGGER.info("{}: Loaded {} Pledge Skills, {} for Pledge and {} Residential.", className, _pledgeSkillTree.size(), (_pledgeSkillTree.size() - resSkillCount), resSkillCount);
+		LOGGER.info("{}: Loaded {} Sub-Pledge Skills.", className, _subPledgeSkillTree.size());
+		LOGGER.info("{}: Loaded {} Transform Skills.", className, _transformSkillTree.size());
+		LOGGER.info("{}: Loaded {} Noble Skills.", className, _nobleSkillTree.size());
+		LOGGER.info("{}: Loaded {} Hero Skills.", className, _heroSkillTree.size());
+		LOGGER.info("{}: Loaded {} Game Master Skills.", className, _gameMasterSkillTree.size());
+		LOGGER.info("{}: Loaded {} Game Master Aura Skills.", className, _gameMasterAuraSkillTree.size());
 		final int commonSkills = _commonSkillTree.size();
 		if (commonSkills > 0)
 		{
-			LOGGER.info(className + ": Loaded " + commonSkills + " Common Skills to all classes.");
+			LOGGER.info("{}: Loaded {} Common Skills to all classes.", className, commonSkills);
 		}
 	}
 	

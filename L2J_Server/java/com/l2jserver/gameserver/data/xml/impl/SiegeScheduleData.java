@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -33,6 +32,7 @@ import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Siege Schedule data.
  * @author UnAfraid
  */
 public class SiegeScheduleData implements IXmlReader
@@ -49,11 +49,11 @@ public class SiegeScheduleData implements IXmlReader
 	{
 		_scheduleData.clear();
 		parseDatapackFile("config/SiegeSchedule.xml");
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _scheduleData.size() + " siege schedulers.");
+		LOGGER.info("{}: Loaded: {} siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
 		if (_scheduleData.isEmpty())
 		{
 			_scheduleData.add(new SiegeScheduleDate(new StatsSet()));
-			LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Emergency Loaded: " + _scheduleData.size() + " default siege schedulers.");
+			LOGGER.info("{}: Emergency Loaded: {} default siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class SiegeScheduleData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.WARNING, "", e);
+			LOGGER.warn("{}: Unable to get value!", getClass().getSimpleName(), e);
 			return -1;
 		}
 	}

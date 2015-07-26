@@ -25,7 +25,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -64,7 +63,7 @@ public final class BuyListData implements IXmlReader
 			parseDatapackDirectory("data/buylists/custom", false);
 		}
 		
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _buyLists.size() + " BuyLists.");
+		LOGGER.info("{}: Loaded {} BuyLists.", getClass().getSimpleName(), _buyLists.size());
 		
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement statement = con.createStatement();
@@ -79,13 +78,13 @@ public final class BuyListData implements IXmlReader
 				final L2BuyList buyList = getBuyList(buyListId);
 				if (buyList == null)
 				{
-					LOGGER.warning("BuyList found in database but not loaded from xml! BuyListId: " + buyListId);
+					LOGGER.warn("BuyList found in database but not loaded from xml! BuyListId: {}", buyListId);
 					continue;
 				}
 				final Product product = buyList.getProductByItemId(itemId);
 				if (product == null)
 				{
-					LOGGER.warning("ItemId found in database but not loaded from xml! BuyListId: " + buyListId + " ItemId: " + itemId);
+					LOGGER.warn("ItemId found in database but not loaded from xml! BuyListId: {} Item ID: {}", buyListId, itemId);
 					continue;
 				}
 				if (count < product.getMaxCount())
@@ -97,7 +96,7 @@ public final class BuyListData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.WARNING, "Failed to load buyList data from database.", e);
+			LOGGER.warn("Failed to load buyList data from database.", e);
 		}
 	}
 	
@@ -146,7 +145,7 @@ public final class BuyListData implements IXmlReader
 							}
 							else
 							{
-								LOGGER.warning("Item not found. BuyList:" + buyList.getListId() + " ItemID:" + itemId + " File:" + f.getName());
+								LOGGER.warn("Item not found. BuyList: {} Item ID: {} File: {}", buyList.getListId(), itemId, f.getName());
 							}
 						}
 						else if ("npcs".equalsIgnoreCase(list_node.getNodeName()))
@@ -167,7 +166,7 @@ public final class BuyListData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.WARNING, "Failed to load buyList data from xml File:" + f.getName(), e);
+			LOGGER.warn("Failed to load buyList data from xml File: {}", f.getName(), e);
 		}
 	}
 	

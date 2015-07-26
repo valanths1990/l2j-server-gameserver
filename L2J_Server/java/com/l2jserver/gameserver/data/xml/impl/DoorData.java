@@ -61,6 +61,7 @@ public class DoorData implements IXmlReader
 		_groups.clear();
 		_regions.clear();
 		parseDatapackFile("data/doors.xml");
+		LOGGER.info("{}: Loaded {} Door templates for {} regions.", getClass().getSimpleName(), _doors.size(), _regions.size());
 	}
 	
 	@Override
@@ -88,8 +89,6 @@ public class DoorData implements IXmlReader
 				}
 			}
 		}
-		
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _doors.size() + " Door Templates for " + _regions.size() + " regions.");
 	}
 	
 	public void insertCollisionData(StatsSet set)

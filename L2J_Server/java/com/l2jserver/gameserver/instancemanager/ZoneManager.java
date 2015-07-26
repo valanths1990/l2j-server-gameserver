@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -102,7 +101,7 @@ public final class ZoneManager implements IXmlReader
 			}
 		}
 		GrandBossManager.getInstance().getZones().clear();
-		LOGGER.info(getClass().getSimpleName() + ": Removed zones in " + count + " regions.");
+		LOGGER.info("{}: Removed zones in " + count + " regions.", getClass().getSimpleName());
 		
 		// Load the zones
 		load();
@@ -155,7 +154,7 @@ public final class ZoneManager implements IXmlReader
 						}
 						else
 						{
-							LOGGER.warning("ZoneData: Missing type for zone in file: " + f.getName());
+							LOGGER.warn("ZoneData: Missing type for zone in file {}", f.getName());
 							continue;
 						}
 						
@@ -184,12 +183,12 @@ public final class ZoneManager implements IXmlReader
 						{
 							if (zoneName == null)
 							{
-								LOGGER.warning("ZoneData: Missing name for NpcSpawnTerritory in file: " + f.getName() + ", skipping zone");
+								LOGGER.warn("ZoneData: Missing name for NpcSpawnTerritory in file: {}, skipping zone!", f.getName());
 								continue;
 							}
 							else if (_spawnTerritories.containsKey(zoneName))
 							{
-								LOGGER.warning("ZoneData: Name " + zoneName + " already used for another zone, check file: " + f.getName() + ". Skipping zone");
+								LOGGER.warn("ZoneData: Name {} already used for another zone, check file {}, skipping zone!", zoneName, f.getName());
 								continue;
 							}
 						}
@@ -221,15 +220,12 @@ public final class ZoneManager implements IXmlReader
 							
 							if ((coords == null) || (coords.length == 0))
 							{
-								LOGGER.warning(getClass().getSimpleName() + ": ZoneData: missing data for zone: " + zoneId + " XML file: " + f.getName());
+								LOGGER.warn("{}: ZoneData: missing data for zone: {} XML file {}!", getClass().getSimpleName(), zoneId, f.getName());
 								continue;
 							}
 							
-							// Create this zone. Parsing for cuboids is a
-							// bit different than for other polygons
-							// cuboids need exactly 2 points to be defined.
-							// Other polygons need at least 3 (one per
-							// vertex)
+							// Create this zone. Parsing for cuboids is a bit different than for other polygons cuboids need exactly 2 points to be defined.
+							// Other polygons need at least 3 (one per vertex)
 							if (zoneShape.equalsIgnoreCase("Cuboid"))
 							{
 								if (coords.length == 2)
@@ -238,7 +234,7 @@ public final class ZoneManager implements IXmlReader
 								}
 								else
 								{
-									LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Missing cuboid vertex in sql data for zone: " + zoneId + " in file: " + f.getName());
+									LOGGER.warn("{}: ZoneData: Missing cuboid vertex in sql data for zone: {} in file {}!", getClass().getSimpleName(), zoneId, f.getName());
 									continue;
 								}
 							}
@@ -258,7 +254,7 @@ public final class ZoneManager implements IXmlReader
 								}
 								else
 								{
-									LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Bad data for zone: " + zoneId + " in file: " + f.getName());
+									LOGGER.warn("{}: ZoneData: Bad data for zone: {} in file {}!", getClass().getSimpleName(), zoneId, f.getName());
 									continue;
 								}
 							}
@@ -274,19 +270,19 @@ public final class ZoneManager implements IXmlReader
 								}
 								else
 								{
-									LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Bad data for zone: " + zoneId + " in file: " + f.getName());
+									LOGGER.warn("{}: ZoneData: Bad data for zone: {} in file {}!", getClass().getSimpleName(), zoneId, f.getName());
 									continue;
 								}
 							}
 							else
 							{
-								LOGGER.warning(getClass().getSimpleName() + ": ZoneData: Unknown shape: \"" + zoneShape + "\"  for zone: " + zoneId + " in file: " + f.getName());
+								LOGGER.warn("{}: ZoneData: Unknown shape: {}  for zone {} in file {}", getClass().getSimpleName(), zoneShape, zoneId, f.getName());
 								continue;
 							}
 						}
 						catch (Exception e)
 						{
-							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": ZoneData: Failed to load zone " + zoneId + " coordinates: " + e.getMessage(), e);
+							LOGGER.warn("{}: ZoneData: Failed to load zone {} coordinates!", getClass().getSimpleName(), zoneId, e);
 						}
 						
 						// No further parameters needed, if NpcSpawnTerritory is loading
@@ -309,7 +305,7 @@ public final class ZoneManager implements IXmlReader
 						}
 						catch (Exception e)
 						{
-							LOGGER.warning(getClass().getSimpleName() + ": ZoneData: No such zone type: " + zoneType + " in file: " + f.getName());
+							LOGGER.warn("{}: ZoneData: No such zone type: {} in file {}!", getClass().getSimpleName(), zoneType, f.getName());
 							continue;
 						}
 						
@@ -342,9 +338,10 @@ public final class ZoneManager implements IXmlReader
 								((L2RespawnZone) temp).addRaceRespawnPoint(race, point);
 							}
 						}
+						
 						if (checkId(zoneId))
 						{
-							LOGGER.config(getClass().getSimpleName() + ": Caution: Zone (" + zoneId + ") from file: " + f.getName() + " overrides previos definition.");
+							LOGGER.debug("{}: Caution: Zone ({}) from file {} overrides previous definition.", getClass().getSimpleName(), zoneId, f.getName());
 						}
 						
 						if ((zoneName != null) && !zoneName.isEmpty())
@@ -354,8 +351,7 @@ public final class ZoneManager implements IXmlReader
 						
 						addZone(zoneId, temp);
 						
-						// Register the zone into any world region it
-						// intersects with...
+						// Register the zone into any world region it intersects with...
 						// currently 11136 test for each zone :>
 						int ax, ay, bx, by;
 						for (int x = 0; x < worldRegions.length; x++)
@@ -386,8 +382,8 @@ public final class ZoneManager implements IXmlReader
 		_spawnTerritories.clear();
 		parseDatapackDirectory("data/zones", false);
 		parseDatapackDirectory("data/zones/npcSpawnTerritories", false);
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _classZones.size() + " zone classes and " + getSize() + " zones.");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _spawnTerritories.size() + " NPC spawn territoriers.");
+		LOGGER.info("{}: Loaded {} zone classes and {} zones.", getClass().getSimpleName(), _classZones.size(), getSize());
+		LOGGER.info("{}: Loaded {} NPC spawn territoriers.", getClass().getSimpleName(), _spawnTerritories.size());
 	}
 	
 	/**

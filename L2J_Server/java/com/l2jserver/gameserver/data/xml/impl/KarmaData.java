@@ -20,7 +20,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -29,6 +28,7 @@ import org.w3c.dom.Node;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Karma data.
  * @author UnAfraid
  */
 public class KarmaData implements IXmlReader
@@ -45,7 +45,7 @@ public class KarmaData implements IXmlReader
 	{
 		_karmaTable.clear();
 		parseDatapackFile("data/stats/chars/pcKarmaIncrease.xml");
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded " + _karmaTable.size() + " karma modifiers.");
+		LOGGER.info("{}: Loaded {} karma modifiers.", getClass().getSimpleName(), _karmaTable.size());
 	}
 	
 	@Override

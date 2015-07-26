@@ -20,7 +20,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -88,7 +87,7 @@ public class EnchantItemOptionsData implements IXmlReader
 				}
 			}
 		}
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _data.size() + " Items and " + counter + " Options.");
+		LOGGER.info("{}: Loaded: {} Items and {} Options.", getClass().getSimpleName(), _data.size(), counter);
 	}
 	
 	/**

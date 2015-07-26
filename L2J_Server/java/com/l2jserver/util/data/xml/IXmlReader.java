@@ -20,11 +20,12 @@ package com.l2jserver.util.data.xml;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -40,7 +41,7 @@ import com.l2jserver.util.file.filter.XMLFilter;
  */
 public interface IXmlReader
 {
-	static final Logger LOGGER = Logger.getLogger(IXmlReader.class.getName());
+	static final Logger LOGGER = LoggerFactory.getLogger(IXmlReader.class.getName());
 	
 	static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
 	static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
@@ -72,7 +73,7 @@ public interface IXmlReader
 	{
 		if (!getCurrentFileFilter().accept(f))
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Could not parse " + f.getName() + " is not a file or it doesn't exist!");
+			LOGGER.warn("{}: Could not parse {} is not a file or it doesn't exist!", getClass().getSimpleName(), f.getName());
 			return;
 		}
 		
@@ -89,12 +90,12 @@ public interface IXmlReader
 		}
 		catch (SAXParseException e)
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Could not parse file " + f.getName() + " at line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getMessage());
+			LOGGER.warn("{}: Could not parse file {} at line {}, column {}", getClass().getSimpleName(), f.getName(), e.getLineNumber(), e.getColumnNumber(), e);
 			return;
 		}
 		catch (Exception e)
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Could not parse file " + f.getName() + ": " + e.getMessage());
+			LOGGER.warn("{}: Could not parse file {}", getClass().getSimpleName(), f.getName(), e);
 			return;
 		}
 	}
@@ -140,7 +141,7 @@ public interface IXmlReader
 	{
 		if (!dir.exists())
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Folder " + dir.getAbsolutePath() + " doesn't exist!");
+			LOGGER.warn("{}: Folder {} doesn't exist!", getClass().getSimpleName(), dir.getAbsolutePath());
 			return false;
 		}
 		
@@ -191,7 +192,7 @@ public interface IXmlReader
 	 */
 	default void parseDocument(Document doc)
 	{
-		LOGGER.severe("Parser not implemented!");
+		LOGGER.error("{}: Parser not implemented!", getClass().getSimpleName());
 	}
 	
 	/**
@@ -588,7 +589,7 @@ public interface IXmlReader
 		}
 		catch (IllegalArgumentException e)
 		{
-			LOGGER.warning("Invalid value specified for node: " + node.getNodeName() + " specified value: " + node.getNodeValue() + " should be enum value of \"" + clazz.getSimpleName() + "\" using default value: " + defaultValue);
+			LOGGER.warn("Invalid value specified for node: {} specified value: {} should be enum value of \"{}\" using default value: {}", node.getNodeName(), node.getNodeValue(), clazz.getSimpleName(), defaultValue);
 			return defaultValue;
 		}
 	}

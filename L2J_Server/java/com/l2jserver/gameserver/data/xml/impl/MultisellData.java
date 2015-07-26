@@ -23,7 +23,6 @@ import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -75,7 +74,7 @@ public final class MultisellData implements IXmlReader
 		}
 		
 		verify();
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded " + _entries.size() + " multisell lists.");
+		LOGGER.info("{}: Loaded {} multisell lists.", getClass().getSimpleName(), _entries.size());
 	}
 	
 	@Override
@@ -109,21 +108,20 @@ public final class MultisellData implements IXmlReader
 						}
 						catch (NumberFormatException e)
 						{
-							
 							try
 							{
 								list.setUseRate(Config.class.getField(att.getNodeValue()).getDouble(Config.class));
 							}
 							catch (Exception e1)
 							{
-								LOGGER.warning(e1.getMessage() + doc.getLocalName());
+								LOGGER.warn("{}: Unable to parse {}", getClass().getSimpleName(), doc.getLocalName(), e1);
 								list.setUseRate(1.0);
 							}
 							
 						}
 						catch (DOMException e)
 						{
-							LOGGER.warning(e.getMessage() + doc.getLocalName());
+							LOGGER.warn("{}: Unable to parse {}", getClass().getSimpleName(), doc.getLocalName(), e);
 						}
 					}
 					
@@ -157,7 +155,7 @@ public final class MultisellData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error in file " + f, e);
+			LOGGER.error("{}: Error in file {}", getClass().getSimpleName(), f, e);
 		}
 	}
 	
@@ -239,13 +237,13 @@ public final class MultisellData implements IXmlReader
 		ListContainer template = _entries.get(listId);
 		if (template == null)
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": can't find list id: " + listId + " requested by player: " + player.getName() + ", npcId:" + (npc != null ? npc.getId() : 0));
+			LOGGER.warn("{}: Cannot find list ID: {} requested by player: {}, NPC ID: {}!", getClass().getSimpleName(), listId, player, (npc != null ? npc.getId() : 0));
 			return;
 		}
 		
 		if (((npc != null) && !template.isNpcAllowed(npc.getId())) || ((npc == null) && template.isNpcOnly()))
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": player " + player + " attempted to open multisell " + listId + " from npc " + npc + " which is not allowed!");
+			LOGGER.warn("{}: Player {} attempted to open multisell {} from npc {} which is not allowed!", getClass().getSimpleName(), player, listId, npc);
 			return;
 		}
 		
@@ -360,14 +358,14 @@ public final class MultisellData implements IXmlReader
 				{
 					if (!verifyIngredient(ing))
 					{
-						LOGGER.warning(getClass().getSimpleName() + ": can't find ingredient with itemId: " + ing.getItemId() + " in list: " + list.getListId());
+						LOGGER.warn("{}: Cannot find ingredient with item ID: {} in list: {}!", getClass().getSimpleName(), ing.getItemId(), list.getListId());
 					}
 				}
 				for (Ingredient ing : ent.getProducts())
 				{
 					if (!verifyIngredient(ing))
 					{
-						LOGGER.warning(getClass().getSimpleName() + ": can't find product with itemId: " + ing.getItemId() + " in list: " + list.getListId());
+						LOGGER.warn("{}: Cannot find product with item ID: {} in list: {}!", getClass().getSimpleName(), ing.getItemId(), list.getListId());
 					}
 				}
 			}

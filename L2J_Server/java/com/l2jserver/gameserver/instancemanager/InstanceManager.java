@@ -36,6 +36,7 @@ import com.l2jserver.gameserver.model.instancezone.InstanceWorld;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Instance Manager.
  * @author evill33t, GodKratos
  */
 public final class InstanceManager implements IXmlReader
@@ -55,10 +56,10 @@ public final class InstanceManager implements IXmlReader
 	{
 		// Creates the multiverse.
 		INSTANCES.put(-1, new Instance(-1, "multiverse"));
-		LOGGER.info(getClass().getSimpleName() + ": Multiverse Instance created.");
+		LOGGER.info("{}: Multiverse Instance created.", getClass().getSimpleName());
 		// Creates the universe.
 		INSTANCES.put(0, new Instance(0, "universe"));
-		LOGGER.info(getClass().getSimpleName() + ": Universe Instance created.");
+		LOGGER.info("{}: Universe Instance created.", getClass().getSimpleName());
 		load();
 	}
 	
@@ -67,7 +68,7 @@ public final class InstanceManager implements IXmlReader
 	{
 		_instanceIdNames.clear();
 		parseDatapackFile("data/instancenames.xml");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _instanceIdNames.size() + " instance names.");
+		LOGGER.info("{}: Loaded {} instance names.", getClass().getSimpleName(), _instanceIdNames.size());
 	}
 	
 	/**
@@ -125,7 +126,7 @@ public final class InstanceManager implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Could not insert character instance time data: " + e.getMessage());
+			LOGGER.warn("{}: Could not insert character instance time data!", getClass().getSimpleName(), e);
 		}
 	}
 	
@@ -145,7 +146,7 @@ public final class InstanceManager implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Could not delete character instance time data: " + e.getMessage());
+			LOGGER.warn("{}: Could not delete character instance time data!", getClass().getSimpleName(), e);
 		}
 	}
 	
@@ -182,7 +183,7 @@ public final class InstanceManager implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.warning(getClass().getSimpleName() + ": Could not delete character instance time data: " + e.getMessage());
+			LOGGER.warn("{}: Could not delete character instance time data!", getClass().getSimpleName(), e);
 		}
 	}
 	
@@ -359,7 +360,7 @@ public final class InstanceManager implements IXmlReader
 			_dynamic++;
 			if (_dynamic == Integer.MAX_VALUE)
 			{
-				LOGGER.warning(getClass().getSimpleName() + ": More then " + (Integer.MAX_VALUE - 300000) + " instances created");
+				LOGGER.warn("{}: More then {} instances has been created!", getClass().getSimpleName(), (Integer.MAX_VALUE - 300000));
 				_dynamic = 300000;
 			}
 		}

@@ -55,6 +55,14 @@ public class EnchantItemHPBonusData implements IXmlReader
 	}
 	
 	@Override
+	public void load()
+	{
+		_armorHPBonuses.clear();
+		parseDatapackFile("data/stats/enchantHPBonus.xml");
+		LOGGER.info("{}: Loaded {} Enchant HP Bonuses.", getClass().getSimpleName(), _armorHPBonuses.size());
+	}
+	
+	@Override
 	public void parseDocument(Document doc)
 	{
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
@@ -109,14 +117,6 @@ public class EnchantItemHPBonusData implements IXmlReader
 				}
 			}
 		}
-	}
-	
-	@Override
-	public void load()
-	{
-		_armorHPBonuses.clear();
-		parseDatapackFile("data/stats/enchantHPBonus.xml");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _armorHPBonuses.size() + " Enchant HP Bonuses.");
 	}
 	
 	/**
