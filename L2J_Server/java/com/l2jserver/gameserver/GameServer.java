@@ -26,9 +26,11 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
-import java.util.logging.Level;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.Server;
@@ -143,7 +145,7 @@ import com.l2jserver.util.IPv4Filter;
 
 public final class GameServer
 {
-	private static final Logger _log = Logger.getLogger(GameServer.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(GameServer.class);
 	
 	private final SelectorThread<L2GameClient> _selectorThread;
 	private final L2GamePacketHandler _gamePacketHandler;
@@ -175,12 +177,12 @@ public final class GameServer
 	{
 		long serverLoadStart = System.currentTimeMillis();
 		
-		_log.info(getClass().getSimpleName() + ": Used memory: " + getUsedMemoryMB() + "MB");
+		_log.info("{}: Used memory: {}MB.", getClass().getSimpleName(), getUsedMemoryMB());
 		
 		if (!IdFactory.getInstance().isInitialized())
 		{
-			_log.severe(getClass().getSimpleName() + ": Could not read object IDs from DB. Please check your data.");
-			throw new Exception("Could not initialize the ID factory");
+			_log.error("{}: Could not read object IDs from DB. Please check your data.", getClass().getSimpleName());
+			throw new Exception("Could not initialize the ID factory!");
 		}
 		
 		ThreadPoolManager.getInstance();
@@ -300,7 +302,7 @@ public final class GameServer
 		
 		try
 		{
-			_log.info(getClass().getSimpleName() + ": Loading server scripts:");
+			_log.info("{}: Loading server scripts:", getClass().getSimpleName());
 			if (!Config.ALT_DEV_NO_HANDLERS || !Config.ALT_DEV_NO_QUESTS)
 			{
 				L2ScriptEngineManager.getInstance().executeScriptList(new File(Config.DATAPACK_ROOT, "data/scripts.cfg"));
@@ -308,7 +310,7 @@ public final class GameServer
 		}
 		catch (IOException ioe)
 		{
-			_log.severe(getClass().getSimpleName() + ": Failed loading scripts.cfg, scripts are not going to be loaded!");
+			_log.error("{}: Failed loading scripts.cfg, scripts are not going to be loaded!", getClass().getSimpleName());
 		}
 		
 		SpawnTable.getInstance().load();
@@ -351,7 +353,7 @@ public final class GameServer
 		FaenorScriptEngine.getInstance();
 		// Init of a cursed weapon manager
 		
-		_log.info("AutoSpawnHandler: Loaded " + AutoSpawnHandler.getInstance().size() + " handlers in total.");
+		_log.info("AutoSpawnHandler: Loaded {} handlers in total.", AutoSpawnHandler.getInstance().size());
 		
 		if (Config.L2JMOD_ALLOW_WEDDING)
 		{
@@ -371,7 +373,7 @@ public final class GameServer
 		
 		Runtime.getRuntime().addShutdownHook(Shutdown.getInstance());
 		
-		_log.info("IdFactory: Free ObjectID's remaining: " + IdFactory.getInstance().size());
+		_log.info("IdFactory: Free ObjectID's remaining: {}", IdFactory.getInstance().size());
 		
 		TvTManager.getInstance();
 		KnownListUpdateTaskManager.getInstance();
@@ -396,7 +398,7 @@ public final class GameServer
 		// the current allocation pool, freeMemory the unused memory in the allocation pool
 		long freeMem = ((Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory()) + Runtime.getRuntime().freeMemory()) / 1048576;
 		long totalMem = Runtime.getRuntime().maxMemory() / 1048576;
-		_log.info(getClass().getSimpleName() + ": Started, free memory " + freeMem + " Mb of " + totalMem + " Mb");
+		_log.info("{}: Started, free memory {} Mb of {} Mb", getClass().getSimpleName(), freeMem, totalMem);
 		Toolkit.getDefaultToolkit().beep();
 		LoginServerThread.getInstance().start();
 		
@@ -419,7 +421,7 @@ public final class GameServer
 			}
 			catch (UnknownHostException e1)
 			{
-				_log.log(Level.SEVERE, getClass().getSimpleName() + ": WARNING: The GameServer bind address is invalid, using all avaliable IPs. Reason: " + e1.getMessage(), e1);
+				_log.error("{}: The GameServer bind address is invalid, using all avaliable IPs!", getClass().getSimpleName(), e1);
 			}
 		}
 		
@@ -427,16 +429,16 @@ public final class GameServer
 		{
 			_selectorThread.openServerSocket(bindAddress, Config.PORT_GAME);
 			_selectorThread.start();
-			_log.log(Level.INFO, getClass().getSimpleName() + ": is now listening on: " + Config.GAMESERVER_HOSTNAME + ":" + Config.PORT_GAME);
+			_log.info("{}: is now listening on: {}:{}", getClass().getSimpleName(), Config.GAMESERVER_HOSTNAME, Config.PORT_GAME);
 		}
 		catch (IOException e)
 		{
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": FATAL: Failed to open server socket. Reason: " + e.getMessage(), e);
+			_log.error("{}: Failed to open server socket!", getClass().getSimpleName(), e);
 			System.exit(1);
 		}
 		
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Maximum numbers of connected players: " + Config.MAXIMUM_ONLINE_USERS);
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Server loaded in " + ((System.currentTimeMillis() - serverLoadStart) / 1000) + " seconds.");
+		_log.info("{}: Maximum numbers of connected players: {}", getClass().getSimpleName(), Config.MAXIMUM_ONLINE_USERS);
+		_log.info("{}: Server loaded in {} seconds.", getClass().getSimpleName(), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - serverLoadStart));
 		
 		printSection("UPnP");
 		UPnPService.getInstance();
@@ -472,7 +474,7 @@ public final class GameServer
 		}
 		else
 		{
-			_log.info(GameServer.class.getSimpleName() + ": Telnet server is currently disabled.");
+			_log.info("{}: Telnet server is currently disabled.", GameServer.class.getSimpleName());
 		}
 	}
 	
