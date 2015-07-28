@@ -29,8 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
@@ -72,7 +74,7 @@ import com.l2jserver.util.Rnd;
  */
 public class SevenSignsFestival implements SpawnListener
 {
-	protected static final Logger _log = Logger.getLogger(SevenSignsFestival.class.getName());
+	protected static final Logger _log = LoggerFactory.getLogger(SevenSignsFestival.class);
 	
 	private static final String GET_CLAN_NAME = "SELECT clan_name FROM clan_data WHERE clan_id = (SELECT clanid FROM characters WHERE char_name = ?)";
 	
@@ -916,7 +918,7 @@ public class SevenSignsFestival implements SpawnListener
 		setNextFestivalStart(Config.ALT_FESTIVAL_MANAGER_START + FESTIVAL_SIGNUP_TIME);
 		_managerScheduledTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(_managerInstance, Config.ALT_FESTIVAL_MANAGER_START, Config.ALT_FESTIVAL_CYCLE_LENGTH);
 		
-		_log.info("SevenSignsFestival: The first Festival of Darkness cycle begins in " + (Config.ALT_FESTIVAL_MANAGER_START / 60000) + " minute(s).");
+		_log.info("SevenSignsFestival: The first Festival of Darkness cycle begins in {} minute(s).", TimeUnit.MILLISECONDS.toMinutes(Config.ALT_FESTIVAL_MANAGER_START));
 	}
 	
 	/**
@@ -954,7 +956,7 @@ public class SevenSignsFestival implements SpawnListener
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, "SevenSignsFestival: Failed to load configuration: " + e.getMessage(), e);
+			_log.error("SevenSignsFestival: Failed to load configuration!", e);
 		}
 		
 		StringBuilder query = new StringBuilder();
@@ -988,7 +990,7 @@ public class SevenSignsFestival implements SpawnListener
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, "SevenSignsFestival: Failed to load configuration: " + e.getMessage(), e);
+			_log.error("SevenSignsFestival: Failed to load configuration!", e);
 		}
 	}
 	
@@ -1038,7 +1040,7 @@ public class SevenSignsFestival implements SpawnListener
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, "SevenSignsFestival: Failed to save configuration: " + e.getMessage(), e);
+			_log.error("SevenSignsFestival: Failed to save configuration!", e);
 		}
 		
 		// Updates Seven Signs DB data also, so call only if really necessary.
@@ -1147,7 +1149,7 @@ public class SevenSignsFestival implements SpawnListener
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, "Could not get clan name of " + partyMemberName + ": " + e.getMessage(), e);
+				_log.warn("Could not get clan name of {}!", partyMemberName, e);
 			}
 		}
 	}
@@ -2001,7 +2003,7 @@ public class SevenSignsFestival implements SpawnListener
 			}
 			catch (Exception e)
 			{
-				_log.warning(e.getMessage());
+				_log.warn("Could not run featival task!", e);
 			}
 		}
 		
@@ -2150,10 +2152,10 @@ public class SevenSignsFestival implements SpawnListener
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, "SevenSignsFestival: Error while spawning Festival Witch ID " + _witchSpawn._npcId + ": " + e.getMessage(), e);
+				_log.warn("SevenSignsFestival: Error while spawning Festival Witch ID {}!", _witchSpawn._npcId, e);
 			}
 			
-			// Make it appear as though the Witch has apparated there.
+			// Make it appear as though the Witch has appeared there.
 			MagicSkillUse msu = new MagicSkillUse(_witchInst, _witchInst, 2003, 1, 1, 0);
 			_witchInst.broadcastPacket(msu);
 			
@@ -2285,7 +2287,7 @@ public class SevenSignsFestival implements SpawnListener
 				}
 				catch (Exception e)
 				{
-					_log.log(Level.WARNING, "SevenSignsFestival: Error while spawning NPC ID " + currSpawn._npcId + ": " + e.getMessage(), e);
+					_log.warn("SevenSignsFestival: Error while spawning NPC ID {}!", currSpawn._npcId, e);
 				}
 			}
 		}

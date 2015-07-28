@@ -20,8 +20,9 @@ package com.l2jserver.gameserver;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.data.xml.impl.DoorData;
@@ -36,11 +37,12 @@ import com.l2jserver.geodriver.Cell;
 import com.l2jserver.geodriver.GeoDriver;
 
 /**
+ * Geodata.
  * @author -Nemesiss-, HorridoJoho
  */
 public class GeoData
 {
-	private static final Logger LOGGER = Logger.getLogger(GeoData.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeoData.class);
 	private static final String FILE_NAME_FORMAT = "%d_%d.l2j";
 	private static final int ELEVATED_SEE_OVER_DISTANCE = 2;
 	private static final int MAX_SEE_OVER_HEIGHT = 48;
@@ -63,7 +65,7 @@ public class GeoData
 					{
 						if (loadFile)
 						{
-							LOGGER.info(getClass().getSimpleName() + ": Loading " + geoFilePath.getFileName() + "...");
+							LOGGER.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
@@ -72,13 +74,13 @@ public class GeoData
 					{
 						try
 						{
-							LOGGER.info(getClass().getSimpleName() + ": Loading " + geoFilePath.getFileName() + "...");
+							LOGGER.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
 						catch (Exception e)
 						{
-							LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Failed to load " + geoFilePath.getFileName() + "!", e);
+							LOGGER.warn("{}: Failed to load {}!", getClass().getSimpleName(), geoFilePath.getFileName(), e);
 						}
 					}
 				}
@@ -86,11 +88,11 @@ public class GeoData
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Failed to load geodata!", e);
+			LOGGER.error("{}: Failed to load geodata!", e);
 			System.exit(1);
 		}
 		
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + loadedRegions + " regions.");
+		LOGGER.info("{}: Loaded {} regions.", loadedRegions);
 	}
 	
 	public boolean hasGeoPos(int geoX, int geoY)
