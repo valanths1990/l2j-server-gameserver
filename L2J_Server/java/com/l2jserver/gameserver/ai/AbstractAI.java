@@ -23,7 +23,9 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_FOLLOW;
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -50,7 +52,7 @@ import com.l2jserver.gameserver.taskmanager.AttackStanceTaskManager;
  */
 public abstract class AbstractAI implements Ctrl
 {
-	protected final Logger _log = Logger.getLogger(getClass().getName());
+	protected static final Logger _log = LoggerFactory.getLogger(AbstractAI.class.getName());
 	
 	private NextAction _nextAction;
 	
@@ -123,7 +125,7 @@ public abstract class AbstractAI implements Ctrl
 			}
 			catch (Exception e)
 			{
-				_log.warning(getClass().getSimpleName() + ": Error: " + e.getMessage());
+				_log.warn("{}: There has been a problem running the follow task!", getClass().getSimpleName(), e);
 			}
 		}
 	}

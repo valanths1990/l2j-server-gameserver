@@ -25,7 +25,6 @@ import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
-import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -191,10 +190,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 	@Override
 	synchronized void changeIntention(CtrlIntention intention, Object arg0, Object arg1)
 	{
-		if (Config.DEBUG)
-		{
-			_log.warning(getClass().getSimpleName() + ": changeIntention(" + intention + ", " + arg0 + ", " + arg1 + ")");
-		}
+		_log.debug("{}: changeIntention({}, {}, {})", getClass().getSimpleName(), intention, arg0, arg1);
 		
 		if (intention == AI_INTENTION_IDLE /* || intention == AI_INTENTION_ACTIVE */) // active becomes idle if only a summon is present
 		{
@@ -368,10 +364,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 	 */
 	private void thinkAttack()
 	{
-		if (Config.DEBUG)
-		{
-			_log.warning(getClass().getSimpleName() + ": thinkAttack(); timeout=" + (_attackTimeout - GameTimeController.getInstance().getGameTicks()));
-		}
+		_log.debug("{}: thinkAttack(); timeout={}", getClass().getSimpleName(), (_attackTimeout - GameTimeController.getInstance().getGameTicks()));
 		
 		if (_attackTimeout < GameTimeController.getInstance().getGameTicks())
 		{
@@ -568,7 +561,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 		}
 		catch (NullPointerException e)
 		{
-			// _log.warning("AttackableAI: Attack target is NULL.");
+			_log.warn("{}: Attack target is NULL.", getClass().getSimpleName());
 			_actor.setTarget(null);
 			setIntention(AI_INTENTION_IDLE, null, null);
 			return;
