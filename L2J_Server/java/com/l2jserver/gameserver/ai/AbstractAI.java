@@ -52,7 +52,7 @@ import com.l2jserver.gameserver.taskmanager.AttackStanceTaskManager;
  */
 public abstract class AbstractAI implements Ctrl
 {
-	protected static final Logger _log = LoggerFactory.getLogger(AbstractAI.class.getName());
+	protected static final Logger _log = LoggerFactory.getLogger(AbstractAI.class);
 	
 	private NextAction _nextAction;
 	

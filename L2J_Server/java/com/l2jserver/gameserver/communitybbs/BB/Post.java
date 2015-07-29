@@ -23,8 +23,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.communitybbs.Manager.PostBBSManager;
@@ -34,7 +35,7 @@ import com.l2jserver.gameserver.communitybbs.Manager.PostBBSManager;
  */
 public class Post
 {
-	private static Logger _log = Logger.getLogger(Post.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(Post.class);
 	
 	public static class CPost
 	{
@@ -93,7 +94,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Error while saving new Post to db " + e.getMessage(), e);
+			_log.warn("Could not save post ID {} in database!", cp.postId, e);
 		}
 	}
 	
@@ -114,7 +115,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Error while deleting post: " + e.getMessage(), e);
+			_log.warn("Unable to delete post for topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
 		}
 	}
 	
@@ -146,7 +147,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Data error on Post " + t.getForumID() + "/" + t.getID() + " : " + e.getMessage(), e);
+			_log.warn("Unable to get post from topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
 		}
 	}
 	
@@ -155,10 +156,10 @@ public class Post
 	 */
 	public void updatetxt(int i)
 	{
+		final CPost cp = getCPost(i);
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement("UPDATE posts SET post_txt=? WHERE post_id=? AND post_topic_id=? AND post_forum_id=?"))
 		{
-			CPost cp = getCPost(i);
 			ps.setString(1, cp.postTxt);
 			ps.setInt(2, cp.postId);
 			ps.setInt(3, cp.postTopicId);
@@ -167,7 +168,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Error while saving new Post to db " + e.getMessage(), e);
+			_log.warn("Unable to store post ID {} in database!", cp.postId, e);
 		}
 	}
 }
