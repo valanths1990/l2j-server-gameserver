@@ -18,8 +18,8 @@
  */
 package com.l2jserver.gameserver;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
  */
 public class FortUpdater implements Runnable
 {
-	protected static Logger _log = Logger.getLogger(FortUpdater.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(FortUpdater.class);
 	private final L2Clan _clan;
 	private final Fort _fort;
 	private int _runCount;
@@ -60,6 +60,7 @@ public class FortUpdater implements Runnable
 			switch (_updaterType)
 			{
 				case PERIODIC_UPDATE:
+				{
 					_runCount++;
 					if ((_fort.getOwnerClan() == null) || (_fort.getOwnerClan() != _clan))
 					{
@@ -83,7 +84,9 @@ public class FortUpdater implements Runnable
 					}
 					_fort.saveFortVariables();
 					break;
+				}
 				case MAX_OWN_TIME:
+				{
 					if ((_fort.getOwnerClan() == null) || (_fort.getOwnerClan() != _clan))
 					{
 						return;
@@ -94,11 +97,12 @@ public class FortUpdater implements Runnable
 						_fort.setFortState(0, 0);
 					}
 					break;
+				}
 			}
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "", e);
+			_log.error("There has been a problem updating forts!", e);
 		}
 	}
 	

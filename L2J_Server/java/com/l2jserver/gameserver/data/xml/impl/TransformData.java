@@ -20,7 +20,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -38,6 +37,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExBasicActionList;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Transformation data.
  * @author UnAfraid
  */
 public final class TransformData implements IXmlReader
@@ -54,7 +54,7 @@ public final class TransformData implements IXmlReader
 	{
 		_transformData.clear();
 		parseDatapackDirectory("data/stats/transformations", false);
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _transformData.size() + " transform templates.");
+		LOGGER.info("{}: Loaded: {} transform templates.", getClass().getSimpleName(), _transformData.size());
 	}
 	
 	@Override

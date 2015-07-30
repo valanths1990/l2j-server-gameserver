@@ -45,6 +45,7 @@ import com.l2jserver.gameserver.model.zone.type.L2RespawnZone;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Map Region Manager.
  * @author Nyaran
  */
 public final class MapRegionManager implements IXmlReader
@@ -62,7 +63,7 @@ public final class MapRegionManager implements IXmlReader
 	{
 		_regions.clear();
 		parseDatapackDirectory("data/mapregion", false);
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _regions.size() + " map regions.");
+		LOGGER.info("{}: Loaded {} map regions.", getClass().getSimpleName(), _regions.size());
 	}
 	
 	@Override

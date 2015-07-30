@@ -19,8 +19,9 @@
 package com.l2jserver.gameserver;
 
 import java.lang.reflect.Constructor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.model.actor.L2Npc;
@@ -29,7 +30,7 @@ import com.l2jserver.util.Rnd;
 
 public class MonsterRace
 {
-	protected static final Logger _log = Logger.getLogger(MonsterRace.class.getName());
+	protected static final Logger _log = LoggerFactory.getLogger(MonsterRace.class);
 	
 	private final L2Npc[] _monsters;
 	private int[][] _speeds;
@@ -76,9 +77,8 @@ public class MonsterRace
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.WARNING, "", e);
+				_log.warn("Unable to create monster!", e);
 			}
-			// _log.info("Monster "+i+" is id: "+(id+random));
 		}
 		newSpeeds();
 	}

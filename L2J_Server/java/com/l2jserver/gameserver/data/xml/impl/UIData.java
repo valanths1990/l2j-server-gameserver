@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -36,8 +35,6 @@ import com.l2jserver.util.data.xml.IXmlReader;
  */
 public class UIData implements IXmlReader
 {
-	private static final Logger LOGGER = Logger.getLogger(UIData.class.getName());
-	
 	private final Map<Integer, List<ActionKey>> _storedKeys = new HashMap<>();
 	private final Map<Integer, List<Integer>> _storedCategories = new HashMap<>();
 	
@@ -52,7 +49,7 @@ public class UIData implements IXmlReader
 		_storedKeys.clear();
 		_storedCategories.clear();
 		parseDatapackFile("data/ui/ui_en.xml");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _storedKeys.size() + " keys " + _storedCategories.size() + " categories.");
+		LOGGER.info("{}: Loaded {} keys {} categories.", getClass().getSimpleName(), _storedKeys.size(), _storedCategories.size());
 	}
 	
 	@Override

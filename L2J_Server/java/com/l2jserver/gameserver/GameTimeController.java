@@ -21,8 +21,9 @@ package com.l2jserver.gameserver;
 import java.util.Calendar;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.instancemanager.DayNightSpawnManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -33,7 +34,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  */
 public final class GameTimeController extends Thread
 {
-	private static final Logger _log = Logger.getLogger(GameTimeController.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(GameTimeController.class);
 	
 	public static final int TICKS_PER_SECOND = 10; // not able to change this without checking through code
 	public static final int MILLIS_IN_TICK = 1000 / TICKS_PER_SECOND;
@@ -132,13 +133,13 @@ public final class GameTimeController extends Thread
 	public final void stopTimer()
 	{
 		super.interrupt();
-		_log.log(Level.INFO, "Stopping " + getClass().getSimpleName());
+		_log.info("Stopping {}", getClass().getSimpleName());
 	}
 	
 	@Override
 	public final void run()
 	{
-		_log.log(Level.CONFIG, getClass().getSimpleName() + ": Started.");
+		_log.debug("{}: Started.", getClass().getSimpleName());
 		
 		long nextTickTime, sleepTime;
 		boolean isNight = isNight();
@@ -158,7 +159,7 @@ public final class GameTimeController extends Thread
 			}
 			catch (final Throwable e)
 			{
-				_log.log(Level.WARNING, "", e);
+				_log.warn("Unable to move objects!", e);
 			}
 			
 			sleepTime = nextTickTime - System.currentTimeMillis();

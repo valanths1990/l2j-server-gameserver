@@ -24,8 +24,9 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.util.Util;
@@ -36,9 +37,9 @@ import com.l2jserver.util.file.filter.HTMLFilter;
  */
 public class HtmCache
 {
-	private static final Logger _log = Logger.getLogger(HtmCache.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(HtmCache.class);
 	
-	private static final HTMLFilter htmlFilter = new HTMLFilter();
+	private static final HTMLFilter HTML_FILTER = new HTMLFilter();
 	
 	private static final Map<String, String> _cache = Config.LAZY_CACHE ? new ConcurrentHashMap<>() : new HashMap<>();
 	
@@ -109,7 +110,7 @@ public class HtmCache
 	
 	public String loadFile(File file)
 	{
-		if (!htmlFilter.accept(file))
+		if (!HTML_FILTER.accept(file))
 		{
 			return null;
 		}
@@ -139,7 +140,7 @@ public class HtmCache
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Problem with htm file " + e.getMessage(), e);
+			_log.warn("Problem with htm file {}!", file, e);
 		}
 		return content;
 	}
@@ -150,7 +151,7 @@ public class HtmCache
 		if (content == null)
 		{
 			content = "<html><body>My text is missing:<br>" + path + "</body></html>";
-			_log.warning("Cache[HTML]: Missing HTML page: " + path);
+			_log.warn("Cache[HTML]: Missing HTML page: " + path);
 		}
 		return content;
 	}
@@ -204,7 +205,7 @@ public class HtmCache
 	 */
 	public boolean isLoadable(String path)
 	{
-		return htmlFilter.accept(new File(Config.DATAPACK_ROOT, path));
+		return HTML_FILTER.accept(new File(Config.DATAPACK_ROOT, path));
 	}
 	
 	public static HtmCache getInstance()

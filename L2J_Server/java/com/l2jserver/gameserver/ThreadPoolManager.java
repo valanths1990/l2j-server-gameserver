@@ -27,8 +27,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.util.StringUtil;
@@ -51,9 +52,9 @@ import com.l2jserver.util.StringUtil;
  * </ul>
  * or
  * <ul>
- * <li>{@link #scheduleEffectAtFixedRate(Runnable, long, long, TimeUnit)} and {@link #scheduleEffectAtFixedRate(Runnable, long, long)} : for effects Tasks that needs to be executed periodicaly.</li>
- * <li>{@link #scheduleGeneralAtFixedRate(Runnable, long, long, TimeUnit)} and {@link #scheduleGeneralAtFixedRate(Runnable, long, long)} : for scheduled Tasks that needs to be executed periodicaly.</li>
- * <li>{@link #scheduleAiAtFixedRate(Runnable, long, long, TimeUnit)} and {@link #scheduleAiAtFixedRate(Runnable, long, long)} : for AI Tasks that needs to be executed periodicaly</li>
+ * <li>{@link #scheduleEffectAtFixedRate(Runnable, long, long, TimeUnit)} and {@link #scheduleEffectAtFixedRate(Runnable, long, long)} : for effects Tasks that needs to be executed periodically.</li>
+ * <li>{@link #scheduleGeneralAtFixedRate(Runnable, long, long, TimeUnit)} and {@link #scheduleGeneralAtFixedRate(Runnable, long, long)} : for scheduled Tasks that needs to be executed periodically.</li>
+ * <li>{@link #scheduleAiAtFixedRate(Runnable, long, long, TimeUnit)} and {@link #scheduleAiAtFixedRate(Runnable, long, long)} : for AI Tasks that needs to be executed periodically</li>
  * </ul>
  * </p>
  * <p>
@@ -69,7 +70,7 @@ import com.l2jserver.util.StringUtil;
  */
 public class ThreadPoolManager
 {
-	protected static final Logger _log = Logger.getLogger(ThreadPoolManager.class.getName());
+	protected static final Logger _log = LoggerFactory.getLogger(ThreadPoolManager.class);
 	
 	private static final class RunnableWrapper implements Runnable
 	{
@@ -571,7 +572,7 @@ public class ThreadPoolManager
 		}
 		catch (InterruptedException e)
 		{
-			_log.log(Level.WARNING, "", e);
+			_log.warn("There has been a problem shuting down the thread pool manager!", e);
 		}
 	}
 	

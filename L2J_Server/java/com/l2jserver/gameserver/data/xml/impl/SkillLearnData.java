@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
- * Holds all skill learn data for all npcs.
+ * Holds all skill learn data for all NPCs.
  * @author xban1x
  */
 public final class SkillLearnData implements IXmlReader
@@ -47,7 +47,7 @@ public final class SkillLearnData implements IXmlReader
 	{
 		_skillLearn.clear();
 		parseDatapackFile("data/skillLearn.xml");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _skillLearn.size() + " Skill Learn data.");
+		LOGGER.info("{}: Loaded {} Skill Learn data.", getClass().getSimpleName(), _skillLearn.size());
 	}
 	
 	@Override

@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -29,6 +28,7 @@ import org.w3c.dom.Node;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Secondary Auth data.
  * @author NosBit
  */
 public class SecondaryAuthData implements IXmlReader
@@ -49,7 +49,7 @@ public class SecondaryAuthData implements IXmlReader
 	{
 		_forbiddenPasswords.clear();
 		parseFile(new File("config/SecondaryAuth.xml"));
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _forbiddenPasswords.size() + " forbidden passwords.");
+		LOGGER.info("{}: Loaded {} forbidden passwords.", getClass().getSimpleName(), _forbiddenPasswords.size());
 	}
 	
 	@Override
@@ -95,7 +95,7 @@ public class SecondaryAuthData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.WARNING, "Failed to load secondary auth data from xml.", e);
+			LOGGER.warn("Failed to load secondary auth data from xml.", e);
 		}
 	}
 	

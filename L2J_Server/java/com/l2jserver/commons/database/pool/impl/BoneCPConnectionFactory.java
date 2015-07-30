@@ -35,7 +35,7 @@ final class BoneCPConnectionFactory extends AbstractConnectionFactory
 	
 	public BoneCPConnectionFactory()
 	{
-		LOG.severe("BoneCP is not supported yet, nothing is going to work!");
+		LOG.error("BoneCP is not supported yet, nothing is going to work!");
 	}
 	
 	@Override

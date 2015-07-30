@@ -22,7 +22,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.util.data.xml.IXmlReader;
@@ -53,17 +52,14 @@ public final class HitConditionBonusData implements IXmlReader
 	public void load()
 	{
 		parseDatapackFile("data/stats/hitConditionBonus.xml");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded Hit Condition bonuses.");
-		if (Config.DEBUG)
-		{
-			LOGGER.info(getClass().getSimpleName() + ": Front bonus: " + frontBonus);
-			LOGGER.info(getClass().getSimpleName() + ": Side bonus: " + sideBonus);
-			LOGGER.info(getClass().getSimpleName() + ": Back bonus: " + backBonus);
-			LOGGER.info(getClass().getSimpleName() + ": High bonus: " + highBonus);
-			LOGGER.info(getClass().getSimpleName() + ": Low bonus: " + lowBonus);
-			LOGGER.info(getClass().getSimpleName() + ": Dark bonus: " + darkBonus);
-			LOGGER.info(getClass().getSimpleName() + ": Rain bonus: " + rainBonus);
-		}
+		LOGGER.info("{}: Loaded Hit Condition bonuses.", getClass().getSimpleName());
+		LOGGER.debug("{}: Front bonus: {}", getClass().getSimpleName(), frontBonus);
+		LOGGER.debug("{}: Side bonus: {}", getClass().getSimpleName(), sideBonus);
+		LOGGER.debug("{}: Back bonus: {}", getClass().getSimpleName(), backBonus);
+		LOGGER.debug("{}: High bonus: {}", getClass().getSimpleName(), highBonus);
+		LOGGER.debug("{}: Low bonus: {}", getClass().getSimpleName(), lowBonus);
+		LOGGER.debug("{}: Dark bonus: {}", getClass().getSimpleName(), darkBonus);
+		LOGGER.debug("{}: Rain bonus: {}", getClass().getSimpleName(), rainBonus);
 	}
 	
 	@Override

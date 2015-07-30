@@ -20,7 +20,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -35,6 +34,7 @@ import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
+ * Item Option data.
  * @author UnAfraid
  */
 public class OptionData implements IXmlReader
@@ -51,7 +51,7 @@ public class OptionData implements IXmlReader
 	{
 		_optionData.clear();
 		parseDatapackDirectory("data/stats/options", false);
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _optionData.size() + " Options.");
+		LOGGER.info("{}: Loaded: {} Options.", getClass().getSimpleName(), _optionData.size());
 	}
 	
 	@Override

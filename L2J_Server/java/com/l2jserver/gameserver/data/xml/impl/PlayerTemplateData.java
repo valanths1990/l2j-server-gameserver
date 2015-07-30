@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -40,8 +39,6 @@ import com.l2jserver.util.data.xml.IXmlReader;
  */
 public final class PlayerTemplateData implements IXmlReader
 {
-	private static final Logger LOGGER = Logger.getLogger(PlayerTemplateData.class.getName());
-	
 	private final Map<ClassId, L2PcTemplate> _playerTemplates = new HashMap<>();
 	
 	private int _dataCount = 0;
@@ -56,8 +53,8 @@ public final class PlayerTemplateData implements IXmlReader
 	{
 		_playerTemplates.clear();
 		parseDatapackDirectory("data/stats/chars/baseStats", false);
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _playerTemplates.size() + " character templates.");
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _dataCount + " level up gain records.");
+		LOGGER.info("{}: Loaded {} character templates.", getClass().getSimpleName(), _playerTemplates.size());
+		LOGGER.info("{}: Loaded {} level up gain records.", getClass().getSimpleName(), _dataCount);
 	}
 	
 	@Override

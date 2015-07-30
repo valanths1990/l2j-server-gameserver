@@ -43,7 +43,7 @@ final class C3P0ConnectionFactory extends AbstractConnectionFactory
 		if (Config.DATABASE_MAX_CONNECTIONS < 2)
 		{
 			Config.DATABASE_MAX_CONNECTIONS = 2;
-			LOG.warning("A minimum of " + Config.DATABASE_MAX_CONNECTIONS + " db connections are required.");
+			LOG.warn("A minimum of {} database connections are required.", Config.DATABASE_MAX_CONNECTIONS);
 		}
 		
 		_dataSource = new ComboPooledDataSource();
@@ -88,8 +88,7 @@ final class C3P0ConnectionFactory extends AbstractConnectionFactory
 		}
 		catch (PropertyVetoException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("There has been a problem setting the driver class!", e);
 		}
 		_dataSource.setJdbcUrl(Config.DATABASE_URL);
 		_dataSource.setUser(Config.DATABASE_LOGIN);
@@ -102,14 +101,10 @@ final class C3P0ConnectionFactory extends AbstractConnectionFactory
 		}
 		catch (SQLException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.warn("There has been a problem closing the test connection!", e);
 		}
 		
-		if (Config.DEBUG)
-		{
-			LOG.fine("Database Connection Working");
-		}
+		LOG.debug("Database connection working.");
 	}
 	
 	@Override
@@ -121,7 +116,7 @@ final class C3P0ConnectionFactory extends AbstractConnectionFactory
 		}
 		catch (Exception e)
 		{
-			LOG.info(e.getMessage());
+			LOG.warn("There has been a problem closing the data source!", e);
 		}
 	}
 	

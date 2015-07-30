@@ -25,16 +25,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
 import com.l2jserver.gameserver.communitybbs.Manager.TopicBBSManager;
 
-public class Forum
+public final class Forum
 {
-	private static final Logger _log = Logger.getLogger(Forum.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(Forum.class);
 	
 	// type
 	public static final int ROOT = 0;
@@ -111,7 +112,7 @@ public class Forum
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Data error on Forum " + _forumId + " : " + e.getMessage(), e);
+			_log.warn("Could not get from database forum ID {}!", _forumId, e);
 		}
 		
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
@@ -133,7 +134,7 @@ public class Forum
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Data error on Forum " + _forumId + " : " + e.getMessage(), e);
+			_log.warn("Could not get from database topics for forum ID {}", _forumId, e);
 		}
 	}
 	
@@ -155,7 +156,7 @@ public class Forum
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Data error on Forum (children): " + e.getMessage(), e);
+			_log.warn("Could not get from database child forums for forum ID {}", _forumId, e);
 		}
 	}
 	
@@ -232,7 +233,7 @@ public class Forum
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Error while saving new Forum to db " + e.getMessage(), e);
+			_log.error("Could not save forum ID {} in database!", _forumId, e);
 		}
 	}
 	
