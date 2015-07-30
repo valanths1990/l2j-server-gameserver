@@ -92,7 +92,7 @@ public class GeoData
 			System.exit(1);
 		}
 		
-		LOGGER.info("{}: Loaded {} regions.", loadedRegions);
+		LOGGER.info("{}: Loaded {} regions.", getClass().getSimpleName(), loadedRegions);
 	}
 	
 	public boolean hasGeoPos(int geoX, int geoY)
