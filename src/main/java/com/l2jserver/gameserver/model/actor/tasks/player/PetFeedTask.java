@@ -19,9 +19,11 @@
 package com.l2jserver.gameserver.model.actor.tasks.player;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.handler.IItemHandler;
 import com.l2jserver.gameserver.handler.ItemHandler;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -35,7 +37,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public class PetFeedTask implements Runnable
 {
-	private static final Logger _log = Logger.getLogger(PetFeedTask.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(PetFeedTask.class);
 	
 	private final L2PcInstance _player;
 	
@@ -47,62 +49,61 @@ public class PetFeedTask implements Runnable
 	@Override
 	public void run()
 	{
-		if (_player != null)
+		try
 		{
-			try
+			if (!_player.isMounted() || (_player.getMountNpcId() == 0) || (PetDataTable.getInstance().getPetData(_player.getMountNpcId()) == null))
 			{
-				if (!_player.isMounted() || (_player.getMountNpcId() == 0) || (_player.getPetData(_player.getMountNpcId()) == null))
+				_player.stopFeed();
+				return;
+			}
+			
+			if (_player.getCurrentFeed() > _player.getFeedConsume())
+			{
+				// eat
+				_player.setCurrentFeed(_player.getCurrentFeed() - _player.getFeedConsume());
+			}
+			else
+			{
+				// go back to pet control item, or simply said, unsummon it
+				_player.setCurrentFeed(0);
+				_player.stopFeed();
+				_player.dismount();
+				_player.sendPacket(SystemMessageId.OUT_OF_FEED_MOUNT_CANCELED);
+				return;
+			}
+			
+			final List<Integer> foodIds = PetDataTable.getInstance().getPetData(_player.getMountNpcId()).getFood();
+			if (foodIds.isEmpty())
+			{
+				return;
+			}
+			
+			L2ItemInstance food = null;
+			for (int id : foodIds)
+			{
+				// TODO: possibly pet inv?
+				food = _player.getInventory().getItemByItemId(id);
+				if (food != null)
 				{
-					_player.stopFeed();
-					return;
-				}
-				
-				if (_player.getCurrentFeed() > _player.getFeedConsume())
-				{
-					// eat
-					_player.setCurrentFeed(_player.getCurrentFeed() - _player.getFeedConsume());
-				}
-				else
-				{
-					// go back to pet control item, or simply said, unsummon it
-					_player.setCurrentFeed(0);
-					_player.stopFeed();
-					_player.dismount();
-					_player.sendPacket(SystemMessageId.OUT_OF_FEED_MOUNT_CANCELED);
-				}
-				
-				List<Integer> foodIds = _player.getPetData(_player.getMountNpcId()).getFood();
-				if (foodIds.isEmpty())
-				{
-					return;
-				}
-				L2ItemInstance food = null;
-				for (int id : foodIds)
-				{
-					// TODO: possibly pet inv?
-					food = _player.getInventory().getItemByItemId(id);
-					if (food != null)
-					{
-						break;
-					}
-				}
-				
-				if ((food != null) && _player.isHungry())
-				{
-					IItemHandler handler = ItemHandler.getInstance().getHandler(food.getEtcItem());
-					if (handler != null)
-					{
-						handler.useItem(_player, food, false);
-						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PET_TOOK_S1_BECAUSE_HE_WAS_HUNGRY);
-						sm.addItemName(food.getId());
-						_player.sendPacket(sm);
-					}
+					break;
 				}
 			}
-			catch (Exception e)
+			
+			if ((food != null) && _player.isHungry())
 			{
-				_log.log(Level.SEVERE, "Mounted Pet [NpcId: " + _player.getMountNpcId() + "] a feed task error has occurred", e);
+				IItemHandler handler = ItemHandler.getInstance().getHandler(food.getEtcItem());
+				if (handler != null)
+				{
+					handler.useItem(_player, food, false);
+					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PET_TOOK_S1_BECAUSE_HE_WAS_HUNGRY);
+					sm.addItemName(food.getId());
+					_player.sendPacket(sm);
+				}
 			}
+		}
+		catch (Exception e)
+		{
+			_log.error("Could not feed mounted Pet NPC ID {}, a feed task error has occurred", _player.getMountNpcId(), e);
 		}
 	}
 }

@@ -126,7 +126,6 @@ import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2Party;
 import com.l2jserver.gameserver.model.L2Party.messageType;
-import com.l2jserver.gameserver.model.L2PetData;
 import com.l2jserver.gameserver.model.L2PetLevelData;
 import com.l2jserver.gameserver.model.L2PremiumItem;
 import com.l2jserver.gameserver.model.L2Radar;
@@ -415,7 +414,6 @@ public final class L2PcInstance extends L2Playable
 	
 	/** data for mounted pets */
 	private int _controlItemId;
-	private L2PetData _data;
 	private L2PetLevelData _leveldata;
 	private int _curFeed;
 	protected Future<?> _mountFeedTask;
@@ -5640,7 +5638,6 @@ public final class L2PcInstance extends L2Playable
 		stopWarnUserTakeBreak();
 		stopWaterTask();
 		stopFeed();
-		clearPetData();
 		storePetFood(_mountNpcId);
 		stopRentPet();
 		stopPvpRegTask();
@@ -6287,7 +6284,6 @@ public final class L2PcInstance extends L2Playable
 		getEffectList().stopAllToggles();
 		setMount(pet.getId(), pet.getLevel());
 		setMountObjectID(pet.getControlObjectId());
-		clearPetData();
 		startFeed(pet.getId());
 		broadcastPacket(new Ride(this));
 		
@@ -6307,7 +6303,6 @@ public final class L2PcInstance extends L2Playable
 		
 		getEffectList().stopAllToggles();
 		setMount(npcId, getLevel());
-		clearPetData();
 		setMountObjectID(controlItemObjId);
 		broadcastPacket(new Ride(this));
 		
@@ -6431,7 +6426,6 @@ public final class L2PcInstance extends L2Playable
 		int petId = _mountNpcId;
 		setMount(0, 0);
 		stopFeed();
-		clearPetData();
 		if (wasFlying)
 		{
 			removeSkill(CommonSkill.WYVERN_BREATH.getSkill());
@@ -12643,20 +12637,6 @@ public final class L2PcInstance extends L2Playable
 		}
 	}
 	
-	private final void clearPetData()
-	{
-		_data = null;
-	}
-	
-	public final L2PetData getPetData(int npcId)
-	{
-		if (_data == null)
-		{
-			_data = PetDataTable.getInstance().getPetData(npcId);
-		}
-		return _data;
-	}
-	
 	private final L2PetLevelData getPetLevelData(int npcId)
 	{
 		if (_leveldata == null)
@@ -12701,7 +12681,7 @@ public final class L2PcInstance extends L2Playable
 	
 	public boolean isHungry()
 	{
-		return _canFeed ? (getCurrentFeed() < ((getPetData(getMountNpcId()).getHungryLimit() / 100f) * getPetLevelData(getMountNpcId()).getPetMaxFeed())) : false;
+		return _canFeed ? (getCurrentFeed() < ((PetDataTable.getInstance().getPetData(getMountNpcId()).getHungryLimit() / 100f) * getPetLevelData(getMountNpcId()).getPetMaxFeed())) : false;
 	}
 	
 	public void enteredNoLanding(int delay)
