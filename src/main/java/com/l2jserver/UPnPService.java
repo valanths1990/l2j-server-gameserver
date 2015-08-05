@@ -121,7 +121,7 @@ public class UPnPService
 		
 		if (_activeGW.addPortMapping(port, port, localAddress.getHostAddress(), PROTOCOL, description))
 		{
-			_log.info("Mapping successfull on ", localAddress.getHostAddress(), port);
+			_log.info("Mapping successful on {}:{}", localAddress.getHostAddress(), port);
 		}
 		else
 		{
