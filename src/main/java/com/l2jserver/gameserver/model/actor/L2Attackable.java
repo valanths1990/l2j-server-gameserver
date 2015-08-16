@@ -472,8 +472,8 @@ public class L2Attackable extends L2Npc
 							
 							if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
 							{
-								exp *= Config.L2JMOD_CHAMPION_REWARDS;
-								sp *= Config.L2JMOD_CHAMPION_REWARDS;
+								exp *= Config.L2JMOD_CHAMPION_REWARDS_EXP_SP;
+								sp *= Config.L2JMOD_CHAMPION_REWARDS_EXP_SP;
 							}
 							
 							exp *= penalty;
@@ -581,8 +581,8 @@ public class L2Attackable extends L2Npc
 						
 						if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
 						{
-							exp *= Config.L2JMOD_CHAMPION_REWARDS;
-							sp *= Config.L2JMOD_CHAMPION_REWARDS;
+							exp *= Config.L2JMOD_CHAMPION_REWARDS_EXP_SP;
+							sp *= Config.L2JMOD_CHAMPION_REWARDS_EXP_SP;
 						}
 						
 						exp *= partyMul;
@@ -989,7 +989,7 @@ public class L2Attackable extends L2Npc
 				}
 				
 				// Broadcast message if RaidBoss was defeated
-				if (isRaid() && !isRaidMinion() && drop.getCount() > 0)
+				if (isRaid() && !isRaidMinion() && (drop.getCount() > 0))
 				{
 					final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_DIED_DROPPED_S3_S2);
 					sm.addCharName(this);
