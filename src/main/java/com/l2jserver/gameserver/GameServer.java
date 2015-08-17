@@ -146,32 +146,14 @@ import com.l2jserver.util.IPv4Filter;
 public final class GameServer
 {
 	private static final Logger _log = LoggerFactory.getLogger(GameServer.class);
+	private static final String LOG_FOLDER = "log"; // Name of folder for log file
+	private static final String LOG_NAME = "./log.cfg"; // Name of log file
 	
 	private final SelectorThread<L2GameClient> _selectorThread;
 	private final L2GamePacketHandler _gamePacketHandler;
 	private final DeadLockDetector _deadDetectThread;
 	public static GameServer gameServer;
 	public static final Calendar dateTimeServerStarted = Calendar.getInstance();
-	
-	public long getUsedMemoryMB()
-	{
-		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
-	}
-	
-	public SelectorThread<L2GameClient> getSelectorThread()
-	{
-		return _selectorThread;
-	}
-	
-	public L2GamePacketHandler getL2GamePacketHandler()
-	{
-		return _gamePacketHandler;
-	}
-	
-	public DeadLockDetector getDeadLockDetectorThread()
-	{
-		return _deadDetectThread;
-	}
 	
 	public GameServer() throws Exception
 	{
@@ -181,7 +163,7 @@ public final class GameServer
 		
 		if (!IdFactory.getInstance().isInitialized())
 		{
-			_log.error("{}: Could not read object IDs from DB. Please check your data.", getClass().getSimpleName());
+			_log.error("{}: Could not read object IDs from database. Please check your configuration.", getClass().getSimpleName());
 			throw new Exception("Could not initialize the ID factory!");
 		}
 		
@@ -447,9 +429,6 @@ public final class GameServer
 	public static void main(String[] args) throws Exception
 	{
 		Server.serverMode = Server.MODE_GAMESERVER;
-		// Local Constants
-		final String LOG_FOLDER = "log"; // Name of folder for log file
-		final String LOG_NAME = "./log.cfg"; // Name of log file
 		
 		/*** Main ***/
 		// Create log folder
@@ -466,6 +445,7 @@ public final class GameServer
 		Config.load();
 		printSection("Database");
 		ConnectionFactory.getInstance();
+		
 		gameServer = new GameServer();
 		
 		if (Config.IS_TELNET_ENABLED)
@@ -476,6 +456,26 @@ public final class GameServer
 		{
 			_log.info("{}: Telnet server is currently disabled.", GameServer.class.getSimpleName());
 		}
+	}
+	
+	public long getUsedMemoryMB()
+	{
+		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+	}
+	
+	public SelectorThread<L2GameClient> getSelectorThread()
+	{
+		return _selectorThread;
+	}
+	
+	public L2GamePacketHandler getL2GamePacketHandler()
+	{
+		return _gamePacketHandler;
+	}
+	
+	public DeadLockDetector getDeadLockDetectorThread()
+	{
+		return _deadDetectThread;
 	}
 	
 	public static void printSection(String s)
