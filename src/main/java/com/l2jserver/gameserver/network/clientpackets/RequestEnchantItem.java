@@ -309,13 +309,6 @@ public final class RequestEnchantItem extends L2GameClientPacket
 						else
 						{
 							// enchant failed, destroy item
-							int crystalId = item.getItem().getCrystalItemId();
-							int count = item.getCrystalCount() - ((item.getItem().getCrystalCount() + 1) / 2);
-							if (count < 1)
-							{
-								count = 1;
-							}
-							
 							item = activeChar.getInventory().destroyItem("Enchant", item, activeChar, null);
 							if (item == null)
 							{
@@ -341,24 +334,23 @@ public final class RequestEnchantItem extends L2GameClientPacket
 							}
 							
 							L2World.getInstance().removeObject(item);
-							L2ItemInstance crystals = null;
-							if (crystalId != 0)
+							
+							final int crystalId = item.getItem().getCrystalItemId();
+							if ((crystalId != 0) && item.getItem().isCrystallizable())
 							{
-								crystals = activeChar.getInventory().addItem("Enchant", crystalId, count, activeChar, item);
+								int count = item.getCrystalCount() - ((item.getItem().getCrystalCount() + 1) / 2);
+								count = count < 1 ? 1 : count;
+								activeChar.getInventory().addItem("Enchant", crystalId, count, activeChar, item);
 								
-								SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S);
-								sm.addItemName(crystals);
+								final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S);
+								sm.addItemName(crystalId);
 								sm.addLong(count);
 								activeChar.sendPacket(sm);
-							}
-							
-							if (crystalId == 0)
-							{
-								activeChar.sendPacket(new EnchantResult(4, 0, 0));
+								activeChar.sendPacket(new EnchantResult(1, crystalId, count));
 							}
 							else
 							{
-								activeChar.sendPacket(new EnchantResult(1, crystalId, count));
+								activeChar.sendPacket(new EnchantResult(4, 0, 0));
 							}
 							
 							if (Config.LOG_ITEM_ENCHANTS)
