@@ -153,6 +153,7 @@ public enum Stats
 	
 	WEIGHT_LIMIT("weightLimit"),
 	WEIGHT_PENALTY("weightPenalty"),
+	ENLARGE_ABNORMAL_SLOT("EnlargeAbnormalSlot"),
 	
 	// ExSkill
 	INV_LIM("inventoryLimit"),

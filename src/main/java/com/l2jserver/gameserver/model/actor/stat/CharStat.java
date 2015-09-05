@@ -44,8 +44,6 @@ public class CharStat
 	private final float[] _defenceTraits = new float[TraitType.values().length];
 	private final int[] _defenceTraitsCount = new int[TraitType.values().length];
 	private final int[] _traitsInvul = new int[TraitType.values().length];
-	/** Creature's maximum buff count. */
-	private int _maxBuffCount = Config.BUFFS_MAX_AMOUNT;
 	
 	public CharStat(L2Character activeChar)
 	{
@@ -61,8 +59,7 @@ public class CharStat
 	
 	/**
 	 * Calculate the new value of the state with modifiers that will be applied on the targeted L2Character.<BR>
-	 * <B><U> Concept</U> :</B><BR
-	 * A L2Character owns a table of Calculators called <B>_calculators</B>. Each Calculator (a calculator per state) own a table of Func object. A Func object is a mathematic function that permit to calculate the modifier of a state (ex : REGENERATE_HP_RATE...) : <BR>
+	 * <B><U> Concept</U> :</B><BR A L2Character owns a table of Calculators called <B>_calculators</B>. Each Calculator (a calculator per state) own a table of Func object. A Func object is a mathematic function that permit to calculate the modifier of a state (ex : REGENERATE_HP_RATE...) : <BR>
 	 * FuncAtkAccuracy -> Math.sqrt(_player.getDEX())*6+_player.getLevel()<BR>
 	 * When the calc method of a calculator is launched, each mathematical function is called according to its priority <B>_order</B>.<br>
 	 * Indeed, Func with lowest priority order is executed firsta and Funcs with the same order are executed in unspecified order.<br>
@@ -790,15 +787,6 @@ public class CharStat
 	 */
 	public int getMaxBuffCount()
 	{
-		return _maxBuffCount;
-	}
-	
-	/**
-	 * Sets the maximum buff count.
-	 * @param buffCount the buff count
-	 */
-	public void setMaxBuffCount(int buffCount)
-	{
-		_maxBuffCount = buffCount;
+		return (int) calcStat(Stats.ENLARGE_ABNORMAL_SLOT, Config.BUFFS_MAX_AMOUNT);
 	}
 }
