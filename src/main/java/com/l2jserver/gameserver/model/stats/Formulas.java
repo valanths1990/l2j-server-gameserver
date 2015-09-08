@@ -576,7 +576,7 @@ public final class Formulas
 		double power = skill.getPower(isPvP, isPvE);
 		double damage = 0;
 		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed);
-		double ssboost = ss ? 2 : 1;
+		double ssboost = ss ? 1.458 : 1;
 		double pvpBonus = 1;
 		
 		if (isPvP)
@@ -630,6 +630,7 @@ public final class Formulas
 			set.set("pvpBonus", pvpBonus);
 			set.set("baseMod", baseMod);
 			set.set("criticalMod", criticalMod);
+			set.set("criticalModPos", criticalModPos);
 			set.set("criticalVulnMod", criticalVulnMod);
 			set.set("criticalAddMod", criticalAddMod);
 			set.set("criticalAddVuln", criticalAddVuln);
@@ -665,8 +666,8 @@ public final class Formulas
 		boolean isPvP = attacker.isPlayable() && target.isPlayer();
 		boolean isPvE = attacker.isPlayable() && target.isAttackable();
 		double damage = 0;
-		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed)
-		double ssboost = ss ? 2 : 1;
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
+		double ssboost = ss ? 1.458 : 1;
 		double pvpBonus = 1;
 		
 		if (isPvP)
@@ -748,6 +749,7 @@ public final class Formulas
 	{
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
 		final boolean isPvE = attacker.isPlayable() && target.isAttackable();
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
 		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
 		
@@ -776,17 +778,16 @@ public final class Formulas
 		// Add soulshot boost.
 		int ssBoost = ss ? 2 : 1;
 		damage = (skill != null) ? ((damage * ssBoost) + skill.getPower(attacker, target, isPvP, isPvE)) : (damage * ssBoost);
-		
 		if (crit)
 		{
 			// H5 Damage Formula
-			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * (attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) / 2) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((76 * damage) / defence);
+			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((120 * damage * proximityBonus) / defence);
 			damage += ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 77) / defence);
 			damage += target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
 		}
 		else
 		{
-			damage = (76 * damage) / defence;
+			damage = (170 * damage * proximityBonus) / defence;
 		}
 		
 		damage *= calcAttackTraitBonus(attacker, target);
