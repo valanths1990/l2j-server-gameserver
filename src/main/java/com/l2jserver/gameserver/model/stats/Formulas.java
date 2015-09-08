@@ -591,7 +591,7 @@ public final class Formulas
 		double baseMod = ((77 * (power + (attacker.getPAtk(target) * ssboost))) / defence);
 		// Critical
 		double criticalMod = (attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill));
-		double criticalModPos = (attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill)) / 2;
+		double criticalModPos = (((attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) - 1) / 2) + 1);
 		double criticalVulnMod = (target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, skill));
 		double criticalAddMod = ((attacker.getStat().calcStat(Stats.CRITICAL_DAMAGE_ADD, 0) * 6.1 * 77) / defence);
 		double criticalAddVuln = target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
@@ -681,14 +681,14 @@ public final class Formulas
 		double baseMod = ((77 * (skill.getPower(isPvP, isPvE) + attacker.getPAtk(target))) / defence) * ssboost;
 		// Critical
 		double criticalMod = (attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill));
-		double criticalModPos = (attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill));
+		double criticalModPos = (((attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) - 1) / 2) + 1);
 		double criticalVulnMod = (target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, skill));
 		double criticalAddMod = ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 6.1 * 77) / defence);
 		double criticalAddVuln = target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
 		// Trait, elements
 		double generalTraitMod = calcGeneralTraitBonus(attacker, target, skill.getTraitType(), false);
 		double attributeMod = calcAttributeBonus(attacker, target, skill);
-		double weaponMod = 1;// attacker.getRandomDamageMultiplier();
+		double weaponMod = attacker.getRandomDamageMultiplier();
 		
 		double penaltyMod = 1;
 		if (target.isAttackable() && !target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
