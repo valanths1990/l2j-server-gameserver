@@ -781,13 +781,13 @@ public final class Formulas
 		if (crit)
 		{
 			// H5 Damage Formula
-			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((120 * damage * proximityBonus) / defence);
+			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((76 * damage * proximityBonus) / defence);
 			damage += ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 77) / defence);
 			damage += target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
 		}
 		else
 		{
-			damage = (170 * damage * proximityBonus) / defence;
+			damage = (76 * damage * proximityBonus) / defence;
 		}
 		
 		damage *= calcAttackTraitBonus(attacker, target);
@@ -1714,6 +1714,10 @@ public final class Formulas
 		else
 		{
 			attack_attribute = attacker.getAttackElementValue(attacker.getAttackElement());
+			if (attack_attribute == 0)
+			{
+				return 0;
+			}
 		}
 		
 		int defence_attribute = target.getDefenseElementValue(attacker.getAttackElement());
