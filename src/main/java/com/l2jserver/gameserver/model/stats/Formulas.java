@@ -1716,7 +1716,7 @@ public final class Formulas
 			attack_attribute = attacker.getAttackElementValue(attacker.getAttackElement());
 			if (attack_attribute == 0)
 			{
-				return 0;
+				return 1;
 			}
 		}
 		
