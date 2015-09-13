@@ -46,7 +46,7 @@ public class PetInfo extends L2GameServerPacket
 		_z = summon.getZ();
 		_heading = summon.getHeading();
 		_mAtkSpd = summon.getMAtkSpd();
-		_pAtkSpd = summon.getPAtkSpd();
+		_pAtkSpd = (int) summon.getPAtkSpd();
 		_moveMultiplier = summon.getMovementSpeedMultiplier();
 		_runSpd = (int) Math.round(summon.getRunSpeed() / _moveMultiplier);
 		_walkSpd = (int) Math.round(summon.getWalkSpeed() / _moveMultiplier);
@@ -151,7 +151,7 @@ public class PetInfo extends L2GameServerPacket
 		writeD(_summon.getEvasionRate(null));// evasion
 		writeD(_summon.getCriticalHit(null, null));// critical
 		writeD((int) _summon.getMoveSpeed());// speed
-		writeD(_summon.getPAtkSpd());// atkspeed
+		writeD((int) _summon.getPAtkSpd());// atkspeed
 		writeD(_summon.getMAtkSpd());// casting speed
 		
 		writeD(_summon.getAbnormalVisualEffects());// c2 abnormal visual effect... bleed=1; poison=2; poison & bleed=3; flame=4;

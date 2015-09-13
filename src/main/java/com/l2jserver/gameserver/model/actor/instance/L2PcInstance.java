@@ -806,6 +806,7 @@ public final class L2PcInstance extends L2Playable
 	private Map<Integer, Skill> _customSkills = null;
 	
 	private volatile int _actionMask;
+	private Map<Stats, Double> _servitorShare;
 	
 	/**
 	 * Creates a player.
@@ -14403,5 +14404,19 @@ public final class L2PcInstance extends L2Playable
 	public boolean isOnSameSiegeSideWith(L2Character target)
 	{
 		return (getSiegeState() > 0) && isInsideZone(ZoneId.SIEGE) && (getSiegeState() == target.getSiegeState()) && (getSiegeSide() == target.getSiegeSide());
+	}
+	
+	public void setServitorShare(Map<Stats, Double> map)
+	{
+		_servitorShare = map;
+	}
+	
+	public final double getServitorShareBonus(Stats stat)
+	{
+		if (_servitorShare == null)
+		{
+			return 1.0d;
+		}
+		return _servitorShare.get(stat);
 	}
 }

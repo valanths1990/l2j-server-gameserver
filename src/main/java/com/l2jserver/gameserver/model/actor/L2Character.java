@@ -3758,7 +3758,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				if (stat == Stats.POWER_ATTACK_SPEED)
 				{
-					su.addAttribute(StatusUpdate.ATK_SPD, getPAtkSpd());
+					su.addAttribute(StatusUpdate.ATK_SPD, (int) getPAtkSpd());
 				}
 				else if (stat == Stats.MAGIC_ATTACK_SPEED)
 				{
@@ -5198,9 +5198,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			switch (weapon.getItemType())
 			{
 				case BOW:
-					return (1500 * 345) / getPAtkSpd();
+					return (int) ((1500 * 345) / getPAtkSpd());
 				case CROSSBOW:
-					return (1200 * 345) / getPAtkSpd();
+					return (int) ((1200 * 345) / getPAtkSpd());
 				case DAGGER:
 					// atkSpd /= 1.15;
 					break;
@@ -6188,7 +6188,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		return getStat().getMaxRecoverableCp();
 	}
 	
-	public final double getMAtk(L2Character target, Skill skill)
+	public double getMAtk(L2Character target, Skill skill)
 	{
 		return getStat().getMAtk(target, skill);
 	}
@@ -6223,7 +6223,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		return getStat().getMCriticalHit(target, skill);
 	}
 	
-	public final double getMDef(L2Character target, Skill skill)
+	public double getMDef(L2Character target, Skill skill)
 	{
 		return getStat().getMDef(target, skill);
 	}
@@ -6233,17 +6233,17 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		return getStat().getMReuseRate(skill);
 	}
 	
-	public final double getPAtk(L2Character target)
+	public double getPAtk(L2Character target)
 	{
 		return getStat().getPAtk(target);
 	}
 	
-	public int getPAtkSpd()
+	public double getPAtkSpd()
 	{
 		return getStat().getPAtkSpd();
 	}
 	
-	public final double getPDef(L2Character target)
+	public double getPDef(L2Character target)
 	{
 		return getStat().getPDef(target);
 	}

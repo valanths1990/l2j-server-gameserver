@@ -18,42 +18,32 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
-import java.util.List;
-
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.network.SystemMessageId;
 
 /**
- * The Class ConditionPlayerServitorNpcId.
+ * The Class ConditionPlayerHasServitor.
+ * @author Zealar
  */
-public class ConditionPlayerServitorNpcId extends Condition
+public class ConditionPlayerHasServitor extends Condition
 {
-	private final List<Integer> _npcIds;
-	
-	/**
-	 * Instantiates a new condition player servitor npc id.
-	 * @param npcIds the npc ids
-	 */
-	public ConditionPlayerServitorNpcId(List<Integer> npcIds)
-	{
-		if ((npcIds.size() == 1) && (npcIds.get(0) == 0))
-		{
-			_npcIds = null;
-		}
-		else
-		{
-			_npcIds = npcIds;
-		}
-	}
 	
 	@Override
 	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
-		if ((effector.getActingPlayer() == null) || !effector.getActingPlayer().hasSummon())
+		if ((effector.getActingPlayer() == null))
 		{
 			return false;
 		}
-		return (_npcIds == null) || _npcIds.contains(effector.getActingPlayer().getSummon().getId());
+		
+		if (!effector.getActingPlayer().hasSummon())
+		{
+			effector.sendPacket(SystemMessageId.CANNOT_USE_SKILL_WITHOUT_SERVITOR);
+			return false;
+		}
+		
+		return true;
 	}
 }
