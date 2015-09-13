@@ -6749,18 +6749,18 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public final WeaponType getAttackType()
 	{
-		final L2Weapon weapon = getActiveWeaponItem();
-		if (weapon != null)
-		{
-			return weapon.getItemType();
-		}
-		else if (isTransformed())
+		if (isTransformed())
 		{
 			final TransformTemplate template = getTransformation().getTemplate(getActingPlayer());
 			if (template != null)
 			{
 				return template.getBaseAttackType();
 			}
+		}
+		final L2Weapon weapon = getActiveWeaponItem();
+		if (weapon != null)
+		{
+			return weapon.getItemType();
 		}
 		return getTemplate().getBaseAttackType();
 	}
