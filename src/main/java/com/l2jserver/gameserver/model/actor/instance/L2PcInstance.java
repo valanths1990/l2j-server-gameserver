@@ -13163,7 +13163,7 @@ public final class L2PcInstance extends L2Playable
 				activeChar.sendPacket(new RecipeShopMsg(this));
 				break;
 		}
-		if (isMounted())
+		if (isTransformed())
 		{
 			// Required double send for fix Mounted H5+
 			sendPacket(new CharInfo(activeChar));
