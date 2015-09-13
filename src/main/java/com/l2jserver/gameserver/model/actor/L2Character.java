@@ -5673,6 +5673,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		// Stop casting
 		setIsCastingNow(false);
+		setIsCastingSimultaneouslyNow(false);
 		
 		final Skill skill = mut.getSkill();
 		final L2Object target = mut.getTargets().length > 0 ? mut.getTargets()[0] : null;
