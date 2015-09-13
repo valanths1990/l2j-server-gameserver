@@ -78,7 +78,6 @@ import com.l2jserver.gameserver.model.actor.tasks.character.HitTask;
 import com.l2jserver.gameserver.model.actor.tasks.character.MagicUseTask;
 import com.l2jserver.gameserver.model.actor.tasks.character.NotifyAITask;
 import com.l2jserver.gameserver.model.actor.tasks.character.QueuedMagicUseTask;
-import com.l2jserver.gameserver.model.actor.tasks.character.UsePotionTask;
 import com.l2jserver.gameserver.model.actor.templates.L2CharTemplate;
 import com.l2jserver.gameserver.model.actor.transform.Transform;
 import com.l2jserver.gameserver.model.actor.transform.TransformTemplate;
@@ -1847,28 +1846,20 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		// queue herbs and potions
 		if (isCastingSimultaneouslyNow() && simultaneously)
 		{
-			ThreadPoolManager.getInstance().scheduleAi(new UsePotionTask(this, skill), 100);
+			ThreadPoolManager.getInstance().scheduleAi(() -> doCast(skill), 100);
 			return;
 		}
 		
-		// Set the _castInterruptTime and casting status (L2PcInstance already has this true)
 		if (simultaneously)
 		{
 			setIsCastingSimultaneouslyNow(true);
+			setLastSimultaneousSkillCast(skill);
 		}
 		else
 		{
 			setIsCastingNow(true);
-		}
-		
-		if (!simultaneously)
-		{
 			_castInterruptTime = -2 + GameTimeController.getInstance().getGameTicks() + (skillTime / GameTimeController.MILLIS_IN_TICK);
 			setLastSkillCast(skill);
-		}
-		else
-		{
-			setLastSimultaneousSkillCast(skill);
 		}
 		
 		// Calculate the Reuse Time of the Skill
