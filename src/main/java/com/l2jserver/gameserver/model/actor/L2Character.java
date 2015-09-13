@@ -6448,7 +6448,13 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public void sendDamageMessage(L2Character target, int damage, boolean mcrit, boolean pcrit, boolean miss)
 	{
-	
+		if (miss && target.isPlayer())
+		{
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_EVADED_C2_ATTACK);
+			sm.addPcName(target.getActingPlayer());
+			sm.addCharName(this);
+			target.sendPacket(sm);
+		}
 	}
 	
 	public byte getAttackElement()
