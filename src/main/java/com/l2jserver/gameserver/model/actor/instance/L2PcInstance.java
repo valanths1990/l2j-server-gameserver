@@ -9897,7 +9897,7 @@ public final class L2PcInstance extends L2Playable
 				continue;
 			}
 			
-			if ((_transformation != null) && !s.isPassive())
+			if (((_transformation != null) && !s.isPassive()) || (hasTransformSkill(s.getId()) && s.isPassive()))
 			{
 				continue;
 			}
@@ -9910,16 +9910,7 @@ public final class L2PcInstance extends L2Playable
 			if (isEnchantable)
 			{
 				L2EnchantSkillLearn esl = EnchantSkillGroupsData.getInstance().getSkillEnchantmentBySkillId(s.getId());
-				if (esl != null)
-				{
-					// if player dont have min level to enchant
-					if (s.getLevel() < esl.getBaseLevel())
-					{
-						isEnchantable = false;
-					}
-				}
-				// if no enchant data
-				else
+				if ((esl == null) || (s.getLevel() < esl.getBaseLevel()))
 				{
 					isEnchantable = false;
 				}
@@ -9939,7 +9930,6 @@ public final class L2PcInstance extends L2Playable
 				{
 					ts.put(holder.getSkillId(), holder.getSkillLvl());
 				}
-				addTransformSkill(holder.getSkill());
 			}
 			
 			for (AdditionalSkillHolder holder : _transformation.getTemplate(this).getAdditionalSkills())
@@ -9951,7 +9941,6 @@ public final class L2PcInstance extends L2Playable
 					{
 						ts.put(holder.getSkillId(), holder.getSkillLvl());
 					}
-					addTransformSkill(holder.getSkill());
 				}
 			}
 			
@@ -9966,6 +9955,8 @@ public final class L2PcInstance extends L2Playable
 			
 			for (Entry<Integer, Integer> transformSkill : ts.entrySet())
 			{
+				Skill sk = SkillData.getInstance().getSkill(transformSkill.getKey(), transformSkill.getValue());
+				addTransformSkill(sk);
 				sl.addSkill(transformSkill.getKey(), transformSkill.getValue(), false, false, false);
 			}
 		}
@@ -12572,6 +12563,10 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		_transformSkills.put(sk.getId(), sk);
+		if (sk.isPassive())
+		{
+			addSkill(sk, false);
+		}
 	}
 	
 	public Skill getTransformSkill(int id)
