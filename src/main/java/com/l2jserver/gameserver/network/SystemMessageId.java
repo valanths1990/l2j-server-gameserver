@@ -1738,7 +1738,7 @@ public final class SystemMessageId
 	
 	/**
 	 * ID: 285<br>
-	 * Message: Clan $s1 has succeeded in engraving the ruler!
+	 * Message: Clan $s1 has successfully engraved the holy artifact!
 	 */
 	public static final SystemMessageId CLAN_S1_ENGRAVED_RULER;
 	
@@ -1750,19 +1750,19 @@ public final class SystemMessageId
 	
 	/**
 	 * ID: 287<br>
-	 * Message: The opposing clan has stared to engrave to monument!
+	 * Message: The opposing clan has started to engrave the holy artifact!
 	 */
 	public static final SystemMessageId OPPONENT_STARTED_ENGRAVING;
 	
 	/**
 	 * ID: 288<br>
-	 * Message: The castle gate has been broken down.
+	 * Message: The castle gate has been destroyed.
 	 */
 	public static final SystemMessageId CASTLE_GATE_BROKEN_DOWN;
 	
 	/**
 	 * ID: 289<br>
-	 * Message: An outpost or headquarters cannot be built because at least one already exists.
+	 * Message: An outpost or headquarters cannot be built because one already exists.
 	 */
 	public static final SystemMessageId NOT_ANOTHER_HEADQUARTERS;
 	

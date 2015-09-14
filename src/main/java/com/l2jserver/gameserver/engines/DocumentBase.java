@@ -851,7 +851,7 @@ public abstract class DocumentBase
 				}
 				case "cantakecastle":
 				{
-					cond = joinAnd(cond, new ConditionPlayerCanTakeCastle(Boolean.parseBoolean(a.getNodeValue())));
+					cond = joinAnd(cond, new ConditionPlayerCanTakeCastle());
 					break;
 				}
 				case "cantakefort":
