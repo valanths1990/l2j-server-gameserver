@@ -20,7 +20,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2Spawn;
@@ -33,6 +35,8 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
  */
 public class L2ControlTowerInstance extends L2Tower
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2ControlTowerInstance.class);
+	
 	private volatile List<L2Spawn> _guards;
 	
 	/**
@@ -63,7 +67,7 @@ public class L2ControlTowerInstance extends L2Tower
 					}
 					catch (Exception e)
 					{
-						_log.log(Level.WARNING, "Error at L2ControlTowerInstance", e);
+						LOG.warn("Error at L2ControlTowerInstance {}", e);
 					}
 				}
 				_guards.clear();

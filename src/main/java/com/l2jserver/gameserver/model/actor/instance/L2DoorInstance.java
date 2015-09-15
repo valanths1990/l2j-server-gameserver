@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
@@ -62,6 +64,8 @@ import com.l2jserver.util.Rnd;
 
 public class L2DoorInstance extends L2Character
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2DoorInstance.class);
+	
 	public static final byte OPEN_BY_CLICK = 1;
 	public static final byte OPEN_BY_TIME = 2;
 	public static final byte OPEN_BY_ITEM = 4;
@@ -254,7 +258,7 @@ public class L2DoorInstance extends L2Character
 			}
 			else
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": cannot find child id: " + getChildId());
+				LOG.warn("Cannot find child id: {}", getChildId());
 			}
 		}
 	}

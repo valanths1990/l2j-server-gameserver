@@ -21,6 +21,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
@@ -41,6 +44,7 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
  */
 public final class L2TeleporterInstance extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2TeleporterInstance.class);
 	private static final int COND_ALL_FALSE = 0;
 	private static final int COND_BUSY_BECAUSE_OF_SIEGE = 1;
 	private static final int COND_OWNER = 2;
@@ -305,7 +309,7 @@ public final class L2TeleporterInstance extends L2Npc
 			{
 				if (Config.DEBUG)
 				{
-					_log.info("Teleporting player " + player.getName() + " to new location: " + list.getLocX() + ":" + list.getLocY() + ":" + list.getLocZ());
+					LOG.debug("Teleporting {} to new location: {}, {}, {}", player, list.getLocX(), list.getLocY(), list.getLocZ());
 				}
 				
 				player.teleToLocation(list.getLocX(), list.getLocY(), list.getLocZ(), false);
@@ -313,7 +317,7 @@ public final class L2TeleporterInstance extends L2Npc
 		}
 		else
 		{
-			_log.warning("No teleport destination with id:" + val);
+			LOG.warn("No teleport destination with id: {}" + val);
 		}
 		
 		player.sendPacket(ActionFailed.STATIC_PACKET);

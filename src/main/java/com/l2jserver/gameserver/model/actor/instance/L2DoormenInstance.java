@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.StringTokenizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.enums.InstanceType;
@@ -30,6 +33,8 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public class L2DoormenInstance extends L2NpcInstance
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2DoormenInstance.class);
+	
 	/**
 	 * Creates a doorman.
 	 * @param template the doorman NPC template
@@ -153,7 +158,7 @@ public class L2DoormenInstance extends L2NpcInstance
 		}
 		else
 		{
-			_log.warning("No teleport destination with id:" + whereTo);
+			LOG.warn("No teleport destination with id: {}", whereTo);
 		}
 		
 		player.sendPacket(ActionFailed.STATIC_PACKET);

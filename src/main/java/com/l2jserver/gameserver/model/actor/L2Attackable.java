@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -76,6 +78,7 @@ import com.l2jserver.util.Rnd;
 
 public class L2Attackable extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2Attackable.class);
 	// Raid
 	private boolean _isRaid = false;
 	private boolean _isRaidMinion = false;
@@ -608,7 +611,7 @@ public class L2Attackable extends L2Npc
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "", e);
+			LOG.error("{}", e);
 		}
 	}
 	
@@ -657,7 +660,7 @@ public class L2Attackable extends L2Npc
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.SEVERE, "", e);
+				LOG.error("{}", e);
 			}
 		}
 	}
@@ -757,7 +760,7 @@ public class L2Attackable extends L2Npc
 		AggroInfo ai = getAggroList().get(target);
 		if (ai == null)
 		{
-			_log.info("target " + target + " not present in aggro list of " + this);
+			LOG.info("target {} not present in aggro list of {}", target, this);
 			return;
 		}
 		

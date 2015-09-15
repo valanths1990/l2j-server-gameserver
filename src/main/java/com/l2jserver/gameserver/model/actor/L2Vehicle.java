@@ -21,7 +21,9 @@ package com.l2jserver.gameserver.model.actor;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
@@ -51,6 +53,8 @@ import com.l2jserver.gameserver.util.Util;
  */
 public abstract class L2Vehicle extends L2Character
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2Vehicle.class);
+	
 	protected int _dockId = 0;
 	protected final List<L2PcInstance> _passengers = new CopyOnWriteArrayList<>();
 	protected Location _oustLoc = null;
@@ -413,7 +417,7 @@ public abstract class L2Vehicle extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed stopMove().", e);
+			LOG.warn("Failed stopMove(). {}", e);
 		}
 		
 		try
@@ -422,7 +426,7 @@ public abstract class L2Vehicle extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed oustPlayers().", e);
+			LOG.warn("Failed oustPlayers(). {}", e);
 		}
 		
 		final L2WorldRegion oldRegion = getWorldRegion();
@@ -433,7 +437,7 @@ public abstract class L2Vehicle extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed decayMe().", e);
+			LOG.warn("Failed decayMe(). {}", e);
 		}
 		
 		if (oldRegion != null)
@@ -447,7 +451,7 @@ public abstract class L2Vehicle extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed cleaning knownlist.", e);
+			LOG.warn("Failed cleaning knownlist. {}", e);
 		}
 		
 		// Remove L2Object object from _allObjects of L2World

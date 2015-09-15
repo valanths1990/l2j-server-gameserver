@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.StringTokenizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.enums.InstanceType;
@@ -32,6 +35,8 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public class L2DungeonGatekeeperInstance extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2DungeonGatekeeperInstance.class);
+	
 	/**
 	 * Creates a dungeon gatekeeper.
 	 * @param template the dungeon gatekeeper NPC template
@@ -176,7 +181,7 @@ public class L2DungeonGatekeeperInstance extends L2Npc
 		}
 		else
 		{
-			_log.warning("No teleport destination with id:" + val);
+			LOG.warn("No teleport destination with id: {}", val);
 		}
 		
 		player.sendPacket(ActionFailed.STATIC_PACKET);

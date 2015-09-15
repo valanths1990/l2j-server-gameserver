@@ -33,8 +33,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.StampedLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
@@ -176,7 +177,7 @@ import com.l2jserver.util.Rnd;
  */
 public abstract class L2Character extends L2Object implements ISkillsHolder, IDeletable
 {
-	public static final Logger _log = Logger.getLogger(L2Character.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(L2Character.class);
 	
 	private volatile Set<L2Character> _attackByList;
 	private volatile boolean _isCastingNow = false;
@@ -4145,7 +4146,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				}
 				catch (final Throwable e)
 				{
-					_log.log(Level.WARNING, "", e);
+					LOG.warn("{}", e);
 				}
 			});
 			
@@ -4450,7 +4451,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				if ((curX < L2World.MAP_MIN_X) || (curX > L2World.MAP_MAX_X) || (curY < L2World.MAP_MIN_Y) || (curY > L2World.MAP_MAX_Y))
 				{
 					// Temporary fix for character outside world region errors
-					_log.warning("Character " + getName() + " outside world area, in coordinates x:" + curX + " y:" + curY);
+					LOG.warn("{} is outside world area, in coordinates x:{} y:{}", this, curX, curY);
 					getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
 					if (isPlayer())
 					{
@@ -4861,7 +4862,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				}
 				else
 				{
-					_log.warning("Skill 4515 at level 1 is missing in DP.");
+					LOG.warn("Skill 4515 at level 1 is missing in DP.");
 				}
 				
 				damage = 0; // prevents messing up drop calculation
@@ -5633,7 +5634,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		catch (NullPointerException e)
 		{
-			_log.log(Level.WARNING, "", e);
+			LOG.warn("{}", e);
 		}
 		
 		if (mut.getSkillTime() > 0)
@@ -5785,7 +5786,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 					else
 					{
-						_log.warning("Skill ID " + curse.getId() + " level " + curse.getLevel() + " is missing in DP!");
+						LOG.warn("Skill ID {} level {} is missing in DP!", curse.getId(), curse.getLevel());
 					}
 					return;
 				}
@@ -5966,7 +5967,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": callSkill() failed.", e);
+			LOG.warn("callSkill() failed. {}", e);
 		}
 	}
 	
@@ -6640,7 +6641,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "", e);
+			LOG.warn("{}", e);
 		}
 	}
 	

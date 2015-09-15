@@ -19,7 +19,9 @@
 package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.concurrent.Future;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -86,8 +88,8 @@ public class L2DecoyInstance extends L2Decoy
 	
 	static class DecoyLifetime implements Runnable
 	{
+		private static final Logger LOG = LoggerFactory.getLogger(DecoyLifetime.class);
 		private final L2PcInstance _activeChar;
-		
 		private final L2DecoyInstance _Decoy;
 		
 		DecoyLifetime(L2PcInstance activeChar, L2DecoyInstance Decoy)
@@ -110,13 +112,14 @@ public class L2DecoyInstance extends L2Decoy
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.SEVERE, "Decoy Error: ", e);
+				LOG.error("Decoy Error: {}", e);
 			}
 		}
 	}
 	
 	private static class HateSpam implements Runnable
 	{
+		private static final Logger LOG = LoggerFactory.getLogger(HateSpam.class);
 		private final L2DecoyInstance _activeChar;
 		private final Skill _skill;
 		
@@ -136,7 +139,7 @@ public class L2DecoyInstance extends L2Decoy
 			}
 			catch (Throwable e)
 			{
-				_log.log(Level.SEVERE, "Decoy Error: ", e);
+				LOG.error("Decoy Error: {}", e);
 			}
 		}
 	}

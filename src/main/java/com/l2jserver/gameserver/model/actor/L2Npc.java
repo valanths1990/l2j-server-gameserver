@@ -26,7 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ItemsAutoDestroy;
@@ -107,6 +109,7 @@ import com.l2jserver.util.Rnd;
  */
 public class L2Npc extends L2Character
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2Npc.class);
 	/** The interaction distance of the L2NpcInstance(is used as offset in MovetoLocation method) */
 	public static final int INTERACTION_DISTANCE = 150;
 	/** Maximum distance where the drop may appear given this NPC position. */
@@ -359,6 +362,8 @@ public class L2Npc extends L2Character
 	/** Task launching the function onRandomAnimation() */
 	protected class RandomAnimationTask implements Runnable
 	{
+		private final Logger LOG = LoggerFactory.getLogger(RandomAnimationTask.class);
+		
 		@Override
 		public void run()
 		{
@@ -389,7 +394,7 @@ public class L2Npc extends L2Character
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.SEVERE, "", e);
+				LOG.error("{}", e);
 			}
 		}
 	}
@@ -870,7 +875,7 @@ public class L2Npc extends L2Character
 				}
 				else
 				{
-					_log.info(getClass().getSimpleName() + ": Unknown NPC bypass: \"" + command + "\" NpcId: " + getId());
+					LOG.info("Unknown NPC bypass: \"{}\" NpcId: {}", command, getId());
 				}
 			}
 		}
@@ -1377,8 +1382,7 @@ public class L2Npc extends L2Character
 	 * <li>Decrease its spawn counter</li>
 	 * <li>Manage Siege task (killFlag, killCT)</li>
 	 * </ul>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World </B></FONT><BR>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packets to players</B></FONT>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World </B></FONT><BR> <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packets to players</B></FONT>
 	 */
 	@Override
 	public void onDecay()
@@ -1417,8 +1421,7 @@ public class L2Npc extends L2Character
 	 * <li>Remove all L2Object from _knownObjects and _knownPlayer of the L2NpcInstance then cancel Attack or Cast and notify AI</li>
 	 * <li>Remove L2Object object from _allObjects of L2World</li>
 	 * </ul>
-	 * <FONT COLOR=#FF0000><B><U>Caution</U>: This method DOESN'T SEND Server->Client packets to players</B></FONT><br>
-	 * UnAfraid: TODO: Add Listener here
+	 * <FONT COLOR=#FF0000><B><U>Caution</U>: This method DOESN'T SEND Server->Client packets to players</B></FONT><br> UnAfraid: TODO: Add Listener here
 	 */
 	@Override
 	public boolean deleteMe()
@@ -1429,7 +1432,7 @@ public class L2Npc extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed decayMe().", e);
+			LOG.error("Failed decayMe(). {}", e);
 		}
 		
 		if (isChannelized())
@@ -1450,7 +1453,7 @@ public class L2Npc extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed removing cleaning knownlist.", e);
+			LOG.error("Failed removing cleaning knownlist. {}", e);
 		}
 		
 		// Remove L2Object object from _allObjects of L2World
@@ -1598,7 +1601,7 @@ public class L2Npc extends L2Character
 		final NpcHtmlMessage noTeachMsg = new NpcHtmlMessage(getObjectId());
 		if (html == null)
 		{
-			_log.warning("Npc " + npcId + " missing noTeach html!");
+			LOG.warn("Npc {} missing noTeach html!", npcId);
 			noTeachMsg.setHtml("<html><body>I cannot teach you any skills.<br>You must find your current class teachers.</body></html>");
 		}
 		else
@@ -1617,7 +1620,7 @@ public class L2Npc extends L2Character
 			{
 				deleteMe();
 			}
-		}, delay);
+		} , delay);
 		return this;
 	}
 	
@@ -1883,7 +1886,7 @@ public class L2Npc extends L2Character
 			
 			if (ItemTable.getInstance().getTemplate(itemId) == null)
 			{
-				_log.log(Level.SEVERE, "Item doesn't exist so cannot be dropped. Item ID: " + itemId + " Quest: " + getName());
+				LOG.error("Item doesn't exist so cannot be dropped. Item ID: {} Quest: {}", itemId, getName());
 				return null;
 			}
 			

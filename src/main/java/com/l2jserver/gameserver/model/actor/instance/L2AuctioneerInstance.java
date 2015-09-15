@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.instancemanager.AuctionManager;
@@ -42,6 +45,8 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public final class L2AuctioneerInstance extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2AuctioneerInstance.class);
+	
 	private static final int COND_ALL_FALSE = 0;
 	private static final int COND_BUSY_BECAUSE_OF_SIEGE = 1;
 	private static final int COND_REGULAR = 3;
@@ -157,7 +162,7 @@ public final class L2AuctioneerInstance extends L2Npc
 				
 				if (Config.DEBUG)
 				{
-					_log.warning("bidding show successful");
+					LOG.debug("bidding show successful");
 				}
 				
 				try
@@ -167,7 +172,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					
 					if (Config.DEBUG)
 					{
-						_log.warning("auction test started");
+						LOG.debug("auction test started");
 					}
 					
 					String filename = "data/html/auction/AgitAuctionInfo.htm";
@@ -194,7 +199,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					}
 					else
 					{
-						_log.warning("Auctioneer Auction null for AuctionId : " + auctionId);
+						LOG.debug("Auctioneer Auction null for AuctionId : {}", auctionId);
 					}
 					
 					player.sendPacket(html);
@@ -302,7 +307,7 @@ public final class L2AuctioneerInstance extends L2Npc
 				
 				if (Config.DEBUG)
 				{
-					_log.warning("cmd list: auction test started");
+					LOG.debug("cmd list: auction test started");
 				}
 				
 				StringBuilder items = new StringBuilder();
@@ -389,7 +394,7 @@ public final class L2AuctioneerInstance extends L2Npc
 				
 				if (Config.DEBUG)
 				{
-					_log.warning("cmd bidlist: auction test started");
+					LOG.debug("cmd bidlist: auction test started");
 				}
 				
 				String biders = "";
@@ -436,7 +441,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					}
 					else
 					{
-						_log.warning("Auctioneer Auction null for AuctionBiddedAt : " + player.getClan().getAuctionBiddedAt());
+						LOG.warn("Auctioneer Auction null for AuctionBiddedAt : {}", player.getClan().getAuctionBiddedAt());
 					}
 					
 					player.sendPacket(html);
@@ -468,7 +473,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					}
 					else
 					{
-						_log.warning("Auctioneer Auction null for getHasHideout : " + player.getClan().getHideoutId());
+						LOG.warn("Auctioneer Auction null for getHasHideout : {}", player.getClan().getHideoutId());
 					}
 					
 					player.sendPacket(html);
@@ -493,7 +498,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					}
 					else
 					{
-						_log.warning("Clan Hall ID NULL : " + ItemId + " Can be caused by concurent write in ClanHallManager");
+						LOG.warn("Clan Hall ID NULL : {} Can be caused by concurent write in ClanHallManager", ItemId);
 					}
 					
 					player.sendPacket(html);
@@ -621,7 +626,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					}
 					else
 					{
-						_log.warning("Auctioneer Auction null for AuctionBiddedAt : " + player.getClan().getAuctionBiddedAt());
+						LOG.warn("Auctioneer Auction null for AuctionBiddedAt : {}", player.getClan().getAuctionBiddedAt());
 					}
 					
 					player.sendPacket(html);

@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
@@ -30,6 +33,8 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 public final class L2TerritoryWardInstance extends L2Attackable
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2TerritoryWardInstance.class);
+	
 	/**
 	 * Creates territory ward.
 	 * @param template the territory ward NPC template
@@ -83,7 +88,7 @@ public final class L2TerritoryWardInstance extends L2Attackable
 		
 		if (getCastle() == null)
 		{
-			_log.warning("L2TerritoryWardInstance(" + getName() + ") spawned outside Castle Zone!");
+			LOG.warn("L2TerritoryWardInstance({}) spawned outside Castle Zone!", getName());
 		}
 	}
 	
