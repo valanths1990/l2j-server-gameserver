@@ -5296,7 +5296,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		// Remove all its Func objects from the L2Character calculator set
 		if (oldSkill != null)
 		{
-			
 			// Stop casting if this skill is used right now
 			if ((getLastSkillCast() != null) && isCastingNow())
 			{
@@ -5331,7 +5330,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public final Collection<Skill> getAllSkills()
 	{
-		return new ArrayList<>(_skills.values());
+		return _skills.values();
 	}
 	
 	/**
