@@ -73,13 +73,13 @@ public class NpcData implements IXmlReader
 		_minionData = new MinionData();
 		
 		parseDatapackDirectory("data/stats/npcs", false);
-		LOGGER.info("{}: Loaded {} NPCs.", getClass().getSimpleName(), _npcs.size());
+		LOG.info("{}: Loaded {} NPCs.", getClass().getSimpleName(), _npcs.size());
 		
 		if (Config.CUSTOM_NPC_DATA)
 		{
 			final int npcCount = _npcs.size();
 			parseDatapackDirectory("data/stats/npcs/custom", true);
-			LOGGER.info("{}: Loaded {} custom NPCs.", getClass().getSimpleName(), (_npcs.size() - npcCount));
+			LOG.info("{}: Loaded {} custom NPCs.", getClass().getSimpleName(), (_npcs.size() - npcCount));
 		}
 		
 		_minionData = null;
@@ -339,7 +339,7 @@ public class NpcData implements IXmlReader
 											}
 											else
 											{
-												LOGGER.warn("[{}] skill not found. NPC ID: {} Skill ID: {} Skill Level: {}!", f.getName(), npcId, skillId, skillLevel);
+												LOG.warn("[{}] skill not found. NPC ID: {} Skill ID: {} Skill Level: {}!", f.getName(), npcId, skillId, skillLevel);
 											}
 										}
 									}
@@ -649,7 +649,7 @@ public class NpcData implements IXmlReader
 						}
 						else
 						{
-							LOGGER.warn("[{}] grouped general drop item supports only general drop item.", f);
+							LOG.warn("[{}] grouped general drop item supports only general drop item.", f);
 						}
 					}
 					dropItem.setItems(items);
@@ -822,7 +822,7 @@ public class NpcData implements IXmlReader
 		{
 			_tempMinions.clear();
 			parseDatapackFile("data/minionData.xml");
-			LOGGER.info("{}: Loaded {} minions data.", getClass().getSimpleName(), _tempMinions.size());
+			LOG.info("{}: Loaded {} minions data.", getClass().getSimpleName(), _tempMinions.size());
 		}
 		
 		@Override

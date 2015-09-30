@@ -54,8 +54,8 @@ public class EnchantItemData implements IXmlReader
 		_scrolls.clear();
 		_supports.clear();
 		parseDatapackFile("data/enchantItemData.xml");
-		LOGGER.info("{}: Loaded {} Enchant Scrolls.", getClass().getSimpleName(), _scrolls.size());
-		LOGGER.info("{}: Loaded {} Support Items.", getClass().getSimpleName(), _supports.size());
+		LOG.info("{}: Loaded {} Enchant Scrolls.", getClass().getSimpleName(), _scrolls.size());
+		LOG.info("{}: Loaded {} Support Items.", getClass().getSimpleName(), _supports.size());
 	}
 	
 	@Override
@@ -94,11 +94,11 @@ public class EnchantItemData implements IXmlReader
 						}
 						catch (NullPointerException e)
 						{
-							LOGGER.warn("{}: Unexistent enchant scroll: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
+							LOG.warn("{}: Unexistent enchant scroll: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
 						}
 						catch (IllegalAccessError e)
 						{
-							LOGGER.warn("{}: Wrong enchant scroll item type: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
+							LOG.warn("{}: Wrong enchant scroll item type: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
 						}
 					}
 					else if ("support".equalsIgnoreCase(d.getNodeName()))
@@ -118,11 +118,11 @@ public class EnchantItemData implements IXmlReader
 						}
 						catch (NullPointerException e)
 						{
-							LOGGER.warn("{}: Unexistent enchant support item: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
+							LOG.warn("{}: Unexistent enchant support item: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
 						}
 						catch (IllegalAccessError e)
 						{
-							LOGGER.warn("{}: Wrong enchant support item type: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
+							LOG.warn("{}: Wrong enchant support item type: {} defined in enchant data!", getClass().getSimpleName(), set.getString("id"));
 						}
 					}
 				}

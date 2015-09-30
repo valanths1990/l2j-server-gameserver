@@ -6526,8 +6526,8 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the _accessLevel of the L2PcInstance.
-	 * @param level
+	 * Set the access level for this player.
+	 * @param level the access level
 	 */
 	public void setAccessLevel(int level)
 	{
@@ -6541,11 +6541,11 @@ public final class L2PcInstance extends L2Playable
 		
 		if (!AdminData.getInstance().hasAccessLevel(level))
 		{
-			LOG.warn("Tryed to set unregistered access level {} for {}. Setting access level without privileges!", level, this);
+			LOG.warn("Tried to set unregistered access level {} for {}. Setting access level without privileges!", level, this);
 		}
 		else if (level > 0)
 		{
-			LOG.warn("{} access level set for character {}! Just a warning to be careful ;)", _accessLevel.getName(), getName());
+			LOG.info("{} access level set for character {}.", _accessLevel.getName(), getName());
 		}
 	}
 	

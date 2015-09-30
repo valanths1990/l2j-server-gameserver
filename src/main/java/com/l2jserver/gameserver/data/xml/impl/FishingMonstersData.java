@@ -50,7 +50,7 @@ public final class FishingMonstersData implements IXmlReader
 	{
 		_fishingMonstersData.clear();
 		parseDatapackFile("data/stats/fishing/fishingMonsters.xml");
-		LOGGER.info("{}: Loaded {} Fishing Monsters.", getClass().getSimpleName(), _fishingMonstersData.size());
+		LOG.info("{}: Loaded {} Fishing Monsters.", getClass().getSimpleName(), _fishingMonstersData.size());
 	}
 	
 	@Override

@@ -3926,13 +3926,13 @@ public final class Config
 			File f = new File(IP_CONFIG_FILE);
 			if (f.exists())
 			{
-				LOGGER.info("Network Config: ipconfig.xml exists using manual configuration...");
+				LOG.info("Network Config: ipconfig.xml exists using manual configuration...");
 				parseFile(new File(IP_CONFIG_FILE));
 			}
 			else
 			// Auto configuration...
 			{
-				LOGGER.info("Network Config: ipconfig.xml doesn't exists using automatic configuration...");
+				LOG.info("Network Config: ipconfig.xml doesn't exists using automatic configuration...");
 				autoIpConfig();
 			}
 		}
@@ -3955,7 +3955,7 @@ public final class Config
 							
 							if (_hosts.size() != _subnets.size())
 							{
-								LOGGER.warn("Failed to load {} file - subnets does not match server addresses.", IP_CONFIG_FILE);
+								LOG.warn("Failed to load {} file - subnets does not match server addresses.", IP_CONFIG_FILE);
 							}
 						}
 					}
@@ -3963,7 +3963,7 @@ public final class Config
 					Node att = n.getAttributes().getNamedItem("address");
 					if (att == null)
 					{
-						LOGGER.warn("Failed to load {} file - default server address is missing.", IP_CONFIG_FILE);
+						LOG.warn("Failed to load {} file - default server address is missing.", IP_CONFIG_FILE);
 						_hosts.add("127.0.0.1");
 					}
 					else
@@ -3988,7 +3988,7 @@ public final class Config
 			}
 			catch (IOException e)
 			{
-				LOGGER.info("Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
+				LOG.info("Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
 				externalIp = "127.0.0.1";
 			}
 			
@@ -4028,7 +4028,7 @@ public final class Config
 						{
 							_subnets.add(subnet);
 							_hosts.add(hostAddress);
-							LOGGER.info("Network Config: Adding new subnet: " + subnet + " address: " + hostAddress);
+							LOG.info("Network Config: Adding new subnet: " + subnet + " address: " + hostAddress);
 						}
 					}
 				}
@@ -4036,11 +4036,11 @@ public final class Config
 				// External host and subnet
 				_hosts.add(externalIp);
 				_subnets.add("0.0.0.0/0");
-				LOGGER.info("Network Config: Adding new subnet: 0.0.0.0/0 address: {}", externalIp);
+				LOG.info("Network Config: Adding new subnet: 0.0.0.0/0 address: {}", externalIp);
 			}
 			catch (SocketException e)
 			{
-				LOGGER.warn("Network Config: Configuration failed please configure manually using ipconfig.xml", e);
+				LOG.warn("Network Config: Configuration failed please configure manually using ipconfig.xml", e);
 				System.exit(0);
 			}
 		}

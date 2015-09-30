@@ -51,7 +51,7 @@ public class OptionData implements IXmlReader
 	{
 		_optionData.clear();
 		parseDatapackDirectory("data/stats/options", false);
-		LOGGER.info("{}: Loaded: {} Options.", getClass().getSimpleName(), _optionData.size());
+		LOG.info("{}: Loaded: {} Options.", getClass().getSimpleName(), _optionData.size());
 	}
 	
 	@Override

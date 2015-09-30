@@ -65,9 +65,9 @@ public final class InitialShortcutData implements IXmlReader
 		
 		parseDatapackFile("data/stats/initialShortcuts.xml");
 		
-		LOGGER.info("{}: Loaded {} Initial Global Shortcuts data.", getClass().getSimpleName(), _initialGlobalShortcutList.size());
-		LOGGER.info("{}: Loaded {} Initial Shortcuts data.", getClass().getSimpleName(), _initialShortcutData.size());
-		LOGGER.info("{}: Loaded {} Macros presets.", getClass().getSimpleName(), _macroPresets.size());
+		LOG.info("{}: Loaded {} Initial Global Shortcuts data.", getClass().getSimpleName(), _initialGlobalShortcutList.size());
+		LOG.info("{}: Loaded {} Initial Shortcuts data.", getClass().getSimpleName(), _initialShortcutData.size());
+		LOG.info("{}: Loaded {} Macros presets.", getClass().getSimpleName(), _macroPresets.size());
 	}
 	
 	@Override
