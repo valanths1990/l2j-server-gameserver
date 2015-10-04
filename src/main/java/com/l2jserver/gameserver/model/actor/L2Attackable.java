@@ -110,7 +110,6 @@ public class L2Attackable extends L2Npc
 	// Misc
 	private boolean _mustGiveExpSp;
 	protected int _onKillDelay = 5000;
-	private long _lastAttack;
 	
 	/**
 	 * Creates an attackable NPC.
@@ -1544,16 +1543,6 @@ public class L2Attackable extends L2Npc
 	public final int getOnKillDelay()
 	{
 		return _onKillDelay;
-	}
-	
-	public long getLastAttack()
-	{
-		return _lastAttack;
-	}
-	
-	public void setLastAttack(long lastAttack)
-	{
-		_lastAttack = lastAttack;
 	}
 	
 	/**
