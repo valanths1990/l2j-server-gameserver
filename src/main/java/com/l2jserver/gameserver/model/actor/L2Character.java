@@ -521,7 +521,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	/**
 	 * Remove the L2Character from the world when the decay task is launched.<br>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World </B></FONT><BR> <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packets to players</B></FONT>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World </B></FONT><BR>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packets to players</B></FONT>
 	 */
 	public void onDecay()
 	{
@@ -3549,7 +3550,13 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * A L2Character owns a table of Calculators called <B>_calculators</B>.<br>
 	 * Each Calculator (a calculator per state) own a table of Func object.<br>
 	 * A Func object is a mathematic function that permit to calculate the modifier of a state (ex : REGENERATE_HP_RATE...).<br>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method is ONLY for L2PcInstance</B></FONT><br> <B><U>Example of use</U>:</B> <ul> <li>Equip an item from inventory</li> <li>Learn a new passive skill</li> <li>Use an active skill</li> </ul>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method is ONLY for L2PcInstance</B></FONT><br>
+	 * <B><U>Example of use</U>:</B>
+	 * <ul>
+	 * <li>Equip an item from inventory</li>
+	 * <li>Learn a new passive skill</li>
+	 * <li>Use an active skill</li>
+	 * </ul>
 	 * @param functions The list of Func objects to add to the Calculator corresponding to the state affected
 	 */
 	public final void addStatFuncs(List<AbstractFunction> functions)
@@ -3639,7 +3646,12 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * A L2Character owns a table of Calculators called <B>_calculators</B>.<br>
 	 * Each Calculator (a calculator per state) own a table of Func object.<br>
 	 * A Func object is a mathematic function that permit to calculate the modifier of a state (ex : REGENERATE_HP_RATE...).<br>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method is ONLY for L2PcInstance</B></FONT><br> <B><U>Example of use</U>:</B> <ul> <li>Unequip an item from inventory</li> <li>Stop an active skill</li> </ul>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method is ONLY for L2PcInstance</B></FONT><br>
+	 * <B><U>Example of use</U>:</B>
+	 * <ul>
+	 * <li>Unequip an item from inventory</li>
+	 * <li>Stop an active skill</li>
+	 * </ul>
 	 * @param functions The list of Func objects to add to the Calculator corresponding to the state affected
 	 */
 	public final void removeStatFuncs(AbstractFunction[] functions)
@@ -4013,7 +4025,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * That's why, client send regularly a Client->Server ValidatePosition packet to eventually correct the gap on the server.<br>
 	 * But, it's always the server position that is used in range calculation. At the end of the estimated movement time,<br>
 	 * the L2Character position is automatically set to the destination position even if the movement is not finished.<br>
-	 * <FONT COLOR=#FF0000><B><U>Caution</U>: The current Z position is obtained FROM THE CLIENT by the Client->Server ValidatePosition Packet.<br> But x and y positions must be calculated to avoid that players try to modify their movement speed.</B></FONT>
+	 * <FONT COLOR=#FF0000><B><U>Caution</U>: The current Z position is obtained FROM THE CLIENT by the Client->Server ValidatePosition Packet.<br>
+	 * But x and y positions must be calculated to avoid that players try to modify their movement speed.</B></FONT>
 	 * @return True if the movement is finished
 	 */
 	public boolean updatePosition()
@@ -4304,7 +4317,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * <li>Add the L2Character to movingObjects of the GameTimeController</li>
 	 * <li>Create a task to notify the AI that L2Character arrives at a check point of the movement</li>
 	 * </ul>
-	 * <FONT COLOR=#FF0000><B><U>Caution</U>: This method DOESN'T send Server->Client packet MoveToPawn/CharMoveToLocation.</B></FONT><br> <B><U>Example of use</U>:</B> <ul> <li>AI : onIntentionMoveTo(Location), onIntentionPickUp(L2Object), onIntentionInteract(L2Object)</li> <li>FollowTask</li>
+	 * <FONT COLOR=#FF0000><B><U>Caution</U>: This method DOESN'T send Server->Client packet MoveToPawn/CharMoveToLocation.</B></FONT><br>
+	 * <B><U>Example of use</U>:</B>
+	 * <ul>
+	 * <li>AI : onIntentionMoveTo(Location), onIntentionPickUp(L2Object), onIntentionInteract(L2Object)</li>
+	 * <li>FollowTask</li>
 	 * </ul>
 	 * @param x The X position of the destination
 	 * @param y The Y position of the destination
@@ -5952,7 +5969,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				for (L2Object target : targets)
 				{
-					if (target instanceof L2Character)
+					if (target.isCharacter())
 					{
 						final L2Character creature = (L2Character) target;
 						if (creature.hasAI())

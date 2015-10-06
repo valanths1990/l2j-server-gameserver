@@ -373,14 +373,14 @@ public final class L2CubicInstance implements IIdentifiable
 				if (ownerTarget.isAttackable())
 				{
 					final L2Attackable attackable = (L2Attackable) ownerTarget;
-					if ((attackable.getAggroList().get(_owner) != null) && !attackable.isDead())
+					if (attackable.isInAggroList(_owner) && !attackable.isDead())
 					{
 						_target = (L2Character) ownerTarget;
 						return;
 					}
 					if (_owner.hasSummon())
 					{
-						if ((attackable.getAggroList().get(_owner.getSummon()) != null) && !attackable.isDead())
+						if (attackable.isInAggroList(_owner.getSummon()) && !attackable.isDead())
 						{
 							_target = (L2Character) ownerTarget;
 							return;
