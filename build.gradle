@@ -24,10 +24,7 @@ dependencies {
 	compile 'org.python:jython:2.2.1'
 	compile 'org.slf4j:slf4j-api:1.7.12'
 	compile 'org.slf4j:slf4j-jdk14:1.7.12'
-	compile files('dist/libs/java-engine-1.8.jar')
-	compile files('dist/libs/jython-engine-2.2.1.jar')
-	compile files('dist/libs/L2J_GeoDriver.jar')
-	compile files('dist/libs/mmocore.jar')
+	compile fileTree(dir: 'dist/libs', include: '*.jar')
 	testCompile 'org.mockito:mockito-all:2.0.2-beta'
 	testCompile 'org.testng:testng:6.9.6'
 }
