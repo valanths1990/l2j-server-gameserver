@@ -290,15 +290,14 @@ public final class L2TeleporterInstance extends L2Npc
 				return;
 			}
 			
-			Calendar cal = Calendar.getInstance();
 			int price = list.getPrice();
-			
 			if (player.getLevel() < 41)
 			{
 				price = 0;
 			}
 			else if (!list.getIsForNoble())
 			{
+				final Calendar cal = Calendar.getInstance();
 				if ((cal.get(Calendar.HOUR_OF_DAY) >= 20) && (cal.get(Calendar.HOUR_OF_DAY) <= 23) && ((cal.get(Calendar.DAY_OF_WEEK) == 1) || (cal.get(Calendar.DAY_OF_WEEK) == 7)))
 				{
 					price /= 2;
@@ -307,12 +306,9 @@ public final class L2TeleporterInstance extends L2Npc
 			
 			if (Config.ALT_GAME_FREE_TELEPORT || player.destroyItemByItemId("Teleport " + (list.getIsForNoble() ? " nobless" : ""), list.getItemId(), price, this, true))
 			{
-				if (Config.DEBUG)
-				{
-					LOG.debug("Teleporting {} to new location: {}, {}, {}", player, list.getLocX(), list.getLocY(), list.getLocZ());
-				}
+				LOG.debug("Teleporting {} to new location: {}, {}, {}", player, list.getLocX(), list.getLocY(), list.getLocZ());
 				
-				player.teleToLocation(list.getLocX(), list.getLocY(), list.getLocZ(), false);
+				player.teleToLocation(list.getLocX(), list.getLocY(), list.getLocZ(), player.getHeading(), -1);
 			}
 		}
 		else
