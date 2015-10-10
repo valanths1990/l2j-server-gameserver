@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -56,7 +56,7 @@ import com.l2jserver.util.Rnd;
 
 public final class ItemAuctionInstance
 {
-	protected static final Logger _log = Logger.getLogger(ItemAuctionInstance.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ItemAuctionInstance.class);
 	private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss dd.MM.yy");
 	
 	private static final long START_TIME_SPACE = TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES);
@@ -153,9 +153,9 @@ public final class ItemAuctionInstance
 					}
 				}
 			}
-			catch (final IllegalArgumentException e)
+			catch (IllegalArgumentException e)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Failed loading auction item", e);
+				LOG.warn("Failed loading auction item!", e);
 			}
 		}
 		
@@ -185,20 +185,20 @@ public final class ItemAuctionInstance
 							ItemAuctionManager.deleteAuction(auctionId);
 						}
 					}
-					catch (final SQLException e)
+					catch (SQLException e)
 					{
-						_log.log(Level.WARNING, getClass().getSimpleName() + ": Failed loading auction: " + auctionId, e);
+						LOG.warn("Failed loading auction ID {}!", auctionId, e);
 					}
 				}
 			}
 		}
-		catch (final SQLException e)
+		catch (SQLException e)
 		{
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Failed loading auctions.", e);
+			LOG.error("Error loading auctions.", e);
 			return;
 		}
 		
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded " + _items.size() + " item(s) and registered " + _auctions.size() + " auction(s) for instance " + _instanceId + ".");
+		LOG.info("Loaded {} item(s) and registered {} auction(s) for NPC ID {}.", _items.size(), _auctions.size(), _instanceId);
 		checkAndSetCurrentAndNextAuction();
 	}
 	
@@ -340,21 +340,21 @@ public final class ItemAuctionInstance
 			{
 				setStateTask(ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleAuctionTask(currentAuction), Math.max(currentAuction.getStartingTime() - System.currentTimeMillis(), 0L)));
 			}
-			_log.log(Level.INFO, getClass().getSimpleName() + ": Schedule current auction " + currentAuction.getAuctionId() + " for instance " + _instanceId);
+			LOG.info("Schedule current auction ID {} for NPC ID {}.", currentAuction.getAuctionId(), _instanceId);
 		}
 		else
 		{
 			setStateTask(ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleAuctionTask(nextAuction), Math.max(nextAuction.getStartingTime() - System.currentTimeMillis(), 0L)));
-			_log.log(Level.INFO, getClass().getSimpleName() + ": Schedule next auction " + nextAuction.getAuctionId() + " on " + DATE_FORMAT.format(new Date(nextAuction.getStartingTime())) + " for instance " + _instanceId);
+			LOG.info("Schedule next auction ID {} on {} for NPC ID {}.", nextAuction.getAuctionId(), DATE_FORMAT.format(new Date(nextAuction.getStartingTime())), _instanceId);
 		}
 	}
 	
-	public final ItemAuction getAuction(final int auctionId)
+	public final ItemAuction getAuction(int auctionId)
 	{
 		return _auctions.get(auctionId);
 	}
 	
-	public final ItemAuction[] getAuctionsByBidder(final int bidderObjId)
+	public final ItemAuction[] getAuctionsByBidder(int bidderObjId)
 	{
 		final Collection<ItemAuction> auctions = getAuctions();
 		final ArrayList<ItemAuction> stack = new ArrayList<>(auctions.size());
@@ -384,11 +384,13 @@ public final class ItemAuctionInstance
 		return auctions;
 	}
 	
-	private final class ScheduleAuctionTask implements Runnable
+	private class ScheduleAuctionTask implements Runnable
 	{
+		private final Logger LOG = LoggerFactory.getLogger(ScheduleAuctionTask.class);
+		
 		private final ItemAuction _auction;
 		
-		public ScheduleAuctionTask(final ItemAuction auction)
+		public ScheduleAuctionTask(ItemAuction auction)
 		{
 			_auction = auction;
 		}
@@ -402,11 +404,11 @@ public final class ItemAuctionInstance
 			}
 			catch (final Exception e)
 			{
-				_log.log(Level.SEVERE, getClass().getSimpleName() + ": Failed scheduling auction " + _auction.getAuctionId(), e);
+				LOG.error("Failed scheduling auction ID {}!", _auction.getAuctionId(), e);
 			}
 		}
 		
-		private final void runImpl() throws Exception
+		private void runImpl() throws Exception
 		{
 			final ItemAuctionState state = _auction.getAuctionState();
 			switch (state)
@@ -418,7 +420,7 @@ public final class ItemAuctionInstance
 						throw new IllegalStateException("Could not set auction state: " + ItemAuctionState.STARTED.toString() + ", expected: " + state.toString());
 					}
 					
-					_log.log(Level.INFO, getClass().getSimpleName() + ": Auction " + _auction.getAuctionId() + " has started for instance " + _auction.getInstanceId());
+					LOG.info("Auction ID {} has started for NPC ID {}.", _auction.getAuctionId(), _auction.getInstanceId());
 					checkAndSetCurrentAndNextAuction();
 					break;
 				}
@@ -501,7 +503,7 @@ public final class ItemAuctionInstance
 				player.getWarehouse().addItem("ItemAuction", item, null, null);
 				player.sendPacket(SystemMessageId.WON_BID_ITEM_CAN_BE_FOUND_IN_WAREHOUSE);
 				
-				_log.log(Level.INFO, getClass().getSimpleName() + ": Auction " + auction.getAuctionId() + " has finished. Highest bid by " + player.getName() + " for instance " + _instanceId);
+				LOG.info("Auction ID {} has finished. Highest bid by {} for instance ID {}.", auction.getAuctionId(), player.getName(), _instanceId);
 			}
 			else
 			{
@@ -510,7 +512,8 @@ public final class ItemAuctionInstance
 				item.updateDatabase();
 				L2World.getInstance().removeObject(item);
 				
-				_log.log(Level.INFO, getClass().getSimpleName() + ": Auction " + auction.getAuctionId() + " has finished. Highest bid by " + CharNameTable.getInstance().getNameById(bid.getPlayerObjId()) + " for instance " + _instanceId);
+				final String playerName = CharNameTable.getInstance().getNameById(bid.getPlayerObjId());
+				LOG.info("Auction ID {} has finished. Highest bid by {} for instance ID {}.", auction.getAuctionId(), playerName, _instanceId);
 			}
 			
 			// Clean all canceled bids
@@ -518,7 +521,7 @@ public final class ItemAuctionInstance
 		}
 		else
 		{
-			_log.log(Level.INFO, getClass().getSimpleName() + ": Auction " + auction.getAuctionId() + " has finished. There have not been any bid for instance " + _instanceId);
+			LOG.info("Auction ID {} has finished. There have not been any bid for instance ID {}.", auction.getAuctionId(), _instanceId);
 		}
 	}
 	
@@ -558,7 +561,7 @@ public final class ItemAuctionInstance
 				{
 					if (!rset.next())
 					{
-						_log.log(Level.WARNING, getClass().getSimpleName() + ": Auction data not found for auction: " + auctionId);
+						LOG.warn("Auction data not found for auction ID {}!", auctionId);
 						return null;
 					}
 					auctionItemId = rset.getInt(1);
@@ -570,27 +573,27 @@ public final class ItemAuctionInstance
 			
 			if (startingTime >= endingTime)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Invalid starting/ending paramaters for auction: " + auctionId);
+				LOG.warn("Invalid starting/ending paramaters for auction ID {}!", auctionId);
 				return null;
 			}
 			
 			final AuctionItem auctionItem = getAuctionItem(auctionItemId);
 			if (auctionItem == null)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": AuctionItem: " + auctionItemId + ", not found for auction: " + auctionId);
+				LOG.warn("Auction item ID {} not found for auction ID {}!", auctionItemId, auctionId);
 				return null;
 			}
 			
 			final ItemAuctionState auctionState = ItemAuctionState.stateForStateId(auctionStateId);
 			if (auctionState == null)
 			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Invalid auctionStateId: " + auctionStateId + ", for auction: " + auctionId);
+				LOG.warn("Invalid auctionStateId {} for auction ID {}!", auctionStateId, auctionId);
 				return null;
 			}
 			
 			if ((auctionState == ItemAuctionState.FINISHED) && (startingTime < (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(Config.ALT_ITEM_AUCTION_EXPIRED_AFTER, TimeUnit.DAYS))))
 			{
-				_log.log(Level.INFO, getClass().getSimpleName() + ": Clearing expired auction: " + auctionId);
+				LOG.info("Clearing expired auction ID {}.", auctionId);
 				try (PreparedStatement ps = con.prepareStatement(DELETE_AUCTION_INFO_BY_AUCTION_ID))
 				{
 					ps.setInt(1, auctionId);

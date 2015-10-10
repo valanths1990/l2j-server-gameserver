@@ -1302,23 +1302,22 @@ public final class SkillTreesData implements IXmlReader
 			}
 		}
 		
-		final String className = getClass().getSimpleName();
-		LOG.info("{}: Loaded {} Class Skills for {} Class Skill Trees.", className, classSkillTreeCount, _classSkillTrees.size());
-		LOG.info("{}: Loaded {} Sub-Class Skills.", className, _subClassSkillTree.size());
-		LOG.info("{}: Loaded {} Transfer Skills for {} Transfer Skill Trees.", className, trasferSkillTreeCount, _transferSkillTrees.size());
-		LOG.info("{}: Loaded {} Fishing Skills, {} Dwarven only Fishing Skills.", className, _fishingSkillTree.size(), dwarvenOnlyFishingSkillCount);
-		LOG.info("{}: Loaded {} Collect Skills.", className, _collectSkillTree.size());
-		LOG.info("{}: Loaded {} Pledge Skills, {} for Pledge and {} Residential.", className, _pledgeSkillTree.size(), (_pledgeSkillTree.size() - resSkillCount), resSkillCount);
-		LOG.info("{}: Loaded {} Sub-Pledge Skills.", className, _subPledgeSkillTree.size());
-		LOG.info("{}: Loaded {} Transform Skills.", className, _transformSkillTree.size());
-		LOG.info("{}: Loaded {} Noble Skills.", className, _nobleSkillTree.size());
-		LOG.info("{}: Loaded {} Hero Skills.", className, _heroSkillTree.size());
-		LOG.info("{}: Loaded {} Game Master Skills.", className, _gameMasterSkillTree.size());
-		LOG.info("{}: Loaded {} Game Master Aura Skills.", className, _gameMasterAuraSkillTree.size());
+		LOG.info("Loaded {} Class Skills for {} Class Skill Trees.", classSkillTreeCount, _classSkillTrees.size());
+		LOG.info("Loaded {} Sub-Class Skills.", _subClassSkillTree.size());
+		LOG.info("Loaded {} Transfer Skills for {} Transfer Skill Trees.", trasferSkillTreeCount, _transferSkillTrees.size());
+		LOG.info("Loaded {} Fishing Skills, {} Dwarven only Fishing Skills.", _fishingSkillTree.size(), dwarvenOnlyFishingSkillCount);
+		LOG.info("Loaded {} Collect Skills.", _collectSkillTree.size());
+		LOG.info("Loaded {} Pledge Skills, {} for Pledge and {} Residential.", _pledgeSkillTree.size(), (_pledgeSkillTree.size() - resSkillCount), resSkillCount);
+		LOG.info("Loaded {} Sub-Pledge Skills.", _subPledgeSkillTree.size());
+		LOG.info("Loaded {} Transform Skills.", _transformSkillTree.size());
+		LOG.info("Loaded {} Noble Skills.", _nobleSkillTree.size());
+		LOG.info("Loaded {} Hero Skills.", _heroSkillTree.size());
+		LOG.info("Loaded {} Game Master Skills.", _gameMasterSkillTree.size());
+		LOG.info("Loaded {} Game Master Aura Skills.", _gameMasterAuraSkillTree.size());
 		final int commonSkills = _commonSkillTree.size();
 		if (commonSkills > 0)
 		{
-			LOG.info("{}: Loaded {} Common Skills to all classes.", className, commonSkills);
+			LOG.info("Loaded {} Common Skills to all classes.", commonSkills);
 		}
 	}
 	
@@ -1328,7 +1327,7 @@ public final class SkillTreesData implements IXmlReader
 	 */
 	public static SkillTreesData getInstance()
 	{
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	/**
@@ -1336,6 +1335,6 @@ public final class SkillTreesData implements IXmlReader
 	 */
 	private static class SingletonHolder
 	{
-		protected static final SkillTreesData _instance = new SkillTreesData();
+		protected static final SkillTreesData INSTANCE = new SkillTreesData();
 	}
 }
