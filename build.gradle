@@ -141,7 +141,7 @@ task zip(type: Zip, dependsOn: build) {
 build.finalizedBy(zip)
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.7'
+	gradleVersion = '2.8-rc-1'
 }
 
 eclipse {
