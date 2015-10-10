@@ -906,7 +906,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					return;
 				}
 				
-				else if ((target.getActingPlayer() != null) && (getActingPlayer().getSiegeState() > 0) && isInsideZone(ZoneId.SIEGE) && (target.getActingPlayer().getSiegeState() == getActingPlayer().getSiegeState()) && (target.getActingPlayer() != this) && (target.getActingPlayer().getSiegeSide() == getActingPlayer().getSiegeSide()))
+				else if ((target.getActingPlayer() != null) && (getActingPlayer().getSiegeState() > 0) && isInsideZone(ZoneId.SIEGE) && (target.getActingPlayer().getSiegeState() == getActingPlayer().getSiegeState()) && (target.getActingPlayer() != this)
+					&& (target.getActingPlayer().getSiegeSide() == getActingPlayer().getSiegeSide()))
 				{
 					if (TerritoryWarManager.getInstance().isTWInProgress())
 					{
@@ -4108,7 +4109,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		double delta = (dx * dx) + (dy * dy);
 		if ((delta < 10000) && ((dz * dz) > 2500) // close enough, allows error between client and server geodata if it cannot be avoided
-		&& !isFloating)
+			&& !isFloating)
 		{
 			delta = Math.sqrt(delta);
 		}
@@ -4428,7 +4429,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		m.disregardingGeodata = false;
 		
 		if (!isFlying() // flying chars not checked - even canSeeTarget doesn't work yet
-		&& (!isInsideZone(ZoneId.WATER) || isInsideZone(ZoneId.SIEGE))) // swimming also not checked unless in siege zone - but distance is limited
+			&& (!isInsideZone(ZoneId.WATER) || isInsideZone(ZoneId.SIEGE))) // swimming also not checked unless in siege zone - but distance is limited
 		{
 			final boolean isInVehicle = isPlayer() && (getActingPlayer().getVehicle() != null);
 			if (isInVehicle)
@@ -4444,10 +4445,10 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			int gty = (originalY - L2World.MAP_MIN_Y) >> 4;
 			
 			// Movement checks:
-			// when PATHFINDING > 0, for all characters except mobs returning home (could be changed later to teleport if pathfinding fails)
+			// When pathfinding enabled, for all characters except monsters returning home (could be changed later to teleport if pathfinding fails)
 			if (((Config.PATHFINDING > 0) && (!(isAttackable() && ((L2Attackable) this).isReturningToSpawnPoint()))) //
-			|| (isPlayer() && !(isInVehicle && (distance > 1500))) //
-			|| (this instanceof L2RiftInvaderInstance))
+				|| (isPlayer() && !(isInVehicle && (distance > 1500))) //
+				|| (this instanceof L2RiftInvaderInstance))
 			{
 				if (isOnGeodataPath())
 				{
@@ -5465,7 +5466,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					
 					// Healing party members should ignore LOS.
 					if (((skill.getTargetType() != L2TargetType.PARTY) || !skill.hasEffectType(L2EffectType.HEAL)) //
-					&& !GeoData.getInstance().canSeeTarget(this, target))
+						&& !GeoData.getInstance().canSeeTarget(this, target))
 					{
 						skipLOS++;
 						continue;
@@ -5789,7 +5790,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					targetsCastTarget = target.getAI().getCastTarget();
 				}
 				
-				if (!Config.RAID_DISABLE_CURSE && ((target.isRaid() && target.giveRaidCurse() && (getLevel() > (target.getLevel() + 8))) || (!skill.isBad() && (targetsAttackTarget != null) && targetsAttackTarget.isRaid() && targetsAttackTarget.giveRaidCurse() && targetsAttackTarget.getAttackByList().contains(target) && (getLevel() > (targetsAttackTarget.getLevel() + 8))) || (!skill.isBad() && (targetsCastTarget != null) && targetsCastTarget.isRaid() && targetsCastTarget.giveRaidCurse() && targetsCastTarget.getAttackByList().contains(target) && (getLevel() > (targetsCastTarget.getLevel() + 8)))))
+				if (!Config.RAID_DISABLE_CURSE && ((target.isRaid() && target.giveRaidCurse() && (getLevel() > (target.getLevel() + 8)))
+					|| (!skill.isBad() && (targetsAttackTarget != null) && targetsAttackTarget.isRaid() && targetsAttackTarget.giveRaidCurse() && targetsAttackTarget.getAttackByList().contains(target) && (getLevel() > (targetsAttackTarget.getLevel() + 8)))
+					|| (!skill.isBad() && (targetsCastTarget != null) && targetsCastTarget.isRaid() && targetsCastTarget.giveRaidCurse() && targetsCastTarget.getAttackByList().contains(target) && (getLevel() > (targetsCastTarget.getLevel() + 8)))))
 				{
 					final CommonSkill curse = skill.isMagic() ? CommonSkill.RAID_CURSE : CommonSkill.RAID_CURSE2;
 					Skill curseSkill = curse.getSkill();
