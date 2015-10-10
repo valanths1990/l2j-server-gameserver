@@ -4177,8 +4177,8 @@ public final class L2PcInstance extends L2Playable
 	 * Send a Server->Client packet UserInfo to this L2PcInstance and CharInfo to all L2PcInstance in its _KnownPlayers. <B><U> Concept</U> :</B> Others L2PcInstance in the detection area of the L2PcInstance are identified in <B>_knownPlayers</B>. In order to inform other players of this
 	 * L2PcInstance state modifications, server just need to go through _knownPlayers to send Server->Client Packet <B><U> Actions</U> :</B>
 	 * <li>Send a Server->Client packet UserInfo to this L2PcInstance (Public and Private Data)</li>
-	 * <li>Send a Server->Client packet CharInfo to all L2PcInstance in _KnownPlayers of the L2PcInstance (Public data only)</li>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : DON'T SEND UserInfo packet to other players instead of CharInfo packet. Indeed, UserInfo packet contains PRIVATE DATA as MaxHP, STR, DEX...</B></FONT>
+	 * <li>Send a Server->Client packet CharInfo to all L2PcInstance in _KnownPlayers of the L2PcInstance (Public data only)</li> <FONT COLOR=#FF0000><B> <U>Caution</U> : DON'T SEND UserInfo packet to other players instead of CharInfo packet. Indeed, UserInfo packet contains PRIVATE DATA as MaxHP,
+	 * STR, DEX...</B></FONT>
 	 */
 	public final void broadcastUserInfo()
 	{
@@ -5115,6 +5115,12 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public boolean doDie(L2Character killer)
 	{
+		// Kill the L2PcInstance
+		if (!super.doDie(killer))
+		{
+			return false;
+		}
+		
 		if (killer != null)
 		{
 			final L2PcInstance pk = killer.getActingPlayer();
@@ -5163,12 +5169,13 @@ public final class L2PcInstance extends L2Playable
 			}
 			else
 			{
-				final boolean insidePvpZone = isInsideZone(ZoneId.PVP) || isInsideZone(ZoneId.SIEGE);
+				final boolean insidePvpZone = isInsideZone(ZoneId.PVP);
+				final boolean insideSiegeZone = isInsideZone(ZoneId.SIEGE);
 				if ((pk == null) || !pk.isCursedWeaponEquipped())
 				{
 					onDieDropItem(killer); // Check if any item should be dropped
 					
-					if (!insidePvpZone)
+					if (!insidePvpZone && !insideSiegeZone)
 					{
 						if ((pk != null) && (pk.getClan() != null) && (getClan() != null) && !isAcademyMember() && !(pk.isAcademyMember()))
 						{
@@ -5191,18 +5198,12 @@ public final class L2PcInstance extends L2Playable
 						}
 					}
 					// If player is Lucky shouldn't get penalized.
-					if (!isLucky() && !insidePvpZone)
+					if (!isLucky() && (insideSiegeZone || !insidePvpZone))
 					{
 						calculateDeathExpPenalty(killer, isAtWarWith(pk));
 					}
 				}
 			}
-		}
-		
-		// Kill the L2PcInstance
-		if (!super.doDie(killer))
-		{
-			return false;
 		}
 		
 		if (isMounted())
@@ -5309,12 +5310,12 @@ public final class L2PcInstance extends L2Playable
 				{
 					// Don't drop
 					if (itemDrop.isShadowItem() || // Dont drop Shadow Items
-					itemDrop.isTimeLimitedItem() || // Dont drop Time Limited Items
-					!itemDrop.isDropable() || (itemDrop.getId() == Inventory.ADENA_ID) || // Adena
-					(itemDrop.getItem().getType2() == L2Item.TYPE2_QUEST) || // Quest Items
-					(hasSummon() && (getSummon().getControlObjectId() == itemDrop.getId())) || // Control Item of active pet
-					(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_ITEMS, itemDrop.getId()) >= 0) || // Item listed in the non droppable item list
-					(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_PET_ITEMS, itemDrop.getId()) >= 0 // Item listed in the non droppable pet item list
+						itemDrop.isTimeLimitedItem() || // Dont drop Time Limited Items
+						!itemDrop.isDropable() || (itemDrop.getId() == Inventory.ADENA_ID) || // Adena
+						(itemDrop.getItem().getType2() == L2Item.TYPE2_QUEST) || // Quest Items
+						(hasSummon() && (getSummon().getControlObjectId() == itemDrop.getId())) || // Control Item of active pet
+						(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_ITEMS, itemDrop.getId()) >= 0) || // Item listed in the non droppable item list
+						(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_PET_ITEMS, itemDrop.getId()) >= 0 // Item listed in the non droppable pet item list
 					))
 					{
 						continue;
@@ -12135,7 +12136,8 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public boolean isJailed()
 	{
-		return PunishmentManager.getInstance().hasPunishment(getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.JAIL) || PunishmentManager.getInstance().hasPunishment(getAccountName(), PunishmentAffect.ACCOUNT, PunishmentType.JAIL) || PunishmentManager.getInstance().hasPunishment(getIPAddress(), PunishmentAffect.IP, PunishmentType.JAIL);
+		return PunishmentManager.getInstance().hasPunishment(getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.JAIL) || PunishmentManager.getInstance().hasPunishment(getAccountName(), PunishmentAffect.ACCOUNT, PunishmentType.JAIL)
+			|| PunishmentManager.getInstance().hasPunishment(getIPAddress(), PunishmentAffect.IP, PunishmentType.JAIL);
 	}
 	
 	/**
@@ -12143,7 +12145,8 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public boolean isChatBanned()
 	{
-		return PunishmentManager.getInstance().hasPunishment(getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.CHAT_BAN) || PunishmentManager.getInstance().hasPunishment(getAccountName(), PunishmentAffect.ACCOUNT, PunishmentType.CHAT_BAN) || PunishmentManager.getInstance().hasPunishment(getIPAddress(), PunishmentAffect.IP, PunishmentType.CHAT_BAN);
+		return PunishmentManager.getInstance().hasPunishment(getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.CHAT_BAN) || PunishmentManager.getInstance().hasPunishment(getAccountName(), PunishmentAffect.ACCOUNT, PunishmentType.CHAT_BAN)
+			|| PunishmentManager.getInstance().hasPunishment(getIPAddress(), PunishmentAffect.IP, PunishmentType.CHAT_BAN);
 	}
 	
 	public void startFameTask(long delay, int fameFixRate)
