@@ -6670,7 +6670,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return {@code true} if current player can revive and shows 'To Village' button upon death, {@code false} otherwise.
 	 */
 	public boolean canRevive()
@@ -6679,7 +6679,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @param val
 	 */
 	public void setCanRevive(boolean val)
@@ -6687,7 +6687,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2Attackable}
+	 * Dummy method overridden in {@link L2Attackable}
 	 * @return {@code true} if there is a loot to sweep, {@code false} otherwise.
 	 */
 	public boolean isSweepActive()
@@ -6696,7 +6696,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return {@code true} if player is on event, {@code false} otherwise.
 	 */
 	public boolean isOnEvent()
@@ -6705,7 +6705,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return the clan id of current character.
 	 */
 	public int getClanId()
@@ -6714,7 +6714,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return the clan of current character.
 	 */
 	public L2Clan getClan()
@@ -6723,7 +6723,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return {@code true} if player is in academy, {@code false} otherwise.
 	 */
 	public boolean isAcademyMember()
@@ -6732,7 +6732,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return the pledge type of current character.
 	 */
 	public int getPledgeType()
@@ -6741,7 +6741,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	}
 	
 	/**
-	 * Dummy method overriden in {@link L2PcInstance}
+	 * Dummy method overridden in {@link L2PcInstance}
 	 * @return the alliance id of current character.
 	 */
 	public int getAllyId()
