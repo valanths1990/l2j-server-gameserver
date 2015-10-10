@@ -18,6 +18,9 @@
  */
 package com.l2jserver.commons.database.pool.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
 
@@ -34,6 +37,8 @@ public class ConnectionFactory
 	
 	private static class SingletonHolder
 	{
+		private static final Logger LOG = LoggerFactory.getLogger(ConnectionFactory.class);
+		
 		protected static final IConnectionFactory INSTANCE;
 		
 		static
@@ -41,14 +46,14 @@ public class ConnectionFactory
 			switch (Config.DATABASE_CONNECTION_POOL)
 			{
 				default:
-				case "C3P0":
-				{
-					INSTANCE = new C3P0ConnectionFactory();
-					break;
-				}
 				case "HikariCP":
 				{
 					INSTANCE = new HikariCPConnectionFactory();
+					break;
+				}
+				case "C3P0":
+				{
+					INSTANCE = new C3P0ConnectionFactory();
 					break;
 				}
 				case "BoneCP":
@@ -57,6 +62,7 @@ public class ConnectionFactory
 					break;
 				}
 			}
+			LOG.info("Using {} connection pool.", INSTANCE.getClass().getSimpleName().replace("ConnectionFactory", ""));
 		}
 	}
 }

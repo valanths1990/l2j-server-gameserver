@@ -18,30 +18,55 @@
  */
 package com.l2jserver.commons.database.pool.impl;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jolbox.bonecp.BoneCPDataSource;
+import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.AbstractConnectionFactory;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
 
 /**
  * BoneCP Connection Factory implementation.<br>
  * <b>Note that this class is not public to prevent external initialization.</b><br>
- * <b>Access it through {@link ConnectionFactory} and proper configuration.</b>
+ * <b>Access it through {@link ConnectionFactory} and proper configuration.</b><br>
+ * <b><font color="RED" size="3">Totally BETA and untested feature!</font></b>
  * @author Zoey76
  */
 final class BoneCPConnectionFactory extends AbstractConnectionFactory
 {
-	private final DataSource _dataSource = null;
+	private static final Logger LOG = LoggerFactory.getLogger(BoneCPConnectionFactory.class);
+	
+	private static final int PARTITION_COUNT = 5;
+	
+	private final BoneCPDataSource _dataSource;
 	
 	public BoneCPConnectionFactory()
 	{
-		LOG.error("BoneCP is not supported yet, nothing is going to work!");
+		_dataSource = new BoneCPDataSource();
+		_dataSource.setJdbcUrl(Config.DATABASE_URL);
+		_dataSource.setUsername(Config.DATABASE_LOGIN);
+		_dataSource.setPassword(Config.DATABASE_PASSWORD);
+		_dataSource.setPartitionCount(PARTITION_COUNT);
+		_dataSource.setMaxConnectionsPerPartition(Config.DATABASE_MAX_CONNECTIONS);
+		_dataSource.setIdleConnectionTestPeriod(Config.DATABASE_MAX_IDLE_TIME, TimeUnit.SECONDS);
 	}
 	
 	@Override
 	public void close()
 	{
-		throw new UnsupportedOperationException("BoneCP is not supported yet!");
+		try
+		{
+			_dataSource.close();
+		}
+		catch (Exception e)
+		{
+			LOG.warn("There has been a problem closing the data source!", e);
+		}
 	}
 	
 	@Override

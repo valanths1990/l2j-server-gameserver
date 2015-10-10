@@ -1935,7 +1935,8 @@ public final class Config
 			CUSTOM_BUYLIST_LOAD = General.getBoolean("CustomBuyListLoad", false);
 			ALT_BIRTHDAY_GIFT = General.getInt("AltBirthdayGift", 22187);
 			ALT_BIRTHDAY_MAIL_SUBJECT = General.getString("AltBirthdayMailSubject", "Happy Birthday!");
-			ALT_BIRTHDAY_MAIL_TEXT = General.getString("AltBirthdayMailText", "Hello Adventurer!! Seeing as you're one year older now, I thought I would send you some birthday cheer :) Please find your birthday pack attached. May these gifts bring you joy and happiness on this very special day." + EOL + EOL + "Sincerely, Alegria");
+			ALT_BIRTHDAY_MAIL_TEXT = General.getString("AltBirthdayMailText", "Hello Adventurer!! Seeing as you're one year older now, I thought I would send you some birthday cheer :) Please find your birthday pack attached. May these gifts bring you joy and happiness on this very special day."
+				+ EOL + EOL + "Sincerely, Alegria");
 			ENABLE_BLOCK_CHECKER_EVENT = General.getBoolean("EnableBlockCheckerEvent", false);
 			MIN_BLOCK_CHECKER_TEAM_MEMBERS = General.getInt("BlockCheckerMinTeamMembers", 2);
 			if (MIN_BLOCK_CHECKER_TEAM_MEMBERS < 1)
@@ -2745,7 +2746,7 @@ public final class Config
 			DATABASE_URL = ServerSettings.getString("URL", "jdbc:mysql://localhost/l2jls");
 			DATABASE_LOGIN = ServerSettings.getString("Login", "root");
 			DATABASE_PASSWORD = ServerSettings.getString("Password", "");
-			DATABASE_CONNECTION_POOL = ServerSettings.getString("ConnectionPool", "C3P0");
+			DATABASE_CONNECTION_POOL = ServerSettings.getString("ConnectionPool", "HikariCP");
 			DATABASE_MAX_CONNECTIONS = ServerSettings.getInt("MaximumDbConnections", 10);
 			DATABASE_MAX_IDLE_TIME = ServerSettings.getInt("MaximumDbIdleTime", 0);
 			CONNECTION_CLOSE_TIME = ServerSettings.getLong("ConnectionCloseTime", 60000);
@@ -2808,7 +2809,7 @@ public final class Config
 	{
 		switch (pName.trim().toLowerCase())
 		{
-		// rates.properties
+			// rates.properties
 			case "ratexp":
 				RATE_XP = Float.parseFloat(pValue);
 				break;

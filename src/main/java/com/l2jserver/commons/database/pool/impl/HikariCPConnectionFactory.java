@@ -20,6 +20,9 @@ package com.l2jserver.commons.database.pool.impl;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.AbstractConnectionFactory;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
@@ -28,12 +31,13 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * HikariCP Connection Factory implementation.<br>
  * <b>Note that this class is not public to prevent external initialization.</b><br>
- * <b>Access it through {@link ConnectionFactory} and proper configuration.</b><br>
- * <b><font color="RED" size="3">Totally BETA and untested feature!</font></b>
+ * <b>Access it through {@link ConnectionFactory} and proper configuration.</b>
  * @author Zoey76
  */
 final class HikariCPConnectionFactory extends AbstractConnectionFactory
 {
+	private static final Logger LOG = LoggerFactory.getLogger(HikariCPConnectionFactory.class);
+	
 	private final HikariDataSource _dataSource;
 	
 	public HikariCPConnectionFactory()
@@ -43,6 +47,7 @@ final class HikariCPConnectionFactory extends AbstractConnectionFactory
 		_dataSource.setUsername(Config.DATABASE_LOGIN);
 		_dataSource.setPassword(Config.DATABASE_PASSWORD);
 		_dataSource.setMaximumPoolSize(Config.DATABASE_MAX_CONNECTIONS);
+		_dataSource.setIdleTimeout(Config.DATABASE_MAX_IDLE_TIME);
 	}
 	
 	@Override
