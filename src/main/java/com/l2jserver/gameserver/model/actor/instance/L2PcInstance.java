@@ -8572,17 +8572,12 @@ public final class L2PcInstance extends L2Playable
 		// Are the target and the player in the same duel?
 		if (isInDuel())
 		{
-			// Get L2PcInstance
-			if (target instanceof L2Playable)
+			final L2PcInstance cha = target.getActingPlayer();
+			if ((cha != null) && (cha.getDuelId() != getDuelId()))
 			{
-				// Get L2PcInstance
-				L2PcInstance cha = target.getActingPlayer();
-				if (cha.getDuelId() != getDuelId())
-				{
-					sendMessage("You cannot do this while duelling.");
-					sendPacket(ActionFailed.STATIC_PACKET);
-					return false;
-				}
+				sendMessage("You cannot do this while duelling.");
+				sendPacket(ActionFailed.STATIC_PACKET);
+				return false;
 			}
 		}
 		
@@ -8758,13 +8753,13 @@ public final class L2PcInstance extends L2Playable
 			case SELF:
 				break;
 			default:
-				if (!checkPvpSkill(target, skill) && !getAccessLevel().allowPeaceAttack() && target.isPlayable())
+				// Verify that player can attack a player or summon
+				if (target.isPlayable() && !getAccessLevel().allowPeaceAttack() && !checkPvpSkill(target, skill))
 				{
+					// Send a System Message to the player
+					sendPacket(SystemMessageId.INCORRECT_TARGET);
 					
-					// Send a System Message to the L2PcInstance
-					sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
-					
-					// Send a Server->Client packet ActionFailed to the L2PcInstance
+					// Send a Server->Client packet ActionFailed to the player
 					sendPacket(ActionFailed.STATIC_PACKET);
 					return false;
 				}
@@ -8831,14 +8826,13 @@ public final class L2PcInstance extends L2Playable
 			return false;
 		}
 		
-		if (!(target instanceof L2Playable))
+		if (!target.isPlayable())
 		{
 			return true;
 		}
 		
 		if (skill.isDebuff() || skill.hasEffectType(L2EffectType.STEAL_ABNORMAL) || skill.isBad())
 		{
-			
 			final L2PcInstance targetPlayer = target.getActingPlayer();
 			
 			if ((targetPlayer == null) || (this == target))
@@ -8867,7 +8861,6 @@ public final class L2PcInstance extends L2Playable
 						return false;
 					}
 				}
-				
 			}
 			
 			// Duel
@@ -8929,7 +8922,7 @@ public final class L2PcInstance extends L2Playable
 			{
 				if (aClan.isAtWarWith(tClan.getId()) && tClan.isAtWarWith(aClan.getId()))
 				{
-					// Check if skill can do dmg
+					// Check if skill can do damage
 					if ((skill.isAOE() && (skill.getEffectRange() > 0)) && isCtrlPressed && (getTarget() == target))
 					{
 						return true;
@@ -8938,13 +8931,10 @@ public final class L2PcInstance extends L2Playable
 				}
 				else if ((getClanId() == targetPlayer.getClanId()) || ((getAllyId() > 0) && (getAllyId() == targetPlayer.getAllyId())))
 				{
-					// Check if skill can do dmg
-					if ((skill.getEffectRange() > 0) && isCtrlPressed && (getTarget() == target))
+					// Check if skill can do damage
+					if ((skill.getEffectRange() > 0) && isCtrlPressed && (getTarget() == target) && skill.isDamage())
 					{
-						if (skill.isDamage())
-						{
-							return true;
-						}
+						return true;
 					}
 					return false;
 				}
@@ -8953,13 +8943,10 @@ public final class L2PcInstance extends L2Playable
 			// On retail, it is impossible to debuff a "peaceful" player.
 			if ((targetPlayer.getPvpFlag() == 0) && (targetPlayer.getKarma() == 0))
 			{
-				// Check if skill can do dmg
-				if ((skill.getEffectRange() > 0) && isCtrlPressed && (getTarget() == target))
+				// Check if skill can do damage
+				if ((skill.getEffectRange() > 0) && isCtrlPressed && (getTarget() == target) && skill.isDamage())
 				{
-					if (skill.isDamage())
-					{
-						return true;
-					}
+					return true;
 				}
 				return false;
 			}
