@@ -2634,7 +2634,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			{
 				if (_ai == null)
 				{
-					_ai = initAI();
+					// Return the new AI within the synchronized block
+					// to avoid being nulled by other threads
+					return _ai = initAI();
 				}
 			}
 		}
@@ -2653,7 +2655,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	public void setAI(L2CharacterAI newAI)
 	{
-		L2CharacterAI oldAI = _ai;
+		final L2CharacterAI oldAI = _ai;
 		if ((oldAI != null) && (oldAI != newAI) && (oldAI instanceof L2AttackableAI))
 		{
 			oldAI.stopAITask();
