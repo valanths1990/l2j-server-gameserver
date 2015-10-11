@@ -3935,7 +3935,7 @@ public final class Config
 			else
 			// Auto configuration...
 			{
-				LOG.info("Using automatic newtwork configuration.");
+				LOG.info("Using automatic network configuration.");
 				autoIpConfig();
 			}
 		}
