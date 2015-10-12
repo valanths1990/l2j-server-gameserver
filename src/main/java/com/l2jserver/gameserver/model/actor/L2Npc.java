@@ -195,23 +195,13 @@ public class L2Npc extends L2Character
 		return getTemplate().getSpiritShotChance();
 	}
 	
-	public int getMinSkillChance()
-	{
-		return getTemplate().getMinSkillChance();
-	}
-	
-	public int getMaxSkillChance()
-	{
-		return getTemplate().getMaxSkillChance();
-	}
-	
 	/**
 	 * Verifies if the NPC can cast a skill given the minimum and maximum skill chances.
 	 * @return {@code true} if the NPC has chances of casting a skill
 	 */
 	public boolean hasSkillChance()
 	{
-		return Rnd.get(100) < Rnd.get(getMinSkillChance(), getMaxSkillChance());
+		return Rnd.get(100) < Rnd.get(getTemplate().getMinSkillChance(), getTemplate().getMaxSkillChance());
 	}
 	
 	public boolean canMove()
@@ -415,7 +405,8 @@ public class L2Npc extends L2Character
 	}
 	
 	/**
-	 * @return True if the L2NpcInstance is aggressive (ex : L2MonsterInstance in function of aggroRange).
+	 * Verifies if the NPC is aggressive.
+	 * @return {@code true} if the NPC is aggressive, {@code false} otherwise
 	 */
 	public boolean isAggressive()
 	{
@@ -423,7 +414,7 @@ public class L2Npc extends L2Character
 	}
 	
 	/**
-	 * @return the Aggro Range of this L2NpcInstance either contained in the L2NpcTemplate, or overriden by spawnlist AI value.
+	 * @return the Aggro Range of this L2NpcInstance either contained in the L2NpcTemplate, or overridden by spawnlist AI value.
 	 */
 	public int getAggroRange()
 	{
@@ -1268,7 +1259,8 @@ public class L2Npc extends L2Character
 	 * <li>Decrease its spawn counter</li>
 	 * <li>Manage Siege task (killFlag, killCT)</li>
 	 * </ul>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World </B></FONT><BR> <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packets to players</B></FONT>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World </B></FONT><BR>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packets to players</B></FONT>
 	 */
 	@Override
 	public void onDecay()
@@ -1307,7 +1299,8 @@ public class L2Npc extends L2Character
 	 * <li>Remove all L2Object from _knownObjects and _knownPlayer of the L2NpcInstance then cancel Attack or Cast and notify AI</li>
 	 * <li>Remove L2Object object from _allObjects of L2World</li>
 	 * </ul>
-	 * <FONT COLOR=#FF0000><B><U>Caution</U>: This method DOESN'T SEND Server->Client packets to players</B></FONT><br> UnAfraid: TODO: Add Listener here
+	 * <FONT COLOR=#FF0000><B><U>Caution</U>: This method DOESN'T SEND Server->Client packets to players</B></FONT><br>
+	 * UnAfraid: TODO: Add Listener here
 	 */
 	@Override
 	public boolean deleteMe()
