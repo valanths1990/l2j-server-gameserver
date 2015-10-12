@@ -1162,6 +1162,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					player.updatePvPStatus(target);
 				}
 			}
+			
 			// Check if hit isn't missed
 			if (!hitted)
 			{
@@ -1201,7 +1202,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			}
 			
 			// Notify AI with EVT_READY_TO_ACT
-			ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(this, CtrlEvent.EVT_READY_TO_ACT), timeAtk + reuse);
+			ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(this, CtrlEvent.EVT_READY_TO_ACT), (timeAtk + reuse) / 2);
 		}
 		finally
 		{
