@@ -806,7 +806,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 						// Check if the L2Object is inside the Faction Range of the actor
 						if (called.hasAI())
 						{
-							if ((Math.abs(originalAttackTarget.getZ() - called.getZ()) < 600) && npc.getAttackByList().contains(originalAttackTarget) && ((called.getAI()._intention == CtrlIntention.AI_INTENTION_IDLE) || (called.getAI()._intention == CtrlIntention.AI_INTENTION_ACTIVE)) && (called.getInstanceId() == npc.getInstanceId()))
+							if ((Math.abs(originalAttackTarget.getZ() - called.getZ()) < 600) && npc.getAttackByList().contains(originalAttackTarget) && ((called.getAI()._intention == CtrlIntention.AI_INTENTION_IDLE) || (called.getAI()._intention == CtrlIntention.AI_INTENTION_ACTIVE))
+								&& (called.getInstanceId() == npc.getInstanceId()))
 							{
 								if (originalAttackTarget.isPlayable())
 								{
@@ -1276,17 +1277,17 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			{
 				targetReconsider();
 			}
-			else if (getAttackTarget() != null)
+			else
 			{
-				if (getAttackTarget().isMoving())
+				final L2Character target = getAttackTarget();
+				if (target != null)
 				{
-					range -= 100;
+					if (target.isMoving())
+					{
+						range -= 100;
+					}
+					moveToPawn(target, Math.max(range, 5));
 				}
-				if (range < 5)
-				{
-					range = 5;
-				}
-				moveToPawn(getAttackTarget(), range);
 			}
 			return;
 		}
