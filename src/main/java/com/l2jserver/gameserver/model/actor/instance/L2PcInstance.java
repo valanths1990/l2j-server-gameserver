@@ -6791,50 +6791,9 @@ public final class L2PcInstance extends L2Playable
 						player.setClanCreateExpiryTime(0);
 					}
 					
-					int clanId = rset.getInt("clanid");
 					player.setPowerGrade(rset.getInt("power_grade"));
 					player.setPledgeType(rset.getInt("subpledge"));
 					// player.setApprentice(rset.getInt("apprentice"));
-					
-					// Set Hero status if it applies
-					player.setHero(Hero.getInstance().isHero(objectId));
-					
-					if (clanId > 0)
-					{
-						player.setClan(ClanTable.getInstance().getClan(clanId));
-					}
-					
-					if (player.getClan() != null)
-					{
-						if (player.getClan().getLeaderId() != player.getObjectId())
-						{
-							if (player.getPowerGrade() == 0)
-							{
-								player.setPowerGrade(5);
-							}
-							player.setClanPrivileges(player.getClan().getRankPrivs(player.getPowerGrade()));
-						}
-						else
-						{
-							player.getClanPrivileges().setAll();
-							player.setPowerGrade(1);
-						}
-						player.setPledgeClass(L2ClanMember.calculatePledgeClass(player));
-					}
-					else
-					{
-						if (player.isNoble())
-						{
-							player.setPledgeClass(5);
-						}
-						
-						if (player.isHero())
-						{
-							player.setPledgeClass(8);
-						}
-						
-						player.getClanPrivileges().clear();
-					}
 					
 					player.setDeleteTimer(rset.getLong("deletetime"));
 					player.setTitle(rset.getString("title"));
@@ -6911,6 +6870,47 @@ public final class L2PcInstance extends L2Playable
 					
 					// Language
 					player.setLang(rset.getString("language"));
+					
+					// Set Hero status if it applies
+					player.setHero(Hero.getInstance().isHero(objectId));
+					
+					int clanId = rset.getInt("clanid");
+					if (clanId > 0)
+					{
+						player.setClan(ClanTable.getInstance().getClan(clanId));
+					}
+					
+					if (player.getClan() != null)
+					{
+						if (player.getClan().getLeaderId() != player.getObjectId())
+						{
+							if (player.getPowerGrade() == 0)
+							{
+								player.setPowerGrade(5);
+							}
+							player.setClanPrivileges(player.getClan().getRankPrivs(player.getPowerGrade()));
+						}
+						else
+						{
+							player.getClanPrivileges().setAll();
+							player.setPowerGrade(1);
+						}
+						player.setPledgeClass(L2ClanMember.calculatePledgeClass(player));
+					}
+					else
+					{
+						if (player.isNoble())
+						{
+							player.setPledgeClass(5);
+						}
+						
+						if (player.isHero())
+						{
+							player.setPledgeClass(8);
+						}
+						
+						player.getClanPrivileges().clear();
+					}
 					
 					// Retrieve the name and ID of the other characters assigned to this account.
 					try (PreparedStatement stmt = con.prepareStatement("SELECT charId, char_name FROM characters WHERE account_name=? AND charId<>?"))
