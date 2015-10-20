@@ -5235,19 +5235,28 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	public int calculateReuseTime(L2Character target, L2Weapon weapon)
 	{
-		if ((weapon == null) || isTransformed())
+		if (isTransformed())
+		{
+			switch (getAttackType())
+			{
+				case BOW:
+				case CROSSBOW:
+					return (int) ((517500 * getStat().getWeaponReuseModifier(null)) / getStat().getPAtkSpd());
+			}
+		}
+		if ((weapon == null))
 		{
 			return 0;
 		}
 		
 		int reuse = weapon.getReuseDelay();
+		
 		// only bows should continue for now
 		if (reuse == 0)
 		{
 			return 0;
 		}
-		
-		reuse *= getStat().getWeaponReuseModifier(target);
+		reuse *= getStat().getWeaponReuseModifier(null);
 		double atkSpd = getStat().getPAtkSpd();
 		switch (weapon.getItemType())
 		{
