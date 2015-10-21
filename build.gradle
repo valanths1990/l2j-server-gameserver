@@ -19,7 +19,7 @@ dependencies {
 	compile 'com.jolbox:bonecp:0.8.0.RELEASE'
 	compile 'com.sun.mail:javax.mail:1.5.4'
 	compile 'com.zaxxer:HikariCP:2.4.1'
-	compile 'mysql:mysql-connector-java:5.1.36'
+	compile 'mysql:mysql-connector-java:5.1.37'
 	compile 'org.bitlet:weupnp:0.1.4'
 	compile 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
 	compile 'com.google.guava:guava:19.0-rc2'
