@@ -18,8 +18,6 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import java.util.logging.Logger;
-
 import com.l2jserver.gameserver.ai.L2BoatAI;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.Location;
@@ -34,8 +32,6 @@ import com.l2jserver.gameserver.network.serverpackets.VehicleStarted;
  */
 public class L2BoatInstance extends L2Vehicle
 {
-	protected static final Logger _logBoat = Logger.getLogger(L2BoatInstance.class.getName());
-	
 	/**
 	 * Creates a boat.
 	 * @param template the boat template

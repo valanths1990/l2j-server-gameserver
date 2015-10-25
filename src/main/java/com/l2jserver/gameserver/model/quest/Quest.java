@@ -150,7 +150,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	protected void loadGlobalData()
 	{
-		
+	
 	}
 	
 	/**
@@ -161,7 +161,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void saveGlobalData()
 	{
-		
+	
 	}
 	
 	/**
@@ -1324,7 +1324,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onOlympiadMatchFinish(Participant winner, Participant looser, CompetitionType type)
 	{
-		
+	
 	}
 	
 	/**
@@ -1334,7 +1334,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onOlympiadLose(L2PcInstance loser, CompetitionType type)
 	{
-		
+	
 	}
 	
 	/**
@@ -1343,7 +1343,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onMoveFinished(L2Npc npc)
 	{
-		
+	
 	}
 	
 	/**
@@ -1352,7 +1352,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onNodeArrived(L2Npc npc)
 	{
-		
+	
 	}
 	
 	/**
@@ -1361,7 +1361,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onRouteFinished(L2Npc npc)
 	{
-		
+	
 	}
 	
 	/**
@@ -1380,7 +1380,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onSummonSpawn(L2Summon summon)
 	{
-		
+	
 	}
 	
 	/**
@@ -1388,7 +1388,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onSummonTalk(L2Summon summon)
 	{
-		
+	
 	}
 	
 	/**
@@ -1458,7 +1458,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 		{
 			showHtmlFile(player, res, npc);
 		}
-		else if (res.startsWith("<html>"))
+		else if (res.startsWith("<html"))
 		{
 			final NpcHtmlMessage npcReply = new NpcHtmlMessage(npc != null ? npc.getObjectId() : 0, res);
 			npcReply.replace("%playername%", player.getName());

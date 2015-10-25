@@ -61,7 +61,7 @@ public class DoorData implements IXmlReader
 		_groups.clear();
 		_regions.clear();
 		parseDatapackFile("data/doors.xml");
-		LOGGER.info("{}: Loaded {} Door templates for {} regions.", getClass().getSimpleName(), _doors.size(), _regions.size());
+		LOG.info("{}: Loaded {} Door templates for {} regions.", getClass().getSimpleName(), _doors.size(), _regions.size());
 	}
 	
 	@Override

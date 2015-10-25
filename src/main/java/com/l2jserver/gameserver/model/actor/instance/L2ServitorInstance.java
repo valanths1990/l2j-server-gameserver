@@ -24,8 +24,9 @@ import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
@@ -43,6 +44,7 @@ import com.l2jserver.gameserver.model.skills.AbnormalType;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.EffectScope;
 import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SetSummonRemainTime;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
@@ -52,8 +54,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public class L2ServitorInstance extends L2Summon implements Runnable
 {
-	protected static final Logger log = Logger.getLogger(L2ServitorInstance.class.getName());
-	
+	private static final Logger LOG = LoggerFactory.getLogger(L2ServitorInstance.class);
 	private static final String ADD_SKILL_SAVE = "INSERT INTO character_summon_skills_save (ownerId,ownerClassIndex,summonSkillId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?,?,?)";
 	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,remaining_time,buff_index FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=? ORDER BY buff_index ASC";
 	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=?";
@@ -180,7 +181,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	@Override
 	public void doPickupItem(L2Object object)
 	{
-		
+	
 	}
 	
 	/**
@@ -326,7 +327,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Could not store summon effect data: ", e);
+			LOG.error("Could not store summon effect data: {}", e);
 		}
 	}
 	
@@ -378,7 +379,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Could not restore " + this + " active effect data: " + e.getMessage(), e);
+			LOG.error("Could not restore {} active effect data: {}", this, e);
 		}
 		finally
 		{
@@ -499,5 +500,53 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		
 		sendPacket(new SetSummonRemainTime(getLifeTime(), _lifeTimeRemaining));
 		updateEffectIcons();
+	}
+	
+	@Override
+	public double getMAtk(L2Character target, Skill skill)
+	{
+		return super.getMAtk(target, skill) + (getActingPlayer().getMAtk(target, skill) * (getActingPlayer().getServitorShareBonus(Stats.MAGIC_ATTACK) - 1.0));
+	}
+	
+	@Override
+	public double getMDef(L2Character target, Skill skill)
+	{
+		return super.getMDef(target, skill) + (getActingPlayer().getMDef(target, skill) * (getActingPlayer().getServitorShareBonus(Stats.MAGIC_DEFENCE) - 1.0));
+	}
+	
+	@Override
+	public double getPAtk(L2Character target)
+	{
+		return super.getPAtk(target) + (getActingPlayer().getPAtk(target) * (getActingPlayer().getServitorShareBonus(Stats.POWER_ATTACK) - 1.0));
+	}
+	
+	@Override
+	public double getPDef(L2Character target)
+	{
+		return super.getPDef(target) + (getActingPlayer().getPDef(target) * (getActingPlayer().getServitorShareBonus(Stats.POWER_DEFENCE) - 1.0));
+	}
+	
+	@Override
+	public int getMAtkSpd()
+	{
+		return (int) (super.getMAtkSpd() + (getActingPlayer().getMAtkSpd() * (getActingPlayer().getServitorShareBonus(Stats.MAGIC_ATTACK_SPEED) - 1.0)));
+	}
+	
+	@Override
+	public int getMaxHp()
+	{
+		return (int) (super.getMaxHp() + (getActingPlayer().getMaxHp() * (getActingPlayer().getServitorShareBonus(Stats.MAX_HP) - 1.0)));
+	}
+	
+	@Override
+	public int getCriticalHit(L2Character target, Skill skill)
+	{
+		return (int) (super.getCriticalHit(target, skill) + ((getActingPlayer().getCriticalHit(target, skill)) * (getActingPlayer().getServitorShareBonus(Stats.CRITICAL_RATE) - 1.0)));
+	}
+	
+	@Override
+	public double getPAtkSpd()
+	{
+		return super.getPAtkSpd() + (getActingPlayer().getPAtkSpd() * (getActingPlayer().getServitorShareBonus(Stats.POWER_ATTACK_SPEED) - 1.0));
 	}
 }

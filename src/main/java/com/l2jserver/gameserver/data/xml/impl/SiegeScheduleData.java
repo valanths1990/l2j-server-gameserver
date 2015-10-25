@@ -49,11 +49,11 @@ public class SiegeScheduleData implements IXmlReader
 	{
 		_scheduleData.clear();
 		parseDatapackFile("config/SiegeSchedule.xml");
-		LOGGER.info("{}: Loaded: {} siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
+		LOG.info("{}: Loaded: {} siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
 		if (_scheduleData.isEmpty())
 		{
 			_scheduleData.add(new SiegeScheduleDate(new StatsSet()));
-			LOGGER.info("{}: Emergency Loaded: {} default siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
+			LOG.info("{}: Emergency Loaded: {} default siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class SiegeScheduleData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.warn("{}: Unable to get value!", getClass().getSimpleName(), e);
+			LOG.warn("{}: Unable to get value!", getClass().getSimpleName(), e);
 			return -1;
 		}
 	}

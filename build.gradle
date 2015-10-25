@@ -16,19 +16,17 @@ configurations.all {
 
 dependencies {
 	compile 'c3p0:c3p0:0.9.1.2'
+	compile 'com.jolbox:bonecp:0.8.0.RELEASE'
 	compile 'com.sun.mail:javax.mail:1.5.4'
-	compile 'com.zaxxer:HikariCP:2.4.0'
-	compile 'mysql:mysql-connector-java:5.1.36'
-	compile 'org.bitlet:weupnp:0.1.3'
+	compile 'com.zaxxer:HikariCP:2.4.1'
+	compile 'mysql:mysql-connector-java:5.1.37'
+	compile 'org.bitlet:weupnp:0.1.4'
 	compile 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
+	compile 'com.google.guava:guava:19.0-rc2'
 	compile 'org.python:jython:2.2.1'
 	compile 'org.slf4j:slf4j-api:1.7.12'
 	compile 'org.slf4j:slf4j-jdk14:1.7.12'
-	compile files('dist/libs/java-engine-1.8.jar')
-	compile files('dist/libs/jython-engine-2.2.1.jar')
-	compile files('dist/libs/L2J_GeoDriver.jar')
-	compile files('dist/libs/mmocore.jar')
-	testCompile 'org.mockito:mockito-all:2.0.2-beta'
+	compile fileTree(dir: 'dist/libs', include: '*.jar')
 	testCompile 'org.testng:testng:6.9.6'
 }
 
@@ -144,7 +142,7 @@ task zip(type: Zip, dependsOn: build) {
 build.finalizedBy(zip)
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.6-rc-1'
+	gradleVersion = '2.8'
 }
 
 eclipse {

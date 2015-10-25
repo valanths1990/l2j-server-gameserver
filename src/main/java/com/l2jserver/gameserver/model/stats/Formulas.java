@@ -576,7 +576,7 @@ public final class Formulas
 		double power = skill.getPower(isPvP, isPvE);
 		double damage = 0;
 		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed);
-		double ssboost = ss ? 2 : 1;
+		double ssboost = ss ? 1.458 : 1;
 		double pvpBonus = 1;
 		
 		if (isPvP)
@@ -591,6 +591,7 @@ public final class Formulas
 		double baseMod = ((77 * (power + (attacker.getPAtk(target) * ssboost))) / defence);
 		// Critical
 		double criticalMod = (attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill));
+		double criticalModPos = (((attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) - 1) / 2) + 1);
 		double criticalVulnMod = (target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, skill));
 		double criticalAddMod = ((attacker.getStat().calcStat(Stats.CRITICAL_DAMAGE_ADD, 0) * 6.1 * 77) / defence);
 		double criticalAddVuln = target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
@@ -613,8 +614,7 @@ public final class Formulas
 				penaltyMod *= Config.NPC_SKILL_DMG_PENALTY.get(lvlDiff);
 			}
 		}
-		
-		damage = (baseMod * criticalMod * criticalVulnMod * proximityBonus * pvpBonus) + criticalAddMod + criticalAddVuln;
+		damage = (baseMod * criticalMod * criticalModPos * criticalVulnMod * proximityBonus * pvpBonus) + criticalAddMod + criticalAddVuln;
 		damage *= weaponTraitMod;
 		damage *= generalTraitMod;
 		damage *= attributeMod;
@@ -630,6 +630,7 @@ public final class Formulas
 			set.set("pvpBonus", pvpBonus);
 			set.set("baseMod", baseMod);
 			set.set("criticalMod", criticalMod);
+			set.set("criticalModPos", criticalModPos);
 			set.set("criticalVulnMod", criticalVulnMod);
 			set.set("criticalAddMod", criticalAddMod);
 			set.set("criticalAddVuln", criticalAddVuln);
@@ -665,8 +666,8 @@ public final class Formulas
 		boolean isPvP = attacker.isPlayable() && target.isPlayer();
 		boolean isPvE = attacker.isPlayable() && target.isAttackable();
 		double damage = 0;
-		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed)
-		double ssboost = ss ? 2 : 1;
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
+		double ssboost = ss ? 1.458 : 1;
 		double pvpBonus = 1;
 		
 		if (isPvP)
@@ -681,6 +682,7 @@ public final class Formulas
 		double baseMod = ((77 * (skill.getPower(isPvP, isPvE) + attacker.getPAtk(target))) / defence) * ssboost;
 		// Critical
 		double criticalMod = (attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill));
+		double criticalModPos = (((attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) - 1) / 2) + 1);
 		double criticalVulnMod = (target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, skill));
 		double criticalAddMod = ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 6.1 * 77) / defence);
 		double criticalAddVuln = target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
@@ -704,7 +706,7 @@ public final class Formulas
 			
 		}
 		
-		damage = (baseMod * criticalMod * criticalVulnMod * proximityBonus * pvpBonus) + criticalAddMod + criticalAddVuln;
+		damage = (baseMod * criticalMod * criticalModPos * criticalVulnMod * proximityBonus * pvpBonus) + criticalAddMod + criticalAddVuln;
 		damage *= generalTraitMod;
 		damage *= attributeMod;
 		damage *= weaponMod;
@@ -747,6 +749,7 @@ public final class Formulas
 	{
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
 		final boolean isPvE = attacker.isPlayable() && target.isAttackable();
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
 		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
 		
@@ -775,18 +778,16 @@ public final class Formulas
 		// Add soulshot boost.
 		int ssBoost = ss ? 2 : 1;
 		damage = (skill != null) ? ((damage * ssBoost) + skill.getPower(attacker, target, isPvP, isPvE)) : (damage * ssBoost);
-		
 		if (crit)
 		{
-			// Finally retail like formula
-			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((70 * damage) / defence);
-			// Crit dmg add is almost useless in normal hits...
-			damage += ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 70) / defence);
+			// H5 Damage Formula
+			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((76 * damage * proximityBonus) / defence);
+			damage += ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 77) / defence);
 			damage += target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
 		}
 		else
 		{
-			damage = (70 * damage) / defence;
+			damage = (76 * damage * proximityBonus) / defence;
 		}
 		
 		damage *= calcAttackTraitBonus(attacker, target);
@@ -892,7 +893,7 @@ public final class Formulas
 	
 	public static final double calcMagicDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean sps, boolean bss, boolean mcrit)
 	{
-		int mDef = target.getMDef(attacker, skill);
+		double mDef = target.getMDef(attacker, skill);
 		switch (shld)
 		{
 			case SHIELD_DEFENSE_SUCCEED:
@@ -906,7 +907,7 @@ public final class Formulas
 			}
 		}
 		
-		int mAtk = attacker.getMAtk(target, skill);
+		double mAtk = attacker.getMAtk(target, skill);
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
 		final boolean isPvE = attacker.isPlayable() && target.isAttackable();
 		
@@ -1001,7 +1002,7 @@ public final class Formulas
 	
 	public static final double calcMagicDam(L2CubicInstance attacker, L2Character target, Skill skill, boolean mcrit, byte shld)
 	{
-		int mDef = target.getMDef(attacker.getOwner(), skill);
+		double mDef = target.getMDef(attacker.getOwner(), skill);
 		switch (shld)
 		{
 			case SHIELD_DEFENSE_SUCCEED:
@@ -1085,17 +1086,30 @@ public final class Formulas
 		return damage;
 	}
 	
+	public static final boolean calcCrit(L2Character attacker, L2Character target)
+	{
+		return calcCrit(attacker, target, null);
+	}
+	
 	/**
 	 * Returns true in case of critical hit
-	 * @param rate
-	 * @param skill
+	 * @param attacker
 	 * @param target
+	 * @param skill
 	 * @return
 	 */
-	public static final boolean calcCrit(double rate, boolean skill, L2Character target)
+	public static final boolean calcCrit(L2Character attacker, L2Character target, Skill skill)
 	{
-		double finalRate = target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE, rate, null, null) + target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE_ADD, 0, null, null);
-		return finalRate > Rnd.get(1000);
+		double rate = 0.d;
+		if (skill != null)
+		{
+			rate = skill.getBaseCritRate() * 10 * BaseStats.STR.calcBonus(attacker);
+		}
+		else
+		{
+			rate = (int) attacker.getStat().calcStat(Stats.CRITICAL_RATE_POS, attacker.getStat().getCriticalHit(target, null));
+		}
+		return (target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE, rate, null, null) + target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE_ADD, 0, null, null)) > Rnd.get(1000);
 	}
 	
 	public static final boolean calcMCrit(double mRate)
@@ -1689,34 +1703,24 @@ public final class Formulas
 	public static double calcAttributeBonus(L2Character attacker, L2Character target, Skill skill)
 	{
 		int attack_attribute;
-		int defence_attribute;
-		
 		if (skill != null)
 		{
-			if (skill.getElement() == -1)
+			if ((skill.getElement() == -1) || (attacker.getAttackElement() != skill.getElement()))
 			{
-				attack_attribute = 0;
-				defence_attribute = target.getDefenseElementValue((byte) -1);
+				return 1;
 			}
-			else
-			{
-				if (attacker.getAttackElement() == skill.getElement())
-				{
-					attack_attribute = attacker.getAttackElementValue(attacker.getAttackElement()) + skill.getElementPower();
-					defence_attribute = target.getDefenseElementValue(attacker.getAttackElement());
-				}
-				else
-				{
-					attack_attribute = skill.getElementPower();
-					defence_attribute = target.getDefenseElementValue(skill.getElement());
-				}
-			}
+			attack_attribute = attacker.getAttackElementValue(attacker.getAttackElement()) + skill.getElementPower();
 		}
 		else
 		{
 			attack_attribute = attacker.getAttackElementValue(attacker.getAttackElement());
-			defence_attribute = target.getDefenseElementValue(attacker.getAttackElement());
+			if (attack_attribute == 0)
+			{
+				return 1;
+			}
 		}
+		
+		int defence_attribute = target.getDefenseElementValue(attacker.getAttackElement());
 		
 		double attack_attribute_mod = 0;
 		double defence_attribute_mod = 0;
@@ -2109,7 +2113,8 @@ public final class Formulas
 	}
 	
 	/**
-	 * Calculates karma gain upon playable kill.</br> Updated to High Five on 10.09.2014 by Zealar tested in retail.
+	 * Calculates karma gain upon playable kill.</br>
+	 * Updated to High Five on 10.09.2014 by Zealar tested in retail.
 	 * @param pkCount
 	 * @param isSummon
 	 * @return karma points that will be added to the player.

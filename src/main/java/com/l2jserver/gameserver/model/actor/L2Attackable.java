@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -76,6 +78,7 @@ import com.l2jserver.util.Rnd;
 
 public class L2Attackable extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2Attackable.class);
 	// Raid
 	private boolean _isRaid = false;
 	private boolean _isRaidMinion = false;
@@ -370,7 +373,7 @@ public class L2Attackable extends L2Npc
 	{
 		try
 		{
-			if (getAggroList().isEmpty())
+			if (_aggroList.isEmpty())
 			{
 				return;
 			}
@@ -383,7 +386,7 @@ public class L2Attackable extends L2Npc
 			long totalDamage = 0;
 			// While Iterating over This Map Removing Object is Not Allowed
 			// Go through the _aggroList of the L2Attackable
-			for (AggroInfo info : getAggroList().values())
+			for (AggroInfo info : _aggroList.values())
 			{
 				if (info == null)
 				{
@@ -608,7 +611,7 @@ public class L2Attackable extends L2Npc
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "", e);
+			LOG.error("{}", e);
 		}
 	}
 	
@@ -657,7 +660,7 @@ public class L2Attackable extends L2Npc
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.SEVERE, "", e);
+				LOG.error("{}", e);
 			}
 		}
 	}
@@ -676,7 +679,7 @@ public class L2Attackable extends L2Npc
 		}
 		
 		// Get the AggroInfo of the attacker L2Character from the _aggroList of the L2Attackable
-		final AggroInfo ai = getAggroList().computeIfAbsent(attacker, AggroInfo::new);
+		final AggroInfo ai = _aggroList.computeIfAbsent(attacker, AggroInfo::new);
 		ai.addDamage(damage);
 		
 		// Traps does not cause aggro
@@ -734,12 +737,8 @@ public class L2Attackable extends L2Npc
 				return;
 			}
 			
-			for (AggroInfo ai : getAggroList().values())
+			for (AggroInfo ai : _aggroList.values())
 			{
-				if (ai == null)
-				{
-					return;
-				}
 				ai.addHate(amount);
 			}
 			
@@ -754,10 +753,10 @@ public class L2Attackable extends L2Npc
 			return;
 		}
 		
-		AggroInfo ai = getAggroList().get(target);
+		AggroInfo ai = _aggroList.get(target);
 		if (ai == null)
 		{
-			_log.info("target " + target + " not present in aggro list of " + this);
+			LOG.info("Target {} not present in aggro list of {}.", target, this);
 			return;
 		}
 		
@@ -781,7 +780,7 @@ public class L2Attackable extends L2Npc
 		{
 			return;
 		}
-		AggroInfo ai = getAggroList().get(target);
+		AggroInfo ai = _aggroList.get(target);
 		if (ai != null)
 		{
 			ai.stopHate();
@@ -793,7 +792,7 @@ public class L2Attackable extends L2Npc
 	 */
 	public L2Character getMostHated()
 	{
-		if (getAggroList().isEmpty() || isAlikeDead())
+		if (_aggroList.isEmpty() || isAlikeDead())
 		{
 			return null;
 		}
@@ -803,7 +802,7 @@ public class L2Attackable extends L2Npc
 		
 		// While Interacting over This Map Removing Object is Not Allowed
 		// Go through the aggroList of the L2Attackable
-		for (AggroInfo ai : getAggroList().values())
+		for (AggroInfo ai : _aggroList.values())
 		{
 			if (ai == null)
 			{
@@ -825,7 +824,7 @@ public class L2Attackable extends L2Npc
 	 */
 	public List<L2Character> get2MostHated()
 	{
-		if (getAggroList().isEmpty() || isAlikeDead())
+		if (_aggroList.isEmpty() || isAlikeDead())
 		{
 			return null;
 		}
@@ -837,7 +836,7 @@ public class L2Attackable extends L2Npc
 		
 		// While iterating over this map removing objects is not allowed
 		// Go through the aggroList of the L2Attackable
-		for (AggroInfo ai : getAggroList().values())
+		for (AggroInfo ai : _aggroList.values())
 		{
 			if (ai == null)
 			{
@@ -867,13 +866,13 @@ public class L2Attackable extends L2Npc
 	
 	public List<L2Character> getHateList()
 	{
-		if (getAggroList().isEmpty() || isAlikeDead())
+		if (_aggroList.isEmpty() || isAlikeDead())
 		{
 			return null;
 		}
 		
 		List<L2Character> result = new ArrayList<>();
-		for (AggroInfo ai : getAggroList().values())
+		for (AggroInfo ai : _aggroList.values())
 		{
 			if (ai == null)
 			{
@@ -892,12 +891,12 @@ public class L2Attackable extends L2Npc
 	 */
 	public int getHating(final L2Character target)
 	{
-		if (getAggroList().isEmpty() || (target == null))
+		if (_aggroList.isEmpty() || (target == null))
 		{
 			return 0;
 		}
 		
-		final AggroInfo ai = getAggroList().get(target);
+		final AggroInfo ai = _aggroList.get(target);
 		if (ai == null)
 		{
 			return 0;
@@ -909,14 +908,14 @@ public class L2Attackable extends L2Npc
 			if (act.isInvisible() || ai.getAttacker().isInvul() || act.isSpawnProtected())
 			{
 				// Remove Object Should Use This Method and Can be Blocked While Interacting
-				getAggroList().remove(target);
+				_aggroList.remove(target);
 				return 0;
 			}
 		}
 		
 		if (!ai.getAttacker().isVisible() || ai.getAttacker().isInvisible())
 		{
-			getAggroList().remove(target);
+			_aggroList.remove(target);
 			return 0;
 		}
 		
@@ -1093,12 +1092,13 @@ public class L2Attackable extends L2Npc
 	}
 	
 	/**
-	 * @param player The L2Character searched in the _aggroList of the L2Attackable
-	 * @return True if the _aggroList of this L2Attackable contains the L2Character.
+	 * Verifies if the creature is in the aggro list.
+	 * @param creature the creature
+	 * @return {@code true} if the creature is in the aggro list, {@code false} otherwise
 	 */
-	public boolean containsTarget(L2Character player)
+	public boolean isInAggroList(L2Character creature)
 	{
-		return getAggroList().containsKey(player);
+		return _aggroList.containsKey(creature);
 	}
 	
 	/**
@@ -1106,7 +1106,7 @@ public class L2Attackable extends L2Npc
 	 */
 	public void clearAggroList()
 	{
-		getAggroList().clear();
+		_aggroList.clear();
 		
 		// clear overhit values
 		_overhit = false;

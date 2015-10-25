@@ -34,26 +34,19 @@ import com.l2jserver.gameserver.util.Util;
  */
 public class ConditionPlayerCanTakeCastle extends Condition
 {
-	private final boolean _val;
-	
-	public ConditionPlayerCanTakeCastle(boolean val)
-	{
-		_val = val;
-	}
-	
 	@Override
 	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
 	{
 		if ((effector == null) || !effector.isPlayer())
 		{
-			return !_val;
+			return false;
 		}
 		
 		final L2PcInstance player = effector.getActingPlayer();
-		boolean canTakeCastle = true;
+		
 		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || !player.isClanLeader())
 		{
-			canTakeCastle = false;
+			return false;
 		}
 		
 		Castle castle = CastleManager.getInstance().getCastle(player);
@@ -63,18 +56,19 @@ public class ConditionPlayerCanTakeCastle extends Condition
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
-			canTakeCastle = false;
+			return false;
 		}
 		else if (!castle.getArtefacts().contains(effected))
 		{
 			player.sendPacket(SystemMessageId.INCORRECT_TARGET);
-			canTakeCastle = false;
+			return false;
 		}
 		else if (!Util.checkIfInRange(skill.getCastRange(), player, effected, true))
 		{
 			player.sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
-			canTakeCastle = false;
+			return false;
 		}
-		return (_val == canTakeCastle);
+		castle.getSiege().announceToPlayer(SystemMessage.getSystemMessage(SystemMessageId.OPPONENT_STARTED_ENGRAVING), false);
+		return true;
 	}
 }

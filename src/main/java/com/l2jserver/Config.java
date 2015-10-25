@@ -55,6 +55,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.l2jserver.gameserver.GameServer;
 import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
@@ -1935,7 +1936,8 @@ public final class Config
 			CUSTOM_BUYLIST_LOAD = General.getBoolean("CustomBuyListLoad", false);
 			ALT_BIRTHDAY_GIFT = General.getInt("AltBirthdayGift", 22187);
 			ALT_BIRTHDAY_MAIL_SUBJECT = General.getString("AltBirthdayMailSubject", "Happy Birthday!");
-			ALT_BIRTHDAY_MAIL_TEXT = General.getString("AltBirthdayMailText", "Hello Adventurer!! Seeing as you're one year older now, I thought I would send you some birthday cheer :) Please find your birthday pack attached. May these gifts bring you joy and happiness on this very special day." + EOL + EOL + "Sincerely, Alegria");
+			ALT_BIRTHDAY_MAIL_TEXT = General.getString("AltBirthdayMailText", "Hello Adventurer!! Seeing as you're one year older now, I thought I would send you some birthday cheer :) Please find your birthday pack attached. May these gifts bring you joy and happiness on this very special day."
+				+ EOL + EOL + "Sincerely, Alegria");
 			ENABLE_BLOCK_CHECKER_EVENT = General.getBoolean("EnableBlockCheckerEvent", false);
 			MIN_BLOCK_CHECKER_TEAM_MEMBERS = General.getInt("BlockCheckerMinTeamMembers", 2);
 			if (MIN_BLOCK_CHECKER_TEAM_MEMBERS < 1)
@@ -2745,7 +2747,7 @@ public final class Config
 			DATABASE_URL = ServerSettings.getString("URL", "jdbc:mysql://localhost/l2jls");
 			DATABASE_LOGIN = ServerSettings.getString("Login", "root");
 			DATABASE_PASSWORD = ServerSettings.getString("Password", "");
-			DATABASE_CONNECTION_POOL = ServerSettings.getString("ConnectionPool", "C3P0");
+			DATABASE_CONNECTION_POOL = ServerSettings.getString("ConnectionPool", "HikariCP");
 			DATABASE_MAX_CONNECTIONS = ServerSettings.getInt("MaximumDbConnections", 10);
 			DATABASE_MAX_IDLE_TIME = ServerSettings.getInt("MaximumDbIdleTime", 0);
 			CONNECTION_CLOSE_TIME = ServerSettings.getLong("ConnectionCloseTime", 60000);
@@ -2808,7 +2810,7 @@ public final class Config
 	{
 		switch (pName.trim().toLowerCase())
 		{
-		// rates.properties
+			// rates.properties
 			case "ratexp":
 				RATE_XP = Float.parseFloat(pValue);
 				break;
@@ -3923,16 +3925,17 @@ public final class Config
 		@Override
 		public void load()
 		{
-			File f = new File(IP_CONFIG_FILE);
+			GameServer.printSection("Network Configuration");
+			final File f = new File(IP_CONFIG_FILE);
 			if (f.exists())
 			{
-				LOGGER.info("Network Config: ipconfig.xml exists using manual configuration...");
+				LOG.info("Using existing ipconfig.xml.");
 				parseFile(new File(IP_CONFIG_FILE));
 			}
 			else
 			// Auto configuration...
 			{
-				LOGGER.info("Network Config: ipconfig.xml doesn't exists using automatic configuration...");
+				LOG.info("Using automatic network configuration.");
 				autoIpConfig();
 			}
 		}
@@ -3955,7 +3958,7 @@ public final class Config
 							
 							if (_hosts.size() != _subnets.size())
 							{
-								LOGGER.warn("Failed to load {} file - subnets does not match server addresses.", IP_CONFIG_FILE);
+								LOG.warn("Failed to load {} file - subnets does not match server addresses.", IP_CONFIG_FILE);
 							}
 						}
 					}
@@ -3963,7 +3966,7 @@ public final class Config
 					Node att = n.getAttributes().getNamedItem("address");
 					if (att == null)
 					{
-						LOGGER.warn("Failed to load {} file - default server address is missing.", IP_CONFIG_FILE);
+						LOG.warn("Failed to load {} file - default server address is missing.", IP_CONFIG_FILE);
 						_hosts.add("127.0.0.1");
 					}
 					else
@@ -3988,7 +3991,7 @@ public final class Config
 			}
 			catch (IOException e)
 			{
-				LOGGER.info("Network Config: Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
+				LOG.warn("Failed to connect to api.externalip.net please check your internet connection using 127.0.0.1!");
 				externalIp = "127.0.0.1";
 			}
 			
@@ -4028,7 +4031,7 @@ public final class Config
 						{
 							_subnets.add(subnet);
 							_hosts.add(hostAddress);
-							LOGGER.info("Network Config: Adding new subnet: " + subnet + " address: " + hostAddress);
+							LOG.info("Adding new subnet: " + subnet + " address: " + hostAddress);
 						}
 					}
 				}
@@ -4036,11 +4039,11 @@ public final class Config
 				// External host and subnet
 				_hosts.add(externalIp);
 				_subnets.add("0.0.0.0/0");
-				LOGGER.info("Network Config: Adding new subnet: 0.0.0.0/0 address: {}", externalIp);
+				LOG.info("Adding new subnet: 0.0.0.0/0 address: {}", externalIp);
 			}
 			catch (SocketException e)
 			{
-				LOGGER.warn("Network Config: Configuration failed please configure manually using ipconfig.xml", e);
+				LOG.error("Configuration failed please manually configure ipconfig.xml", e);
 				System.exit(0);
 			}
 		}

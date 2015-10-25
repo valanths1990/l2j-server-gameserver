@@ -70,7 +70,7 @@ public class EnchantSkillGroupsData implements IXmlReader
 		{
 			routes += group.getEnchantGroupDetails().size();
 		}
-		LOGGER.info("{}: Loaded {} groups and {} routes.", getClass().getSimpleName(), _enchantSkillGroups.size(), routes);
+		LOG.info("{}: Loaded {} groups and {} routes.", getClass().getSimpleName(), _enchantSkillGroups.size(), routes);
 	}
 	
 	@Override
@@ -136,7 +136,7 @@ public class EnchantSkillGroupsData implements IXmlReader
 			
 			return _enchantSkillGroups.get(group).getEnchantGroupDetails().size();
 		}
-		LOGGER.error("{}: Error while loading generating enchant skill ID: {} route: {} missing group: {}", skillId, route, group);
+		LOG.error("{}: Error while loading generating enchant skill ID: {} route: {} missing group: {}", skillId, route, group);
 		return 0;
 	}
 	

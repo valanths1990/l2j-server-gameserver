@@ -67,7 +67,8 @@ public class MinionList
 	 * <BR>
 	 * <B><U> Actions</U> :</B><BR>
 	 * <BR>
-	 * <li>Get the Minion data of all Minions that must be spawn</li> <li>For each Minion type, spawn the amount of Minion needed</li><BR>
+	 * <li>Get the Minion data of all Minions that must be spawn</li>
+	 * <li>For each Minion type, spawn the amount of Minion needed</li><BR>
 	 * <BR>
 	 * @param minions
 	 */
@@ -322,7 +323,11 @@ public class MinionList
 	 * <BR>
 	 * <B><U> Actions</U> :</B><BR>
 	 * <BR>
-	 * <li>Get the template of the Minion to spawn</li> <li>Create and Init the Minion and generate its Identifier</li> <li>Set the Minion HP, MP and Heading</li> <li>Set the Minion leader to this RaidBoss</li> <li>Init the position of the Minion and add it in the world as a visible object</li><BR>
+	 * <li>Get the template of the Minion to spawn</li>
+	 * <li>Create and Init the Minion and generate its Identifier</li>
+	 * <li>Set the Minion HP, MP and Heading</li>
+	 * <li>Set the Minion leader to this RaidBoss</li>
+	 * <li>Init the position of the Minion and add it in the world as a visible object</li><BR>
 	 * <BR>
 	 * @param master L2MonsterInstance used as master for this minion
 	 * @param minionId The L2NpcTemplate Identifier of the Minion to spawn

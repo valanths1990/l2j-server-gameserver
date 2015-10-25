@@ -225,10 +225,8 @@ public class GeoData
 	{
 		if (target.isDoor())
 		{
-			// can always see doors :o
 			return true;
 		}
-		
 		return canSeeTarget(cha.getX(), cha.getY(), cha.getZ(), cha.getInstanceId(), target.getX(), target.getY(), target.getZ(), target.getInstanceId());
 	}
 	
@@ -376,8 +374,7 @@ public class GeoData
 			// check if the position has geodata
 			if (hasGeoPos(curX, curY))
 			{
-				int beeCurGeoZ = getNearestZ(curX, curY, beeCurZ);
-				int nswe = GeoUtils.computeNswe(prevX, prevY, curX, curY);// .computeDirection(prevX, prevY, curX, curY);
+				int nswe = GeoUtils.computeNswe(prevX, prevY, curX, curY);
 				curGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, curX, curY, nswe);
 				int maxHeight;
 				if (ptIndex < ELEVATED_SEE_OVER_DISTANCE)
@@ -390,7 +387,7 @@ public class GeoData
 				}
 				
 				boolean canSeeThrough = false;
-				if ((curGeoZ <= maxHeight) && (curGeoZ <= beeCurGeoZ))
+				if (curGeoZ <= maxHeight)
 				{
 					if ((nswe & Cell.NSWE_NORTH_EAST) == Cell.NSWE_NORTH_EAST)
 					{

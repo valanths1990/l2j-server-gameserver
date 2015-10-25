@@ -189,10 +189,13 @@ public final class GameServer
 		CategoryData.getInstance();
 		SecondaryAuthData.getInstance();
 		
-		printSection("Skills");
+		printSection("Effects");
 		EffectHandler.getInstance().executeScript();
+		printSection("Enchant Skill Groups");
 		EnchantSkillGroupsData.getInstance();
+		printSection("Skill Trees");
 		SkillTreesData.getInstance();
+		printSection("Skills");
 		SkillData.getInstance();
 		SummonSkillsTable.getInstance();
 		
@@ -249,11 +252,12 @@ public final class GameServer
 		StaticObjectData.getInstance();
 		ZoneManager.getInstance();
 		DoorData.getInstance();
-		ItemAuctionManager.getInstance();
 		CastleManager.getInstance().loadInstances();
 		NpcBufferTable.getInstance();
 		GrandBossManager.getInstance().initZones();
 		EventDroplist.getInstance();
+		printSection("Auction Manager");
+		ItemAuctionManager.getInstance();
 		
 		printSection("Olympiad");
 		Olympiad.getInstance();

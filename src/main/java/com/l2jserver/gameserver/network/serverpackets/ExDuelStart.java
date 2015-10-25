@@ -19,15 +19,19 @@
 package com.l2jserver.gameserver.network.serverpackets;
 
 /**
- * @author KenM
+ * Duel Start packet implementation.
+ * @author KenM, Zoey76
  */
 public class ExDuelStart extends L2GameServerPacket
 {
-	private final int _unk1;
+	public static final ExDuelStart PLAYER_DUEL = new ExDuelStart(false);
+	public static final ExDuelStart PARTY_DUEL = new ExDuelStart(true);
 	
-	public ExDuelStart(int unk1)
+	private final boolean _partyDuel;
+	
+	public ExDuelStart(boolean partyDuel)
 	{
-		_unk1 = unk1;
+		_partyDuel = partyDuel;
 	}
 	
 	@Override
@@ -36,6 +40,6 @@ public class ExDuelStart extends L2GameServerPacket
 		writeC(0xfe);
 		writeH(0x4e);
 		
-		writeD(_unk1);
+		writeD(_partyDuel ? 1 : 0);
 	}
 }

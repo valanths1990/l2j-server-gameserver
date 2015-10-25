@@ -23,6 +23,9 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.AbstractConnectionFactory;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
@@ -36,6 +39,8 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  */
 final class C3P0ConnectionFactory extends AbstractConnectionFactory
 {
+	private static final Logger LOG = LoggerFactory.getLogger(C3P0ConnectionFactory.class);
+	
 	private final ComboPooledDataSource _dataSource;
 	
 	public C3P0ConnectionFactory()

@@ -378,6 +378,15 @@ public abstract class L2Summon extends L2Playable
 			{
 				party.broadcastToPartyMembers(owner, new ExPartyPetWindowDelete(this));
 			}
+			
+			for (int itemId : owner.getAutoSoulShot())
+			{
+				String handler = ((L2EtcItem) ItemTable.getInstance().getTemplate(itemId)).getHandlerName();
+				if ((handler != null) && handler.contains("Beast"))
+				{
+					owner.disableAutoShot(itemId);
+				}
+			}
 		}
 		
 		// pet will be deleted along with all his items
@@ -610,7 +619,7 @@ public abstract class L2Summon extends L2Playable
 		L2Object target = null;
 		switch (skill.getTargetType())
 		{
-		// OWNER_PET should be cast even if no target has been found
+			// OWNER_PET should be cast even if no target has been found
 			case OWNER_PET:
 				target = getOwner();
 				break;

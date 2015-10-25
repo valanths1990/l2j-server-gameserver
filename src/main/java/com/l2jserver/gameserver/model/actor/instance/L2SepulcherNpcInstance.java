@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
@@ -47,6 +50,7 @@ import com.l2jserver.util.Rnd;
  */
 public class L2SepulcherNpcInstance extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2SepulcherNpcInstance.class);
 	protected Future<?> _closeTask = null;
 	protected Future<?> _spawnNextMysteriousBoxTask = null;
 	protected Future<?> _spawnMonsterTask = null;
@@ -122,7 +126,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 		{
 			if (Config.DEBUG)
 			{
-				_log.info("new target selected:" + getObjectId());
+				LOG.debug("new target selected: {}", getObjectId());
 			}
 			
 			// Set the target of the L2PcInstance player
@@ -215,7 +219,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 				}
 				_spawnMonsterTask = ThreadPoolManager.getInstance().scheduleEffect(new SpawnMonster(getId()), 3500);
 				break;
-			
+				
 			case 31455:
 			case 31456:
 			case 31457:
@@ -237,7 +241,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 				}
 				player.addItem("Quest", HALLS_KEY, 1, player, true);
 				break;
-			
+				
 			default:
 			{
 				if (hasListener(EventType.ON_NPC_QUEST_START))
@@ -375,6 +379,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 	
 	private static class CloseNextDoor implements Runnable
 	{
+		private static final Logger LOG = LoggerFactory.getLogger(CloseNextDoor.class);
 		final DoorData _DoorTable = DoorData.getInstance();
 		
 		private final int _DoorId;
@@ -393,7 +398,7 @@ public class L2SepulcherNpcInstance extends L2Npc
 			}
 			catch (Exception e)
 			{
-				_log.warning(e.getMessage());
+				LOG.warn("{}", e);
 			}
 		}
 	}

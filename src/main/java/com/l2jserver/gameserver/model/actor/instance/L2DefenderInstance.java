@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
@@ -40,6 +43,7 @@ import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
 public class L2DefenderInstance extends L2Attackable
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2DefenderInstance.class);
 	private Castle _castle = null; // the castle which the instance should defend
 	private Fort _fort = null; // the fortress which the instance should defend
 	private SiegableHall _hall = null; // the siegable hall which the instance should defend
@@ -133,7 +137,7 @@ public class L2DefenderInstance extends L2Attackable
 		{
 			if (Config.DEBUG)
 			{
-				_log.info(getObjectId() + ": moving home");
+				LOG.debug("{} moving home", getObjectId());
 			}
 			setisReturningToSpawnPoint(true);
 			clearAggroList();
@@ -155,7 +159,7 @@ public class L2DefenderInstance extends L2Attackable
 		_hall = getConquerableHall();
 		if ((_fort == null) && (_castle == null) && (_hall == null))
 		{
-			_log.warning("L2DefenderInstance spawned outside of Fortress, Castle or Siegable hall Zone! NpcId: " + getId() + " x=" + getX() + " y=" + getY() + " z=" + getZ());
+			LOG.warn("L2DefenderInstance spawned outside of Fortress, Castle or Siegable hall Zone! NpcId: {} x={} y={} z={}", getId(), getX(), getY(), getZ());
 		}
 	}
 	
@@ -176,7 +180,7 @@ public class L2DefenderInstance extends L2Attackable
 		{
 			if (Config.DEBUG)
 			{
-				_log.info("new target selected:" + getObjectId());
+				LOG.debug("new target selected: {}", getObjectId());
 			}
 			
 			// Set the target of the L2PcInstance player

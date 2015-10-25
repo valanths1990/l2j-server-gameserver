@@ -44,8 +44,6 @@ public class CharStat
 	private final float[] _defenceTraits = new float[TraitType.values().length];
 	private final int[] _defenceTraitsCount = new int[TraitType.values().length];
 	private final int[] _traitsInvul = new int[TraitType.values().length];
-	/** Creature's maximum buff count. */
-	private int _maxBuffCount = Config.BUFFS_MAX_AMOUNT;
 	
 	public CharStat(L2Character activeChar)
 	{
@@ -61,8 +59,7 @@ public class CharStat
 	
 	/**
 	 * Calculate the new value of the state with modifiers that will be applied on the targeted L2Character.<BR>
-	 * <B><U> Concept</U> :</B><BR
-	 * A L2Character owns a table of Calculators called <B>_calculators</B>. Each Calculator (a calculator per state) own a table of Func object. A Func object is a mathematic function that permit to calculate the modifier of a state (ex : REGENERATE_HP_RATE...) : <BR>
+	 * <B><U> Concept</U> :</B><BR A L2Character owns a table of Calculators called <B>_calculators</B>. Each Calculator (a calculator per state) own a table of Func object. A Func object is a mathematic function that permit to calculate the modifier of a state (ex : REGENERATE_HP_RATE...) : <BR>
 	 * FuncAtkAccuracy -> Math.sqrt(_player.getDEX())*6+_player.getLevel()<BR>
 	 * When the calc method of a calculator is launched, each mathematical function is called according to its priority <B>_order</B>.<br>
 	 * Indeed, Func with lowest priority order is executed firsta and Funcs with the same order are executed in unspecified order.<br>
@@ -179,14 +176,21 @@ public class CharStat
 	 */
 	public int getCriticalHit(L2Character target, Skill skill)
 	{
-		int val = (int) calcStat(Stats.CRITICAL_RATE, _activeChar.getTemplate().getBaseCritRate(), target, skill);
-		
+		double val = (int) calcStat(Stats.CRITICAL_RATE, _activeChar.getTemplate().getBaseCritRate(), target, skill);
 		if (!_activeChar.canOverrideCond(PcCondOverride.MAX_STATS_VALUE))
 		{
 			val = Math.min(val, Config.MAX_PCRIT_RATE);
 		}
-		
-		return val;
+		return (int) (val + .5);
+	}
+	
+	/**
+	 * @param base
+	 * @return the Critical Hit Pos rate of the L2Character
+	 */
+	public int getCriticalHitPos(int base)
+	{
+		return (int) calcStat(Stats.CRITICAL_RATE_POS, base);
 	}
 	
 	/**
@@ -292,7 +296,7 @@ public class CharStat
 	 * @param skill The L2Skill used against the target
 	 * @return
 	 */
-	public int getMAtk(L2Character target, Skill skill)
+	public double getMAtk(L2Character target, Skill skill)
 	{
 		float bonusAtk = 1;
 		if (Config.L2JMOD_CHAMPION_ENABLE && _activeChar.isChampion())
@@ -305,7 +309,7 @@ public class CharStat
 		}
 		
 		// Calculate modifiers Magic Attack
-		return (int) calcStat(Stats.MAGIC_ATTACK, _activeChar.getTemplate().getBaseMAtk() * bonusAtk, target, skill);
+		return calcStat(Stats.MAGIC_ATTACK, _activeChar.getTemplate().getBaseMAtk() * bonusAtk, target, skill);
 	}
 	
 	/**
@@ -352,7 +356,7 @@ public class CharStat
 	 * @param skill The L2Skill used against the target
 	 * @return the MDef (base+modifier) of the L2Character against a skill in function of abnormal effects in progress.
 	 */
-	public int getMDef(L2Character target, Skill skill)
+	public double getMDef(L2Character target, Skill skill)
 	{
 		// Get the base MDef of the L2Character
 		double defence = _activeChar.getTemplate().getBaseMDef();
@@ -364,7 +368,7 @@ public class CharStat
 		}
 		
 		// Calculate modifiers Magic Attack
-		return (int) calcStat(Stats.MAGIC_DEFENCE, defence, target, skill);
+		return calcStat(Stats.MAGIC_DEFENCE, defence, target, skill);
 	}
 	
 	/**
@@ -479,7 +483,7 @@ public class CharStat
 	 * @param target
 	 * @return the PAtk (base+modifier) of the L2Character.
 	 */
-	public int getPAtk(L2Character target)
+	public double getPAtk(L2Character target)
 	{
 		float bonusAtk = 1;
 		if (Config.L2JMOD_CHAMPION_ENABLE && _activeChar.isChampion())
@@ -490,30 +494,29 @@ public class CharStat
 		{
 			bonusAtk *= Config.RAID_PATTACK_MULTIPLIER;
 		}
-		return (int) calcStat(Stats.POWER_ATTACK, _activeChar.getTemplate().getBasePAtk() * bonusAtk, target, null);
+		return calcStat(Stats.POWER_ATTACK, _activeChar.getTemplate().getBasePAtk() * bonusAtk, target, null);
 	}
 	
 	/**
 	 * @return the PAtk Speed (base+modifier) of the L2Character in function of the Armour Expertise Penalty.
 	 */
-	public int getPAtkSpd()
+	public double getPAtkSpd()
 	{
 		float bonusAtk = 1;
 		if (Config.L2JMOD_CHAMPION_ENABLE && _activeChar.isChampion())
 		{
 			bonusAtk = Config.L2JMOD_CHAMPION_SPD_ATK;
 		}
-		int val = (int) Math.round(calcStat(Stats.POWER_ATTACK_SPEED, _activeChar.getTemplate().getBasePAtkSpd() * bonusAtk, null, null));
-		return val;
+		return Math.round(calcStat(Stats.POWER_ATTACK_SPEED, _activeChar.getTemplate().getBasePAtkSpd() * bonusAtk, null, null));
 	}
 	
 	/**
 	 * @param target
 	 * @return the PDef (base+modifier) of the L2Character.
 	 */
-	public int getPDef(L2Character target)
+	public double getPDef(L2Character target)
 	{
-		return (int) calcStat(Stats.POWER_DEFENCE, (_activeChar.isRaid()) ? _activeChar.getTemplate().getBasePDef() * Config.RAID_PDEFENCE_MULTIPLIER : _activeChar.getTemplate().getBasePDef(), target, null);
+		return calcStat(Stats.POWER_DEFENCE, (_activeChar.isRaid()) ? _activeChar.getTemplate().getBasePDef() * Config.RAID_PDEFENCE_MULTIPLIER : _activeChar.getTemplate().getBasePDef(), target, null);
 	}
 	
 	/**
@@ -790,15 +793,6 @@ public class CharStat
 	 */
 	public int getMaxBuffCount()
 	{
-		return _maxBuffCount;
-	}
-	
-	/**
-	 * Sets the maximum buff count.
-	 * @param buffCount the buff count
-	 */
-	public void setMaxBuffCount(int buffCount)
-	{
-		_maxBuffCount = buffCount;
+		return (int) calcStat(Stats.ENLARGE_ABNORMAL_SLOT, Config.BUFFS_MAX_AMOUNT);
 	}
 }

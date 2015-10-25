@@ -46,7 +46,7 @@ public class PetInfo extends L2GameServerPacket
 		_z = summon.getZ();
 		_heading = summon.getHeading();
 		_mAtkSpd = summon.getMAtkSpd();
-		_pAtkSpd = summon.getPAtkSpd();
+		_pAtkSpd = (int) summon.getPAtkSpd();
 		_moveMultiplier = summon.getMovementSpeedMultiplier();
 		_runSpd = (int) Math.round(summon.getRunSpeed() / _moveMultiplier);
 		_walkSpd = (int) Math.round(summon.getWalkSpeed() / _moveMultiplier);
@@ -143,15 +143,15 @@ public class PetInfo extends L2GameServerPacket
 		writeQ(_summon.getExpForNextLevel());// 100% absoulte value
 		writeD(_summon.isPet() ? _summon.getInventory().getTotalWeight() : 0);// weight
 		writeD(_summon.getMaxLoad());// max weight it can carry
-		writeD(_summon.getPAtk(null));// patk
-		writeD(_summon.getPDef(null));// pdef
-		writeD(_summon.getMAtk(null, null));// matk
-		writeD(_summon.getMDef(null, null));// mdef
+		writeD((int) _summon.getPAtk(null));// patk
+		writeD((int) _summon.getPDef(null));// pdef
+		writeD((int) _summon.getMAtk(null, null));// matk
+		writeD((int) _summon.getMDef(null, null));// mdef
 		writeD(_summon.getAccuracy());// accuracy
 		writeD(_summon.getEvasionRate(null));// evasion
 		writeD(_summon.getCriticalHit(null, null));// critical
 		writeD((int) _summon.getMoveSpeed());// speed
-		writeD(_summon.getPAtkSpd());// atkspeed
+		writeD((int) _summon.getPAtkSpd());// atkspeed
 		writeD(_summon.getMAtkSpd());// casting speed
 		
 		writeD(_summon.getAbnormalVisualEffects());// c2 abnormal visual effect... bleed=1; poison=2; poison & bleed=3; flame=4;

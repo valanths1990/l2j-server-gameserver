@@ -640,9 +640,9 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public int getPAtkSpd()
+	public double getPAtkSpd()
 	{
-		int val = super.getPAtkSpd();
+		double val = super.getPAtkSpd();
 		
 		if ((val > Config.MAX_PATK_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE))
 		{

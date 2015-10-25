@@ -21,8 +21,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -49,7 +50,7 @@ import com.l2jserver.util.Rnd;
 
 public final class L2CubicInstance implements IIdentifiable
 {
-	private static final Logger _log = Logger.getLogger(L2CubicInstance.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(L2CubicInstance.class);
 	
 	// Type of Cubics
 	public static final int STORM_CUBIC = 1;
@@ -372,14 +373,14 @@ public final class L2CubicInstance implements IIdentifiable
 				if (ownerTarget.isAttackable())
 				{
 					final L2Attackable attackable = (L2Attackable) ownerTarget;
-					if ((attackable.getAggroList().get(_owner) != null) && !attackable.isDead())
+					if (attackable.isInAggroList(_owner) && !attackable.isDead())
 					{
 						_target = (L2Character) ownerTarget;
 						return;
 					}
 					if (_owner.hasSummon())
 					{
-						if ((attackable.getAggroList().get(_owner.getSummon()) != null) && !attackable.isDead())
+						if (attackable.isInAggroList(_owner.getSummon()) && !attackable.isDead())
 						{
 							_target = (L2Character) ownerTarget;
 							return;
@@ -457,7 +458,7 @@ public final class L2CubicInstance implements IIdentifiable
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "", e);
+			LOG.warn("Error while get cubic target {}", e);
 		}
 	}
 	
@@ -524,7 +525,7 @@ public final class L2CubicInstance implements IIdentifiable
 			
 			if (Config.DEBUG)
 			{
-				_log.info("L2SkillMdam: useCubicSkill() -> damage = " + damage);
+				LOG.debug("L2SkillMdam: useCubicSkill() -> damage = " + damage);
 			}
 			
 			if (damage > 0)
@@ -554,7 +555,7 @@ public final class L2CubicInstance implements IIdentifiable
 	{
 		if (Config.DEBUG)
 		{
-			_log.info("L2SkillDrain: useCubicSkill()");
+			LOG.debug("L2SkillDrain: useCubicSkill()");
 		}
 		
 		for (L2Character target : (L2Character[]) targets)
@@ -570,7 +571,7 @@ public final class L2CubicInstance implements IIdentifiable
 			int damage = (int) Formulas.calcMagicDam(this, target, skill, mcrit, shld);
 			if (Config.DEBUG)
 			{
-				_log.info("L2SkillDrain: useCubicSkill() -> damage = " + damage);
+				LOG.debug("L2SkillDrain: useCubicSkill() -> damage = " + damage);
 			}
 			
 			// TODO: Unhardcode fixed value
@@ -600,7 +601,7 @@ public final class L2CubicInstance implements IIdentifiable
 	{
 		if (Config.DEBUG)
 		{
-			_log.info("Disablers: useCubicSkill()");
+			LOG.debug("Disablers: useCubicSkill() skill : {}", skill);
 		}
 		
 		for (L2Character target : (L2Character[]) targets)
@@ -627,14 +628,14 @@ public final class L2CubicInstance implements IIdentifiable
 					
 					if (Config.DEBUG)
 					{
-						_log.info("Disablers: useCubicSkill() -> success");
+						LOG.debug("Disablers: useCubicSkill() -> success");
 					}
 				}
 				else
 				{
 					if (Config.DEBUG)
 					{
-						_log.info("Disablers: useCubicSkill() -> failed");
+						LOG.debug("Disablers: useCubicSkill() -> failed");
 					}
 				}
 			}
@@ -653,14 +654,14 @@ public final class L2CubicInstance implements IIdentifiable
 					
 					if (Config.DEBUG)
 					{
-						_log.info("Disablers: useCubicSkill() -> success");
+						LOG.debug("Disablers: useCubicSkill() -> success");
 					}
 				}
 				else
 				{
 					if (Config.DEBUG)
 					{
-						_log.info("Disablers: useCubicSkill() -> failed");
+						LOG.debug("Disablers: useCubicSkill() -> failed");
 					}
 				}
 			}

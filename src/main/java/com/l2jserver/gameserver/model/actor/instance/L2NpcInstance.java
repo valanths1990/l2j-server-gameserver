@@ -21,6 +21,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -40,6 +43,8 @@ import com.l2jserver.util.StringUtil;
 
 public class L2NpcInstance extends L2Npc
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2NpcInstance.class);
+	
 	/**
 	 * Creates a NPC.
 	 * @param template the NPC template
@@ -78,7 +83,7 @@ public class L2NpcInstance extends L2Npc
 	{
 		if (Config.DEBUG)
 		{
-			_log.fine("SkillList activated on: " + npc.getObjectId());
+			LOG.debug("SkillList activated on: {}", npc.getObjectId());
 		}
 		
 		final int npcId = npc.getTemplate().getId();

@@ -26,8 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
@@ -39,7 +40,8 @@ import com.l2jserver.util.StringUtil;
 
 public final class L2World
 {
-	private static final Logger _log = Logger.getLogger(L2World.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(L2World.class);
+	
 	/** Gracia border Flying objects not allowed to the east of it. */
 	public static final int GRACIA_MAX_X = -166168;
 	public static final int GRACIA_MAX_Z = 6105;
@@ -101,11 +103,11 @@ public final class L2World
 	{
 		if (_allObjects.containsKey(object.getObjectId()))
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Current object: " + object + " already exist in OID map!");
-			_log.log(Level.WARNING, StringUtil.getTraceString(Thread.currentThread().getStackTrace()));
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Previous object: " + _allObjects.get(object.getObjectId()) + " already exist in OID map!");
-			_log.log(Level.WARNING, _allObjectsDebug.get(object.getObjectId()));
-			_log.log(Level.WARNING, "---------------------- End ---------------------");
+			LOG.warn("Current object: {} already exist in OID map!", object);
+			LOG.warn(StringUtil.getTraceString(Thread.currentThread().getStackTrace()));
+			LOG.warn("Previous object: {} already exist in OID map!", _allObjects.get(object.getObjectId()));
+			LOG.warn(_allObjectsDebug.get(object.getObjectId()));
+			LOG.warn("---------------------- End ---------------------");
 			return;
 		}
 		
@@ -246,12 +248,15 @@ public final class L2World
 	
 	/**
 	 * Add a L2Object in the world. <B><U> Concept</U> :</B> L2Object (including L2PcInstance) are identified in <B>_visibleObjects</B> of his current L2WorldRegion and in <B>_knownObjects</B> of other surrounding L2Characters <BR>
-	 * L2PcInstance are identified in <B>_allPlayers</B> of L2World, in <B>_allPlayers</B> of his current L2WorldRegion and in <B>_knownPlayer</B> of other surrounding L2Characters <B><U> Actions</U> :</B> <li>Add the L2Object object in _allPlayers* of L2World</li> <li>Add the L2Object object in
-	 * _gmList** of GmListTable</li> <li>Add object in _knownObjects and _knownPlayer* of all surrounding L2WorldRegion L2Characters</li><BR>
+	 * L2PcInstance are identified in <B>_allPlayers</B> of L2World, in <B>_allPlayers</B> of his current L2WorldRegion and in <B>_knownPlayer</B> of other surrounding L2Characters <B><U> Actions</U> :</B>
+	 * <li>Add the L2Object object in _allPlayers* of L2World</li>
+	 * <li>Add the L2Object object in _gmList** of GmListTable</li>
+	 * <li>Add object in _knownObjects and _knownPlayer* of all surrounding L2WorldRegion L2Characters</li><BR>
 	 * <li>If object is a L2Character, add all surrounding L2Object in its _knownObjects and all surrounding L2PcInstance in its _knownPlayer</li><BR>
 	 * <I>* only if object is a L2PcInstance</I><BR>
-	 * <I>** only if object is a GM L2PcInstance</I> <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T ADD the object in _visibleObjects and _allPlayers* of L2WorldRegion (need synchronisation)</B></FONT><BR>
-	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T ADD the object to _allObjects and _allPlayers* of L2World (need synchronisation)</B></FONT> <B><U> Example of use </U> :</B> <li>Drop an Item</li> <li>Spawn a L2Character</li> <li>Apply Death Penalty of a L2PcInstance</li>
+	 * <I>** only if object is a GM L2PcInstance</I>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T ADD the object in _visibleObjects and _allPlayers* of L2WorldRegion (need synchronisation)</B></FONT><BR> <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T ADD the object to _allObjects and _allPlayers* of L2World (need
+	 * synchronisation)</B></FONT> <B><U> Example of use </U> :</B> <li>Drop an Item</li> <li>Spawn a L2Character</li> <li>Apply Death Penalty of a L2PcInstance</li>
 	 * @param object L2object to add in the world
 	 * @param newRegion L2WorldRegion in wich the object will be add (not used)
 	 */
@@ -266,7 +271,7 @@ public final class L2World
 				final L2PcInstance old = getPlayer(player.getObjectId());
 				if (old != null)
 				{
-					_log.warning("Duplicate character!? Closing both characters (" + player.getName() + ")");
+					LOG.warn("Duplicate character!? Closing both characters ({})", player.getName());
 					player.logout();
 					old.logout();
 					return;
@@ -284,7 +289,7 @@ public final class L2World
 		List<L2Object> visibles = getVisibleObjects(object, 2000);
 		if (Config.DEBUG)
 		{
-			_log.finest("objects in range:" + visibles.size());
+			LOG.debug("objects in range: {}", visibles.size());
 		}
 		
 		// tell the player about the surroundings
@@ -329,10 +334,14 @@ public final class L2World
 	
 	/**
 	 * Remove a L2Object from the world. <B><U> Concept</U> :</B> L2Object (including L2PcInstance) are identified in <B>_visibleObjects</B> of his current L2WorldRegion and in <B>_knownObjects</B> of other surrounding L2Characters <BR>
-	 * L2PcInstance are identified in <B>_allPlayers</B> of L2World, in <B>_allPlayers</B> of his current L2WorldRegion and in <B>_knownPlayer</B> of other surrounding L2Characters <B><U> Actions</U> :</B> <li>Remove the L2Object object from _allPlayers* of L2World</li> <li>Remove the L2Object
-	 * object from _visibleObjects and _allPlayers* of L2WorldRegion</li> <li>Remove the L2Object object from _gmList** of GmListTable</li> <li>Remove object from _knownObjects and _knownPlayer* of all surrounding L2WorldRegion L2Characters</li><BR>
-	 * <li>If object is a L2Character, remove all L2Object from its _knownObjects and all L2PcInstance from its _knownPlayer</li> <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World</B></FONT> <I>* only if object is a L2PcInstance</I><BR>
-	 * <I>** only if object is a GM L2PcInstance</I> <B><U> Example of use </U> :</B> <li>Pickup an Item</li> <li>Decay a L2Character</li>
+	 * L2PcInstance are identified in <B>_allPlayers</B> of L2World, in <B>_allPlayers</B> of his current L2WorldRegion and in <B>_knownPlayer</B> of other surrounding L2Characters <B><U> Actions</U> :</B>
+	 * <li>Remove the L2Object object from _allPlayers* of L2World</li>
+	 * <li>Remove the L2Object object from _visibleObjects and _allPlayers* of L2WorldRegion</li>
+	 * <li>Remove the L2Object object from _gmList** of GmListTable</li>
+	 * <li>Remove object from _knownObjects and _knownPlayer* of all surrounding L2WorldRegion L2Characters</li><BR>
+	 * <li>If object is a L2Character, remove all L2Object from its _knownObjects and all L2PcInstance from its _knownPlayer</li>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T REMOVE the object from _allObjects of L2World</B></FONT> <I>* only if object is a L2PcInstance</I><BR> <I>** only if object is a GM L2PcInstance</I> <B><U> Example of use </U> :</B> <li>Pickup an Item</li> <li>Decay a
+	 * L2Character</li>
 	 * @param object L2object to remove from the world
 	 * @param oldRegion L2WorldRegion in which the object was before removing
 	 */
@@ -381,7 +390,8 @@ public final class L2World
 	
 	/**
 	 * Return all visible objects of the L2WorldRegion object's and of its surrounding L2WorldRegion. <B><U> Concept</U> :</B> All visible object are identified in <B>_visibleObjects</B> of their current L2WorldRegion <BR>
-	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B> <li>Find Close Objects for L2Character</li><BR>
+	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B>
+	 * <li>Find Close Objects for L2Character</li><BR>
 	 * @param object L2object that determine the current L2WorldRegion
 	 * @return
 	 */
@@ -418,8 +428,10 @@ public final class L2World
 	
 	/**
 	 * Return all visible objects of the L2WorldRegions in the circular area (radius) centered on the object. <B><U> Concept</U> :</B> All visible object are identified in <B>_visibleObjects</B> of their current L2WorldRegion <BR>
-	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B> <li>Define the aggrolist of monster</li> <li>Define visible objects of a L2Object</li> <li>Skill :
-	 * Confusion...</li><BR>
+	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B>
+	 * <li>Define the aggrolist of monster</li>
+	 * <li>Define visible objects of a L2Object</li>
+	 * <li>Skill : Confusion...</li><BR>
 	 * @param object L2object that determine the center of the circular area
 	 * @param radius Radius of the circular area
 	 * @return
@@ -457,7 +469,9 @@ public final class L2World
 	
 	/**
 	 * Return all visible objects of the L2WorldRegions in the spheric area (radius) centered on the object. <B><U> Concept</U> :</B> All visible object are identified in <B>_visibleObjects</B> of their current L2WorldRegion <BR>
-	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B> <li>Define the target list of a skill</li> <li>Define the target list of a polearme attack</li>
+	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B>
+	 * <li>Define the target list of a skill</li>
+	 * <li>Define the target list of a polearme attack</li>
 	 * @param object L2object that determine the center of the circular area
 	 * @param radius Radius of the spheric area
 	 * @return
@@ -494,7 +508,8 @@ public final class L2World
 	
 	/**
 	 * <B><U> Concept</U> :</B> All visible object are identified in <B>_visibleObjects</B> of their current L2WorldRegion <BR>
-	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B> <li>Find Close Objects for L2Character</li><BR>
+	 * All surrounding L2WorldRegion are identified in <B>_surroundingRegions</B> of the selected L2WorldRegion in order to scan a large area around a L2Object <B><U> Example of use </U> :</B>
+	 * <li>Find Close Objects for L2Character</li><BR>
 	 * @param object L2object that determine the current L2WorldRegion
 	 * @return all visible players of the L2WorldRegion object's and of its surrounding L2WorldRegion.
 	 */
@@ -534,7 +549,9 @@ public final class L2World
 	}
 	
 	/**
-	 * Calculate the current L2WorldRegions of the object according to its position (x,y). <B><U> Example of use </U> :</B> <li>Set position of a new L2Object (drop, spawn...)</li> <li>Update position of a L2Object after a movement</li><BR>
+	 * Calculate the current L2WorldRegions of the object according to its position (x,y). <B><U> Example of use </U> :</B>
+	 * <li>Set position of a new L2Object (drop, spawn...)</li>
+	 * <li>Update position of a L2Object after a movement</li><BR>
 	 * @param point position of the object
 	 * @return
 	 */
@@ -558,7 +575,8 @@ public final class L2World
 	}
 	
 	/**
-	 * Check if the current L2WorldRegions of the object is valid according to its position (x,y). <B><U> Example of use </U> :</B> <li>Init L2WorldRegions</li><BR>
+	 * Check if the current L2WorldRegions of the object is valid according to its position (x,y). <B><U> Example of use </U> :</B>
+	 * <li>Init L2WorldRegions</li><BR>
 	 * @param x X position of the object
 	 * @param y Y position of the object
 	 * @return True if the L2WorldRegion is valid
@@ -600,7 +618,7 @@ public final class L2World
 			}
 		}
 		
-		_log.info("L2World: (" + REGIONS_X + " by " + REGIONS_Y + ") World Region Grid set up.");
+		LOG.info("L2World: ({} by {}) World Region Grid set up.", REGIONS_X, REGIONS_Y);
 		
 	}
 	
@@ -609,7 +627,7 @@ public final class L2World
 	 */
 	public void deleteVisibleNpcSpawns()
 	{
-		_log.info("Deleting all visible NPC's.");
+		LOG.info("Deleting all visible NPC's.");
 		for (int i = 0; i <= REGIONS_X; i++)
 		{
 			for (int j = 0; j <= REGIONS_Y; j++)
@@ -617,7 +635,7 @@ public final class L2World
 				_worldRegions[i][j].deleteVisibleNpcSpawns();
 			}
 		}
-		_log.info("All visible NPC's deleted.");
+		LOG.info("All visible NPC's deleted.");
 	}
 	
 	/**

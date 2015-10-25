@@ -334,8 +334,8 @@ public final class Skill implements IIdentifiable
 		
 		_nextActionIsAttack = set.getBoolean("nextActionAttack", false);
 		
-		_removedOnAnyActionExceptMove = set.getBoolean("removedOnAnyActionExceptMove", false);
-		_removedOnDamage = set.getBoolean("removedOnDamage", false);
+		_removedOnAnyActionExceptMove = (_abnormalType == AbnormalType.INVINCIBILITY) || (_abnormalType == AbnormalType.HIDE);
+		_removedOnDamage = (_abnormalType == AbnormalType.SLEEP) || (_abnormalType == AbnormalType.FORCE_MEDITATION) || (_abnormalType == AbnormalType.HIDE);
 		
 		_blockedInOlympiad = set.getBoolean("blockedInOlympiad", false);
 		
@@ -998,7 +998,7 @@ public final class Skill implements IIdentifiable
 	
 	public boolean isBad()
 	{
-		return _effectPoint < 0;
+		return (_effectPoint < 0) && (_targetType != L2TargetType.SELF);
 	}
 	
 	public boolean checkCondition(L2Character activeChar, L2Object object, boolean itemOrWeapon)
@@ -1403,7 +1403,7 @@ public final class Skill implements IIdentifiable
 			}
 			
 			// Support for buff sharing feature including healing herbs.
-			if (effected.isPlayer() && effected.hasServitor())
+			if (effected.isPlayer() && effected.hasServitor() && !isTransformation() && (getAbnormalType() != AbnormalType.SUMMON_CONDITION))
 			{
 				if ((addContinuousEffects && isContinuous() && !isDebuff()) || isRecoveryHerb())
 				{
@@ -1476,7 +1476,7 @@ public final class Skill implements IIdentifiable
 	{
 		switch (getId())
 		{
-		// TODO: replace with AI
+			// TODO: replace with AI
 			case 5852:
 			case 5853:
 			{
@@ -1557,6 +1557,11 @@ public final class Skill implements IIdentifiable
 			{
 				caster.setChargedShot(ShotType.SOULSHOTS, false);
 			}
+		}
+		
+		if (isSuicideAttack())
+		{
+			caster.doDie(caster);
 		}
 	}
 	

@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.data.xml.impl.BuyListData;
 import com.l2jserver.gameserver.datatables.MerchantPriceConfigTable;
 import com.l2jserver.gameserver.datatables.MerchantPriceConfigTable.MerchantPriceConfig;
@@ -34,6 +37,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExBuySellList;
  */
 public class L2MerchantInstance extends L2NpcInstance
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2MerchantInstance.class);
 	private MerchantPriceConfig _mpc;
 	
 	/**
@@ -88,14 +92,14 @@ public class L2MerchantInstance extends L2NpcInstance
 		final L2BuyList buyList = BuyListData.getInstance().getBuyList(val);
 		if (buyList == null)
 		{
-			_log.warning("BuyList not found! BuyListId:" + val);
+			LOG.warn("BuyList not found! BuyListId: {}", val);
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		if (!buyList.isNpcAllowed(getId()))
 		{
-			_log.warning("Npc not allowed in BuyList! BuyListId:" + val + " NpcId:" + getId());
+			LOG.warn("Npc not allowed in BuyList! BuyListId: {} NpcId: {}", val, getId());
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}

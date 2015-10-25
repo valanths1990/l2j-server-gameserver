@@ -18,7 +18,8 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
@@ -41,7 +42,7 @@ import com.l2jserver.util.Rnd;
  */
 public class L2GuardInstance extends L2Attackable
 {
-	private static Logger _log = Logger.getLogger(L2GuardInstance.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(L2GuardInstance.class);
 	
 	/**
 	 * Creates a guard.
@@ -153,11 +154,11 @@ public class L2GuardInstance extends L2Attackable
 		else if (interact)
 		{
 			// Check if the L2PcInstance is in the _aggroList of the L2GuardInstance
-			if (containsTarget(player))
+			if (isInAggroList(player))
 			{
 				if (Config.DEBUG)
 				{
-					_log.fine(player.getObjectId() + ": Attacked guard " + getObjectId());
+					LOG.debug("{}: Attacked guard {}", player.getObjectId(), getObjectId());
 				}
 				
 				// Set the L2PcInstance Intention to AI_INTENTION_ATTACK

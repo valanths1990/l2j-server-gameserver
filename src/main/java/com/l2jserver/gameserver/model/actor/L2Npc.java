@@ -20,13 +20,14 @@ package com.l2jserver.gameserver.model.actor;
 
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ItemsAutoDestroy;
@@ -85,7 +86,6 @@ import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.olympiad.Olympiad;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.model.variables.NpcVariables;
 import com.l2jserver.gameserver.model.zone.type.L2TownZone;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -107,6 +107,7 @@ import com.l2jserver.util.Rnd;
  */
 public class L2Npc extends L2Character
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2Npc.class);
 	/** The interaction distance of the L2NpcInstance(is used as offset in MovetoLocation method) */
 	public static final int INTERACTION_DISTANCE = 150;
 	/** Maximum distance where the drop may appear given this NPC position. */
@@ -195,21 +196,12 @@ public class L2Npc extends L2Character
 	}
 	
 	/**
-	 * @return the primary attack skill Id
+	 * Verifies if the NPC can cast a skill given the minimum and maximum skill chances.
+	 * @return {@code true} if the NPC has chances of casting a skill
 	 */
-	public int getPrimarySkillId()
+	public boolean hasSkillChance()
 	{
-		return getTemplate().getPrimarySkillId();
-	}
-	
-	public int getMinSkillChance()
-	{
-		return getTemplate().getMinSkillChance();
-	}
-	
-	public int getMaxSkillChance()
-	{
-		return getTemplate().getMaxSkillChance();
+		return Rnd.get(100) < Rnd.get(getTemplate().getMinSkillChance(), getTemplate().getMaxSkillChance());
 	}
 	
 	public boolean canMove()
@@ -227,169 +219,58 @@ public class L2Npc extends L2Character
 		return getTemplate().getDodge();
 	}
 	
-	public int getSSkillChance()
+	public List<Skill> getLongRangeSkills()
 	{
-		return getTemplate().getShortRangeSkillChance();
+		return getTemplate().getAISkills(AISkillScope.LONG_RANGE);
 	}
 	
-	public int getLSkillChance()
+	public List<Skill> getShortRangeSkills()
 	{
-		return getTemplate().getLongRangeSkillChance();
-	}
-	
-	public boolean hasLSkill()
-	{
-		return getTemplate().getLongRangeSkillId() > 0;
-	}
-	
-	public boolean hasSSkill()
-	{
-		return getTemplate().getShortRangeSkillId() > 0;
-	}
-	
-	public List<Skill> getLongRangeSkill()
-	{
-		final List<Skill> skilldata = new ArrayList<>();
-		if (getTemplate().getLongRangeSkillId() == 0)
-		{
-			return skilldata;
-		}
-		
-		switch (getTemplate().getLongRangeSkillId())
-		{
-			case -1:
-			{
-				final Collection<Skill> skills = getAllSkills();
-				if (skills != null)
-				{
-					for (Skill sk : skills)
-					{
-						if ((sk == null) || sk.isPassive() || (sk.getTargetType() == L2TargetType.SELF))
-						{
-							continue;
-						}
-						
-						if (sk.getCastRange() >= 200)
-						{
-							skilldata.add(sk);
-						}
-					}
-				}
-				break;
-			}
-			case 1:
-			{
-				for (Skill sk : getTemplate().getAISkills(AISkillScope.UNIVERSAL))
-				{
-					if (sk.getCastRange() >= 200)
-					{
-						skilldata.add(sk);
-					}
-				}
-				break;
-			}
-			default:
-			{
-				for (Skill sk : getAllSkills())
-				{
-					if (sk.getId() == getTemplate().getLongRangeSkillId())
-					{
-						skilldata.add(sk);
-					}
-				}
-			}
-		}
-		return skilldata;
-	}
-	
-	public List<Skill> getShortRangeSkill()
-	{
-		final List<Skill> skilldata = new ArrayList<>();
-		if (getTemplate().getShortRangeSkillId() == 0)
-		{
-			return skilldata;
-		}
-		
-		switch (getTemplate().getShortRangeSkillId())
-		{
-			case -1:
-			{
-				Collection<Skill> skills = getAllSkills();
-				if (skills != null)
-				{
-					for (Skill sk : skills)
-					{
-						if ((sk == null) || sk.isPassive() || (sk.getTargetType() == L2TargetType.SELF))
-						{
-							continue;
-						}
-						if (sk.getCastRange() <= 200)
-						{
-							skilldata.add(sk);
-						}
-					}
-				}
-				break;
-			}
-			case 1:
-			{
-				for (Skill sk : getTemplate().getAISkills(AISkillScope.UNIVERSAL))
-				{
-					if (sk.getCastRange() <= 200)
-					{
-						skilldata.add(sk);
-					}
-				}
-				break;
-			}
-			default:
-			{
-				for (Skill sk : getAllSkills())
-				{
-					if (sk.getId() == getTemplate().getShortRangeSkillId())
-					{
-						skilldata.add(sk);
-					}
-				}
-			}
-		}
-		return skilldata;
+		return getTemplate().getAISkills(AISkillScope.SHORT_RANGE);
 	}
 	
 	/** Task launching the function onRandomAnimation() */
-	protected class RandomAnimationTask implements Runnable
+	protected static class RandomAnimationTask implements Runnable
 	{
+		private static final Logger LOG = LoggerFactory.getLogger(RandomAnimationTask.class);
+		private final L2Npc _npc;
+		
+		protected RandomAnimationTask(L2Npc npc)
+		{
+			_npc = npc;
+		}
+		
 		@Override
 		public void run()
 		{
 			try
 			{
-				if (isMob())
+				if (_npc.isMob())
 				{
 					// Cancel further animation timers until intention is changed to ACTIVE again.
-					if (getAI().getIntention() != AI_INTENTION_ACTIVE)
+					if (_npc.getAI().getIntention() != AI_INTENTION_ACTIVE)
 					{
 						return;
 					}
 				}
 				else
 				{
-					if (!isInActiveRegion())
+					if (!_npc.isInActiveRegion())
 					{
 						return;
 					}
 				}
 				
-				if (!(isDead() || isStunned() || isSleeping() || isParalyzed()))
+				if (!(_npc.isDead() || _npc.isStunned() || _npc.isSleeping() || _npc.isParalyzed()))
 				{
-					onRandomAnimation(Rnd.get(2, 3));
+					_npc.onRandomAnimation(Rnd.get(2, 3));
 				}
 				
-				startRandomAnimationTimer();
+				_npc.startRandomAnimationTimer();
 			}
 			catch (Exception e)
 			{
-				_log.log(Level.SEVERE, "", e);
+				LOG.error("There has been an error trying to perform a random animation for NPC {}!", _npc, e);
 			}
 		}
 	}
@@ -426,7 +307,7 @@ public class L2Npc extends L2Character
 		int interval = Rnd.get(minWait, maxWait) * 1000;
 		
 		// Create a RandomAnimation Task that will be launched after the calculated delay
-		_rAniTask = new RandomAnimationTask();
+		_rAniTask = new RandomAnimationTask(this);
 		ThreadPoolManager.getInstance().scheduleGeneral(_rAniTask, interval);
 	}
 	
@@ -524,7 +405,8 @@ public class L2Npc extends L2Character
 	}
 	
 	/**
-	 * @return True if the L2NpcInstance is aggressive (ex : L2MonsterInstance in function of aggroRange).
+	 * Verifies if the NPC is aggressive.
+	 * @return {@code true} if the NPC is aggressive, {@code false} otherwise
 	 */
 	public boolean isAggressive()
 	{
@@ -532,7 +414,7 @@ public class L2Npc extends L2Character
 	}
 	
 	/**
-	 * @return the Aggro Range of this L2NpcInstance either contained in the L2NpcTemplate, or overriden by spawnlist AI value.
+	 * @return the Aggro Range of this L2NpcInstance either contained in the L2NpcTemplate, or overridden by spawnlist AI value.
 	 */
 	public int getAggroRange()
 	{
@@ -870,7 +752,7 @@ public class L2Npc extends L2Character
 				}
 				else
 				{
-					_log.info(getClass().getSimpleName() + ": Unknown NPC bypass: \"" + command + "\" NpcId: " + getId());
+					LOG.info("Unknown NPC bypass: \"{}\" NpcId: {}", command, getId());
 				}
 			}
 		}
@@ -1429,7 +1311,7 @@ public class L2Npc extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed decayMe().", e);
+			LOG.error("Failed decayMe(). {}", e);
 		}
 		
 		if (isChannelized())
@@ -1450,7 +1332,7 @@ public class L2Npc extends L2Character
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.SEVERE, "Failed removing cleaning knownlist.", e);
+			LOG.error("Failed removing cleaning knownlist. {}", e);
 		}
 		
 		// Remove L2Object object from _allObjects of L2World
@@ -1598,7 +1480,7 @@ public class L2Npc extends L2Character
 		final NpcHtmlMessage noTeachMsg = new NpcHtmlMessage(getObjectId());
 		if (html == null)
 		{
-			_log.warning("Npc " + npcId + " missing noTeach html!");
+			LOG.warn("Npc {} missing noTeach html!", npcId);
 			noTeachMsg.setHtml("<html><body>I cannot teach you any skills.<br>You must find your current class teachers.</body></html>");
 		}
 		else
@@ -1617,7 +1499,7 @@ public class L2Npc extends L2Character
 			{
 				deleteMe();
 			}
-		}, delay);
+		} , delay);
 		return this;
 	}
 	
@@ -1883,7 +1765,7 @@ public class L2Npc extends L2Character
 			
 			if (ItemTable.getInstance().getTemplate(itemId) == null)
 			{
-				_log.log(Level.SEVERE, "Item doesn't exist so cannot be dropped. Item ID: " + itemId + " Quest: " + getName());
+				LOG.error("Item doesn't exist so cannot be dropped. Item ID: {} Quest: {}", itemId, getName());
 				return null;
 			}
 			

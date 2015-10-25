@@ -55,7 +55,7 @@ public class RecipeData implements IXmlReader
 	{
 		_recipes.clear();
 		parseDatapackFile("data/recipes.xml");
-		LOGGER.info("{}: Loaded {} recipes.", getClass().getSimpleName(), _recipes.size());
+		LOG.info("{}: Loaded {} recipes.", getClass().getSimpleName(), _recipes.size());
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public class RecipeData implements IXmlReader
 						att = attrs.getNamedItem("id");
 						if (att == null)
 						{
-							LOGGER.error("{}: Missing id for recipe item, skipping!", getClass().getSimpleName());
+							LOG.error("{}: Missing id for recipe item, skipping!", getClass().getSimpleName());
 							continue;
 						}
 						id = Integer.parseInt(att.getNodeValue());
@@ -94,7 +94,7 @@ public class RecipeData implements IXmlReader
 						att = attrs.getNamedItem("recipeId");
 						if (att == null)
 						{
-							LOGGER.error("{}: Missing recipeId for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("{}: Missing recipeId for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 							continue;
 						}
 						set.set("recipeId", Integer.parseInt(att.getNodeValue()));
@@ -102,7 +102,7 @@ public class RecipeData implements IXmlReader
 						att = attrs.getNamedItem("name");
 						if (att == null)
 						{
-							LOGGER.error("{}: Missing name for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("{}: Missing name for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 							continue;
 						}
 						set.set("recipeName", att.getNodeValue());
@@ -110,7 +110,7 @@ public class RecipeData implements IXmlReader
 						att = attrs.getNamedItem("craftLevel");
 						if (att == null)
 						{
-							LOGGER.error("{}: Missing level for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("{}: Missing level for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 							continue;
 						}
 						set.set("craftLevel", Integer.parseInt(att.getNodeValue()));
@@ -118,7 +118,7 @@ public class RecipeData implements IXmlReader
 						att = attrs.getNamedItem("type");
 						if (att == null)
 						{
-							LOGGER.error("{}: Missing type for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("{}: Missing type for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 							continue;
 						}
 						set.set("isDwarvenRecipe", att.getNodeValue().equalsIgnoreCase("dwarven"));
@@ -126,7 +126,7 @@ public class RecipeData implements IXmlReader
 						att = attrs.getNamedItem("successRate");
 						if (att == null)
 						{
-							LOGGER.error("{}: Missing successRate for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("{}: Missing successRate for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 							continue;
 						}
 						set.set("successRate", Integer.parseInt(att.getNodeValue()));
@@ -143,7 +143,7 @@ public class RecipeData implements IXmlReader
 								}
 								catch (Exception e)
 								{
-									LOGGER.error("{}: Error in StatUse parameter for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+									LOG.error("{}: Error in StatUse parameter for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 									continue RECIPES_FILE;
 								}
 							}
@@ -157,7 +157,7 @@ public class RecipeData implements IXmlReader
 								}
 								catch (Exception e)
 								{
-									LOGGER.error("{}: Error in AltStatChange parameter for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+									LOG.error("{}: Error in AltStatChange parameter for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
 									continue RECIPES_FILE;
 								}
 							}

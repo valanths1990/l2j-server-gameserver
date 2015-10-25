@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.model.actor.instance;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
@@ -37,6 +40,7 @@ import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 
 public class L2FortCommanderInstance extends L2DefenderInstance
 {
+	private static final Logger LOG = LoggerFactory.getLogger(L2FortCommanderInstance.class);
 	private boolean _canTalk;
 	
 	/**
@@ -109,7 +113,7 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 		{
 			if (Config.DEBUG)
 			{
-				_log.info(getObjectId() + ": moving home");
+				LOG.debug("{} moving home", getObjectId());
 			}
 			setisReturningToSpawnPoint(true);
 			clearAggroList();

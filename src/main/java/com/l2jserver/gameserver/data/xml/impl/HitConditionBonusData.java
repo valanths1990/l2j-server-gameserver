@@ -52,14 +52,14 @@ public final class HitConditionBonusData implements IXmlReader
 	public void load()
 	{
 		parseDatapackFile("data/stats/hitConditionBonus.xml");
-		LOGGER.info("{}: Loaded Hit Condition bonuses.", getClass().getSimpleName());
-		LOGGER.debug("{}: Front bonus: {}", getClass().getSimpleName(), frontBonus);
-		LOGGER.debug("{}: Side bonus: {}", getClass().getSimpleName(), sideBonus);
-		LOGGER.debug("{}: Back bonus: {}", getClass().getSimpleName(), backBonus);
-		LOGGER.debug("{}: High bonus: {}", getClass().getSimpleName(), highBonus);
-		LOGGER.debug("{}: Low bonus: {}", getClass().getSimpleName(), lowBonus);
-		LOGGER.debug("{}: Dark bonus: {}", getClass().getSimpleName(), darkBonus);
-		LOGGER.debug("{}: Rain bonus: {}", getClass().getSimpleName(), rainBonus);
+		LOG.info("{}: Loaded Hit Condition bonuses.", getClass().getSimpleName());
+		LOG.debug("{}: Front bonus: {}", getClass().getSimpleName(), frontBonus);
+		LOG.debug("{}: Side bonus: {}", getClass().getSimpleName(), sideBonus);
+		LOG.debug("{}: Back bonus: {}", getClass().getSimpleName(), backBonus);
+		LOG.debug("{}: High bonus: {}", getClass().getSimpleName(), highBonus);
+		LOG.debug("{}: Low bonus: {}", getClass().getSimpleName(), lowBonus);
+		LOG.debug("{}: Dark bonus: {}", getClass().getSimpleName(), darkBonus);
+		LOG.debug("{}: Rain bonus: {}", getClass().getSimpleName(), rainBonus);
 	}
 	
 	@Override

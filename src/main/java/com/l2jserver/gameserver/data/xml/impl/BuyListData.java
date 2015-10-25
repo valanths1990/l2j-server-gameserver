@@ -63,7 +63,7 @@ public final class BuyListData implements IXmlReader
 			parseDatapackDirectory("data/buylists/custom", false);
 		}
 		
-		LOGGER.info("{}: Loaded {} BuyLists.", getClass().getSimpleName(), _buyLists.size());
+		LOG.info("{}: Loaded {} BuyLists.", getClass().getSimpleName(), _buyLists.size());
 		
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			Statement statement = con.createStatement();
@@ -78,13 +78,13 @@ public final class BuyListData implements IXmlReader
 				final L2BuyList buyList = getBuyList(buyListId);
 				if (buyList == null)
 				{
-					LOGGER.warn("BuyList found in database but not loaded from xml! BuyListId: {}", buyListId);
+					LOG.warn("BuyList found in database but not loaded from xml! BuyListId: {}", buyListId);
 					continue;
 				}
 				final Product product = buyList.getProductByItemId(itemId);
 				if (product == null)
 				{
-					LOGGER.warn("ItemId found in database but not loaded from xml! BuyListId: {} Item ID: {}", buyListId, itemId);
+					LOG.warn("ItemId found in database but not loaded from xml! BuyListId: {} Item ID: {}", buyListId, itemId);
 					continue;
 				}
 				if (count < product.getMaxCount())
@@ -96,7 +96,7 @@ public final class BuyListData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.warn("Failed to load buyList data from database.", e);
+			LOG.warn("Failed to load buyList data from database.", e);
 		}
 	}
 	
@@ -145,7 +145,7 @@ public final class BuyListData implements IXmlReader
 							}
 							else
 							{
-								LOGGER.warn("Item not found. BuyList: {} Item ID: {} File: {}", buyList.getListId(), itemId, f.getName());
+								LOG.warn("Item not found. BuyList: {} Item ID: {} File: {}", buyList.getListId(), itemId, f.getName());
 							}
 						}
 						else if ("npcs".equalsIgnoreCase(list_node.getNodeName()))
@@ -166,7 +166,7 @@ public final class BuyListData implements IXmlReader
 		}
 		catch (Exception e)
 		{
-			LOGGER.warn("Failed to load buyList data from xml File: {}", f.getName(), e);
+			LOG.warn("Failed to load buyList data from xml File: {}", f.getName(), e);
 		}
 	}
 	

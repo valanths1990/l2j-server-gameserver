@@ -87,7 +87,7 @@ public class EnchantItemOptionsData implements IXmlReader
 				}
 			}
 		}
-		LOGGER.info("{}: Loaded: {} Items and {} Options.", getClass().getSimpleName(), _data.size(), counter);
+		LOG.info("{}: Loaded: {} Items and {} Options.", getClass().getSimpleName(), _data.size(), counter);
 	}
 	
 	/**

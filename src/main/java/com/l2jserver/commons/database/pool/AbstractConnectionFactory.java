@@ -30,8 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractConnectionFactory implements IConnectionFactory
 {
-	/** The logger. */
-	protected static final Logger LOG = LoggerFactory.getLogger(AbstractConnectionFactory.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractConnectionFactory.class);
 	
 	@Override
 	public Connection getConnection()
