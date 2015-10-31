@@ -62,7 +62,7 @@ public final class BuyList extends L2GameServerPacket
 				writeH(product.getItem().getType1()); // Custom Type 1
 				writeH(0x00); // isEquipped
 				writeD(product.getItem().getBodyPart()); // Body Part
-				writeH(0x00); // Enchant
+				writeH(product.getItem().getDefaultEnchantLevel()); // Enchant
 				writeH(0x00); // Custom Type
 				writeD(0x00); // Augment
 				writeD(-1); // Mana
