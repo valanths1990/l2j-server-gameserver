@@ -11508,7 +11508,7 @@ public final class L2PcInstance extends L2Playable
 		
 		// Remove L2Object object from _allObjects of L2World
 		L2World.getInstance().removeObject(this);
-		L2World.getInstance().removeFromAllPlayers(this); // force remove in case of crash during teleport
+		L2World.getInstance().removeFromAllPlayers(this);
 		
 		try
 		{
