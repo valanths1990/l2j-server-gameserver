@@ -1088,12 +1088,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			// Add the L2PcInstance to _knownObjects and _knownPlayer of the target
 			target.getKnownList().addKnownObject(this);
 			
-			// Reduce the current CP if TIREDNESS configuration is activated
-			if (Config.ALT_GAME_TIREDNESS)
-			{
-				setCurrentCp(getCurrentCp() - 10);
-			}
-			
 			// Verify if soulshots are charged.
 			final boolean wasSSCharged = isChargedShot(ShotType.SOULSHOTS);
 			// Get the Attack Speed of the L2Character (delay (in milliseconds) before next attack)
