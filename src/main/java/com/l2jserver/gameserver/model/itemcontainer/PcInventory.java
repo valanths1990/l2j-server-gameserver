@@ -489,7 +489,7 @@ public class PcInventory extends Inventory
 		if (item != null)
 		{
 			// Notify to scripts
-			EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemAdd(actor, item), item.getItem());
+			EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemAdd(actor, item), actor);
 		}
 		return item;
 	}
@@ -538,7 +538,7 @@ public class PcInventory extends Inventory
 				actor.sendPacket(su);
 				
 				// Notify to scripts
-				EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemAdd(actor, item), item.getItem());
+				EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemAdd(actor, item), actor);
 			}
 		}
 		return item;
