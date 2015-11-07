@@ -416,9 +416,14 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 	}
 	
 	/**
-	 * Decrease the current number of L2NpcInstance of this L2Spawn and if necessary create a SpawnTask to launch after the respawn Delay. <B><U> Actions</U> :</B> <li>Decrease the current number of L2NpcInstance of this L2Spawn</li> <li>Check if respawn is possible to prevent multiple respawning
-	 * caused by lag</li> <li>Update the current number of SpawnTask in progress or stand by of this L2Spawn</li> <li>Create a new SpawnTask to launch after the respawn Delay</li> <FONT COLOR=#FF0000><B> <U>Caution</U> : A respawn is possible ONLY if _doRespawn=True and _scheduledCount +
-	 * _currentCount < _maximumCount</B></FONT>
+	 * Decrease the current number of NPC instances of this spawn and if necessary create a spawn task to launch after the respawn delay.<br>
+	 * <B><U>Actions</U>:</B>
+	 * <li>Decrease the current number of L2NpcInstance of this L2Spawn</li>
+	 * <li>Check if respawn is possible to prevent multiple respawning caused by lag</li>
+	 * <li>Update the current number of SpawnTask in progress or stand by of this L2Spawn</li>
+	 * <li>Create a new SpawnTask to launch after the respawn Delay</li>
+	 * </ul>
+	 * <FONT COLOR=#FF0000><B><U>Caution</U>: A respawn is possible ONLY if _doRespawn=True and _scheduledCount + _currentCount < _maximumCount</B></FONT>
 	 * @param oldNpc
 	 */
 	public void decreaseCount(L2Npc oldNpc)
@@ -648,7 +653,11 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable
 		if (Config.L2JMOD_CHAMPION_ENABLE)
 		{
 			// Set champion on next spawn
-			if (mob.isMonster() && !getTemplate().isUndying() && !mob.isRaid() && !mob.isRaidMinion() && (Config.L2JMOD_CHAMPION_FREQUENCY > 0) && (mob.getLevel() >= Config.L2JMOD_CHAMP_MIN_LVL) && (mob.getLevel() <= Config.L2JMOD_CHAMP_MAX_LVL) && (Config.L2JMOD_CHAMPION_ENABLE_IN_INSTANCES || (getInstanceId() == 0)))
+			if (mob.isMonster() && !getTemplate().isUndying() && !mob.isRaid() && !mob.isRaidMinion() && //
+				(Config.L2JMOD_CHAMPION_FREQUENCY > 0) && //
+				(mob.getLevel() >= Config.L2JMOD_CHAMP_MIN_LVL) && //
+				(mob.getLevel() <= Config.L2JMOD_CHAMP_MAX_LVL) && //
+				(Config.L2JMOD_CHAMPION_ENABLE_IN_INSTANCES || (getInstanceId() == 0)))
 			{
 				if (Rnd.get(100) < Config.L2JMOD_CHAMPION_FREQUENCY)
 				{

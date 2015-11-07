@@ -2162,7 +2162,7 @@ public final class Config
 			
 			L2JMOD_CHAMPION_ENABLE = L2JModSettings.getBoolean("ChampionEnable", false);
 			L2JMOD_CHAMPION_PASSIVE = L2JModSettings.getBoolean("ChampionPassive", false);
-			L2JMOD_CHAMPION_FREQUENCY = L2JModSettings.getInt("ChampionFrequency", 0);
+			L2JMOD_CHAMPION_FREQUENCY = L2JModSettings.getInt("ChampionFrequency", -1);
 			L2JMOD_CHAMP_TITLE = L2JModSettings.getString("ChampionTitle", "Champion");
 			L2JMOD_CHAMP_MIN_LVL = L2JModSettings.getInt("ChampionMinLevel", 20);
 			L2JMOD_CHAMP_MAX_LVL = L2JModSettings.getInt("ChampionMaxLevel", 60);
