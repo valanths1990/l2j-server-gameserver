@@ -866,7 +866,6 @@ public final class L2PcInstance extends L2Playable
 	
 	public void startPvPFlag()
 	{
-		Thread.dumpStack();
 		updatePvPFlag(1);
 		
 		if (_PvPRegTask == null)
