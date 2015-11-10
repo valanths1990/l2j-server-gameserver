@@ -35,7 +35,6 @@ import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.PartyDistributionType;
-import com.l2jserver.gameserver.instancemanager.DuelManager;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Summon;
@@ -368,7 +367,7 @@ public class L2Party extends AbstractPlayerGroup
 					_positionPacket.reuse(this);
 				}
 				broadcastPacket(_positionPacket);
-			}, PARTY_POSITION_BROADCAST_INTERVAL.toMillis() / 2, PARTY_POSITION_BROADCAST_INTERVAL.toMillis());
+			} , PARTY_POSITION_BROADCAST_INTERVAL.toMillis() / 2, PARTY_POSITION_BROADCAST_INTERVAL.toMillis());
 		}
 	}
 	
@@ -407,11 +406,6 @@ public class L2Party extends AbstractPlayerGroup
 			if (player.isFestivalParticipant())
 			{
 				SevenSignsFestival.getInstance().updateParticipants(player, this);
-			}
-			
-			if (player.isInDuel())
-			{
-				DuelManager.getInstance().onRemoveFromParty(player);
 			}
 			
 			try
@@ -491,11 +485,8 @@ public class L2Party extends AbstractPlayerGroup
 				if (getLeader() != null)
 				{
 					getLeader().setParty(null);
-					if (getLeader().isInDuel())
-					{
-						DuelManager.getInstance().onRemoveFromParty(getLeader());
-					}
 				}
+				
 				if (_changeDistributionTypeRequestTask != null)
 				{
 					_changeDistributionTypeRequestTask.cancel(true);
@@ -725,7 +716,10 @@ public class L2Party extends AbstractPlayerGroup
 	/**
 	 * Distribute Experience and SP rewards to L2PcInstance Party members in the known area of the last attacker.<BR>
 	 * <BR>
-	 * <B><U> Actions</U> :</B> <li>Get the L2PcInstance owner of the L2ServitorInstance (if necessary)</li> <li>Calculate the Experience and SP reward distribution rate</li> <li>Add Experience and SP to the L2PcInstance</li><BR>
+	 * <B><U> Actions</U> :</B>
+	 * <li>Get the L2PcInstance owner of the L2ServitorInstance (if necessary)</li>
+	 * <li>Calculate the Experience and SP reward distribution rate</li>
+	 * <li>Add Experience and SP to the L2PcInstance</li><BR>
 	 * @param xpReward The Experience reward to distribute
 	 * @param spReward The SP reward to distribute
 	 * @param rewardedMembers The list of L2PcInstance to reward

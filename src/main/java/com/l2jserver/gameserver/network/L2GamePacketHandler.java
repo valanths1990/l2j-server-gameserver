@@ -691,7 +691,7 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 					case 0xcf: // RequestProcureCrop
 						// msg = new RequestBuyProcure();
 						break;
-					
+						
 					case 0xd0:
 						int id2 = -1;
 						if (buf.remaining() >= 2)
