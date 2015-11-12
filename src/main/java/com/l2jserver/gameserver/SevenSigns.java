@@ -140,8 +140,10 @@ public class SevenSigns
 	
 	private static final String UPDATE_PLAYER = "UPDATE seven_signs SET cabal=?, seal=?, red_stones=?, green_stones=?, blue_stones=?, " + "ancient_adena_amount=?, contribution_score=? WHERE charId=?";
 	
-	private static final String UPDATE_STATUS = "UPDATE seven_signs_status SET current_cycle=?, active_period=?, previous_winner=?, " + "dawn_stone_score=?, dawn_festival_score=?, dusk_stone_score=?, dusk_festival_score=?, " + "avarice_owner=?, gnosis_owner=?, strife_owner=?, avarice_dawn_score=?, gnosis_dawn_score=?, " + "strife_dawn_score=?, avarice_dusk_score=?, gnosis_dusk_score=?, strife_dusk_score=?, " + "festival_cycle=?, accumulated_bonus0=?, accumulated_bonus1=?, accumulated_bonus2=?," + "accumulated_bonus3=?, accumulated_bonus4=?, date=? WHERE id=0";
-	
+	private static final String UPDATE_STATUS = "UPDATE seven_signs_status SET current_cycle=?, active_period=?, previous_winner=?, " + "dawn_stone_score=?, dawn_festival_score=?, dusk_stone_score=?, dusk_festival_score=?, "
+		+ "avarice_owner=?, gnosis_owner=?, strife_owner=?, avarice_dawn_score=?, gnosis_dawn_score=?, " + "strife_dawn_score=?, avarice_dusk_score=?, gnosis_dusk_score=?, strife_dusk_score=?, " + "festival_cycle=?, accumulated_bonus0=?, accumulated_bonus1=?, accumulated_bonus2=?,"
+		+ "accumulated_bonus3=?, accumulated_bonus4=?, date=? WHERE id=0";
+		
 	protected SevenSigns()
 	{
 		try
@@ -336,7 +338,7 @@ public class SevenSigns
 							AutoSpawnHandler.getInstance().setSpawnActive(duskCrest, false);
 						}
 						break;
-					
+						
 					case CABAL_DUSK:
 						if (!AutoSpawnHandler.getInstance().getAutoSpawnInstance(anakimSpawn.getObjectId(), true).isSpawnActive())
 						{
@@ -883,9 +885,9 @@ public class SevenSigns
 				ps.setDouble(6, sevenDat.getDouble("ancient_adena_amount"));
 				ps.setDouble(7, sevenDat.getDouble("contribution_score"));
 				ps.setInt(8, sevenDat.getInt("charId"));
-				ps.execute();
-				ps.clearParameters();
+				ps.addBatch();
 			}
+			ps.executeBatch();
 		}
 		catch (SQLException e)
 		{

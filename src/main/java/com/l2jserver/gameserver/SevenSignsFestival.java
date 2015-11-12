@@ -1001,42 +1001,22 @@ public class SevenSignsFestival implements SpawnListener
 	public void saveFestivalData(boolean updateSettings)
 	{
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement psUpdate = con.prepareStatement("UPDATE seven_signs_festival SET date=?, score=?, members=? WHERE cycle=? AND cabal=? AND festivalId=?");
-			PreparedStatement psInsert = con.prepareStatement("INSERT INTO seven_signs_festival (festivalId, cabal, cycle, date, score, members) VALUES (?,?,?,?,?,?)"))
+			PreparedStatement psInsert = con.prepareStatement("REPLACE INTO seven_signs_festival (festivalId, cabal, cycle, date, score, members) VALUES (?,?,?,?,?,?)"))
 		{
 			for (Map<Integer, StatsSet> currCycleData : _festivalData.values())
 			{
 				for (StatsSet festivalDat : currCycleData.values())
 				{
-					int festivalCycle = festivalDat.getInt("cycle");
-					int festivalId = festivalDat.getInt("festivalId");
-					String cabal = festivalDat.getString("cabal");
-					
-					// Try to update an existing record.
-					psUpdate.setLong(1, Long.valueOf(festivalDat.getString("date")));
-					psUpdate.setInt(2, festivalDat.getInt("score"));
-					psUpdate.setString(3, festivalDat.getString("members"));
-					psUpdate.setInt(4, festivalCycle);
-					psUpdate.setString(5, cabal);
-					psUpdate.setInt(6, festivalId);
-					
-					// If there was no record to update, assume it doesn't exist and add a new one,
-					// otherwise continue with the next record to store.
-					if (psUpdate.executeUpdate() > 0)
-					{
-						continue;
-					}
-					
-					psInsert.setInt(1, festivalId);
-					psInsert.setString(2, cabal);
-					psInsert.setInt(3, festivalCycle);
+					psInsert.setInt(1, festivalDat.getInt("festivalId"));
+					psInsert.setString(2, festivalDat.getString("cabal"));
+					psInsert.setInt(3, festivalDat.getInt("cycle"));
 					psInsert.setLong(4, Long.valueOf(festivalDat.getString("date")));
 					psInsert.setInt(5, festivalDat.getInt("score"));
 					psInsert.setString(6, festivalDat.getString("members"));
-					psInsert.execute();
-					psInsert.clearParameters();
+					psInsert.addBatch();
 				}
 			}
+			psInsert.executeBatch();
 		}
 		catch (SQLException e)
 		{
