@@ -613,7 +613,7 @@ public abstract class L2Summon extends L2Playable
 		}
 		
 		// Set current pet skill
-		getOwner().setCurrentPetSkill(skill, forceUse, dontMove);
+		// getOwner().setCurrentPetSkill(skill, forceUse, dontMove);
 		
 		// Get the target for the skill
 		L2Object target = null;
@@ -698,7 +698,8 @@ public abstract class L2Summon extends L2Playable
 				return false;
 			}
 			
-			if ((target.getActingPlayer() != null) && (getOwner().getSiegeState() > 0) && getOwner().isInsideZone(ZoneId.SIEGE) && (target.getActingPlayer().getSiegeState() == getOwner().getSiegeState()) && (target.getActingPlayer() != getOwner()) && (target.getActingPlayer().getSiegeSide() == getOwner().getSiegeSide()))
+			if ((target.getActingPlayer() != null) && (getOwner().getSiegeState() > 0) && getOwner().isInsideZone(ZoneId.SIEGE) && (target.getActingPlayer().getSiegeState() == getOwner().getSiegeState()) && (target.getActingPlayer() != getOwner())
+				&& (target.getActingPlayer().getSiegeSide() == getOwner().getSiegeSide()))
 			{
 				if (TerritoryWarManager.getInstance().isTWInProgress())
 				{
@@ -729,7 +730,8 @@ public abstract class L2Summon extends L2Playable
 				}
 				
 				// Check if a Forced attack is in progress on non-attackable target
-				if (!target.isAutoAttackable(this) && !forceUse && !target.isNpc() && (skill.getTargetType() != L2TargetType.AURA) && (skill.getTargetType() != L2TargetType.FRONT_AURA) && (skill.getTargetType() != L2TargetType.BEHIND_AURA) && (skill.getTargetType() != L2TargetType.CLAN) && (skill.getTargetType() != L2TargetType.PARTY) && (skill.getTargetType() != L2TargetType.SELF))
+				if (!target.isAutoAttackable(this) && !forceUse && !target.isNpc() && (skill.getTargetType() != L2TargetType.AURA) && (skill.getTargetType() != L2TargetType.FRONT_AURA) && (skill.getTargetType() != L2TargetType.BEHIND_AURA) && (skill.getTargetType() != L2TargetType.CLAN)
+					&& (skill.getTargetType() != L2TargetType.PARTY) && (skill.getTargetType() != L2TargetType.SELF))
 				{
 					return false;
 				}
