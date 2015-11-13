@@ -613,7 +613,7 @@ public abstract class L2Summon extends L2Playable
 		}
 		
 		// Set current pet skill
-		// getOwner().setCurrentPetSkill(skill, forceUse, dontMove);
+		getOwner().setCurrentPetSkill(skill, forceUse, dontMove);
 		
 		// Get the target for the skill
 		L2Object target = null;

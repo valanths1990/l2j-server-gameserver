@@ -4613,6 +4613,11 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void doCast(Skill skill)
 	{
+		if (!checkUseMagicConditions(skill, getCurrentSkill().isCtrlPressed(), getCurrentSkill().isShiftPressed()))
+		{
+			setIsCastingNow(false);
+			return;
+		}
 		super.doCast(skill);
 		setRecentFakeDeath(false);
 	}
@@ -8413,12 +8418,6 @@ public final class L2PcInstance extends L2Playable
 		if (getQueuedSkill() != null)
 		{
 			setQueuedSkill(null, false, false);
-		}
-		
-		if (!checkUseMagicConditions(skill, forceUse, dontMove))
-		{
-			setIsCastingNow(false);
-			return false;
 		}
 		
 		// Check if the target is correct and Notify the AI with AI_INTENTION_CAST and target
