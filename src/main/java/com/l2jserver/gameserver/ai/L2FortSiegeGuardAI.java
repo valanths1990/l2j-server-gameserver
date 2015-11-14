@@ -146,11 +146,11 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 		if ((target != null) && target.isInvul())
 		{
 			// However EffectInvincible requires to check GMs specially
-			if ((target instanceof L2PcInstance) && target.isGM())
+			if (target.isPlayer() && target.isGM())
 			{
 				return false;
 			}
-			if ((target instanceof L2Summon) && ((L2Summon) target).getOwner().isGM())
+			if (target.isSummon() && ((L2Summon) target).getOwner().isGM())
 			{
 				return false;
 			}
@@ -483,9 +483,9 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 			{
 				if (!npc.isDead() && (Math.abs(target.getZ() - npc.getZ()) < 600)
 				// && _actor.getAttackByList().contains(getAttackTarget())
-				&& ((npc.getAI()._intention == CtrlIntention.AI_INTENTION_IDLE) || (npc.getAI()._intention == CtrlIntention.AI_INTENTION_ACTIVE))
-				// limiting aggro for siege guards
-				&& target.isInsideRadius(npc, 1500, true, false) && GeoData.getInstance().canSeeTarget(npc, target))
+					&& ((npc.getAI()._intention == CtrlIntention.AI_INTENTION_IDLE) || (npc.getAI()._intention == CtrlIntention.AI_INTENTION_ACTIVE))
+					// limiting aggro for siege guards
+					&& target.isInsideRadius(npc, 1500, true, false) && GeoData.getInstance().canSeeTarget(npc, target))
 				{
 					// Notify the L2Object AI with EVT_AGGRESSION
 					npc.getAI().notifyEvent(CtrlEvent.EVT_AGGRESSION, getAttackTarget(), 1);

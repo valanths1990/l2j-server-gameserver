@@ -4613,10 +4613,13 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void doCast(Skill skill)
 	{
-		if (!checkUseMagicConditions(skill, getCurrentSkill().isCtrlPressed(), getCurrentSkill().isShiftPressed()))
+		if (getCurrentSkill() != null)
 		{
-			setIsCastingNow(false);
-			return;
+			if (!checkUseMagicConditions(skill, getCurrentSkill().isCtrlPressed(), getCurrentSkill().isShiftPressed()))
+			{
+				setIsCastingNow(false);
+				return;
+			}
 		}
 		super.doCast(skill);
 		setRecentFakeDeath(false);
@@ -6454,7 +6457,7 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public boolean isInvul()
 	{
-		return super.isInvul() || (_teleportProtectEndTime > GameTimeController.getInstance().getGameTicks());
+		return super.isInvul() || _isTeleporting;
 	}
 	
 	/**
@@ -12388,7 +12391,7 @@ public final class L2PcInstance extends L2Playable
 		
 		final SystemMessage sm;
 		
-		if (target.isInvul() && !target.isNpc())
+		if ((target.isInvul() || target.isHpBlocked()) && !target.isNpc())
 		{
 			sm = SystemMessage.getSystemMessage(SystemMessageId.ATTACK_WAS_BLOCKED);
 		}

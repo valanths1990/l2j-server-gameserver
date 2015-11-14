@@ -108,13 +108,13 @@ public class L2SiegeFlagInstance extends L2Npc
 	@Override
 	public boolean canBeAttacked()
 	{
-		return !isInvul();
+		return !(isInvul() || isHpBlocked());
 	}
 	
 	@Override
 	public boolean isAutoAttackable(L2Character attacker)
 	{
-		return !isInvul();
+		return !(isInvul() || isHpBlocked());
 	}
 	
 	@Override

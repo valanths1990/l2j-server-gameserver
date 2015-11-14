@@ -1368,11 +1368,25 @@ public final class Skill implements IIdentifiable
 		{
 			return;
 		}
-		
 		// Check bad skills against target.
 		if ((effector != effected) && isBad() && (effected.isInvul() || (effector.isGM() && !effector.getAccessLevel().canGiveDamage())))
 		{
 			return;
+		}
+		
+		if (isDebuff())
+		{
+			if (effected.isDebuffBlocked())
+			{
+				return;
+			}
+		}
+		else
+		{
+			if (effected.isBuffBlocked() && !isBad())
+			{
+				return;
+			}
 		}
 		
 		if (effected.isInvulAgainst(getId(), getLevel()))
