@@ -169,10 +169,6 @@ public final class UserInfo extends L2GameServerPacket
 		writeD(_activeChar.isGM() ? 1 : 0); // builder level
 		
 		String title = _activeChar.getTitle();
-		if (_activeChar.isInvisible())
-		{
-			title = "Invisible";
-		}
 		if (_activeChar.getPoly().isMorphed())
 		{
 			final L2NpcTemplate polyObj = NpcData.getInstance().getTemplate(_activeChar.getPoly().getPolyId());
