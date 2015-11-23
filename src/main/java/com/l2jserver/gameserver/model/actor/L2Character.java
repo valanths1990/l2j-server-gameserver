@@ -1411,10 +1411,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		for (L2Object obj : objs)
 		{
-			if (attackpercent == 85)
-			{
-				break;
-			}
 			if (obj == target)
 			{
 				continue; // do not hit twice
