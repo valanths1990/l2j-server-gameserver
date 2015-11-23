@@ -104,19 +104,11 @@ public class CharSelectionInfo extends L2GameServerPacket
 			writeS(_loginName);
 			writeD(_sessionId);
 			writeD(charInfoPackage.getClanId());
-			writeD(0x00); // ??
+			writeD(0x00); // Builder Level
 			
 			writeD(charInfoPackage.getSex());
 			writeD(charInfoPackage.getRace());
-			
-			if (charInfoPackage.getClassId() == charInfoPackage.getBaseClassId())
-			{
-				writeD(charInfoPackage.getClassId());
-			}
-			else
-			{
-				writeD(charInfoPackage.getBaseClassId());
-			}
+			writeD(charInfoPackage.getBaseClassId());
 			
 			writeD(0x01); // active ??
 			
@@ -157,33 +149,24 @@ public class CharSelectionInfo extends L2GameServerPacket
 			writeF(charInfoPackage.getMaxHp()); // hp max
 			writeF(charInfoPackage.getMaxMp()); // mp max
 			
-			long deleteTime = charInfoPackage.getDeleteTimer();
-			int deletedays = 0;
-			if (deleteTime > 0)
-			{
-				deletedays = (int) ((deleteTime - System.currentTimeMillis()) / 1000);
-			}
-			writeD(deletedays); // days left before
+			writeD(charInfoPackage.getDeleteTimer() > 0 ? (int) ((charInfoPackage.getDeleteTimer() - System.currentTimeMillis()) / 1000) : 0); // days left before
 			// delete .. if != 0
 			// then char is inactive
 			writeD(charInfoPackage.getClassId());
 			writeD(i == _activeId ? 0x01 : 0x00); // c3 auto-select char
 			
-			writeC(charInfoPackage.getEnchantEffect() > 127 ? 127 : charInfoPackage.getEnchantEffect());
-			writeH(0x00);
-			writeH(0x00);
-			// writeD(charInfoPackage.getAugmentationId());
+			writeC(Math.min(charInfoPackage.getEnchantEffect(), 127));
+			writeD(charInfoPackage.getAugmentationId());
 			
-			// writeD(charInfoPackage.getTransformId()); // Used to display Transformations
 			writeD(0x00); // Currently on retail when you are on character select you don't see your transformation.
 			
-			// Freya by Vistall:
-			writeD(0x00); // npdid - 16024 Tame Tiny Baby Kookaburra A9E89C
-			writeD(0x00); // level
-			writeD(0x00); // ?
-			writeD(0x00); // food? - 1200
-			writeF(0x00); // max Hp
-			writeF(0x00); // cur Hp
+			// Implementing it will be waster of resources.
+			writeD(0x00); // Pet ID
+			writeD(0x00); // Pet Level
+			writeD(0x00); // Pet Max Food
+			writeD(0x00); // Pet Current Food
+			writeF(0x00); // Pet Max HP
+			writeF(0x00); // Pet Max MP
 			
 			// High Five by Vistall:
 			writeD(charInfoPackage.getVitalityPoints()); // H5 Vitality
