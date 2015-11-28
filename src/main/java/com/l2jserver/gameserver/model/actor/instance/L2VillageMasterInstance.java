@@ -707,7 +707,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			return true;
 		}
 		
-		QuestState qs = player.getQuestState("234_FatesWhisper");
+		QuestState qs = player.getQuestState("Q00234_FatesWhisper");
 		if ((qs == null) || !qs.isCompleted())
 		{
 			return false;

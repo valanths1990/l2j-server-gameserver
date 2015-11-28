@@ -61,7 +61,7 @@ public final class L2VillageMasterKamaelInstance extends L2VillageMasterInstance
 			return true;
 		}
 		
-		QuestState qs = player.getQuestState("234_FatesWhisper");
+		QuestState qs = player.getQuestState("Q00234_FatesWhisper");
 		if ((qs == null) || !qs.isCompleted())
 		{
 			return false;
