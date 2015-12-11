@@ -18,18 +18,20 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
+import java.util.List;
+
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.model.quest.QuestState;
 
 public class QuestList extends L2GameServerPacket
 {
-	private Quest[] _quests;
+	private List<Quest> _quests;
 	private L2PcInstance _activeChar;
 	
 	public QuestList()
 	{
-		
+	
 	}
 	
 	@Override
@@ -79,34 +81,26 @@ public class QuestList extends L2GameServerPacket
 		 */
 		
 		writeC(0x86);
-		if (_quests != null)
+		writeH(_quests.size());
+		for (Quest q : _quests)
 		{
-			writeH(_quests.length);
-			for (Quest q : _quests)
+			writeD(q.getId());
+			QuestState qs = _activeChar.getQuestState(q.getName());
+			if (qs == null)
 			{
-				writeD(q.getId());
-				QuestState qs = _activeChar.getQuestState(q.getName());
-				if (qs == null)
-				{
-					writeD(0);
-					continue;
-				}
-				
-				int states = qs.getInt("__compltdStateFlags");
-				if (states != 0)
-				{
-					writeD(states);
-				}
-				else
-				{
-					writeD(qs.getInt("cond"));
-				}
+				writeD(0);
+				continue;
 			}
-		}
-		else
-		{
-			// write empty size
-			writeH(0x00);
+			
+			int states = qs.getInt("__compltdStateFlags");
+			if (states != 0)
+			{
+				writeD(states);
+			}
+			else
+			{
+				writeD(qs.getInt("cond"));
+			}
 		}
 		writeB(new byte[128]);
 	}
