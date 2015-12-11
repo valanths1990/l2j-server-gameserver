@@ -127,7 +127,9 @@ import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 import com.l2jserver.gameserver.model.zone.ZoneId;
+import com.l2jserver.gameserver.network.NpcStringId;
 import com.l2jserver.gameserver.network.SystemMessageId;
+import com.l2jserver.gameserver.network.clientpackets.Say2;
 import com.l2jserver.gameserver.network.serverpackets.AbstractNpcInfo;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.Attack;
@@ -140,6 +142,7 @@ import com.l2jserver.gameserver.network.serverpackets.MagicSkillCanceld;
 import com.l2jserver.gameserver.network.serverpackets.MagicSkillLaunched;
 import com.l2jserver.gameserver.network.serverpackets.MagicSkillUse;
 import com.l2jserver.gameserver.network.serverpackets.MoveToLocation;
+import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 import com.l2jserver.gameserver.network.serverpackets.Revive;
 import com.l2jserver.gameserver.network.serverpackets.ServerObjectInfo;
 import com.l2jserver.gameserver.network.serverpackets.SetupGauge;
@@ -6896,5 +6899,41 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	public int getSiegeSide()
 	{
 		return 0;
+	}
+	
+	/**
+	 * Send a normal message to all L2PcInstance in the known list.<br>
+	 * @param msg String with message
+	 */
+	public void Say(String msg)
+	{
+		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_ALL, getId(), msg));
+	}
+	
+	/**
+	 * Send a client message to all L2PcInstance in the known list.<br>
+	 * @param msg NpcString from client
+	 */
+	public void Say(NpcStringId msg)
+	{
+		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_ALL, getId(), msg));
+	}
+	
+	/**
+	 * Send a shout message (orange chat) to all L2PcInstance in the known list.<br>
+	 * @param msg String with message
+	 */
+	public void Shout(String msg)
+	{
+		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_SHOUT, getId(), msg));
+	}
+	
+	/**
+	 * Send a shout message (orange chat) to all L2PcInstance in the known list.<br>
+	 * @param msg NpcString from client
+	 */
+	public void Shout(NpcStringId msg)
+	{
+		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_SHOUT, getId(), msg));
 	}
 }
