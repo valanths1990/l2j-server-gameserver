@@ -507,7 +507,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	@Override
 	public int getMaxMp()
 	{
-		return (int) (super.getMaxMp() + (getActingPlayer().getMaxMp() * (getActingPlayer().getServitorShareBonus(Stats.MAX_HP) - 1.0)));
+		return (int) (super.getMaxMp() + (getActingPlayer().getMaxMp() * (getActingPlayer().getServitorShareBonus(Stats.MAX_MP) - 1.0)));
 	}
 	
 	@Override
