@@ -6905,7 +6905,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * Send a normal message to all L2PcInstance in the known list.<br>
 	 * @param msg String with message
 	 */
-	public void Say(String msg)
+	public void say(String msg)
 	{
 		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_ALL, getId(), msg));
 	}
@@ -6914,7 +6914,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * Send a client message to all L2PcInstance in the known list.<br>
 	 * @param msg NpcString from client
 	 */
-	public void Say(NpcStringId msg)
+	public void say(NpcStringId msg)
 	{
 		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_ALL, getId(), msg));
 	}
@@ -6923,7 +6923,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * Send a shout message (orange chat) to all L2PcInstance in the known list.<br>
 	 * @param msg String with message
 	 */
-	public void Shout(String msg)
+	public void shout(String msg)
 	{
 		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_SHOUT, getId(), msg));
 	}
@@ -6932,7 +6932,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * Send a shout message (orange chat) to all L2PcInstance in the known list.<br>
 	 * @param msg NpcString from client
 	 */
-	public void Shout(NpcStringId msg)
+	public void shout(NpcStringId msg)
 	{
 		broadcastPacket(new NpcSay(getObjectId(), Say2.NPC_SHOUT, getId(), msg));
 	}
