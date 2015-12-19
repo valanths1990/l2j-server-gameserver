@@ -91,7 +91,7 @@ public enum ClassId implements IIdentifiable
 	orcMonk(0x2f, false, Race.ORC, orcFighter),
 	tyrant(0x30, false, Race.ORC, orcMonk),
 	
-	orcMage(0x31, false, Race.ORC, null),
+	orcMage(0x31, true, Race.ORC, null),
 	orcShaman(0x32, true, Race.ORC, orcMage),
 	overlord(0x33, true, Race.ORC, orcShaman),
 	warcryer(0x34, true, Race.ORC, orcShaman),
