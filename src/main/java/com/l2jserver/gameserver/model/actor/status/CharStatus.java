@@ -28,7 +28,6 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.stat.CharStat;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.util.Rnd;
 
@@ -388,20 +387,19 @@ public class CharStatus
 	
 	protected void doRegeneration()
 	{
-		final CharStat charstat = getActiveChar().getStat();
 		// Modify the current HP of the L2Character and broadcast Server->Client packet StatusUpdate
-		if (getCurrentHp() < charstat.getMaxRecoverableHp())
+		if (getCurrentHp() < getActiveChar().getMaxRecoverableHp())
 		{
 			setCurrentHp(getCurrentHp() + Formulas.calcHpRegen(getActiveChar()), false);
 		}
 		
 		// Modify the current MP of the L2Character and broadcast Server->Client packet StatusUpdate
-		if (getCurrentMp() < charstat.getMaxRecoverableMp())
+		if (getCurrentMp() < getActiveChar().getMaxRecoverableMp())
 		{
 			setCurrentMp(getCurrentMp() + Formulas.calcMpRegen(getActiveChar()), false);
 		}
 		
-		if ((getCurrentHp() >= charstat.getMaxRecoverableHp()) && (getCurrentMp() >= charstat.getMaxMp()))
+		if ((getCurrentHp() >= getActiveChar().getMaxRecoverableHp()) && (getCurrentMp() >= getActiveChar().getMaxMp()))
 		{
 			stopHpMpRegeneration();
 		}
