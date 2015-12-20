@@ -1414,12 +1414,12 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		for (L2Object obj : objs)
 		{
-			if (obj == target)
+			if ((obj == target) || (obj == null))
 			{
 				continue; // do not hit twice
 			}
 			// Check if the L2Object is a L2Character
-			if (obj instanceof L2Character)
+			if (obj.isCharacter())
 			{
 				if (obj.isPet() && isPlayer() && (((L2PetInstance) obj).getOwner() == getActingPlayer()))
 				{
