@@ -288,6 +288,7 @@ public abstract class Inventory extends ItemContainer
 				item.getAugmentation().removeBonus(player);
 			}
 			
+			item.unChargeAllShots();
 			item.removeElementAttrBonus(player);
 			
 			// Remove skills bestowed from +4 armor
@@ -407,7 +408,7 @@ public abstract class Inventory extends ItemContainer
 			{
 				item.getAugmentation().applyBonus(player);
 			}
-			
+			item.rechargeShots(true, true);
 			item.updateElementAttrBonus(player);
 			
 			// Add skills bestowed from +4 armor
@@ -1417,7 +1418,8 @@ public abstract class Inventory extends ItemContainer
 			case L2Item.SLOT_L_HAND:
 			{
 				L2ItemInstance rh = getPaperdollItem(PAPERDOLL_RHAND);
-				if ((rh != null) && (rh.getItem().getBodyPart() == L2Item.SLOT_LR_HAND) && !(((rh.getItemType() == WeaponType.BOW) && (item.getItemType() == EtcItemType.ARROW)) || ((rh.getItemType() == WeaponType.CROSSBOW) && (item.getItemType() == EtcItemType.BOLT)) || ((rh.getItemType() == WeaponType.FISHINGROD) && (item.getItemType() == EtcItemType.LURE))))
+				if ((rh != null) && (rh.getItem().getBodyPart() == L2Item.SLOT_LR_HAND)
+					&& !(((rh.getItemType() == WeaponType.BOW) && (item.getItemType() == EtcItemType.ARROW)) || ((rh.getItemType() == WeaponType.CROSSBOW) && (item.getItemType() == EtcItemType.BOLT)) || ((rh.getItemType() == WeaponType.FISHINGROD) && (item.getItemType() == EtcItemType.LURE))))
 				{
 					setPaperdollItem(PAPERDOLL_RHAND, null);
 				}
