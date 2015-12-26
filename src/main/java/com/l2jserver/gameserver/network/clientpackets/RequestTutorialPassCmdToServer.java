@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.network.clientpackets;
 import com.l2jserver.gameserver.handler.BypassHandler;
 import com.l2jserver.gameserver.handler.IBypassHandler;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.model.quest.QuestState;
 
 public class RequestTutorialPassCmdToServer extends L2GameClientPacket
@@ -50,7 +51,7 @@ public class RequestTutorialPassCmdToServer extends L2GameClientPacket
 		}
 		else
 		{
-			QuestState qs = player.getQuestState("255_Tutorial");
+			final QuestState qs = player.getQuestState(Quest.TUTORIAL);
 			if (qs != null)
 			{
 				qs.getQuest().notifyEvent(_bypass, null, player);

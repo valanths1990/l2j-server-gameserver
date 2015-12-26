@@ -32,6 +32,7 @@ import com.l2jserver.gameserver.model.actor.transform.TransformTemplate;
 import com.l2jserver.gameserver.model.entity.RecoBonus;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLevelChanged;
+import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.model.quest.QuestState;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.MoveType;
@@ -258,7 +259,7 @@ public class PcStat extends PlayableStat
 		{
 			if (!Config.DISABLE_TUTORIAL)
 			{
-				QuestState qs = getActiveChar().getQuestState("255_Tutorial");
+				final QuestState qs = getActiveChar().getQuestState(Quest.TUTORIAL);
 				if (qs != null)
 				{
 					qs.getQuest().notifyEvent("CE40", null, getActiveChar());

@@ -75,6 +75,8 @@ import com.l2jserver.util.Util;
  */
 public class Quest extends AbstractScript implements IIdentifiable
 {
+	public static final String TUTORIAL = "255_Tutorial";
+	
 	/** Map containing lists of timers from the name of the timer. */
 	private volatile Map<String, List<QuestTimer>> _questTimers = null;
 	private final ReentrantReadWriteLock _rwLock = new ReentrantReadWriteLock();

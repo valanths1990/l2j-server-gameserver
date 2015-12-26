@@ -28,6 +28,7 @@ import com.l2jserver.gameserver.model.actor.L2Playable;
 import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.stat.PcStat;
+import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.model.quest.QuestState;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.Stats;
@@ -308,7 +309,7 @@ public class PcStatus extends PlayableStatus
 			getActiveChar().doDie(attacker);
 			if (!Config.DISABLE_TUTORIAL)
 			{
-				QuestState qs = getActiveChar().getQuestState("255_Tutorial");
+				final QuestState qs = getActiveChar().getQuestState(Quest.TUTORIAL);
 				if (qs != null)
 				{
 					qs.getQuest().notifyEvent("CE30", null, getActiveChar());
@@ -324,7 +325,7 @@ public class PcStatus extends PlayableStatus
 		
 		if (!Config.DISABLE_TUTORIAL && (getCurrentHp() <= (getActiveChar().getStat().getMaxHp() * .3)))
 		{
-			QuestState qs = getActiveChar().getQuestState("255_Tutorial");
+			final QuestState qs = getActiveChar().getQuestState(Quest.TUTORIAL);
 			if (qs != null)
 			{
 				qs.getQuest().notifyEvent("CE45", null, getActiveChar());
