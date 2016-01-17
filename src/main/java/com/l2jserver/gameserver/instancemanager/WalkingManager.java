@@ -53,10 +53,12 @@ import com.l2jserver.util.data.xml.IXmlReader;
 public final class WalkingManager implements IXmlReader
 {
 	// Repeat style:
+	// -1 - no repeat
 	// 0 - go back
 	// 1 - go to first point (circle style)
 	// 2 - teleport to first point (conveyor style)
 	// 3 - random walking between points.
+	public static final byte NO_REPEAT = -1;
 	public static final byte REPEAT_GO_BACK = 0;
 	public static final byte REPEAT_GO_FIRST = 1;
 	public static final byte REPEAT_TELE_FIRST = 2;
@@ -88,27 +90,36 @@ public final class WalkingManager implements IXmlReader
 			{
 				final String routeName = parseString(d.getAttributes(), "name");
 				boolean repeat = parseBoolean(d.getAttributes(), "repeat");
-				String repeatStyle = d.getAttributes().getNamedItem("repeatStyle").getNodeValue();
-				byte repeatType;
-				if (repeatStyle.equalsIgnoreCase("back"))
+				final String repeatStyle = d.getAttributes().getNamedItem("repeatStyle").getNodeValue().toLowerCase();
+				
+				final byte repeatType;
+				switch (repeatStyle)
 				{
-					repeatType = REPEAT_GO_BACK;
-				}
-				else if (repeatStyle.equalsIgnoreCase("cycle"))
-				{
-					repeatType = REPEAT_GO_FIRST;
-				}
-				else if (repeatStyle.equalsIgnoreCase("conveyor"))
-				{
-					repeatType = REPEAT_TELE_FIRST;
-				}
-				else if (repeatStyle.equalsIgnoreCase("random"))
-				{
-					repeatType = REPEAT_RANDOM;
-				}
-				else
-				{
-					repeatType = -1;
+					case "back":
+					{
+						repeatType = REPEAT_GO_BACK;
+						break;
+					}
+					case "cycle":
+					{
+						repeatType = REPEAT_GO_FIRST;
+						break;
+					}
+					case "conveyor":
+					{
+						repeatType = REPEAT_TELE_FIRST;
+						break;
+					}
+					case "random":
+					{
+						repeatType = REPEAT_RANDOM;
+						break;
+					}
+					default:
+					{
+						repeatType = NO_REPEAT;
+						break;
+					}
 				}
 				
 				final List<L2NpcWalkerNode> list = new ArrayList<>();
@@ -273,7 +284,8 @@ public final class WalkingManager implements IXmlReader
 					
 					if (!npc.isInsideRadius(node, 3000, true, false))
 					{
-						final String message = "Route '" + routeName + "': NPC (id=" + npc.getId() + ", x=" + npc.getX() + ", y=" + npc.getY() + ", z=" + npc.getZ() + ") is too far from starting point (node x=" + node.getX() + ", y=" + node.getY() + ", z=" + node.getZ() + ", range=" + npc.calculateDistance(node, true, true) + "), walking will not start";
+						final String message = "Route '" + routeName + "': NPC (id=" + npc.getId() + ", x=" + npc.getX() + ", y=" + npc.getY() + ", z=" + npc.getZ() + ") is too far from starting point (node x=" + node.getX() + ", y=" + node.getY() + ", z=" + node.getZ() + ", range="
+							+ npc.calculateDistance(node, true, true) + "), walking will not start";
 						LOG.warn("{}: {}", getClass().getSimpleName(), message);
 						npc.sendDebugMessage(message);
 						return;

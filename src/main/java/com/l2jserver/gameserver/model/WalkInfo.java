@@ -27,13 +27,12 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcMoveRouteFi
 import com.l2jserver.util.Rnd;
 
 /**
- * Holds info about current walk progress
+ * Holds info about current walk progress.
  * @author GKR, UnAfraid
  */
 public class WalkInfo
 {
 	private final String _routeName;
-	
 	private ScheduledFuture<?> _walkCheckTask;
 	private boolean _blocked = false;
 	private boolean _suspended = false;
@@ -67,7 +66,7 @@ public class WalkInfo
 	 * Calculate next node for this WalkInfo and send debug message from given npc
 	 * @param npc NPC to debug message to be sent from
 	 */
-	public void calculateNextNode(L2Npc npc)
+	public synchronized void calculateNextNode(L2Npc npc)
 	{
 		// Check this first, within the bounds of random moving, we have no conception of "first" or "last" node
 		if (getRoute().getRepeatType() == WalkingManager.REPEAT_RANDOM)
@@ -126,8 +125,7 @@ public class WalkInfo
 					}
 				}
 			}
-			
-			else if (_currentNode == -1) // First node arrived, when direction is first <-- last
+			else if (_currentNode == WalkingManager.NO_REPEAT) // First node arrived, when direction is first <-- last
 			{
 				_currentNode = 1;
 				_forward = true;
@@ -221,5 +219,12 @@ public class WalkInfo
 	public void setWalkCheckTask(ScheduledFuture<?> val)
 	{
 		_walkCheckTask = val;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "WalkInfo [_routeName=" + _routeName + ", _walkCheckTask=" + _walkCheckTask + ", _blocked=" + _blocked + ", _suspended=" + _suspended + ", _stoppedByAttack=" + _stoppedByAttack + ", _currentNode=" + _currentNode + ", _forward=" + _forward + ", _lastActionTime=" + _lastActionTime
+			+ "]";
 	}
 }
