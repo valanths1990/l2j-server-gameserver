@@ -246,6 +246,7 @@ public class L2PlayerAI extends L2PlayableAI
 			return;
 		}
 		
+		clientStopMoving(null);
 		_actor.doAttack(target);
 	}
 	
