@@ -2657,9 +2657,9 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (exp < 0)
 		{
+			LOG.warn("For player {} is set negative amount of exp [{}]", this, exp, new IllegalArgumentException());
 			exp = 0;
 		}
-		
 		getStat().setExp(exp);
 	}
 	
@@ -5604,7 +5604,7 @@ public final class L2PcInstance extends L2Playable
 		
 		setExpBeforeDeath(getExp());
 		
-		getStat().addExp(-lostExp);
+		getStat().removeExp(lostExp);
 	}
 	
 	public boolean isPartyWaiting()

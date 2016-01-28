@@ -130,26 +130,4 @@ public final class SubClass
 		
 		_level = levelValue;
 	}
-	
-	public void incLevel()
-	{
-		if (getLevel() == _maxLevel)
-		{
-			return;
-		}
-		
-		_level++;
-		setExp(ExperienceData.getInstance().getExpForLevel(getLevel()));
-	}
-	
-	public void decLevel()
-	{
-		if (getLevel() == Config.BASE_SUBCLASS_LEVEL)
-		{
-			return;
-		}
-		
-		_level--;
-		setExp(ExperienceData.getInstance().getExpForLevel(getLevel()));
-	}
 }
