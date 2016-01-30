@@ -3728,25 +3728,25 @@ public final class Config
 		{
 			switch (cType.trim().toLowerCase())
 			{
-				case "Normal":
+				case "normal":
 					tType |= 0x01;
 					break;
-				case "Relax":
+				case "relax":
 					tType |= 0x02;
 					break;
-				case "Test":
+				case "test":
 					tType |= 0x04;
 					break;
-				case "NoLabel":
+				case "nolabel":
 					tType |= 0x08;
 					break;
-				case "Restricted":
+				case "restricted":
 					tType |= 0x10;
 					break;
-				case "Event":
+				case "event":
 					tType |= 0x20;
 					break;
-				case "Free":
+				case "free":
 					tType |= 0x40;
 					break;
 				default:
