@@ -10888,7 +10888,7 @@ public final class L2PcInstance extends L2Playable
 	{
 		for (int i = 0; i < _htmlActionCaches.length; ++i)
 		{
-			if (validateHtmlAction(_htmlActionCaches[i], action))
+			if ((_htmlActionCaches[i] != null) && validateHtmlAction(_htmlActionCaches[i], action))
 			{
 				_lastHtmlActionOriginObjId = _htmlActionOriginObjectIds[i];
 				return _lastHtmlActionOriginObjId;
