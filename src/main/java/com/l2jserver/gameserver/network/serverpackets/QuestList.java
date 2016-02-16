@@ -80,6 +80,12 @@ public class QuestList extends L2GameServerPacket
 		 * </pre>
 		 */
 		
+		// Maybe client crash on login so client and quest stay null
+		if ((_activeChar == null) || (_quests == null))
+		{
+			return;
+		}
+		
 		writeC(0x86);
 		writeH(_quests.size());
 		for (Quest q : _quests)
