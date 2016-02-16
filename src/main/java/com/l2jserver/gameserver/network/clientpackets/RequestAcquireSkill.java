@@ -120,6 +120,13 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 		
 		// Hack check. Doesn't apply to all Skill Types
 		final int prevSkillLevel = activeChar.getSkillLevel(_id);
+		if ((prevSkillLevel == -1) && (_level != 1))
+		{
+			_log.warning("Player " + activeChar.getName() + " try to cheat with jump over levels when learn skill, Id: " + _id + " level: " + _level + " prevSkillLevel: " + prevSkillLevel + "!");
+			activeChar.sendPacket(new AcquireSkillDone());
+			return;
+		}
+		
 		if ((prevSkillLevel > 0) && !((_skillType == AcquireSkillType.TRANSFER) || (_skillType == AcquireSkillType.SUBPLEDGE)))
 		{
 			if (prevSkillLevel == _level)
@@ -490,7 +497,8 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 					{
 						if (!player.destroyItemByItemId("SkillLearn", itemIdCount.getId(), itemIdCount.getCount(), trainer, true))
 						{
-							Util.handleIllegalPlayerAction(player, "Somehow player " + player.getName() + ", level " + player.getLevel() + " lose required item Id: " + itemIdCount.getId() + " to learn skill while learning skill Id: " + _id + " level " + _level + "!", IllegalActionPunishmentType.NONE);
+							Util.handleIllegalPlayerAction(player, "Somehow player " + player.getName() + ", level " + player.getLevel() + " lose required item Id: " + itemIdCount.getId() + " to learn skill while learning skill Id: " + _id + " level " + _level
+								+ "!", IllegalActionPunishmentType.NONE);
 						}
 					}
 				}
