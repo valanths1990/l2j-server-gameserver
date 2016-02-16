@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.data.sql.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -67,8 +68,9 @@ public class SummonEffectsTable
 	{
 		if ((effects != null) && !effects.isEmpty())
 		{
-			for (SummonEffect effect : effects)
+			for (Iterator<SummonEffect> it= effects.iterator();it.hasNext();)
 			{
+				final SummonEffect effect = it.next();
 				final Skill skill = effect.getSkill();
 				if ((skill != null) && (skill.getId() == skillId))
 				{
