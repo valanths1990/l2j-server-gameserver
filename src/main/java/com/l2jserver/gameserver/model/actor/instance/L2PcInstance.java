@@ -10903,13 +10903,13 @@ public final class L2PcInstance extends L2Playable
 	 * <ul>
 	 * <li>Inventory contains item</li>
 	 * <li>Item owner id == owner id</li>
-	 * <li>It isnt pet control item while mounting pet or pet summoned</li>
-	 * <li>It isnt active enchant item</li>
-	 * <li>It isnt cursed weapon/item</li>
-	 * <li>It isnt wear item</li>
+	 * <li>It isn't pet control item while mounting pet or pet summoned</li>
+	 * <li>It isn't active enchant item</li>
+	 * <li>It isn't cursed weapon/item</li>
+	 * <li>It isn't wear item</li>
 	 * </ul>
 	 * @param objectId item object id
-	 * @param action just for login porpouse
+	 * @param action just for login purpose
 	 * @return
 	 */
 	public boolean validateItemManipulation(int objectId, String action)

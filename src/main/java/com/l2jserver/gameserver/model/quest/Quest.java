@@ -2597,7 +2597,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	
 	/**
 	 * This method is called for every party member in {@link #getRandomPartyMemberState(L2PcInstance, int, int, L2Npc)} if/after all the standard checks are passed.<br>
-	 * It is intended to be overriden by the specific quest implementations.<br>
+	 * It is intended to be overridden by the specific quest implementations.<br>
 	 * It can be used in cases when there are more checks performed than simply a quest condition check,<br>
 	 * for example, if an item is required in the player's inventory.
 	 * @param qs the {@link QuestState} object of the party member
