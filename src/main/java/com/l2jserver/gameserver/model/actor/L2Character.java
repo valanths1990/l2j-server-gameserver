@@ -1442,7 +1442,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					continue;
 				}
 				
-				if (isAttackable() && obj.isPlayer() && getTarget().isAttackable())
+				if (isAttackable() && obj.isPlayer() && obj.isAttackable())
 				{
 					continue;
 				}
