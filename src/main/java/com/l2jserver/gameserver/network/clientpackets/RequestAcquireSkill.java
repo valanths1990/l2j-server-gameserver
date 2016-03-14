@@ -399,7 +399,7 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 					_log.warning("Player " + activeChar.getName() + " is trying to learn a skill that already knows, Id: " + _id + " level: " + _level + "!");
 					return false;
 				}
-				if (prevSkillLevel != (_level - 1))
+				if ((_level != 1) && (prevSkillLevel != (_level - 1)))
 				{
 					activeChar.sendPacket(SystemMessageId.PREVIOUS_LEVEL_SKILL_NOT_LEARNED);
 					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " without knowing it's previous level!", Config.DEFAULT_PUNISH);
