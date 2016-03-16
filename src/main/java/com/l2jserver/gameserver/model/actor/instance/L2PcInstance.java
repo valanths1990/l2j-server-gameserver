@@ -5434,6 +5434,7 @@ public final class L2PcInstance extends L2Playable
 			else if (targetPlayer.getPvpFlag() == 0) // Target player doesn't have karma
 			{
 				increasePkKillsAndKarma(target);
+				stopPvPFlag();
 				checkItemRestriction(); // Unequip adventurer items
 			}
 		}
