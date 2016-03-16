@@ -1488,12 +1488,8 @@ public final class CharEffectList
 					if (summonOwner.isInParty())
 					{
 						summonOwner.getParty().broadcastToPartyMembers(summonOwner, psSummon); // send to all member except summonOwner
-						summonOwner.sendPacket(ps); // now send to summonOwner
 					}
-					else
-					{
-						summonOwner.sendPacket(ps);
-					}
+					summonOwner.sendPacket(ps);
 				}
 			}
 			else if (_owner.isPlayer() && _owner.isInParty())
