@@ -5543,7 +5543,7 @@ public final class L2PcInstance extends L2Playable
 		if (getExpBeforeDeath() > 0)
 		{
 			// Restore the specified % of lost experience.
-			getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100));
+			getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100), true);
 			setExpBeforeDeath(0);
 		}
 	}
