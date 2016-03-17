@@ -1247,7 +1247,7 @@ public final class CharEffectList
 		}
 		
 		// Prevent adding and initializing buffs/effects on dead creatures.
-		if (info.getEffected().isDead())
+		if (info.getEffected().isDead() && (info.getEffector() != info.getEffector()))
 		{
 			return;
 		}
