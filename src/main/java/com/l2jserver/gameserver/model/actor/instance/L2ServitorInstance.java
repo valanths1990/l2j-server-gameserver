@@ -227,13 +227,18 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		// Clear list for overwrite
 		SummonEffectsTable.getInstance().clearServitorEffects(getOwner(), getReferenceSkill());
 		
+		final int ownerId = getOwner().getObjectId();
+		final int ownerClassId = getOwner().getClassIndex();
+		final int servitorRefSkill = getReferenceSkill();
+		
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(DELETE_SKILL_SAVE))
 		{
+			con.setAutoCommit(false);
 			// Delete all current stored effects for summon to avoid dupe
-			ps.setInt(1, getOwner().getObjectId());
-			ps.setInt(2, getOwner().getClassIndex());
-			ps.setInt(3, getReferenceSkill());
+			ps.setInt(1, ownerId);
+			ps.setInt(2, ownerClassId);
+			ps.setInt(3, servitorRefSkill);
 			ps.execute();
 			
 			int buff_index = 0;
@@ -277,23 +282,25 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 						
 						storedSkills.add(skill.getReuseHashCode());
 						
-						ps2.setInt(1, getOwner().getObjectId());
-						ps2.setInt(2, getOwner().getClassIndex());
-						ps2.setInt(3, getReferenceSkill());
+						ps2.setInt(1, ownerId);
+						ps2.setInt(2, ownerClassId);
+						ps2.setInt(3, servitorRefSkill);
 						ps2.setInt(4, skill.getId());
 						ps2.setInt(5, skill.getLevel());
 						ps2.setInt(6, info.getTime());
 						ps2.setInt(7, ++buff_index);
-						ps2.execute();
+						ps2.addBatch();
 						
 						SummonEffectsTable.getInstance().addServitorEffect(getOwner(), getReferenceSkill(), skill, info.getTime());
 					}
+					ps2.executeBatch();
 				}
 			}
+			con.commit();
 		}
 		catch (Exception e)
 		{
-			LOG.error("Could not store summon effect data: {}", e);
+			LOG.error("Could not store summon effect data for owner {},  class {}, skill {}, error {}", ownerId, ownerClassId, servitorRefSkill, e);
 		}
 	}
 	
