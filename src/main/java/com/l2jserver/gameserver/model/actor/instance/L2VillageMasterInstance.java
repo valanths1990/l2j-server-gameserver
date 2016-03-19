@@ -98,6 +98,11 @@ public class L2VillageMasterInstance extends L2NpcInstance
 	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
 	{
+		if (command.startsWith("Quest"))
+		{
+			super.onBypassFeedback(player, command);
+			return;
+		}
 		final String actualCommand = command.substring(0, command.indexOf(" "));
 		final String[] params = command.substring(command.indexOf(" ")).trim().split(" ");
 		
