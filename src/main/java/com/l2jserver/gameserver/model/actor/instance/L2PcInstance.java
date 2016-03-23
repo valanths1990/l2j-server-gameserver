@@ -14351,4 +14351,99 @@ public final class L2PcInstance extends L2Playable
 		}
 		return _servitorShare.get(stat);
 	}
+	
+	public boolean canSummonTarget(L2PcInstance target)
+	{
+		if (this == target)
+		{
+			return false;
+		}
+		
+		if (target.isAlikeDead())
+		{
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_DEAD_AT_THE_MOMENT_AND_CANNOT_BE_SUMMONED);
+			sm.addPcName(target);
+			sendPacket(sm);
+			return false;
+		}
+		
+		if (target.isInStoreMode())
+		{
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_CURRENTLY_TRADING_OR_OPERATING_PRIVATE_STORE_AND_CANNOT_BE_SUMMONED);
+			sm.addPcName(target);
+			sendPacket(sm);
+			return false;
+		}
+		
+		if (target.isRooted() || target.isInCombat())
+		{
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_ENGAGED_IN_COMBAT_AND_CANNOT_BE_SUMMONED);
+			sm.addPcName(target);
+			sendPacket(sm);
+			return false;
+		}
+		
+		if (target.isInOlympiadMode() || OlympiadManager.getInstance().isRegisteredInComp(target))
+		{
+			sendPacket(SystemMessageId.YOU_CANNOT_SUMMON_PLAYERS_WHO_ARE_IN_OLYMPIAD);
+			return false;
+		}
+		
+		if (target.isFestivalParticipant() || target.isFlyingMounted() || target.isCombatFlagEquipped() || !TvTEvent.onEscapeUse(target.getObjectId()))
+		{
+			sendPacket(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING);
+			return false;
+		}
+		
+		if (target.inObserverMode())
+		{
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_STATE_FORBIDS_SUMMONING);
+			sm.addCharName(target);
+			sendPacket(sm);
+			return false;
+		}
+		
+		if (target.isInsideZone(ZoneId.NO_SUMMON_FRIEND) || target.isInsideZone(ZoneId.JAIL))
+		{
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IN_SUMMON_BLOCKING_AREA);
+			sm.addString(target.getName());
+			sendPacket(sm);
+			return false;
+		}
+		
+		if (isInsideZone(ZoneId.NO_SUMMON_FRIEND) || isInsideZone(ZoneId.JAIL) || isFlyingMounted())
+		{
+			sendPacket(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING);
+			return false;
+		}
+		
+		if (getInstanceId() > 0)
+		{
+			if (!Config.ALLOW_SUMMON_IN_INSTANCE || !InstanceManager.getInstance().getInstance(getInstanceId()).isSummonAllowed())
+			{
+				sendPacket(SystemMessageId.YOU_MAY_NOT_SUMMON_FROM_YOUR_CURRENT_LOCATION);
+				return false;
+			}
+		}
+		
+		// TODO: on retail character can enter 7s dungeon with summon friend, but should be teleported away by mobs, because currently this is not working in L2J we do not allowing summoning.
+		if (isIn7sDungeon())
+		{
+			int targetCabal = SevenSigns.getInstance().getPlayerCabal(target.getObjectId());
+			if (SevenSigns.getInstance().isSealValidationPeriod())
+			{
+				if (targetCabal != SevenSigns.getInstance().getCabalHighestScore())
+				{
+					sendPacket(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING);
+					return false;
+				}
+			}
+			else if (targetCabal == SevenSigns.CABAL_NULL)
+			{
+				sendPacket(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING);
+				return false;
+			}
+		}
+		return true;
+	}
 }
