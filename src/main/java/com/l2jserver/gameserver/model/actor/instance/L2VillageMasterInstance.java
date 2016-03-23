@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.model.actor.instance;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -98,86 +99,78 @@ public class L2VillageMasterInstance extends L2NpcInstance
 	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
 	{
-		if (command.startsWith("Quest"))
-		{
-			super.onBypassFeedback(player, command);
-			return;
-		}
-		final String actualCommand = command.substring(0, command.indexOf(" "));
-		final String[] params = command.substring(command.indexOf(" ")).trim().split(" ");
 		
-		switch (actualCommand)
+		final StringTokenizer st = new StringTokenizer(command, " ");
+		
+		switch (st.nextToken())
 		{
 			case "create_clan":
 			{
-				if ((params.length != 1) || !isValidName(params[0]))
+				if (st.hasMoreTokens())
 				{
-					player.sendPacket(SystemMessageId.CLAN_NAME_INCORRECT);
-					return;
+					final String clanName = st.nextToken();
+					
+					if (!isValidName(clanName))
+					{
+						player.sendPacket(SystemMessageId.CLAN_NAME_INCORRECT);
+						return;
+					}
+					ClanTable.getInstance().createClan(player, clanName);
 				}
-				
-				ClanTable.getInstance().createClan(player, params[0]);
 				break;
 			}
 			case "create_academy":
 			{
-				if (params.length != 1)
+				if (st.hasMoreTokens())
 				{
-					return;
+					createSubPledge(player, st.nextToken(), null, L2Clan.SUBUNIT_ACADEMY, 5);
 				}
-				createSubPledge(player, params[0], null, L2Clan.SUBUNIT_ACADEMY, 5);
 				break;
 			}
 			case "rename_pledge":
 			{
-				if (params.length != 2)
+				if (st.countTokens() > 2)
 				{
-					return;
+					renameSubPledge(player, Integer.parseInt(st.nextToken()), st.nextToken());
 				}
-				renameSubPledge(player, Integer.parseInt(params[0]), params[1]);
 				break;
 			}
 			case "create_royal":
 			{
-				if (params.length != 2)
+				if (st.countTokens() > 2)
 				{
-					return;
+					createSubPledge(player, st.nextToken(), st.nextToken(), L2Clan.SUBUNIT_ROYAL1, 6);
 				}
-				createSubPledge(player, params[0], params[1], L2Clan.SUBUNIT_ROYAL1, 6);
 				break;
 			}
 			case "create_knight":
 			{
-				if (params.length != 2)
+				if (st.countTokens() > 2)
 				{
-					return;
+					createSubPledge(player, st.nextToken(), st.nextToken(), L2Clan.SUBUNIT_KNIGHT1, 7);
 				}
-				createSubPledge(player, params[0], params[1], L2Clan.SUBUNIT_KNIGHT1, 7);
 				break;
 			}
 			case "assign_subpl_leader":
 			{
-				if (params.length != 2)
+				if (st.countTokens() > 2)
 				{
-					return;
+					assignSubPledgeLeader(player, st.nextToken(), st.nextToken());
 				}
-				assignSubPledgeLeader(player, params[0], params[1]);
 				break;
 			}
 			case "create_ally":
 			{
-				if (params.length != 1)
-				{
-					return;
-				}
-				
-				if (player.getClan() == null)
+				if (!player.isClanLeader())
 				{
 					player.sendPacket(SystemMessageId.ONLY_CLAN_LEADER_CREATE_ALLIANCE);
 				}
 				else
 				{
-					player.getClan().createAlly(player, params[0]);
+					if (st.hasMoreTokens())
+					{
+						player.getClan().createAlly(player, st.nextToken());
+					}
 				}
 				break;
 			}
@@ -193,28 +186,30 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			}
 			case "change_clan_leader":
 			{
-				if (params.length != 1)
-				{
-					return;
-				}
-				
 				if (!player.isClanLeader())
 				{
 					player.sendPacket(SystemMessageId.YOU_ARE_NOT_AUTHORIZED_TO_DO_THAT);
 					return;
 				}
 				
-				if (player.getName().equalsIgnoreCase(params[0]))
+				if (!st.hasMoreTokens())
+				{
+					break;
+				}
+				
+				final String newLeaderName = st.nextToken();
+				
+				if (player.getName().equalsIgnoreCase(newLeaderName))
 				{
 					return;
 				}
 				
 				final L2Clan clan = player.getClan();
-				final L2ClanMember member = clan.getClanMember(params[0]);
+				final L2ClanMember member = clan.getClanMember(newLeaderName);
 				if (member == null)
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DOES_NOT_EXIST);
-					sm.addString(params[0]);
+					sm.addString(newLeaderName);
 					player.sendPacket(sm);
 					return;
 				}
