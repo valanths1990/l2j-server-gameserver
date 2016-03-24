@@ -51,7 +51,7 @@ public class ConditionTargetMyPartyExceptMe extends Condition
 				sm.addSkillName(skill);
 				effector.sendPacket(sm);
 			}
-			isPartyMember = true;
+			isPartyMember = false;
 		}
 		else if (player == effected)
 		{
