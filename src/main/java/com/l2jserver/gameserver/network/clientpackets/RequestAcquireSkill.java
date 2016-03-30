@@ -118,26 +118,9 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 			return;
 		}
 		
-		// Hack check. Doesn't apply to all Skill Types
-		final int prevSkillLevel = activeChar.getSkillLevel(_id);
-		if ((prevSkillLevel > 0) && !((_skillType == AcquireSkillType.TRANSFER) || (_skillType == AcquireSkillType.SUBPLEDGE)))
-		{
-			if (prevSkillLevel == _level)
-			{
-				_log.warning("Player " + activeChar.getName() + " is trying to learn a skill that already knows, Id: " + _id + " level: " + _level + "!");
-				return;
-			}
-			else if (prevSkillLevel != (_level - 1))
-			{
-				// The previous level skill has not been learned.
-				activeChar.sendPacket(SystemMessageId.PREVIOUS_LEVEL_SKILL_NOT_LEARNED);
-				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " without knowing it's previous level!", IllegalActionPunishmentType.NONE);
-				return;
-			}
-		}
-		
 		final L2SkillLearn s = SkillTreesData.getInstance().getSkillLearn(_skillType, _id, _level, activeChar);
-		if (s == null)
+		
+		if (!canBeLearn(activeChar, skill, s))
 		{
 			return;
 		}
@@ -229,25 +212,7 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 			}
 			case SUBPLEDGE:
 			{
-				if (!activeChar.isClanLeader() || !activeChar.hasClanPrivilege(ClanPrivilege.CL_TROOPS_FAME))
-				{
-					return;
-				}
-				
 				final L2Clan clan = activeChar.getClan();
-				if ((clan.getFortId() == 0) && (clan.getCastleId() == 0))
-				{
-					return;
-				}
-				
-				// Hack check. Check if SubPledge can accept the new skill:
-				if (!clan.isLearnableSubPledgeSkill(skill, _subType))
-				{
-					activeChar.sendPacket(SystemMessageId.SQUAD_SKILL_ALREADY_ACQUIRED);
-					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " without knowing it's previous level!", IllegalActionPunishmentType.NONE);
-					return;
-				}
-				
 				final int repCost = s.getLevelUpSp();
 				if (clan.getReputationScore() < repCost)
 				{
@@ -294,23 +259,6 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 			}
 			case SUBCLASS:
 			{
-				// Hack check.
-				if (activeChar.isSubClassActive())
-				{
-					activeChar.sendPacket(SystemMessageId.SKILL_NOT_FOR_SUBCLASS);
-					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " while Sub-Class is active!", IllegalActionPunishmentType.NONE);
-					return;
-				}
-				
-				// Certification Skills - Exploit fix
-				if ((prevSkillLevel == -1) && (_level > 1))
-				{
-					// The previous level skill has not been learned.
-					activeChar.sendPacket(SystemMessageId.PREVIOUS_LEVEL_SKILL_NOT_LEARNED);
-					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " without knowing it's previous level!", IllegalActionPunishmentType.NONE);
-					return;
-				}
-				
 				QuestState st = activeChar.getQuestState("SubClassSkills");
 				if (st == null)
 				{
@@ -385,6 +333,82 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 				break;
 			}
 		}
+	}
+	
+	/**
+	 * Check if player try to exploit by add extra levels on skill learn.
+	 * @param activeChar the player
+	 * @param skill the skill
+	 * @param skl the skill for learn
+	 * @return {@code true} if skill id and level is fine, otherwise {@code false}
+	 */
+	private boolean canBeLearn(L2PcInstance activeChar, Skill skill, L2SkillLearn skl)
+	{
+		final int prevSkillLevel = activeChar.getSkillLevel(_id);
+		
+		switch (_skillType)
+		{
+			case SUBPLEDGE:
+			{
+				L2Clan clan = activeChar.getClan();
+				
+				if (clan == null)
+				{
+					return false;
+				}
+				
+				if (!activeChar.isClanLeader() || !activeChar.hasClanPrivilege(ClanPrivilege.CL_TROOPS_FAME))
+				{
+					return false;
+				}
+				
+				if ((clan.getFortId() == 0) && (clan.getCastleId() == 0))
+				{
+					return false;
+				}
+				
+				if (!clan.isLearnableSubPledgeSkill(skill, _subType))
+				{
+					activeChar.sendPacket(SystemMessageId.SQUAD_SKILL_ALREADY_ACQUIRED);
+					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " without knowing it's previous level!", Config.DEFAULT_PUNISH);
+					return false;
+				}
+				break;
+			}
+			case TRANSFER:
+			{
+				if (skl == null)
+				{
+					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting transfer skill Id: " + _id + " level " + _level + " what is not included in transfer skills!", Config.DEFAULT_PUNISH);
+				}
+				break;
+			}
+			case SUBCLASS:
+			{
+				if (activeChar.isSubClassActive())
+				{
+					activeChar.sendPacket(SystemMessageId.SKILL_NOT_FOR_SUBCLASS);
+					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " while Sub-Class is active!", Config.DEFAULT_PUNISH);
+					return false;
+				}
+			}
+			default:
+			{
+				if (prevSkillLevel == _level)
+				{
+					_log.warning("Player " + activeChar.getName() + " is trying to learn a skill that already knows, Id: " + _id + " level: " + _level + "!");
+					return false;
+				}
+				if ((_level != 1) && (prevSkillLevel != (_level - 1)))
+				{
+					activeChar.sendPacket(SystemMessageId.PREVIOUS_LEVEL_SKILL_NOT_LEARNED);
+					Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is requesting skill Id: " + _id + " level " + _level + " without knowing it's previous level!", Config.DEFAULT_PUNISH);
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	public static void showSubUnitSkillList(L2PcInstance activeChar)
@@ -490,7 +514,8 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 					{
 						if (!player.destroyItemByItemId("SkillLearn", itemIdCount.getId(), itemIdCount.getCount(), trainer, true))
 						{
-							Util.handleIllegalPlayerAction(player, "Somehow player " + player.getName() + ", level " + player.getLevel() + " lose required item Id: " + itemIdCount.getId() + " to learn skill while learning skill Id: " + _id + " level " + _level + "!", IllegalActionPunishmentType.NONE);
+							Util.handleIllegalPlayerAction(player, "Somehow player " + player.getName() + ", level " + player.getLevel() + " lose required item Id: " + itemIdCount.getId() + " to learn skill while learning skill Id: " + _id + " level " + _level
+								+ "!", IllegalActionPunishmentType.NONE);
 						}
 					}
 				}

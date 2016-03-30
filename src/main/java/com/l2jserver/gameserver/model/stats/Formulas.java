@@ -1184,18 +1184,13 @@ public final class Formulas
 	
 	/**
 	 * Calculate delay (in milliseconds) for skills cast
-	 * @param attacker
-	 * @param skill
+	 * @param speed
 	 * @param skillTime
 	 * @return
 	 */
-	public static final int calcAtkSpd(L2Character attacker, Skill skill, double skillTime)
+	public static final double calcAtkSpd(double speed, double skillTime)
 	{
-		if (skill.isMagic())
-		{
-			return (int) ((skillTime / attacker.getMAtkSpd()) * 333);
-		}
-		return (int) ((skillTime / attacker.getPAtkSpd()) * 300);
+		return (skillTime / speed) * 333;
 	}
 	
 	/**

@@ -19,29 +19,35 @@
 package com.l2jserver.gameserver.model.holders;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
  * @author UnAfraid
  */
 public class SummonRequestHolder
 {
-	private final L2PcInstance _target;
-	private final Skill _skill;
+	private final L2PcInstance _requester;
+	private final int _itemId;
+	private final int _itemCount;
 	
-	public SummonRequestHolder(L2PcInstance destination, Skill skill)
+	public SummonRequestHolder(L2PcInstance requester, int itemId, int itemCount)
 	{
-		_target = destination;
-		_skill = skill;
+		_requester = requester;
+		_itemId = itemId;
+		_itemCount = itemCount;
 	}
 	
-	public L2PcInstance getTarget()
+	public L2PcInstance getRequester()
 	{
-		return _target;
+		return _requester;
 	}
 	
-	public Skill getSkill()
+	public int getItemId()
 	{
-		return _skill;
+		return _itemId;
+	}
+	
+	public int getItemCount()
+	{
+		return _itemCount;
 	}
 }

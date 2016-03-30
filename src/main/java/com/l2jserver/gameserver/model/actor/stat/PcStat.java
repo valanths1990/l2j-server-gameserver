@@ -83,6 +83,11 @@ public class PcStat extends PlayableStat
 	@Override
 	public boolean addExp(long value)
 	{
+		return addExp(value, false);
+	}
+	
+	public boolean addExp(long exp, boolean isRessurect)
+	{
 		L2PcInstance activeChar = getActiveChar();
 		
 		// Allowed to gain exp?
@@ -91,15 +96,41 @@ public class PcStat extends PlayableStat
 			return false;
 		}
 		
-		if (!super.addExp(value))
+		// Exp from resurrect don't remove karma
+		if (!super.addExp(exp))
 		{
 			return false;
 		}
 		
-		// Set new karma
+		if (!isRessurect)
+		{
+			changeKarma(exp);
+		}
+		
+		// EXP status update currently not used in retail
+		activeChar.sendPacket(new UserInfo(activeChar));
+		activeChar.sendPacket(new ExBrExtraUserInfo(activeChar));
+		return true;
+	}
+	
+	@Override
+	public boolean removeExp(long exp)
+	{
+		if (!super.removeExp(exp))
+		{
+			return false;
+		}
+		changeKarma(exp);
+		return true;
+	}
+	
+	public void changeKarma(long exp)
+	{
+		L2PcInstance activeChar = getActiveChar();
+		
 		if (!activeChar.isCursedWeaponEquipped() && (activeChar.getKarma() > 0) && (activeChar.isGM() || !activeChar.isInsideZone(ZoneId.PVP)))
 		{
-			int karmaLost = Formulas.calculateKarmaLost(activeChar, value);
+			int karmaLost = Formulas.calculateKarmaLost(activeChar, exp);
 			if (karmaLost > 0)
 			{
 				activeChar.setKarma(activeChar.getKarma() - karmaLost);
@@ -108,11 +139,6 @@ public class PcStat extends PlayableStat
 				activeChar.sendPacket(msg);
 			}
 		}
-		
-		// EXP status update currently not used in retail
-		activeChar.sendPacket(new UserInfo(activeChar));
-		activeChar.sendPacket(new ExBrExtraUserInfo(activeChar));
-		return true;
 	}
 	
 	public boolean addExpAndSp(long addToExp, int addToSp, boolean useBonuses)

@@ -30,6 +30,7 @@ import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.holders.DoorRequestHolder;
 import com.l2jserver.gameserver.model.holders.SummonRequestHolder;
 import com.l2jserver.gameserver.network.SystemMessageId;
+import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.GMAudit;
 
 /**
@@ -101,9 +102,23 @@ public final class DlgAnswer extends L2GameClientPacket
 		else if (_messageId == SystemMessageId.C1_WISHES_TO_SUMMON_YOU_FROM_S2_DO_YOU_ACCEPT.getId())
 		{
 			final SummonRequestHolder holder = activeChar.removeScript(SummonRequestHolder.class);
-			if ((_answer == 1) && (holder != null) && (holder.getTarget().getObjectId() == _requesterId))
+			if ((_answer == 1) && (holder != null) && holder.getRequester().canSummonTarget(activeChar) && (holder.getRequester().getObjectId() == _requesterId))
 			{
-				activeChar.teleToLocation(holder.getTarget().getLocation(), true);
+				if ((holder.getItemId() != 0) && (holder.getItemCount() != 0))
+				{
+					if (activeChar.getInventory().getInventoryItemCount(holder.getItemId(), 0) < holder.getItemCount())
+					{
+						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_REQUIRED_FOR_SUMMONING);
+						sm.addItemName(holder.getItemId());
+						activeChar.sendPacket(sm);
+						return;
+					}
+					activeChar.getInventory().destroyItemByItemId("Consume", holder.getItemId(), holder.getItemCount(), activeChar, activeChar);
+					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED);
+					sm.addItemName(holder.getItemId());
+					activeChar.sendPacket(sm);
+				}
+				activeChar.teleToLocation(holder.getRequester().getLocation(), true);
 			}
 		}
 		else if (_messageId == SystemMessageId.WOULD_YOU_LIKE_TO_OPEN_THE_GATE.getId())

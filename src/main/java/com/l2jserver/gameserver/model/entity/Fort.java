@@ -1003,7 +1003,7 @@ public final class Fort extends AbstractResidence
 	
 	/**
 	 * @return Returns state of fortress.<BR>
-	 * <BR>
+	 *         <BR>
 	 *         0 - not decided yet<BR>
 	 *         1 - independent<BR>
 	 *         2 - contracted with castle<BR>
@@ -1014,7 +1014,8 @@ public final class Fort extends AbstractResidence
 	}
 	
 	/**
-	 * @param state <ul>
+	 * @param state
+	 *            <ul>
 	 *            <li>0 - not decided yet</li>
 	 *            <li>1 - independent</li>
 	 *            <li>2 - contracted with castle</li>
@@ -1151,7 +1152,6 @@ public final class Fort extends AbstractResidence
 		for (L2Spawn spawnDat : _specialEnvoys)
 		{
 			spawnDat.doSpawn();
-			spawnDat.startRespawn();
 		}
 	}
 	

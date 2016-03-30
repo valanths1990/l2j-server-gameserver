@@ -44,6 +44,7 @@ public class ConditionPlayerCallPc extends Condition
 	{
 		boolean canCallPlayer = true;
 		final L2PcInstance player = effector.getActingPlayer();
+		
 		if (player == null)
 		{
 			canCallPlayer = false;

@@ -1446,7 +1446,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					continue;
 				}
 				
-				if (isAttackable() && obj.isPlayer() && getTarget().isAttackable())
+				if (isAttackable() && obj.isPlayer() && obj.isAttackable())
 				{
 					continue;
 				}
@@ -1760,32 +1760,25 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		int magicId = skill.getId();
 		
 		// Get the Base Casting Time of the Skills.
-		int skillTime = (skill.getHitTime() + skill.getCoolTime());
+		double skillAnimTime = skill.getHitTime();
 		
 		if (!skill.isChanneling() || (skill.getChannelingSkillId() == 0))
 		{
 			// Calculate the Casting Time of the "Non-Static" Skills (with caster PAtk/MAtkSpd).
 			if (!skill.isStatic())
 			{
-				skillTime = Formulas.calcAtkSpd(this, skill, skillTime);
+				skillAnimTime = Formulas.calcAtkSpd(skill.isMagic() ? getMAtkSpd() : getPAtkSpd(), skillAnimTime);
 			}
 			// Calculate the Casting Time of Magic Skills (reduced in 40% if using SPS/BSPS)
 			if (skill.isMagic() && (isChargedShot(ShotType.SPIRITSHOTS) || isChargedShot(ShotType.BLESSED_SPIRITSHOTS)))
 			{
-				skillTime = (int) (0.6 * skillTime);
+				skillAnimTime = (int) (skillAnimTime / 1.4);
 			}
 		}
 		
-		// Avoid broken Casting Animation.
-		// Client can't handle less than 550ms Casting Animation in Magic Skills with more than 550ms base.
-		if (skill.isMagic() && ((skill.getHitTime() + skill.getCoolTime()) > 550) && (skillTime < 550))
+		if ((skillAnimTime < 500) && (skill.getHitTime() > 500))
 		{
-			skillTime = 550;
-		}
-		// Client can't handle less than 500ms Casting Animation in Physical Skills with 500ms base or more.
-		else if (!skill.isStatic() && ((skill.getHitTime() + skill.getCoolTime()) >= 500) && (skillTime < 500))
-		{
-			skillTime = 500;
+			skillAnimTime = 500;
 		}
 		
 		// queue herbs and potions
@@ -1803,7 +1796,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		else
 		{
 			setIsCastingNow(true);
-			_castInterruptTime = -2 + GameTimeController.getInstance().getGameTicks() + (skillTime / GameTimeController.MILLIS_IN_TICK);
+			_castInterruptTime = -2 + GameTimeController.getInstance().getGameTicks() + ((int) skillAnimTime / GameTimeController.MILLIS_IN_TICK);
 			setLastSkillCast(skill);
 		}
 		
@@ -1900,7 +1893,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		// Send a Server->Client packet MagicSkillUser with target, displayId, level, skillTime, reuseDelay
 		// to the L2Character AND to all L2PcInstance in the _KnownPlayers of the L2Character
-		broadcastPacket(new MagicSkillUse(this, target, skill.getDisplayId(), skill.getDisplayLevel(), skillTime, reuseDelay));
+		broadcastPacket(new MagicSkillUse(this, target, skill.getDisplayId(), skill.getDisplayLevel(), (int) skillAnimTime, reuseDelay));
 		
 		// Send a system message to the player.
 		if (isPlayer() && !skill.isAbnormalInstant())
@@ -1940,20 +1933,25 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			ThreadPoolManager.getInstance().scheduleEffect(new FlyToLocationTask(this, target, skill), 50);
 		}
 		
-		MagicUseTask mut = new MagicUseTask(this, targets, skill, skillTime, simultaneously);
+		MagicUseTask mut = new MagicUseTask(this, targets, skill, (int) skillAnimTime, simultaneously);
 		
 		// launch the magic in skillTime milliseconds
-		if (skillTime > 0)
+		if (skillAnimTime > 0)
 		{
 			// Send a Server->Client packet SetupGauge with the color of the gauge and the casting time
 			if (isPlayer() && !simultaneously)
 			{
-				sendPacket(new SetupGauge(SetupGauge.BLUE, skillTime));
+				sendPacket(new SetupGauge(SetupGauge.BLUE, (int) skillAnimTime));
 			}
 			
 			if (skill.isChanneling() && (skill.getChannelingSkillId() > 0))
 			{
 				getSkillChannelizer().startChanneling(skill);
+			}
+			else if (skill.isContinuous())
+			{
+				// For client animation reasons (party buffs especially) 300 ms before!
+				skillAnimTime -= 300;
 			}
 			
 			if (simultaneously)
@@ -1964,10 +1962,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					future.cancel(true);
 					_skillCast2 = null;
 				}
-				
-				// Create a task MagicUseTask to launch the MagicSkill at the end of the casting time (skillTime)
-				// For client animation reasons (party buffs especially) 400 ms before!
-				_skillCast2 = ThreadPoolManager.getInstance().scheduleEffect(mut, skillTime - 400);
+				_skillCast2 = ThreadPoolManager.getInstance().scheduleEffect(mut, (int) skillAnimTime);
 			}
 			else
 			{
@@ -1977,10 +1972,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					future.cancel(true);
 					_skillCast = null;
 				}
-				
-				// Create a task MagicUseTask to launch the MagicSkill at the end of the casting time (skillTime)
-				// For client animation reasons (party buffs especially) 400 ms before!
-				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(mut, skillTime - 400);
+				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(mut, (int) skillAnimTime);
 			}
 		}
 		else
