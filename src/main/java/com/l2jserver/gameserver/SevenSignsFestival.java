@@ -916,7 +916,7 @@ public class SevenSignsFestival implements SpawnListener
 		// at the specified time, then invoke it automatically after every cycle.
 		if (_managerInstance != null)
 		{
-			return; // already stared
+			return; // already started
 		}
 		_managerInstance = new FestivalManager();
 		setNextFestivalStart(Config.ALT_FESTIVAL_MANAGER_START + FESTIVAL_SIGNUP_TIME);
