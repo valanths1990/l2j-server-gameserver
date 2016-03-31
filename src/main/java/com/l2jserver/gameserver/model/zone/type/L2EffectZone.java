@@ -229,11 +229,14 @@ public class L2EffectZone extends L2ZoneType
 	
 	public int getSkillLevel(int skillId)
 	{
-		if ((_skills == null) || !_skills.containsKey(skillId))
+		synchronized (_skills)
 		{
-			return 0;
+			if ((_skills == null) || !_skills.containsKey(skillId))
+			{
+				return 0;
+			}
+			return _skills.get(skillId);
 		}
-		return _skills.get(skillId);
 	}
 	
 	private final class ApplySkill implements Runnable
