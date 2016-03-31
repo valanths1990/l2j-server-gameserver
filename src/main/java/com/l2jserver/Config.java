@@ -2492,7 +2492,9 @@ public final class Config
 				{
 					try
 					{
-						L2JMOD_DUALBOX_CHECK_WHITELIST.put(InetAddress.getByName(entrySplit[0]).hashCode(), Integer.parseInt(entrySplit[1]));
+						int num = Integer.parseInt(entrySplit[1]);
+						num = (num == 0) ? -1 : num;
+						L2JMOD_DUALBOX_CHECK_WHITELIST.put(InetAddress.getByName(entrySplit[0]).hashCode(), num);
 					}
 					catch (UnknownHostException e)
 					{
