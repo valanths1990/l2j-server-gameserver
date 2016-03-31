@@ -229,7 +229,7 @@ public class L2EffectZone extends L2ZoneType
 	
 	public int getSkillLevel(int skillId)
 	{
-		synchronized (_skills)
+		synchronized (this)
 		{
 			if ((_skills == null) || !_skills.containsKey(skillId))
 			{
