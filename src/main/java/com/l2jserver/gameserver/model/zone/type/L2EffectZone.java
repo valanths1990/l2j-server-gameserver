@@ -229,14 +229,8 @@ public class L2EffectZone extends L2ZoneType
 	
 	public int getSkillLevel(int skillId)
 	{
-		synchronized (this)
-		{
-			if ((_skills == null) || !_skills.containsKey(skillId))
-			{
-				return 0;
-			}
-			return _skills.get(skillId);
-		}
+		final Map<Integer, Integer> skills = _skills;
+		return skills != null ? skills.getOrDefault(skillId, 0) : 0;
 	}
 	
 	private final class ApplySkill implements Runnable
