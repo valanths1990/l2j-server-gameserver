@@ -4749,6 +4749,7 @@ public final class L2PcInstance extends L2Playable
 			setQueuedSkill(null, false, false);
 			_transformation.onUntransform(this);
 			_transformation = null;
+			getEffectList().stopAllToggles(false);
 			getEffectList().stopSkillEffects(false, AbnormalType.TRANSFORM);
 			sendSkillList();
 			sendPacket(new SkillCoolTime(this));
