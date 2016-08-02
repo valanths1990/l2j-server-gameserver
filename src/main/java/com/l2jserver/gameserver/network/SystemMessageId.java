@@ -15171,6 +15171,12 @@ public final class SystemMessageId
 	public static final SystemMessageId SAFE_ENCHANT_FAILED = new SystemMessageId(6004);
 	
 	/**
+	 * ID: 6050<br>
+	 * Message: If you have a Maestro's Key, you can use it to open the treasure chest.
+	 */
+	public static final SystemMessageId IF_YOU_HAVE_A_MAESTROS_KEY_YOU_CAN_USE_IT_TO_OPEN_THE_TREASURE_CHEST = new SystemMessageId(6050);
+	
+	/**
 	 * ID: 6501<br>
 	 * Message: You cannot bookmark this location because you do not have a My Teleport Flag.
 	 */
