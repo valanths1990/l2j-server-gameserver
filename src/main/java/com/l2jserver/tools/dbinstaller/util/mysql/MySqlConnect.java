@@ -18,11 +18,16 @@
  */
 package com.l2jserver.tools.dbinstaller.util.mysql;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Formatter;
+import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.swing.JOptionPane;
 
@@ -31,65 +36,57 @@ import javax.swing.JOptionPane;
  */
 public class MySqlConnect
 {
-	Connection con = null;
+	private Connection con = null;
 	
 	public MySqlConnect(String host, String port, String user, String password, String db, boolean console)
 	{
 		try (Formatter form = new Formatter())
 		{
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			final String formattedText = form.format("jdbc:mysql://%1$s:%2$s", host, port).toString();
-			con = DriverManager.getConnection(formattedText, user, password);
+			String url = form.format("jdbc:mysql://%s:%s", host, port).toString();
+			Driver driver = DriverManager.getDriver(url);
+			Properties info = new Properties();
+			info.put("user", user);
+			info.put("password", password);
+			info.put("useSSL", "false");
+			info.put("serverTimezone", TimeZone.getDefault().getID());
+			con = driver.connect(url, info);
+		}
+		catch (Throwable t)
+		{
+			if (console)
+			{
+				t.printStackTrace();
+			}
+			else
+			{
+				StringWriter writer = new StringWriter();
+				try (PrintWriter pw = new PrintWriter(writer))
+				{
+					t.printStackTrace(pw);
+					JOptionPane.showMessageDialog(null, "Failed to establish mysql connection!\n\n" + writer.toString(), "MySql Connection", JOptionPane.ERROR_MESSAGE);
+				}
+			}
 			
-			try (Statement s = con.createStatement())
-			{
-				s.execute("CREATE DATABASE IF NOT EXISTS `" + db + "`");
-				s.execute("USE `" + db + "`");
-			}
+			return;
 		}
-		catch (SQLException e)
+		
+		try (Statement s = con.createStatement())
+		{
+			s.execute("CREATE DATABASE IF NOT EXISTS `" + db + "`");
+			s.execute("USE `" + db + "`");
+		}
+		catch (Throwable t)
 		{
 			if (console)
 			{
-				e.printStackTrace();
+				t.printStackTrace();
 			}
 			else
 			{
-				JOptionPane.showMessageDialog(null, "MySQL Error: " + e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Failed to ensure mysql database " + db + "!\n\n" + t.toString(), "MySql Connection", JOptionPane.ERROR_MESSAGE);
 			}
-		}
-		catch (InstantiationException e)
-		{
-			if (console)
-			{
-				e.printStackTrace();
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(null, "Instantiation Exception: " + e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		catch (IllegalAccessException e)
-		{
-			if (console)
-			{
-				e.printStackTrace();
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(null, "Illegal Access: " + e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		catch (ClassNotFoundException e)
-		{
-			if (console)
-			{
-				e.printStackTrace();
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(null, "Cannot find MySQL Connector: " + e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-			}
+			
+			return;
 		}
 	}
 	
