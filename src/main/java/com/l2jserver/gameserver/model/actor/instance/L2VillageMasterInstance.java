@@ -129,7 +129,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			}
 			case "rename_pledge":
 			{
-				if (st.countTokens() > 2)
+				if (st.countTokens() > 1)
 				{
 					renameSubPledge(player, Integer.parseInt(st.nextToken()), st.nextToken());
 				}
@@ -137,7 +137,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			}
 			case "create_royal":
 			{
-				if (st.countTokens() > 2)
+				if (st.countTokens() > 1)
 				{
 					createSubPledge(player, st.nextToken(), st.nextToken(), L2Clan.SUBUNIT_ROYAL1, 6);
 				}
@@ -145,7 +145,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			}
 			case "create_knight":
 			{
-				if (st.countTokens() > 2)
+				if (st.countTokens() > 1)
 				{
 					createSubPledge(player, st.nextToken(), st.nextToken(), L2Clan.SUBUNIT_KNIGHT1, 7);
 				}
@@ -153,7 +153,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			}
 			case "assign_subpl_leader":
 			{
-				if (st.countTokens() > 2)
+				if (st.countTokens() > 1)
 				{
 					assignSubPledgeLeader(player, st.nextToken(), st.nextToken());
 				}
