@@ -28,6 +28,8 @@ dependencies {
 	compile 'org.slf4j:slf4j-jdk14:1.7.21'
 	compile fileTree(dir: 'dist/libs', include: '*.jar')
 	testCompile 'org.testng:testng:6.9.10'
+	testCompile 'org.mockito:mockito-all:2.0.2-beta'
+	testCompile 'com.beust:jcommander:1.48'
 }
 
 def generalManifest = manifest {

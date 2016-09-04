@@ -1182,15 +1182,30 @@ public final class Formulas
 		return (int) (470000 / rate);
 	}
 	
-	/**
-	 * Calculate delay (in milliseconds) for skills cast
-	 * @param speed
-	 * @param skillTime
-	 * @return
-	 */
-	public static final double calcAtkSpd(double speed, double skillTime)
+	public static double calcCastTime(L2Character character, Skill skill)
 	{
-		return (skillTime / speed) * 333;
+		double skillAnimTime = skill.getHitTime();
+		if (!skill.isChanneling() || (skill.getChannelingSkillId() == 0))
+		{
+			// Calculate the Casting Time of the "Non-Static" Skills (with caster PAtk/MAtkSpd).
+			if (!skill.isStatic())
+			{
+				final double speed = skill.isMagic() ? character.getMAtkSpd() : character.getPAtkSpd();
+				skillAnimTime = (skillAnimTime / speed) * 333;
+			}
+			
+			// Calculate the Casting Time of Magic Skills (reduced in 40% if using SPS/BSPS)
+			if (skill.isMagic() && (character.isChargedShot(ShotType.SPIRITSHOTS) || character.isChargedShot(ShotType.BLESSED_SPIRITSHOTS)))
+			{
+				skillAnimTime = (int) (skillAnimTime / 1.4);
+			}
+			
+			if ((skillAnimTime < 500) && (skill.getHitTime() > 500))
+			{
+				skillAnimTime = 500.0;
+			}
+		}
+		return skillAnimTime;
 	}
 	
 	/**

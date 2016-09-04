@@ -69,7 +69,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.Rnd;
 
-public final class Skill implements IIdentifiable
+public class Skill implements IIdentifiable
 {
 	private static final Logger _log = Logger.getLogger(Skill.class.getName());
 	
