@@ -1,0 +1,15 @@
+box: openjdk
+
+dev:
+  steps:
+    - script:
+      name: run gradle
+      code: |
+        ./gradlew bootRun
+
+build:
+  steps:
+    - script:
+        name: run gradle
+        code: |
+          ./gradlew -q --project-cache-dir=$WERCKER_CACHE_DIR build
