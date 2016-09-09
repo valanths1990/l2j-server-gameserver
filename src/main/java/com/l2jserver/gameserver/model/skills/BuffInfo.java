@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
@@ -44,6 +45,8 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public final class BuffInfo
 {
+	private static final Logger _log = Logger.getLogger(BuffInfo.class.getName());
+	
 	// Data
 	/** Data. */
 	private final L2Character _effector;
@@ -263,13 +266,8 @@ public final class BuffInfo
 			_effected.sendPacket(sm);
 		}
 		
-		// Creates a task that will stop all the effects.
-		if (_abnormalTime > 0)
-		{
-			_scheduledFutureTimeTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new BuffTimeTask(this), 0, 1000L);
-		}
+		boolean needsTimer = addAbnormalVisualEffects();
 		
-		boolean update = false;
 		for (AbstractEffect effect : _effects)
 		{
 			if (effect.isInstant() || (_effected.isDead() && !_skill.isPassive()))
@@ -293,13 +291,21 @@ public final class BuffInfo
 			// Add stats.
 			_effected.addStatFuncs(effect.getStatFuncs(_effector, _effected, _skill));
 			
-			update = true;
+			needsTimer = true;
 		}
 		
-		if (update)
+		// Creates a task that will stop all the (abnormal visual) effects
+		if (needsTimer)
 		{
-			// Add abnormal visual effects.
-			addAbnormalVisualEffects();
+			// TODO: this checks must be done when a skill is loaded so errors can be dicovered on startup
+			if (!_skill.isPassive() && (_abnormalTime <= 0))
+			{
+				_log.warning(_skill + " needs a timer for effects and/or abnormal visual effects but the _abnormalTime is <= 0!");
+			}
+			else
+			{
+				_scheduledFutureTimeTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new BuffTimeTask(this), 0, 1000L);
+			}
 		}
 	}
 	
@@ -387,55 +393,82 @@ public final class BuffInfo
 	/**
 	 * Applies all the abnormal visual effects to the effected.<br>
 	 * Prevents multiple updates.
+	 * @return true when abnormal visual effects are added, false otherwise
 	 */
-	private void addAbnormalVisualEffects()
+	private boolean addAbnormalVisualEffects()
 	{
+		boolean addedVisuals = false;
+		AbnormalVisualEffect[] visuals;
 		if (_skill.hasAbnormalVisualEffects())
 		{
-			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
+			visuals = _skill.getAbnormalVisualEffects();
+			addedVisuals = visuals.length > 0;
+			_effected.startAbnormalVisualEffect(false, visuals);
 		}
 		
 		if (_effected.isPlayer() && _skill.hasAbnormalVisualEffectsEvent())
 		{
-			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsEvent());
+			visuals = _skill.getAbnormalVisualEffectsEvent();
+			addedVisuals = visuals.length > 0;
+			_effected.startAbnormalVisualEffect(false, visuals);
 		}
 		
 		if (_skill.hasAbnormalVisualEffectsSpecial())
 		{
-			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
+			visuals = _skill.getAbnormalVisualEffectsSpecial();
+			addedVisuals = visuals.length > 0;
+			_effected.startAbnormalVisualEffect(false, visuals);
 		}
 		
-		// Update abnormal visual effects.
-		_effected.updateAbnormalEffect();
+		if (addedVisuals)
+		{
+			_effected.updateAbnormalEffect();
+		}
+		
+		return addedVisuals;
 	}
 	
 	/**
 	 * Removes all the abnormal visual effects from the effected.<br>
 	 * Prevents multiple updates.
+	 * @return true when abnormal visual effects are removed, false otherwise
 	 */
-	private void removeAbnormalVisualEffects()
+	private boolean removeAbnormalVisualEffects()
 	{
 		if ((_effected == null) || (_skill == null))
 		{
-			return;
+			return false;
 		}
 		
+		boolean addedVisuals = false;
+		AbnormalVisualEffect[] visuals;
 		if (_skill.hasAbnormalVisualEffects())
 		{
-			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
+			visuals = _skill.getAbnormalVisualEffects();
+			addedVisuals = visuals.length > 0;
+			_effected.stopAbnormalVisualEffect(false, visuals);
 		}
 		
 		if (_effected.isPlayer() && _skill.hasAbnormalVisualEffectsEvent())
 		{
-			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsEvent());
+			visuals = _skill.getAbnormalVisualEffectsEvent();
+			addedVisuals = visuals.length > 0;
+			_effected.stopAbnormalVisualEffect(false, visuals);
 		}
 		
 		if (_skill.hasAbnormalVisualEffectsSpecial())
 		{
-			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
+			visuals = _skill.getAbnormalVisualEffectsSpecial();
+			addedVisuals = visuals.length > 0;
+			_effected.stopAbnormalVisualEffect(false, visuals);
 		}
 		
-		_effected.updateAbnormalEffect();
+		if (addedVisuals)
+		{
+			_effected.updateAbnormalEffect();
+		}
+		
+		return addedVisuals;
 	}
 	
 	/**
@@ -476,6 +509,7 @@ public final class BuffInfo
 	@Override
 	public String toString()
 	{
-		return "BuffInfo [effector=" + _effector + ", effected=" + _effected + ", skill=" + _skill + ", effects=" + _effects + ", tasks=" + _tasks + ", scheduledFutureTimeTask=" + _scheduledFutureTimeTask + ", abnormalTime=" + _abnormalTime + ", periodStartTicks=" + _periodStartTicks + ", isRemoved=" + _isRemoved + ", isInUse=" + _isInUse + "]";
+		return "BuffInfo [effector=" + _effector + ", effected=" + _effected + ", skill=" + _skill + ", effects=" + _effects + ", tasks=" + _tasks + ", scheduledFutureTimeTask=" + _scheduledFutureTimeTask + ", abnormalTime=" + _abnormalTime + ", periodStartTicks=" + _periodStartTicks
+			+ ", isRemoved=" + _isRemoved + ", isInUse=" + _isInUse + "]";
 	}
 }
