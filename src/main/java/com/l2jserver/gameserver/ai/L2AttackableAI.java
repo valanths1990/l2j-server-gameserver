@@ -114,8 +114,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	private int _globalAggro;
 	/** The flag used to indicate that a thinking action is in progress, to prevent recursive thinking. */
 	private boolean _thinking;
-	
-	private int _timePass = 0;
 	private int _chaosTime = 0;
 	private int _lastBuffTick;
 	// Fear parameters
@@ -766,8 +764,30 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			return;
 		}
 		
-		L2Character originalAttackTarget = getAttackTarget();
+		if (npc.isCoreAIDisabled())
+		{
+			return;
+		}
+		
+		final L2Character mostHate = npc.getMostHated();
+		if (mostHate == null)
+		{
+			setIntention(AI_INTENTION_ACTIVE);
+			return;
+		}
+		
+		setAttackTarget(mostHate);
+		npc.setTarget(mostHate);
+		
+		// Immobilize condition
+		if (npc.isMovementDisabled())
+		{
+			movementDisable();
+			return;
+		}
+		
 		// Check if target is dead or if timeout is expired to stop this attack
+		final L2Character originalAttackTarget = getAttackTarget();
 		if ((originalAttackTarget == null) || originalAttackTarget.isAlikeDead() || (_attackTimeout < GameTimeController.getInstance().getGameTicks()))
 		{
 			// Stop hating this target after the attack timeout or if target is dead
@@ -842,22 +862,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			}
 		}
 		
-		if (npc.isCoreAIDisabled())
-		{
-			return;
-		}
-		
 		// Initialize data
-		L2Character mostHate = npc.getMostHated();
-		if (mostHate == null)
-		{
-			setIntention(AI_INTENTION_ACTIVE);
-			return;
-		}
-		
-		setAttackTarget(mostHate);
-		npc.setTarget(mostHate);
-		
 		final int combinedCollision = collision + mostHate.getTemplate().getCollisionRadius();
 		
 		final List<Skill> aiSuicideSkills = npc.getTemplate().getAISkills(AISkillScope.SUICIDE);
@@ -921,7 +926,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		{
 			if (Rnd.get(100) <= npc.getDodge())
 			{
-				// Micht: kepping this one otherwise we should do 2 sqrt
+				// Micht: Keeping this one otherwise we should do 2 sqrt
 				double distance2 = npc.calculateDistance(mostHate, false, true);
 				if (Math.sqrt(distance2) <= (60 + combinedCollision))
 				{
@@ -956,7 +961,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			}
 		}
 		
-		// ------------------------------------------------------------------------------
 		// BOSS/Raid Minion Target Reconsider
 		if (npc.isRaid() || npc.isRaidMinion())
 		{
@@ -1018,7 +1022,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		final List<Skill> generalSkills = npc.getTemplate().getAISkills(AISkillScope.GENERAL);
 		if (!generalSkills.isEmpty())
 		{
-			// -------------------------------------------------------------------------------
 			// Heal Condition
 			final List<Skill> aiHealSkills = npc.getTemplate().getAISkills(AISkillScope.HEAL);
 			if (!aiHealSkills.isEmpty())
@@ -1128,7 +1131,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				}
 			}
 			
-			// -------------------------------------------------------------------------------
 			// Res Skill Condition
 			final List<Skill> aiResSkills = npc.getTemplate().getAISkills(AISkillScope.RES);
 			if (!aiResSkills.isEmpty())
@@ -1232,17 +1234,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			}
 		}
 		
-		// -------------------------------------------------------------------------------
-		// Immobilize Condition
-		if ((npc.isMovementDisabled() && ((dist > range) || mostHate.isMoving())) || ((dist > range) && mostHate.isMoving()))
-		{
-			movementDisable();
-			return;
-		}
-		
-		setTimepass(0);
-		
-		// --------------------------------------------------------------------------------
 		// Long/Short Range skill usage.
 		if (!npc.getShortRangeSkills().isEmpty() && npc.hasSkillChance())
 		{
@@ -1268,7 +1259,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			}
 		}
 		
-		// --------------------------------------------------------------------------------
 		// Starts melee attack
 		if ((dist2 > range) || !GeoData.getInstance().canSeeTarget(npc, mostHate))
 		{
@@ -1343,7 +1333,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					_actor.setTarget(attackTarget);
 					return true;
 				}
-				// ----------------------------------------
 				// If actor already have buff, start looking at others same faction mob to cast
 				if (sk.getTargetType() == L2TargetType.SELF)
 				{
@@ -1759,7 +1748,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		
 		if (!canAura(sk))
 		{
-			
 			if (GeoData.getInstance().canSeeTarget(caster, attackTarget) && !attackTarget.isDead() && (dist2 <= srange))
 			{
 				clientStopMoving(null);
@@ -1786,230 +1774,99 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		return false;
 	}
 	
-	/**
-	 * This AI task will start when ACTOR cannot move and attack range larger than distance
-	 */
-	// TODO(Zoey76): Rework this method.
 	private void movementDisable()
 	{
 		final L2Attackable npc = getActiveChar();
-		double dist = 0;
-		double dist2 = 0;
-		int range = 0;
 		final L2Character target = getAttackTarget();
 		if (target == null)
 		{
 			return;
 		}
-		try
 		
+		if (npc.getTarget() == null)
 		{
-			if (npc.getTarget() == null)
-			{
-				npc.setTarget(target);
-			}
-			dist = npc.calculateDistance(target, false, false);
-			dist2 = dist - npc.getTemplate().getCollisionRadius();
-			range = npc.getPhysicalAttackRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius();
-			if (target.isMoving())
-			{
-				dist = dist - 30;
-				if (npc.isMoving())
-				{
-					dist = dist - 50;
-				}
-			}
-			
-			// Check if activeChar has any skill
-			if (!npc.getTemplate().getAISkills(AISkillScope.GENERAL).isEmpty())
-			{
-				// -------------------------------------------------------------
-				// Try to stop the target or disable the target as priority
-				int random = Rnd.get(100);
-				if (!target.isImmobilized() && (random < 2))
-				{
-					for (Skill sk : npc.getTemplate().getAISkills(AISkillScope.IMMOBILIZE))
-					{
-						if (!checkSkillCastConditions(npc, sk) || (((sk.getCastRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius()) <= dist2) && !canAura(sk)))
-						{
-							continue;
-						}
-						if (!GeoData.getInstance().canSeeTarget(npc, target))
-						{
-							continue;
-						}
-						if (!target.isAffectedBySkill(sk.getId()))
-						{
-							clientStopMoving(null);
-							// L2Object target = target;
-							// _actor.setTarget(_actor);
-							npc.doCast(sk);
-							// _actor.setTarget(target);
-							return;
-						}
-					}
-				}
-				// -------------------------------------------------------------
-				// Same as Above, but with Mute/FEAR etc....
-				if (random < 5)
-				{
-					for (Skill sk : npc.getTemplate().getAISkills(AISkillScope.COT))
-					{
-						if (!checkSkillCastConditions(npc, sk) || (((sk.getCastRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius()) <= dist2) && !canAura(sk)))
-						{
-							continue;
-						}
-						if (!GeoData.getInstance().canSeeTarget(npc, target))
-						{
-							continue;
-						}
-						if (!target.isAffectedBySkill(sk.getId()))
-						{
-							clientStopMoving(null);
-							// L2Object target = target;
-							// _actor.setTarget(_actor);
-							npc.doCast(sk);
-							// _actor.setTarget(target);
-							return;
-						}
-					}
-				}
-				// -------------------------------------------------------------
-				if (random < 8)
-				{
-					for (Skill sk : npc.getTemplate().getAISkills(AISkillScope.DEBUFF))
-					{
-						if (!checkSkillCastConditions(npc, sk) || (((sk.getCastRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius()) <= dist2) && !canAura(sk)))
-						{
-							continue;
-						}
-						if (!GeoData.getInstance().canSeeTarget(npc, target))
-						{
-							continue;
-						}
-						if (!target.isAffectedBySkill(sk.getId()))
-						{
-							clientStopMoving(null);
-							// L2Object target = target;
-							// _actor.setTarget(_actor);
-							npc.doCast(sk);
-							// _actor.setTarget(target);
-							return;
-						}
-					}
-				}
-				// -------------------------------------------------------------
-				// Some side effect skill like CANCEL or NEGATE
-				if (random < 9)
-				{
-					for (Skill sk : npc.getTemplate().getAISkills(AISkillScope.NEGATIVE))
-					{
-						if (!checkSkillCastConditions(npc, sk) || (((sk.getCastRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius()) <= dist2) && !canAura(sk)))
-						{
-							continue;
-						}
-						if (!GeoData.getInstance().canSeeTarget(npc, target))
-						{
-							continue;
-						}
-						if (target.getEffectList().getFirstEffect(L2EffectType.BUFF) != null)
-						{
-							clientStopMoving(null);
-							// L2Object target = target;
-							// _actor.setTarget(_actor);
-							npc.doCast(sk);
-							// _actor.setTarget(target);
-							return;
-						}
-					}
-				}
-				// -------------------------------------------------------------
-				// Start ATK SKILL when nothing can be done
-				if ((npc.isMovementDisabled() || (npc.getAiType() == AIType.MAGE) || (npc.getAiType() == AIType.HEALER)))
-				{
-					for (Skill sk : npc.getTemplate().getAISkills(AISkillScope.ATTACK))
-					{
-						if (!checkSkillCastConditions(npc, sk) || (((sk.getCastRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius()) <= dist2) && !canAura(sk)))
-						{
-							continue;
-						}
-						if (!GeoData.getInstance().canSeeTarget(npc, target))
-						{
-							continue;
-						}
-						clientStopMoving(null);
-						// L2Object target = target;
-						// _actor.setTarget(_actor);
-						npc.doCast(sk);
-						// _actor.setTarget(target);
-						return;
-					}
-				}
-				// -------------------------------------------------------------
-				// if there is no ATK skill to use, then try Universal skill
-				// @formatter:off
-				/*
-				for(L2Skill sk:_skillrender.getUniversalSkills())
-				{
-					if(sk.getMpConsume()>=_actor.getCurrentMp()
-							|| _actor.isSkillDisabled(sk.getId())
-							||(sk.getCastRange()+ _actor.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius() <= dist2 && !canAura(sk))
-							||(sk.isMagic()&&_actor.isMuted())
-							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
-					{
-						continue;
-					}
-					if(!GeoData.getInstance().canSeeTarget(_actor,target))
-						continue;
-					clientStopMoving(null);
-					L2Object target = target;
-					//_actor.setTarget(_actor);
-					_actor.doCast(sk);
-					//_actor.setTarget(target);
-					return;
-				}
-				*/
-				// @formatter:on
-			}
-			// timepass = timepass + 1;
-			if (npc.isMovementDisabled())
-			{
-				// timepass = 0;
-				targetReconsider();
-				
-				return;
-			}
-			// else if(timepass>=5)
-			// {
-			// timepass = 0;
-			// AggroReconsider();
-			// return;
-			// }
-			
-			if ((dist > range) || !GeoData.getInstance().canSeeTarget(npc, target))
-			{
-				if (target.isMoving())
-				{
-					range -= 100;
-				}
-				if (range < 5)
-				{
-					range = 5;
-				}
-				moveToPawn(target, range);
-				return;
-				
-			}
-			
-			// Attacks target
-			_actor.doAttack(target);
+			npc.setTarget(target);
 		}
-		catch (NullPointerException e)
+		
+		final double dist = npc.calculateDistance(target, false, false);
+		final int range = npc.getPhysicalAttackRange() + npc.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius();
+		// TODO(Zoey76): Review this "magic changes".
+		final int random = Rnd.get(100);
+		if (!target.isImmobilized() && (random < 15))
 		{
-			setIntention(AI_INTENTION_ACTIVE);
-			LOG.warn("{}: {} - failed executing movementDisable()!", getClass().getSimpleName(), this, e);
+			if (tryCast(npc, target, AISkillScope.IMMOBILIZE, dist))
+			{
+				return;
+			}
+		}
+		
+		if (random < 20)
+		{
+			if (tryCast(npc, target, AISkillScope.COT, dist))
+			{
+				return;
+			}
+		}
+		
+		if (random < 30)
+		{
+			if (tryCast(npc, target, AISkillScope.DEBUFF, dist))
+			{
+				return;
+			}
+		}
+		
+		if (random < 40)
+		{
+			if (tryCast(npc, target, AISkillScope.NEGATIVE, dist))
+			{
+				return;
+			}
+		}
+		
+		if (npc.isMovementDisabled() || (npc.getAiType() == AIType.MAGE) || (npc.getAiType() == AIType.HEALER))
+		{
+			if (tryCast(npc, target, AISkillScope.ATTACK, dist))
+			{
+				return;
+			}
+		}
+		
+		if (tryCast(npc, target, AISkillScope.UNIVERSAL, dist))
+		{
 			return;
 		}
+		
+		// If cannot cast, try to attack.
+		if ((dist <= range) && GeoData.getInstance().canSeeTarget(npc, target))
+		{
+			_actor.doAttack(target);
+			return;
+		}
+		
+		// If cannot cast nor attack, find a new target.
+		targetReconsider();
+	}
+	
+	private boolean tryCast(L2Attackable npc, L2Character target, AISkillScope aiSkillScope, double dist)
+	{
+		for (Skill sk : npc.getTemplate().getAISkills(aiSkillScope))
+		{
+			if (!checkSkillCastConditions(npc, sk) || (((sk.getCastRange() + target.getTemplate().getCollisionRadius()) <= dist) && !canAura(sk)))
+			{
+				continue;
+			}
+			
+			if (!GeoData.getInstance().canSeeTarget(npc, target))
+			{
+				continue;
+			}
+			
+			clientStopMoving(null);
+			npc.doCast(sk);
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -2017,25 +1874,24 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	 * @param skill the skill to check.
 	 * @return {@code true} if the skill is available for casting {@code false} otherwise.
 	 */
-	private boolean checkSkillCastConditions(L2Attackable caster, Skill skill)
+	private static boolean checkSkillCastConditions(L2Attackable caster, Skill skill)
 	{
 		if (caster.isCastingNow() && !skill.isSimultaneousCast())
 		{
 			return false;
 		}
-		
 		// Not enough MP.
-		if (skill.getMpConsume() >= getActiveChar().getCurrentMp())
+		if (skill.getMpConsume() >= caster.getCurrentMp())
 		{
 			return false;
 		}
 		// Character is in "skill disabled" mode.
-		if (getActiveChar().isSkillDisabled(skill))
+		if (caster.isSkillDisabled(skill))
 		{
 			return false;
 		}
 		// If is a static skill and magic skill and character is muted or is a physical skill muted and character is physically muted.
-		if (!skill.isStatic() && ((skill.isMagic() && getActiveChar().isMuted()) || getActiveChar().isPhysicalMuted()))
+		if (!skill.isStatic() && ((skill.isMagic() && caster.isMuted()) || caster.isPhysicalMuted()))
 		{
 			return false;
 		}
@@ -2692,22 +2548,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	public void setGlobalAggro(int value)
 	{
 		_globalAggro = value;
-	}
-	
-	/**
-	 * @param TP The timepass to set.
-	 */
-	public void setTimepass(int TP)
-	{
-		_timePass = TP;
-	}
-	
-	/**
-	 * @return Returns the timepass.
-	 */
-	public int getTimepass()
-	{
-		return _timePass;
 	}
 	
 	public L2Attackable getActiveChar()

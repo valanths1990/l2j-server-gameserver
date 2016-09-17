@@ -21,13 +21,15 @@ dependencies {
 	compile 'com.zaxxer:HikariCP:2.4.7'
 	compile 'mysql:mysql-connector-java:6.0.3'
 	compile 'org.bitlet:weupnp:0.1.4'
-	compile 'org.eclipse.jdt.core.compiler:ecj:4.5.1'
+	compile 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
 	compile 'com.google.guava:guava:19.0'
 	compile 'org.python:jython:2.2.1'
 	compile 'org.slf4j:slf4j-api:1.7.21'
 	compile 'org.slf4j:slf4j-jdk14:1.7.21'
 	compile fileTree(dir: 'dist/libs', include: '*.jar')
 	testCompile 'org.testng:testng:6.9.10'
+	testCompile 'org.mockito:mockito-all:2.0.2-beta'
+	testCompile 'com.beust:jcommander:1.48'
 }
 
 def generalManifest = manifest {
@@ -142,7 +144,7 @@ task zip(type: Zip, dependsOn: build) {
 build.finalizedBy(zip)
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.14.1'
+	gradleVersion = '3.0'
 }
 
 eclipse {

@@ -955,7 +955,7 @@ public abstract class L2Summon extends L2Playable
 	@Override
 	public String toString()
 	{
-		return super.toString() + "(" + getId() + ") Owner: " + getOwner();
+		return super.toString() + "(" + getId() + ") Level: " + getLevel() + " Owner: " + getOwner();
 	}
 	
 	@Override

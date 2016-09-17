@@ -84,7 +84,7 @@ public final class L2AuctioneerInstance extends L2Npc
 			String actualCommand = st.nextToken(); // Get actual command
 			
 			String val = "";
-			if (st.countTokens() >= 1)
+			if (st.hasMoreTokens())
 			{
 				val = st.nextToken();
 			}
@@ -103,7 +103,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					{
 						SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 						long bid = 0;
-						if (st.countTokens() >= 1)
+						if (st.hasMoreTokens())
 						{
 							bid = Math.min(Long.parseLong(st.nextToken()), MAX_ADENA);
 						}
@@ -223,7 +223,7 @@ public final class L2AuctioneerInstance extends L2Npc
 					try
 					{
 						long bid = 0;
-						if (st.countTokens() >= 1)
+						if (st.hasMoreTokens())
 						{
 							bid = Math.min(Long.parseLong(st.nextToken()), MAX_ADENA);
 						}

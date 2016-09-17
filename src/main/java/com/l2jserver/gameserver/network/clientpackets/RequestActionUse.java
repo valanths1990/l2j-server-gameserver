@@ -41,6 +41,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2SiegeFlagInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2StaticObjectInstance;
 import com.l2jserver.gameserver.model.effects.AbstractEffect;
 import com.l2jserver.gameserver.model.effects.L2EffectType;
+import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.skills.AbnormalType;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.Skill;
@@ -811,7 +812,7 @@ public final class RequestActionUse extends L2GameClientPacket
 	
 	/**
 	 * Cast a skill for active summon.<br>
-	 * Target is specified as a parameter but can be overwrited or ignored depending on skill type.
+	 * Target is specified as a parameter but can be overwritten or ignored depending on skill type.
 	 * @param skillId the skill Id to be casted by the summon
 	 * @param target the target to cast the skill on, overwritten or ignored depending on skill type
 	 * @param pet if {@code true} it'll validate a pet, if {@code false} it will validate a servitor
@@ -884,17 +885,27 @@ public final class RequestActionUse extends L2GameClientPacket
 				return;
 			}
 		}
-		final Skill skill = summon.getTemplate().getParameters().getSkillHolder(skillName).getSkill();
 		
-		if (skill != null)
+		final SkillHolder skillHolder = summon.getTemplate().getParameters().getSkillHolder(skillName);
+		if (skillHolder == null)
 		{
-			summon.setTarget(target);
-			summon.useMagic(skill, _ctrlPressed, _shiftPressed);
-			
-			if (skill.getId() == SWITCH_STANCE_ID)
-			{
-				summon.switchMode();
-			}
+			_log.warning(summon + " requested missing skill " + skillName + "!");
+			return;
+		}
+		
+		final Skill skill = skillHolder.getSkill();
+		if (skill == null)
+		{
+			_log.warning(summon + " requested missing skill " + skillHolder + "!");
+			return;
+		}
+		
+		summon.setTarget(target);
+		summon.useMagic(skill, _ctrlPressed, _shiftPressed);
+		
+		if (skill.getId() == SWITCH_STANCE_ID)
+		{
+			summon.switchMode();
 		}
 	}
 	

@@ -1760,26 +1760,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		int magicId = skill.getId();
 		
 		// Get the Base Casting Time of the Skills.
-		double skillAnimTime = skill.getHitTime();
-		
-		if (!skill.isChanneling() || (skill.getChannelingSkillId() == 0))
-		{
-			// Calculate the Casting Time of the "Non-Static" Skills (with caster PAtk/MAtkSpd).
-			if (!skill.isStatic())
-			{
-				skillAnimTime = Formulas.calcAtkSpd(skill.isMagic() ? getMAtkSpd() : getPAtkSpd(), skillAnimTime);
-			}
-			// Calculate the Casting Time of Magic Skills (reduced in 40% if using SPS/BSPS)
-			if (skill.isMagic() && (isChargedShot(ShotType.SPIRITSHOTS) || isChargedShot(ShotType.BLESSED_SPIRITSHOTS)))
-			{
-				skillAnimTime = (int) (skillAnimTime / 1.4);
-			}
-		}
-		
-		if ((skillAnimTime < 500) && (skill.getHitTime() > 500))
-		{
-			skillAnimTime = 500;
-		}
+		double skillAnimTime = Formulas.calcCastTime(this, skill);
 		
 		// queue herbs and potions
 		if (isCastingSimultaneouslyNow() && simultaneously)
@@ -1962,7 +1943,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					future.cancel(true);
 					_skillCast2 = null;
 				}
-				_skillCast2 = ThreadPoolManager.getInstance().scheduleEffect(mut, (int) skillAnimTime);
+				_skillCast2 = ThreadPoolManager.getInstance().scheduleEffect(mut, (int) skillAnimTime - 400);
 			}
 			else
 			{
@@ -1972,7 +1953,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					future.cancel(true);
 					_skillCast = null;
 				}
-				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(mut, (int) skillAnimTime);
+				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(mut, (int) skillAnimTime - 400);
 			}
 		}
 		else
@@ -5692,7 +5673,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	// Quest event ON_SPELL_FNISHED
 	protected void notifyQuestEventSkillFinished(Skill skill, L2Object target)
 	{
-	
+		
 	}
 	
 	/**
