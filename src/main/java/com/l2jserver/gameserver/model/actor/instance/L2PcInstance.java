@@ -3233,15 +3233,43 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * Equivalent to {@link #addItem(String, int, long, L2Object, boolean)} with parameters (process, itemId, 1, -1, reference, sendMessage)
+	 * @param process
+	 * @param itemId
+	 * @param reference
+	 * @param sendMessage
+	 * @return the new or updated item
+	 */
+	public L2ItemInstance addItem(String process, int itemId, L2Object reference, boolean sendMessage)
+	{
+		return addItem(process, itemId, 1, -1, reference, sendMessage);
+	}
+	
+	/**
+	 * Equivalent to {@link #addItem(String, int, long, int, L2Object, boolean)} with parameters (process, itemId, count, -1, reference, sendMessage)
+	 * @param process
+	 * @param itemId
+	 * @param count
+	 * @param reference
+	 * @param sendMessage
+	 * @return the new or updated item
+	 */
+	public L2ItemInstance addItem(String process, int itemId, long count, L2Object reference, boolean sendMessage)
+	{
+		return addItem(process, itemId, count, -1, reference, sendMessage);
+	}
+	
+	/**
 	 * Adds item to Inventory and send a Server->Client InventoryUpdate packet to the L2PcInstance.
 	 * @param process : String Identifier of process triggering this action
 	 * @param itemId : int Item Identifier of the item to be added
 	 * @param count : long Quantity of items to be added
+	 * @param enchantLevel : int Enchant of the item; -1 to not modify on existing items, for new items use the default enchantLevel when -1
 	 * @param reference : L2Object Object referencing current action like NPC selling item or previous item in transformation
 	 * @param sendMessage : boolean Specifies whether to send message to Client about this action
-	 * @return
+	 * @return the new or updated item
 	 */
-	public L2ItemInstance addItem(String process, int itemId, long count, L2Object reference, boolean sendMessage)
+	public L2ItemInstance addItem(String process, int itemId, long count, int enchantLevel, L2Object reference, boolean sendMessage)
 	{
 		if (count > 0)
 		{
@@ -3304,7 +3332,7 @@ public final class L2PcInstance extends L2Playable
 			else
 			{
 				// Add the item to inventory
-				L2ItemInstance createdItem = _inventory.addItem(process, itemId, count, this, reference);
+				L2ItemInstance createdItem = _inventory.addItem(process, itemId, count, enchantLevel, this, reference);
 				
 				// If over capacity, drop the item
 				if (!canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !_inventory.validateCapacity(0, item.isQuestItem()) && createdItem.isDropable() && (!createdItem.isStackable() || (createdItem.getLastChange() != L2ItemInstance.MODIFIED)))
@@ -5327,7 +5355,7 @@ public final class L2PcInstance extends L2Playable
 						(hasSummon() && (getSummon().getControlObjectId() == itemDrop.getId())) || // Control Item of active pet
 						(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_ITEMS, itemDrop.getId()) >= 0) || // Item listed in the non droppable item list
 						(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_PET_ITEMS, itemDrop.getId()) >= 0 // Item listed in the non droppable pet item list
-					))
+						))
 					{
 						continue;
 					}

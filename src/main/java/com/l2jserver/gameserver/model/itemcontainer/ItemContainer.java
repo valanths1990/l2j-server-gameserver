@@ -271,15 +271,43 @@ public abstract class ItemContainer
 	}
 	
 	/**
+	 * Eqivalent to {@link #addItem(String, int, long, int, L2PcInstance, Object)} with parameters (process, itemId, 1, -1, actor, reference)
+	 * @param process
+	 * @param itemId
+	 * @param actor
+	 * @param reference
+	 * @return the new or updated item
+	 */
+	public L2ItemInstance addItem(String process, int itemId, L2PcInstance actor, Object reference)
+	{
+		return addItem(process, itemId, 1, -1, actor, reference);
+	}
+	
+	/**
+	 * Eqivalent to {@link #addItem(String, int, long, int, L2PcInstance, Object)} with parameters (process, itemId, count, -1, actor, reference)
+	 * @param process
+	 * @param itemId
+	 * @param count
+	 * @param actor
+	 * @param reference
+	 * @return the new or updated item
+	 */
+	public L2ItemInstance addItem(String process, int itemId, long count, L2PcInstance actor, Object reference)
+	{
+		return addItem(process, itemId, count, -1, actor, reference);
+	}
+	
+	/**
 	 * Adds item to inventory
 	 * @param process : String Identifier of process triggering this action
 	 * @param itemId : int Item Identifier of the item to be added
 	 * @param count : int Quantity of items to be added
+	 * @param enchantLevel : int Enchant of the item; -1 to not modify on existing items, for new items use the default enchantLevel when -1
 	 * @param actor : L2PcInstance Player requesting the item add
 	 * @param reference : Object Object referencing current action like NPC selling item or previous item in transformation
 	 * @return L2ItemInstance corresponding to the new item or the updated item in inventory
 	 */
-	public L2ItemInstance addItem(String process, int itemId, long count, L2PcInstance actor, Object reference)
+	public L2ItemInstance addItem(String process, int itemId, long count, int enchantLevel, L2PcInstance actor, Object reference)
 	{
 		L2ItemInstance item = getItemByItemId(itemId);
 		
@@ -288,6 +316,10 @@ public abstract class ItemContainer
 		{
 			item.changeCount(process, count, actor, reference);
 			item.setLastChange(L2ItemInstance.MODIFIED);
+			if (enchantLevel > -1)
+			{
+				item.setEnchantLevel(enchantLevel);
+			}
 			// Updates database
 			// If Adena drop rate is not present it will be x1.
 			float adenaRate = Config.RATE_DROP_AMOUNT_MULTIPLIER.getOrDefault(Inventory.ADENA_ID, 1f);
@@ -320,7 +352,7 @@ public abstract class ItemContainer
 				item.setOwnerId(getOwnerId());
 				item.setItemLocation(getBaseLocation());
 				item.setLastChange(L2ItemInstance.ADDED);
-				item.setEnchantLevel(template.getDefaultEnchantLevel());
+				item.setEnchantLevel(enchantLevel > -1 ? enchantLevel : template.getDefaultEnchantLevel());
 				
 				// Add item in inventory
 				addItem(item);
