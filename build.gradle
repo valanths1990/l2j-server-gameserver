@@ -144,11 +144,12 @@ task zip(type: Zip, dependsOn: build) {
 build.finalizedBy(zip)
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '3.0'
+	gradleVersion = '3.1'
 }
 
 eclipse {
 	project {
+		name = 'L2J_Server'
 		comment 'L2J Server Project'
 		natures 'org.eclipse.buildship.core.gradleprojectbuilde'
 	}
