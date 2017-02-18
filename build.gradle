@@ -18,25 +18,29 @@ dependencies {
 	compile 'com.mchange:c3p0:0.9.5.2'
 	compile 'com.jolbox:bonecp:0.8.0.RELEASE'
 	compile 'com.sun.mail:javax.mail:1.5.6'
-	compile 'com.zaxxer:HikariCP:2.5.1'
-	compile 'mysql:mysql-connector-java:6.0.3'
+	compile 'com.zaxxer:HikariCP:2.6.0'
+	compile 'mysql:mysql-connector-java:6.0.5'
 	compile 'org.bitlet:weupnp:0.1.4'
 	compile 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
-	compile 'com.google.guava:guava:19.0'
+	compile 'com.google.guava:guava:21.0'
 	compile 'org.python:jython:2.2.1'
-	compile 'org.slf4j:slf4j-api:1.7.21'
-	compile 'org.slf4j:slf4j-jdk14:1.7.21'
+	compile 'org.slf4j:slf4j-api:1.7.23'
+	compile 'org.slf4j:slf4j-jdk14:1.7.23'
 	compile fileTree(dir: 'dist/libs', include: '*.jar')
-	testCompile 'org.testng:testng:6.9.10'
-	testCompile 'org.mockito:mockito-all:2.0.2-beta'
+	testCompile 'org.testng:testng:6.10'
 	testCompile 'com.beust:jcommander:1.48'
+	testCompile 'org.mockito:mockito-core:2.7.9'
+	testCompile 'net.bytebuddy:byte-buddy:1.6.8'
+	testCompile 'net.bytebuddy:byte-buddy-agent:1.6.8'
+	testCompile 'org.objenesis:objenesis:2.5.1'
+	testCompile 'org.jmockit:jmockit:1.30'
 }
 
 def generalManifest = manifest {
 	attributes('Built-By': System.getProperty('user.name'),
 			'Built-Date': new Date().format("yyyy-MM-dd HH:mm:ss"),
 			'Implementation-URL': 'http://www.l2jserver.com/',
-			'Class-Path': configurations.runtime.collect({ '../libs/' + it.getName() }).join(' '))
+			'Class-Path': configurations.compile.collect { '../libs/$it.name' }.join(' '))
 }
 
 jar {
@@ -47,7 +51,7 @@ jar {
 	exclude('**/gsregistering/**')
 	manifest {
 		from(generalManifest)
-		attributes ('Main-Class': 'com.l2jserver.gameserver.GameServer')
+		attributes('Main-Class': 'com.l2jserver.gameserver.GameServer')
 	}
 }
 
@@ -144,7 +148,7 @@ task zip(type: Zip, dependsOn: build) {
 build.finalizedBy(zip)
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '3.2.1'
+	gradleVersion = '3.3'
 }
 
 eclipse {
