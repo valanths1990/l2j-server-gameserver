@@ -23,11 +23,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.AbstractConnectionFactory;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -37,13 +33,13 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * <b>Access it through {@link ConnectionFactory} and proper configuration.</b>
  * @author Zoey76
  */
-final class C3P0ConnectionFactory extends AbstractConnectionFactory
+enum C3P0ConnectionFactory implements IConnectionFactory
 {
-	private static final Logger LOG = LoggerFactory.getLogger(C3P0ConnectionFactory.class);
+	INSTANCE;
 	
 	private final ComboPooledDataSource _dataSource;
 	
-	public C3P0ConnectionFactory()
+	C3P0ConnectionFactory()
 	{
 		if (Config.DATABASE_MAX_CONNECTIONS < 2)
 		{
@@ -129,15 +125,5 @@ final class C3P0ConnectionFactory extends AbstractConnectionFactory
 	public DataSource getDataSource()
 	{
 		return _dataSource;
-	}
-	
-	public static IConnectionFactory getInstance()
-	{
-		return SingletonHolder.INSTANCE;
-	}
-	
-	private static class SingletonHolder
-	{
-		protected static final IConnectionFactory INSTANCE = new C3P0ConnectionFactory();
 	}
 }

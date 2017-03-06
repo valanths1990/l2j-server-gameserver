@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2016 L2J Server
+ * Copyright (C) 2004-2017 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -16,37 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.commons.database.pool;
+package com.l2jserver.gameserver.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Abstract Connection Factory.
+ * Recommendation Bonus DAO interface.
  * @author Zoey76
  */
-public abstract class AbstractConnectionFactory implements IConnectionFactory
+public interface RecommendationBonusDAO
 {
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractConnectionFactory.class);
+	long load(L2PcInstance player);
 	
-	@Override
-	public Connection getConnection()
-	{
-		Connection con = null;
-		while (con == null)
-		{
-			try
-			{
-				con = getDataSource().getConnection();
-			}
-			catch (SQLException e)
-			{
-				LOG.warn("{}: Unable to get a connection!", getClass().getSimpleName(), e);
-			}
-		}
-		return con;
-	}
+	void insert(L2PcInstance player, long recoTaskEnd);
 }

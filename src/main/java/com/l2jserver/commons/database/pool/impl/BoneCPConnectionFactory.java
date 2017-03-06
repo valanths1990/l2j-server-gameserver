@@ -22,12 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.AbstractConnectionFactory;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
 
 /**
@@ -37,15 +33,15 @@ import com.l2jserver.commons.database.pool.IConnectionFactory;
  * <b><font color="RED" size="3">Totally BETA and untested feature!</font></b>
  * @author Zoey76
  */
-final class BoneCPConnectionFactory extends AbstractConnectionFactory
+enum BoneCPConnectionFactory implements IConnectionFactory
 {
-	private static final Logger LOG = LoggerFactory.getLogger(BoneCPConnectionFactory.class);
+	INSTANCE;
 	
 	private static final int PARTITION_COUNT = 5;
 	
 	private final BoneCPDataSource _dataSource;
 	
-	public BoneCPConnectionFactory()
+	BoneCPConnectionFactory()
 	{
 		_dataSource = new BoneCPDataSource();
 		_dataSource.setJdbcUrl(Config.DATABASE_URL);
@@ -73,15 +69,5 @@ final class BoneCPConnectionFactory extends AbstractConnectionFactory
 	public DataSource getDataSource()
 	{
 		return _dataSource;
-	}
-	
-	public static IConnectionFactory getInstance()
-	{
-		return SingletonHolder.INSTANCE;
-	}
-	
-	private static class SingletonHolder
-	{
-		protected static final IConnectionFactory INSTANCE = new BoneCPConnectionFactory();
 	}
 }

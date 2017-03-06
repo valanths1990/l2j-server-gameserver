@@ -18,11 +18,6 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -51,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ItemsAutoDestroy;
@@ -67,33 +61,28 @@ import com.l2jserver.gameserver.ai.L2SummonAI;
 import com.l2jserver.gameserver.cache.WarehouseCacheManager;
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
+import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
-import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
-import com.l2jserver.gameserver.data.xml.impl.ClassListData;
 import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
 import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
 import com.l2jserver.gameserver.data.xml.impl.FishData;
-import com.l2jserver.gameserver.data.xml.impl.HennaData;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.data.xml.impl.PlayerTemplateData;
 import com.l2jserver.gameserver.data.xml.impl.PlayerXpPercentLostData;
-import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.DuelState;
 import com.l2jserver.gameserver.enums.HtmlActionScope;
-import com.l2jserver.gameserver.enums.IllegalActionPunishmentType;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.enums.PartyDistributionType;
 import com.l2jserver.gameserver.enums.PlayerAction;
 import com.l2jserver.gameserver.enums.PrivateStoreType;
 import com.l2jserver.gameserver.enums.Race;
-import com.l2jserver.gameserver.enums.Sex;
 import com.l2jserver.gameserver.enums.ShortcutType;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.enums.Team;
@@ -149,7 +138,6 @@ import com.l2jserver.gameserver.model.Shortcut;
 import com.l2jserver.gameserver.model.TeleportBookmark;
 import com.l2jserver.gameserver.model.TeleportWhereType;
 import com.l2jserver.gameserver.model.TerritoryWard;
-import com.l2jserver.gameserver.model.TimeStamp;
 import com.l2jserver.gameserver.model.TradeList;
 import com.l2jserver.gameserver.model.UIKeysSettings;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
@@ -192,7 +180,6 @@ import com.l2jserver.gameserver.model.effects.L2EffectType;
 import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Duel;
 import com.l2jserver.gameserver.model.entity.Fort;
-import com.l2jserver.gameserver.model.entity.Hero;
 import com.l2jserver.gameserver.model.entity.Instance;
 import com.l2jserver.gameserver.model.entity.L2Event;
 import com.l2jserver.gameserver.model.entity.Siege;
@@ -276,7 +263,6 @@ import com.l2jserver.gameserver.network.serverpackets.ExPrivateStoreSetWholeMsg;
 import com.l2jserver.gameserver.network.serverpackets.ExSetCompassZoneCode;
 import com.l2jserver.gameserver.network.serverpackets.ExStartScenePlayer;
 import com.l2jserver.gameserver.network.serverpackets.ExStorageMaxCount;
-import com.l2jserver.gameserver.network.serverpackets.ExUseSharedGroupItem;
 import com.l2jserver.gameserver.network.serverpackets.FlyToLocation.FlyType;
 import com.l2jserver.gameserver.network.serverpackets.FriendStatusPacket;
 import com.l2jserver.gameserver.network.serverpackets.GameGuardQuery;
@@ -338,55 +324,6 @@ public final class L2PcInstance extends L2Playable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(L2PcInstance.class);
 	
-	// Character Skill SQL String Definitions:
-	private static final String RESTORE_SKILLS_FOR_CHAR = "SELECT skill_id,skill_level FROM character_skills WHERE charId=? AND class_index=?";
-	private static final String ADD_NEW_SKILL = "INSERT INTO character_skills (charId,skill_id,skill_level,class_index) VALUES (?,?,?,?)";
-	private static final String UPDATE_CHARACTER_SKILL_LEVEL = "UPDATE character_skills SET skill_level=? WHERE skill_id=? AND charId=? AND class_index=?";
-	private static final String ADD_NEW_SKILLS = "REPLACE INTO character_skills (charId,skill_id,skill_level,class_index) VALUES (?,?,?,?)";
-	private static final String DELETE_SKILL_FROM_CHAR = "DELETE FROM character_skills WHERE skill_id=? AND charId=? AND class_index=?";
-	private static final String DELETE_CHAR_SKILLS = "DELETE FROM character_skills WHERE charId=? AND class_index=?";
-	
-	// Character Skill Save SQL String Definitions:
-	private static final String ADD_SKILL_SAVE = "INSERT INTO character_skills_save (charId,skill_id,skill_level,remaining_time,reuse_delay,systime,restore_type,class_index,buff_index) VALUES (?,?,?,?,?,?,?,?,?)";
-	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,remaining_time, reuse_delay, systime, restore_type FROM character_skills_save WHERE charId=? AND class_index=? ORDER BY buff_index ASC";
-	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_skills_save WHERE charId=? AND class_index=?";
-	
-	// Character Item Reuse Time String Definition:
-	private static final String ADD_ITEM_REUSE_SAVE = "INSERT INTO character_item_reuse_save (charId,itemId,itemObjId,reuseDelay,systime) VALUES (?,?,?,?,?)";
-	private static final String RESTORE_ITEM_REUSE_SAVE = "SELECT charId,itemId,itemObjId,reuseDelay,systime FROM character_item_reuse_save WHERE charId=?";
-	private static final String DELETE_ITEM_REUSE_SAVE = "DELETE FROM character_item_reuse_save WHERE charId=?";
-	
-	// Character Character SQL String Definitions:
-	private static final String INSERT_CHARACTER = "INSERT INTO characters (account_name,charId,char_name,level,maxHp,curHp,maxCp,curCp,maxMp,curMp,face,hairStyle,hairColor,sex,exp,sp,karma,fame,pvpkills,pkkills,clanid,race,classid,deletetime,cancraft,title,title_color,accesslevel,online,isin7sdungeon,clan_privs,wantspeace,base_class,newbie,nobless,power_grade,createDate) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	private static final String UPDATE_CHARACTER = "UPDATE characters SET level=?,maxHp=?,curHp=?,maxCp=?,curCp=?,maxMp=?,curMp=?,face=?,hairStyle=?,hairColor=?,sex=?,heading=?,x=?,y=?,z=?,exp=?,expBeforeDeath=?,sp=?,karma=?,fame=?,pvpkills=?,pkkills=?,clanid=?,race=?,classid=?,deletetime=?,title=?,title_color=?,accesslevel=?,online=?,isin7sdungeon=?,clan_privs=?,wantspeace=?,base_class=?,onlinetime=?,newbie=?,nobless=?,power_grade=?,subpledge=?,lvl_joined_academy=?,apprentice=?,sponsor=?,clan_join_expiry_time=?,clan_create_expiry_time=?,char_name=?,death_penalty_level=?,bookmarkslot=?,vitality_points=?,language=? WHERE charId=?";
-	private static final String RESTORE_CHARACTER = "SELECT * FROM characters WHERE charId=?";
-	
-	// Character Teleport Bookmark:
-	private static final String INSERT_TP_BOOKMARK = "INSERT INTO character_tpbookmark (charId,Id,x,y,z,icon,tag,name) values (?,?,?,?,?,?,?,?)";
-	private static final String UPDATE_TP_BOOKMARK = "UPDATE character_tpbookmark SET icon=?,tag=?,name=? where charId=? AND Id=?";
-	private static final String RESTORE_TP_BOOKMARK = "SELECT Id,x,y,z,icon,tag,name FROM character_tpbookmark WHERE charId=?";
-	private static final String DELETE_TP_BOOKMARK = "DELETE FROM character_tpbookmark WHERE charId=? AND Id=?";
-	
-	// Character Subclass SQL String Definitions:
-	private static final String RESTORE_CHAR_SUBCLASSES = "SELECT class_id,exp,sp,level,class_index FROM character_subclasses WHERE charId=? ORDER BY class_index ASC";
-	private static final String ADD_CHAR_SUBCLASS = "INSERT INTO character_subclasses (charId,class_id,exp,sp,level,class_index) VALUES (?,?,?,?,?,?)";
-	private static final String UPDATE_CHAR_SUBCLASS = "UPDATE character_subclasses SET exp=?,sp=?,level=?,class_id=? WHERE charId=? AND class_index =?";
-	private static final String DELETE_CHAR_SUBCLASS = "DELETE FROM character_subclasses WHERE charId=? AND class_index=?";
-	
-	// Character Henna SQL String Definitions:
-	private static final String RESTORE_CHAR_HENNAS = "SELECT slot,symbol_id FROM character_hennas WHERE charId=? AND class_index=?";
-	private static final String ADD_CHAR_HENNA = "INSERT INTO character_hennas (charId,symbol_id,slot,class_index) VALUES (?,?,?,?)";
-	private static final String DELETE_CHAR_HENNA = "DELETE FROM character_hennas WHERE charId=? AND slot=? AND class_index=?";
-	private static final String DELETE_CHAR_HENNAS = "DELETE FROM character_hennas WHERE charId=? AND class_index=?";
-	
-	// Character Shortcut SQL String Definitions:
-	private static final String DELETE_CHAR_SHORTCUTS = "DELETE FROM character_shortcuts WHERE charId=? AND class_index=?";
-	
-	// Character Recipe List Save
-	private static final String DELETE_CHAR_RECIPE_SHOP = "DELETE FROM character_recipeshoplist WHERE charId=?";
-	private static final String INSERT_CHAR_RECIPE_SHOP = "REPLACE INTO character_recipeshoplist (`charId`, `recipeId`, `price`, `index`) VALUES (?, ?, ?, ?)";
-	private static final String RESTORE_CHAR_RECIPE_SHOP = "SELECT * FROM character_recipeshoplist WHERE charId=? ORDER BY `index`";
-	
 	private static final String COND_OVERRIDE_KEY = "cond_override";
 	
 	public static final String NEWBIE_KEY = "NEWBIE";
@@ -413,15 +350,15 @@ public final class L2PcInstance extends L2Playable
 	private long _uptime;
 	
 	private final ReentrantLock _subclassLock = new ReentrantLock();
-	protected int _baseClass;
-	protected int _activeClass;
-	protected int _classIndex = 0;
+	private int _baseClass;
+	private int _activeClass;
+	private int _classIndex = 0;
 	
 	/** data for mounted pets */
 	private int _controlItemId;
 	private L2PetLevelData _leveldata;
 	private int _curFeed;
-	protected Future<?> _mountFeedTask;
+	private Future<?> _mountFeedTask;
 	private ScheduledFuture<?> _dismountTask;
 	private boolean _petItems = false;
 	
@@ -492,14 +429,14 @@ public final class L2PcInstance extends L2Playable
 	private L2Vehicle _vehicle = null;
 	private Location _inVehiclePosition;
 	
-	public ScheduledFuture<?> _taskforfish;
+	private ScheduledFuture<?> _taskforfish;
 	private MountType _mountType = MountType.NONE;
 	private int _mountNpcId;
 	private int _mountLevel;
 	/** Store object used to summon the strider you are mounting **/
 	private int _mountObjectID = 0;
 	
-	public int _telemode = 0;
+	private int _telemode = 0;
 	
 	private boolean _inCrystallize;
 	private boolean _inCraftMode;
@@ -535,7 +472,7 @@ public final class L2PcInstance extends L2Playable
 	/** Recommendation task **/
 	private ScheduledFuture<?> _recoGiveTask;
 	/** Recommendation Two Hours bonus **/
-	protected boolean _recoTwoHoursGiven = false;
+	private boolean _recoTwoHoursGiven = false;
 	
 	private final PcInventory _inventory = new PcInventory(this);
 	private final PcFreight _freight = new PcFreight(this);
@@ -578,8 +515,7 @@ public final class L2PcInstance extends L2Playable
 	private final Set<L2PcInstance> _snoopListener = ConcurrentHashMap.newKeySet(1);
 	private final Set<L2PcInstance> _snoopedPlayer = ConcurrentHashMap.newKeySet(1);
 	
-	// hennas
-	private final L2Henna[] _henna = new L2Henna[3];
+	private L2Henna[] _henna = new L2Henna[3];
 	private int _hennaSTR;
 	private int _hennaINT;
 	private int _hennaDEX;
@@ -709,11 +645,11 @@ public final class L2PcInstance extends L2Playable
 	private int _activeEnchantAttrItemId = ID_NONE;
 	private long _activeEnchantTimestamp = 0;
 	
-	protected boolean _inventoryDisable = false;
+	private boolean _inventoryDisable = false;
 	/** Player's cubics. */
 	private final Map<Integer, L2CubicInstance> _cubics = new ConcurrentSkipListMap<>(); // TODO(Zoey76): This should be sorted in insert order.
 	/** Active shots. */
-	protected Set<Integer> _activeSoulShots = ConcurrentHashMap.newKeySet(1);
+	private final Set<Integer> _activeSoulShots = ConcurrentHashMap.newKeySet(1);
 	
 	public final ReentrantLock soulShotLock = new ReentrantLock();
 	
@@ -743,7 +679,7 @@ public final class L2PcInstance extends L2Playable
 	private final int[] _htmlActionOriginObjectIds = new int[HtmlActionScope.values().length];
 	/**
 	 * Origin of the last incoming html action request.<br>
-	 * This can be used for htmls continuing the conversation with an npc.
+	 * This can be used for HTMLs continuing the conversation with an npc.
 	 */
 	private int _lastHtmlActionOriginObjId;
 	
@@ -788,6 +724,7 @@ public final class L2PcInstance extends L2Playable
 	
 	// during fall validations will be disabled for 10 ms.
 	private static final int FALLING_VALIDATION_DELAY = 10000;
+	
 	private volatile long _fallingTimestamp = 0;
 	
 	private int _multiSocialTarget = 0;
@@ -814,13 +751,13 @@ public final class L2PcInstance extends L2Playable
 	/**
 	 * Creates a player.
 	 * @param objectId the object ID
-	 * @param template the player template
+	 * @param classId the player's class ID
 	 * @param accountName the account name
 	 * @param app the player appearance
 	 */
-	private L2PcInstance(int objectId, L2PcTemplate template, String accountName, PcAppearance app)
+	public L2PcInstance(int objectId, int classId, String accountName, PcAppearance app)
 	{
-		super(objectId, template);
+		super(objectId, PlayerTemplateData.getInstance().getTemplate(classId));
 		setInstanceType(InstanceType.L2PcInstance);
 		super.initCharStatusUpdateValues();
 		initPcStatusUpdateValues();
@@ -845,13 +782,13 @@ public final class L2PcInstance extends L2Playable
 	
 	/**
 	 * Creates a player.
-	 * @param template the player template
+	 * @param classId the player class ID
 	 * @param accountName the account name
 	 * @param app the player appearance
 	 */
-	private L2PcInstance(L2PcTemplate template, String accountName, PcAppearance app)
+	private L2PcInstance(int classId, String accountName, PcAppearance app)
 	{
-		this(IdFactory.getInstance().getNextId(), template, accountName, app);
+		this(IdFactory.getInstance().getNextId(), classId, accountName, app);
 	}
 	
 	public void setPvpFlagLasts(long time)
@@ -917,16 +854,16 @@ public final class L2PcInstance extends L2Playable
 	 * <li>Set the name, the Hair Style, the Hair Color and the Face type of the L2PcInstance</li>
 	 * <li>Add the player in the characters table of the database</li>
 	 * </ul>
-	 * @param template The L2PcTemplate to apply to the L2PcInstance
+	 * @param classId the player class ID
 	 * @param accountName The name of the L2PcInstance
 	 * @param name The name of the L2PcInstance
 	 * @param app the player's appearance
 	 * @return The L2PcInstance added to the database or null
 	 */
-	public static L2PcInstance create(L2PcTemplate template, String accountName, String name, PcAppearance app)
+	public static L2PcInstance create(int classId, String accountName, String name, PcAppearance app)
 	{
 		// Create a new L2PcInstance with an account name
-		L2PcInstance player = new L2PcInstance(template, accountName, app);
+		L2PcInstance player = new L2PcInstance(classId, accountName, app);
 		// Set the name of the L2PcInstance
 		player.setName(name);
 		// Set Character's create time
@@ -938,7 +875,7 @@ public final class L2PcInstance extends L2Playable
 		// Give 20 recommendations
 		player.setRecomLeft(20);
 		// Add the player in the characters table of the database
-		return player.createDb() ? player : null;
+		return DAOFactory.getInstance().getPlayerDAO().insert(player) ? player : null;
 	}
 	
 	public String getAccountName()
@@ -1070,23 +1007,6 @@ public final class L2PcInstance extends L2Playable
 			result |= RelationChanged.RELATION_ATTACKER;
 		}
 		return result;
-	}
-	
-	/**
-	 * Retrieve a L2PcInstance from the characters table of the database and add it in _allObjects of the L2world (call restore method).<br>
-	 * <B><U> Actions</U> :</B>
-	 * <ul>
-	 * <li>Retrieve the L2PcInstance from the characters table of the database</li>
-	 * <li>Add the L2PcInstance object in _allObjects</li>
-	 * <li>Set the x,y,z position of the L2PcInstance and make it invisible</li>
-	 * <li>Update the overloaded status of the L2PcInstance</li>
-	 * </ul>
-	 * @param objectId Identifier of the object to initialized
-	 * @return The L2PcInstance loaded from the database
-	 */
-	public static L2PcInstance load(int objectId)
-	{
-		return restore(objectId);
 	}
 	
 	private void initPcStatusUpdateValues()
@@ -1293,7 +1213,7 @@ public final class L2PcInstance extends L2Playable
 		
 		if (saveToDb)
 		{
-			insertNewRecipeData(recipe.getId(), false);
+			DAOFactory.getInstance().getRecipeBookDAO().insert(this, recipe.getId(), false);
 		}
 	}
 	
@@ -1308,7 +1228,7 @@ public final class L2PcInstance extends L2Playable
 		
 		if (saveToDb)
 		{
-			insertNewRecipeData(recipe.getId(), true);
+			DAOFactory.getInstance().getRecipeBookDAO().insert(this, recipe.getId(), true);
 		}
 	}
 	
@@ -1329,11 +1249,11 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (_dwarvenRecipeBook.remove(recipeId) != null)
 		{
-			deleteRecipeData(recipeId, true);
+			DAOFactory.getInstance().getRecipeBookDAO().delete(this, recipeId, true);
 		}
 		else if (_commonRecipeBook.remove(recipeId) != null)
 		{
-			deleteRecipeData(recipeId, false);
+			DAOFactory.getInstance().getRecipeBookDAO().delete(this, recipeId, false);
 		}
 		else
 		{
@@ -1346,39 +1266,6 @@ public final class L2PcInstance extends L2Playable
 			{
 				deleteShortCut(sc.getSlot(), sc.getPage());
 			}
-		}
-	}
-	
-	private void insertNewRecipeData(int recipeId, boolean isDwarf)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("INSERT INTO character_recipebook (charId, id, classIndex, type) values(?,?,?,?)"))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, recipeId);
-			ps.setInt(3, isDwarf ? _classIndex : 0);
-			ps.setInt(4, isDwarf ? 1 : 0);
-			ps.execute();
-		}
-		catch (SQLException e)
-		{
-			LOG.warn("SQL exception while inserting recipe: {} from player {}", recipeId, this, e);
-		}
-	}
-	
-	private void deleteRecipeData(int recipeId, boolean isDwarf)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM character_recipebook WHERE charId=? AND id=? AND classIndex=?"))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, recipeId);
-			ps.setInt(3, isDwarf ? _classIndex : 0);
-			ps.execute();
-		}
-		catch (SQLException e)
-		{
-			LOG.warn("SQL exception while deleting recipe: {} from player {}", recipeId, this, e);
 		}
 	}
 	
@@ -2618,7 +2505,9 @@ public final class L2PcInstance extends L2Playable
 			addSkill(sk, false);
 			skillsForStore.add(sk);
 		}
-		storeSkills(skillsForStore, -1);
+		
+		DAOFactory.getInstance().getSkillDAO().insert(this, -1, skillsForStore);
+		
 		if (Config.AUTO_LEARN_SKILLS && (skillCounter > 0))
 		{
 			sendMessage("You have learned " + skillCounter + " new skills.");
@@ -3876,7 +3765,7 @@ public final class L2PcInstance extends L2Playable
 	
 	public L2ItemInstance checkItemManipulation(int objectId, long count, String action)
 	{
-		// TODO: if we remove objects that are not visisble from the L2World, we'll have to remove this check
+		// TODO: if we remove objects that are not visible from the L2World, we'll have to remove this check
 		if (L2World.getInstance().findObject(objectId) == null)
 		{
 			LOG.warn("{} tried to {} item not available in L2World", this, action);
@@ -5668,7 +5557,7 @@ public final class L2PcInstance extends L2Playable
 		stopWarnUserTakeBreak();
 		stopWaterTask();
 		stopFeed();
-		storePetFood(_mountNpcId);
+		DAOFactory.getInstance().getPetDAO().updateFood(this, _mountNpcId);
 		stopRentPet();
 		stopPvpRegTask();
 		stopSoulTask();
@@ -6466,7 +6355,7 @@ public final class L2PcInstance extends L2Playable
 		}
 		broadcastPacket(new Ride(this));
 		setMountObjectID(0);
-		storePetFood(petId);
+		DAOFactory.getInstance().getPetDAO().updateFood(this, petId);
 		// Notify self and others about speed change
 		broadcastUserInfo();
 		return true;
@@ -6684,7 +6573,7 @@ public final class L2PcInstance extends L2Playable
 		// Update the characters table of the database with online status and lastAccess (called when login and logout)
 		if (updateInDb)
 		{
-			updateOnlineStatus();
+			DAOFactory.getInstance().getPlayerDAO().updateOnlineStatus(this);
 		}
 	}
 	
@@ -6694,282 +6583,26 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Update the characters table of the database with online status and lastAccess of this L2PcInstance (called when login and logout).
+	 * Restores a player from the database.
+	 * @param objectId the player's object ID
+	 * @return the player
 	 */
-	public void updateOnlineStatus()
+	public static L2PcInstance load(int objectId)
 	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("UPDATE characters SET online=?, lastAccess=? WHERE charId=?"))
+		try
 		{
-			ps.setInt(1, isOnlineInt());
-			ps.setLong(2, System.currentTimeMillis());
-			ps.setInt(3, getObjectId());
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Failed updating character online status. {}", e);
-		}
-	}
-	
-	/**
-	 * Create a new player in the characters table of the database.
-	 * @return
-	 */
-	private boolean createDb()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT_CHARACTER))
-		{
-			ps.setString(1, _accountName);
-			ps.setInt(2, getObjectId());
-			ps.setString(3, getName());
-			ps.setInt(4, getLevel());
-			ps.setInt(5, getMaxHp());
-			ps.setDouble(6, getCurrentHp());
-			ps.setInt(7, getMaxCp());
-			ps.setDouble(8, getCurrentCp());
-			ps.setInt(9, getMaxMp());
-			ps.setDouble(10, getCurrentMp());
-			ps.setInt(11, getAppearance().getFace());
-			ps.setInt(12, getAppearance().getHairStyle());
-			ps.setInt(13, getAppearance().getHairColor());
-			ps.setInt(14, getAppearance().getSex() ? 1 : 0);
-			ps.setLong(15, getExp());
-			ps.setInt(16, getSp());
-			ps.setInt(17, getKarma());
-			ps.setInt(18, getFame());
-			ps.setInt(19, getPvpKills());
-			ps.setInt(20, getPkKills());
-			ps.setInt(21, getClanId());
-			ps.setInt(22, getRace().ordinal());
-			ps.setInt(23, getClassId().getId());
-			ps.setLong(24, getDeleteTimer());
-			ps.setInt(25, hasDwarvenCraft() ? 1 : 0);
-			ps.setString(26, getTitle());
-			ps.setInt(27, getAppearance().getTitleColor());
-			ps.setInt(28, getAccessLevel().getLevel());
-			ps.setInt(29, isOnlineInt());
-			ps.setInt(30, isIn7sDungeon() ? 1 : 0);
-			ps.setInt(31, getClanPrivileges().getBitmask());
-			ps.setInt(32, getWantsPeace());
-			ps.setInt(33, getBaseClass());
-			ps.setInt(34, getNewbie());
-			ps.setInt(35, isNoble() ? 1 : 0);
-			ps.setLong(36, 0);
-			ps.setTimestamp(37, new Timestamp(getCreateDate().getTimeInMillis()));
-			ps.executeUpdate();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not insert char data: {}", e);
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Retrieve a L2PcInstance from the characters table of the database and add it in _allObjects of the L2world. <B><U> Actions</U> :</B>
-	 * <li>Retrieve the L2PcInstance from the characters table of the database</li>
-	 * <li>Add the L2PcInstance object in _allObjects</li>
-	 * <li>Set the x,y,z position of the L2PcInstance and make it invisible</li>
-	 * <li>Update the overloaded status of the L2PcInstance</li>
-	 * @param objectId Identifier of the object to initialized
-	 * @return The L2PcInstance loaded from the database
-	 */
-	private static L2PcInstance restore(int objectId)
-	{
-		L2PcInstance player = null;
-		double currentCp = 0;
-		double currentHp = 0;
-		double currentMp = 0;
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_CHARACTER))
-		{
-			// Retrieve the L2PcInstance from the characters table of the database
-			ps.setInt(1, objectId);
-			try (ResultSet rset = ps.executeQuery())
-			{
-				if (rset.next())
-				{
-					final int activeClassId = rset.getInt("classid");
-					final boolean female = rset.getInt("sex") != Sex.MALE.ordinal();
-					final L2PcTemplate template = PlayerTemplateData.getInstance().getTemplate(activeClassId);
-					PcAppearance app = new PcAppearance(rset.getByte("face"), rset.getByte("hairColor"), rset.getByte("hairStyle"), female);
-					
-					player = new L2PcInstance(objectId, template, rset.getString("account_name"), app);
-					player.setName(rset.getString("char_name"));
-					player._lastAccess = rset.getLong("lastAccess");
-					
-					player.getStat().setExp(rset.getLong("exp"));
-					player.setExpBeforeDeath(rset.getLong("expBeforeDeath"));
-					player.getStat().setLevel(rset.getByte("level"));
-					player.getStat().setSp(rset.getInt("sp"));
-					
-					player.setWantsPeace(rset.getInt("wantspeace"));
-					
-					player.setHeading(rset.getInt("heading"));
-					
-					player.setKarma(rset.getInt("karma"));
-					player.setFame(rset.getInt("fame"));
-					player.setPvpKills(rset.getInt("pvpkills"));
-					player.setPkKills(rset.getInt("pkkills"));
-					player.setOnlineTime(rset.getLong("onlinetime"));
-					player.setNewbie(rset.getInt("newbie"));
-					player.setNoble(rset.getInt("nobless") == 1);
-					
-					player.setClanJoinExpiryTime(rset.getLong("clan_join_expiry_time"));
-					if (player.getClanJoinExpiryTime() < System.currentTimeMillis())
-					{
-						player.setClanJoinExpiryTime(0);
-					}
-					player.setClanCreateExpiryTime(rset.getLong("clan_create_expiry_time"));
-					if (player.getClanCreateExpiryTime() < System.currentTimeMillis())
-					{
-						player.setClanCreateExpiryTime(0);
-					}
-					
-					player.setPowerGrade(rset.getInt("power_grade"));
-					player.setPledgeType(rset.getInt("subpledge"));
-					// player.setApprentice(rset.getInt("apprentice"));
-					
-					player.setDeleteTimer(rset.getLong("deletetime"));
-					player.setTitle(rset.getString("title"));
-					player.setAccessLevel(rset.getInt("accesslevel"));
-					int titleColor = rset.getInt("title_color");
-					if (titleColor != PcAppearance.DEFAULT_TITLE_COLOR)
-					{
-						player.getAppearance().setTitleColor(titleColor);
-					}
-					player.setFistsWeaponItem(player.findFistsWeaponItem(activeClassId));
-					player.setUptime(System.currentTimeMillis());
-					
-					currentHp = rset.getDouble("curHp");
-					currentCp = rset.getDouble("curCp");
-					currentMp = rset.getDouble("curMp");
-					
-					player._classIndex = 0;
-					try
-					{
-						player.setBaseClass(rset.getInt("base_class"));
-					}
-					catch (Exception e)
-					{
-						// TODO: Should this be logged?
-						player.setBaseClass(activeClassId);
-					}
-					
-					// Restore Subclass Data (cannot be done earlier in function)
-					if (restoreSubClassData(player))
-					{
-						if (activeClassId != player.getBaseClass())
-						{
-							for (SubClass subClass : player.getSubClasses().values())
-							{
-								if (subClass.getClassId() == activeClassId)
-								{
-									player._classIndex = subClass.getClassIndex();
-								}
-							}
-						}
-					}
-					if ((player.getClassIndex() == 0) && (activeClassId != player.getBaseClass()))
-					{
-						// Subclass in use but doesn't exist in DB -
-						// a possible restart-while-modifysubclass cheat has been attempted.
-						// Switching to use base class
-						player.setClassId(player.getBaseClass());
-						LOG.warn("{} reverted to base class. Possibly has tried a relogin exploit while subclassing.", player);
-					}
-					else
-					{
-						player._activeClass = activeClassId;
-					}
-					
-					player.setApprentice(rset.getInt("apprentice"));
-					player.setSponsor(rset.getInt("sponsor"));
-					player.setLvlJoinedAcademy(rset.getInt("lvl_joined_academy"));
-					player.setIsIn7sDungeon(rset.getInt("isin7sdungeon") == 1);
-					
-					CursedWeaponsManager.getInstance().checkPlayer(player);
-					
-					player.setDeathPenaltyBuffLevel(rset.getInt("death_penalty_level"));
-					
-					player.setVitalityPoints(rset.getInt("vitality_points"), true);
-					
-					// Set the x,y,z position of the L2PcInstance and make it invisible
-					player.setXYZInvisible(rset.getInt("x"), rset.getInt("y"), rset.getInt("z"));
-					
-					// Set Teleport Bookmark Slot
-					player.setBookMarkSlot(rset.getInt("BookmarkSlot"));
-					
-					// character creation Time
-					player.getCreateDate().setTimeInMillis(rset.getTimestamp("createDate").getTime());
-					
-					// Language
-					player.setLang(rset.getString("language"));
-					
-					// Set Hero status if it applies
-					player.setHero(Hero.getInstance().isHero(objectId));
-					
-					int clanId = rset.getInt("clanid");
-					if (clanId > 0)
-					{
-						player.setClan(ClanTable.getInstance().getClan(clanId));
-					}
-					
-					if (player.getClan() != null)
-					{
-						if (player.getClan().getLeaderId() != player.getObjectId())
-						{
-							if (player.getPowerGrade() == 0)
-							{
-								player.setPowerGrade(5);
-							}
-							player.setClanPrivileges(player.getClan().getRankPrivs(player.getPowerGrade()));
-						}
-						else
-						{
-							player.getClanPrivileges().setAll();
-							player.setPowerGrade(1);
-						}
-						player.setPledgeClass(L2ClanMember.calculatePledgeClass(player));
-					}
-					else
-					{
-						if (player.isNoble())
-						{
-							player.setPledgeClass(5);
-						}
-						
-						if (player.isHero())
-						{
-							player.setPledgeClass(8);
-						}
-						
-						player.getClanPrivileges().clear();
-					}
-					
-					// Retrieve the name and ID of the other characters assigned to this account.
-					try (PreparedStatement stmt = con.prepareStatement("SELECT charId, char_name FROM characters WHERE account_name=? AND charId<>?"))
-					{
-						stmt.setString(1, player._accountName);
-						stmt.setInt(2, objectId);
-						try (ResultSet chars = stmt.executeQuery())
-						{
-							while (chars.next())
-							{
-								player._chars.put(chars.getInt("charId"), chars.getString("char_name"));
-							}
-						}
-					}
-				}
-			}
-			
+			final L2PcInstance player = DAOFactory.getInstance().getPlayerDAO().load(objectId);
 			if (player == null)
 			{
 				return null;
 			}
+			
+			// Backup database values before restoring skills.
+			double currentCp = player.getCurrentCp();
+			double currentHp = player.getCurrentHp();
+			double currentMp = player.getCurrentMp();
+			
+			DAOFactory.getInstance().getPlayerDAO().loadCharacters(player);
 			
 			// Retrieve from the database all items of this L2PcInstance and add them to _inventory
 			player.getInventory().restore();
@@ -6982,14 +6615,33 @@ public final class L2PcInstance extends L2Playable
 			// Retrieve from the database all secondary data of this L2PcInstance
 			// Note that Clan, Noblesse and Hero skills are given separately and not here.
 			// Retrieve from the database all skills of this L2PcInstance and add them to _skills
-			player.restoreCharData();
+			DAOFactory.getInstance().getSkillDAO().load(player);
+			
+			player._macros.restoreMe();
+			
+			player._shortCuts.restoreMe();
+			
+			DAOFactory.getInstance().getHennaDAO().load(player);
+			
+			DAOFactory.getInstance().getTeleportBookmarkDAO().load(player);
+			
+			DAOFactory.getInstance().getRecipeBookDAO().load(player, true);
+			
+			if (Config.STORE_RECIPE_SHOPLIST)
+			{
+				DAOFactory.getInstance().getRecipeShopListDAO().load(player);
+			}
+			
+			DAOFactory.getInstance().getPremiumItemDAO().load(player);
+			
+			DAOFactory.getInstance().getItemDAO().loadPetInventory(player);
 			
 			// Reward auto-get skills and all available skills if auto-learn skills is true.
 			player.rewardSkills();
 			
-			player.restoreItemReuse();
+			DAOFactory.getInstance().getItemReuseDAO().load(player);
 			
-			// Restore current Cp, HP and MP values
+			// Restore current CP, HP and MP values
 			player.setCurrentCp(currentCp);
 			player.setCurrentHp(currentHp);
 			player.setCurrentMp(currentMp);
@@ -7014,7 +6666,7 @@ public final class L2PcInstance extends L2Playable
 			// Update the expertise status of the L2PcInstance
 			player.refreshExpertisePenalty();
 			
-			player.restoreFriendList();
+			DAOFactory.getInstance().getFriendDAO().load(player);
 			
 			if (Config.STORE_UI_SETTINGS)
 			{
@@ -7026,17 +6678,15 @@ public final class L2PcInstance extends L2Playable
 				final long masks = player.getVariables().getLong(COND_OVERRIDE_KEY, PcCondOverride.getAllExceptionsMask());
 				player.setOverrideCond(masks);
 			}
+			return player;
 		}
 		catch (Exception e)
 		{
-			LOG.error("Failed loading character. {}", e);
+			LOG.error("Failed loading character.", e);
 		}
-		return player;
+		return null;
 	}
 	
-	/**
-	 * @return
-	 */
 	public Forum getMail()
 	{
 		if (_forumMail == null)
@@ -7053,17 +6703,11 @@ public final class L2PcInstance extends L2Playable
 		return _forumMail;
 	}
 	
-	/**
-	 * @param forum
-	 */
 	public void setMail(Forum forum)
 	{
 		_forumMail = forum;
 	}
 	
-	/**
-	 * @return
-	 */
 	public Forum getMemo()
 	{
 		if (_forumMemo == null)
@@ -7080,206 +6724,14 @@ public final class L2PcInstance extends L2Playable
 		return _forumMemo;
 	}
 	
-	/**
-	 * @param forum
-	 */
 	public void setMemo(Forum forum)
 	{
 		_forumMemo = forum;
 	}
 	
-	/**
-	 * Restores sub-class data for the L2PcInstance, used to check the current class index for the character.
-	 * @param player
-	 * @return
-	 */
-	private static boolean restoreSubClassData(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_CHAR_SUBCLASSES))
-		{
-			ps.setInt(1, player.getObjectId());
-			try (ResultSet rset = ps.executeQuery())
-			{
-				while (rset.next())
-				{
-					SubClass subClass = new SubClass();
-					subClass.setClassId(rset.getInt("class_id"));
-					subClass.setLevel(rset.getByte("level"));
-					subClass.setExp(rset.getLong("exp"));
-					subClass.setSp(rset.getInt("sp"));
-					subClass.setClassIndex(rset.getInt("class_index"));
-					
-					// Enforce the correct indexing of _subClasses against their class indexes.
-					player.getSubClasses().put(subClass.getClassIndex(), subClass);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore classes for {}, {}", player, e);
-		}
-		return true;
-	}
-	
-	/**
-	 * Restores:
-	 * <ul>
-	 * <li>Skills</li>
-	 * <li>Macros</li>
-	 * <li>Short-cuts</li>
-	 * <li>Henna</li>
-	 * <li>Teleport Bookmark</li>
-	 * <li>Recipe Book</li>
-	 * <li>Recipe Shop List (If configuration enabled)</li>
-	 * <li>Premium Item List</li>
-	 * <li>Pet Inventory Items</li>
-	 * </ul>
-	 */
-	private void restoreCharData()
-	{
-		// Retrieve from the database all skills of this L2PcInstance and add them to _skills.
-		restoreSkills();
-		
-		// Retrieve from the database all macroses of this L2PcInstance and add them to _macros.
-		_macros.restoreMe();
-		
-		// Retrieve from the database all shortCuts of this L2PcInstance and add them to _shortCuts.
-		_shortCuts.restoreMe();
-		
-		// Retrieve from the database all henna of this L2PcInstance and add them to _henna.
-		restoreHenna();
-		
-		// Retrieve from the database all teleport bookmark of this L2PcInstance and add them to _tpbookmark.
-		restoreTeleportBookmark();
-		
-		// Retrieve from the database the recipe book of this L2PcInstance.
-		restoreRecipeBook(true);
-		
-		// Restore Recipe Shop list.
-		if (Config.STORE_RECIPE_SHOPLIST)
-		{
-			restoreRecipeShopList();
-		}
-		
-		// Load Premium Item List.
-		loadPremiumItemList();
-		
-		// Restore items in pet inventory.
-		restorePetInventoryItems();
-	}
-	
-	/**
-	 * Restore recipe book data for this L2PcInstance.
-	 * @param loadCommon
-	 */
-	private void restoreRecipeBook(boolean loadCommon)
-	{
-		final String sql = loadCommon ? "SELECT id, type, classIndex FROM character_recipebook WHERE charId=?" : "SELECT id FROM character_recipebook WHERE charId=? AND classIndex=? AND type = 1";
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(sql))
-		{
-			ps.setInt(1, getObjectId());
-			if (!loadCommon)
-			{
-				ps.setInt(2, _classIndex);
-			}
-			
-			try (ResultSet rset = ps.executeQuery())
-			{
-				_dwarvenRecipeBook.clear();
-				
-				L2RecipeList recipe;
-				RecipeData rd = RecipeData.getInstance();
-				while (rset.next())
-				{
-					recipe = rd.getRecipeList(rset.getInt("id"));
-					if (loadCommon)
-					{
-						if (rset.getInt(2) == 1)
-						{
-							if (rset.getInt(3) == _classIndex)
-							{
-								registerDwarvenRecipeList(recipe, false);
-							}
-						}
-						else
-						{
-							registerCommonRecipeList(recipe, false);
-						}
-					}
-					else
-					{
-						registerDwarvenRecipeList(recipe, false);
-					}
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore recipe book data: {}", e);
-		}
-	}
-	
 	public Map<Integer, L2PremiumItem> getPremiumItemList()
 	{
 		return _premiumItems;
-	}
-	
-	private void loadPremiumItemList()
-	{
-		final String sql = "SELECT itemNum, itemId, itemCount, itemSender FROM character_premium_items WHERE charId=?";
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(sql))
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rset = ps.executeQuery())
-			{
-				while (rset.next())
-				{
-					int itemNum = rset.getInt("itemNum");
-					int itemId = rset.getInt("itemId");
-					long itemCount = rset.getLong("itemCount");
-					String itemSender = rset.getString("itemSender");
-					_premiumItems.put(itemNum, new L2PremiumItem(itemId, itemCount, itemSender));
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore premium items: {}", e);
-		}
-	}
-	
-	public void updatePremiumItem(int itemNum, long newcount)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("UPDATE character_premium_items SET itemCount=? WHERE charId=? AND itemNum=? "))
-		{
-			ps.setLong(1, newcount);
-			ps.setInt(2, getObjectId());
-			ps.setInt(3, itemNum);
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not update premium items: {}", e);
-		}
-	}
-	
-	public void deletePremiumItem(int itemNum)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM character_premium_items WHERE charId=? AND itemNum=? "))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, itemNum);
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not delete premium item: {}" + e);
-		}
 	}
 	
 	/**
@@ -7288,18 +6740,25 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public synchronized void store(boolean storeActiveEffects)
 	{
-		storeCharBase();
-		storeCharSub();
+		DAOFactory.getInstance().getPlayerDAO().storeCharBase(this);
+		
+		DAOFactory.getInstance().getSubclassDAO().update(this);
+		
 		storeEffect(storeActiveEffects);
-		storeItemReuseDelay();
+		
+		DAOFactory.getInstance().getItemReuseDAO().insert(this);
+		
 		if (Config.STORE_RECIPE_SHOPLIST)
 		{
-			storeRecipeShopList();
+			DAOFactory.getInstance().getRecipeShopListDAO().delete(this);
+			DAOFactory.getInstance().getRecipeShopListDAO().insert(this);
 		}
+		
 		if (Config.STORE_UI_SETTINGS)
 		{
 			storeUISettings();
 		}
+		
 		SevenSigns.getInstance().saveSevenSignsData(getObjectId());
 		
 		final PlayerVariables vars = getScript(PlayerVariables.class);
@@ -7321,111 +6780,6 @@ public final class L2PcInstance extends L2Playable
 		store(true);
 	}
 	
-	private void storeCharBase()
-	{
-		// Get the exp, level, and sp of base class to store in base table
-		long exp = getStat().getBaseExp();
-		int level = getStat().getBaseLevel();
-		int sp = getStat().getBaseSp();
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE_CHARACTER))
-		{
-			ps.setInt(1, level);
-			ps.setInt(2, getMaxHp());
-			ps.setDouble(3, getCurrentHp());
-			ps.setInt(4, getMaxCp());
-			ps.setDouble(5, getCurrentCp());
-			ps.setInt(6, getMaxMp());
-			ps.setDouble(7, getCurrentMp());
-			ps.setInt(8, getAppearance().getFace());
-			ps.setInt(9, getAppearance().getHairStyle());
-			ps.setInt(10, getAppearance().getHairColor());
-			ps.setInt(11, getAppearance().getSex() ? 1 : 0);
-			ps.setInt(12, getHeading());
-			ps.setInt(13, _observerMode ? _lastLoc.getX() : getX());
-			ps.setInt(14, _observerMode ? _lastLoc.getY() : getY());
-			ps.setInt(15, _observerMode ? _lastLoc.getZ() : getZ());
-			ps.setLong(16, exp);
-			ps.setLong(17, getExpBeforeDeath());
-			ps.setInt(18, sp);
-			ps.setInt(19, getKarma());
-			ps.setInt(20, getFame());
-			ps.setInt(21, getPvpKills());
-			ps.setInt(22, getPkKills());
-			ps.setInt(23, getClanId());
-			ps.setInt(24, getRace().ordinal());
-			ps.setInt(25, getClassId().getId());
-			ps.setLong(26, getDeleteTimer());
-			ps.setString(27, getTitle());
-			ps.setInt(28, getAppearance().getTitleColor());
-			ps.setInt(29, getAccessLevel().getLevel());
-			ps.setInt(30, isOnlineInt());
-			ps.setInt(31, isIn7sDungeon() ? 1 : 0);
-			ps.setInt(32, getClanPrivileges().getBitmask());
-			ps.setInt(33, getWantsPeace());
-			ps.setInt(34, getBaseClass());
-			
-			long totalOnlineTime = _onlineTime;
-			if (_onlineBeginTime > 0)
-			{
-				totalOnlineTime += (System.currentTimeMillis() - _onlineBeginTime) / 1000;
-			}
-			
-			ps.setLong(35, totalOnlineTime);
-			ps.setInt(36, getNewbie());
-			ps.setInt(37, isNoble() ? 1 : 0);
-			ps.setInt(38, getPowerGrade());
-			ps.setInt(39, getPledgeType());
-			ps.setInt(40, getLvlJoinedAcademy());
-			ps.setLong(41, getApprentice());
-			ps.setLong(42, getSponsor());
-			ps.setLong(43, getClanJoinExpiryTime());
-			ps.setLong(44, getClanCreateExpiryTime());
-			ps.setString(45, getName());
-			ps.setLong(46, getDeathPenaltyBuffLevel());
-			ps.setInt(47, getBookMarkSlot());
-			ps.setInt(48, getVitalityPoints());
-			ps.setString(49, getLang());
-			ps.setInt(50, getObjectId());
-			
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not store {} base data: {}", this, e);
-		}
-	}
-	
-	private void storeCharSub()
-	{
-		if (getTotalSubClasses() <= 0)
-		{
-			return;
-		}
-		
-		// TODO(Zoey76): Refactor this to use batch.
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE_CHAR_SUBCLASS))
-		{
-			for (SubClass subClass : getSubClasses().values())
-			{
-				ps.setLong(1, subClass.getExp());
-				ps.setInt(2, subClass.getSp());
-				ps.setInt(3, subClass.getLevel());
-				ps.setInt(4, subClass.getClassId());
-				ps.setInt(5, getObjectId());
-				ps.setInt(6, subClass.getClassIndex());
-				
-				ps.execute();
-				ps.clearParameters();
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not store sub class data for {} : {}", this, e);
-		}
-	}
-	
 	@Override
 	public void storeEffect(boolean storeEffects)
 	{
@@ -7434,137 +6788,9 @@ public final class L2PcInstance extends L2Playable
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement delete = con.prepareStatement(DELETE_SKILL_SAVE);
-			PreparedStatement statement = con.prepareStatement(ADD_SKILL_SAVE);)
-		{
-			// Delete all current stored effects for char to avoid dupe
-			delete.setInt(1, getObjectId());
-			delete.setInt(2, getClassIndex());
-			delete.execute();
-			
-			int buff_index = 0;
-			final List<Integer> storedSkills = new ArrayList<>();
-			
-			// Store all effect data along with calulated remaining
-			// reuse delays for matching skills. 'restore_type'= 0.
-			if (storeEffects)
-			{
-				for (BuffInfo info : getEffectList().getEffects())
-				{
-					if (info == null)
-					{
-						continue;
-					}
-					
-					final Skill skill = info.getSkill();
-					// Do not save heals.
-					if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS)
-					{
-						continue;
-					}
-					
-					if (skill.isToggle())
-					{
-						continue;
-					}
-					
-					// Dances and songs are not kept in retail.
-					if (skill.isDance() && !Config.ALT_STORE_DANCES)
-					{
-						continue;
-					}
-					
-					if (storedSkills.contains(skill.getReuseHashCode()))
-					{
-						continue;
-					}
-					
-					storedSkills.add(skill.getReuseHashCode());
-					
-					statement.setInt(1, getObjectId());
-					statement.setInt(2, skill.getId());
-					statement.setInt(3, skill.getLevel());
-					statement.setInt(4, info.getTime());
-					
-					final TimeStamp t = getSkillReuseTimeStamp(skill.getReuseHashCode());
-					statement.setLong(5, (t != null) && t.hasNotPassed() ? t.getReuse() : 0);
-					statement.setLong(6, (t != null) && t.hasNotPassed() ? t.getStamp() : 0);
-					
-					statement.setInt(7, 0); // Store type 0, active buffs/debuffs.
-					statement.setInt(8, getClassIndex());
-					statement.setInt(9, ++buff_index);
-					statement.execute();
-				}
-			}
-			
-			// Skills under reuse.
-			final Map<Integer, TimeStamp> reuseTimeStamps = getSkillReuseTimeStamps();
-			if (reuseTimeStamps != null)
-			{
-				for (Entry<Integer, TimeStamp> ts : reuseTimeStamps.entrySet())
-				{
-					final int hash = ts.getKey();
-					if (storedSkills.contains(hash))
-					{
-						continue;
-					}
-					
-					final TimeStamp t = ts.getValue();
-					if ((t != null) && t.hasNotPassed())
-					{
-						storedSkills.add(hash);
-						
-						statement.setInt(1, getObjectId());
-						statement.setInt(2, t.getSkillId());
-						statement.setInt(3, t.getSkillLvl());
-						statement.setInt(4, -1);
-						statement.setLong(5, t.getReuse());
-						statement.setLong(6, t.getStamp());
-						statement.setInt(7, 1); // Restore type 1, skill reuse.
-						statement.setInt(8, getClassIndex());
-						statement.setInt(9, ++buff_index);
-						statement.execute();
-					}
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not store {} effect data: {}", this, e);
-		}
-	}
-	
-	private void storeItemReuseDelay()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps1 = con.prepareStatement(DELETE_ITEM_REUSE_SAVE);
-			PreparedStatement ps2 = con.prepareStatement(ADD_ITEM_REUSE_SAVE))
-		{
-			ps1.setInt(1, getObjectId());
-			ps1.execute();
-			
-			final Map<Integer, TimeStamp> itemReuseTimeStamps = getItemReuseTimeStamps();
-			if (itemReuseTimeStamps != null)
-			{
-				for (TimeStamp ts : itemReuseTimeStamps.values())
-				{
-					if ((ts != null) && ts.hasNotPassed())
-					{
-						ps2.setInt(1, getObjectId());
-						ps2.setInt(2, ts.getItemId());
-						ps2.setInt(3, ts.getItemObjectId());
-						ps2.setLong(4, ts.getReuse());
-						ps2.setLong(5, ts.getStamp());
-						ps2.execute();
-					}
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.warn("Could not store char item reuse data: ", e);
-		}
+		DAOFactory.getInstance().getSkillSaveDAO().delete(this);
+		
+		DAOFactory.getInstance().getSkillSaveDAO().insert(this, storeEffects);
 	}
 	
 	/**
@@ -7587,8 +6813,8 @@ public final class L2PcInstance extends L2Playable
 	/**
 	 * Verifies if the player is in offline mode.<br>
 	 * The offline mode may happen for different reasons:<br>
-	 * Abnormally: Player gets abrouptaly disconnected from server.<br>
-	 * Normally: The player gets into offline shop mode, only avaiable by enabling the offline shop mod.
+	 * Abnormally: Player gets abruptly disconnected from server.<br>
+	 * Normally: The player gets into offline shop mode, only available by enabling the offline shop mod.
 	 * @return {@code true} if the player is in offline mode, {@code false} otherwise
 	 */
 	public boolean isInOfflineMode()
@@ -7657,19 +6883,7 @@ public final class L2PcInstance extends L2Playable
 		final Skill oldSkill = super.removeSkill(skill, true);
 		if (oldSkill != null)
 		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(DELETE_SKILL_FROM_CHAR))
-			{
-				// Remove or update a L2PcInstance skill from the character_skills table of the database
-				ps.setInt(1, oldSkill.getId());
-				ps.setInt(2, getObjectId());
-				ps.setInt(3, getClassIndex());
-				ps.execute();
-			}
-			catch (Exception e)
-			{
-				LOG.warn("Error could not delete skill: {}", e);
-			}
+			DAOFactory.getInstance().getSkillDAO().delete(this, oldSkill);
 		}
 		
 		if ((getTransformationId() > 0) || isCursedWeaponEquipped())
@@ -7700,123 +6914,17 @@ public final class L2PcInstance extends L2Playable
 	private void storeSkill(Skill newSkill, Skill oldSkill, int newClassIndex)
 	{
 		final int classIndex = (newClassIndex > -1) ? newClassIndex : _classIndex;
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
+		if ((oldSkill != null) && (newSkill != null))
 		{
-			if ((oldSkill != null) && (newSkill != null))
-			{
-				try (PreparedStatement ps = con.prepareStatement(UPDATE_CHARACTER_SKILL_LEVEL))
-				{
-					ps.setInt(1, newSkill.getLevel());
-					ps.setInt(2, oldSkill.getId());
-					ps.setInt(3, getObjectId());
-					ps.setInt(4, classIndex);
-					ps.execute();
-				}
-			}
-			else if (newSkill != null)
-			{
-				try (PreparedStatement ps = con.prepareStatement(ADD_NEW_SKILL))
-				{
-					ps.setInt(1, getObjectId());
-					ps.setInt(2, newSkill.getId());
-					ps.setInt(3, newSkill.getLevel());
-					ps.setInt(4, classIndex);
-					ps.execute();
-				}
-			}
-			else
-			{
-				LOG.warn("Could not store new skill, it's null!");
-			}
+			DAOFactory.getInstance().getSkillDAO().update(this, classIndex, newSkill, oldSkill);
 		}
-		catch (Exception e)
+		else if (newSkill != null)
 		{
-			LOG.warn("Error could not store char skills: {}", e);
+			DAOFactory.getInstance().getSkillDAO().insert(this, classIndex, newSkill);
 		}
-	}
-	
-	/**
-	 * Adds or updates player's skills in the database.
-	 * @param newSkills the list of skills to store
-	 * @param newClassIndex if newClassIndex > -1, the skills will be stored for that class index, not the current one
-	 */
-	private void storeSkills(List<Skill> newSkills, int newClassIndex)
-	{
-		if (newSkills.isEmpty())
+		else
 		{
-			return;
-		}
-		
-		final int classIndex = (newClassIndex > -1) ? newClassIndex : _classIndex;
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(ADD_NEW_SKILLS))
-		{
-			con.setAutoCommit(false);
-			for (final Skill addSkill : newSkills)
-			{
-				
-				ps.setInt(1, getObjectId());
-				ps.setInt(2, addSkill.getId());
-				ps.setInt(3, addSkill.getLevel());
-				ps.setInt(4, classIndex);
-				ps.addBatch();
-			}
-			ps.executeBatch();
-			con.commit();
-		}
-		catch (SQLException e)
-		{
-			LOG.error("Error could not store {} skills: {}", this, e);
-		}
-	}
-	
-	/**
-	 * Retrieve from the database all skills of this L2PcInstance and add them to _skills.
-	 */
-	private void restoreSkills()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_SKILLS_FOR_CHAR))
-		{
-			// Retrieve all skills of this L2PcInstance from the database
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, getClassIndex());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
-					final int id = rs.getInt("skill_id");
-					final int level = rs.getInt("skill_level");
-					
-					// Create a L2Skill object for each record
-					final Skill skill = SkillData.getInstance().getSkill(id, level);
-					
-					if (skill == null)
-					{
-						LOG.warn("Skipped null skill Id: {}, Level: {} while restoring player skills for {}", id, level, this);
-						continue;
-					}
-					
-					// Add the L2Skill object to the L2Character _skills and its Func objects to the calculator set of the L2Character
-					addSkill(skill);
-					
-					if (Config.SKILL_CHECK_ENABLE && (!canOverrideCond(PcCondOverride.SKILL_CONDITIONS) || Config.SKILL_CHECK_GM))
-					{
-						if (!SkillTreesData.getInstance().isSkillAllowed(this, skill))
-						{
-							Util.handleIllegalPlayerAction(this, "Player " + getName() + " has invalid skill " + skill.getName() + " (" + skill.getId() + "/" + skill.getLevel() + "), class:" + ClassListData.getInstance().getClass(getClassId()).getClassName(), IllegalActionPunishmentType.BROADCAST);
-							if (Config.SKILL_CHECK_REMOVE)
-							{
-								removeSkill(skill);
-							}
-						}
-					}
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore {} skills: {}", this, e);
+			LOG.warn("Could not store new skill, it's null!");
 		}
 	}
 	
@@ -7826,167 +6934,9 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void restoreEffects()
 	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_SKILL_SAVE))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, getClassIndex());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
-					int remainingTime = rs.getInt("remaining_time");
-					long reuseDelay = rs.getLong("reuse_delay");
-					long systime = rs.getLong("systime");
-					int restoreType = rs.getInt("restore_type");
-					
-					final Skill skill = SkillData.getInstance().getSkill(rs.getInt("skill_id"), rs.getInt("skill_level"));
-					if (skill == null)
-					{
-						continue;
-					}
-					
-					final long time = systime - System.currentTimeMillis();
-					if (time > 10)
-					{
-						disableSkill(skill, time);
-						addTimeStamp(skill, reuseDelay, systime);
-					}
-					
-					// Restore Type 1 The remaning skills lost effect upon logout but were still under a high reuse delay.
-					if (restoreType > 0)
-					{
-						continue;
-					}
-					
-					// Restore Type 0 These skill were still in effect on the character upon logout.
-					// Some of which were self casted and might still have had a long reuse delay which also is restored.
-					skill.applyEffects(this, this, false, remainingTime);
-				}
-			}
-			// Remove previously restored skills
-			try (PreparedStatement delete = con.prepareStatement(DELETE_SKILL_SAVE))
-			{
-				delete.setInt(1, getObjectId());
-				delete.setInt(2, getClassIndex());
-				delete.executeUpdate();
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore {} active effect data: {}", this, e);
-		}
-	}
-	
-	/**
-	 * Retrieve from the database all Item Reuse Time of this L2PcInstance and add them to the player.
-	 */
-	private void restoreItemReuse()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_ITEM_REUSE_SAVE);
-			PreparedStatement delete = con.prepareStatement(DELETE_ITEM_REUSE_SAVE);)
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				int itemId;
-				@SuppressWarnings("unused")
-				int itemObjId;
-				long reuseDelay;
-				long systime;
-				boolean isInInventory;
-				long remainingTime;
-				while (rs.next())
-				{
-					itemId = rs.getInt("itemId");
-					itemObjId = rs.getInt("itemObjId");
-					reuseDelay = rs.getLong("reuseDelay");
-					systime = rs.getLong("systime");
-					isInInventory = true;
-					
-					// Using item Id
-					L2ItemInstance item = getInventory().getItemByItemId(itemId);
-					if (item == null)
-					{
-						item = getWarehouse().getItemByItemId(itemId);
-						isInInventory = false;
-					}
-					
-					if ((item != null) && (item.getId() == itemId) && (item.getReuseDelay() > 0))
-					{
-						remainingTime = systime - System.currentTimeMillis();
-						// Hardcoded to 10 seconds.
-						if (remainingTime > 10)
-						{
-							addTimeStampItem(item, reuseDelay, systime);
-							
-							if (isInInventory && item.isEtcItem())
-							{
-								final int group = item.getSharedReuseGroup();
-								if (group > 0)
-								{
-									sendPacket(new ExUseSharedGroupItem(itemId, group, (int) remainingTime, (int) reuseDelay));
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			// Delete item reuse.
-			delete.setInt(1, getObjectId());
-			delete.executeUpdate();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore {} Item Reuse data: {}", this, e);
-		}
-	}
-	
-	/**
-	 * Retrieve from the database all Henna of this L2PcInstance, add them to _henna and calculate stats of the L2PcInstance.
-	 */
-	private void restoreHenna()
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			_henna[i] = null;
-		}
+		DAOFactory.getInstance().getSkillSaveDAO().load(this);
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_CHAR_HENNAS))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, getClassIndex());
-			try (ResultSet rset = ps.executeQuery())
-			{
-				int slot;
-				int symbolId;
-				while (rset.next())
-				{
-					slot = rset.getInt("slot");
-					if ((slot < 1) || (slot > 3))
-					{
-						continue;
-					}
-					
-					symbolId = rset.getInt("symbol_id");
-					if (symbolId == 0)
-					{
-						continue;
-					}
-					_henna[slot - 1] = HennaData.getInstance().getHenna(symbolId);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Failed restoing character {} hennas. {}", this, e);
-		}
-		
-		// Calculate henna modifiers of this player.
-		recalcHennaStats();
+		DAOFactory.getInstance().getSkillSaveDAO().delete(this);
 	}
 	
 	/**
@@ -8021,7 +6971,7 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Remove a Henna of the L2PcInstance, save update in the character_hennas table of the database and send Server->Client HennaInfo/UserInfo packet to this L2PcInstance.
+	 * Remove a henna from the player and updates the database.
 	 * @param slot
 	 * @return
 	 */
@@ -8042,18 +6992,7 @@ public final class L2PcInstance extends L2Playable
 		
 		_henna[slot] = null;
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE_CHAR_HENNA))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, slot + 1);
-			ps.setInt(3, getClassIndex());
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Failed remocing character henna. {}", e);
-		}
+		DAOFactory.getInstance().getHennaDAO().delete(this, slot + 1);
 		
 		// Calculate Henna modifiers of this L2PcInstance
 		recalcHennaStats();
@@ -8080,9 +7019,9 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Add a Henna to the L2PcInstance, save update in the character_hennas table of the database and send Server->Client HennaInfo/UserInfo packet to this L2PcInstance.
-	 * @param henna the henna to add to the player.
-	 * @return {@code true} if the henna is added to the player, {@code false} otherwise.
+	 * Adds a henna to the player and stores it into the database.
+	 * @param henna the henna to add to the player
+	 * @return {@code true} if the henna is added to the player, {@code false} otherwise
 	 */
 	public boolean addHenna(L2Henna henna)
 	{
@@ -8095,19 +7034,7 @@ public final class L2PcInstance extends L2Playable
 				// Calculate Henna modifiers of this L2PcInstance
 				recalcHennaStats();
 				
-				try (Connection con = ConnectionFactory.getInstance().getConnection();
-					PreparedStatement ps = con.prepareStatement(ADD_CHAR_HENNA))
-				{
-					ps.setInt(1, getObjectId());
-					ps.setInt(2, henna.getDyeId());
-					ps.setInt(3, i + 1);
-					ps.setInt(4, getClassIndex());
-					ps.execute();
-				}
-				catch (Exception e)
-				{
-					LOG.error("Failed saving character henna. {}", e);
-				}
+				DAOFactory.getInstance().getHennaDAO().insert(this, henna, i + 1);
 				
 				// Send Server->Client HennaInfo packet to this L2PcInstance
 				sendPacket(new HennaInfo(this));
@@ -9959,25 +8886,12 @@ public final class L2PcInstance extends L2Playable
 			newClass.setClassId(classId);
 			newClass.setClassIndex(classIndex);
 			
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(ADD_CHAR_SUBCLASS))
+			if (!DAOFactory.getInstance().getSubclassDAO().insert(this, newClass))
 			{
-				// Store the basic info about this new sub-class.
-				ps.setInt(1, getObjectId());
-				ps.setInt(2, newClass.getClassId());
-				ps.setLong(3, newClass.getExp());
-				ps.setInt(4, newClass.getSp());
-				ps.setInt(5, newClass.getLevel());
-				ps.setInt(6, newClass.getClassIndex()); // <-- Added
-				ps.execute();
-			}
-			catch (Exception e)
-			{
-				LOG.error("Could not add character sub class for {}, {}", this, e);
 				return false;
 			}
 			
-			// Commit after database INSERT incase exception is thrown.
+			// Commit after database INSERT in case exception is thrown.
 			getSubClasses().put(newClass.getClassIndex(), newClass);
 			
 			final ClassId subTemplate = ClassId.getClassId(classId);
@@ -10008,7 +8922,7 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * 1. Completely erase all existance of the subClass linked to the classIndex.<br>
+	 * 1. Completely erase all existence of the subClass linked to the classIndex.<br>
 	 * 2. Send over the newClassId to addSubClass() to create a new instance on this classIndex.<br>
 	 * 3. Upon Exception, revert the player to their BaseClass to avoid further problems.
 	 * @param classIndex the class index to delete
@@ -10024,46 +8938,16 @@ public final class L2PcInstance extends L2Playable
 		
 		try
 		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement deleteHennas = con.prepareStatement(DELETE_CHAR_HENNAS);
-				PreparedStatement deleteShortcuts = con.prepareStatement(DELETE_CHAR_SHORTCUTS);
-				PreparedStatement deleteSkillReuse = con.prepareStatement(DELETE_SKILL_SAVE);
-				PreparedStatement deleteSkills = con.prepareStatement(DELETE_CHAR_SKILLS);
-				PreparedStatement deleteSubclass = con.prepareStatement(DELETE_CHAR_SUBCLASS))
-			{
-				// Remove all henna info stored for this sub-class.
-				deleteHennas.setInt(1, getObjectId());
-				deleteHennas.setInt(2, classIndex);
-				deleteHennas.execute();
-				
-				// Remove all shortcuts info stored for this sub-class.
-				deleteShortcuts.setInt(1, getObjectId());
-				deleteShortcuts.setInt(2, classIndex);
-				deleteShortcuts.execute();
-				
-				// Remove all effects info stored for this sub-class.
-				deleteSkillReuse.setInt(1, getObjectId());
-				deleteSkillReuse.setInt(2, classIndex);
-				deleteSkillReuse.execute();
-				
-				// Remove all skill info stored for this sub-class.
-				deleteSkills.setInt(1, getObjectId());
-				deleteSkills.setInt(2, classIndex);
-				deleteSkills.execute();
-				
-				// Remove all basic info stored about this sub-class.
-				deleteSubclass.setInt(1, getObjectId());
-				deleteSubclass.setInt(2, classIndex);
-				deleteSubclass.execute();
-			}
-			catch (Exception e)
-			{
-				LOG.error("Could not modify sub class for {} to class index {}, {}", this, classIndex, e);
-				
-				// This must be done in order to maintain data consistency.
-				getSubClasses().remove(classIndex);
-				return false;
-			}
+			DAOFactory.getInstance().getHennaDAO().deleteAll(this, classIndex);
+			
+			DAOFactory.getInstance().getSkillDAO().deleteAll(this, classIndex);
+			
+			DAOFactory.getInstance().getShortcutDAO().delete(this, classIndex);
+			
+			DAOFactory.getInstance().getSkillSaveDAO().delete(this, classIndex);
+			
+			DAOFactory.getInstance().getSubclassDAO().delete(this, classIndex);
+			
 			getSubClasses().remove(classIndex);
 		}
 		finally
@@ -10104,6 +8988,11 @@ public final class L2PcInstance extends L2Playable
 		return _activeClass;
 	}
 	
+	public void setActiveClass(int classId)
+	{
+		_activeClass = classId;
+	}
+	
 	public int getClassIndex()
 	{
 		return _classIndex;
@@ -10129,11 +9018,11 @@ public final class L2PcInstance extends L2Playable
 	/**
 	 * Changes the character's class based on the given class index.<br>
 	 * An index of zero specifies the character's original (base) class, while indexes 1-3 specifies the character's sub-classes respectively.<br>
-	 * <font color="00FF00"/>WARNING: Use only on subclase change</font>
+	 * <font color="00FF00"/>WARNING: Use only on subclass change</font>
 	 * @param classIndex
 	 * @return
 	 */
-	public boolean setActiveClass(int classIndex)
+	public boolean changeActiveClass(int classIndex)
 	{
 		if (!_subclassLock.tryLock())
 		{
@@ -10198,6 +9087,7 @@ public final class L2PcInstance extends L2Playable
 					return false;
 				}
 			}
+			
 			_classIndex = classIndex;
 			
 			setLearningClass(getClassId());
@@ -10226,16 +9116,17 @@ public final class L2PcInstance extends L2Playable
 			stopAllEffectsNotStayOnSubclassChange();
 			stopCubics();
 			
-			restoreRecipeBook(false);
+			DAOFactory.getInstance().getRecipeBookDAO().load(this, false);
 			
 			// Restore any Death Penalty Buff
 			restoreDeathPenaltyBuffLevel();
 			
-			restoreSkills();
+			DAOFactory.getInstance().getSkillDAO().load(this);
+			
 			rewardSkills();
 			regiveTemporarySkills();
 			
-			// Prevents some issues when changing between subclases that shares skills
+			// Prevents some issues when changing between subclasses that shares skills
 			resetDisabledSkills();
 			
 			restoreEffects();
@@ -10254,7 +9145,11 @@ public final class L2PcInstance extends L2Playable
 				_henna[i] = null;
 			}
 			
-			restoreHenna();
+			DAOFactory.getInstance().getHennaDAO().load(this);
+			
+			// Calculate henna modifiers of this player.
+			recalcHennaStats();
+			
 			sendPacket(new HennaInfo(this));
 			
 			if (getCurrentHp() > getMaxHp())
@@ -12657,26 +11552,6 @@ public final class L2PcInstance extends L2Playable
 		}
 	}
 	
-	public void storePetFood(int petId)
-	{
-		if ((_controlItemId != 0) && (petId != 0))
-		{
-			final String req = "UPDATE pets SET fed=? WHERE item_obj_id = ?";
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(req))
-			{
-				ps.setInt(1, getCurrentFeed());
-				ps.setInt(2, _controlItemId);
-				ps.executeUpdate();
-				_controlItemId = 0;
-			}
-			catch (Exception e)
-			{
-				LOG.error("Failed to store Pet [NpcId: {}] data {}", petId, e);
-			}
-		}
-	}
-	
 	public void setIsInSiege(boolean b)
 	{
 		_isInSiege = b;
@@ -12814,20 +11689,7 @@ public final class L2PcInstance extends L2Playable
 			bookmark.setTag(tag);
 			bookmark.setName(name);
 			
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(UPDATE_TP_BOOKMARK))
-			{
-				ps.setInt(1, icon);
-				ps.setString(2, tag);
-				ps.setString(3, name);
-				ps.setInt(4, getObjectId());
-				ps.setInt(5, id);
-				ps.execute();
-			}
-			catch (Exception e)
-			{
-				LOG.error("Could not update character teleport bookmark data: {}", e);
-			}
+			DAOFactory.getInstance().getTeleportBookmarkDAO().update(this, id, icon, tag, name);
 		}
 		
 		sendPacket(new ExGetBookMarkInfoPacket(this));
@@ -12837,19 +11699,9 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (_tpbookmarks.remove(id) != null)
 		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(DELETE_TP_BOOKMARK))
-			{
-				ps.setInt(1, getObjectId());
-				ps.setInt(2, id);
-				ps.execute();
-			}
-			catch (Exception e)
-			{
-				LOG.error("Could not delete character teleport bookmark data: {}", e);
-			}
-			
 			sendPacket(new ExGetBookMarkInfoPacket(this));
+			
+			DAOFactory.getInstance().getTeleportBookmarkDAO().delete(this, id);
 		}
 	}
 	
@@ -12981,48 +11833,13 @@ public final class L2PcInstance extends L2Playable
 		
 		destroyItem("Consume", getInventory().getItemByItemId(20033).getObjectId(), 1, null, false);
 		
-		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED);
+		final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED);
 		sm.addItemName(20033);
 		sendPacket(sm);
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT_TP_BOOKMARK))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, id);
-			ps.setInt(3, x);
-			ps.setInt(4, y);
-			ps.setInt(5, z);
-			ps.setInt(6, icon);
-			ps.setString(7, tag);
-			ps.setString(8, name);
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.warn("Could not insert character teleport bookmark data: {}", e);
-		}
 		sendPacket(new ExGetBookMarkInfoPacket(this));
-	}
-	
-	public void restoreTeleportBookmark()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_TP_BOOKMARK))
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
-					_tpbookmarks.put(rs.getInt("Id"), new TeleportBookmark(rs.getInt("Id"), rs.getInt("x"), rs.getInt("y"), rs.getInt("z"), rs.getInt("icon"), rs.getString("tag"), rs.getString("name")));
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Failed restoing character teleport bookmark.", e);
-		}
+		
+		DAOFactory.getInstance().getTeleportBookmarkDAO().insert(this, id, x, y, z, icon, tag, name);
 	}
 	
 	@Override
@@ -13216,6 +12033,7 @@ public final class L2PcInstance extends L2Playable
 		return -1;
 	}
 	
+	// TODO(Zoey76): Change this to ConcurrentHashMap.newKeySet() and move variable to the top of the class.
 	/** Friend list. */
 	private final List<Integer> _friendList = new CopyOnWriteArrayList<>();
 	
@@ -13224,37 +12042,9 @@ public final class L2PcInstance extends L2Playable
 		return _friendList;
 	}
 	
-	public void restoreFriendList()
-	{
-		_friendList.clear();
-		
-		final String sqlQuery = "SELECT friendId FROM character_friends WHERE charId=? AND relation=0";
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(sqlQuery))
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
-					int friendId = rs.getInt("friendId");
-					if (friendId == getObjectId())
-					{
-						continue;
-					}
-					_friendList.add(friendId);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Error found in {} FriendList: ", this, e);
-		}
-	}
-	
 	private void notifyFriends()
 	{
-		FriendStatusPacket pkt = new FriendStatusPacket(getObjectId());
+		final FriendStatusPacket pkt = new FriendStatusPacket(getObjectId());
 		for (int id : _friendList)
 		{
 			L2PcInstance friend = L2World.getInstance().getPlayer(id);
@@ -13313,64 +12103,6 @@ public final class L2PcInstance extends L2Playable
 			_silenceModeExcluded = new ArrayList<>(1);
 		}
 		_silenceModeExcluded.add(playerObjId);
-	}
-	
-	private void storeRecipeShopList()
-	{
-		if (hasManufactureShop())
-		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection())
-			{
-				try (PreparedStatement ps = con.prepareStatement(DELETE_CHAR_RECIPE_SHOP))
-				{
-					ps.setInt(1, getObjectId());
-					ps.execute();
-				}
-				
-				try (PreparedStatement ps = con.prepareStatement(INSERT_CHAR_RECIPE_SHOP))
-				{
-					AtomicInteger slot = new AtomicInteger(1);
-					for (L2ManufactureItem item : _manufactureItems.values())
-					{
-						ps.setInt(1, getObjectId());
-						ps.setInt(2, item.getRecipeId());
-						ps.setLong(3, item.getCost());
-						ps.setInt(4, slot.getAndIncrement());
-						ps.addBatch();
-					}
-					ps.executeBatch();
-				}
-			}
-			catch (Exception e)
-			{
-				LOG.error("Could not store recipe shop for {}, {}", this, e);
-			}
-		}
-	}
-	
-	private void restoreRecipeShopList()
-	{
-		if (_manufactureItems != null)
-		{
-			_manufactureItems.clear();
-		}
-		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(RESTORE_CHAR_RECIPE_SHOP))
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
-					getManufactureItems().put(rs.getInt("recipeId"), new L2ManufactureItem(rs.getInt("recipeId"), rs.getLong("price")));
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore recipe shop list data for {}, {}", this, e);
-		}
 	}
 	
 	public double getCollisionRadius()
@@ -13783,26 +12515,6 @@ public final class L2PcInstance extends L2Playable
 		_petItems = haveit;
 	}
 	
-	/**
-	 * Restore Pet's inventory items from database.
-	 */
-	private void restorePetInventoryItems()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT object_id FROM `items` WHERE `owner_id`=? AND (`loc`='PET' OR `loc`='PET_EQUIP') LIMIT 1;"))
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				setPetInvItems(rs.next() && (rs.getInt("object_id") > 0));
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not check Items in Pet Inventory for {}, {}", this, e);
-		}
-	}
-	
 	public String getAdminConfirmCmd()
 	{
 		return _adminConfirmCmd;
@@ -13824,38 +12536,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Load L2PcInstance Recommendations data.
-	 * @return
-	 */
-	private long loadRecommendations()
-	{
-		long _time_left = 0;
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT rec_have,rec_left,time_left FROM character_reco_bonus WHERE charId=? LIMIT 1"))
-		{
-			ps.setInt(1, getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				if (rs.next())
-				{
-					setRecomHave(rs.getInt("rec_have"));
-					setRecomLeft(rs.getInt("rec_left"));
-					_time_left = rs.getLong("time_left");
-				}
-				else
-				{
-					_time_left = 3600000;
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore Recommendations for {}, {}", this, e);
-		}
-		return _time_left;
-	}
-	
-	/**
 	 * Update L2PcInstance Recommendations data.
 	 */
 	public void storeRecommendations()
@@ -13866,30 +12546,12 @@ public final class L2PcInstance extends L2Playable
 			recoTaskEnd = Math.max(0, _recoBonusTask.getDelay(TimeUnit.MILLISECONDS));
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("INSERT INTO character_reco_bonus (charId,rec_have,rec_left,time_left) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE rec_have=?, rec_left=?, time_left=?"))
-		{
-			ps.setInt(1, getObjectId());
-			ps.setInt(2, getRecomHave());
-			ps.setInt(3, getRecomLeft());
-			ps.setLong(4, recoTaskEnd);
-			// Update part
-			ps.setInt(5, getRecomHave());
-			ps.setInt(6, getRecomLeft());
-			ps.setLong(7, recoTaskEnd);
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not update Recommendations for player: {}", this, e);
-		}
+		DAOFactory.getInstance().getRecommendationBonusDAO().insert(this, recoTaskEnd);
 	}
 	
 	public void checkRecoBonusTask()
 	{
-		// Load data
-		long taskTime = loadRecommendations();
-		
+		final long taskTime = DAOFactory.getInstance().getRecommendationBonusDAO().load(this);
 		if (taskTime > 0)
 		{
 			// Add 20 recos on first login
@@ -14474,5 +13136,51 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		return true;
+	}
+	
+	public void setLastAccess(long lastAccess)
+	{
+		_lastAccess = lastAccess;
+	}
+	
+	public void setClassIndex(int classIndex)
+	{
+		_classIndex = classIndex;
+	}
+	
+	public Map<Integer, TeleportBookmark> getTpbookmarks()
+	{
+		return _tpbookmarks;
+	}
+	
+	public long getOnlineTime()
+	{
+		return _onlineTime;
+	}
+	
+	public void setHenna(L2Henna[] henna)
+	{
+		_henna = henna;
+	}
+	
+	public long getOnlineBeginTime()
+	{
+		return _onlineBeginTime;
+	}
+	
+	public int getControlItemId()
+	{
+		return _controlItemId;
+	}
+	
+	public void setControlItemId(int controlItemId)
+	{
+		_controlItemId = controlItemId;
+	}
+	
+	// TODO(Zoey76): Improve this.
+	public void getDwarvenRecipeBookClear()
+	{
+		_dwarvenRecipeBook.clear();
 	}
 }

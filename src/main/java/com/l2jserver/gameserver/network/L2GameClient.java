@@ -293,7 +293,11 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 	/**
 	 * Method to handle character deletion
 	 * @param charslot
-	 * @return a byte: <li>-1: Error: No char was found for such charslot, caught exception, etc... <li>0: character is not member of any clan, proceed with deletion <li>1: character is member of a clan, but not clan leader <li>2: character is clan leader
+	 * @return a byte:
+	 *         <li>-1: Error: No char was found for such charslot, caught exception, etc...
+	 *         <li>0: character is not member of any clan, proceed with deletion
+	 *         <li>1: character is member of a clan, but not clan leader
+	 *         <li>2: character is clan leader
 	 */
 	public byte markToDeleteChar(int charslot)
 	{
@@ -629,9 +633,6 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		return character;
 	}
 	
-	/**
-	 * @param list
-	 */
 	public void setCharSelection(List<CharSelectInfoPackage> list)
 	{
 		_charSlotMapping = list;

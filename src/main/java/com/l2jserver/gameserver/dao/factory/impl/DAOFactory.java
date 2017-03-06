@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2016 L2J Server
+ * Copyright (C) 2004-2017 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -16,58 +16,57 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.commons.database.pool.impl;
+package com.l2jserver.gameserver.dao.factory.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.IConnectionFactory;
+import com.l2jserver.gameserver.dao.factory.IDAOFactory;
 
 /**
- * Connection Factory implementation.
+ * DAO Factory implementation.
  * @author Zoey76
  */
-public class ConnectionFactory
+public class DAOFactory
 {
-	private ConnectionFactory()
+	private DAOFactory()
 	{
 		// Hide constructor.
 	}
 	
-	public static IConnectionFactory getInstance()
+	public static IDAOFactory getInstance()
 	{
 		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder
 	{
-		private static final Logger LOG = LoggerFactory.getLogger(ConnectionFactory.class);
+		private static final Logger LOG = LoggerFactory.getLogger(DAOFactory.class);
 		
-		protected static final IConnectionFactory INSTANCE;
+		protected static final IDAOFactory INSTANCE;
 		
 		static
 		{
-			switch (Config.DATABASE_CONNECTION_POOL)
+			switch (Config.DATABASE_ENGINE)
 			{
+				case "MSSQL":
+				case "OracleDB":
+				case "PostgreSQL":
+				case "H2":
+				case "HSQLDB":
+				{
+					throw new UnsupportedOperationException(Config.DATABASE_ENGINE + " is not supported!");
+				}
 				default:
-				case "HikariCP":
+				case "MariaDB":
+				case "MySQL":
 				{
-					INSTANCE = HikariCPConnectionFactory.INSTANCE;
-					break;
-				}
-				case "C3P0":
-				{
-					INSTANCE = C3P0ConnectionFactory.INSTANCE;
-					break;
-				}
-				case "BoneCP":
-				{
-					INSTANCE = BoneCPConnectionFactory.INSTANCE;
+					INSTANCE = MySQLDAOFactory.INSTANCE;
 					break;
 				}
 			}
-			LOG.info("Using {} connection pool.", INSTANCE.getClass().getSimpleName().replace("ConnectionFactory", ""));
+			LOG.info("Using {} DAO Factory.", INSTANCE.getClass().getSimpleName().replace("DAOFactory", ""));
 		}
 	}
 }

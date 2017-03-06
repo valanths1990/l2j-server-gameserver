@@ -19,18 +19,14 @@
 package com.l2jserver.gameserver.network.clientpackets;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.xml.impl.InitialEquipmentData;
 import com.l2jserver.gameserver.data.xml.impl.InitialShortcutData;
-import com.l2jserver.gameserver.data.xml.impl.PlayerTemplateData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.instancemanager.QuestManager;
@@ -59,7 +55,8 @@ import com.l2jserver.gameserver.util.Util;
 public final class CharacterCreate extends L2GameClientPacket
 {
 	private static final String _C__0C_CHARACTERCREATE = "[C] 0C CharacterCreate";
-	protected static final Logger _logAccounting = Logger.getLogger("accounting");
+	
+	private static final Logger LOG = LoggerFactory.getLogger("accounting");
 	
 	// cSdddddddddddd
 	private String _name;
@@ -102,23 +99,17 @@ public final class CharacterCreate extends L2GameClientPacket
 		{
 			if (Config.DEBUG)
 			{
-				_log.fine("Character Creation Failure: Character name " + _name + " is invalid. Message generated: Your title cannot exceed 16 characters in length. Please try again.");
+				_log.fine("Character Creation Failure: Character name " + _name + " is invalid.");
 			}
 			
 			sendPacket(new CharCreateFail(CharCreateFail.REASON_16_ENG_CHARS));
 			return;
 		}
 		
-		if (Config.FORBIDDEN_NAMES.length > 1)
+		if (Config.FORBIDDEN_NAMES.contains(_name.toLowerCase()))
 		{
-			for (String st : Config.FORBIDDEN_NAMES)
-			{
-				if (_name.toLowerCase().contains(st.toLowerCase()))
-				{
-					sendPacket(new CharCreateFail(CharCreateFail.REASON_INCORRECT_NAME));
-					return;
-				}
-			}
+			sendPacket(new CharCreateFail(CharCreateFail.REASON_INCORRECT_NAME));
+			return;
 		}
 		
 		// Last Verified: May 30, 2009 - Gracia Final
@@ -126,7 +117,7 @@ public final class CharacterCreate extends L2GameClientPacket
 		{
 			if (Config.DEBUG)
 			{
-				_log.fine("Character Creation Failure: Character name " + _name + " is invalid. Message generated: Incorrect name. Please try again.");
+				_log.fine("Character Creation Failure: Character name " + _name + " is invalid.");
 			}
 			
 			sendPacket(new CharCreateFail(CharCreateFail.REASON_INCORRECT_NAME));
@@ -158,7 +149,6 @@ public final class CharacterCreate extends L2GameClientPacket
 		}
 		
 		L2PcInstance newChar = null;
-		L2PcTemplate template = null;
 		
 		/*
 		 * DrHouse: Since checks for duplicate names are done using SQL, lock must be held until data is written to DB as well.
@@ -186,19 +176,15 @@ public final class CharacterCreate extends L2GameClientPacket
 				return;
 			}
 			
-			template = PlayerTemplateData.getInstance().getTemplate(_classId);
-			if ((template == null) || (ClassId.getClassId(_classId).level() > 0))
+			if (ClassId.getClassId(_classId).level() > 0)
 			{
-				if (Config.DEBUG)
-				{
-					_log.fine("Character Creation Failure: " + _name + " classId: " + _classId + " Template: " + template + " Message generated: Your character creation has failed.");
-				}
+				_log.warning("Character Creation Failure: " + _name + " classId: " + _classId);
 				
 				sendPacket(new CharCreateFail(CharCreateFail.REASON_CREATION_FAILED));
 				return;
 			}
 			final PcAppearance app = new PcAppearance(_face, _hairColor, _hairStyle, _sex != 0);
-			newChar = L2PcInstance.create(template, getClient().getAccountName(), _name, app);
+			newChar = L2PcInstance.create(_classId, getClient().getAccountName(), _name, app);
 		}
 		
 		// HP and MP are at maximum and CP is zero by default.
@@ -210,36 +196,12 @@ public final class CharacterCreate extends L2GameClientPacket
 		
 		initNewChar(getClient(), newChar);
 		
-		LogRecord record = new LogRecord(Level.INFO, "Created new character");
-		record.setParameters(new Object[]
-		{
-			newChar,
-			getClient()
-		});
-		_logAccounting.log(record);
+		LOG.info("Created new character {} {}.", newChar, getClient());
 	}
 	
 	private boolean isValidName(String text)
 	{
-		boolean result = true;
-		String test = text;
-		Pattern pattern;
-		// UnAfraid: TODO: Move that into Config
-		try
-		{
-			pattern = Pattern.compile(Config.CNAME_TEMPLATE);
-		}
-		catch (PatternSyntaxException e) // case of illegal pattern
-		{
-			_log.warning("ERROR : Character name pattern of config is wrong!");
-			pattern = Pattern.compile(".*");
-		}
-		Matcher regexp = pattern.matcher(test);
-		if (!regexp.matches())
-		{
-			result = false;
-		}
-		return result;
+		return Config.CNAME_TEMPLATE.matcher(text).matches();
 	}
 	
 	private void initNewChar(L2GameClient client, L2PcInstance newChar)

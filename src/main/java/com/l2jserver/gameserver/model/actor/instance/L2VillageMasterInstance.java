@@ -539,7 +539,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 								return;
 							}
 							
-							player.setActiveClass(player.getTotalSubClasses());
+							player.changeActiveClass(player.getTotalSubClasses());
 							
 							html.setFile(player.getHtmlPrefix(), "data/html/villagemaster/SubClass_AddOk.htm");
 							
@@ -588,7 +588,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 							}
 						}
 						
-						player.setActiveClass(paramOne);
+						player.changeActiveClass(paramOne);
 						player.sendPacket(SystemMessageId.SUBCLASS_TRANSFER_COMPLETED); // Transfer completed.
 						return;
 					case 6: // Change/Cancel Subclass - Choice
@@ -650,7 +650,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 							player.stopAllEffectsExceptThoseThatLastThroughDeath(); // all effects from old subclass stopped!
 							player.stopAllEffectsNotStayOnSubclassChange();
 							player.stopCubics();
-							player.setActiveClass(paramOne);
+							player.changeActiveClass(paramOne);
 							
 							html.setFile(player.getHtmlPrefix(), "data/html/villagemaster/SubClass_ModifyOk.htm");
 							html.replace("%name%", ClassListData.getInstance().getClass(paramTwo).getClientCode());
@@ -662,7 +662,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 							/**
 							 * This isn't good! modifySubClass() removed subclass from memory we must update _classIndex! Else IndexOutOfBoundsException can turn up some place down the line along with other seemingly unrelated problems.
 							 */
-							player.setActiveClass(0); // Also updates _classIndex plus switching _classid to baseclass.
+							player.changeActiveClass(0); // Also updates _classIndex plus switching _classid to baseclass.
 							
 							player.sendMessage("The sub class could not be added, you have been reverted to your base class.");
 							return;

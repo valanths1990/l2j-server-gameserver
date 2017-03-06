@@ -42,10 +42,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -256,7 +260,7 @@ public final class Config
 	public static boolean EXPERTISE_PENALTY;
 	public static boolean STORE_RECIPE_SHOPLIST;
 	public static boolean STORE_UI_SETTINGS;
-	public static String[] FORBIDDEN_NAMES;
+	public static Set<String> FORBIDDEN_NAMES;
 	public static boolean SILENCE_MODE_EXCLUDE;
 	public static boolean ALT_VALIDATE_TRIGGER_SKILLS;
 	
@@ -925,6 +929,7 @@ public final class Config
 	public static int LOGIN_TRY_BEFORE_BAN;
 	public static int LOGIN_BLOCK_AFTER_BAN;
 	public static String GAMESERVER_HOSTNAME;
+	public static String DATABASE_ENGINE;
 	public static String DATABASE_DRIVER;
 	public static String DATABASE_URL;
 	public static String DATABASE_LOGIN;
@@ -933,7 +938,7 @@ public final class Config
 	public static int DATABASE_MAX_CONNECTIONS;
 	public static int DATABASE_MAX_IDLE_TIME;
 	public static int MAXIMUM_ONLINE_USERS;
-	public static String CNAME_TEMPLATE;
+	public static Pattern CNAME_TEMPLATE;
 	public static String PET_NAME_TEMPLATE;
 	public static String CLAN_NAME_TEMPLATE;
 	public static int MAX_CHARACTERS_NUMBER_PER_ACCOUNT;
@@ -1148,6 +1153,7 @@ public final class Config
 			REQUEST_ID = serverSettings.getInt("RequestServerID", 0);
 			ACCEPT_ALTERNATE_ID = serverSettings.getBoolean("AcceptAlternateID", true);
 			
+			DATABASE_ENGINE = serverSettings.getString("Database", "MySQL");
 			DATABASE_DRIVER = serverSettings.getString("Driver", "com.mysql.jdbc.Driver");
 			DATABASE_URL = serverSettings.getString("URL", "jdbc:mysql://localhost/l2jgs");
 			DATABASE_LOGIN = serverSettings.getString("Login", "root");
@@ -1166,7 +1172,16 @@ public final class Config
 				DATAPACK_ROOT = new File(".");
 			}
 			
-			CNAME_TEMPLATE = serverSettings.getString("CnameTemplate", ".*");
+			try
+			{
+				CNAME_TEMPLATE = Pattern.compile(serverSettings.getString("CnameTemplate", "[a-zA-Z0-9]{1,16}"));
+			}
+			catch (PatternSyntaxException e)
+			{
+				_log.warn("ERROR : Character name pattern of config is wrong!");
+				CNAME_TEMPLATE = Pattern.compile("[a-zA-Z0-9]{1,16}");
+			}
+			
 			PET_NAME_TEMPLATE = serverSettings.getString("PetNameTemplate", ".*");
 			CLAN_NAME_TEMPLATE = serverSettings.getString("ClanNameTemplate", ".*");
 			
@@ -1688,7 +1703,7 @@ public final class Config
 			EXPERTISE_PENALTY = character.getBoolean("ExpertisePenalty", true);
 			STORE_RECIPE_SHOPLIST = character.getBoolean("StoreRecipeShopList", false);
 			STORE_UI_SETTINGS = character.getBoolean("StoreCharUiSettings", false);
-			FORBIDDEN_NAMES = character.getString("ForbiddenNames", "").split(",");
+			FORBIDDEN_NAMES = new HashSet<>(Arrays.asList(character.getString("ForbiddenNames", "annou,ammou,amnou,anmou,anou,amou,announcements,announce").split(",")));
 			SILENCE_MODE_EXCLUDE = character.getBoolean("SilenceModeExclude", false);
 			ALT_VALIDATE_TRIGGER_SKILLS = character.getBoolean("AltValidateTriggerSkills", false);
 			PLAYER_MOVEMENT_BLOCK_TIME = character.getInt("NpcTalkBlockingTime", 0) * 1000;

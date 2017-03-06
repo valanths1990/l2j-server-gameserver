@@ -20,11 +20,7 @@ package com.l2jserver.commons.database.pool.impl;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.AbstractConnectionFactory;
 import com.l2jserver.commons.database.pool.IConnectionFactory;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -34,13 +30,13 @@ import com.zaxxer.hikari.HikariDataSource;
  * <b>Access it through {@link ConnectionFactory} and proper configuration.</b>
  * @author Zoey76
  */
-final class HikariCPConnectionFactory extends AbstractConnectionFactory
+enum HikariCPConnectionFactory implements IConnectionFactory
 {
-	private static final Logger LOG = LoggerFactory.getLogger(HikariCPConnectionFactory.class);
+	INSTANCE;
 	
 	private final HikariDataSource _dataSource;
 	
-	public HikariCPConnectionFactory()
+	HikariCPConnectionFactory()
 	{
 		_dataSource = new HikariDataSource();
 		_dataSource.setJdbcUrl(Config.DATABASE_URL);
@@ -67,15 +63,5 @@ final class HikariCPConnectionFactory extends AbstractConnectionFactory
 	public DataSource getDataSource()
 	{
 		return _dataSource;
-	}
-	
-	public static IConnectionFactory getInstance()
-	{
-		return SingletonHolder.INSTANCE;
-	}
-	
-	private static class SingletonHolder
-	{
-		protected static final IConnectionFactory INSTANCE = new HikariCPConnectionFactory();
 	}
 }

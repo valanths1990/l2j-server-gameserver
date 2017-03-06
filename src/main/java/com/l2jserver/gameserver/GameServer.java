@@ -37,6 +37,7 @@ import com.l2jserver.Server;
 import com.l2jserver.UPnPService;
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.sql.impl.AnnouncementsTable;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
@@ -448,6 +449,7 @@ public final class GameServer
 		// Initialize config
 		Config.load();
 		printSection("Database");
+		DAOFactory.getInstance();
 		ConnectionFactory.getInstance();
 		
 		gameServer = new GameServer();

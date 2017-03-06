@@ -20,6 +20,7 @@ dependencies {
 	compile 'com.sun.mail:javax.mail:1.5.6'
 	compile 'com.zaxxer:HikariCP:2.6.0'
 	compile 'mysql:mysql-connector-java:6.0.5'
+	compile 'org.mariadb.jdbc:mariadb-java-client:1.5.8'
 	compile 'org.bitlet:weupnp:0.1.4'
 	compile 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
 	compile 'com.google.guava:guava:21.0'
@@ -40,7 +41,7 @@ def generalManifest = manifest {
 	attributes('Built-By': System.getProperty('user.name'),
 			'Built-Date': new Date().format("yyyy-MM-dd HH:mm:ss"),
 			'Implementation-URL': 'http://www.l2jserver.com/',
-			'Class-Path': configurations.compile.collect { '../libs/$it.name' }.join(' '))
+			'Class-Path': configurations.runtime.collect { '../libs/' + it.name }.join(' '))
 }
 
 jar {
@@ -140,15 +141,14 @@ task zip(type: Zip, dependsOn: build) {
 		from(dbInstGsJar)
 	}
 	
-	def fileName = 'L2J_Server_' + new Date().format("yyyy-MM-dd")
-	baseName = fileName
-	println 'Build in build/distributions/' + fileName + '.zip'
+	baseName = 'L2J_Server_' + new Date().format("yyyy-MM-dd")
+	println 'Build in build/distributions/' + baseName + '.zip'
 }
 
 build.finalizedBy(zip)
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '3.3'
+	gradleVersion = '3.4'
 }
 
 eclipse {
