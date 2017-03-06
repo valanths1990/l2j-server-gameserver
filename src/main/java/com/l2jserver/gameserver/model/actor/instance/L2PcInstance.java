@@ -322,38 +322,73 @@ import com.l2jserver.util.Rnd;
  */
 public final class L2PcInstance extends L2Playable
 {
-	private static final Logger LOG = LoggerFactory.getLogger(L2PcInstance.class);
-	
-	private static final String COND_OVERRIDE_KEY = "cond_override";
-	
-	public static final String NEWBIE_KEY = "NEWBIE";
-	
 	public static final int ID_NONE = -1;
-	
 	public static final int REQUEST_TIMEOUT = 15;
-	
+	private static final Logger LOG = LoggerFactory.getLogger(L2PcInstance.class);
+	private static final String COND_OVERRIDE_KEY = "cond_override";
+	// during fall validations will be disabled for 10 ms.
+	private static final int FALLING_VALIDATION_DELAY = 10000;
+	public final ReentrantLock soulShotLock = new ReentrantLock();
 	private final Queue<IEventListener> _eventListeners = new ConcurrentLinkedQueue<>();
-	
-	private L2GameClient _client;
-	
 	private final String _accountName;
+	private final ReentrantLock _subclassLock = new ReentrantLock();
+	private final PcAppearance _appearance;
+	private final L2ContactList _contactList = new L2ContactList(this);
+	private final Map<Integer, TeleportBookmark> _tpbookmarks = new ConcurrentHashMap<>();
+	/** The table containing all L2RecipeList of the L2PcInstance */
+	private final Map<Integer, L2RecipeList> _dwarvenRecipeBook = new ConcurrentHashMap<>();
+	private final Map<Integer, L2RecipeList> _commonRecipeBook = new ConcurrentHashMap<>();
+	/** Premium Items */
+	private final Map<Integer, L2PremiumItem> _premiumItems = new ConcurrentHashMap<>();
+	/** Location before entering Observer Mode */
+	private final Location _lastLoc = new Location(0, 0, 0);
+	/** Stored from last ValidatePosition **/
+	private final Location _lastServerPosition = new Location(0, 0, 0);
+	private final PcInventory _inventory = new PcInventory(this);
+	private final PcFreight _freight = new PcFreight(this);
+	/** The table containing all Quests began by the L2PcInstance */
+	private final Map<String, QuestState> _quests = new ConcurrentHashMap<>();
+	/** The list containing all shortCuts of this player. */
+	private final ShortCuts _shortCuts = new ShortCuts(this);
+	/** The list containing all macros of this player. */
+	private final MacroList _macros = new MacroList(this);
+	private final Set<L2PcInstance> _snoopListener = ConcurrentHashMap.newKeySet(1);
+	private final Set<L2PcInstance> _snoopedPlayer = ConcurrentHashMap.newKeySet(1);
+	// TODO: This needs to be better integrated and saved/loaded
+	private final L2Radar _radar;
+	private final AtomicInteger _charges = new AtomicInteger();
+	private final L2Request _request = new L2Request(this);
+	private final Map<Integer, String> _chars = new LinkedHashMap<>();
+	/** Player's cubics. */
+	private final Map<Integer, L2CubicInstance> _cubics = new ConcurrentSkipListMap<>(); // TODO(Zoey76): This should be sorted in insert order.
+	/** Active shots. */
+	private final Set<Integer> _activeSoulShots = ConcurrentHashMap.newKeySet(1);
+	/** new loto ticket **/
+	private final int _loto[] = new int[5];
+	/** new race ticket **/
+	private final int _race[] = new int[2];
+	private final BlockList _blockList = new BlockList(this);
+	/** Last Html Npcs, 0 = last html was not bound to an npc */
+	private final int[] _htmlActionOriginObjectIds = new int[HtmlActionScope.values().length];
+	/** Bypass validations */
+	@SuppressWarnings("unchecked")
+	private final LinkedList<String>[] _htmlActionCaches = new LinkedList[HtmlActionScope.values().length];
+	// TODO(Zoey76): Change this to ConcurrentHashMap.newKeySet() and move variable to the top of the class.
+	private final List<Integer> _friendList = new CopyOnWriteArrayList<>();
+	private PartyDistributionType _partyDistributionType;
+	private L2GameClient _client;
 	private long _deleteTimer;
 	private Calendar _createDate = Calendar.getInstance();
-	
 	private String _lang = null;
 	private String _htmlPrefix = null;
-	
 	private volatile boolean _isOnline = false;
 	private long _onlineTime;
 	private long _onlineBeginTime;
 	private long _lastAccess;
 	private long _uptime;
-	
-	private final ReentrantLock _subclassLock = new ReentrantLock();
 	private int _baseClass;
 	private int _activeClass;
 	private int _classIndex = 0;
-	
 	/** data for mounted pets */
 	private int _controlItemId;
 	private L2PetLevelData _leveldata;
@@ -361,58 +396,35 @@ public final class L2PcInstance extends L2Playable
 	private Future<?> _mountFeedTask;
 	private ScheduledFuture<?> _dismountTask;
 	private boolean _petItems = false;
-	
 	/** The list of sub-classes this character has. */
 	private Map<Integer, SubClass> _subClasses;
-	
-	private final PcAppearance _appearance;
-	
 	/** The Experience of the L2PcInstance before the last Death Penalty */
 	private long _expBeforeDeath;
-	
 	/** The Karma of the L2PcInstance (if higher than 0, the name of the L2PcInstance appears in red) */
 	private int _karma;
-	
 	/** The number of player killed during a PvP (the player killed was PvP Flagged) */
 	private int _pvpKills;
-	
 	/** The PK counter of the L2PcInstance (= Number of non PvP Flagged player killed) */
 	private int _pkKills;
-	
 	/** The PvP Flag state of the L2PcInstance (0=White, 1=Purple) */
 	private byte _pvpFlag;
-	
 	/** The Fame of this L2PcInstance */
 	private int _fame;
 	private ScheduledFuture<?> _fameTask;
-	
 	/** Vitality recovery task */
 	private ScheduledFuture<?> _vitalityTask;
-	
 	private volatile ScheduledFuture<?> _teleportWatchdog;
-	
 	/** The Siege state of the L2PcInstance */
 	private byte _siegeState = 0;
-	
 	/** The id of castle/fort which the L2PcInstance is registered for siege */
 	private int _siegeSide = 0;
-	
 	private int _curWeightPenalty = 0;
-	
 	private int _lastCompassZone; // the last compass zone update send to the client
-	
 	private boolean _isIn7sDungeon = false;
-	
-	private final L2ContactList _contactList = new L2ContactList(this);
-	
 	private int _bookmarkslot = 0; // The Teleport Bookmark Slot
-	
-	private final Map<Integer, TeleportBookmark> _tpbookmarks = new ConcurrentHashMap<>();
-	
 	private boolean _canFeed;
 	private boolean _isInSiege;
 	private boolean _isInHideoutSiege = false;
-	
 	/** Olympiad */
 	private boolean _inOlympiadMode = false;
 	private boolean _OlympiadStart = false;
@@ -420,101 +432,56 @@ public final class L2PcInstance extends L2Playable
 	private int _olympiadSide = -1;
 	/** Olympiad buff count. */
 	private int _olyBuffsCount = 0;
-	
 	/** Duel */
 	private DuelState _duelState = DuelState.NO_DUEL;
 	private int _duelId = 0;
-	
 	/** Boat and AirShip */
 	private L2Vehicle _vehicle = null;
 	private Location _inVehiclePosition;
-	
 	private ScheduledFuture<?> _taskforfish;
 	private MountType _mountType = MountType.NONE;
 	private int _mountNpcId;
 	private int _mountLevel;
 	/** Store object used to summon the strider you are mounting **/
 	private int _mountObjectID = 0;
-	
 	private int _telemode = 0;
-	
 	private boolean _inCrystallize;
 	private boolean _inCraftMode;
-	
 	private long _offlineShopStart = 0;
-	
 	private Transform _transformation;
 	private volatile Map<Integer, Skill> _transformSkills;
-	
-	/** The table containing all L2RecipeList of the L2PcInstance */
-	private final Map<Integer, L2RecipeList> _dwarvenRecipeBook = new ConcurrentHashMap<>();
-	private final Map<Integer, L2RecipeList> _commonRecipeBook = new ConcurrentHashMap<>();
-	
-	/** Premium Items */
-	private final Map<Integer, L2PremiumItem> _premiumItems = new ConcurrentHashMap<>();
-	
 	/** True if the L2PcInstance is sitting */
 	private boolean _waitTypeSitting;
-	
-	/** Location before entering Observer Mode */
-	private final Location _lastLoc = new Location(0, 0, 0);
 	private boolean _observerMode = false;
-	
-	/** Stored from last ValidatePosition **/
-	private final Location _lastServerPosition = new Location(0, 0, 0);
-	
-	/** The number of recommendation obtained by the L2PcInstance */
-	private int _recomHave; // how much I was recommended by others
-	/** The number of recommendation that the L2PcInstance can give */
-	private int _recomLeft; // how many recommendations I can give to others
+	/** The number of recommendation obtained by the player. */
+	private int _recomHave;
+	/** The number of recommendation that the player can give. */
+	private int _recomLeft;
 	/** Recommendation Bonus task **/
 	private ScheduledFuture<?> _recoBonusTask;
 	/** Recommendation task **/
 	private ScheduledFuture<?> _recoGiveTask;
 	/** Recommendation Two Hours bonus **/
 	private boolean _recoTwoHoursGiven = false;
-	
-	private final PcInventory _inventory = new PcInventory(this);
-	private final PcFreight _freight = new PcFreight(this);
 	private PcWarehouse _warehouse;
 	private PcRefund _refund;
-	
 	private PrivateStoreType _privateStoreType = PrivateStoreType.NONE;
-	
 	private TradeList _activeTradeList;
 	private ItemContainer _activeWarehouse;
 	private volatile Map<Integer, L2ManufactureItem> _manufactureItems;
 	private String _storeName = "";
 	private TradeList _sellList;
 	private TradeList _buyList;
-	
 	// Multisell
 	private PreparedListContainer _currentMultiSell = null;
-	
 	/** Bitmask used to keep track of one-time/newbie quest rewards */
 	private int _newbie;
-	
 	private boolean _noble = false;
 	private boolean _hero = false;
-	
 	/** The L2FolkInstance corresponding to the last Folk which one the player talked. */
 	private L2Npc _lastFolkNpc = null;
-	
 	/** Last NPC Id talked on a quest */
 	private int _questNpcObject = 0;
-	
-	/** The table containing all Quests began by the L2PcInstance */
-	private final Map<String, QuestState> _quests = new ConcurrentHashMap<>();
-	
-	/** The list containing all shortCuts of this player. */
-	private final ShortCuts _shortCuts = new ShortCuts(this);
-	
-	/** The list containing all macros of this player. */
-	private final MacroList _macros = new MacroList(this);
-	
-	private final Set<L2PcInstance> _snoopListener = ConcurrentHashMap.newKeySet(1);
-	private final Set<L2PcInstance> _snoopedPlayer = ConcurrentHashMap.newKeySet(1);
-	
 	private L2Henna[] _henna = new L2Henna[3];
 	private int _hennaSTR;
 	private int _hennaINT;
@@ -522,7 +489,6 @@ public final class L2PcInstance extends L2Playable
 	private int _hennaMEN;
 	private int _hennaWIT;
 	private int _hennaCON;
-	
 	/** The L2Summon of the L2PcInstance */
 	private L2Summon _summon = null;
 	/** The L2Decoy of the L2PcInstance */
@@ -534,159 +500,80 @@ public final class L2PcInstance extends L2Playable
 	// apparently, a L2PcInstance CAN have both a summon AND a tamed beast at the same time!!
 	// after Freya players can control more than one tamed beast
 	private List<L2TamedBeastInstance> _tamedBeast = null;
-	
 	private boolean _minimapAllowed = false;
-	
-	// client radar
-	// TODO: This needs to be better integrated and saved/loaded
-	private final L2Radar _radar;
-	
-	// Party matching
-	// private int _partymatching = 0;
 	private int _partyroom = 0;
-	// private int _partywait = 0;
-	
-	// Clan related attributes
 	/** The Clan Identifier of the L2PcInstance */
 	private int _clanId;
-	
 	/** The Clan object of the L2PcInstance */
 	private L2Clan _clan;
-	
 	/** Apprentice and Sponsor IDs */
 	private int _apprentice = 0;
 	private int _sponsor = 0;
-	
 	private long _clanJoinExpiryTime;
 	private long _clanCreateExpiryTime;
-	
 	private int _powerGrade = 0;
 	private volatile EnumIntBitmask<ClanPrivilege> _clanPrivileges = new EnumIntBitmask<>(ClanPrivilege.class, false);
-	
 	/** L2PcInstance's pledge class (knight, Baron, etc.) */
 	private int _pledgeClass = 0;
 	private int _pledgeType = 0;
-	
 	/** Level at which the player joined the clan as an academy member */
 	private int _lvlJoinedAcademy = 0;
-	
 	private int _wantsPeace = 0;
-	
 	// Death Penalty Buff Level
 	private int _deathPenaltyBuffLevel = 0;
-	
-	// charges
-	private final AtomicInteger _charges = new AtomicInteger();
 	private volatile ScheduledFuture<?> _chargeTask = null;
-	
 	// Absorbed Souls
 	private int _souls = 0;
 	private ScheduledFuture<?> _soulTask = null;
-	
 	// WorldPosition used by TARGET_SIGNET_GROUND
 	private Location _currentSkillWorldPosition;
-	
 	private L2AccessLevel _accessLevel;
-	
 	private boolean _messageRefusal = false; // message refusal mode
-	
 	private boolean _silenceMode = false; // silence mode
 	private List<Integer> _silenceModeExcluded; // silence mode
 	private boolean _dietMode = false; // ignore weight penalty
 	private boolean _tradeRefusal = false; // Trade refusal
 	private boolean _exchangeRefusal = false; // Exchange refusal
-	
 	private L2Party _party;
-	PartyDistributionType _partyDistributionType;
-	
 	// this is needed to find the inviting player for Party response
 	// there can only be one active party request at once
 	private L2PcInstance _activeRequester;
 	private long _requestExpireTime = 0;
-	private final L2Request _request = new L2Request(this);
 	private L2ItemInstance _arrowItem;
 	private L2ItemInstance _boltItem;
-	
 	// Used for protection after teleport
 	private long _protectEndTime = 0;
-	
 	private L2ItemInstance _lure = null;
-	
-	public boolean isSpawnProtected()
-	{
-		return _protectEndTime > GameTimeController.getInstance().getGameTicks();
-	}
-	
 	private long _teleportProtectEndTime = 0;
-	
-	public boolean isTeleportProtected()
-	{
-		return _teleportProtectEndTime > GameTimeController.getInstance().getGameTicks();
-	}
-	
 	// protects a char from aggro mobs when getting up from fake death
 	private long _recentFakeDeathEndTime = 0;
 	private boolean _isFakeDeath;
-	
 	/** The fists L2Weapon of the L2PcInstance (used when no weapon is equipped) */
 	private L2Weapon _fistsWeaponItem;
-	
-	private final Map<Integer, String> _chars = new LinkedHashMap<>();
-	
-	// private byte _updateKnownCounter = 0;
-	
 	private int _expertiseArmorPenalty = 0;
 	private int _expertiseWeaponPenalty = 0;
 	private int _expertisePenaltyBonus = 0;
-	
 	private boolean _isEnchanting = false;
 	private int _activeEnchantItemId = ID_NONE;
 	private int _activeEnchantSupportItemId = ID_NONE;
 	private int _activeEnchantAttrItemId = ID_NONE;
 	private long _activeEnchantTimestamp = 0;
-	
 	private boolean _inventoryDisable = false;
-	/** Player's cubics. */
-	private final Map<Integer, L2CubicInstance> _cubics = new ConcurrentSkipListMap<>(); // TODO(Zoey76): This should be sorted in insert order.
-	/** Active shots. */
-	private final Set<Integer> _activeSoulShots = ConcurrentHashMap.newKeySet(1);
-	
-	public final ReentrantLock soulShotLock = new ReentrantLock();
-	
 	/** Event parameters */
 	private PlayerEventHolder eventStatus = null;
-	
 	private byte _handysBlockCheckerEventArena = -1;
-	
-	/** new loto ticket **/
-	private final int _loto[] = new int[5];
-	// public static int _loto_nums[] = {0,1,2,3,4,5,6,7,8,9,};
-	/** new race ticket **/
-	private final int _race[] = new int[2];
-	
-	private final BlockList _blockList = new BlockList(this);
-	
 	private L2Fishing _fishCombat;
 	private boolean _fishing = false;
 	private int _fishx = 0;
 	private int _fishy = 0;
 	private int _fishz = 0;
-	
 	private ScheduledFuture<?> _taskRentPet;
 	private ScheduledFuture<?> _taskWater;
-	
-	/** Last Html Npcs, 0 = last html was not bound to an npc */
-	private final int[] _htmlActionOriginObjectIds = new int[HtmlActionScope.values().length];
 	/**
 	 * Origin of the last incoming html action request.<br>
 	 * This can be used for HTMLs continuing the conversation with an npc.
 	 */
 	private int _lastHtmlActionOriginObjId;
-	
-	/** Bypass validations */
-	@SuppressWarnings("unchecked")
-	private final LinkedList<String>[] _htmlActionCaches = new LinkedList[HtmlActionScope.values().length];
-	
 	private Forum _forumMail;
 	private Forum _forumMemo;
 	
@@ -721,32 +608,40 @@ public final class L2PcInstance extends L2Playable
 	private int _clientY;
 	private int _clientZ;
 	private int _clientHeading;
-	
-	// during fall validations will be disabled for 10 ms.
-	private static final int FALLING_VALIDATION_DELAY = 10000;
-	
 	private volatile long _fallingTimestamp = 0;
-	
 	private int _multiSocialTarget = 0;
 	private int _multiSociaAction = 0;
-	
 	private int _movieId = 0;
-	
 	private String _adminConfirmCmd = null;
-	
 	private volatile long _lastItemAuctionInfoRequest = 0;
-	
 	private Future<?> _PvPRegTask;
-	
 	private long _pvpFlagLasts;
-	
 	private long _notMoveUntil = 0;
-	
 	/** Map containing all custom skills of this player. */
 	private Map<Integer, Skill> _customSkills = null;
-	
 	private volatile int _actionMask;
 	private Map<Stats, Double> _servitorShare;
+	// Character UI
+	private UIKeysSettings _uiKeySettings;
+	// L2JMOD Wedding
+	private boolean _married = false;
+	private int _partnerId = 0;
+	private int _coupleId = 0;
+	private boolean _engagerequest = false;
+	private int _engageid = 0;
+	private boolean _marryrequest = false;
+	private boolean _marryaccepted = false;
+	// Save responder name for log it
+	private String _lastPetitionGmName = null;
+	private boolean _hasCharmOfCourage = false;
+	/** List of all QuestState instance that needs to be notified of this L2PcInstance's or its pet's death */
+	private volatile List<QuestState> _notifyQuestOfDeathList;
+	/**
+	 * Used for AltGameSkillLearn to set a custom skill learning class Id.
+	 */
+	private ClassId _learningClass = getClassId();
+	private ScheduledFuture<?> _taskWarnUserTakeBreak;
+	private L2Fish _fish;
 	
 	/**
 	 * Creates a player.
@@ -791,61 +686,6 @@ public final class L2PcInstance extends L2Playable
 		this(IdFactory.getInstance().getNextId(), classId, accountName, app);
 	}
 	
-	public void setPvpFlagLasts(long time)
-	{
-		_pvpFlagLasts = time;
-	}
-	
-	public long getPvpFlagLasts()
-	{
-		return _pvpFlagLasts;
-	}
-	
-	public void startPvPFlag()
-	{
-		updatePvPFlag(1);
-		
-		if (_PvPRegTask == null)
-		{
-			_PvPRegTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new PvPFlagTask(this), 1000, 1000);
-		}
-	}
-	
-	public void stopPvpRegTask()
-	{
-		if (_PvPRegTask != null)
-		{
-			_PvPRegTask.cancel(true);
-			_PvPRegTask = null;
-		}
-	}
-	
-	public void stopPvPFlag()
-	{
-		stopPvpRegTask();
-		
-		updatePvPFlag(0);
-		
-		_PvPRegTask = null;
-	}
-	
-	// Character UI
-	private UIKeysSettings _uiKeySettings;
-	
-	// L2JMOD Wedding
-	private boolean _married = false;
-	private int _partnerId = 0;
-	private int _coupleId = 0;
-	private boolean _engagerequest = false;
-	private int _engageid = 0;
-	private boolean _marryrequest = false;
-	private boolean _marryaccepted = false;
-	
-	// Save responder name for log it
-	private String _lastPetitionGmName = null;
-	
-	private boolean _hasCharmOfCourage = false;
-	
 	/**
 	 * Create a new L2PcInstance and add it in the characters table of the database.<br>
 	 * <B><U> Actions</U> :</B>
@@ -876,6 +716,159 @@ public final class L2PcInstance extends L2Playable
 		player.setRecomLeft(20);
 		// Add the player in the characters table of the database
 		return DAOFactory.getInstance().getPlayerDAO().insert(player) ? player : null;
+	}
+	
+	/**
+	 * Restores a player from the database.
+	 * @param objectId the player's object ID
+	 * @return the player
+	 */
+	public static L2PcInstance load(int objectId)
+	{
+		try
+		{
+			final L2PcInstance player = DAOFactory.getInstance().getPlayerDAO().load(objectId);
+			if (player == null)
+			{
+				return null;
+			}
+			
+			// Backup database values before restoring skills.
+			double currentCp = player.getCurrentCp();
+			double currentHp = player.getCurrentHp();
+			double currentMp = player.getCurrentMp();
+			
+			DAOFactory.getInstance().getPlayerDAO().loadCharacters(player);
+			
+			// Retrieve from the database all items of this L2PcInstance and add them to _inventory
+			player.getInventory().restore();
+			player.getFreight().restore();
+			if (!Config.WAREHOUSE_CACHE)
+			{
+				player.getWarehouse();
+			}
+			
+			// Retrieve from the database all secondary data of this L2PcInstance
+			// Note that Clan, Noblesse and Hero skills are given separately and not here.
+			// Retrieve from the database all skills of this L2PcInstance and add them to _skills
+			DAOFactory.getInstance().getSkillDAO().load(player);
+			
+			player._macros.restoreMe();
+			
+			player._shortCuts.restoreMe();
+			
+			DAOFactory.getInstance().getHennaDAO().load(player);
+			
+			DAOFactory.getInstance().getTeleportBookmarkDAO().load(player);
+			
+			DAOFactory.getInstance().getRecipeBookDAO().load(player, true);
+			
+			if (Config.STORE_RECIPE_SHOPLIST)
+			{
+				DAOFactory.getInstance().getRecipeShopListDAO().load(player);
+			}
+			
+			DAOFactory.getInstance().getPremiumItemDAO().load(player);
+			
+			DAOFactory.getInstance().getItemDAO().loadPetInventory(player);
+			
+			// Reward auto-get skills and all available skills if auto-learn skills is true.
+			player.rewardSkills();
+			
+			DAOFactory.getInstance().getItemReuseDAO().load(player);
+			
+			// Restore current CP, HP and MP values
+			player.setCurrentCp(currentCp);
+			player.setCurrentHp(currentHp);
+			player.setCurrentMp(currentMp);
+			
+			player.setOriginalCpHpMp(currentCp, currentHp, currentMp);
+			
+			if (currentHp < 0.5)
+			{
+				player.setIsDead(true);
+				player.stopHpMpRegeneration();
+			}
+			
+			// Restore pet if exists in the world
+			player.setPet(L2World.getInstance().getPet(player.getObjectId()));
+			if (player.hasSummon())
+			{
+				player.getSummon().setOwner(player);
+			}
+			
+			// Update the overloaded status of the L2PcInstance
+			player.refreshOverloaded();
+			// Update the expertise status of the L2PcInstance
+			player.refreshExpertisePenalty();
+			
+			DAOFactory.getInstance().getFriendDAO().load(player);
+			
+			if (Config.STORE_UI_SETTINGS)
+			{
+				player.restoreUISettings();
+			}
+			
+			if (player.isGM())
+			{
+				final long masks = player.getVariables().getLong(COND_OVERRIDE_KEY, PcCondOverride.getAllExceptionsMask());
+				player.setOverrideCond(masks);
+			}
+			return player;
+		}
+		catch (Exception e)
+		{
+			LOG.error("Failed loading character.", e);
+		}
+		return null;
+	}
+	
+	public boolean isSpawnProtected()
+	{
+		return _protectEndTime > GameTimeController.getInstance().getGameTicks();
+	}
+	
+	public boolean isTeleportProtected()
+	{
+		return _teleportProtectEndTime > GameTimeController.getInstance().getGameTicks();
+	}
+	
+	public long getPvpFlagLasts()
+	{
+		return _pvpFlagLasts;
+	}
+	
+	public void setPvpFlagLasts(long time)
+	{
+		_pvpFlagLasts = time;
+	}
+	
+	public void startPvPFlag()
+	{
+		updatePvPFlag(1);
+		
+		if (_PvPRegTask == null)
+		{
+			_PvPRegTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new PvPFlagTask(this), 1000, 1000);
+		}
+	}
+	
+	public void stopPvpRegTask()
+	{
+		if (_PvPRegTask != null)
+		{
+			_PvPRegTask.cancel(true);
+			_PvPRegTask = null;
+		}
+	}
+	
+	public void stopPvPFlag()
+	{
+		stopPvpRegTask();
+		
+		updatePvPFlag(0);
+		
+		_PvPRegTask = null;
 	}
 	
 	public String getAccountName()
@@ -1134,11 +1127,6 @@ public final class L2PcInstance extends L2Playable
 		_baseClass = baseClass;
 	}
 	
-	public void setBaseClass(ClassId classId)
-	{
-		_baseClass = classId.ordinal();
-	}
-	
 	public boolean isInStoreMode()
 	{
 		return getPrivateStoreType() != PrivateStoreType.NONE;
@@ -1364,9 +1352,6 @@ public final class L2PcInstance extends L2Playable
 		}
 	}
 	
-	/** List of all QuestState instance that needs to be notified of this L2PcInstance's or its pet's death */
-	private volatile List<QuestState> _notifyQuestOfDeathList;
-	
 	/**
 	 * Add QuestState instance that is to be notified of L2PcInstance's death.
 	 * @param qs The QuestState that subscribe to this event
@@ -1494,15 +1479,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the siege state of the L2PcInstance.
-	 * @param siegeState 1 = attacker, 2 = defender, 0 = not involved
-	 */
-	public void setSiegeState(byte siegeState)
-	{
-		_siegeState = siegeState;
-	}
-	
-	/**
 	 * Get the siege state of the L2PcInstance.
 	 * @return 1 = attacker, 2 = defender, 0 = not involved
 	 */
@@ -1513,12 +1489,12 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the siege Side of the L2PcInstance.
-	 * @param val
+	 * Set the siege state of the L2PcInstance.
+	 * @param siegeState 1 = attacker, 2 = defender, 0 = not involved
 	 */
-	public void setSiegeSide(int val)
+	public void setSiegeState(byte siegeState)
 	{
-		_siegeSide = val;
+		_siegeState = siegeState;
 	}
 	
 	public boolean isRegisteredOnThisSiegeField(int val)
@@ -1537,18 +1513,27 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the PvP Flag of the L2PcInstance.
-	 * @param pvpFlag
+	 * Set the siege Side of the L2PcInstance.
+	 * @param val
 	 */
-	public void setPvpFlag(int pvpFlag)
+	public void setSiegeSide(int val)
 	{
-		_pvpFlag = (byte) pvpFlag;
+		_siegeSide = val;
 	}
 	
 	@Override
 	public byte getPvpFlag()
 	{
 		return _pvpFlag;
+	}
+	
+	/**
+	 * Set the PvP Flag of the L2PcInstance.
+	 * @param pvpFlag
+	 */
+	public void setPvpFlag(int pvpFlag)
+	{
+		_pvpFlag = (byte) pvpFlag;
 	}
 	
 	@Override
@@ -1751,6 +1736,15 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * Set the number of recommendation obtained by the L2PcInstance (Max : 255).
+	 * @param value
+	 */
+	public void setRecomHave(int value)
+	{
+		_recomHave = Math.min(Math.max(value, 0), 255);
+	}
+	
+	/**
 	 * Increment the number of recommendation obtained by the L2PcInstance (Max : 255).
 	 */
 	protected void incRecomHave()
@@ -1762,12 +1756,11 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the number of recommendation obtained by the L2PcInstance (Max : 255).
-	 * @param value
+	 * @return the number of recommendation that the L2PcInstance can give.
 	 */
-	public void setRecomHave(int value)
+	public int getRecomLeft()
 	{
-		_recomHave = Math.min(Math.max(value, 0), 255);
+		return _recomLeft;
 	}
 	
 	/**
@@ -1777,14 +1770,6 @@ public final class L2PcInstance extends L2Playable
 	public void setRecomLeft(int value)
 	{
 		_recomLeft = Math.min(Math.max(value, 0), 255);
-	}
-	
-	/**
-	 * @return the number of recommendation that the L2PcInstance can give.
-	 */
-	public int getRecomLeft()
-	{
-		return _recomLeft;
 	}
 	
 	/**
@@ -1804,6 +1789,11 @@ public final class L2PcInstance extends L2Playable
 		decRecomLeft();
 	}
 	
+	public long getExpBeforeDeath()
+	{
+		return _expBeforeDeath;
+	}
+	
 	/**
 	 * Set the exp of the L2PcInstance before a death
 	 * @param exp
@@ -1811,11 +1801,6 @@ public final class L2PcInstance extends L2Playable
 	public void setExpBeforeDeath(long exp)
 	{
 		_expBeforeDeath = exp;
-	}
-	
-	public long getExpBeforeDeath()
-	{
-		return _expBeforeDeath;
 	}
 	
 	/**
@@ -2238,11 +2223,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Used for AltGameSkillLearn to set a custom skill learning class Id.
-	 */
-	private ClassId _learningClass = getClassId();
-	
-	/**
 	 * @return the custom skill learning class Id.
 	 */
 	public ClassId getLearningClass()
@@ -2266,14 +2246,33 @@ public final class L2PcInstance extends L2Playable
 		return getStat().getExp();
 	}
 	
-	public void setActiveEnchantAttrItemId(int objectId)
+	/**
+	 * Set the Experience value of the L2PcInstance.
+	 * @param exp
+	 */
+	public void setExp(long exp)
 	{
-		_activeEnchantAttrItemId = objectId;
+		if (exp < 0)
+		{
+			LOG.warn("For player {} is set negative amount of exp [{}]", this, exp, new IllegalArgumentException());
+			exp = 0;
+		}
+		getStat().setExp(exp);
 	}
 	
 	public int getActiveEnchantAttrItemId()
 	{
 		return _activeEnchantAttrItemId;
+	}
+	
+	public void setActiveEnchantAttrItemId(int objectId)
+	{
+		_activeEnchantAttrItemId = objectId;
+	}
+	
+	public int getActiveEnchantItemId()
+	{
+		return _activeEnchantItemId;
 	}
 	
 	public void setActiveEnchantItemId(int objectId)
@@ -2288,19 +2287,14 @@ public final class L2PcInstance extends L2Playable
 		_activeEnchantItemId = objectId;
 	}
 	
-	public int getActiveEnchantItemId()
+	public int getActiveEnchantSupportItemId()
 	{
-		return _activeEnchantItemId;
+		return _activeEnchantSupportItemId;
 	}
 	
 	public void setActiveEnchantSupportItemId(int objectId)
 	{
 		_activeEnchantSupportItemId = objectId;
-	}
-	
-	public int getActiveEnchantSupportItemId()
-	{
-		return _activeEnchantSupportItemId;
 	}
 	
 	public long getActiveEnchantTimestamp()
@@ -2324,20 +2318,20 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * @return the fists weapon of the L2PcInstance (used when no weapon is equipped).
+	 */
+	public L2Weapon getFistsWeaponItem()
+	{
+		return _fistsWeaponItem;
+	}
+	
+	/**
 	 * Set the fists weapon of the L2PcInstance (used when no weapon is equiped).
 	 * @param weaponItem The fists L2Weapon to set to the L2PcInstance
 	 */
 	public void setFistsWeaponItem(L2Weapon weaponItem)
 	{
 		_fistsWeaponItem = weaponItem;
-	}
-	
-	/**
-	 * @return the fists weapon of the L2PcInstance (used when no weapon is equipped).
-	 */
-	public L2Weapon getFistsWeaponItem()
-	{
-		return _fistsWeaponItem;
 	}
 	
 	/**
@@ -2539,20 +2533,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the Experience value of the L2PcInstance.
-	 * @param exp
-	 */
-	public void setExp(long exp)
-	{
-		if (exp < 0)
-		{
-			LOG.warn("For player {} is set negative amount of exp [{}]", this, exp, new IllegalArgumentException());
-			exp = 0;
-		}
-		getStat().setExp(exp);
-	}
-	
-	/**
 	 * @return the Race object of the L2PcInstance.
 	 */
 	@Override
@@ -2678,12 +2658,6 @@ public final class L2PcInstance extends L2Playable
 	public void setClanCreateExpiryTime(long time)
 	{
 		_clanCreateExpiryTime = time;
-	}
-	
-	public void setOnlineTime(long time)
-	{
-		_onlineTime = time;
-		_onlineBeginTime = System.currentTimeMillis();
 	}
 	
 	/**
@@ -3845,6 +3819,11 @@ public final class L2PcInstance extends L2Playable
 		_teleportProtectEndTime = protect ? GameTimeController.getInstance().getGameTicks() + (Config.PLAYER_TELEPORT_PROTECTION * GameTimeController.TICKS_PER_SECOND) : 0;
 	}
 	
+	public boolean isRecentFakeDeath()
+	{
+		return _recentFakeDeathEndTime > GameTimeController.getInstance().getGameTicks();
+	}
+	
 	/**
 	 * Set protection from agro mobs when getting up from fake death, according settings.
 	 * @param protect
@@ -3852,11 +3831,6 @@ public final class L2PcInstance extends L2Playable
 	public void setRecentFakeDeath(boolean protect)
 	{
 		_recentFakeDeathEndTime = protect ? GameTimeController.getInstance().getGameTicks() + (Config.PLAYER_FAKEDEATH_UP_PROTECTION * GameTimeController.TICKS_PER_SECOND) : 0;
-	}
-	
-	public boolean isRecentFakeDeath()
-	{
-		return _recentFakeDeathEndTime > GameTimeController.getInstance().getGameTicks();
 	}
 	
 	public final boolean isFakeDeath()
@@ -4933,24 +4907,24 @@ public final class L2PcInstance extends L2Playable
 		_engageid = playerid;
 	}
 	
-	public void setMarryRequest(boolean state)
-	{
-		_marryrequest = state;
-	}
-	
 	public boolean isMarryRequest()
 	{
 		return _marryrequest;
 	}
 	
-	public void setMarryAccepted(boolean state)
+	public void setMarryRequest(boolean state)
 	{
-		_marryaccepted = state;
+		_marryrequest = state;
 	}
 	
 	public boolean isMarryAccepted()
 	{
 		return _marryaccepted;
+	}
+	
+	public void setMarryAccepted(boolean state)
+	{
+		_marryaccepted = state;
 	}
 	
 	public int getEngageId()
@@ -5531,14 +5505,14 @@ public final class L2PcInstance extends L2Playable
 		return PartyMatchWaitingList.getInstance().getPlayers().contains(this);
 	}
 	
-	public void setPartyRoom(int id)
-	{
-		_partyroom = id;
-	}
-	
 	public int getPartyRoom()
 	{
 		return _partyroom;
+	}
+	
+	public void setPartyRoom(int id)
+	{
+		_partyroom = id;
 	}
 	
 	public boolean isInPartyMatchRoom()
@@ -5583,23 +5557,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * @return the L2Trap of the L2PcInstance or null.
-	 */
-	public L2TrapInstance getTrap()
-	{
-		return _trap;
-	}
-	
-	/**
-	 * Set the L2Summon of the L2PcInstance.
-	 * @param summon
-	 */
-	public void setPet(L2Summon summon)
-	{
-		_summon = summon;
-	}
-	
-	/**
 	 * Set the L2Decoy of the L2PcInstance.
 	 * @param decoy
 	 */
@@ -5609,12 +5566,29 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * @return the L2Trap of the L2PcInstance or null.
+	 */
+	public L2TrapInstance getTrap()
+	{
+		return _trap;
+	}
+	
+	/**
 	 * Set the L2Trap of this L2PcInstance
 	 * @param trap
 	 */
 	public void setTrap(L2TrapInstance trap)
 	{
 		_trap = trap;
+	}
+	
+	/**
+	 * Set the L2Summon of the L2PcInstance.
+	 * @param summon
+	 */
+	public void setPet(L2Summon summon)
+	{
+		_summon = summon;
 	}
 	
 	/**
@@ -5647,15 +5621,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * Set the L2PcInstance requester of a transaction (ex : FriendInvite, JoinAlly, JoinParty...).
-	 * @param requester
-	 */
-	public void setActiveRequester(L2PcInstance requester)
-	{
-		_activeRequester = requester;
-	}
-	
-	/**
 	 * @return the L2PcInstance requester of a transaction (ex : FriendInvite, JoinAlly, JoinParty...).
 	 */
 	public L2PcInstance getActiveRequester()
@@ -5669,6 +5634,15 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		return _activeRequester;
+	}
+	
+	/**
+	 * Set the L2PcInstance requester of a transaction (ex : FriendInvite, JoinAlly, JoinParty...).
+	 * @param requester
+	 */
+	public void setActiveRequester(L2PcInstance requester)
+	{
+		_activeRequester = requester;
 	}
 	
 	/**
@@ -5715,6 +5689,14 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * @return active Warehouse.
+	 */
+	public ItemContainer getActiveWarehouse()
+	{
+		return _activeWarehouse;
+	}
+	
+	/**
 	 * Select the Warehouse to be used in next activity.
 	 * @param warehouse
 	 */
@@ -5724,11 +5706,11 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * @return active Warehouse.
+	 * @return active TradeList.
 	 */
-	public ItemContainer getActiveWarehouse()
+	public TradeList getActiveTradeList()
 	{
-		return _activeWarehouse;
+		return _activeTradeList;
 	}
 	
 	/**
@@ -5738,14 +5720,6 @@ public final class L2PcInstance extends L2Playable
 	public void setActiveTradeList(TradeList tradeList)
 	{
 		_activeTradeList = tradeList;
-	}
-	
-	/**
-	 * @return active TradeList.
-	 */
-	public TradeList getActiveTradeList()
-	{
-		return _activeTradeList;
 	}
 	
 	public void onTradeStart(L2PcInstance partner)
@@ -5881,6 +5855,21 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * <B><U> Values </U> :</B>
+	 * <li>0 : STORE_PRIVATE_NONE</li>
+	 * <li>1 : STORE_PRIVATE_SELL</li>
+	 * <li>2 : sellmanage</li><BR>
+	 * <li>3 : STORE_PRIVATE_BUY</li><BR>
+	 * <li>4 : buymanage</li><BR>
+	 * <li>5 : STORE_PRIVATE_MANUFACTURE</li><BR>
+	 * @return the Private Store type of the L2PcInstance.
+	 */
+	public PrivateStoreType getPrivateStoreType()
+	{
+		return _privateStoreType;
+	}
+	
+	/**
 	 * Set the Private Store type of the L2PcInstance. <B><U> Values </U> :</B>
 	 * <li>0 : STORE_PRIVATE_NONE</li>
 	 * <li>1 : STORE_PRIVATE_SELL</li>
@@ -5901,18 +5890,12 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * <B><U> Values </U> :</B>
-	 * <li>0 : STORE_PRIVATE_NONE</li>
-	 * <li>1 : STORE_PRIVATE_SELL</li>
-	 * <li>2 : sellmanage</li><BR>
-	 * <li>3 : STORE_PRIVATE_BUY</li><BR>
-	 * <li>4 : buymanage</li><BR>
-	 * <li>5 : STORE_PRIVATE_MANUFACTURE</li><BR>
-	 * @return the Private Store type of the L2PcInstance.
+	 * @return the _clan object of the L2PcInstance.
 	 */
-	public PrivateStoreType getPrivateStoreType()
+	@Override
+	public L2Clan getClan()
 	{
-		return _privateStoreType;
+		return _clan;
 	}
 	
 	/**
@@ -5943,15 +5926,6 @@ public final class L2PcInstance extends L2Playable
 		}
 		
 		_clanId = clan.getId();
-	}
-	
-	/**
-	 * @return the _clan object of the L2PcInstance.
-	 */
-	@Override
-	public L2Clan getClan()
-	{
-		return _clan;
 	}
 	
 	/**
@@ -6361,14 +6335,14 @@ public final class L2PcInstance extends L2Playable
 		return true;
 	}
 	
-	public void setUptime(long time)
-	{
-		_uptime = time;
-	}
-	
 	public long getUptime()
 	{
 		return System.currentTimeMillis() - _uptime;
+	}
+	
+	public void setUptime(long time)
+	{
+		_uptime = time;
 	}
 	
 	/**
@@ -6387,15 +6361,6 @@ public final class L2PcInstance extends L2Playable
 	public boolean isInParty()
 	{
 		return _party != null;
-	}
-	
-	/**
-	 * Set the _party object of the L2PcInstance (without joining it).
-	 * @param party
-	 */
-	public void setParty(L2Party party)
-	{
-		_party = party;
 	}
 	
 	/**
@@ -6434,14 +6399,23 @@ public final class L2PcInstance extends L2Playable
 		return _party;
 	}
 	
-	public void setPartyDistributionType(PartyDistributionType pdt)
+	/**
+	 * Set the _party object of the L2PcInstance (without joining it).
+	 * @param party
+	 */
+	public void setParty(L2Party party)
 	{
-		_partyDistributionType = pdt;
+		_party = party;
 	}
 	
 	public PartyDistributionType getPartyDistributionType()
 	{
 		return _partyDistributionType;
+	}
+	
+	public void setPartyDistributionType(PartyDistributionType pdt)
+	{
+		_partyDistributionType = pdt;
 	}
 	
 	/**
@@ -6451,6 +6425,29 @@ public final class L2PcInstance extends L2Playable
 	public boolean isGM()
 	{
 		return getAccessLevel().isGm();
+	}
+	
+	public void setAccountAccesslevel(int level)
+	{
+		LoginServerThread.getInstance().sendAccessLevel(getAccountName(), level);
+	}
+	
+	/**
+	 * @return the _accessLevel of the L2PcInstance.
+	 */
+	@Override
+	public L2AccessLevel getAccessLevel()
+	{
+		if (Config.EVERYBODY_HAS_ADMIN_RIGHTS)
+		{
+			return AdminData.getInstance().getMasterAccessLevel();
+		}
+		else if (_accessLevel == null)
+		{
+			setAccessLevel(0);
+		}
+		
+		return _accessLevel;
 	}
 	
 	/**
@@ -6475,29 +6472,6 @@ public final class L2PcInstance extends L2Playable
 		{
 			LOG.info("{} access level set for character {}.", _accessLevel.getName(), getName());
 		}
-	}
-	
-	public void setAccountAccesslevel(int level)
-	{
-		LoginServerThread.getInstance().sendAccessLevel(getAccountName(), level);
-	}
-	
-	/**
-	 * @return the _accessLevel of the L2PcInstance.
-	 */
-	@Override
-	public L2AccessLevel getAccessLevel()
-	{
-		if (Config.EVERYBODY_HAS_ADMIN_RIGHTS)
-		{
-			return AdminData.getInstance().getMasterAccessLevel();
-		}
-		else if (_accessLevel == null)
-		{
-			setAccessLevel(0);
-		}
-		
-		return _accessLevel;
 	}
 	
 	/**
@@ -6580,111 +6554,6 @@ public final class L2PcInstance extends L2Playable
 	public void setIsIn7sDungeon(boolean isIn7sDungeon)
 	{
 		_isIn7sDungeon = isIn7sDungeon;
-	}
-	
-	/**
-	 * Restores a player from the database.
-	 * @param objectId the player's object ID
-	 * @return the player
-	 */
-	public static L2PcInstance load(int objectId)
-	{
-		try
-		{
-			final L2PcInstance player = DAOFactory.getInstance().getPlayerDAO().load(objectId);
-			if (player == null)
-			{
-				return null;
-			}
-			
-			// Backup database values before restoring skills.
-			double currentCp = player.getCurrentCp();
-			double currentHp = player.getCurrentHp();
-			double currentMp = player.getCurrentMp();
-			
-			DAOFactory.getInstance().getPlayerDAO().loadCharacters(player);
-			
-			// Retrieve from the database all items of this L2PcInstance and add them to _inventory
-			player.getInventory().restore();
-			player.getFreight().restore();
-			if (!Config.WAREHOUSE_CACHE)
-			{
-				player.getWarehouse();
-			}
-			
-			// Retrieve from the database all secondary data of this L2PcInstance
-			// Note that Clan, Noblesse and Hero skills are given separately and not here.
-			// Retrieve from the database all skills of this L2PcInstance and add them to _skills
-			DAOFactory.getInstance().getSkillDAO().load(player);
-			
-			player._macros.restoreMe();
-			
-			player._shortCuts.restoreMe();
-			
-			DAOFactory.getInstance().getHennaDAO().load(player);
-			
-			DAOFactory.getInstance().getTeleportBookmarkDAO().load(player);
-			
-			DAOFactory.getInstance().getRecipeBookDAO().load(player, true);
-			
-			if (Config.STORE_RECIPE_SHOPLIST)
-			{
-				DAOFactory.getInstance().getRecipeShopListDAO().load(player);
-			}
-			
-			DAOFactory.getInstance().getPremiumItemDAO().load(player);
-			
-			DAOFactory.getInstance().getItemDAO().loadPetInventory(player);
-			
-			// Reward auto-get skills and all available skills if auto-learn skills is true.
-			player.rewardSkills();
-			
-			DAOFactory.getInstance().getItemReuseDAO().load(player);
-			
-			// Restore current CP, HP and MP values
-			player.setCurrentCp(currentCp);
-			player.setCurrentHp(currentHp);
-			player.setCurrentMp(currentMp);
-			
-			player.setOriginalCpHpMp(currentCp, currentHp, currentMp);
-			
-			if (currentHp < 0.5)
-			{
-				player.setIsDead(true);
-				player.stopHpMpRegeneration();
-			}
-			
-			// Restore pet if exists in the world
-			player.setPet(L2World.getInstance().getPet(player.getObjectId()));
-			if (player.hasSummon())
-			{
-				player.getSummon().setOwner(player);
-			}
-			
-			// Update the overloaded status of the L2PcInstance
-			player.refreshOverloaded();
-			// Update the expertise status of the L2PcInstance
-			player.refreshExpertisePenalty();
-			
-			DAOFactory.getInstance().getFriendDAO().load(player);
-			
-			if (Config.STORE_UI_SETTINGS)
-			{
-				player.restoreUISettings();
-			}
-			
-			if (player.isGM())
-			{
-				final long masks = player.getVariables().getLong(COND_OVERRIDE_KEY, PcCondOverride.getAllExceptionsMask());
-				player.setOverrideCond(masks);
-			}
-			return player;
-		}
-		catch (Exception e)
-		{
-			LOG.error("Failed loading character.", e);
-		}
-		return null;
 	}
 	
 	public Forum getMail()
@@ -8146,20 +8015,20 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * @return the _lastFolkNpc of the L2PcInstance corresponding to the last Folk wich one the player talked.
+	 */
+	public L2Npc getLastFolkNPC()
+	{
+		return _lastFolkNpc;
+	}
+	
+	/**
 	 * Set the _lastFolkNpc of the L2PcInstance corresponding to the last Folk wich one the player talked.
 	 * @param folkNpc
 	 */
 	public void setLastFolkNPC(L2Npc folkNpc)
 	{
 		_lastFolkNpc = folkNpc;
-	}
-	
-	/**
-	 * @return the _lastFolkNpc of the L2PcInstance corresponding to the last Folk wich one the player talked.
-	 */
-	public L2Npc getLastFolkNPC()
-	{
-		return _lastFolkNpc;
 	}
 	
 	/**
@@ -8284,8 +8153,6 @@ public final class L2PcInstance extends L2Playable
 		_activeSoulShots.clear();
 	}
 	
-	private ScheduledFuture<?> _taskWarnUserTakeBreak;
-	
 	public EnumIntBitmask<ClanPrivilege> getClanPrivileges()
 	{
 		return _clanPrivileges;
@@ -8301,6 +8168,11 @@ public final class L2PcInstance extends L2Playable
 		return _clanPrivileges.has(privilege);
 	}
 	
+	public int getPledgeClass()
+	{
+		return _pledgeClass;
+	}
+	
 	// baron etc
 	public void setPledgeClass(int classId)
 	{
@@ -8308,20 +8180,15 @@ public final class L2PcInstance extends L2Playable
 		checkItemRestriction();
 	}
 	
-	public int getPledgeClass()
+	@Override
+	public int getPledgeType()
 	{
-		return _pledgeClass;
+		return _pledgeType;
 	}
 	
 	public void setPledgeType(int typeId)
 	{
 		_pledgeType = typeId;
-	}
-	
-	@Override
-	public int getPledgeType()
-	{
-		return _pledgeType;
 	}
 	
 	public int getApprentice()
@@ -8486,24 +8353,24 @@ public final class L2PcInstance extends L2Playable
 		broadcastUserInfo();
 	}
 	
-	public void setOlympiadSide(int i)
-	{
-		_olympiadSide = i;
-	}
-	
 	public int getOlympiadSide()
 	{
 		return _olympiadSide;
 	}
 	
-	public void setOlympiadGameId(int id)
+	public void setOlympiadSide(int i)
 	{
-		_olympiadGameId = id;
+		_olympiadSide = i;
 	}
 	
 	public int getOlympiadGameId()
 	{
 		return _olympiadGameId;
+	}
+	
+	public void setOlympiadGameId(int id)
+	{
+		_olympiadGameId = id;
 	}
 	
 	/**
@@ -8575,19 +8442,14 @@ public final class L2PcInstance extends L2Playable
 		sendPacket(new EtcStatusUpdate(this));
 	}
 	
-	public void setDietMode(boolean mode)
-	{
-		_dietMode = mode;
-	}
-	
 	public boolean getDietMode()
 	{
 		return _dietMode;
 	}
 	
-	public void setTradeRefusal(boolean mode)
+	public void setDietMode(boolean mode)
 	{
-		_tradeRefusal = mode;
+		_dietMode = mode;
 	}
 	
 	public boolean getTradeRefusal()
@@ -8595,9 +8457,9 @@ public final class L2PcInstance extends L2Playable
 		return _tradeRefusal;
 	}
 	
-	public void setExchangeRefusal(boolean mode)
+	public void setTradeRefusal(boolean mode)
 	{
-		_exchangeRefusal = mode;
+		_tradeRefusal = mode;
 	}
 	
 	public boolean getExchangeRefusal()
@@ -8605,9 +8467,34 @@ public final class L2PcInstance extends L2Playable
 		return _exchangeRefusal;
 	}
 	
+	public void setExchangeRefusal(boolean mode)
+	{
+		_exchangeRefusal = mode;
+	}
+	
 	public BlockList getBlockList()
 	{
 		return _blockList;
+	}
+	
+	public void setIsInOlympiadMode(boolean b)
+	{
+		_inOlympiadMode = b;
+	}
+	
+	public void setIsOlympiadStart(boolean b)
+	{
+		_OlympiadStart = b;
+	}
+	
+	public boolean isOlympiadStart()
+	{
+		return _OlympiadStart;
+	}
+	
+	public boolean isHero()
+	{
+		return _hero;
 	}
 	
 	public void setHero(boolean hero)
@@ -8631,26 +8518,6 @@ public final class L2PcInstance extends L2Playable
 		sendSkillList();
 	}
 	
-	public void setIsInOlympiadMode(boolean b)
-	{
-		_inOlympiadMode = b;
-	}
-	
-	public void setIsOlympiadStart(boolean b)
-	{
-		_OlympiadStart = b;
-	}
-	
-	public boolean isOlympiadStart()
-	{
-		return _OlympiadStart;
-	}
-	
-	public boolean isHero()
-	{
-		return _hero;
-	}
-	
 	public boolean isInOlympiadMode()
 	{
 		return _inOlympiadMode;
@@ -8668,14 +8535,14 @@ public final class L2PcInstance extends L2Playable
 		return _duelId;
 	}
 	
-	public void setDuelState(DuelState mode)
-	{
-		_duelState = mode;
-	}
-	
 	public DuelState getDuelState()
 	{
 		return _duelState;
+	}
+	
+	public void setDuelState(DuelState mode)
+	{
+		_duelState = mode;
 	}
 	
 	/**
@@ -8729,14 +8596,14 @@ public final class L2PcInstance extends L2Playable
 		sendSkillList();
 	}
 	
-	public void setLvlJoinedAcademy(int lvl)
-	{
-		_lvlJoinedAcademy = lvl;
-	}
-	
 	public int getLvlJoinedAcademy()
 	{
 		return _lvlJoinedAcademy;
+	}
+	
+	public void setLvlJoinedAcademy(int lvl)
+	{
+		_lvlJoinedAcademy = lvl;
 	}
 	
 	@Override
@@ -8756,14 +8623,14 @@ public final class L2PcInstance extends L2Playable
 		}
 	}
 	
-	public void setWantsPeace(int wantsPeace)
-	{
-		_wantsPeace = wantsPeace;
-	}
-	
 	public int getWantsPeace()
 	{
 		return _wantsPeace;
+	}
+	
+	public void setWantsPeace(int wantsPeace)
+	{
+		_wantsPeace = wantsPeace;
 	}
 	
 	public boolean isFishing()
@@ -8983,6 +8850,11 @@ public final class L2PcInstance extends L2Playable
 		return _baseClass;
 	}
 	
+	public void setBaseClass(ClassId classId)
+	{
+		_baseClass = classId.ordinal();
+	}
+	
 	public int getActiveClass()
 	{
 		return _activeClass;
@@ -8996,6 +8868,11 @@ public final class L2PcInstance extends L2Playable
 	public int getClassIndex()
 	{
 		return _classIndex;
+	}
+	
+	public void setClassIndex(int classIndex)
+	{
+		_classIndex = classIndex;
 	}
 	
 	private void setClassTemplate(int classId)
@@ -9374,6 +9251,11 @@ public final class L2PcInstance extends L2Playable
 	public long getLastAccess()
 	{
 		return _lastAccess;
+	}
+	
+	public void setLastAccess(long lastAccess)
+	{
+		_lastAccess = lastAccess;
 	}
 	
 	@Override
@@ -9928,14 +9810,14 @@ public final class L2PcInstance extends L2Playable
 		return _vehicle != null;
 	}
 	
-	public void setInCrystallize(boolean inCrystallize)
-	{
-		_inCrystallize = inCrystallize;
-	}
-	
 	public boolean isInCrystallize()
 	{
 		return _inCrystallize;
+	}
+	
+	public void setInCrystallize(boolean inCrystallize)
+	{
+		_inCrystallize = inCrystallize;
 	}
 	
 	/**
@@ -10388,8 +10270,6 @@ public final class L2PcInstance extends L2Playable
 		}
 	}
 	
-	private L2Fish _fish;
-	
 	// startFishing() was stripped of any pre-fishing related checks, namely the fishing zone check.
 	// Also worthy of note is the fact the code to find the hook landing position was also striped.
 	// The stripped code was moved into fishing.java.
@@ -10794,14 +10674,14 @@ public final class L2PcInstance extends L2Playable
 		return _fishz;
 	}
 	
-	public void setLure(L2ItemInstance lure)
-	{
-		_lure = lure;
-	}
-	
 	public L2ItemInstance getLure()
 	{
 		return _lure;
+	}
+	
+	public void setLure(L2ItemInstance lure)
+	{
+		_lure = lure;
 	}
 	
 	public int getInventoryLimit()
@@ -10906,14 +10786,14 @@ public final class L2PcInstance extends L2Playable
 		return _mountLevel;
 	}
 	
-	public void setMountObjectID(int newID)
-	{
-		_mountObjectID = newID;
-	}
-	
 	public int getMountObjectID()
 	{
 		return _mountObjectID;
+	}
+	
+	public void setMountObjectID(int newID)
+	{
+		_mountObjectID = newID;
 	}
 	
 	/**
@@ -11056,14 +10936,14 @@ public final class L2PcInstance extends L2Playable
 		return _cursedWeaponEquippedId != 0;
 	}
 	
-	public void setCursedWeaponEquippedId(int value)
-	{
-		_cursedWeaponEquippedId = value;
-	}
-	
 	public int getCursedWeaponEquippedId()
 	{
 		return _cursedWeaponEquippedId;
+	}
+	
+	public void setCursedWeaponEquippedId(int value)
+	{
+		_cursedWeaponEquippedId = value;
 	}
 	
 	public boolean isCombatFlagEquipped()
@@ -11337,19 +11217,19 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * @param npcId
-	 */
-	public void setAgathionId(int npcId)
-	{
-		_agathionId = npcId;
-	}
-	
-	/**
 	 * @return
 	 */
 	public int getAgathionId()
 	{
 		return _agathionId;
+	}
+	
+	/**
+	 * @param npcId
+	 */
+	public void setAgathionId(int npcId)
+	{
+		_agathionId = npcId;
 	}
 	
 	public int getVitalityPoints()
@@ -11505,16 +11385,6 @@ public final class L2PcInstance extends L2Playable
 		return _curFeed;
 	}
 	
-	public int getFeedConsume()
-	{
-		// if pet is attacking
-		if (isAttackingNow())
-		{
-			return getPetLevelData(_mountNpcId).getPetFeedBattle();
-		}
-		return getPetLevelData(_mountNpcId).getPetFeedNormal();
-	}
-	
 	public void setCurrentFeed(int num)
 	{
 		boolean lastHungryState = isHungry();
@@ -11526,6 +11396,16 @@ public final class L2PcInstance extends L2Playable
 		{
 			broadcastUserInfo();
 		}
+	}
+	
+	public int getFeedConsume()
+	{
+		// if pet is attacking
+		if (isAttackingNow())
+		{
+			return getPetLevelData(_mountNpcId).getPetFeedBattle();
+		}
+		return getPetLevelData(_mountNpcId).getPetFeedNormal();
 	}
 	
 	private int getMaxFeed()
@@ -11987,20 +11867,20 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * @return the _createDate of the L2PcInstance.
+	 */
+	public Calendar getCreateDate()
+	{
+		return _createDate;
+	}
+	
+	/**
 	 * Set the _createDate of the L2PcInstance.
 	 * @param createDate
 	 */
 	public void setCreateDate(Calendar createDate)
 	{
 		_createDate = createDate;
-	}
-	
-	/**
-	 * @return the _createDate of the L2PcInstance.
-	 */
-	public Calendar getCreateDate()
-	{
-		return _createDate;
 	}
 	
 	/**
@@ -12033,10 +11913,6 @@ public final class L2PcInstance extends L2Playable
 		return -1;
 	}
 	
-	// TODO(Zoey76): Change this to ConcurrentHashMap.newKeySet() and move variable to the top of the class.
-	/** Friend list. */
-	private final List<Integer> _friendList = new CopyOnWriteArrayList<>();
-	
 	public List<Integer> getFriendList()
 	{
 		return _friendList;
@@ -12065,20 +11941,6 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * While at silenceMode, checks if this player blocks PMs for this user
-	 * @param playerObjId the player object Id
-	 * @return {@code true} if the given Id is not excluded and this player is in silence mode, {@code false} otherwise
-	 */
-	public boolean isSilenceMode(int playerObjId)
-	{
-		if (Config.SILENCE_MODE_EXCLUDE && _silenceMode && (_silenceModeExcluded != null))
-		{
-			return !_silenceModeExcluded.contains(playerObjId);
-		}
-		return _silenceMode;
-	}
-	
-	/**
 	 * Set the silence mode.
 	 * @param mode the value
 	 */
@@ -12090,6 +11952,20 @@ public final class L2PcInstance extends L2Playable
 			_silenceModeExcluded.clear(); // Clear the excluded list on each setSilenceMode
 		}
 		sendPacket(new EtcStatusUpdate(this));
+	}
+	
+	/**
+	 * While at silenceMode, checks if this player blocks PMs for this user
+	 * @param playerObjId the player object Id
+	 * @return {@code true} if the given Id is not excluded and this player is in silence mode, {@code false} otherwise
+	 */
+	public boolean isSilenceMode(int playerObjId)
+	{
+		if (Config.SILENCE_MODE_EXCLUDE && _silenceMode && (_silenceModeExcluded != null))
+		{
+			return !_silenceModeExcluded.contains(playerObjId);
+		}
+		return _silenceMode;
 	}
 	
 	/**
@@ -12136,24 +12012,14 @@ public final class L2PcInstance extends L2Playable
 		return _clientX;
 	}
 	
-	public final int getClientY()
-	{
-		return _clientY;
-	}
-	
-	public final int getClientZ()
-	{
-		return _clientZ;
-	}
-	
-	public final int getClientHeading()
-	{
-		return _clientHeading;
-	}
-	
 	public final void setClientX(int val)
 	{
 		_clientX = val;
+	}
+	
+	public final int getClientY()
+	{
+		return _clientY;
 	}
 	
 	public final void setClientY(int val)
@@ -12161,9 +12027,19 @@ public final class L2PcInstance extends L2Playable
 		_clientY = val;
 	}
 	
+	public final int getClientZ()
+	{
+		return _clientZ;
+	}
+	
 	public final void setClientZ(int val)
 	{
 		_clientZ = val;
+	}
+	
+	public final int getClientHeading()
+	{
+		return _clientHeading;
 	}
 	
 	public final void setClientHeading(int val)
@@ -12525,14 +12401,14 @@ public final class L2PcInstance extends L2Playable
 		_adminConfirmCmd = adminConfirmCmd;
 	}
 	
-	public void setBlockCheckerArena(byte arena)
-	{
-		_handysBlockCheckerEventArena = arena;
-	}
-	
 	public int getBlockCheckerArena()
 	{
 		return _handysBlockCheckerEventArena;
+	}
+	
+	public void setBlockCheckerArena(byte arena)
+	{
+		_handysBlockCheckerEventArena = arena;
 	}
 	
 	/**
@@ -12615,14 +12491,14 @@ public final class L2PcInstance extends L2Playable
 		return 0;
 	}
 	
-	public void setLastPetitionGmName(String gmName)
-	{
-		_lastPetitionGmName = gmName;
-	}
-	
 	public String getLastPetitionGmName()
 	{
 		return _lastPetitionGmName;
+	}
+	
+	public void setLastPetitionGmName(String gmName)
+	{
+		_lastPetitionGmName = gmName;
 	}
 	
 	public L2ContactList getContactList()
@@ -12635,14 +12511,14 @@ public final class L2PcInstance extends L2Playable
 		eventStatus = new PlayerEventHolder(this);
 	}
 	
-	public void setEventStatus(PlayerEventHolder pes)
-	{
-		eventStatus = pes;
-	}
-	
 	public PlayerEventHolder getEventStatus()
 	{
 		return eventStatus;
+	}
+	
+	public void setEventStatus(PlayerEventHolder pes)
+	{
+		eventStatus = pes;
 	}
 	
 	public long getNotMoveUntil()
@@ -13138,16 +13014,6 @@ public final class L2PcInstance extends L2Playable
 		return true;
 	}
 	
-	public void setLastAccess(long lastAccess)
-	{
-		_lastAccess = lastAccess;
-	}
-	
-	public void setClassIndex(int classIndex)
-	{
-		_classIndex = classIndex;
-	}
-	
 	public Map<Integer, TeleportBookmark> getTpbookmarks()
 	{
 		return _tpbookmarks;
@@ -13156,6 +13022,12 @@ public final class L2PcInstance extends L2Playable
 	public long getOnlineTime()
 	{
 		return _onlineTime;
+	}
+	
+	public void setOnlineTime(long time)
+	{
+		_onlineTime = time;
+		_onlineBeginTime = System.currentTimeMillis();
 	}
 	
 	public void setHenna(L2Henna[] henna)
