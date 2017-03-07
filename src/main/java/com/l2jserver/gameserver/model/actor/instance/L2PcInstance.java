@@ -35,7 +35,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -373,8 +372,7 @@ public final class L2PcInstance extends L2Playable
 	/** Bypass validations */
 	@SuppressWarnings("unchecked")
 	private final LinkedList<String>[] _htmlActionCaches = new LinkedList[HtmlActionScope.values().length];
-	// TODO(Zoey76): Change this to ConcurrentHashMap.newKeySet() and move variable to the top of the class.
-	private final List<Integer> _friendList = new CopyOnWriteArrayList<>();
+	private volatile Set<Integer> _friends;
 	private PartyDistributionType _partyDistributionType;
 	private L2GameClient _client;
 	private long _deleteTimer;
@@ -499,7 +497,7 @@ public final class L2PcInstance extends L2Playable
 	private int _agathionId = 0;
 	// apparently, a L2PcInstance CAN have both a summon AND a tamed beast at the same time!!
 	// after Freya players can control more than one tamed beast
-	private List<L2TamedBeastInstance> _tamedBeast = null;
+	private volatile Set<L2TamedBeastInstance> _tamedBeasts = null;
 	private boolean _minimapAllowed = false;
 	private int _partyroom = 0;
 	/** The Clan Identifier of the L2PcInstance */
@@ -635,7 +633,7 @@ public final class L2PcInstance extends L2Playable
 	private String _lastPetitionGmName = null;
 	private boolean _hasCharmOfCourage = false;
 	/** List of all QuestState instance that needs to be notified of this L2PcInstance's or its pet's death */
-	private volatile List<QuestState> _notifyQuestOfDeathList;
+	private volatile Set<QuestState> _notifyQuestOfDeathList;
 	/**
 	 * Used for AltGameSkillLearn to set a custom skill learning class Id.
 	 */
@@ -1384,9 +1382,10 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * @return a list of QuestStates which registered for notify of death of this L2PcInstance.
+	 * Gets the quest states registered for notify of death of this player.
+	 * @return the quest states
 	 */
-	public final List<QuestState> getNotifyQuestOfDeath()
+	public final Set<QuestState> getNotifyQuestOfDeath()
 	{
 		if (_notifyQuestOfDeathList == null)
 		{
@@ -1394,7 +1393,7 @@ public final class L2PcInstance extends L2Playable
 			{
 				if (_notifyQuestOfDeathList == null)
 				{
-					_notifyQuestOfDeathList = new CopyOnWriteArrayList<>();
+					_notifyQuestOfDeathList = ConcurrentHashMap.newKeySet(1);
 				}
 			}
 		}
@@ -5592,24 +5591,48 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
-	 * @return the L2Summon of the L2PcInstance or null.
+	 * Gets the players tamed beasts.
+	 * @return the tamed beasts
 	 */
-	public List<L2TamedBeastInstance> getTrainedBeasts()
+	public Set<L2TamedBeastInstance> getTamedBeasts()
 	{
-		return _tamedBeast;
+		if (_tamedBeasts == null)
+		{
+			synchronized (this)
+			{
+				if (_tamedBeasts == null)
+				{
+					_tamedBeasts = ConcurrentHashMap.newKeySet(1);
+				}
+			}
+		}
+		return _tamedBeasts;
 	}
 	
 	/**
-	 * Set the L2Summon of the L2PcInstance.
-	 * @param tamedBeast
+	 * Verifies if the player has tamed beasts.
+	 * @return {@code true} if the player has tamed beasts
 	 */
-	public void addTrainedBeast(L2TamedBeastInstance tamedBeast)
+	public boolean hasTamedBeasts()
 	{
-		if (_tamedBeast == null)
+		return (_tamedBeasts != null) && !_tamedBeasts.isEmpty();
+	}
+	
+	/**
+	 * Adds a tamed beast to the player.
+	 * @param tamedBeast the tamed beast
+	 */
+	public void addTamedBeast(L2TamedBeastInstance tamedBeast)
+	{
+		getTamedBeasts().add(tamedBeast);
+	}
+	
+	public void removeTamedBeast(L2TamedBeastInstance tamedBeast)
+	{
+		if (hasTamedBeasts())
 		{
-			_tamedBeast = new CopyOnWriteArrayList<>();
+			_tamedBeasts.remove(tamedBeast);
 		}
-		_tamedBeast.add(tamedBeast);
 	}
 	
 	/**
@@ -9483,14 +9506,13 @@ public final class L2PcInstance extends L2Playable
 			setTeleportProtection(true);
 		}
 		
-		// Trained beast is lost after teleport
-		if (getTrainedBeasts() != null)
+		if (hasTamedBeasts())
 		{
-			for (L2TamedBeastInstance tamedBeast : getTrainedBeasts())
+			for (L2TamedBeastInstance tamedBeast : _tamedBeasts)
 			{
 				tamedBeast.deleteMe();
 			}
-			getTrainedBeasts().clear();
+			_tamedBeasts.clear();
 		}
 		
 		// Modify the position of the pet if necessary
@@ -9592,9 +9614,9 @@ public final class L2PcInstance extends L2Playable
 		}
 		
 		// notify the tamed beast of attacks
-		if (getTrainedBeasts() != null)
+		if (hasTamedBeasts())
 		{
-			for (L2TamedBeastInstance tamedBeast : getTrainedBeasts())
+			for (L2TamedBeastInstance tamedBeast : _tamedBeasts)
 			{
 				tamedBeast.onOwnerGotAttacked(attacker);
 			}
@@ -11913,17 +11935,50 @@ public final class L2PcInstance extends L2Playable
 		return -1;
 	}
 	
-	public List<Integer> getFriendList()
+	public Set<Integer> getFriends()
 	{
-		return _friendList;
+		if (_friends == null)
+		{
+			synchronized (this)
+			{
+				if (_friends == null)
+				{
+					_friends = ConcurrentHashMap.newKeySet(1);
+				}
+			}
+		}
+		return _friends;
+	}
+	
+	public boolean hasFriends()
+	{
+		return (_friends != null) && !_friends.isEmpty();
+	}
+	
+	public boolean isFriend(int objectId)
+	{
+		return hasFriends() && _friends.contains(objectId);
+	}
+	
+	public void addFriend(int objectId)
+	{
+		getFriends().add(objectId);
+	}
+	
+	public void removeFriend(int objectId)
+	{
+		if (hasFriends())
+		{
+			_friends.remove(objectId);
+		}
 	}
 	
 	private void notifyFriends()
 	{
 		final FriendStatusPacket pkt = new FriendStatusPacket(getObjectId());
-		for (int id : _friendList)
+		for (int id : _friends)
 		{
-			L2PcInstance friend = L2World.getInstance().getPlayer(id);
+			final L2PcInstance friend = L2World.getInstance().getPlayer(id);
 			if (friend != null)
 			{
 				friend.sendPacket(pkt);

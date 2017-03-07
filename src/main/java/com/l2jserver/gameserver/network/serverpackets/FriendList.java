@@ -19,6 +19,7 @@
 package com.l2jserver.gameserver.network.serverpackets;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
@@ -32,7 +33,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  */
 public class FriendList extends L2GameServerPacket
 {
-	private final List<FriendInfo> _info;
+	private List<FriendInfo> _info;
 	
 	private static class FriendInfo
 	{
@@ -50,16 +51,18 @@ public class FriendList extends L2GameServerPacket
 	
 	public FriendList(L2PcInstance player)
 	{
-		_info = new ArrayList<>(player.getFriendList().size());
-		for (int objId : player.getFriendList())
+		if (!player.hasFriends())
 		{
-			String name = CharNameTable.getInstance().getNameById(objId);
-			L2PcInstance player1 = L2World.getInstance().getPlayer(objId);
-			boolean online = false;
-			if ((player1 != null) && player1.isOnline())
-			{
-				online = true;
-			}
+			_info = Collections.emptyList();
+			return;
+		}
+		
+		_info = new ArrayList<>(player.getFriends().size());
+		for (int objId : player.getFriends())
+		{
+			final String name = CharNameTable.getInstance().getNameById(objId);
+			final L2PcInstance friend = L2World.getInstance().getPlayer(objId);
+			final boolean online = (friend != null) && friend.isOnline();
 			_info.add(new FriendInfo(objId, name, online));
 		}
 	}

@@ -423,12 +423,16 @@ public class EnterWorld extends L2GameClientPacket
 		
 		final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.FRIEND_S1_HAS_LOGGED_IN);
 		sm.addCharName(activeChar);
-		for (int id : activeChar.getFriendList())
+		
+		if (activeChar.hasFriends())
 		{
-			final L2Object obj = L2World.getInstance().findObject(id);
-			if (obj != null)
+			for (int id : activeChar.getFriends())
 			{
-				obj.sendPacket(sm);
+				final L2Object obj = L2World.getInstance().findObject(id);
+				if (obj != null)
+				{
+					obj.sendPacket(sm);
+				}
 			}
 		}
 		

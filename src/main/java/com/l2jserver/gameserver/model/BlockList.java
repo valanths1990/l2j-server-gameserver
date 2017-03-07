@@ -173,7 +173,7 @@ public class BlockList
 		
 		String charName = CharNameTable.getInstance().getNameById(targetId);
 		
-		if (listOwner.getFriendList().contains(targetId))
+		if (listOwner.isFriend(targetId))
 		{
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_IN_FRIENDS_LIST);
 			sm.addString(charName);

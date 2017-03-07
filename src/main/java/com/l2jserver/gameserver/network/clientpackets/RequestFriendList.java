@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 /**
- * This class ...
- * @version $Revision: 1.3.4.3 $ $Date: 2005/03/27 15:29:30 $
+ * @since 2005/03/27
  */
 public final class RequestFriendList extends L2GameClientPacket
 {
@@ -41,47 +40,30 @@ public final class RequestFriendList extends L2GameClientPacket
 	@Override
 	protected void runImpl()
 	{
-		L2PcInstance activeChar = getClient().getActiveChar();
-		
+		final L2PcInstance activeChar = getClient().getActiveChar();
 		if (activeChar == null)
 		{
 			return;
 		}
 		
-		SystemMessage sm;
-		
 		// ======<Friend List>======
 		activeChar.sendPacket(SystemMessageId.FRIEND_LIST_HEADER);
-		
-		L2PcInstance friend = null;
-		for (int id : activeChar.getFriendList())
+		if (activeChar.hasFriends())
 		{
-			// int friendId = rset.getInt("friendId");
-			String friendName = CharNameTable.getInstance().getNameById(id);
-			
-			if (friendName == null)
+			for (int id : activeChar.getFriends())
 			{
-				continue;
-			}
-			
-			friend = L2World.getInstance().getPlayer(friendName);
-			
-			if ((friend == null) || !friend.isOnline())
-			{
-				// (Currently: Offline)
-				sm = SystemMessage.getSystemMessage(SystemMessageId.S1_OFFLINE);
+				final String friendName = CharNameTable.getInstance().getNameById(id);
+				if (friendName == null)
+				{
+					continue;
+				}
+				
+				final L2PcInstance friend = L2World.getInstance().getPlayer(friendName);
+				final SystemMessage sm = SystemMessage.getSystemMessage((friend == null) || !friend.isOnline() ? SystemMessageId.S1_OFFLINE : SystemMessageId.S1_ONLINE);
 				sm.addString(friendName);
+				activeChar.sendPacket(sm);
 			}
-			else
-			{
-				// (Currently: Online)
-				sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ONLINE);
-				sm.addString(friendName);
-			}
-			
-			activeChar.sendPacket(sm);
 		}
-		
 		// =========================
 		activeChar.sendPacket(SystemMessageId.FRIEND_LIST_FOOTER);
 	}

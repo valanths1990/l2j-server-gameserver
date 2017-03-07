@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
@@ -36,7 +37,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  */
 public class FriendListExtended extends L2GameServerPacket
 {
-	private final List<FriendInfo> _info;
+	private List<FriendInfo> _info;
 	
 	private static class FriendInfo
 	{
@@ -46,7 +47,7 @@ public class FriendListExtended extends L2GameServerPacket
 		int _classid;
 		int _level;
 		
-		public FriendInfo(int objId, String name, boolean online, int classid, int level)
+		FriendInfo(int objId, String name, boolean online, int classid, int level)
 		{
 			_objId = objId;
 			_name = name;
@@ -58,17 +59,18 @@ public class FriendListExtended extends L2GameServerPacket
 	
 	public FriendListExtended(L2PcInstance player)
 	{
-		_info = new ArrayList<>(player.getFriendList().size());
-		for (int objId : player.getFriendList())
+		if (!player.hasFriends())
+		{
+			_info = Collections.emptyList();
+			return;
+		}
+		
+		_info = new ArrayList<>(player.getFriends().size());
+		for (int objId : player.getFriends())
 		{
 			String name = CharNameTable.getInstance().getNameById(objId);
-			L2PcInstance player1 = L2World.getInstance().getPlayer(objId);
-			
-			boolean online = false;
-			int classid = 0;
-			int level = 0;
-			
-			if (player1 == null)
+			final L2PcInstance friend = L2World.getInstance().getPlayer(objId);
+			if (friend == null)
 			{
 				try (Connection con = ConnectionFactory.getInstance().getConnection();
 					PreparedStatement statement = con.prepareStatement("SELECT char_name, online, classid, level FROM characters WHERE charId = ?"))
@@ -88,16 +90,7 @@ public class FriendListExtended extends L2GameServerPacket
 				}
 				continue;
 			}
-			
-			if (player1.isOnline())
-			{
-				online = true;
-			}
-			
-			classid = player1.getClassId().getId();
-			level = player1.getLevel();
-			
-			_info.add(new FriendInfo(objId, name, online, classid, level));
+			_info.add(new FriendInfo(objId, name, friend.isOnline(), friend.getClassId().getId(), friend.getLevel()));
 		}
 	}
 	

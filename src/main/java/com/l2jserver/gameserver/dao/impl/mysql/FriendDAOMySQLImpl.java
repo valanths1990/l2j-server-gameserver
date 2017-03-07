@@ -42,8 +42,6 @@ public class FriendDAOMySQLImpl implements FriendDAO
 	@Override
 	public void load(L2PcInstance player)
 	{
-		player.getFriendList().clear();
-		
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(SELECT))
 		{
@@ -52,7 +50,7 @@ public class FriendDAOMySQLImpl implements FriendDAO
 			{
 				while (rs.next())
 				{
-					player.getFriendList().add(rs.getInt("friendId"));
+					player.addFriend(rs.getInt("friendId"));
 				}
 			}
 		}

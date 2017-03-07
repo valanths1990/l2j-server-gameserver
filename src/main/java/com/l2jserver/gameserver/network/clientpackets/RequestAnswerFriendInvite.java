@@ -55,8 +55,7 @@ public final class RequestAnswerFriendInvite extends L2GameClientPacket
 			return;
 		}
 		
-		if (player.getFriendList().contains(requestor.getObjectId()) //
-			|| requestor.getFriendList().contains(player.getObjectId()))
+		if (player.isFriend(requestor.getObjectId()) || requestor.isFriend(player.getObjectId()))
 		{
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_IN_FRIENDS_LIST);
 			sm.addCharName(player);
@@ -81,13 +80,13 @@ public final class RequestAnswerFriendInvite extends L2GameClientPacket
 				msg = SystemMessage.getSystemMessage(SystemMessageId.S1_ADDED_TO_FRIENDS);
 				msg.addString(player.getName());
 				requestor.sendPacket(msg);
-				requestor.getFriendList().add(player.getObjectId());
+				requestor.addFriend(player.getObjectId());
 				
 				// has joined as friend.
 				msg = SystemMessage.getSystemMessage(SystemMessageId.S1_JOINED_AS_FRIEND);
 				msg.addString(requestor.getName());
 				player.sendPacket(msg);
-				player.getFriendList().add(requestor.getObjectId());
+				player.addFriend(requestor.getObjectId());
 				
 				// Send notifications for both player in order to show them online
 				player.sendPacket(new FriendPacket(true, requestor.getObjectId()));

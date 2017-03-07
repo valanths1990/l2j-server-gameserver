@@ -68,7 +68,7 @@ public final class RequestFriendDel extends L2GameClientPacket
 			return;
 		}
 		
-		if (!activeChar.getFriendList().contains(id))
+		if (!activeChar.isFriend(id))
 		{
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_NOT_ON_YOUR_FRIENDS_LIST);
 			sm.addString(_name);
@@ -90,14 +90,14 @@ public final class RequestFriendDel extends L2GameClientPacket
 			sm.addString(_name);
 			activeChar.sendPacket(sm);
 			
-			activeChar.getFriendList().remove(Integer.valueOf(id));
+			activeChar.removeFriend(id);
 			activeChar.sendPacket(new FriendPacket(false, id));
 			
-			L2PcInstance player = L2World.getInstance().getPlayer(_name);
-			if (player != null)
+			final L2PcInstance friend = L2World.getInstance().getPlayer(_name);
+			if (friend != null)
 			{
-				player.getFriendList().remove(Integer.valueOf(activeChar.getObjectId()));
-				player.sendPacket(new FriendPacket(false, activeChar.getObjectId()));
+				friend.removeFriend(activeChar.getObjectId());
+				friend.sendPacket(new FriendPacket(false, activeChar.getObjectId()));
 			}
 		}
 		catch (Exception e)
