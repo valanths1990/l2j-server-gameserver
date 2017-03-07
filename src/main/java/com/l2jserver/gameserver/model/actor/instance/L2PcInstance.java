@@ -11975,13 +11975,16 @@ public final class L2PcInstance extends L2Playable
 	
 	private void notifyFriends()
 	{
-		final FriendStatusPacket pkt = new FriendStatusPacket(getObjectId());
-		for (int id : _friends)
+		if (hasFriends())
 		{
-			final L2PcInstance friend = L2World.getInstance().getPlayer(id);
-			if (friend != null)
+			final FriendStatusPacket pkt = new FriendStatusPacket(getObjectId());
+			for (int id : _friends)
 			{
-				friend.sendPacket(pkt);
+				final L2PcInstance friend = L2World.getInstance().getPlayer(id);
+				if (friend != null)
+				{
+					friend.sendPacket(pkt);
+				}
 			}
 		}
 	}
