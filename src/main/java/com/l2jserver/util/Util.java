@@ -33,14 +33,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Useful utilities common to L2J Server.
  */
 public final class Util
 {
-	private static final Logger _log = Logger.getLogger(Util.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(Util.class);
 	
 	private static final char[] ILLEGAL_CHARACTERS =
 	{
@@ -76,7 +78,7 @@ public final class Util
 		}
 		catch (UnknownHostException e)
 		{
-			_log.warning("Util: " + e.getMessage());
+			LOG.warn("Invalid host!", e);
 		}
 		return false;
 	}

@@ -24,8 +24,9 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -42,7 +43,7 @@ import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
  */
 public final class AnnouncementsTable
 {
-	private static Logger LOGGER = Logger.getLogger(AnnouncementsTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(AnnouncementsTable.class);
 	
 	private final Map<Integer, IAnnouncement> _announcements = new ConcurrentSkipListMap<>();
 	
@@ -86,7 +87,7 @@ public final class AnnouncementsTable
 		}
 		catch (Exception e)
 		{
-			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Failed loading announcements:", e);
+			LOG.warn("Failed loading announcements:", e);
 		}
 	}
 	
@@ -113,8 +114,8 @@ public final class AnnouncementsTable
 			if (announce.isValid() && (announce.getType() == type))
 			{
 				player.sendPacket(new CreatureSay(0, //
-				type == AnnouncementType.CRITICAL ? Say2.CRITICAL_ANNOUNCE : Say2.ANNOUNCEMENT, //
-				player.getName(), announce.getContent()));
+					type == AnnouncementType.CRITICAL ? Say2.CRITICAL_ANNOUNCE : Say2.ANNOUNCEMENT, //
+					player.getName(), announce.getContent()));
 			}
 		}
 	}

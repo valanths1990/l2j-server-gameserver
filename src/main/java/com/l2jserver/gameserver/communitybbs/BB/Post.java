@@ -35,7 +35,7 @@ import com.l2jserver.gameserver.communitybbs.Manager.PostBBSManager;
  */
 public class Post
 {
-	private static final Logger _log = LoggerFactory.getLogger(Post.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Post.class);
 	
 	public static class CPost
 	{
@@ -94,7 +94,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.warn("Could not save post ID {} in database!", cp.postId, e);
+			LOG.warn("Could not save post ID {} in database!", cp.postId, e);
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.warn("Unable to delete post for topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
+			LOG.warn("Unable to delete post for topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.warn("Unable to get post from topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
+			LOG.warn("Unable to get post from topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
 		}
 	}
 	
@@ -168,7 +168,7 @@ public class Post
 		}
 		catch (Exception e)
 		{
-			_log.warn("Unable to store post ID {} in database!", cp.postId, e);
+			LOG.warn("Unable to store post ID {} in database!", cp.postId, e);
 		}
 	}
 }

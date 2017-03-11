@@ -26,8 +26,9 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
@@ -35,11 +36,11 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
  * Loads name and access level for all players.
- * @version 2005/03/27
+ * @since 2005/03/27
  */
 public class CharNameTable
 {
-	private static Logger _log = Logger.getLogger(CharNameTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(CharNameTable.class);
 	
 	private final Map<Integer, String> _chars = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> _accessLevels = new ConcurrentHashMap<>();
@@ -116,7 +117,7 @@ public class CharNameTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing char name: " + e.getMessage(), e);
+			LOG.warn("Could not check existing char name!", e);
 		}
 		
 		if (id > 0)
@@ -164,7 +165,7 @@ public class CharNameTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing char id: " + e.getMessage(), e);
+			LOG.warn("Could not check existing char id!", e);
 		}
 		
 		return null; // not found
@@ -194,7 +195,7 @@ public class CharNameTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing charname: " + e.getMessage(), e);
+			LOG.warn("Could not check existing charname!", e);
 		}
 		return result;
 	}
@@ -215,7 +216,7 @@ public class CharNameTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing char count: " + e.getMessage(), e);
+			LOG.warn("Could not check existing char count!", e);
 		}
 		return 0;
 	}
@@ -235,9 +236,9 @@ public class CharNameTable
 		}
 		catch (SQLException e)
 		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not load char name: " + e.getMessage(), e);
+			LOG.warn("Could not load char name!", e);
 		}
-		_log.info(getClass().getSimpleName() + ": Loaded " + _chars.size() + " char names.");
+		LOG.info(getClass().getSimpleName() + ": Loaded " + _chars.size() + " char names.");
 	}
 	
 	public static CharNameTable getInstance()

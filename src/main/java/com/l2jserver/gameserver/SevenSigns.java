@@ -54,7 +54,7 @@ import com.l2jserver.gameserver.util.Broadcast;
  */
 public class SevenSigns
 {
-	protected static final Logger _log = LoggerFactory.getLogger(SevenSigns.class);
+	protected static final Logger LOG = LoggerFactory.getLogger(SevenSigns.class);
 	
 	// Basic Seven Signs Constants \\
 	public static final String SEVEN_SIGNS_HTML_PATH = "data/html/seven_signs/";
@@ -152,10 +152,10 @@ public class SevenSigns
 		}
 		catch (Exception e)
 		{
-			_log.error("SevenSigns: Failed to load configuration!", e);
+			LOG.error("SevenSigns: Failed to load configuration!", e);
 		}
 		
-		_log.info("SevenSigns: Currently in the {} period.", getCurrentPeriodName());
+		LOG.info("SevenSigns: Currently in the {} period.", getCurrentPeriodName());
 		
 		initializeSeals();
 		
@@ -163,26 +163,26 @@ public class SevenSigns
 		{
 			if (getCabalHighestScore() == CABAL_NULL)
 			{
-				_log.info("SevenSigns: The competition ended with a tie last week.");
+				LOG.info("SevenSigns: The competition ended with a tie last week.");
 			}
 			else
 			{
-				_log.info("SevenSigns: The {} were victorious last week.", getCabalName(getCabalHighestScore()));
+				LOG.info("SevenSigns: The {} were victorious last week.", getCabalName(getCabalHighestScore()));
 			}
 		}
 		else if (getCabalHighestScore() == CABAL_NULL)
 		{
-			_log.info("SevenSigns: The competition, if the current trend continues, will end in a tie this week.");
+			LOG.info("SevenSigns: The competition, if the current trend continues, will end in a tie this week.");
 		}
 		else
 		{
-			_log.info("SevenSigns: The {} are in the lead this week.", getCabalName(getCabalHighestScore()));
+			LOG.info("SevenSigns: The {} are in the lead this week.", getCabalName(getCabalHighestScore()));
 		}
 		
 		long milliToChange = 0;
 		if (isNextPeriodChangeInPast())
 		{
-			_log.info("SevenSigns: Next period change was in the past (server was offline), changing periods now!");
+			LOG.info("SevenSigns: Next period change was in the past (server was offline), changing periods now!");
 		}
 		else
 		{
@@ -202,7 +202,7 @@ public class SevenSigns
 		int numHours = (int) Math.floor(countDown % 24);
 		int numDays = (int) Math.floor((countDown - numHours) / 24);
 		
-		_log.info("SevenSigns: Next period begins in {} days, {} hours and {} mins.", numDays, numHours, numMins);
+		LOG.info("SevenSigns: Next period begins in {} days, {} hours and {} mins.", numDays, numHours, numMins);
 		
 	}
 	
@@ -538,7 +538,7 @@ public class SevenSigns
 				_nextPeriodChange.add(Calendar.MILLISECOND, PERIOD_MINOR_LENGTH);
 				break;
 		}
-		_log.info("SevenSigns: Next period change set to {}.", _nextPeriodChange.getTime());
+		LOG.info("SevenSigns: Next period change set to {}.", _nextPeriodChange.getTime());
 	}
 	
 	public final String getCurrentPeriodName()
@@ -861,7 +861,7 @@ public class SevenSigns
 		}
 		catch (SQLException e)
 		{
-			_log.error("SevenSigns: Unable to load Seven Signs data from database!", e);
+			LOG.error("SevenSigns: Unable to load Seven Signs data from database!", e);
 		}
 		// Festival data is loaded now after the Seven Signs engine data.
 	}
@@ -891,7 +891,7 @@ public class SevenSigns
 		}
 		catch (SQLException e)
 		{
-			_log.error("SevenSigns: Unable to save data to database!", e);
+			LOG.error("SevenSigns: Unable to save data to database!", e);
 		}
 	}
 	
@@ -918,7 +918,7 @@ public class SevenSigns
 		}
 		catch (SQLException e)
 		{
-			_log.error("SevenSigns: Unable to save data to database!", e);
+			LOG.error("SevenSigns: Unable to save data to database!", e);
 		}
 	}
 	
@@ -955,7 +955,7 @@ public class SevenSigns
 		}
 		catch (SQLException e)
 		{
-			_log.error("SevenSigns: Unable to save data to database!", e);
+			LOG.error("SevenSigns: Unable to save data to database!", e);
 		}
 	}
 	
@@ -1021,7 +1021,7 @@ public class SevenSigns
 			}
 			catch (SQLException e)
 			{
-				_log.error("SevenSigns: Failed to save data!", e);
+				LOG.error("SevenSigns: Failed to save data!", e);
 			}
 		}
 		
@@ -1200,16 +1200,16 @@ public class SevenSigns
 			{
 				if (isSealValidationPeriod())
 				{
-					_log.info("SevenSigns: The {} have won the {}.", getCabalName(e.getValue()), getSealName(e.getKey(), false));
+					LOG.info("SevenSigns: The {} have won the {}.", getCabalName(e.getValue()), getSealName(e.getKey(), false));
 				}
 				else
 				{
-					_log.info("SevenSigns: The {} is currently owned by {}.", getSealName(e.getKey(), false), getCabalName(e.getValue()));
+					LOG.info("SevenSigns: The {} is currently owned by {}.", getSealName(e.getKey(), false), getCabalName(e.getValue()));
 				}
 			}
 			else
 			{
-				_log.info("SevenSigns: The {} remains unclaimed.", getSealName(e.getKey(), false));
+				LOG.info("SevenSigns: The {} remains unclaimed.", getSealName(e.getKey(), false));
 			}
 		}
 	}
@@ -1500,7 +1500,7 @@ public class SevenSigns
 					// Send message that Seal Validation has begun.
 					sendMessageToAll(SystemMessageId.SEAL_VALIDATION_PERIOD_BEGUN);
 					
-					_log.info("SevenSigns: The {} have won the competition with {} points!", getCabalName(_previousWinner), getCurrentScore(_previousWinner));
+					LOG.info("SevenSigns: The {} have won the competition with {} points!", getCabalName(_previousWinner), getCurrentScore(_previousWinner));
 					break;
 				case PERIOD_SEAL_VALIDATION: // Reset for New Cycle
 					
@@ -1539,7 +1539,7 @@ public class SevenSigns
 			Broadcast.toAllOnlinePlayers(ss);
 			spawnSevenSignsNPC();
 			
-			_log.info("SevenSigns: The {} period has begun!", getCurrentPeriodName());
+			LOG.info("SevenSigns: The {} period has begun!", getCurrentPeriodName());
 			
 			setCalendarForNextPeriodChange();
 			

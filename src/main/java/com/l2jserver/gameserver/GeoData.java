@@ -42,7 +42,7 @@ import com.l2jserver.geodriver.GeoDriver;
  */
 public class GeoData
 {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GeoData.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GeoData.class);
 	private static final String FILE_NAME_FORMAT = "%d_%d.l2j";
 	private static final int ELEVATED_SEE_OVER_DISTANCE = 2;
 	private static final int MAX_SEE_OVER_HEIGHT = 48;
@@ -65,7 +65,7 @@ public class GeoData
 					{
 						if (loadFile)
 						{
-							LOGGER.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
+							LOG.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
@@ -74,13 +74,13 @@ public class GeoData
 					{
 						try
 						{
-							LOGGER.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
+							LOG.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
 						catch (Exception e)
 						{
-							LOGGER.warn("{}: Failed to load {}!", getClass().getSimpleName(), geoFilePath.getFileName(), e);
+							LOG.warn("{}: Failed to load {}!", getClass().getSimpleName(), geoFilePath.getFileName(), e);
 						}
 					}
 				}
@@ -88,11 +88,11 @@ public class GeoData
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("{}: Failed to load geodata!", e);
+			LOG.error("{}: Failed to load geodata!", e);
 			System.exit(1);
 		}
 		
-		LOGGER.info("{}: Loaded {} regions.", getClass().getSimpleName(), loadedRegions);
+		LOG.info("{}: Loaded {} regions.", getClass().getSimpleName(), loadedRegions);
 	}
 	
 	public boolean hasGeoPos(int geoX, int geoY)

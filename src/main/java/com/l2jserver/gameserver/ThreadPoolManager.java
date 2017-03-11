@@ -70,7 +70,7 @@ import com.l2jserver.util.StringUtil;
  */
 public class ThreadPoolManager
 {
-	protected static final Logger _log = LoggerFactory.getLogger(ThreadPoolManager.class);
+	protected static final Logger LOG = LoggerFactory.getLogger(ThreadPoolManager.class);
 	
 	private static final class RunnableWrapper implements Runnable
 	{
@@ -99,11 +99,11 @@ public class ThreadPoolManager
 			}
 		}
 	}
-	
-	protected ScheduledThreadPoolExecutor _effectsScheduledThreadPool;
-	protected ScheduledThreadPoolExecutor _generalScheduledThreadPool;
-	protected ScheduledThreadPoolExecutor _aiScheduledThreadPool;
-	protected ScheduledThreadPoolExecutor _eventScheduledThreadPool;
+
+	private ScheduledThreadPoolExecutor _effectsScheduledThreadPool;
+	private ScheduledThreadPoolExecutor _generalScheduledThreadPool;
+	private ScheduledThreadPoolExecutor _aiScheduledThreadPool;
+	private ScheduledThreadPoolExecutor _eventScheduledThreadPool;
 	private final ThreadPoolExecutor _generalPacketsThreadPool;
 	private final ThreadPoolExecutor _ioPacketsThreadPool;
 	private final ThreadPoolExecutor _generalThreadPool;
@@ -567,12 +567,12 @@ public class ThreadPoolManager
 			_ioPacketsThreadPool.shutdown();
 			_generalThreadPool.shutdown();
 			_eventThreadPool.shutdown();
-			_log.info("All ThreadPools are now stopped");
+			LOG.info("All ThreadPools are now stopped");
 			
 		}
 		catch (InterruptedException e)
 		{
-			_log.warn("There has been a problem shuting down the thread pool manager!", e);
+			LOG.warn("There has been a problem shuting down the thread pool manager!", e);
 		}
 	}
 	
@@ -653,8 +653,8 @@ public class ThreadPoolManager
 			}
 		}
 		
-		sb.append("Packet Tp stack traces printed." + Config.EOL);
-		
+		sb.append("Packet Tp stack traces printed.");
+		sb.append(Config.EOL);
 		return sb.toString();
 	}
 	
@@ -687,8 +687,8 @@ public class ThreadPoolManager
 			}
 		}
 		
-		sb.append("Packet Tp stack traces printed." + Config.EOL);
-		
+		sb.append("Packet Tp stack traces printed.");
+		sb.append(Config.EOL);
 		return sb.toString();
 	}
 	

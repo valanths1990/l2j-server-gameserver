@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  */
 public class UPnPService
 {
-	private static final Logger _log = LoggerFactory.getLogger(UPnPService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UPnPService.class);
 	private static final String PROTOCOL = "TCP";
 	
 	private final GatewayDiscover _gatewayDiscover = new GatewayDiscover();
@@ -48,7 +48,7 @@ public class UPnPService
 		}
 		catch (Exception e)
 		{
-			_log.warn("{}: There was a problem while initializing the UPnP Service!", getClass().getSimpleName(), e);
+			LOG.warn("{}: There was a problem while initializing the UPnP Service!", getClass().getSimpleName(), e);
 		}
 	}
 	
@@ -56,16 +56,16 @@ public class UPnPService
 	{
 		if (!Config.ENABLE_UPNP)
 		{
-			_log.info("UPnP Service is disabled.");
+			LOG.info("UPnP Service is disabled.");
 			return;
 		}
 		
-		_log.info("Looking for UPnP Gateway Devices...");
+		LOG.info("Looking for UPnP Gateway Devices...");
 		
 		final Map<InetAddress, GatewayDevice> gateways = _gatewayDiscover.discover();
 		if (gateways.isEmpty())
 		{
-			_log.info("No UPnP gateways found.");
+			LOG.info("No UPnP gateways found.");
 			return;
 		}
 		
@@ -73,15 +73,15 @@ public class UPnPService
 		_activeGW = _gatewayDiscover.getValidGateway();
 		if (_activeGW != null)
 		{
-			_log.info("Using UPnP gateway: {}", _activeGW.getFriendlyName());
+			LOG.info("Using UPnP gateway: {}", _activeGW.getFriendlyName());
 		}
 		else
 		{
-			_log.info("No active UPnP gateway found.");
+			LOG.info("No active UPnP gateway found.");
 			return;
 		}
 		
-		_log.info("Using local address: {} External address: {}", _activeGW.getLocalAddress().getHostAddress(), _activeGW.getExternalIPAddress());
+		LOG.info("Using local address: {} External address: {}", _activeGW.getLocalAddress().getHostAddress(), _activeGW.getExternalIPAddress());
 		
 		if (Server.serverMode == Server.MODE_GAMESERVER)
 		{
@@ -121,11 +121,11 @@ public class UPnPService
 		
 		if (_activeGW.addPortMapping(port, port, localAddress.getHostAddress(), PROTOCOL, description))
 		{
-			_log.info("Mapping successful on {}:{}", localAddress.getHostAddress(), port);
+			LOG.info("Mapping successful on {}:{}", localAddress.getHostAddress(), port);
 		}
 		else
 		{
-			_log.info("Mapping failed on [{}:{}] - Already mapped?", localAddress.getHostAddress(), port);
+			LOG.info("Mapping failed on [{}:{}] - Already mapped?", localAddress.getHostAddress(), port);
 		}
 	}
 	
@@ -133,7 +133,7 @@ public class UPnPService
 	{
 		if (_activeGW.deletePortMapping(port, PROTOCOL))
 		{
-			_log.info("Mapping was deleted from [{}:{}]", _activeGW.getLocalAddress().getHostAddress(), port);
+			LOG.info("Mapping was deleted from [{}:{}]", _activeGW.getLocalAddress().getHostAddress(), port);
 		}
 	}
 	

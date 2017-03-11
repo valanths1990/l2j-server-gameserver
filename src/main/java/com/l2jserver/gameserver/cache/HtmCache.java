@@ -37,7 +37,7 @@ import com.l2jserver.util.file.filter.HTMLFilter;
  */
 public class HtmCache
 {
-	private static final Logger _log = LoggerFactory.getLogger(HtmCache.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HtmCache.class);
 	
 	private static final HTMLFilter HTML_FILTER = new HTMLFilter();
 	
@@ -60,23 +60,23 @@ public class HtmCache
 	{
 		if (!Config.LAZY_CACHE)
 		{
-			_log.info("Html cache start...");
+			LOG.info("Html cache start...");
 			parseDir(f);
-			_log.info("Cache[HTML]: " + String.format("%.3f", getMemoryUsage()) + " megabytes on " + getLoadedFiles() + " files loaded");
+			LOG.info("Cache[HTML]: " + String.format("%.3f", getMemoryUsage()) + " megabytes on " + getLoadedFiles() + " files loaded");
 		}
 		else
 		{
 			_cache.clear();
 			_loadedFiles = 0;
 			_bytesBuffLen = 0;
-			_log.info("Cache[HTML]: Running lazy cache");
+			LOG.info("Cache[HTML]: Running lazy cache");
 		}
 	}
 	
 	public void reloadPath(File f)
 	{
 		parseDir(f);
-		_log.info("Cache[HTML]: Reloaded specified path.");
+		LOG.info("Cache[HTML]: Reloaded specified path.");
 	}
 	
 	public double getMemoryUsage()
@@ -140,7 +140,7 @@ public class HtmCache
 		}
 		catch (Exception e)
 		{
-			_log.warn("Problem with htm file {}!", file, e);
+			LOG.warn("Problem with htm file {}!", file, e);
 		}
 		return content;
 	}
@@ -151,7 +151,7 @@ public class HtmCache
 		if (content == null)
 		{
 			content = "<html><body>My text is missing:<br>" + path + "</body></html>";
-			_log.warn("Cache[HTML]: Missing HTML page: " + path);
+			LOG.warn("Cache[HTML]: Missing HTML page: " + path);
 		}
 		return content;
 	}

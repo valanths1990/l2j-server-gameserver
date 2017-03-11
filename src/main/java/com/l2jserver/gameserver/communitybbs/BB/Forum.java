@@ -35,7 +35,7 @@ import com.l2jserver.gameserver.communitybbs.Manager.TopicBBSManager;
 
 public final class Forum
 {
-	private static final Logger _log = LoggerFactory.getLogger(Forum.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Forum.class);
 	
 	// type
 	public static final int ROOT = 0;
@@ -112,7 +112,7 @@ public final class Forum
 		}
 		catch (Exception e)
 		{
-			_log.warn("Could not get from database forum ID {}!", _forumId, e);
+			LOG.warn("Could not get from database forum ID {}!", _forumId, e);
 		}
 		
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
@@ -134,7 +134,7 @@ public final class Forum
 		}
 		catch (Exception e)
 		{
-			_log.warn("Could not get from database topics for forum ID {}", _forumId, e);
+			LOG.warn("Could not get from database topics for forum ID {}", _forumId, e);
 		}
 	}
 	
@@ -156,7 +156,7 @@ public final class Forum
 		}
 		catch (Exception e)
 		{
-			_log.warn("Could not get from database child forums for forum ID {}", _forumId, e);
+			LOG.warn("Could not get from database child forums for forum ID {}", _forumId, e);
 		}
 	}
 	
@@ -233,7 +233,7 @@ public final class Forum
 		}
 		catch (Exception e)
 		{
-			_log.error("Could not save forum ID {} in database!", _forumId, e);
+			LOG.error("Could not save forum ID {} in database!", _forumId, e);
 		}
 	}
 	

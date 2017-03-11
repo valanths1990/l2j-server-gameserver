@@ -30,7 +30,7 @@ import com.l2jserver.util.Rnd;
 
 public class MonsterRace
 {
-	protected static final Logger _log = LoggerFactory.getLogger(MonsterRace.class);
+	protected static final Logger LOG = LoggerFactory.getLogger(MonsterRace.class);
 	
 	private final L2Npc[] _monsters;
 	private int[][] _speeds;
@@ -77,7 +77,7 @@ public class MonsterRace
 			}
 			catch (Exception e)
 			{
-				_log.warn("Unable to create monster!", e);
+				LOG.warn("Unable to create monster!", e);
 			}
 		}
 		newSpeeds();

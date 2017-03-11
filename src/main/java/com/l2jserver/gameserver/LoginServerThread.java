@@ -80,8 +80,8 @@ import com.l2jserver.util.network.BaseSendablePacket;
 
 public class LoginServerThread extends Thread
 {
-	protected static final Logger _log = LoggerFactory.getLogger(LoginServerThread.class);
-	protected static final Logger _logAccounting = LoggerFactory.getLogger("accounting");
+	protected static final Logger LOG = LoggerFactory.getLogger(LoginServerThread.class);
+	protected static final Logger LOG_ACCOUNTING = LoggerFactory.getLogger("accounting");
 	
 	/** @see com.l2jserver.loginserver.L2LoginServer#PROTOCOL_REV */
 	private static final int REVISION = 0x0106;
@@ -152,7 +152,7 @@ public class LoginServerThread extends Thread
 			try
 			{
 				// Connection
-				_log.info("Connecting to login on {}:{}", _hostname, _port);
+				LOG.info("Connecting to login on {}:{}", _hostname, _port);
 				_loginSocket = new Socket(_hostname, _port);
 				InputStream in = _loginSocket.getInputStream();
 				_out = new BufferedOutputStream(_loginSocket.getOutputStream());
@@ -173,7 +173,7 @@ public class LoginServerThread extends Thread
 					
 					if (lengthHi < 0)
 					{
-						_log.info("LoginServerThread: Login terminated the connection.");
+						LOG.info("LoginServerThread: Login terminated the connection.");
 						break;
 					}
 					
@@ -191,7 +191,7 @@ public class LoginServerThread extends Thread
 					
 					if (receivedBytes != (length - 2))
 					{
-						_log.warn("Incomplete Packet is sent to the server, closing connection.(LS)");
+						LOG.warn("Incomplete Packet is sent to the server, closing connection.(LS)");
 						break;
 					}
 					
@@ -201,7 +201,7 @@ public class LoginServerThread extends Thread
 					
 					if (!checksumOk)
 					{
-						_log.warn("Incorrect packet checksum, ignoring packet (LS)");
+						LOG.warn("Incorrect packet checksum, ignoring packet (LS)");
 						break;
 					}
 					
@@ -213,7 +213,7 @@ public class LoginServerThread extends Thread
 							if (init.getRevision() != REVISION)
 							{
 								// TODO: revision mismatch
-								_log.warn("/!\\ Revision mismatch between LS and GS /!\\");
+								LOG.warn("/!\\ Revision mismatch between LS and GS /!\\");
 								break;
 							}
 							
@@ -228,7 +228,7 @@ public class LoginServerThread extends Thread
 							}
 							catch (GeneralSecurityException e)
 							{
-								_log.warn("Trouble while init the public key send by login");
+								LOG.warn("Trouble while init the public key send by login");
 								break;
 							}
 							// send the blowfish key through the rsa encryption
@@ -239,7 +239,7 @@ public class LoginServerThread extends Thread
 							break;
 						case 0x01:
 							LoginServerFail lsf = new LoginServerFail(incoming);
-							_log.info("Damn! Registeration Failed: {}", lsf.getReasonString());
+							LOG.info("Damn! Registeration Failed: {}", lsf.getReasonString());
 							// login will close the connection here
 							break;
 						case 0x02:
@@ -247,7 +247,7 @@ public class LoginServerThread extends Thread
 							int serverID = aresp.getServerId();
 							_serverName = aresp.getServerName();
 							Config.saveHexid(serverID, hexToString(_hexID));
-							_log.info("Registered on login as Server {}: {}", serverID, _serverName);
+							LOG.info("Registered on login as Server {}: {}", serverID, _serverName);
 							ServerStatus st = new ServerStatus();
 							if (Config.SERVER_LIST_BRACKET)
 							{
@@ -317,7 +317,7 @@ public class LoginServerThread extends Thread
 								}
 								else
 								{
-									_log.warn("Session key is not correct. Closing connection for account {}.", wcToRemove.account);
+									LOG.warn("Session key is not correct. Closing connection for account {}.", wcToRemove.account);
 									// wcToRemove.gameClient.getConnection().sendPacket(new LoginFail(LoginFail.SYSTEM_ERROR_LOGIN_LATER));
 									wcToRemove.gameClient.close(new LoginFail(LoginFail.SYSTEM_ERROR_LOGIN_LATER));
 									_accountsInGameServer.remove(wcToRemove.account);
@@ -341,15 +341,15 @@ public class LoginServerThread extends Thread
 			}
 			catch (UnknownHostException e)
 			{
-				_log.warn("Unknown host!", e);
+				LOG.warn("Unknown host!", e);
 			}
 			catch (SocketException e)
 			{
-				_log.warn("LoginServer not avaible, trying to reconnect...");
+				LOG.warn("LoginServer not avaible, trying to reconnect...");
 			}
 			catch (IOException e)
 			{
-				_log.warn("Disconnected from Login, Trying to reconnect!", e);
+				LOG.warn("Disconnected from Login, Trying to reconnect!", e);
 			}
 			finally
 			{
@@ -397,7 +397,7 @@ public class LoginServerThread extends Thread
 		}
 		catch (IOException e)
 		{
-			_log.warn("Error while sending player auth request!");
+			LOG.warn("Error while sending player auth request!");
 		}
 	}
 	
@@ -441,7 +441,7 @@ public class LoginServerThread extends Thread
 		}
 		catch (IOException e)
 		{
-			_log.warn("Error while sending logout packet to login!");
+			LOG.warn("Error while sending logout packet to login!");
 		}
 		finally
 		{
@@ -549,7 +549,7 @@ public class LoginServerThread extends Thread
 		L2GameClient client = _accountsInGameServer.get(account);
 		if (client != null)
 		{
-			_logAccounting.warn("Kicked by login: {}", client);
+			LOG_ACCOUNTING.warn("Kicked by login: {}", client);
 			client.setAditionalClosePacket(SystemMessage.getSystemMessage(SystemMessageId.ANOTHER_LOGIN_WITH_ACCOUNT));
 			client.closeNow();
 		}
@@ -583,7 +583,7 @@ public class LoginServerThread extends Thread
 		}
 		catch (SQLException e)
 		{
-			_log.warn("Exception: getCharsOnServer!", e);
+			LOG.warn("Exception: getCharsOnServer!", e);
 		}
 		
 		ReplyCharacters rec = new ReplyCharacters(account, chars, charToDel);

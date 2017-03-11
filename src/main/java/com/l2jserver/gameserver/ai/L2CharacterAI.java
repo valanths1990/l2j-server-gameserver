@@ -485,7 +485,7 @@ public class L2CharacterAI extends AbstractAI
 		setTarget(object);
 		if ((object.getX() == 0) && (object.getY() == 0)) // TODO: Find the drop&spawn bug
 		{
-			_log.warn("Object in coords 0,0 - using a temporary fix");
+			LOG.warn("Object in coords 0,0 - using a temporary fix");
 			object.setXYZ(getActor().getX(), getActor().getY(), getActor().getZ() + 5);
 		}
 		
@@ -990,7 +990,7 @@ public class L2CharacterAI extends AbstractAI
 	{
 		if (worldPosition == null)
 		{
-			_log.warn("maybeMoveToPosition: worldPosition == NULL!");
+			LOG.warn("maybeMoveToPosition: worldPosition == NULL!");
 			return false;
 		}
 		
@@ -1062,7 +1062,7 @@ public class L2CharacterAI extends AbstractAI
 		// Get the distance between the current position of the L2Character and the target (x,y)
 		if (target == null)
 		{
-			_log.warn("maybeMoveToPawn: target == NULL!");
+			LOG.warn("maybeMoveToPawn: target == NULL!");
 			return false;
 		}
 		if (offset < 0)

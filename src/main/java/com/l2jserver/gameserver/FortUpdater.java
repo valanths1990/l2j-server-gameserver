@@ -27,12 +27,13 @@ import com.l2jserver.gameserver.model.entity.Fort;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 
 /**
- * Class managing periodical events with castle
- * @author Vice - 2008
+ * Class managing periodical events with castle.
+ * @author Vice
+ * @since 2008
  */
 public class FortUpdater implements Runnable
 {
-	private static final Logger _log = LoggerFactory.getLogger(FortUpdater.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FortUpdater.class);
 	private final L2Clan _clan;
 	private final Fort _fort;
 	private int _runCount;
@@ -102,7 +103,7 @@ public class FortUpdater implements Runnable
 		}
 		catch (Exception e)
 		{
-			_log.error("There has been a problem updating forts!", e);
+			LOG.error("There has been a problem updating forts!", e);
 		}
 	}
 	
