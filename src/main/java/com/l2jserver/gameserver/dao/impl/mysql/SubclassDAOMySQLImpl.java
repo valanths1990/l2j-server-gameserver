@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.base.SubClass;
 
 /**
- * Subclass DAO implementation.
+ * Subclass DAO MySQL implementation.
  * @author Zoey76
  */
 public class SubclassDAOMySQLImpl implements SubclassDAO

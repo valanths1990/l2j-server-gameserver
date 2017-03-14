@@ -23,14 +23,16 @@ import com.l2jserver.gameserver.dao.HennaDAO;
 import com.l2jserver.gameserver.dao.ItemDAO;
 import com.l2jserver.gameserver.dao.ItemReuseDAO;
 import com.l2jserver.gameserver.dao.PetDAO;
+import com.l2jserver.gameserver.dao.PetSkillSaveDAO;
 import com.l2jserver.gameserver.dao.PlayerDAO;
+import com.l2jserver.gameserver.dao.PlayerSkillSaveDAO;
 import com.l2jserver.gameserver.dao.PremiumItemDAO;
 import com.l2jserver.gameserver.dao.RecipeBookDAO;
 import com.l2jserver.gameserver.dao.RecipeShopListDAO;
 import com.l2jserver.gameserver.dao.RecommendationBonusDAO;
+import com.l2jserver.gameserver.dao.ServitorSkillSaveDAO;
 import com.l2jserver.gameserver.dao.ShortcutDAO;
 import com.l2jserver.gameserver.dao.SkillDAO;
-import com.l2jserver.gameserver.dao.SkillSaveDAO;
 import com.l2jserver.gameserver.dao.SubclassDAO;
 import com.l2jserver.gameserver.dao.TeleportBookmarkDAO;
 
@@ -50,7 +52,11 @@ public interface IDAOFactory
 	
 	PetDAO getPetDAO();
 	
+	PetSkillSaveDAO getPetSkillSaveDAO();
+	
 	PlayerDAO getPlayerDAO();
+	
+	PlayerSkillSaveDAO getPlayerSkillSaveDAO();
 	
 	PremiumItemDAO getPremiumItemDAO();
 	
@@ -60,11 +66,11 @@ public interface IDAOFactory
 	
 	RecommendationBonusDAO getRecommendationBonusDAO();
 	
+	ServitorSkillSaveDAO getServitorSkillSaveDAO();
+	
 	ShortcutDAO getShortcutDAO();
 	
 	SkillDAO getSkillDAO();
-	
-	SkillSaveDAO getSkillSaveDAO();
 	
 	SubclassDAO getSubclassDAO();
 	

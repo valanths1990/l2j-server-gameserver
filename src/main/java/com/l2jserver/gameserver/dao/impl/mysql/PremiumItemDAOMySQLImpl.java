@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.model.L2PremiumItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Premium Item DAO implementation.
+ * Premium Item DAO MySQL implementation.
  * @author Zoey76
  */
 public class PremiumItemDAOMySQLImpl implements PremiumItemDAO

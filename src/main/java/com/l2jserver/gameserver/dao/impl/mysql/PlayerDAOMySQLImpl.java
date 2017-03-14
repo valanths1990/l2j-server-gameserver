@@ -39,7 +39,7 @@ import com.l2jserver.gameserver.model.base.SubClass;
 import com.l2jserver.gameserver.model.entity.Hero;
 
 /**
- * Player DAO implementation.
+ * Player DAO MySQL implementation.
  * @author Zoey76
  */
 public class PlayerDAOMySQLImpl implements PlayerDAO

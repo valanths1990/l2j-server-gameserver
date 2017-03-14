@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Recipe Shop List DAO implementation.
+ * Recipe Shop List DAO MySQL implementation.
  * @author Zoey76
  */
 public class RecipeShopListDAOMySQLImpl implements RecipeShopListDAO

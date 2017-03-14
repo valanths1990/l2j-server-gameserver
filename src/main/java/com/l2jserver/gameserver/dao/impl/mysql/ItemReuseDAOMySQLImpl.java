@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.serverpackets.ExUseSharedGroupItem;
 
 /**
- * Item Reuse DAO implementation.
+ * Item Reuse DAO MySQL implementation.
  * @author Zoey76
  */
 public class ItemReuseDAOMySQLImpl implements ItemReuseDAO

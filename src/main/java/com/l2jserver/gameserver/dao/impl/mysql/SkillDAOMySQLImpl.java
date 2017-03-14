@@ -40,7 +40,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.util.Util;
 
 /**
- * Skill DAO implementation.
+ * Skill DAO MySQL implementation.
  * @author Zoey76
  */
 public class SkillDAOMySQLImpl implements SkillDAO

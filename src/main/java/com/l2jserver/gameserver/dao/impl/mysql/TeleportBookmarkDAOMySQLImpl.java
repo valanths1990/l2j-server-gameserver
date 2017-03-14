@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.model.TeleportBookmark;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Teleport Bookmark DAO implementation.
+ * Teleport Bookmark DAO MySQL implementation.
  * @author Zoey76
  */
 public class TeleportBookmarkDAOMySQLImpl implements TeleportBookmarkDAO

@@ -33,7 +33,7 @@ import com.l2jserver.gameserver.model.L2RecipeList;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Recipe Book DAO implementation.
+ * Recipe Book DAO MySQL implementation.
  * @author Zoey76
  */
 public class RecipeBookDAOMySQLImpl implements RecipeBookDAO

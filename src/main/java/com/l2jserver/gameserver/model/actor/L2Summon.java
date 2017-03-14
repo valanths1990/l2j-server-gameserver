@@ -515,6 +515,11 @@ public abstract class L2Summon extends L2Playable
 		return null;
 	}
 	
+	public boolean isRestoreSummon()
+	{
+		return _restoreSummon;
+	}
+	
 	public void setRestoreSummon(boolean val)
 	{
 	}

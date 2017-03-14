@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
-import com.l2jserver.gameserver.dao.SkillSaveDAO;
+import com.l2jserver.gameserver.dao.PlayerSkillSaveDAO;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.model.TimeStamp;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -40,12 +40,12 @@ import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
- * Skill Save DAO implementation.
+ * Player Skill Save DAO MySQL implementation.
  * @author Zoey76
  */
-public class SkillSaveDAOMySQLImpl implements SkillSaveDAO
+public class PlayerSkillSaveDAOMySQLImpl implements PlayerSkillSaveDAO
 {
-	private static final Logger LOG = LoggerFactory.getLogger(SkillSaveDAOMySQLImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PlayerSkillSaveDAOMySQLImpl.class);
 	
 	private static final String INSERT = "INSERT INTO character_skills_save (charId,skill_id,skill_level,remaining_time,reuse_delay,systime,restore_type,class_index,buff_index) VALUES (?,?,?,?,?,?,?,?,?)";
 	private static final String SELECT = "SELECT skill_id,skill_level,remaining_time, reuse_delay, systime, restore_type FROM character_skills_save WHERE charId=? AND class_index=? ORDER BY buff_index ASC";
@@ -63,7 +63,7 @@ public class SkillSaveDAOMySQLImpl implements SkillSaveDAO
 		}
 		catch (Exception e)
 		{
-			LOG.error("Could not delete all effect data: {}", player, e);
+			LOG.error("Could not delete all effect data!", player, e);
 		}
 	}
 	
@@ -167,7 +167,7 @@ public class SkillSaveDAOMySQLImpl implements SkillSaveDAO
 		}
 		catch (Exception e)
 		{
-			LOG.error("Could not store {} effect data: {}", player, e);
+			LOG.error("Could not store {} effect data!", player, e);
 		}
 	}
 	
@@ -215,7 +215,7 @@ public class SkillSaveDAOMySQLImpl implements SkillSaveDAO
 		}
 		catch (Exception e)
 		{
-			LOG.error("Could not restore {} active effect data: {}", player, e);
+			LOG.error("Could not restore {} active effect data!", player, e);
 		}
 	}
 }

@@ -29,7 +29,7 @@ import com.l2jserver.gameserver.dao.ShortcutDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Shortcut DAO implementation.
+ * Shortcut DAO MySQL implementation.
  * @author Zoey76
  */
 public class ShortcutDAOMySQLImpl implements ShortcutDAO

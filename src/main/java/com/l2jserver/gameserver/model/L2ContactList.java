@@ -88,8 +88,6 @@ public class L2ContactList
 	
 	public boolean add(String name)
 	{
-		SystemMessage sm;
-		
 		int contactId = CharNameTable.getInstance().getIdByName(name);
 		if (_contacts.contains(name))
 		{
@@ -108,7 +106,7 @@ public class L2ContactList
 		}
 		else if (contactId < 1)
 		{
-			sm = SystemMessage.getSystemMessage(SystemMessageId.NAME_S1_NOT_EXIST_TRY_ANOTHER_NAME);
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.NAME_S1_NOT_EXIST_TRY_ANOTHER_NAME);
 			sm.addString(name);
 			activeChar.sendPacket(sm);
 			return false;
@@ -134,7 +132,7 @@ public class L2ContactList
 			
 			_contacts.add(name);
 			
-			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_SUCCESSFULLY_ADDED_TO_CONTACT_LIST);
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_SUCCESSFULLY_ADDED_TO_CONTACT_LIST);
 			sm.addString(name);
 			activeChar.sendPacket(sm);
 		}

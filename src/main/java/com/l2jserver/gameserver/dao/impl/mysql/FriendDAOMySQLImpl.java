@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.dao.FriendDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Friend DAO implementation.
+ * Friend DAO MySQL implementation.
  * @author Zoey76
  */
 public class FriendDAOMySQLImpl implements FriendDAO

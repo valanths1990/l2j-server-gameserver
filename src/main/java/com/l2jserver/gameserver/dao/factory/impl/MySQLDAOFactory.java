@@ -23,14 +23,16 @@ import com.l2jserver.gameserver.dao.HennaDAO;
 import com.l2jserver.gameserver.dao.ItemDAO;
 import com.l2jserver.gameserver.dao.ItemReuseDAO;
 import com.l2jserver.gameserver.dao.PetDAO;
+import com.l2jserver.gameserver.dao.PetSkillSaveDAO;
 import com.l2jserver.gameserver.dao.PlayerDAO;
+import com.l2jserver.gameserver.dao.PlayerSkillSaveDAO;
 import com.l2jserver.gameserver.dao.PremiumItemDAO;
 import com.l2jserver.gameserver.dao.RecipeBookDAO;
 import com.l2jserver.gameserver.dao.RecipeShopListDAO;
 import com.l2jserver.gameserver.dao.RecommendationBonusDAO;
+import com.l2jserver.gameserver.dao.ServitorSkillSaveDAO;
 import com.l2jserver.gameserver.dao.ShortcutDAO;
 import com.l2jserver.gameserver.dao.SkillDAO;
-import com.l2jserver.gameserver.dao.SkillSaveDAO;
 import com.l2jserver.gameserver.dao.SubclassDAO;
 import com.l2jserver.gameserver.dao.TeleportBookmarkDAO;
 import com.l2jserver.gameserver.dao.factory.IDAOFactory;
@@ -39,14 +41,16 @@ import com.l2jserver.gameserver.dao.impl.mysql.HennaDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.ItemDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.ItemReuseDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.PetDAOMySQLImpl;
+import com.l2jserver.gameserver.dao.impl.mysql.PetSkillSaveDAOMySQL;
 import com.l2jserver.gameserver.dao.impl.mysql.PlayerDAOMySQLImpl;
+import com.l2jserver.gameserver.dao.impl.mysql.PlayerSkillSaveDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.PremiumItemDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.RecipeBookDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.RecipeShopListDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.RecommendationBonusDAOMySQLImpl;
+import com.l2jserver.gameserver.dao.impl.mysql.ServitorSkillSaveDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.ShortcutDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.SkillDAOMySQLImpl;
-import com.l2jserver.gameserver.dao.impl.mysql.SkillSaveDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.SubclassDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.TeleportBookmarkDAOMySQLImpl;
 
@@ -63,14 +67,16 @@ enum MySQLDAOFactory implements IDAOFactory
 	private final ItemDAO itemDAO = new ItemDAOMySQLImpl();
 	private final ItemReuseDAO itemReuseDAO = new ItemReuseDAOMySQLImpl();
 	private final PetDAO petDAO = new PetDAOMySQLImpl();
+	private final PetSkillSaveDAO petSkillSaveDAO = new PetSkillSaveDAOMySQL();
 	private final PlayerDAO playerDAO = new PlayerDAOMySQLImpl();
+	private final PlayerSkillSaveDAO playerSkillSaveDAO = new PlayerSkillSaveDAOMySQLImpl();
 	private final PremiumItemDAO premiumItemDAO = new PremiumItemDAOMySQLImpl();
 	private final RecipeBookDAO recipeBookDAO = new RecipeBookDAOMySQLImpl();
 	private final RecipeShopListDAO recipeShopListDAO = new RecipeShopListDAOMySQLImpl();
 	private final RecommendationBonusDAO recommendationBonusDAO = new RecommendationBonusDAOMySQLImpl();
+	private final ServitorSkillSaveDAO servitorSkillSaveDAO = new ServitorSkillSaveDAOMySQLImpl();
 	private final ShortcutDAO shortcutDAO = new ShortcutDAOMySQLImpl();
 	private final SkillDAO skillDAO = new SkillDAOMySQLImpl();
-	private final SkillSaveDAO skillSaveDAO = new SkillSaveDAOMySQLImpl();
 	private final SubclassDAO subclassDAO = new SubclassDAOMySQLImpl();
 	private final TeleportBookmarkDAO teleportBookmarkDAO = new TeleportBookmarkDAOMySQLImpl();
 	
@@ -105,9 +111,21 @@ enum MySQLDAOFactory implements IDAOFactory
 	}
 	
 	@Override
+	public PetSkillSaveDAO getPetSkillSaveDAO()
+	{
+		return petSkillSaveDAO;
+	}
+	
+	@Override
 	public PlayerDAO getPlayerDAO()
 	{
 		return playerDAO;
+	}
+	
+	@Override
+	public PlayerSkillSaveDAO getPlayerSkillSaveDAO()
+	{
+		return playerSkillSaveDAO;
 	}
 	
 	@Override
@@ -135,6 +153,12 @@ enum MySQLDAOFactory implements IDAOFactory
 	}
 	
 	@Override
+	public ServitorSkillSaveDAO getServitorSkillSaveDAO()
+	{
+		return servitorSkillSaveDAO;
+	}
+	
+	@Override
 	public ShortcutDAO getShortcutDAO()
 	{
 		return shortcutDAO;
@@ -144,12 +168,6 @@ enum MySQLDAOFactory implements IDAOFactory
 	public SkillDAO getSkillDAO()
 	{
 		return skillDAO;
-	}
-	
-	@Override
-	public SkillSaveDAO getSkillSaveDAO()
-	{
-		return skillSaveDAO;
 	}
 	
 	@Override

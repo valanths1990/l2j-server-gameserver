@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.dao.ItemDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
- * Item DAO implementation.
+ * Item DAO MySQL implementation.
  * @author Zoey76
  */
 public class ItemDAOMySQLImpl implements ItemDAO

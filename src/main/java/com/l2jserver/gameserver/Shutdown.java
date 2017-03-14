@@ -61,10 +61,10 @@ public class Shutdown extends Thread
 	
 	private int _secondsShut;
 	private int _shutdownMode;
-	public static final int SIGTERM = 0;
-	public static final int GM_SHUTDOWN = 1;
-	public static final int GM_RESTART = 2;
-	public static final int ABORT = 3;
+	private static final int SIGTERM = 0;
+	private static final int GM_SHUTDOWN = 1;
+	private static final int GM_RESTART = 2;
+	private static final int ABORT = 3;
 	private static final String[] MODE_TEXT =
 	{
 		"SIGTERM",
@@ -271,15 +271,8 @@ public class Shutdown extends Thread
 			}
 			
 			// commit data, last chance
-			try
-			{
-				ConnectionFactory.getInstance().close();
-				LOG.info("ConnectionFactory: Database connection has been shut down({}ms).", tc.getEstimatedTimeAndRestartCounter());
-			}
-			catch (Exception e)
-			{
-				
-			}
+			ConnectionFactory.getInstance().close();
+			LOG.info("ConnectionFactory: Database connection has been shutdown({}ms).", tc.getEstimatedTimeAndRestartCounter());
 			
 			// server will quit, when this function ends.
 			if (getInstance()._shutdownMode == GM_RESTART)
@@ -407,7 +400,6 @@ public class Shutdown extends Thread
 	 */
 	private void countdown()
 	{
-		
 		try
 		{
 			while (_secondsShut > 0)
@@ -499,7 +491,6 @@ public class Shutdown extends Thread
 			case GM_RESTART:
 				LOG.info("GM restart received. Restarting NOW!");
 				break;
-		
 		}
 		
 		TimeCounter tc = new TimeCounter();

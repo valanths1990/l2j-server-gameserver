@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.L2Henna;
 
 /**
- * Henna DAO implementation.
+ * Henna DAO MySQL implementation.
  * @author Zoey76
  */
 public class HennaDAOMySQLImpl implements HennaDAO

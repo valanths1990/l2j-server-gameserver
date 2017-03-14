@@ -18,31 +18,19 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
 import com.l2jserver.gameserver.data.sql.impl.SummonEffectsTable;
-import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
-import com.l2jserver.gameserver.model.skills.AbnormalType;
-import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.skills.EffectScope;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -54,11 +42,6 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  */
 public class L2ServitorInstance extends L2Summon implements Runnable
 {
-	private static final Logger LOG = LoggerFactory.getLogger(L2ServitorInstance.class);
-	private static final String ADD_SKILL_SAVE = "INSERT INTO character_summon_skills_save (ownerId,ownerClassIndex,summonSkillId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?,?,?)";
-	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,remaining_time,buff_index FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=? ORDER BY buff_index ASC";
-	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=?";
-	
 	private float _expMultiplier = 0;
 	private ItemHolder _itemConsume;
 	private int _lifeTime;
@@ -181,7 +164,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 	@Override
 	public void doPickupItem(L2Object object)
 	{
-	
+		
 	}
 	
 	@Override
@@ -227,81 +210,7 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 		// Clear list for overwrite
 		SummonEffectsTable.getInstance().clearServitorEffects(getOwner(), getReferenceSkill());
 		
-		final int ownerId = getOwner().getObjectId();
-		final int ownerClassId = getOwner().getClassIndex();
-		final int servitorRefSkill = getReferenceSkill();
-		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE_SKILL_SAVE))
-		{
-			con.setAutoCommit(false);
-			// Delete all current stored effects for summon to avoid dupe
-			ps.setInt(1, ownerId);
-			ps.setInt(2, ownerClassId);
-			ps.setInt(3, servitorRefSkill);
-			ps.execute();
-			
-			int buff_index = 0;
-			
-			final List<Integer> storedSkills = new LinkedList<>();
-			
-			// Store all effect data along with calculated remaining
-			if (storeEffects)
-			{
-				try (PreparedStatement ps2 = con.prepareStatement(ADD_SKILL_SAVE))
-				{
-					for (BuffInfo info : getEffectList().getEffects())
-					{
-						if (info == null)
-						{
-							continue;
-						}
-						
-						final Skill skill = info.getSkill();
-						// Do not save heals.
-						if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS)
-						{
-							continue;
-						}
-						
-						if (skill.isToggle())
-						{
-							continue;
-						}
-						
-						// Dances and songs are not kept in retail.
-						if (skill.isDance() && !Config.ALT_STORE_DANCES)
-						{
-							continue;
-						}
-						
-						if (storedSkills.contains(skill.getReuseHashCode()))
-						{
-							continue;
-						}
-						
-						storedSkills.add(skill.getReuseHashCode());
-						
-						ps2.setInt(1, ownerId);
-						ps2.setInt(2, ownerClassId);
-						ps2.setInt(3, servitorRefSkill);
-						ps2.setInt(4, skill.getId());
-						ps2.setInt(5, skill.getLevel());
-						ps2.setInt(6, info.getTime());
-						ps2.setInt(7, ++buff_index);
-						ps2.addBatch();
-						
-						SummonEffectsTable.getInstance().addServitorEffect(getOwner(), getReferenceSkill(), skill, info.getTime());
-					}
-					ps2.executeBatch();
-				}
-			}
-			con.commit();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not store summon effect data for owner {},  class {}, skill {}, error {}", ownerId, ownerClassId, servitorRefSkill, e);
-		}
+		DAOFactory.getInstance().getServitorSkillSaveDAO().insert(this, storeEffects);
 	}
 	
 	@Override
@@ -312,52 +221,9 @@ public class L2ServitorInstance extends L2Summon implements Runnable
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
-			if (!SummonEffectsTable.getInstance().containsSkill(getOwner(), getReferenceSkill()))
-			{
-				try (PreparedStatement ps = con.prepareStatement(RESTORE_SKILL_SAVE))
-				{
-					ps.setInt(1, getOwner().getObjectId());
-					ps.setInt(2, getOwner().getClassIndex());
-					ps.setInt(3, getReferenceSkill());
-					try (ResultSet rset = ps.executeQuery())
-					{
-						while (rset.next())
-						{
-							int effectCurTime = rset.getInt("remaining_time");
-							
-							final Skill skill = SkillData.getInstance().getSkill(rset.getInt("skill_id"), rset.getInt("skill_level"));
-							if (skill == null)
-							{
-								continue;
-							}
-							
-							if (skill.hasEffects(EffectScope.GENERAL))
-							{
-								SummonEffectsTable.getInstance().addServitorEffect(getOwner(), getReferenceSkill(), skill, effectCurTime);
-							}
-						}
-					}
-				}
-			}
-			
-			try (PreparedStatement ps = con.prepareStatement(DELETE_SKILL_SAVE))
-			{
-				ps.setInt(1, getOwner().getObjectId());
-				ps.setInt(2, getOwner().getClassIndex());
-				ps.setInt(3, getReferenceSkill());
-				ps.executeUpdate();
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore {} active effect data: {}", this, e);
-		}
-		finally
-		{
-			SummonEffectsTable.getInstance().applyServitorEffects(this, getOwner(), getReferenceSkill());
-		}
+		DAOFactory.getInstance().getServitorSkillSaveDAO().load(this);
+		
+		SummonEffectsTable.getInstance().applyServitorEffects(this, getOwner(), getReferenceSkill());
 	}
 	
 	@Override

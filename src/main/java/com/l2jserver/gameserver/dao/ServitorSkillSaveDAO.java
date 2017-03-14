@@ -18,19 +18,24 @@
  */
 package com.l2jserver.gameserver.dao;
 
-import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.actor.instance.L2ServitorInstance;
 
 /**
- * Skill Save DAO interface.
+ * Servitor Skill Save DAO interface.
  * @author Zoey76
  */
-public interface SkillSaveDAO
+public interface ServitorSkillSaveDAO
 {
-	void delete(L2PcInstance player);
+	/**
+	 * Stores the servitor skills in the database.
+	 * @param servitor the servitor
+	 * @param storeEffects if {@code true} effects will be stored
+	 */
+	void insert(L2ServitorInstance servitor, boolean storeEffects);
 	
-	void delete(L2PcInstance player, int classIndex);
-	
-	void insert(L2PcInstance player, boolean storeEffects);
-	
-	void load(L2PcInstance l2PcInstance);
+	/**
+	 * Restores the servitor skills from the database.
+	 * @param servitor the servitor.
+	 */
+	void load(L2ServitorInstance servitor);
 }

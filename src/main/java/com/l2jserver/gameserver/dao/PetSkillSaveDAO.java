@@ -18,43 +18,24 @@
  */
 package com.l2jserver.gameserver.dao;
 
-import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
-import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
-import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
 /**
- * Pet DAO interface.
+ * Pet Skill Save interface.
  * @author Zoey76
  */
-public interface PetDAO
+public interface PetSkillSaveDAO
 {
-	void updateFood(L2PcInstance player, int petId);
+	/**
+	 * Stores the pet skills in the database.
+	 * @param pet the pets
+	 * @param storeEffects if {@code true} effects will be stored
+	 */
+	void insert(L2PetInstance pet, boolean storeEffects);
 	
 	/**
-	 * Deletes a pet by item object ID.
+	 * Restores the pet skills from the database.
 	 * @param pet the pet
 	 */
-	void delete(L2PetInstance pet);
-	
-	/**
-	 * Restores a pet from the database.
-	 * @param control the summoning item
-	 * @param template the NPC template
-	 * @param owner the owner
-	 * @return the pet
-	 */
-	L2PetInstance load(L2ItemInstance control, L2NpcTemplate template, L2PcInstance owner);
-	
-	/**
-	 * Stores a pet into the database.
-	 * @param pet the pet
-	 */
-	void insert(L2PetInstance pet);
-	
-	/**
-	 * Updates a pet in the database.
-	 * @param pet the pet
-	 */
-	void update(L2PetInstance pet);
+	void load(L2PetInstance pet);
 }

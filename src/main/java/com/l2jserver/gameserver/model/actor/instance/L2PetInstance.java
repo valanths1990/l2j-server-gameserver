@@ -18,10 +18,6 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -29,9 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
+import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
 import com.l2jserver.gameserver.data.sql.impl.SummonEffectsTable;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
@@ -58,9 +54,6 @@ import com.l2jserver.gameserver.model.itemcontainer.PetInventory;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
-import com.l2jserver.gameserver.model.skills.AbnormalType;
-import com.l2jserver.gameserver.model.skills.BuffInfo;
-import com.l2jserver.gameserver.model.skills.EffectScope;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -77,10 +70,6 @@ import com.l2jserver.util.Rnd;
 public class L2PetInstance extends L2Summon
 {
 	private static final Logger LOG = LoggerFactory.getLogger(L2PetInstance.class);
-	
-	private static final String ADD_SKILL_SAVE = "INSERT INTO character_pet_skills_save (petObjItemId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?)";
-	private static final String RESTORE_SKILL_SAVE = "SELECT petObjItemId,skill_id,skill_level,remaining_time,buff_index FROM character_pet_skills_save WHERE petObjItemId=? ORDER BY buff_index ASC";
-	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_pet_skills_save WHERE petObjItemId=?";
 	
 	private int _curFed;
 	private final PetInventory _inventory;
@@ -259,8 +248,7 @@ public class L2PetInstance extends L2Summon
 		}
 		final L2PetData data = PetDataTable.getInstance().getPetData(template.getId());
 		
-		L2PetInstance pet = restore(control, template, owner);
-		// add the pet instance to world
+		final L2PetInstance pet = DAOFactory.getInstance().getPetDAO().load(control, template, owner);
 		if (pet != null)
 		{
 			pet.setTitle(owner.getName());
@@ -289,6 +277,11 @@ public class L2PetInstance extends L2Summon
 	public boolean isRespawned()
 	{
 		return _respawned;
+	}
+	
+	public void setRespawned(boolean respawned)
+	{
+		_respawned = respawned;
 	}
 	
 	@Override
@@ -798,17 +791,8 @@ public class L2PetInstance extends L2Summon
 			LOG.error("Destroying control item: {}", e);
 		}
 		
-		// pet control item no longer exists, delete the pet from the db
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM pets WHERE item_obj_id = ?"))
-		{
-			ps.setInt(1, getControlObjectId());
-			ps.execute();
-		}
-		catch (Exception e)
-		{
-			LOG.error("Failed to delete Pet [ObjectId: {}] {}", getObjectId(), e);
-		}
+		// Pet control item no longer exists, delete the pet from the database.
+		DAOFactory.getInstance().getPetDAO().delete(this);
 	}
 	
 	public void dropAllItems()
@@ -855,78 +839,6 @@ public class L2PetInstance extends L2Summon
 		return _mountable;
 	}
 	
-	private static L2PetInstance restore(L2ItemInstance control, L2NpcTemplate template, L2PcInstance owner)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT item_obj_id, name, level, curHp, curMp, exp, sp, fed FROM pets WHERE item_obj_id=?"))
-		{
-			L2PetInstance pet;
-			ps.setInt(1, control.getObjectId());
-			try (ResultSet rset = ps.executeQuery())
-			{
-				if (!rset.next())
-				{
-					if (template.isType("L2BabyPet"))
-					{
-						pet = new L2BabyPetInstance(template, owner, control);
-					}
-					else
-					{
-						pet = new L2PetInstance(template, owner, control);
-					}
-					return pet;
-				}
-				
-				if (template.isType("L2BabyPet"))
-				{
-					pet = new L2BabyPetInstance(template, owner, control, rset.getByte("level"));
-				}
-				else
-				{
-					pet = new L2PetInstance(template, owner, control, rset.getByte("level"));
-				}
-				
-				pet._respawned = true;
-				pet.setName(rset.getString("name"));
-				
-				long exp = rset.getLong("exp");
-				L2PetLevelData info = PetDataTable.getInstance().getPetLevelData(pet.getId(), pet.getLevel());
-				// DS: update experience based by level
-				// Avoiding pet delevels due to exp per level values changed.
-				if ((info != null) && (exp < info.getPetMaxExp()))
-				{
-					exp = info.getPetMaxExp();
-				}
-				
-				pet.getStat().setExp(exp);
-				pet.getStat().setSp(rset.getInt("sp"));
-				
-				pet.getStatus().setCurrentHp(rset.getInt("curHp"));
-				pet.getStatus().setCurrentMp(rset.getInt("curMp"));
-				pet.getStatus().setCurrentCp(pet.getMaxCp());
-				if (rset.getDouble("curHp") < 1)
-				{
-					pet.setIsDead(true);
-					pet.stopHpMpRegeneration();
-				}
-				
-				pet.setCurrentFed(rset.getInt("fed"));
-			}
-			return pet;
-		}
-		catch (Exception e)
-		{
-			LOG.error("Could not restore pet data for owner: {}, {}", owner, e);
-		}
-		return null;
-	}
-	
-	@Override
-	public void setRestoreSummon(boolean val)
-	{
-		_restoreSummon = val;
-	}
-	
 	@Override
 	public final void stopSkillEffects(boolean removed, int skillId)
 	{
@@ -945,51 +857,30 @@ public class L2PetInstance extends L2Summon
 		
 		if (!Config.RESTORE_PET_ON_RECONNECT)
 		{
-			_restoreSummon = false;
+			setRestoreSummon(false);
 		}
 		
-		String req;
 		if (!isRespawned())
 		{
-			req = "INSERT INTO pets (name,level,curHp,curMp,exp,sp,fed,ownerId,restore,item_obj_id) " + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+			DAOFactory.getInstance().getPetDAO().insert(this);
 		}
 		else
 		{
-			req = "UPDATE pets SET name=?,level=?,curHp=?,curMp=?,exp=?,sp=?,fed=?,ownerId=?,restore=? " + "WHERE item_obj_id = ?";
+			DAOFactory.getInstance().getPetDAO().update(this);
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(req))
+		setRespawned(true);
+		
+		if (isRestoreSummon())
 		{
-			ps.setString(1, getName());
-			ps.setInt(2, getStat().getLevel());
-			ps.setDouble(3, getStatus().getCurrentHp());
-			ps.setDouble(4, getStatus().getCurrentMp());
-			ps.setLong(5, getStat().getExp());
-			ps.setInt(6, getStat().getSp());
-			ps.setInt(7, getCurrentFed());
-			ps.setInt(8, getOwner().getObjectId());
-			ps.setString(9, String.valueOf(_restoreSummon)); // True restores pet on login
-			ps.setInt(10, getControlObjectId());
-			ps.executeUpdate();
-			
-			_respawned = true;
-			
-			if (_restoreSummon)
-			{
-				CharSummonTable.getInstance().getPets().put(getOwner().getObjectId(), getControlObjectId());
-			}
-			else
-			{
-				CharSummonTable.getInstance().getPets().remove(getOwner().getObjectId());
-			}
+			CharSummonTable.getInstance().getPets().put(getOwner().getObjectId(), getControlObjectId());
 		}
-		catch (Exception e)
+		else
 		{
-			LOG.error("Failed to store Pet [ObjectId: {}] data {}", getObjectId(), e);
+			CharSummonTable.getInstance().getPets().remove(getOwner().getObjectId());
 		}
 		
-		L2ItemInstance itemInst = getControlItem();
+		final L2ItemInstance itemInst = getControlItem();
 		if ((itemInst != null) && (itemInst.getEnchantLevel() != getStat().getLevel()))
 		{
 			itemInst.setEnchantLevel(getStat().getLevel());
@@ -1008,111 +899,14 @@ public class L2PetInstance extends L2Summon
 		// Clear list for overwrite
 		SummonEffectsTable.getInstance().clearPetEffects(getControlObjectId());
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps1 = con.prepareStatement(DELETE_SKILL_SAVE);
-			PreparedStatement ps2 = con.prepareStatement(ADD_SKILL_SAVE))
-		{
-			// Delete all current stored effects for summon to avoid dupe
-			ps1.setInt(1, getControlObjectId());
-			ps1.execute();
-			
-			int buff_index = 0;
-			
-			final List<Integer> storedSkills = new LinkedList<>();
-			
-			// Store all effect data along with calculated remaining
-			if (storeEffects)
-			{
-				for (BuffInfo info : getEffectList().getEffects())
-				{
-					if (info == null)
-					{
-						continue;
-					}
-					
-					final Skill skill = info.getSkill();
-					// Do not save heals.
-					if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS)
-					{
-						continue;
-					}
-					
-					if (skill.isToggle())
-					{
-						continue;
-					}
-					
-					// Dances and songs are not kept in retail.
-					if (skill.isDance() && !Config.ALT_STORE_DANCES)
-					{
-						continue;
-					}
-					
-					if (storedSkills.contains(skill.getReuseHashCode()))
-					{
-						continue;
-					}
-					
-					storedSkills.add(skill.getReuseHashCode());
-					
-					ps2.setInt(1, getControlObjectId());
-					ps2.setInt(2, skill.getId());
-					ps2.setInt(3, skill.getLevel());
-					ps2.setInt(4, info.getTime());
-					ps2.setInt(5, ++buff_index);
-					ps2.execute();
-					
-					SummonEffectsTable.getInstance().addPetEffect(getControlObjectId(), skill, info.getTime());
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			LOG.warn("Could not store pet effect data: {}", e);
-		}
+		DAOFactory.getInstance().getPetSkillSaveDAO().insert(this, storeEffects);
 	}
 	
 	@Override
 	public void restoreEffects()
 	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps1 = con.prepareStatement(RESTORE_SKILL_SAVE);
-			PreparedStatement ps2 = con.prepareStatement(DELETE_SKILL_SAVE))
-		{
-			if (!SummonEffectsTable.getInstance().containsPetId(getControlObjectId()))
-			{
-				ps1.setInt(1, getControlObjectId());
-				try (ResultSet rset = ps1.executeQuery())
-				{
-					while (rset.next())
-					{
-						int effectCurTime = rset.getInt("remaining_time");
-						
-						final Skill skill = SkillData.getInstance().getSkill(rset.getInt("skill_id"), rset.getInt("skill_level"));
-						if (skill == null)
-						{
-							continue;
-						}
-						
-						if (skill.hasEffects(EffectScope.GENERAL))
-						{
-							SummonEffectsTable.getInstance().addPetEffect(getControlObjectId(), skill, effectCurTime);
-						}
-					}
-				}
-			}
-			
-			ps2.setInt(1, getControlObjectId());
-			ps2.executeUpdate();
-		}
-		catch (Exception e)
-		{
-			LOG.warn("Could not restore {} active effect data: {}", this, e);
-		}
-		finally
-		{
-			SummonEffectsTable.getInstance().applyPetEffects(this, getControlObjectId());
-		}
+		DAOFactory.getInstance().getPetSkillSaveDAO().load(this);
+		SummonEffectsTable.getInstance().applyPetEffects(this, getControlObjectId());
 	}
 	
 	public synchronized void stopFeed()
@@ -1126,9 +920,8 @@ public class L2PetInstance extends L2Summon
 	
 	public synchronized void startFeed()
 	{
-		// stop feeding task if its active
-		
 		stopFeed();
+		
 		if (!isDead() && (getOwner().getSummon() == this))
 		{
 			_feedTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new FeedTask(), 10000, 10000);

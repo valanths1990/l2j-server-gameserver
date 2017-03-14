@@ -6680,9 +6680,9 @@ public final class L2PcInstance extends L2Playable
 			return;
 		}
 		
-		DAOFactory.getInstance().getSkillSaveDAO().delete(this);
+		DAOFactory.getInstance().getPlayerSkillSaveDAO().delete(this);
 		
-		DAOFactory.getInstance().getSkillSaveDAO().insert(this, storeEffects);
+		DAOFactory.getInstance().getPlayerSkillSaveDAO().insert(this, storeEffects);
 	}
 	
 	/**
@@ -6826,9 +6826,9 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void restoreEffects()
 	{
-		DAOFactory.getInstance().getSkillSaveDAO().load(this);
+		DAOFactory.getInstance().getPlayerSkillSaveDAO().load(this);
 		
-		DAOFactory.getInstance().getSkillSaveDAO().delete(this);
+		DAOFactory.getInstance().getPlayerSkillSaveDAO().delete(this);
 	}
 	
 	/**
@@ -8834,7 +8834,7 @@ public final class L2PcInstance extends L2Playable
 			
 			DAOFactory.getInstance().getShortcutDAO().delete(this, classIndex);
 			
-			DAOFactory.getInstance().getSkillSaveDAO().delete(this, classIndex);
+			DAOFactory.getInstance().getPlayerSkillSaveDAO().delete(this, classIndex);
 			
 			DAOFactory.getInstance().getSubclassDAO().delete(this, classIndex);
 			
