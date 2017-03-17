@@ -32,22 +32,22 @@ public enum StatFunction
 	SHARE("Share", 30),
 	SUB("Sub", 30);
 	
-	String name;
-	int order;
+	private String _name;
+	private int _order;
 	
 	StatFunction(String name, int order)
 	{
-		this.name = name;
-		this.order = order;
+		_name = name;
+		_order = order;
 	}
 	
 	public String getName()
 	{
-		return name;
+		return _name;
 	}
 	
 	public int getOrder()
 	{
-		return order;
+		return _order;
 	}
 }

@@ -361,23 +361,6 @@ public enum AbnormalType
 	WP_CHANGE_EVENT;
 	
 	/**
-	 * Get the enumerate for the given String.
-	 * @param type the abnormal type to get
-	 * @return the abnormal type
-	 */
-	public static AbnormalType getAbnormalType(String type)
-	{
-		try
-		{
-			return Enum.valueOf(AbnormalType.class, type);
-		}
-		catch (Exception e)
-		{
-			return NONE;
-		}
-	}
-	
-	/**
 	 * Verify if this enumerate is default.
 	 * @return {@code true} if this enumerate is none, {@code false} otherwise
 	 */
