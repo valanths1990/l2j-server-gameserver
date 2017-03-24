@@ -201,7 +201,7 @@ public final class CharacterCreate extends L2GameClientPacket
 	
 	private boolean isValidName(String text)
 	{
-		return Config.CNAME_TEMPLATE.matcher(text).matches();
+		return Config.PLAYER_NAME_TEMPLATE.matcher(text).matches();
 	}
 	
 	private void initNewChar(L2GameClient client, L2PcInstance newChar)

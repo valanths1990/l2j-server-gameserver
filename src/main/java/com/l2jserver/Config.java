@@ -49,7 +49,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -938,7 +937,7 @@ public final class Config
 	public static int DATABASE_MAX_CONNECTIONS;
 	public static int DATABASE_MAX_IDLE_TIME;
 	public static int MAXIMUM_ONLINE_USERS;
-	public static Pattern CNAME_TEMPLATE;
+	public static Pattern PLAYER_NAME_TEMPLATE;
 	public static String PET_NAME_TEMPLATE;
 	public static String CLAN_NAME_TEMPLATE;
 	public static int MAX_CHARACTERS_NUMBER_PER_ACCOUNT;
@@ -1172,18 +1171,9 @@ public final class Config
 				DATAPACK_ROOT = new File(".");
 			}
 			
-			try
-			{
-				CNAME_TEMPLATE = Pattern.compile(serverSettings.getString("CnameTemplate", "[a-zA-Z0-9]{1,16}"));
-			}
-			catch (PatternSyntaxException e)
-			{
-				LOG.warn("Character name pattern of config is wrong!");
-				CNAME_TEMPLATE = Pattern.compile("[a-zA-Z0-9]{1,16}");
-			}
-			
-			PET_NAME_TEMPLATE = serverSettings.getString("PetNameTemplate", ".*");
-			CLAN_NAME_TEMPLATE = serverSettings.getString("ClanNameTemplate", ".*");
+			PLAYER_NAME_TEMPLATE = Pattern.compile(serverSettings.getString("PlayerNameTemplate", "[A-Za-z][A-Za-z0-9]*"));
+			PET_NAME_TEMPLATE = serverSettings.getString("PetNameTemplate", "[A-Za-z][A-Za-z0-9]*");
+			CLAN_NAME_TEMPLATE = serverSettings.getString("ClanNameTemplate", "[A-Za-z][A-Za-z0-9]*");
 			
 			MAX_CHARACTERS_NUMBER_PER_ACCOUNT = serverSettings.getInt("CharMaxNumber", 7);
 			MAXIMUM_ONLINE_USERS = serverSettings.getInt("MaximumOnlineUsers", 100);
