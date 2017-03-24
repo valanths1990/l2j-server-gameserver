@@ -1082,11 +1082,35 @@ public final class QuestState
 	 */
 	public QuestState startQuest()
 	{
+		return startQuest(true);
+	}
+	
+	/**
+	 * Starts the quest.
+	 * @param playSound if {@code true} plays the accept sound
+	 * @return the quest state
+	 */
+	public QuestState startQuest(boolean playSound)
+	{
+		return startQuest(playSound, 1);
+	}
+	
+	/**
+	 * Starts the quest.
+	 * @param playSound if {@code true} plays the accept sound
+	 * @param cond the cond
+	 * @return the quest state
+	 */
+	public QuestState startQuest(boolean playSound, int cond)
+	{
 		if (isCreated() && !getQuest().isCustomQuest())
 		{
-			set("cond", "1");
+			set("cond", cond);
 			setState(State.STARTED);
-			playSound(QuestSound.ITEMSOUND_QUEST_ACCEPT);
+			if (playSound)
+			{
+				playSound(QuestSound.ITEMSOUND_QUEST_ACCEPT);
+			}
 		}
 		return this;
 	}
