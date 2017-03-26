@@ -49,12 +49,12 @@ import com.l2jserver.gameserver.network.L2GameClient;
 import com.l2jserver.gameserver.network.serverpackets.CharCreateFail;
 import com.l2jserver.gameserver.network.serverpackets.CharCreateOk;
 import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
-import com.l2jserver.gameserver.util.Util;
 
 @SuppressWarnings("unused")
 public final class CharacterCreate extends L2GameClientPacket
 {
 	private static final String _C__0C_CHARACTERCREATE = "[C] 0C CharacterCreate";
+	private static final int PLAYER_NAME_MAX_LENGHT = 16;
 	
 	private static final Logger LOG = LoggerFactory.getLogger("accounting");
 	
@@ -94,7 +94,6 @@ public final class CharacterCreate extends L2GameClientPacket
 	@Override
 	protected void runImpl()
 	{
-		// Last Verified: May 30, 2009 - Gracia Final - Players are able to create characters with names consisting of as little as 1,2,3 letter/number combinations.
 		if ((_name.length() < 1) || (_name.length() > 16))
 		{
 			if (Config.DEBUG)
@@ -112,15 +111,15 @@ public final class CharacterCreate extends L2GameClientPacket
 			return;
 		}
 		
-		// Last Verified: May 30, 2009 - Gracia Final
-		if (!Util.isAlphaNumeric(_name) || !isValidName(_name))
+		if (!isValidName(_name))
 		{
-			if (Config.DEBUG)
-			{
-				_log.fine("Character Creation Failure: Character name " + _name + " is invalid.");
-			}
-			
 			sendPacket(new CharCreateFail(CharCreateFail.REASON_INCORRECT_NAME));
+			return;
+		}
+		
+		if (_name.isEmpty() || (_name.length() > PLAYER_NAME_MAX_LENGHT))
+		{
+			sendPacket(new CharCreateFail(CharCreateFail.REASON_16_ENG_CHARS));
 			return;
 		}
 		

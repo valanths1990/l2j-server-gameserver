@@ -24,13 +24,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import com.l2jserver.Config;
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
-import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 
 public class PetNameTable
 {
@@ -41,73 +37,26 @@ public class PetNameTable
 		return SingletonHolder._instance;
 	}
 	
-	public boolean doesPetNameExist(String name, int petNpcId)
+	public boolean doesPetNameExist(String name)
 	{
-		boolean result = true;
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT name FROM pets p, items i WHERE p.item_obj_id = i.object_id AND name=? AND i.item_id IN (?)"))
+			PreparedStatement ps = con.prepareStatement("SELECT name FROM pets WHERE name=?"))
 		{
-			ps.setString(1, name);
-			StringBuilder cond = new StringBuilder();
-			if (!cond.toString().isEmpty())
-			{
-				cond.append(", ");
-			}
-			
-			cond.append(PetDataTable.getInstance().getPetItemsByNpc(petNpcId));
-			ps.setString(2, cond.toString());
 			try (ResultSet rs = ps.executeQuery())
 			{
-				result = rs.next();
+				return rs.next();
 			}
 		}
 		catch (SQLException e)
 		{
 			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing petname:" + e.getMessage(), e);
 		}
-		return result;
+		return false;
 	}
 	
 	public boolean isValidPetName(String name)
 	{
-		boolean result = true;
-		
-		if (!isAlphaNumeric(name))
-		{
-			return result;
-		}
-		
-		Pattern pattern;
-		try
-		{
-			pattern = Pattern.compile(Config.PET_NAME_TEMPLATE);
-		}
-		catch (PatternSyntaxException e) // case of illegal pattern
-		{
-			LOGGER.warning(getClass().getSimpleName() + ": Pet name pattern of config is wrong!");
-			pattern = Pattern.compile(".*");
-		}
-		Matcher regexp = pattern.matcher(name);
-		if (!regexp.matches())
-		{
-			result = false;
-		}
-		return result;
-	}
-	
-	private boolean isAlphaNumeric(String text)
-	{
-		boolean result = true;
-		char[] chars = text.toCharArray();
-		for (int i = 0; i < chars.length; i++)
-		{
-			if (!Character.isLetterOrDigit(chars[i]))
-			{
-				result = false;
-				break;
-			}
-		}
-		return result;
+		return Config.PET_NAME_TEMPLATE.matcher(name).matches();
 	}
 	
 	private static class SingletonHolder

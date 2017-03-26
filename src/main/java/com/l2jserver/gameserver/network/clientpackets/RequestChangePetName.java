@@ -30,6 +30,7 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 public final class RequestChangePetName extends L2GameClientPacket
 {
 	private static final String _C__93_REQUESTCHANGEPETNAME = "[C] 93 RequestChangePetName";
+	private static final int PET_NAME_MAX_LENGHT = 16;
 	
 	private String _name;
 	
@@ -66,16 +67,15 @@ public final class RequestChangePetName extends L2GameClientPacket
 			return;
 		}
 		
-		if (PetNameTable.getInstance().doesPetNameExist(_name, pet.getTemplate().getId()))
+		if (!PetNameTable.getInstance().doesPetNameExist(_name))
 		{
 			activeChar.sendPacket(SystemMessageId.NAMING_ALREADY_IN_USE_BY_ANOTHER_PET);
 			return;
 		}
 		
-		if ((_name.length() < 3) || (_name.length() > 16))
+		if (_name.isEmpty() || (_name.length() > PET_NAME_MAX_LENGHT))
 		{
-			// activeChar.sendPacket(SystemMessageId.NAMING_PETNAME_UP_TO_8CHARS);
-			activeChar.sendMessage("Your pet's name can be up to 16 characters in length.");
+			activeChar.sendPacket(SystemMessageId.NAMING_CHARNAME_UP_TO_16CHARS);
 			return;
 		}
 		

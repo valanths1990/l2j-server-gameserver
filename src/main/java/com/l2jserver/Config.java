@@ -938,8 +938,8 @@ public final class Config
 	public static int DATABASE_MAX_IDLE_TIME;
 	public static int MAXIMUM_ONLINE_USERS;
 	public static Pattern PLAYER_NAME_TEMPLATE;
-	public static String PET_NAME_TEMPLATE;
-	public static String CLAN_NAME_TEMPLATE;
+	public static Pattern PET_NAME_TEMPLATE;
+	public static Pattern CLAN_NAME_TEMPLATE;
 	public static int MAX_CHARACTERS_NUMBER_PER_ACCOUNT;
 	public static File DATAPACK_ROOT;
 	public static boolean ACCEPT_ALTERNATE_ID;
@@ -1171,9 +1171,9 @@ public final class Config
 				DATAPACK_ROOT = new File(".");
 			}
 			
-			PLAYER_NAME_TEMPLATE = Pattern.compile(serverSettings.getString("PlayerNameTemplate", "[A-Za-z][A-Za-z0-9]*"));
-			PET_NAME_TEMPLATE = serverSettings.getString("PetNameTemplate", "[A-Za-z][A-Za-z0-9]*");
-			CLAN_NAME_TEMPLATE = serverSettings.getString("ClanNameTemplate", "[A-Za-z][A-Za-z0-9]*");
+			PLAYER_NAME_TEMPLATE = Pattern.compile(serverSettings.getString("PlayerNameTemplate", "[a-zA-Z0-9]*"));
+			PET_NAME_TEMPLATE = Pattern.compile(serverSettings.getString("PetNameTemplate", "[a-zA-Z0-9]*"));
+			CLAN_NAME_TEMPLATE = Pattern.compile(serverSettings.getString("ClanNameTemplate", "[a-zA-Z0-9]*"));
 			
 			MAX_CHARACTERS_NUMBER_PER_ACCOUNT = serverSettings.getInt("CharMaxNumber", 7);
 			MAXIMUM_ONLINE_USERS = serverSettings.getInt("MaximumOnlineUsers", 100);

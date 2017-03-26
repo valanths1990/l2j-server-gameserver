@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
@@ -58,7 +56,6 @@ import com.l2jserver.gameserver.network.serverpackets.MagicSkillUse;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
-import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.StringUtil;
 
 /**
@@ -979,12 +976,12 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			
 			return;
 		}
-		if (!Util.isAlphaNumeric(clanName) || !isValidName(clanName) || (2 > clanName.length()))
+		if (!isValidName(clanName) || (clanName.length() < 2))
 		{
 			player.sendPacket(SystemMessageId.CLAN_NAME_INCORRECT);
 			return;
 		}
-		if (clanName.length() > 16)
+		if (clanName.length() > ClanTable.CLAN_NAME_MAX_LENGHT)
 		{
 			player.sendPacket(SystemMessageId.CLAN_NAME_TOO_LONG);
 			return;
@@ -1084,12 +1081,12 @@ public class L2VillageMasterInstance extends L2NpcInstance
 			player.sendMessage("Pledge don't exists.");
 			return;
 		}
-		if (!Util.isAlphaNumeric(pledgeName) || !isValidName(pledgeName) || (2 > pledgeName.length()))
+		if (!isValidName(pledgeName) || (pledgeName.length() < 2))
 		{
 			player.sendPacket(SystemMessageId.CLAN_NAME_INCORRECT);
 			return;
 		}
-		if (pledgeName.length() > 16)
+		if (pledgeName.length() > ClanTable.CLAN_NAME_MAX_LENGHT)
 		{
 			player.sendPacket(SystemMessageId.CLAN_NAME_TOO_LONG);
 			return;
@@ -1216,16 +1213,6 @@ public class L2VillageMasterInstance extends L2NpcInstance
 	
 	private static boolean isValidName(String name)
 	{
-		Pattern pattern;
-		try
-		{
-			pattern = Pattern.compile(Config.CLAN_NAME_TEMPLATE);
-		}
-		catch (PatternSyntaxException e)
-		{
-			_log.warning("ERROR: Wrong pattern for clan name!");
-			pattern = Pattern.compile(".*");
-		}
-		return pattern.matcher(name).matches();
+		return Config.CLAN_NAME_TEMPLATE.matcher(name).matches();
 	}
 }

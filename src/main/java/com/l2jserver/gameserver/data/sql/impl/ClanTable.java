@@ -61,7 +61,6 @@ import com.l2jserver.gameserver.network.serverpackets.PledgeShowMemberListAll;
 import com.l2jserver.gameserver.network.serverpackets.PledgeShowMemberListUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
-import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.util.EnumIntBitmask;
 
 /**
@@ -70,6 +69,7 @@ import com.l2jserver.util.EnumIntBitmask;
 public class ClanTable
 {
 	private static final Logger _log = Logger.getLogger(ClanTable.class.getName());
+	public static final int CLAN_NAME_MAX_LENGHT = 16;
 	
 	private final Map<Integer, L2Clan> _clans = new ConcurrentHashMap<>();
 	
@@ -174,12 +174,12 @@ public class ClanTable
 			player.sendPacket(SystemMessageId.YOU_MUST_WAIT_XX_DAYS_BEFORE_CREATING_A_NEW_CLAN);
 			return null;
 		}
-		if (!Util.isAlphaNumeric(clanName) || (2 > clanName.length()))
+		if (clanName.length() < 2)
 		{
 			player.sendPacket(SystemMessageId.CLAN_NAME_INCORRECT);
 			return null;
 		}
-		if (16 < clanName.length())
+		if (clanName.length() > CLAN_NAME_MAX_LENGHT)
 		{
 			player.sendPacket(SystemMessageId.CLAN_NAME_TOO_LONG);
 			return null;

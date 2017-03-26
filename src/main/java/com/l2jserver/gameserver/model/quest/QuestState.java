@@ -605,6 +605,11 @@ public final class QuestState
 		return 0;
 	}
 	
+	public boolean hasMemoState()
+	{
+		return getMemoState() > 0;
+	}
+	
 	public boolean isMemoState(int memoState)
 	{
 		return (getInt("memoState") == memoState);

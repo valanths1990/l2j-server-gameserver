@@ -183,21 +183,20 @@ public class CharNameTable
 	
 	public synchronized boolean doesCharNameExist(String name)
 	{
-		boolean result = true;
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement("SELECT account_name FROM characters WHERE char_name=?"))
 		{
 			ps.setString(1, name);
 			try (ResultSet rs = ps.executeQuery())
 			{
-				result = rs.next();
+				return rs.next();
 			}
 		}
 		catch (SQLException e)
 		{
 			LOG.warn("Could not check existing charname!", e);
 		}
-		return result;
+		return false;
 	}
 	
 	public int getAccountCharacterCount(String account)
