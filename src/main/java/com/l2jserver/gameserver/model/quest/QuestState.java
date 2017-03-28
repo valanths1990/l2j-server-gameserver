@@ -29,8 +29,9 @@ import java.util.logging.Logger;
 
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.enums.QuestSound;
 import com.l2jserver.gameserver.enums.QuestType;
+import com.l2jserver.gameserver.enums.audio.IAudio;
+import com.l2jserver.gameserver.enums.audio.Sound;
 import com.l2jserver.gameserver.instancemanager.QuestManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Npc;
@@ -39,7 +40,6 @@ import com.l2jserver.gameserver.model.events.AbstractScript;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.network.serverpackets.ExShowQuestMark;
-import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 import com.l2jserver.gameserver.network.serverpackets.QuestList;
 import com.l2jserver.gameserver.network.serverpackets.TutorialCloseHtml;
 import com.l2jserver.gameserver.network.serverpackets.TutorialEnableClientEvent;
@@ -582,7 +582,7 @@ public final class QuestState
 		
 		if (playQuestMiddle)
 		{
-			AbstractScript.playSound(_player, QuestSound.ITEMSOUND_QUEST_MIDDLE);
+			AbstractScript.playSound(_player, Sound.ITEMSOUND_QUEST_MIDDLE);
 		}
 		return this;
 	}
@@ -811,20 +811,11 @@ public final class QuestState
 	
 	/**
 	 * Send a packet in order to play a sound to the player.
-	 * @param sound the name of the sound to play
+	 * @param sound the {@link IAudio} object of the sound to play
 	 */
-	public void playSound(String sound)
+	public void playSound(IAudio audio)
 	{
-		AbstractScript.playSound(_player, sound);
-	}
-	
-	/**
-	 * Send a packet in order to play a sound to the player.
-	 * @param sound the {@link QuestSound} object of the sound to play
-	 */
-	public void playSound(QuestSound sound)
-	{
-		AbstractScript.playSound(_player, sound);
+		AbstractScript.playSound(_player, audio);
 	}
 	
 	/**
@@ -1114,7 +1105,7 @@ public final class QuestState
 			setState(State.STARTED);
 			if (playSound)
 			{
-				playSound(QuestSound.ITEMSOUND_QUEST_ACCEPT);
+				playSound(Sound.ITEMSOUND_QUEST_ACCEPT);
 			}
 		}
 		return this;
@@ -1165,7 +1156,7 @@ public final class QuestState
 		exitQuest(type);
 		if (playExitQuest)
 		{
-			playSound(QuestSound.ITEMSOUND_QUEST_FINISH);
+			playSound(Sound.ITEMSOUND_QUEST_FINISH);
 		}
 		return this;
 	}
@@ -1220,7 +1211,7 @@ public final class QuestState
 		exitQuest(repeatable);
 		if (playExitQuest)
 		{
-			playSound(QuestSound.ITEMSOUND_QUEST_FINISH);
+			playSound(Sound.ITEMSOUND_QUEST_FINISH);
 		}
 		return this;
 	}
@@ -1228,12 +1219,6 @@ public final class QuestState
 	public void showQuestionMark(int number)
 	{
 		_player.sendPacket(new TutorialShowQuestionMark(number));
-	}
-	
-	// TODO make tutorial voices the same as quest sounds
-	public void playTutorialVoice(String voice)
-	{
-		_player.sendPacket(new PlaySound(2, voice, 0, 0, _player.getX(), _player.getY(), _player.getZ()));
 	}
 	
 	/**

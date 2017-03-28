@@ -37,6 +37,7 @@ import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.MountType;
+import com.l2jserver.gameserver.enums.audio.Music;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.CastleManorManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
@@ -57,7 +58,6 @@ import com.l2jserver.gameserver.model.zone.type.L2CastleZone;
 import com.l2jserver.gameserver.model.zone.type.L2ResidenceTeleportZone;
 import com.l2jserver.gameserver.model.zone.type.L2SiegeZone;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 import com.l2jserver.gameserver.network.serverpackets.PledgeShowInfoUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
@@ -872,7 +872,7 @@ public final class Castle extends AbstractResidence
 			{
 				clan.setCastleId(getResidenceId()); // Set has castle flag for new owner
 				clan.broadcastToOnlineMembers(new PledgeShowInfoUpdate(clan));
-				clan.broadcastToOnlineMembers(new PlaySound(1, "Siege_Victory", 0, 0, 0, 0, 0));
+				clan.broadcastToOnlineMembers(Music.SIEGE_VICTORY.getPacket());
 			}
 		}
 		catch (Exception e)

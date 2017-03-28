@@ -22,13 +22,13 @@ import java.util.concurrent.Future;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.data.xml.impl.FishingMonstersData;
+import com.l2jserver.gameserver.enums.audio.Music;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.AbstractScript;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ExFishingHpRegen;
 import com.l2jserver.gameserver.network.serverpackets.ExFishingStartCombat;
-import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.util.Rnd;
 
@@ -99,7 +99,7 @@ public class L2Fishing implements Runnable
 		_mode = ((Rnd.get(100) >= 80) ? 1 : 0);
 		
 		_fisher.broadcastPacket(new ExFishingStartCombat(_fisher, _time, _fishMaxHp, _mode, lureType, _deceptiveMode));
-		_fisher.sendPacket(new PlaySound(1, "SF_S_01", 0, 0, 0, 0, 0));
+		_fisher.sendPacket(Music.SF_S_01.getPacket());
 		// Succeeded in getting a bite
 		_fisher.sendPacket(SystemMessageId.GOT_A_BITE);
 		

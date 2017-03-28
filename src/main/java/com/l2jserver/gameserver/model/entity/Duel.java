@@ -33,6 +33,7 @@ import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.enums.DuelResult;
 import com.l2jserver.gameserver.enums.DuelState;
 import com.l2jserver.gameserver.enums.Team;
+import com.l2jserver.gameserver.enums.audio.Music;
 import com.l2jserver.gameserver.instancemanager.DuelManager;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
 import com.l2jserver.gameserver.model.Location;
@@ -58,7 +59,7 @@ public class Duel
 {
 	protected static final Logger LOG = LoggerFactory.getLogger(Duel.class);
 	
-	private static final PlaySound B04_S01 = new PlaySound(1, "B04_S01", 0, 0, 0, 0, 0);
+	private static final PlaySound B04_S01 = Music.B04_S01.getPacket();
 	
 	private static final int PARTY_DUEL_DURATION = 300;
 	private static final int PARTY_DUEL_PREPARE_TIME = 30;
@@ -360,7 +361,7 @@ public class Duel
 		ThreadPoolManager.getInstance().scheduleGeneral(() ->
 		{
 			_playerConditions.values().forEach(c -> c.restoreCondition());
-		} , _partyDuel ? PARTY_DUEL_TELEPORT_BACK_TIME : 1000);
+		}, _partyDuel ? PARTY_DUEL_TELEPORT_BACK_TIME : 1000);
 		
 		ThreadPoolManager.getInstance().scheduleGeneral(() -> clear(), _partyDuel ? PARTY_DUEL_TELEPORT_BACK_TIME : 1000);
 	}

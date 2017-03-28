@@ -47,7 +47,8 @@ import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
-import com.l2jserver.gameserver.enums.QuestSound;
+import com.l2jserver.gameserver.enums.audio.IAudio;
+import com.l2jserver.gameserver.enums.audio.Sound;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.InstanceManager;
@@ -2322,14 +2323,14 @@ public abstract class AbstractScript implements INamable
 				{
 					if (playSound)
 					{
-						playSound(player, QuestSound.ITEMSOUND_QUEST_MIDDLE);
+						playSound(player, Sound.ITEMSOUND_QUEST_MIDDLE);
 					}
 					return true;
 				}
 				
 				if (playSound)
 				{
-					playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+					playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 				}
 				// if there is no limit, return true every time an item is given
 				if (limit <= 0)
@@ -2396,7 +2397,7 @@ public abstract class AbstractScript implements INamable
 		boolean drop = giveItems(player, item, limit);
 		if (drop && playSound)
 		{
-			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
@@ -2422,7 +2423,7 @@ public abstract class AbstractScript implements INamable
 		boolean drop = giveItems(player, items, limit);
 		if (drop && playSound)
 		{
-			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
@@ -2473,7 +2474,7 @@ public abstract class AbstractScript implements INamable
 		boolean drop = giveItems(player, items, limit);
 		if (drop && playSound)
 		{
-			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
@@ -2500,7 +2501,7 @@ public abstract class AbstractScript implements INamable
 		boolean drop = giveItems(player, item, victim, limit);
 		if (drop && playSound)
 		{
-			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
@@ -2539,7 +2540,7 @@ public abstract class AbstractScript implements INamable
 		boolean drop = giveItems(player, item, victim, limit);
 		if (drop && playSound)
 		{
-			playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
@@ -2671,7 +2672,8 @@ public abstract class AbstractScript implements INamable
 		{
 			toDrop = new GroupedGeneralDropItem(items.getChance(), items.getDropCalculationStrategy(), items.getKillerChanceModifierStrategy(), items.getPreciseStrategy());
 			List<GeneralDropItem> dropItems = new LinkedList<>(items.getItems());
-			ITEM_LOOP: for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)
+			ITEM_LOOP:
+			for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)
 			{
 				GeneralDropItem item = it.next();
 				for (L2PcInstance player : players)
@@ -2741,7 +2743,8 @@ public abstract class AbstractScript implements INamable
 		{
 			rewardedCounts.put(player, new HashMap<Integer, Long>());
 		}
-		NEXT_ITEM: for (ItemHolder item : items)
+		NEXT_ITEM:
+		for (ItemHolder item : items)
 		{
 			long equaldist = item.getCount() / players.size();
 			long randomdist = item.getCount() % players.size();
@@ -2831,7 +2834,7 @@ public abstract class AbstractScript implements INamable
 			}
 			if (playSound && playPlayerSound)
 			{
-				playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+				playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 			}
 		}
 	}
@@ -2949,19 +2952,9 @@ public abstract class AbstractScript implements INamable
 	/**
 	 * Send a packet in order to play a sound to the player.
 	 * @param player the player whom to send the packet
-	 * @param sound the name of the sound to play
+	 * @param sound the {@link IAudio} object of the sound to play
 	 */
-	public static void playSound(L2PcInstance player, String sound)
-	{
-		player.sendPacket(QuestSound.getSound(sound));
-	}
-	
-	/**
-	 * Send a packet in order to play a sound to the player.
-	 * @param player the player whom to send the packet
-	 * @param sound the {@link QuestSound} object of the sound to play
-	 */
-	public static void playSound(L2PcInstance player, QuestSound sound)
+	public static void playSound(L2PcInstance player, IAudio sound)
 	{
 		player.sendPacket(sound.getPacket());
 	}

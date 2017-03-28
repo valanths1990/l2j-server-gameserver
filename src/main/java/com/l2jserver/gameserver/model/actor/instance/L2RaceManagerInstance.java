@@ -24,6 +24,8 @@ import java.util.List;
 import com.l2jserver.gameserver.MonsterRace;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.enums.InstanceType;
+import com.l2jserver.gameserver.enums.audio.Music;
+import com.l2jserver.gameserver.enums.audio.Sound;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.knownlist.RaceManagerKnownList;
@@ -169,7 +171,7 @@ public class L2RaceManagerInstance extends L2Npc
 				{// _log.info("Race Initializing");
 					_state = ACCEPTING_BETS;
 					startRace();
-				}// else{_log.info("Race open");}
+				} // else{_log.info("Race open");}
 				sm.addInt(_raceNumber);
 				break;
 			case 818: // SystemMessageId.MONSRACE_TICKETS_STOP_IN_S1_MINUTES
@@ -237,9 +239,10 @@ public class L2RaceManagerInstance extends L2Npc
 		if (_state == STARTING_RACE)
 		{
 			// state++;
-			PlaySound SRace = new PlaySound(1, "S_Race", 0, 0, 0, 0, 0);
+			PlaySound SRace = Music.S_RACE.getPacket();
 			broadcast(SRace);
-			PlaySound SRace2 = new PlaySound(0, "ItemSound2.race_start", 1, 121209259, 12125, 182487, -3559);
+			// TODO find correct sender 121209259, 12125, 182487, -3559
+			PlaySound SRace2 = Sound.ITEMSOUND2_RACE_START.getPacket();
 			broadcast(SRace2);
 			_packet = new MonRaceInfo(_codes[1][0], _codes[1][1], race.getMonsters(), race.getSpeeds());
 			sendMonsterInfo();

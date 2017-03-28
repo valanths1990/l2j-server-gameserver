@@ -85,6 +85,7 @@ import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.ShortcutType;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.enums.Team;
+import com.l2jserver.gameserver.enums.audio.Music;
 import com.l2jserver.gameserver.handler.IItemHandler;
 import com.l2jserver.gameserver.handler.ItemHandler;
 import com.l2jserver.gameserver.idfactory.IdFactory;
@@ -278,7 +279,6 @@ import com.l2jserver.gameserver.network.serverpackets.ObservationMode;
 import com.l2jserver.gameserver.network.serverpackets.ObservationReturn;
 import com.l2jserver.gameserver.network.serverpackets.PartySmallWindowUpdate;
 import com.l2jserver.gameserver.network.serverpackets.PetInventoryUpdate;
-import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 import com.l2jserver.gameserver.network.serverpackets.PledgeShowMemberListDelete;
 import com.l2jserver.gameserver.network.serverpackets.PledgeShowMemberListUpdate;
 import com.l2jserver.gameserver.network.serverpackets.PrivateStoreListBuy;
@@ -10328,7 +10328,7 @@ public final class L2PcInstance extends L2Playable
 		}
 		// sendMessage("Hook x,y: " + _x + "," + _y + " - Water Z, Player Z:" + _z + ", " + getZ()); //debug line, uncoment to show coordinates used in fishing.
 		broadcastPacket(new ExFishingStart(this, _fish.getFishGroup(), _x, _y, _z, _lure.isNightLure()));
-		sendPacket(new PlaySound(1, "SF_P_01", 0, 0, 0, 0, 0));
+		sendPacket(Music.SF_P_01.getPacket());
 		startLookingForFishTask();
 	}
 	

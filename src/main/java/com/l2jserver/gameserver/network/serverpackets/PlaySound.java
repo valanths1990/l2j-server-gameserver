@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2016 L2J Server
+ * Copyright (C) 2004-2017 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -18,39 +18,99 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
+import com.l2jserver.gameserver.model.L2Object;
+
+/**
+ * @author Zealar
+ */
 public class PlaySound extends L2GameServerPacket
 {
-	private final int _unknown1;
+	private final int _type;
+	// 0 Sound, 1 Music, 2 Voice
 	private final String _soundFile;
-	private final int _unknown3;
-	private final int _unknown4;
-	private final int _unknown5;
-	private final int _unknown6;
-	private final int _unknown7;
-	private final int _unknown8;
+	private final int _bindToObject;
+	private final int _objectId; // used for ships
+	private final int _locX;
+	private final int _locY;
+	private final int _locZ;
+	// Only for Music and Voice
+	private final int _delay;
 	
-	public PlaySound(String soundFile)
+	public static PlaySound createSound(String soundName)
 	{
-		_unknown1 = 0;
-		_soundFile = soundFile;
-		_unknown3 = 0;
-		_unknown4 = 0;
-		_unknown5 = 0;
-		_unknown6 = 0;
-		_unknown7 = 0;
-		_unknown8 = 0;
+		return new PlaySound(soundName);
 	}
 	
-	public PlaySound(int unknown1, String soundFile, int unknown3, int unknown4, int unknown5, int unknown6, int unknown7)
+	public static PlaySound createSound(String soundName, L2Object obj)
 	{
-		_unknown1 = unknown1;
+		return new PlaySound(soundName, obj);
+	}
+	
+	public static PlaySound createMusic(String soundName)
+	{
+		return createMusic(soundName, 0);
+	}
+	
+	public static PlaySound createMusic(String soundName, int delay)
+	{
+		return new PlaySound(1, soundName, delay);
+	}
+	
+	public static PlaySound createVoice(String soundName)
+	{
+		return createVoice(soundName, 0);
+	}
+	
+	public static PlaySound createVoice(String soundName, int delay)
+	{
+		return new PlaySound(2, soundName, delay);
+	}
+	
+	private PlaySound(String soundFile)
+	{
+		_type = 0;
 		_soundFile = soundFile;
-		_unknown3 = unknown3;
-		_unknown4 = unknown4;
-		_unknown5 = unknown5;
-		_unknown6 = unknown6;
-		_unknown7 = unknown7;
-		_unknown8 = 0;
+		_bindToObject = 0;
+		_objectId = 0;
+		_locX = 0;
+		_locY = 0;
+		_locZ = 0;
+		_delay = 0;
+	}
+	
+	private PlaySound(String soundFile, L2Object obj)
+	{
+		_type = 0;
+		_soundFile = soundFile;
+		if (obj != null)
+		{
+			_bindToObject = 1;
+			_objectId = obj.getObjectId();
+			_locX = obj.getX();
+			_locY = obj.getY();
+			_locZ = obj.getZ();
+		}
+		else
+		{
+			_bindToObject = 0;
+			_objectId = 0;
+			_locX = 0;
+			_locY = 0;
+			_locZ = 0;
+		}
+		_delay = 0;
+	}
+	
+	private PlaySound(int type, String soundFile, int radius)
+	{
+		_type = type;
+		_soundFile = soundFile;
+		_bindToObject = 0;
+		_objectId = 0;
+		_locX = 0;
+		_locY = 0;
+		_locZ = 0;
+		_delay = radius;
 	}
 	
 	public String getSoundName()
@@ -62,13 +122,13 @@ public class PlaySound extends L2GameServerPacket
 	protected final void writeImpl()
 	{
 		writeC(0x9e);
-		writeD(_unknown1); // unknown 0 for quest and ship;
+		writeD(_type);
 		writeS(_soundFile);
-		writeD(_unknown3); // unknown 0 for quest; 1 for ship;
-		writeD(_unknown4); // 0 for quest; objectId of ship
-		writeD(_unknown5); // x
-		writeD(_unknown6); // y
-		writeD(_unknown7); // z
-		writeD(_unknown8);
+		writeD(_bindToObject);
+		writeD(_objectId);
+		writeD(_locX);
+		writeD(_locY);
+		writeD(_locZ);
+		writeD(_delay);
 	}
 }
