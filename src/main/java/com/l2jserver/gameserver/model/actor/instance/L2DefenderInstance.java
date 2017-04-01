@@ -209,7 +209,7 @@ public class L2DefenderInstance extends L2Attackable
 	}
 	
 	@Override
-	public void addDamageHate(L2Character attacker, int damage, int aggro)
+	public void addDamageHate(L2Character attacker, int damage, long aggro)
 	{
 		if (attacker == null)
 		{

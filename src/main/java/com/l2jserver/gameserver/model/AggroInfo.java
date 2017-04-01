@@ -26,7 +26,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 public final class AggroInfo
 {
 	private final L2Character _attacker;
-	private int _hate = 0;
+	private long _hate = 0;
 	private int _damage = 0;
 	
 	public AggroInfo(L2Character pAttacker)
@@ -39,12 +39,12 @@ public final class AggroInfo
 		return _attacker;
 	}
 	
-	public int getHate()
+	public long getHate()
 	{
 		return _hate;
 	}
 	
-	public int checkHate(L2Character owner)
+	public long checkHate(L2Character owner)
 	{
 		if (_attacker.isAlikeDead() || !_attacker.isVisible() || !owner.getKnownList().knowsObject(_attacker))
 		{
@@ -54,9 +54,9 @@ public final class AggroInfo
 		return _hate;
 	}
 	
-	public void addHate(int value)
+	public void addHate(long value)
 	{
-		_hate = (int) Math.min(_hate + (long) value, 999999999);
+		_hate = Math.min(_hate + value, 999999999);
 	}
 	
 	public void stopHate()

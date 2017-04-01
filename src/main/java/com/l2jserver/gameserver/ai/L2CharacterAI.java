@@ -549,7 +549,7 @@ public class L2CharacterAI extends AbstractAI
 	 * Do nothing.
 	 */
 	@Override
-	protected void onEvtAggression(L2Character target, int aggro)
+	protected void onEvtAggression(L2Character target, long aggro)
 	{
 		// do nothing
 	}

@@ -68,7 +68,7 @@ public abstract class L2VehicleAI extends L2CharacterAI
 	}
 	
 	@Override
-	protected void onEvtAggression(L2Character target, int aggro)
+	protected void onEvtAggression(L2Character target, long aggro)
 	{
 	}
 	

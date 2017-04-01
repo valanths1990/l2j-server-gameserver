@@ -75,7 +75,7 @@ public final class L2QuestGuardInstance extends L2GuardInstance
 	}
 	
 	@Override
-	public void addDamageHate(L2Character attacker, int damage, int aggro)
+	public void addDamageHate(L2Character attacker, int damage, long aggro)
 	{
 		if (!_isPassive && !(attacker instanceof L2PcInstance))
 		{

@@ -448,7 +448,7 @@ public abstract class AbstractAI implements Ctrl
 	
 	protected abstract void onEvtAttacked(L2Character attacker);
 	
-	protected abstract void onEvtAggression(L2Character target, int aggro);
+	protected abstract void onEvtAggression(L2Character target, long aggro);
 	
 	protected abstract void onEvtStunned(L2Character attacker);
 	

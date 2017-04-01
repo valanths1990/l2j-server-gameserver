@@ -293,7 +293,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 				if (autoAttackCondition(target)) // check aggression
 				{
 					// Get the hate level of the L2Attackable against this L2Character target contained in _aggroList
-					int hating = npc.getHating(target);
+					long hating = npc.getHating(target);
 					
 					// Add the attacker to the L2Attackable _aggroList with 0 damage and 1 hate
 					if (hating == 0)
@@ -319,8 +319,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 			if (hated != null)
 			{
 				// Get the hate level of the L2Attackable against this L2Character target contained in _aggroList
-				int aggro = npc.getHating(hated);
-				
+				long aggro = npc.getHating(hated);
 				if ((aggro + _globalAggro) > 0)
 				{
 					// Set the L2Character movement type to run and send Server->Client packet ChangeMoveType to all others L2PcInstance
@@ -863,7 +862,7 @@ public class L2FortSiegeGuardAI extends L2CharacterAI implements Runnable
 	 * @param aggro The value of hate to add to the actor against the target
 	 */
 	@Override
-	protected void onEvtAggression(L2Character target, int aggro)
+	protected void onEvtAggression(L2Character target, long aggro)
 	{
 		if (_actor == null)
 		{
