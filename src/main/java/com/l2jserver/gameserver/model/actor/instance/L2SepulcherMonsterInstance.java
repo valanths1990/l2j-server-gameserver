@@ -26,7 +26,6 @@ import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
-import com.l2jserver.gameserver.model.quest.QuestState;
 import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 
 /**
@@ -262,7 +261,6 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 25342:
 			case 25346:
 			case 25349:
-				giveCup(killer);
 				if (_onDeadEventTask != null)
 				{
 					_onDeadEventTask.cancel(true);
@@ -288,56 +286,6 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 		}
 		
 		return super.deleteMe();
-	}
-	
-	private void giveCup(L2Character killer)
-	{
-		String questId = "620_FourGoblets";
-		int cupId = 0;
-		int oldBrooch = 7262;
-		
-		switch (getId())
-		{
-			case 25339:
-				cupId = 7256;
-				break;
-			case 25342:
-				cupId = 7257;
-				break;
-			case 25346:
-				cupId = 7258;
-				break;
-			case 25349:
-				cupId = 7259;
-				break;
-		}
-		
-		L2PcInstance player = killer.getActingPlayer();
-		
-		if (player == null)
-		{
-			return;
-		}
-		
-		if (player.getParty() != null)
-		{
-			for (L2PcInstance mem : player.getParty().getMembers())
-			{
-				QuestState qs = mem.getQuestState(questId);
-				if ((qs != null) && (qs.isStarted() || qs.isCompleted()) && (mem.getInventory().getItemByItemId(oldBrooch) == null))
-				{
-					mem.addItem("Quest", cupId, 1, mem, true);
-				}
-			}
-		}
-		else
-		{
-			QuestState qs = player.getQuestState(questId);
-			if ((qs != null) && (qs.isStarted() || qs.isCompleted()) && (player.getInventory().getItemByItemId(oldBrooch) == null))
-			{
-				player.addItem("Quest", cupId, 1, player, true);
-			}
-		}
 	}
 	
 	private class VictimShout implements Runnable
