@@ -3156,27 +3156,27 @@ public abstract class AbstractScript implements INamable
 	/**
 	 * Monster is running and attacking the playable.
 	 * @param npc the NPC that performs the attack
-	 * @param playable the player
+	 * @param creature the target of the attack
 	 */
-	protected void addAttackPlayerDesire(L2Npc npc, L2Playable playable)
+	protected void addAttackDesire(L2Npc npc, L2Character creature)
 	{
-		addAttackPlayerDesire(npc, playable, 999);
+		addAttackDesire(npc, creature, 999);
 	}
 	
 	/**
 	 * Monster is running and attacking the target.
 	 * @param npc the NPC that performs the attack
-	 * @param target the target of the attack
+	 * @param creature the target of the attack
 	 * @param desire the desire to perform the attack
 	 */
-	protected void addAttackPlayerDesire(L2Npc npc, L2Playable target, int desire)
+	protected void addAttackDesire(L2Npc npc, L2Character creature, long desire)
 	{
 		if (npc instanceof L2Attackable)
 		{
-			((L2Attackable) npc).addDamageHate(target, 0, desire);
+			((L2Attackable) npc).addDamageHate(creature, 0, desire);
 		}
 		npc.setIsRunning(true);
-		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, creature);
 	}
 	
 	/**
