@@ -1067,6 +1067,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				{
 					if (!isPlayer())
 					{
+						_attackEndTime = System.nanoTime() + TimeUnit.NANOSECONDS.convert(timeAtk, TimeUnit.MILLISECONDS);
 						hitted = doAttackHitSimple(attack, target, timeToHit);
 						break;
 					}
