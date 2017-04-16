@@ -10,3 +10,4 @@
 # Ignoring debug files
 /dist/game/log/
 /dist/game/config/hexid.txt
+/dist/login/log/
