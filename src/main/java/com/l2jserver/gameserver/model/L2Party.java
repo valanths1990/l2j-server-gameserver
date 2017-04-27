@@ -371,7 +371,7 @@ public class L2Party extends AbstractPlayerGroup
 					_positionPacket.reuse(this);
 				}
 				broadcastPacket(_positionPacket);
-			} , PARTY_POSITION_BROADCAST_INTERVAL.toMillis() / 2, PARTY_POSITION_BROADCAST_INTERVAL.toMillis());
+			}, PARTY_POSITION_BROADCAST_INTERVAL.toMillis() / 2, PARTY_POSITION_BROADCAST_INTERVAL.toMillis());
 		}
 	}
 	

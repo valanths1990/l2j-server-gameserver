@@ -854,12 +854,12 @@ public class PcInventory extends Inventory
 	 */
 	public boolean validateCapacity(L2ItemInstance item)
 	{
-		int slots = 0;
-		if (!item.isStackable() || (getInventoryItemCount(item.getId(), -1) <= 0) || !item.getItem().hasExImmediateEffect())
+		if (item.getItem().hasExImmediateEffect() || (item.isStackable() && (getInventoryItemCount(item.getId(), -1) > 0)))
 		{
-			slots++;
+			return true;
 		}
-		return validateCapacity(slots, item.isQuestItem());
+		
+		return validateCapacity(1, item.isQuestItem());
 	}
 	
 	/**
@@ -869,13 +869,12 @@ public class PcInventory extends Inventory
 	 */
 	public boolean validateCapacityByItemId(int itemId)
 	{
-		int slots = 0;
 		final L2ItemInstance invItem = getItemByItemId(itemId);
-		if ((invItem == null) || !invItem.isStackable())
+		if ((invItem == null) || !(invItem.isStackable() && (getInventoryItemCount(itemId, -1) > 0)))
 		{
-			slots++;
+			validateCapacity(1, ItemTable.getInstance().getTemplate(itemId).isQuestItem());
 		}
-		return validateCapacity(slots, ItemTable.getInstance().getTemplate(itemId).isQuestItem());
+		return true;
 	}
 	
 	@Override
