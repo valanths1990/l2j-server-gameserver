@@ -24,6 +24,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.l2jserver.Config;
 import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
@@ -32,8 +33,7 @@ import com.l2jserver.util.data.xml.IXmlReader;
  */
 public final class PlayerXpPercentLostData implements IXmlReader
 {
-	private final int _maxlevel = ExperienceData.getInstance().getMaxLevel();
-	private final double[] _playerXpPercentLost = new double[_maxlevel + 1];
+	private final double[] _playerXpPercentLost = new double[Config.MAX_PLAYER_LEVEL + 1];
 	
 	protected PlayerXpPercentLostData()
 	{
@@ -68,10 +68,10 @@ public final class PlayerXpPercentLostData implements IXmlReader
 	
 	public double getXpPercent(final int level)
 	{
-		if (level > _maxlevel)
+		if (level > Config.MAX_PLAYER_LEVEL)
 		{
 			LOG.warn("Require to high level inside PlayerXpPercentLostData ({})", level);
-			return _playerXpPercentLost[_maxlevel];
+			return _playerXpPercentLost[Config.MAX_PLAYER_LEVEL];
 		}
 		return _playerXpPercentLost[level];
 	}

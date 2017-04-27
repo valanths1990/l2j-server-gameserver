@@ -22,7 +22,7 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2SummonAI;
-import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.enums.Race;
@@ -221,7 +221,7 @@ public abstract class L2Summon extends L2Playable
 	
 	public long getExpForThisLevel()
 	{
-		if (getLevel() >= ExperienceData.getInstance().getMaxPetLevel())
+		if (getLevel() >= Config.MAX_PET_LEVEL)
 		{
 			return 0;
 		}
@@ -230,7 +230,7 @@ public abstract class L2Summon extends L2Playable
 	
 	public long getExpForNextLevel()
 	{
-		if (getLevel() >= (ExperienceData.getInstance().getMaxPetLevel() - 1))
+		if (getLevel() >= (Config.MAX_PET_LEVEL - 1))
 		{
 			return 0;
 		}

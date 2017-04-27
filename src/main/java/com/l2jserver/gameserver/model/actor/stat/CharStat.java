@@ -19,6 +19,7 @@
 package com.l2jserver.gameserver.model.actor.stat;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.Elementals;
@@ -36,9 +37,9 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
 public class CharStat
 {
 	private final L2Character _activeChar;
-	private long _exp = 0;
+	private final AtomicLong _exp = new AtomicLong();
 	private int _sp = 0;
-	private byte _level = 1;
+	private int _level = 1;
 	private final float[] _attackTraits = new float[TraitType.values().length];
 	private final int[] _attackTraitsCount = new int[TraitType.values().length];
 	private final float[] _defenceTraits = new float[TraitType.values().length];
@@ -219,12 +220,22 @@ public class CharStat
 	
 	public long getExp()
 	{
-		return _exp;
+		return _exp.get();
+	}
+	
+	public void increaseExp(long value)
+	{
+		_exp.addAndGet(value);
+	}
+	
+	public void decreaseExp(long value)
+	{
+		_exp.addAndGet(-value);
 	}
 	
 	public void setExp(long value)
 	{
-		_exp = value;
+		_exp.set(value);
 	}
 	
 	/**
@@ -235,12 +246,12 @@ public class CharStat
 		return (int) calcStat(Stats.STAT_INT, _activeChar.getTemplate().getBaseINT());
 	}
 	
-	public byte getLevel()
+	public int getLevel()
 	{
 		return _level;
 	}
 	
-	public void setLevel(byte value)
+	public void setLevel(int value)
 	{
 		_level = value;
 	}

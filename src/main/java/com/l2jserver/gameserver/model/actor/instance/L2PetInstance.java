@@ -109,7 +109,7 @@ public class L2PetInstance extends L2Summon
 		
 		_controlObjectId = control.getObjectId();
 		
-		getStat().setLevel((byte) Math.max(level, PetDataTable.getInstance().getPetMinLevel(template.getId())));
+		getStat().setLevel(Math.max(level, getMinLevel()));
 		
 		_inventory = new PetInventory(this);
 		_inventory.restore();
@@ -254,7 +254,7 @@ public class L2PetInstance extends L2Summon
 			pet.setTitle(owner.getName());
 			if (data.isSynchLevel() && (pet.getLevel() != owner.getLevel()))
 			{
-				pet.getStat().setLevel((byte) owner.getLevel());
+				pet.getStat().setLevel(owner.getLevel());
 				pet.getStat().setExp(pet.getStat().getExpForLevel(owner.getLevel()));
 			}
 			L2World.getInstance().addPet(owner.getObjectId(), pet);
@@ -974,7 +974,7 @@ public class L2PetInstance extends L2Summon
 		_expBeforeDeath = getStat().getExp();
 		
 		// Set the new Experience value of the L2PetInstance
-		getStat().addExp(-lostExp);
+		getStat().removeExp(lostExp);
 	}
 	
 	@Override
@@ -1006,6 +1006,12 @@ public class L2PetInstance extends L2Summon
 	public final int getLevel()
 	{
 		return getStat().getLevel();
+	}
+	
+	@Override
+	public int getMinLevel()
+	{
+		return PetDataTable.getInstance().getPetMinLevel((this).getTemplate().getId());
 	}
 	
 	public int getMaxFed()

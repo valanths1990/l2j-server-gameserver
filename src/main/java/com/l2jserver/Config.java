@@ -171,6 +171,8 @@ public final class Config
 	public static int MAX_EVASION;
 	public static int MIN_ABNORMAL_STATE_SUCCESS_RATE;
 	public static int MAX_ABNORMAL_STATE_SUCCESS_RATE;
+	public static int MAX_PLAYER_LEVEL;
+	public static int MAX_PET_LEVEL;
 	public static byte MAX_SUBCLASS;
 	public static byte BASE_SUBCLASS_LEVEL;
 	public static byte MAX_SUBCLASS_LEVEL;
@@ -1505,6 +1507,8 @@ public final class Config
 			MAX_EVASION = character.getInt("MaxEvasion", 250);
 			MIN_ABNORMAL_STATE_SUCCESS_RATE = character.getInt("MinAbnormalStateSuccessRate", 10);
 			MAX_ABNORMAL_STATE_SUCCESS_RATE = character.getInt("MaxAbnormalStateSuccessRate", 90);
+			MAX_PLAYER_LEVEL = character.getInt("MaxPlayerLevel", 85) + 1;
+			MAX_PET_LEVEL = character.getInt("MaxPetLevel", 86) + 1;
 			MAX_SUBCLASS = character.getByte("MaxSubclass", (byte) 3);
 			BASE_SUBCLASS_LEVEL = character.getByte("BaseSubclassLevel", (byte) 40);
 			MAX_SUBCLASS_LEVEL = character.getByte("MaxSubclassLevel", (byte) 80);

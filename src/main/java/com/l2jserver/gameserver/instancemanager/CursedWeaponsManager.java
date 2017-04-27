@@ -266,7 +266,7 @@ public final class CursedWeaponsManager
 	public synchronized void checkDrop(L2Attackable attackable, L2PcInstance player)
 	{
 		// Cursed weapons cannot drop in instance
-		if (player.getInstanceId() != 0)
+		if (attackable.getInstanceId() != 0)
 		{
 			return;
 		}

@@ -34,8 +34,8 @@ public class StaticObjStat extends CharStat
 	}
 	
 	@Override
-	public final byte getLevel()
+	public final int getLevel()
 	{
-		return (byte) getActiveChar().getLevel();
+		return getActiveChar().getLevel();
 	}
 }

@@ -21,12 +21,9 @@ package com.l2jserver.gameserver.model.actor.stat;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
-import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.actor.L2Playable;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableExpChanged;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
@@ -44,70 +41,58 @@ public class PlayableStat extends CharStat
 	
 	public boolean addExp(long value)
 	{
-		final TerminateReturn term = EventDispatcher.getInstance().notifyEvent(new OnPlayableExpChanged(getActiveChar(), getExp(), getExp() + value), getActiveChar(), TerminateReturn.class);
+		final long currentExp = getExp();
+		final long totalExp = currentExp + value;
+		final TerminateReturn term = EventDispatcher.getInstance().notifyEvent(new OnPlayableExpChanged(getActiveChar(), currentExp, totalExp), getActiveChar(), TerminateReturn.class);
 		if ((term != null) && term.terminate())
 		{
 			return false;
 		}
 		
-		if (((getExp() + value) < 0) || ((value > 0) && (getExp() == (getExpForLevel(getMaxLevel()) - 1))))
+		if (((getExp() + value) < 0) || ((value > 0) && (currentExp == (getExpForLevel(getMaxLevel()) - 1))))
 		{
 			return true;
 		}
 		
-		if ((getExp() + value) >= getExpForLevel(getMaxLevel()))
+		if (totalExp >= getExpForLevel(getMaxLevel()))
 		{
 			value = getExpForLevel(getMaxLevel()) - 1 - getExp();
 		}
 		
-		setExp(getExp() + value);
+		increaseExp(value);
 		
-		byte minimumLevel = 1;
-		if (getActiveChar() instanceof L2PetInstance)
-		{
-			// get minimum level from L2NpcTemplate
-			minimumLevel = (byte) PetDataTable.getInstance().getPetMinLevel(((L2PetInstance) getActiveChar()).getTemplate().getId());
-		}
-		
-		byte level = minimumLevel; // minimum level
-		
-		for (byte tmp = level; tmp <= getMaxLevel(); tmp++)
-		{
-			if (getExp() >= getExpForLevel(tmp))
-			{
-				continue;
-			}
-			level = --tmp;
-			break;
-		}
-		if ((level != getLevel()) && (level >= minimumLevel))
-		{
-			addLevel((byte) (level - getLevel()));
-		}
+		incrementLevel();
 		
 		return true;
 	}
 	
 	public boolean removeExp(long value)
 	{
-		if ((getExp() - value) < 0)
+		final long currentExp = getExp();
+		if ((currentExp - value) < 0)
 		{
-			value = getExp() - 1;
+			value = currentExp - 1;
 		}
 		
-		setExp(getExp() - value);
+		decreaseExp(value);
 		
-		byte minimumLevel = 1;
-		if (getActiveChar() instanceof L2PetInstance)
-		{
-			// get minimum level from L2NpcTemplate
-			minimumLevel = (byte) PetDataTable.getInstance().getPetMinLevel(((L2PetInstance) getActiveChar()).getTemplate().getId());
-		}
-		byte level = minimumLevel;
+		incrementLevel();
+		return true;
+	}
+	
+	/**
+	 * Check Playable exp and increase level if is needed.
+	 */
+	private void incrementLevel()
+	{
+		int minimumLevel = getActiveChar().getMinLevel();
+		int level = minimumLevel;
+		long currentExp = getExp();
+		int maxLevel = getMaxLevel();
 		
-		for (byte tmp = level; tmp <= getMaxLevel(); tmp++)
+		for (int tmp = level; tmp <= maxLevel; tmp++)
 		{
-			if (getExp() >= getExpForLevel(tmp))
+			if (currentExp >= getExpForLevel(tmp))
 			{
 				continue;
 			}
@@ -116,9 +101,8 @@ public class PlayableStat extends CharStat
 		}
 		if ((level != getLevel()) && (level >= minimumLevel))
 		{
-			addLevel((byte) (level - getLevel()));
+			addLevel(level - getLevel());
 		}
-		return true;
 	}
 	
 	public boolean removeExpAndSp(long removeExp, int removeSp)
@@ -137,13 +121,14 @@ public class PlayableStat extends CharStat
 		return expRemoved || spRemoved;
 	}
 	
-	public boolean addLevel(byte value)
+	public boolean addLevel(int value)
 	{
-		if ((getLevel() + value) > (getMaxLevel() - 1))
+		final int currentLevel = getLevel();
+		if ((currentLevel + value) > (getMaxLevel() - 1))
 		{
-			if (getLevel() < (getMaxLevel() - 1))
+			if (currentLevel < (getMaxLevel() - 1))
 			{
-				value = (byte) (getMaxLevel() - 1 - getLevel());
+				value = (byte) (getMaxLevel() - 1 - currentLevel);
 			}
 			else
 			{
@@ -151,8 +136,8 @@ public class PlayableStat extends CharStat
 			}
 		}
 		
-		boolean levelIncreased = ((getLevel() + value) > getLevel());
-		value += getLevel();
+		boolean levelIncreased = ((currentLevel + value) > currentLevel);
+		value += currentLevel;
 		setLevel(value);
 		
 		// Sync up exp with current level
@@ -251,6 +236,6 @@ public class PlayableStat extends CharStat
 	
 	public int getMaxLevel()
 	{
-		return ExperienceData.getInstance().getMaxLevel();
+		return Config.MAX_PLAYER_LEVEL;
 	}
 }

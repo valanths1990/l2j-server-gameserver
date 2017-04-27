@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.base.ClassId;
@@ -57,12 +57,12 @@ public class L2PcTemplate extends L2CharTemplate
 		super(set);
 		_classId = ClassId.getClassId(set.getInt("classId"));
 		setRace(_classId.getRace());
-		_baseHp = new float[ExperienceData.getInstance().getMaxLevel()];
-		_baseMp = new float[ExperienceData.getInstance().getMaxLevel()];
-		_baseCp = new float[ExperienceData.getInstance().getMaxLevel()];
-		_baseHpReg = new double[ExperienceData.getInstance().getMaxLevel()];
-		_baseMpReg = new double[ExperienceData.getInstance().getMaxLevel()];
-		_baseCpReg = new double[ExperienceData.getInstance().getMaxLevel()];
+		_baseHp = new float[Config.MAX_PLAYER_LEVEL];
+		_baseMp = new float[Config.MAX_PLAYER_LEVEL];
+		_baseCp = new float[Config.MAX_PLAYER_LEVEL];
+		_baseHpReg = new double[Config.MAX_PLAYER_LEVEL];
+		_baseMpReg = new double[Config.MAX_PLAYER_LEVEL];
+		_baseCpReg = new double[Config.MAX_PLAYER_LEVEL];
 		
 		_baseSlotDef = new HashMap<>(12);
 		_baseSlotDef.put(Inventory.PAPERDOLL_CHEST, set.getInt("basePDefchest", 0));

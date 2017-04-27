@@ -65,7 +65,6 @@ import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
-import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
 import com.l2jserver.gameserver.data.xml.impl.FishData;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
@@ -5479,13 +5478,13 @@ public final class L2PcInstance extends L2Playable
 		long lostExp = 0;
 		if (!L2Event.isParticipant(this))
 		{
-			if (lvl < ExperienceData.getInstance().getMaxLevel())
+			if (lvl < Config.MAX_PLAYER_LEVEL)
 			{
 				lostExp = Math.round(((getStat().getExpForLevel(lvl + 1) - getStat().getExpForLevel(lvl)) * percentLost) / 100);
 			}
 			else
 			{
-				lostExp = Math.round(((getStat().getExpForLevel(ExperienceData.getInstance().getMaxLevel()) - getStat().getExpForLevel(ExperienceData.getInstance().getMaxLevel() - 1)) * percentLost) / 100);
+				lostExp = Math.round(((getStat().getExpForLevel(Config.MAX_PLAYER_LEVEL) - getStat().getExpForLevel(Config.MAX_PLAYER_LEVEL - 1)) * percentLost) / 100);
 			}
 		}
 		

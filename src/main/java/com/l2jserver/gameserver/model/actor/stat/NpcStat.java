@@ -28,7 +28,7 @@ public class NpcStat extends CharStat
 	}
 	
 	@Override
-	public byte getLevel()
+	public int getLevel()
 	{
 		return getActiveChar().getTemplate().getLevel();
 	}

@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model.actor.stat;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.model.L2PetLevelData;
 import com.l2jserver.gameserver.model.PcCondOverride;
@@ -270,9 +270,9 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public final boolean addLevel(byte value)
+	public final boolean addLevel(int value)
 	{
-		if ((getLevel() + value) > (ExperienceData.getInstance().getMaxLevel() - 1))
+		if ((getLevel() + value) > (Config.MAX_PLAYER_LEVEL - 1))
 		{
 			return false;
 		}
@@ -463,7 +463,7 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public final byte getLevel()
+	public final int getLevel()
 	{
 		if (getActiveChar().isSubClassActive())
 		{
@@ -473,17 +473,17 @@ public class PcStat extends PlayableStat
 		return super.getLevel();
 	}
 	
-	public final byte getBaseLevel()
+	public final int getBaseLevel()
 	{
 		return super.getLevel();
 	}
 	
 	@Override
-	public final void setLevel(byte value)
+	public final void setLevel(int value)
 	{
-		if (value > (ExperienceData.getInstance().getMaxLevel() - 1))
+		if (value > (Config.MAX_PLAYER_LEVEL - 1))
 		{
-			value = (byte) (ExperienceData.getInstance().getMaxLevel() - 1);
+			value = Config.MAX_PLAYER_LEVEL - 1;
 		}
 		
 		if (getActiveChar().isSubClassActive())

@@ -36,6 +36,6 @@ public class StopRotation extends L2GameServerPacket
 		writeD(_charObjId);
 		writeD(_degree);
 		writeD(_speed);
-		writeC(0); // ?
+		writeD(0); // ? bluff effect related ?
 	}
 }

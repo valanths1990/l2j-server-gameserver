@@ -6082,6 +6082,16 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public abstract int getLevel();
 	
+	/**
+	 * Check minimum level what creature can be.<BR>
+	 * {@link L2PetInstance} use it, some pet cannot drop under specific level.
+	 * @return Minimum level what can be current Character.
+	 */
+	public int getMinLevel()
+	{
+		return 1;
+	}
+	
 	public final double calcStat(Stats stat, double init)
 	{
 		return getStat().calcStat(stat, init, null, null);

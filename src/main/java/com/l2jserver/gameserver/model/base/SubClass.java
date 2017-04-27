@@ -18,8 +18,10 @@
  */
 package com.l2jserver.gameserver.model.base;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
+import com.l2jserver.gameserver.data.json.ExperienceData;
 
 /**
  * Character Sub-Class Definition <BR>
@@ -28,18 +30,18 @@ import com.l2jserver.gameserver.data.xml.impl.ExperienceData;
  */
 public final class SubClass
 {
-	private static final byte _maxLevel = Config.MAX_SUBCLASS_LEVEL < ExperienceData.getInstance().getMaxLevel() ? Config.MAX_SUBCLASS_LEVEL : (byte) (ExperienceData.getInstance().getMaxLevel() - 1);
+	private static final int _maxLevel = Math.min(Config.MAX_SUBCLASS_LEVEL, Config.MAX_PLAYER_LEVEL - 1);
 	
 	private PlayerClass _class;
-	private long _exp = ExperienceData.getInstance().getExpForLevel(Config.BASE_SUBCLASS_LEVEL);
+	private final AtomicLong _exp = new AtomicLong(ExperienceData.getInstance().getExpForLevel(Config.BASE_SUBCLASS_LEVEL));
 	private int _sp = 0;
-	private byte _level = Config.BASE_SUBCLASS_LEVEL;
+	private int _level = Config.BASE_SUBCLASS_LEVEL;
 	private int _classIndex = 1;
 	
 	public SubClass(int classId, long exp, int sp, byte level, int classIndex)
 	{
 		_class = PlayerClass.values()[classId];
-		_exp = exp;
+		_exp.set(exp);
 		_sp = sp;
 		_level = level;
 		_classIndex = classIndex;
@@ -70,7 +72,7 @@ public final class SubClass
 	
 	public long getExp()
 	{
-		return _exp;
+		return _exp.get();
 	}
 	
 	public int getSp()
@@ -78,7 +80,7 @@ public final class SubClass
 		return _sp;
 	}
 	
-	public byte getLevel()
+	public int getLevel()
 	{
 		return _level;
 	}
@@ -104,7 +106,7 @@ public final class SubClass
 			expValue = ExperienceData.getInstance().getExpForLevel(_maxLevel + 1) - 1;
 		}
 		
-		_exp = expValue;
+		_exp.set(expValue);
 	}
 	
 	public void setSp(int spValue)
@@ -117,7 +119,7 @@ public final class SubClass
 		_classIndex = classIndex;
 	}
 	
-	public void setLevel(byte levelValue)
+	public void setLevel(int levelValue)
 	{
 		if (levelValue > _maxLevel)
 		{
