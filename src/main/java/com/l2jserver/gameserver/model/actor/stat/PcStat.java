@@ -25,15 +25,12 @@ import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.model.L2PetLevelData;
 import com.l2jserver.gameserver.model.PcCondOverride;
-import com.l2jserver.gameserver.model.actor.instance.L2ClassMasterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.actor.transform.TransformTemplate;
 import com.l2jserver.gameserver.model.entity.RecoBonus;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLevelChanged;
-import com.l2jserver.gameserver.model.quest.Quest;
-import com.l2jserver.gameserver.model.quest.QuestState;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.MoveType;
 import com.l2jserver.gameserver.model.stats.Stats;
@@ -283,20 +280,9 @@ public class PcStat extends PlayableStat
 		boolean levelIncreased = super.addLevel(value);
 		if (levelIncreased)
 		{
-			if (!Config.DISABLE_TUTORIAL)
-			{
-				final QuestState qs = getActiveChar().getQuestState(Quest.TUTORIAL);
-				if (qs != null)
-				{
-					qs.getQuest().notifyEvent("CE40", null, getActiveChar());
-				}
-			}
-			
 			getActiveChar().setCurrentCp(getMaxCp());
 			getActiveChar().broadcastPacket(new SocialAction(getActiveChar().getObjectId(), SocialAction.LEVEL_UP));
 			getActiveChar().sendPacket(SystemMessageId.YOU_INCREASED_YOUR_LEVEL);
-			
-			L2ClassMasterInstance.showQuestionMark(getActiveChar());
 		}
 		
 		// Give AutoGet skills and all normal skills if Auto-Learn is activated.

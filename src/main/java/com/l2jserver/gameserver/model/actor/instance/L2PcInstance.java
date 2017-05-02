@@ -183,6 +183,7 @@ import com.l2jserver.gameserver.model.entity.Instance;
 import com.l2jserver.gameserver.model.entity.L2Event;
 import com.l2jserver.gameserver.model.entity.Siege;
 import com.l2jserver.gameserver.model.entity.TvTEvent;
+import com.l2jserver.gameserver.model.events.Containers;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerEquipItem;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerFameChanged;
@@ -194,7 +195,10 @@ import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPKCha
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionChange;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPChanged;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPKill;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSit;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerStand;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTransform;
+import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.fishing.L2Fish;
 import com.l2jserver.gameserver.model.fishing.L2Fishing;
 import com.l2jserver.gameserver.model.holders.AdditionalSkillHolder;
@@ -2703,9 +2707,14 @@ public final class L2PcInstance extends L2Playable
 	
 	public void sitDown(boolean checkCast)
 	{
+		final TerminateReturn terminate = EventDispatcher.getInstance().notifyEvent(new OnPlayerSit(this), this, TerminateReturn.class);
+		if ((terminate != null) && terminate.terminate())
+		{
+			return;
+		}
+		
 		if (checkCast && isCastingNow())
 		{
-			sendMessage("Cannot sit while casting");
 			return;
 		}
 		
@@ -2726,11 +2735,13 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public void standUp()
 	{
-		if (L2Event.isParticipant(this) && getEventStatus().isSitForced())
+		final TerminateReturn terminate = EventDispatcher.getInstance().notifyEvent(new OnPlayerStand(this), Containers.Players(), TerminateReturn.class);
+		if ((terminate != null) && terminate.terminate())
 		{
-			sendMessage("A dark force beyond your mortal understanding makes your knees to shake when you try to stand up...");
+			return;
 		}
-		else if (_waitTypeSitting && !isInStoreMode() && !isAlikeDead())
+		
+		if (_waitTypeSitting && !isInStoreMode() && !isAlikeDead())
 		{
 			if (getEffectList().isAffected(EffectFlag.RELAXING))
 			{
@@ -9077,14 +9088,6 @@ public final class L2PcInstance extends L2Playable
 			broadcastPacket(new SocialAction(getObjectId(), SocialAction.LEVEL_UP));
 			sendPacket(new SkillCoolTime(this));
 			sendPacket(new ExStorageMaxCount(this));
-			
-			if (Config.ALTERNATE_CLASS_MASTER)
-			{
-				if (Config.CLASS_MASTER_SETTINGS.isAllowed(getClassId().level() + 1) && Config.ALTERNATE_CLASS_MASTER && (((this.getClassId().level() == 1) && (this.getLevel() >= 40)) || ((this.getClassId().level() == 2) && (this.getLevel() >= 76))))
-				{
-					L2ClassMasterInstance.showQuestionMark(this);
-				}
-			}
 			return true;
 		}
 		finally

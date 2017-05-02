@@ -94,7 +94,7 @@ public final class SpawnTable implements IXmlReader
 			return false;
 		}
 		
-		if (npcTemplate.isType("L2SiegeGuard") || npcTemplate.isType("L2RaidBoss") || (!Config.ALLOW_CLASS_MASTERS && npcTemplate.isType("L2ClassMaster")))
+		if (npcTemplate.isType("L2SiegeGuard") || npcTemplate.isType("L2RaidBoss"))
 		{
 			// Don't spawn
 			return false;

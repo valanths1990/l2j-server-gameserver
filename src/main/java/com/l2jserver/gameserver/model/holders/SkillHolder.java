@@ -30,6 +30,12 @@ public class SkillHolder
 	private final int _skillId;
 	private final int _skillLvl;
 	
+	public SkillHolder(int skillId)
+	{
+		_skillId = skillId;
+		_skillLvl = 1;
+	}
+	
 	public SkillHolder(int skillId, int skillLvl)
 	{
 		_skillId = skillId;

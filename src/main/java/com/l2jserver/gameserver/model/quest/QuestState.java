@@ -28,11 +28,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
-import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.enums.QuestType;
 import com.l2jserver.gameserver.enums.audio.IAudio;
 import com.l2jserver.gameserver.enums.audio.Sound;
 import com.l2jserver.gameserver.instancemanager.QuestManager;
+import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -43,7 +43,6 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowQuestMark;
 import com.l2jserver.gameserver.network.serverpackets.QuestList;
 import com.l2jserver.gameserver.network.serverpackets.TutorialCloseHtml;
 import com.l2jserver.gameserver.network.serverpackets.TutorialEnableClientEvent;
-import com.l2jserver.gameserver.network.serverpackets.TutorialShowHtml;
 import com.l2jserver.gameserver.network.serverpackets.TutorialShowQuestionMark;
 import com.l2jserver.gameserver.util.Util;
 
@@ -490,16 +489,16 @@ public final class QuestState
 	{
 		if (_vars == null)
 		{
-			return 0;
+			return -1;
 		}
 		
 		final String variable = _vars.get(var);
 		if ((variable == null) || variable.isEmpty())
 		{
-			return 0;
+			return -1;
 		}
 		
-		int varint = 0;
+		int varint = -1;
 		try
 		{
 			varint = Integer.parseInt(variable);
@@ -602,7 +601,7 @@ public final class QuestState
 		{
 			return getInt("memoState");
 		}
-		return 0;
+		return -1;
 	}
 	
 	public boolean hasMemoState()
@@ -1216,43 +1215,6 @@ public final class QuestState
 		return this;
 	}
 	
-	public void showQuestionMark(int number)
-	{
-		_player.sendPacket(new TutorialShowQuestionMark(number));
-	}
-	
-	/**
-	 * Used only in 255_Tutorial
-	 * @param html
-	 */
-	public void showTutorialHTML(String html)
-	{
-		String text = HtmCache.getInstance().getHtm(_player.getHtmlPrefix(), "data/scripts/quests/255_Tutorial/" + html);
-		if (text == null)
-		{
-			_log.warning("missing html page data/scripts/quests/255_Tutorial/" + html);
-			text = "<html><body>File data/scripts/quests/255_Tutorial/" + html + " not found or file is empty.</body></html>";
-		}
-		_player.sendPacket(new TutorialShowHtml(text));
-	}
-	
-	/**
-	 * Used only in 255_Tutorial
-	 */
-	public void closeTutorialHtml()
-	{
-		_player.sendPacket(TutorialCloseHtml.STATIC_PACKET);
-	}
-	
-	/**
-	 * Used only in 255_Tutorial
-	 * @param number
-	 */
-	public void onTutorialClientEvent(int number)
-	{
-		_player.sendPacket(new TutorialEnableClientEvent(number));
-	}
-	
 	/**
 	 * Set the restart time for the daily quests.<br>
 	 * The time is hardcoded at {@link Quest#getResetHour()} hours, {@link Quest#getResetMinutes()} minutes of the following day.<br>
@@ -1278,5 +1240,83 @@ public final class QuestState
 	{
 		final String val = get("restartTime");
 		return ((val == null) || !Util.isDigit(val)) || (Long.parseLong(val) <= System.currentTimeMillis());
+	}
+	
+	public void setNRMemo(L2PcInstance talker, int value)
+	{
+		set("NRmemo", String.valueOf(value));
+	}
+	
+	// TODO Check if remover only for basic NRmemo or from all!
+	// TODO Maybe value determine what to be removed?
+	public void removeNRMemo(L2PcInstance talker, int value)
+	{
+		unset("NRmemo");
+	}
+	
+	public void setNRMemoState(L2PcInstance talker, int slot, int value)
+	{
+		set("NRmemoState" + slot, String.valueOf(value));
+	}
+	
+	public int getNRMemoState(L2PcInstance talker, int slot)
+	{
+		return getInt("NRmemoState" + slot);
+	}
+	
+	// TODO Find what unknown do (always 1)
+	public void setNRMemoStateEx(L2PcInstance talker, int slot, int unknown, int value)
+	{
+		set("NRmemoStateEx" + slot, String.valueOf(value));
+	}
+	
+	// TODO Find what unknown do (always 1)
+	public int getNRMemoStateEx(L2PcInstance talker, int slot, int unknown)
+	{
+		return getInt("NRmemoStateEx" + slot);
+	}
+	
+	public boolean haveNRMemo(L2PcInstance talker, int slot)
+	{
+		return getInt("NRmemo") == slot;
+	}
+	
+	public void setNRFlagJournal(L2PcInstance talker, int questId, int val)
+	{
+		// TODO Implement me!
+	}
+	
+	/**
+	 * @param castleId
+	 * @return true if castle under TW
+	 */
+	public int getDominionWarState(int castleId)
+	{
+		return TerritoryWarManager.getInstance().isTWInProgress() ? 5 : 0;
+	}
+	
+	public void enableTutorialEvent(L2PcInstance talker, int state)
+	{
+		talker.sendPacket(new TutorialEnableClientEvent(state));
+	}
+	
+	public int getDominionSiegeID(L2PcInstance talker)
+	{
+		return TerritoryWarManager.getInstance().getRegisteredTerritoryId(talker);
+	}
+	
+	public void showQuestionMark(L2PcInstance talker, int number)
+	{
+		talker.sendPacket(new TutorialShowQuestionMark(number));
+	}
+	
+	public void showQuestionMark(int number)
+	{
+		_player.sendPacket(new TutorialShowQuestionMark(number));
+	}
+	
+	public void closeTutorialHtml(L2PcInstance player)
+	{
+		player.sendPacket(TutorialCloseHtml.STATIC_PACKET);
 	}
 }

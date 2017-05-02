@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2016 L2J Server
+ * Copyright (C) 2004-2017 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -16,38 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.network.clientpackets;
+package com.l2jserver.gameserver.model.events.impl.character.player;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.events.EventDispatcher;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialClientEvent;
+import com.l2jserver.gameserver.model.events.EventType;
+import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 
-public class RequestTutorialClientEvent extends L2GameClientPacket
+/**
+ * @author Zealar
+ * @since 2.6.0.0
+ */
+public class OnPlayerTutorialClientEvent implements IBaseEvent
 {
-	private static final String _C__88_REQUESTTUTORIALCLIENTEVENT = "[C] 88 RequestTutorialClientEvent";
+	private final L2PcInstance _activeChar;
+	private final int _event;
 	
-	int eventId = 0;
-	
-	@Override
-	protected void readImpl()
+	public OnPlayerTutorialClientEvent(L2PcInstance activeChar, int event)
 	{
-		eventId = readD();
+		_activeChar = activeChar;
+		_event = event;
+	}
+	
+	public L2PcInstance getActiveChar()
+	{
+		return _activeChar;
+	}
+	
+	public int getEvent()
+	{
+		return _event;
 	}
 	
 	@Override
-	protected void runImpl()
+	public EventType getType()
 	{
-		final L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
-			return;
-		}
-		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerTutorialClientEvent(player, eventId), player);
-	}
-	
-	@Override
-	public String getType()
-	{
-		return _C__88_REQUESTTUTORIALCLIENTEVENT;
+		return EventType.ON_PLAYER_TUTORIAL_CLIENT_EVENT;
 	}
 }

@@ -40,6 +40,7 @@ import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.enums.CategoryType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.TrapAction;
+import com.l2jserver.gameserver.enums.audio.IAudio;
 import com.l2jserver.gameserver.instancemanager.QuestManager;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2Party;
@@ -65,6 +66,7 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.NpcQuestHtmlMessage;
+import com.l2jserver.gameserver.network.serverpackets.TutorialShowHtml;
 import com.l2jserver.gameserver.scripting.ScriptManager;
 import com.l2jserver.util.Rnd;
 import com.l2jserver.util.Util;
@@ -75,8 +77,6 @@ import com.l2jserver.util.Util;
  */
 public class Quest extends AbstractScript implements IIdentifiable
 {
-	public static final String TUTORIAL = "255_Tutorial";
-	
 	/** Map containing lists of timers from the name of the timer. */
 	private volatile Map<String, List<QuestTimer>> _questTimers = null;
 	private final ReentrantReadWriteLock _rwLock = new ReentrantReadWriteLock();
@@ -152,7 +152,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	protected void loadGlobalData()
 	{
-	
+		
 	}
 	
 	/**
@@ -163,7 +163,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void saveGlobalData()
 	{
-	
+		
 	}
 	
 	/**
@@ -569,6 +569,62 @@ public class Quest extends AbstractScript implements IIdentifiable
 		try
 		{
 			res = onEnterWorld(player);
+		}
+		catch (Exception e)
+		{
+			showError(player, e);
+			return;
+		}
+		showResult(player, res);
+	}
+	
+	public final void notifyTutorialEvent(L2PcInstance player, String command)
+	{
+		try
+		{
+			onTutorialEvent(player, command);
+		}
+		catch (Exception e)
+		{
+			showError(player, e);
+			return;
+		}
+	}
+	
+	public final void notifyTutorialClientEvent(L2PcInstance player, int event)
+	{
+		try
+		{
+			onTutorialClientEvent(player, event);
+		}
+		catch (Exception e)
+		{
+			showError(player, e);
+			return;
+		}
+	}
+	
+	public final void notifyTutorialQuestionMark(L2PcInstance player, int number)
+	{
+		String res = null;
+		try
+		{
+			res = onTutorialQuestionMark(player, number);
+		}
+		catch (Exception e)
+		{
+			showError(player, e);
+			return;
+		}
+		showResult(player, res);
+	}
+	
+	public final void notifyTutorialCmd(L2PcInstance player, String command)
+	{
+		String res = null;
+		try
+		{
+			res = onTutorialCmd(player, command);
 		}
 		catch (Exception e)
 		{
@@ -1284,6 +1340,24 @@ public class Quest extends AbstractScript implements IIdentifiable
 		return null;
 	}
 	
+	public void onTutorialEvent(L2PcInstance player, String command)
+	{
+	}
+	
+	public void onTutorialClientEvent(L2PcInstance player, int event)
+	{
+	}
+	
+	public String onTutorialQuestionMark(L2PcInstance player, int number)
+	{
+		return null;
+	}
+	
+	public String onTutorialCmd(L2PcInstance player, String command)
+	{
+		return null;
+	}
+	
 	/**
 	 * This function is called whenever a character enters a registered zone.
 	 * @param character this parameter contains a reference to the exact instance of the character who is entering the zone.
@@ -1326,7 +1400,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onOlympiadMatchFinish(Participant winner, Participant looser, CompetitionType type)
 	{
-	
+		
 	}
 	
 	/**
@@ -1336,7 +1410,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onOlympiadLose(L2PcInstance loser, CompetitionType type)
 	{
-	
+		
 	}
 	
 	/**
@@ -1345,7 +1419,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onMoveFinished(L2Npc npc)
 	{
-	
+		
 	}
 	
 	/**
@@ -1354,7 +1428,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onNodeArrived(L2Npc npc)
 	{
-	
+		
 	}
 	
 	/**
@@ -1363,7 +1437,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onRouteFinished(L2Npc npc)
 	{
-	
+		
 	}
 	
 	/**
@@ -1382,7 +1456,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onSummonSpawn(L2Summon summon)
 	{
-	
+		
 	}
 	
 	/**
@@ -1390,7 +1464,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void onSummonTalk(L2Summon summon)
 	{
-	
+		
 	}
 	
 	/**
@@ -2609,6 +2683,47 @@ public class Quest extends AbstractScript implements IIdentifiable
 		return true;
 	}
 	
+	public void showPage(L2PcInstance player, String fileName)
+	{
+		showPage(player, fileName, false);
+	}
+	
+	public void showPage(L2PcInstance player, String fileName, boolean haveQuest)
+	{
+		String content = getHtm(player.getHtmlPrefix(), fileName);
+		if (content != null)
+		{
+			L2Npc npc = player.getLastFolkNPC();
+			if (haveQuest && (npc != null))
+			{
+				content = content.replace("%objectId%", npc.getObjectId() + "");
+			}
+			final NpcHtmlMessage npcReply = new NpcHtmlMessage(npc != null ? npc.getObjectId() : 0, content);
+			player.sendPacket(npcReply);
+		}
+	}
+	
+	public void showQuestPage(L2PcInstance player, String fileName, int questId)
+	{
+		String content = getHtm(player.getHtmlPrefix(), fileName);
+		if (content != null)
+		{
+			L2Npc npc = player.getLastFolkNPC();
+			NpcQuestHtmlMessage npcReply = new NpcQuestHtmlMessage(npc != null ? npc.getObjectId() : 0, questId);
+			npcReply.setHtml(content);
+			player.sendPacket(npcReply);
+		}
+	}
+	
+	public void showTutorialHTML(L2PcInstance player, String fileName)
+	{
+		String content = getHtm(player.getHtmlPrefix(), fileName);
+		if (content != null)
+		{
+			player.sendPacket(new TutorialShowHtml(content));
+		}
+	}
+	
 	/**
 	 * Send an HTML file to the specified player.
 	 * @param player the player to send the HTML to
@@ -2783,6 +2898,26 @@ public class Quest extends AbstractScript implements IIdentifiable
 		{
 			getListeners().stream().filter(listener -> listener.getType() == EventType.ON_PLAYER_LOGIN).forEach(AbstractEventListener::unregisterMe);
 		}
+	}
+	
+	public void registerTutorialEvent()
+	{
+		setPlayerTutorialEvent(event -> notifyTutorialEvent(event.getActiveChar(), event.getCommand()));
+	}
+	
+	public void registerTutorialClientEvent()
+	{
+		setPlayerTutorialClientEvent(event -> notifyTutorialClientEvent(event.getActiveChar(), event.getEvent()));
+	}
+	
+	public void registerTutorialQuestionMark()
+	{
+		setPlayerTutorialQuestionMark(event -> notifyTutorialQuestionMark(event.getActiveChar(), event.getNumber()));
+	}
+	
+	public void registerTutorialCmd()
+	{
+		setPlayerTutorialCmd(event -> notifyTutorialCmd(event.getActiveChar(), event.getCommand()));
 	}
 	
 	/**
@@ -2984,5 +3119,54 @@ public class Quest extends AbstractScript implements IIdentifiable
 	public void addCondInCategory(CategoryType categoryType, String html)
 	{
 		getStartConditions().put(p -> p.isInCategory(categoryType), html);
+	}
+	
+	public boolean haveMemo(L2PcInstance talker, int questId)
+	{
+		Quest quest = QuestManager.getInstance().getQuest(questId);
+		if ((quest != null) && talker.hasQuestState(quest.getName()))
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @param talker Player
+	 * @param questId Quest Id
+	 * @param flag 0 = false / 1 = true
+	 */
+	public void setOneTimeQuestFlag(L2PcInstance talker, int questId, int flag)
+	{
+		Quest quest = QuestManager.getInstance().getQuest(questId);
+		if (quest != null)
+		{
+			quest.getQuestState(talker, true).setState(flag == 1 ? State.COMPLETED : State.STARTED);
+		}
+	}
+	
+	public int getOneTimeQuestFlag(L2PcInstance talker, int questId)
+	{
+		Quest quest = QuestManager.getInstance().getQuest(questId);
+		if ((quest != null) && quest.getQuestState(talker, true).isCompleted())
+		{
+			return 1;
+		}
+		return 0;
+	}
+	
+	public static void playSound(L2PcInstance player, IAudio sound)
+	{
+		player.sendPacket(sound.getPacket());
+	}
+	
+	public void showRadar(L2PcInstance player, int x, int y, int z, int type)
+	{
+		player.getRadar().addMarker(x, y, z);
+	}
+	
+	public boolean isVisibleInQuestWindow()
+	{
+		return true;
 	}
 }
