@@ -104,7 +104,6 @@ public enum InstanceType
 	L2FortDoormenInstance(L2DoormenInstance),
 	L2ClanHallDoormenInstance(L2DoormenInstance),
 	// Custom
-	L2ClassMasterInstance(L2NpcInstance),
 	L2NpcBufferInstance(L2Npc),
 	L2EventMobInstance(L2Npc);
 	

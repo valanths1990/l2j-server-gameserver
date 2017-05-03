@@ -105,6 +105,10 @@ import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfe
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSkillLearn;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSummonSpawn;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSummonTalk;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialClientEvent;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialCmd;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialEvent;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialQuestionMark;
 import com.l2jserver.gameserver.model.events.impl.character.trap.OnTrapAction;
 import com.l2jserver.gameserver.model.events.impl.item.OnItemBypassEvent;
 import com.l2jserver.gameserver.model.events.impl.item.OnItemTalk;
@@ -435,6 +439,28 @@ public abstract class AbstractScript implements INamable
 	protected final List<AbstractEventListener> setNpcFirstTalkId(Consumer<OnNpcFirstTalk> callback, Collection<Integer> npcIds)
 	{
 		return registerConsumer(callback, EventType.ON_NPC_FIRST_TALK, ListenerRegisterType.NPC, npcIds);
+	}
+	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	
+	protected final List<AbstractEventListener> setPlayerTutorialEvent(Consumer<OnPlayerTutorialEvent> callback)
+	{
+		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_EVENT, ListenerRegisterType.GLOBAL);
+	}
+	
+	protected final List<AbstractEventListener> setPlayerTutorialClientEvent(Consumer<OnPlayerTutorialClientEvent> callback)
+	{
+		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_CLIENT_EVENT, ListenerRegisterType.GLOBAL);
+	}
+	
+	protected final List<AbstractEventListener> setPlayerTutorialQuestionMark(Consumer<OnPlayerTutorialQuestionMark> callback)
+	{
+		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_QUESTION_MARK, ListenerRegisterType.GLOBAL);
+	}
+	
+	protected final List<AbstractEventListener> setPlayerTutorialCmd(Consumer<OnPlayerTutorialCmd> callback)
+	{
+		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_CMD, ListenerRegisterType.GLOBAL);
 	}
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
