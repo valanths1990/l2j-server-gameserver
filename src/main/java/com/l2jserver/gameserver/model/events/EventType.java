@@ -62,6 +62,7 @@ import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLevel
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogin;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogout;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPKChanged;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionCancel;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionChange;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPChanged;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPKill;
@@ -217,6 +218,7 @@ public enum EventType
 	ON_PLAYER_LOGOUT(OnPlayerLogout.class, void.class),
 	ON_PLAYER_PK_CHANGED(OnPlayerPKChanged.class, void.class),
 	ON_PLAYER_PROFESSION_CHANGE(OnPlayerProfessionChange.class, void.class),
+	ON_PLAYER_PROFESSION_CANCEL(OnPlayerProfessionCancel.class, void.class),
 	ON_PLAYER_PVP_CHANGED(OnPlayerPvPChanged.class, void.class),
 	ON_PLAYER_PVP_KILL(OnPlayerPvPKill.class, void.class),
 	ON_PLAYER_RESTORE(OnPlayerRestore.class, void.class),

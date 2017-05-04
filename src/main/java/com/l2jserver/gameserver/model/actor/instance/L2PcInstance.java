@@ -192,6 +192,7 @@ import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerKarma
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogin;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogout;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPKChanged;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionCancel;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionChange;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPChanged;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPKill;
@@ -8847,6 +8848,10 @@ public final class L2PcInstance extends L2Playable
 			DAOFactory.getInstance().getPlayerSkillSaveDAO().delete(this, classIndex);
 			
 			DAOFactory.getInstance().getSubclassDAO().delete(this, classIndex);
+			
+			// Notify to scripts
+			int classId = getSubClasses().get(classIndex).getClassId();
+			EventDispatcher.getInstance().notifyEventAsync(new OnPlayerProfessionCancel(this, classId), this);
 			
 			getSubClasses().remove(classIndex);
 		}
