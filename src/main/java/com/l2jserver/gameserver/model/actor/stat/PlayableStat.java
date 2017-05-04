@@ -83,7 +83,7 @@ public class PlayableStat extends CharStat
 	/**
 	 * Check Playable exp and increase level if is needed.
 	 */
-	private void incrementLevel()
+	public void incrementLevel()
 	{
 		int minimumLevel = getActiveChar().getMinLevel();
 		int level = minimumLevel;

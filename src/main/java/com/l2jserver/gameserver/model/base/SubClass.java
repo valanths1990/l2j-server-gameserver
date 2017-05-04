@@ -99,6 +99,14 @@ public final class SubClass
 		_class = PlayerClass.values()[classId];
 	}
 	
+	public void addExp(long expValue)
+	{
+		if (_exp.addAndGet(expValue) > (ExperienceData.getInstance().getExpForLevel(_maxLevel + 1) - 1))
+		{
+			_exp.set(ExperienceData.getInstance().getExpForLevel(_maxLevel + 1) - 1);
+		}
+	}
+	
 	public void setExp(long expValue)
 	{
 		if (expValue > (ExperienceData.getInstance().getExpForLevel(_maxLevel + 1) - 1))

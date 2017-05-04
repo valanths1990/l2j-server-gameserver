@@ -93,10 +93,17 @@ public class PcStat extends PlayableStat
 			return false;
 		}
 		
-		// Exp from resurrect don't remove karma
-		if (!super.addExp(exp))
+		if (getActiveChar().isSubClassActive())
 		{
-			return false;
+			getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).addExp(exp);
+			super.incrementLevel();
+		}
+		else
+		{
+			if (!super.addExp(exp))
+			{
+				return false;
+			}
 		}
 		
 		if (!isRessurect)
