@@ -42,6 +42,7 @@ public class PetNameTable
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement("SELECT name FROM pets WHERE name=?"))
 		{
+			ps.setString(1, name);
 			try (ResultSet rs = ps.executeQuery())
 			{
 				return rs.next();
