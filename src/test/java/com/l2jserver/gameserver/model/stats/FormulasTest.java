@@ -4,17 +4,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.skills.Skill;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Formulas test.
@@ -24,49 +23,115 @@ public class FormulasTest
 {
 	private static final String PROVIDE_SPEED_SKILL_TIME = "PROVIDE_SPEED_SKILL_TIME";
 	
+	private static final String PROVIDE_CHARACTERS = "PROVIDE_CHARACTERS";
+	
 	private static final int HP_REGENERATE_PERIOD_CHARACTER = 3000;
 	
 	private static final int HP_REGENERATE_PERIOD_DOOR = 300000;
 	
-	@Mock
-	private L2Character character;
-	
-	@Mock
-	private Skill skill;
-	
-	@BeforeClass
-	public void setUp()
+	@Test(dataProvider = PROVIDE_CHARACTERS)
+	public void testGetRegeneratePeriod(L2Character character, int expected)
 	{
-		MockitoAnnotations.initMocks(this);
-	}
-	
-	@Test
-	public void testGetRegeneratePeriod()
-	{
-		Mockito.when(character.isDoor()).thenReturn(true);
-		
-		Assert.assertEquals(Formulas.getRegeneratePeriod(character), HP_REGENERATE_PERIOD_DOOR);
-		
-		Mockito.when(character.isDoor()).thenReturn(false);
-		
-		Assert.assertEquals(Formulas.getRegeneratePeriod(character), HP_REGENERATE_PERIOD_CHARACTER);
+		Assert.assertEquals(Formulas.getRegeneratePeriod(character), expected);
 	}
 	
 	@Test(dataProvider = PROVIDE_SPEED_SKILL_TIME)
 	public void testCalcAtkSpd(int hitTime, boolean isChanneling, int channelingSkillId, boolean isStatic, boolean isMagic, //
 		int mAtkSpeed, double pAtkSpeed, boolean isChargedSpiritshots, boolean isChargedBlessedSpiritShots, double expected)
 	{
-		Mockito.when(skill.getHitTime()).thenReturn(hitTime);
-		Mockito.when(skill.isChanneling()).thenReturn(isChanneling);
-		Mockito.when(skill.getChannelingSkillId()).thenReturn(channelingSkillId);
-		Mockito.when(skill.isStatic()).thenReturn(isStatic);
-		Mockito.when(skill.isMagic()).thenReturn(isMagic);
-		Mockito.when(character.getMAtkSpd()).thenReturn(mAtkSpeed);
-		Mockito.when(character.getPAtkSpd()).thenReturn(pAtkSpeed);
-		Mockito.when(character.isChargedShot(ShotType.SPIRITSHOTS)).thenReturn(isChargedSpiritshots);
-		Mockito.when(character.isChargedShot(ShotType.BLESSED_SPIRITSHOTS)).thenReturn(isChargedBlessedSpiritShots);
+		final L2Character character = new MockUp<L2Character>()
+		{
+			@Mock
+			int getMAtkSpd()
+			{
+				return mAtkSpeed;
+			}
+			
+			@Mock
+			double getPAtkSpd()
+			{
+				return pAtkSpeed;
+			}
+			
+			@Mock
+			boolean isChargedShot(ShotType type)
+			{
+				switch (type)
+				{
+					case SPIRITSHOTS:
+					{
+						return isChargedSpiritshots;
+					}
+					case BLESSED_SPIRITSHOTS:
+					{
+						return isChargedBlessedSpiritShots;
+					}
+				}
+				return false;
+			}
+		}.getMockInstance();
+		
+		final Skill skill = new MockUp<Skill>()
+		{
+			@Mock
+			int getHitTime()
+			{
+				return hitTime;
+			}
+			
+			@Mock
+			boolean isChanneling()
+			{
+				return isChanneling;
+			}
+			
+			@Mock
+			int getChannelingSkillId()
+			{
+				return channelingSkillId;
+			}
+			
+			@Mock
+			boolean isStatic()
+			{
+				return isStatic;
+			}
+			
+			@Mock
+			boolean isMagic()
+			{
+				return isMagic;
+			}
+		}.getMockInstance();
 		
 		Assert.assertEquals(Formulas.calcCastTime(character, skill), expected);
+	}
+	
+	@DataProvider(name = PROVIDE_CHARACTERS)
+	private Iterator<Object[]> provideCharacters()
+	{
+		final Set<Object[]> result = new HashSet<>();
+		final L2Character c1 = new MockUp<L2Character>()
+		{
+			@Mock
+			boolean isDoor()
+			{
+				return true;
+			}
+		}.getMockInstance();
+		final L2Character c2 = new MockUp<L2Character>()
+		{
+			@Mock
+			boolean isDoor()
+			{
+				return false;
+			}
+		}.getMockInstance();
+		// @formatter:off
+		result.add(new Object[]{ c1, HP_REGENERATE_PERIOD_DOOR });
+		result.add(new Object[]{ c2, HP_REGENERATE_PERIOD_CHARACTER });
+		// @formatter:on
+		return result.iterator();
 	}
 	
 	@DataProvider(name = PROVIDE_SPEED_SKILL_TIME)

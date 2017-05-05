@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
@@ -143,12 +144,15 @@ import com.l2jserver.mmocore.SelectorThread;
 import com.l2jserver.status.Status;
 import com.l2jserver.util.DeadLockDetector;
 import com.l2jserver.util.IPv4Filter;
+import com.l2jserver.util.Util;
 
 public final class GameServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
 	private static final String LOG_FOLDER = "log"; // Name of folder for log file
 	private static final String LOG_NAME = "./log.cfg"; // Name of log file
+	private static final String DATAPACK = "-dp";
+	private static final String GEODATA = "-gd";
 	
 	private final SelectorThread<L2GameClient> _selectorThread;
 	private final L2GamePacketHandler _gamePacketHandler;
@@ -435,7 +439,21 @@ public final class GameServer
 	{
 		Server.serverMode = Server.MODE_GAMESERVER;
 		
-		/*** Main ***/
+		// Initialize configurations.
+		Config.load();
+		
+		final String dp = Util.parseArg(args, DATAPACK, true);
+		if (dp != null)
+		{
+			Config.DATAPACK_ROOT = new File(dp);
+		}
+		
+		final String gd = Util.parseArg(args, GEODATA, true);
+		if (gd != null)
+		{
+			Config.GEODATA_PATH = Paths.get(gd);
+		}
+		
 		// Create log folder
 		File logFolder = new File(Config.DATAPACK_ROOT, LOG_FOLDER);
 		logFolder.mkdir();
@@ -446,8 +464,6 @@ public final class GameServer
 			LogManager.getLogManager().readConfiguration(is);
 		}
 		
-		// Initialize config
-		Config.load();
 		printSection("Database");
 		DAOFactory.getInstance();
 		ConnectionFactory.getInstance();

@@ -239,4 +239,35 @@ public final class Util
 	{
 		return key -> map.get(key);
 	}
+	
+	/**
+	 * Parses a given argument.
+	 * @param args the Java program arguments
+	 * @param arg the argument to parse
+	 * @param hasArgValue if {@code true} will look for the argument value
+	 * @return the argument if hasArgValue is {@code false}, the argument value if hasArgValue is {@code true}, null if the argument is not present
+	 */
+	public static String parseArg(String[] args, String arg, boolean hasArgValue)
+	{
+		if ((args == null) || (arg == null) || arg.isEmpty())
+		{
+			return null;
+		}
+		
+		try
+		{
+			for (int i = 0; i < args.length; i++)
+			{
+				if (arg.equals(args[i]))
+				{
+					return hasArgValue ? args[i + 1] : arg;
+				}
+			}
+			return null;
+		}
+		catch (Exception ex)
+		{
+			throw new IllegalArgumentException("Illegal arguments " + Arrays.toString(args) + " and argument " + arg + "!", ex);
+		}
+	}
 }

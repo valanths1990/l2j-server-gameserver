@@ -29,13 +29,9 @@ dependencies {
 	compile 'org.slf4j:slf4j-api:1.7.23'
 	compile 'org.slf4j:slf4j-jdk14:1.7.23'
 	compile fileTree(dir: 'dist/libs', include: '*.jar')
-	testCompile 'org.testng:testng:6.10'
-	testCompile 'com.beust:jcommander:1.48'
-	testCompile 'org.mockito:mockito-core:2.7.9'
-	testCompile 'net.bytebuddy:byte-buddy:1.6.8'
-	testCompile 'net.bytebuddy:byte-buddy-agent:1.6.8'
-	testCompile 'org.objenesis:objenesis:2.5.1'
-	testCompile 'org.jmockit:jmockit:1.30'
+	testCompile 'org.testng:testng:6.11'
+	testCompile 'com.beust:jcommander:1.69'
+	testCompile 'org.jmockit:jmockit:1.31'
 }
 
 def generalManifest = manifest {
