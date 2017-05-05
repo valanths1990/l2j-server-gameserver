@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.l2jserver.gameserver.enums.PrivateStoreType;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Duel;
-import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
@@ -36,9 +35,9 @@ public final class DuelManager
 	private final Map<Integer, Duel> _duels = new ConcurrentHashMap<>();
 	private final AtomicInteger _currentDuelId = new AtomicInteger();
 	
-	protected DuelManager()
+	DuelManager()
 	{
-	
+		// Hide constructor
 	}
 	
 	public Duel getDuel(int duelId)
@@ -53,53 +52,6 @@ public final class DuelManager
 			return;
 		}
 		
-		// return if a player has PvPFlag
-		String engagedInPvP = "The duel was canceled because a duelist engaged in PvP combat.";
-		if (partyDuel)
-		{
-			boolean playerInPvP = false;
-			for (L2PcInstance temp : playerA.getParty().getMembers())
-			{
-				if (temp.getPvpFlag() != 0)
-				{
-					playerInPvP = true;
-					break;
-				}
-			}
-			if (!playerInPvP)
-			{
-				for (L2PcInstance temp : playerB.getParty().getMembers())
-				{
-					if (temp.getPvpFlag() != 0)
-					{
-						playerInPvP = true;
-						break;
-					}
-				}
-			}
-			// A player has PvP flag
-			if (playerInPvP)
-			{
-				for (L2PcInstance temp : playerA.getParty().getMembers())
-				{
-					temp.sendMessage(engagedInPvP);
-				}
-				for (L2PcInstance temp : playerB.getParty().getMembers())
-				{
-					temp.sendMessage(engagedInPvP);
-				}
-				return;
-			}
-		}
-		else
-		{
-			if ((playerA.getPvpFlag() != 0) || (playerB.getPvpFlag() != 0))
-			{
-				playerA.sendMessage(engagedInPvP);
-				playerB.sendMessage(engagedInPvP);
-				return;
-			}
-		}
 		final int duelId = _currentDuelId.incrementAndGet();
 		_duels.put(duelId, new Duel(playerA, playerB, partyDuel, duelId));
 	}
@@ -133,24 +85,6 @@ public final class DuelManager
 		if (duel != null)
 		{
 			duel.onPlayerDefeat(player);
-		}
-	}
-	
-	/**
-	 * Registers a buff which will be removed if the duel ends
-	 * @param player
-	 * @param buff
-	 */
-	public void onBuff(L2PcInstance player, Skill buff)
-	{
-		if ((player == null) || !player.isInDuel() || (buff == null))
-		{
-			return;
-		}
-		final Duel duel = getDuel(player.getDuelId());
-		if (duel != null)
-		{
-			duel.onBuff(player, buff);
 		}
 	}
 	
@@ -199,7 +133,7 @@ public final class DuelManager
 		{
 			reason = SystemMessageId.C1_CANNOT_DUEL_WHILE_POLYMORPHED;
 		}
-		else if (target.isDead() || target.isAlikeDead() || ((target.getCurrentHp() < (target.getMaxHp() / 2)) || (target.getCurrentMp() < (target.getMaxMp() / 2))))
+		else if (target.isDead() || target.isDead() || ((target.getCurrentHp() < (target.getMaxHp() / 2)) || (target.getCurrentMp() < (target.getMaxMp() / 2))))
 		{
 			reason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_HP_OR_MP_IS_BELOW_50_PERCENT;
 		}
@@ -211,7 +145,7 @@ public final class DuelManager
 		{
 			reason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_PARTICIPATING_IN_THE_OLYMPIAD;
 		}
-		else if (target.isCursedWeaponEquipped())
+		else if (target.isCursedWeaponEquipped() || (target.getKarma() > 0) || (target.getPvpFlag() > 0))
 		{
 			reason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_IN_A_CHAOTIC_STATE;
 		}
@@ -227,7 +161,7 @@ public final class DuelManager
 		{
 			reason = SystemMessageId.C1_CANNOT_DUEL_BECAUSE_C1_IS_CURRENTLY_FISHING;
 		}
-		else if ((!partyDuel && target.isInsideZone(ZoneId.PEACE)) || target.isInsideZone(ZoneId.PVP) || target.isInsideZone(ZoneId.SIEGE))
+		else if ((!partyDuel && (target.isInsideZone(ZoneId.PEACE) || target.isInsideZone(ZoneId.WATER))) || target.isInsideZone(ZoneId.PVP) || target.isInsideZone(ZoneId.SIEGE))
 		{
 			reason = SystemMessageId.C1_CANNOT_MAKE_A_CHALLANGE_TO_A_DUEL_BECAUSE_C1_IS_CURRENTLY_IN_A_DUEL_PROHIBITED_AREA;
 		}
@@ -250,6 +184,6 @@ public final class DuelManager
 	
 	private static class SingletonHolder
 	{
-		protected static final DuelManager _instance = new DuelManager();
+		static final DuelManager _instance = new DuelManager();
 	}
 }
