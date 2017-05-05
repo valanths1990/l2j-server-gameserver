@@ -99,11 +99,11 @@ public class ThreadPoolManager
 			}
 		}
 	}
-
-	private ScheduledThreadPoolExecutor _effectsScheduledThreadPool;
-	private ScheduledThreadPoolExecutor _generalScheduledThreadPool;
-	private ScheduledThreadPoolExecutor _aiScheduledThreadPool;
-	private ScheduledThreadPoolExecutor _eventScheduledThreadPool;
+	
+	private final ScheduledThreadPoolExecutor _effectsScheduledThreadPool;
+	private final ScheduledThreadPoolExecutor _generalScheduledThreadPool;
+	private final ScheduledThreadPoolExecutor _aiScheduledThreadPool;
+	private final ScheduledThreadPoolExecutor _eventScheduledThreadPool;
 	private final ThreadPoolExecutor _generalPacketsThreadPool;
 	private final ThreadPoolExecutor _ioPacketsThreadPool;
 	private final ThreadPoolExecutor _generalThreadPool;
@@ -127,7 +127,7 @@ public class ThreadPoolManager
 		_aiScheduledThreadPool = new ScheduledThreadPoolExecutor(Config.AI_MAX_THREAD, new PriorityThreadFactory("AISTPool", Thread.NORM_PRIORITY));
 		_eventThreadPool = new ThreadPoolExecutor(Config.EVENT_MAX_THREAD, Config.EVENT_MAX_THREAD + 2, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new PriorityThreadFactory("Event Pool", Thread.NORM_PRIORITY));
 		
-		scheduleGeneralAtFixedRate(new PurgeTask(), 10, 5, TimeUnit.MINUTES);
+		scheduleGeneralAtFixedRate(new PurgeTask(_effectsScheduledThreadPool, _generalScheduledThreadPool, _aiScheduledThreadPool, _eventThreadPool), 10, 5, TimeUnit.MINUTES);
 	}
 	
 	/**
@@ -694,13 +694,30 @@ public class ThreadPoolManager
 	
 	protected class PurgeTask implements Runnable
 	{
+		private final ScheduledThreadPoolExecutor _effectsScheduled;
+		
+		private final ScheduledThreadPoolExecutor _generalScheduled;
+		
+		private final ScheduledThreadPoolExecutor _aiScheduled;
+		
+		private final ThreadPoolExecutor _eventScheduled;
+		
+		PurgeTask(ScheduledThreadPoolExecutor effectsScheduledThreadPool, ScheduledThreadPoolExecutor generalScheduledThreadPool, //
+			ScheduledThreadPoolExecutor aiScheduledThreadPool, ThreadPoolExecutor eventScheduledThreadPool)
+		{
+			_effectsScheduled = effectsScheduledThreadPool;
+			_generalScheduled = generalScheduledThreadPool;
+			_aiScheduled = aiScheduledThreadPool;
+			_eventScheduled = eventScheduledThreadPool;
+		}
+		
 		@Override
 		public void run()
 		{
-			_effectsScheduledThreadPool.purge();
-			_generalScheduledThreadPool.purge();
-			_aiScheduledThreadPool.purge();
-			_eventScheduledThreadPool.purge();
+			_effectsScheduled.purge();
+			_generalScheduled.purge();
+			_aiScheduled.purge();
+			_eventScheduled.purge();
 		}
 	}
 	

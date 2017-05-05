@@ -48,7 +48,7 @@ public final class ExperienceData
 	}.getType();
 	private final Map<Integer, Long> _expTable = new HashMap<>();
 	
-	private ExperienceData()
+	ExperienceData()
 	{
 		load();
 	}
@@ -99,6 +99,6 @@ public final class ExperienceData
 	
 	private static class SingletonHolder
 	{
-		private static final ExperienceData _instance = new ExperienceData();
+		static final ExperienceData _instance = new ExperienceData();
 	}
 }
