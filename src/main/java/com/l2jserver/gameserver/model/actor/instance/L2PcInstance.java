@@ -601,10 +601,6 @@ public final class L2PcInstance extends L2Playable
 	private double _mpUpdateDecCheck = .0;
 	private double _mpUpdateInterval = .0;
 	
-	private double _originalCp = .0;
-	private double _originalHp = .0;
-	private double _originalMp = .0;
-	
 	/** Char Coords from Client */
 	private int _clientX;
 	private int _clientY;
@@ -735,11 +731,6 @@ public final class L2PcInstance extends L2Playable
 				return null;
 			}
 			
-			// Backup database values before restoring skills.
-			double currentCp = player.getCurrentCp();
-			double currentHp = player.getCurrentHp();
-			double currentMp = player.getCurrentMp();
-			
 			DAOFactory.getInstance().getPlayerDAO().loadCharacters(player);
 			
 			// Retrieve from the database all items of this L2PcInstance and add them to _inventory
@@ -779,14 +770,14 @@ public final class L2PcInstance extends L2Playable
 			
 			DAOFactory.getInstance().getItemReuseDAO().load(player);
 			
+			// Buff and status icons
+			if (Config.STORE_SKILL_COOLTIME)
+			{
+				player.restoreEffects();
+			}
+			
 			// Restore current CP, HP and MP values
-			player.setCurrentCp(currentCp);
-			player.setCurrentHp(currentHp);
-			player.setCurrentMp(currentMp);
-			
-			player.setOriginalCpHpMp(currentCp, currentHp, currentMp);
-			
-			if (currentHp < 0.5)
+			if (player.getCurrentHp() < 0.5)
 			{
 				player.setIsDead(true);
 				player.stopHpMpRegeneration();
@@ -9276,20 +9267,6 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		
-		// Buff and status icons
-		if (Config.STORE_SKILL_COOLTIME)
-		{
-			restoreEffects();
-		}
-		
-		// TODO : Need to fix that hack!
-		if (!isDead())
-		{
-			setCurrentCp(_originalCp);
-			setCurrentHp(_originalHp);
-			setCurrentMp(_originalMp);
-		}
-		
 		revalidateZone(true);
 		
 		notifyFriends();
@@ -12783,13 +12760,6 @@ public final class L2PcInstance extends L2Playable
 			}
 		}
 		return false;
-	}
-	
-	public void setOriginalCpHpMp(double cp, double hp, double mp)
-	{
-		_originalCp = cp;
-		_originalHp = hp;
-		_originalMp = mp;
 	}
 	
 	@Override
