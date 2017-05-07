@@ -18,47 +18,14 @@
  */
 package com.l2jserver.tools.dbinstaller;
 
-import java.awt.HeadlessException;
-
-import javax.swing.UIManager;
-
-import com.l2jserver.tools.dbinstaller.console.DBInstallerConsole;
-import com.l2jserver.tools.dbinstaller.gui.DBConfigGUI;
-
 /**
- * Contains main class for Database Installer If system doesn't support the graphical UI, start the installer in console mode.
- * @author mrTJO
+ * Main for the game database installer.
+ * @author mrTJO, HorridoJoho
  */
-public class LauncherGS extends AbstractDBLauncher
+public class LauncherGS
 {
 	public static void main(String[] args)
 	{
-		String defDatabase = "l2jgs";
-		String dir = "../sql/game/";
-		String cleanUpScript = "gs_cleanup.sql";
-		
-		if ((args != null) && (args.length > 0))
-		{
-			new DBInstallerConsole(defDatabase, dir, cleanUpScript, getArg("-h", args), getArg("-p", args), getArg("-u", args), getArg("-pw", args), getArg("-d", args), getArg("-m", args));
-			return;
-		}
-		
-		try
-		{
-			// Set OS Look And Feel
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e)
-		{
-		}
-		
-		try
-		{
-			new DBConfigGUI(defDatabase, dir, cleanUpScript);
-		}
-		catch (HeadlessException e)
-		{
-			new DBInstallerConsole(defDatabase, dir, cleanUpScript);
-		}
+		new DatabaseInstaller("../sql/game/", "gs_cleanup.sql", "l2jgs").run(args);
 	}
 }

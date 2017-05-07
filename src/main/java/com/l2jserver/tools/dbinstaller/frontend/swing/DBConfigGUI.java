@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.tools.dbinstaller.gui;
+package com.l2jserver.tools.dbinstaller.frontend.swing;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.text.MessageFormat;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -33,14 +35,15 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 
 import com.l2jserver.tools.dbinstaller.RunTasks;
-import com.l2jserver.tools.dbinstaller.util.mysql.MySqlConnect;
+import com.l2jserver.tools.dbinstaller.util.SQLUtil;
 import com.l2jserver.tools.dbinstaller.util.swing.SpringUtilities;
 import com.l2jserver.tools.images.ImagesTable;
+import com.l2jserver.tools.util.SwingUtil;
 
 /**
- * @author mrTJO
+ * @author mrTJO, HorridoJoho
  */
-public class DBConfigGUI extends JFrame
+public class DBConfigGUI extends AbstractGUI
 {
 	private static final long serialVersionUID = -8391792251140797076L;
 	
@@ -67,8 +70,8 @@ public class DBConfigGUI extends JFrame
 		_dir = dir;
 		_cleanUp = cleanUp;
 		
-		int width = 260;
-		int height = 220;
+		int width = 320;
+		int height = 240;
 		Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,58 +120,85 @@ public class DBConfigGUI extends JFrame
 		labelDbDbse.setLabelFor(_dbDbse);
 		add(_dbDbse);
 		
-		ActionListener cancelListener = e -> System.exit(0);
-		
-		// Cancel
-		JButton btnCancel = new JButton("Cancel");
-		btnCancel.addActionListener(cancelListener);
+		// Quit
+		JButton btnCancel = new JButton("Quit");
+		btnCancel.addActionListener(e -> close());
 		add(btnCancel);
 		
 		ActionListener connectListener = e ->
 		{
-			MySqlConnect connector = new MySqlConnect(_dbHost.getText(), _dbPort.getText(), _dbUser.getText(), new String(_dbPass.getPassword()), _dbDbse.getText(), false);
-			
-			if (connector.getConnection() != null)
+			Connection con = null;
+			try
 			{
-				_prop.put("dbHost_" + _db, _dbHost.getText());
-				_prop.put("dbPort_" + _db, _dbPort.getText());
-				_prop.put("dbUser_" + _db, _dbUser.getText());
-				_prop.put("dbDbse_" + _db, _dbDbse.getText());
 				
+				final JOptionPane optionPane = new JOptionPane(MessageFormat.format("Connecting to SQL server at {0}:{1} with user {2}...", _dbHost.getText(), _dbPort.getText(), _dbUser.getText()), JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+				con = SwingUtil.runBackgroundTaskWithDialog(this, "Database Installer", optionPane, () -> SQLUtil.connect(_dbHost.getText(), _dbPort.getText(), _dbUser.getText(), new String(_dbPass.getPassword()), _dbDbse.getText()));
+			}
+			catch (Throwable t)
+			{
+				reportError(true, t, "Failed to establish connection with user {0} to SQL server at {1}:{2}!", _dbUser.getText(), _dbHost.getText(), _dbPort.getText());
+				return;
+			}
+			
+			try
+			{
+				final Connection con2 = con;
+				final JOptionPane optionPane = new JOptionPane(MessageFormat.format("Ensuring that database {0} exists and is in use...", _dbDbse.getText()), JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+				SwingUtil.runBackgroundTaskWithDialog(this, "Database Installer", optionPane, () ->
+				{
+					SQLUtil.ensureDatabaseUsage(con2, _dbDbse.getText());
+					return null;
+				});
+			}
+			catch (Throwable t)
+			{
+				SQLUtil.close(con);
+				reportError(true, t, MessageFormat.format("Failed to ensure that the database {0} exists and is in use!", _dbDbse.getText()));
+				return;
+			}
+			
+			_prop.put("dbHost_" + _db, _dbHost.getText());
+			_prop.put("dbPort_" + _db, _dbPort.getText());
+			_prop.put("dbUser_" + _db, _dbUser.getText());
+			_prop.put("dbDbse_" + _db, _dbDbse.getText());
+			
+			try
+			{
 				boolean cleanInstall = false;
-				DBInstallerGUI dbi = new DBInstallerGUI(connector.getConnection());
-				setVisible(false);
 				
 				Object[] options =
 				{
 					"Full Install",
 					"Upgrade",
-					"Exit"
+					"Abbort"
 				};
-				int n = JOptionPane.showOptionDialog(null, "Select Installation Type", "Installation Type", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				
+				int n = JOptionPane.showOptionDialog(null, "Select the installation type for your database:", "Database Installer", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if ((n == 2) || (n == -1))
 				{
-					System.exit(0);
+					SQLUtil.close(con);
+					return;
 				}
 				
 				if (n == 0)
 				{
-					int conf = JOptionPane.showConfirmDialog(null, "Do you really want to destroy your db?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-					
-					if (conf == 1)
+					if (!requestUserConfirm("A clean install will delete your current database! Do you want to continue?"))
 					{
-						System.exit(0);
+						SQLUtil.close(con);
+						return;
 					}
 					
 					cleanInstall = true;
 				}
 				
-				dbi.setVisible(true);
-				
-				RunTasks task = new RunTasks(dbi, _db, _dir, _cleanUp, cleanInstall);
+				DBInstallerGUI dbi = new DBInstallerGUI();
+				RunTasks task = new RunTasks(dbi, con, _db, _dir, _cleanUp, cleanInstall);
 				task.setPriority(Thread.MAX_PRIORITY);
 				task.start();
+			}
+			catch (Throwable t)
+			{
+				SQLUtil.close(con);
+				reportError(true, t, "Failed to launch database installation!");
 			}
 		};
 		

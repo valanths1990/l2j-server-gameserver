@@ -19,29 +19,29 @@
 package com.l2jserver.tools.dbinstaller;
 
 import java.io.File;
-import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.prefs.Preferences;
 
-import javax.swing.JOptionPane;
-
-import com.l2jserver.tools.dbinstaller.util.mysql.DBDumper;
-import com.l2jserver.tools.dbinstaller.util.mysql.ScriptExecutor;
+import com.l2jserver.tools.IApplicationFrontend;
+import com.l2jserver.tools.dbinstaller.util.SQLUtil;
 import com.l2jserver.util.file.filter.SQLFilter;
 
 /**
- * @author mrTJO
+ * @author mrTJO, HorridoJoho
  */
 public class RunTasks extends Thread
 {
-	DBOutputInterface _frame;
+	IApplicationFrontend _frontend;
+	Connection _con;
 	boolean _cleanInstall;
 	String _db;
 	String _sqlDir;
 	String _cleanUpFile;
 	
-	public RunTasks(DBOutputInterface frame, String db, String sqlDir, String cleanUpFile, boolean cleanInstall)
+	public RunTasks(IApplicationFrontend frontend, Connection con, String db, String sqlDir, String cleanUpFile, boolean cleanInstall)
 	{
-		_frame = frame;
+		_frontend = frontend;
+		_con = con;
 		_db = db;
 		_cleanInstall = cleanInstall;
 		_sqlDir = sqlDir;
@@ -51,97 +51,133 @@ public class RunTasks extends Thread
 	@Override
 	public void run()
 	{
-		new DBDumper(_frame, _db);
-		ScriptExecutor exec = new ScriptExecutor(_frame);
-		
-		File clnFile = new File(_cleanUpFile);
-		File updDir = new File(_sqlDir, "updates");
-		File[] files = updDir.listFiles(new SQLFilter());
-		
-		Preferences prefs = Preferences.userRoot();
-		
-		if (_cleanInstall)
+		try
 		{
-			if (clnFile.exists())
+			File sqlDir = new File(_sqlDir);
+			if (!sqlDir.exists())
 			{
-				_frame.appendToProgressArea("Cleaning Database...");
-				exec.execSqlFile(clnFile);
-				_frame.appendToProgressArea("Database Cleaned!");
-			}
-			else
-			{
-				_frame.appendToProgressArea("Database Cleaning Script Not Found!");
+				_frontend.reportError(true, null, "The directory {0} does not exist!", sqlDir.getAbsolutePath());
+				return;
 			}
 			
-			if (updDir.exists())
+			try
 			{
-				StringBuilder sb = new StringBuilder();
-				for (File cf : files)
-				{
-					sb.append(cf.getName() + ';');
-				}
-				prefs.put(_db + "_upd", sb.toString());
+				_frontend.reportInfo(false, "Backup database...");
+				SQLUtil.createDump(_con, _db);
 			}
-		}
-		else
-		{
-			if (!_cleanInstall && updDir.exists())
+			catch (Exception e)
 			{
-				_frame.appendToProgressArea("Installing Updates...");
+				_frontend.reportError(true, e, "Failed to backup database!");
+				return;
+			}
+			
+			File updDir = new File(sqlDir, "updates");
+			Preferences prefs = Preferences.userRoot();
+			if (_cleanInstall)
+			{
+				try
+				{
+					_frontend.reportInfo(false, "Executing SQL cleanup script...");
+					SQLUtil.executeSQLScript(_con, new File(_cleanUpFile));
+				}
+				catch (Exception e)
+				{
+					_frontend.reportError(true, e, "Failed to execute SQL cleanup script {0}!", _cleanUpFile);
+					return;
+				}
 				
-				for (File cf : files)
+				if (updDir.exists())
+				{
+					StringBuilder sb = new StringBuilder();
+					for (File cf : updDir.listFiles(new SQLFilter()))
+					{
+						sb.append(cf.getName() + ';');
+					}
+					prefs.put(_db + "_upd", sb.toString());
+				}
+			}
+			else if (updDir.exists())
+			{
+				_frontend.reportInfo(false, "Installing update SQL scripts...");
+				for (File cf : updDir.listFiles(new SQLFilter()))
 				{
 					if (!prefs.get(_db + "_upd", "").contains(cf.getName()))
 					{
-						exec.execSqlFile(cf, true);
+						if (!_cleanInstall)
+						{
+							try
+							{
+								_frontend.reportInfo(false, "Installing {0}...", cf);
+								SQLUtil.executeSQLScript(_con, cf);
+							}
+							catch (Exception e)
+							{
+								_frontend.reportError(true, e, "Failed to execute SQL update file {0}!", cf);
+								return;
+							}
+						}
 						prefs.put(_db + "_upd", prefs.get(_db + "_upd", "") + cf.getName() + ";");
 					}
 				}
-				_frame.appendToProgressArea("Database Updates Installed!");
 			}
-		}
-		
-		_frame.appendToProgressArea("Installing Database Content...");
-		exec.execSqlBatch(new File(_sqlDir));
-		_frame.appendToProgressArea("Database Installation Complete!");
-		
-		File cusDir = new File(_sqlDir, "custom");
-		if (cusDir.exists())
-		{
-			int ch = _frame.requestConfirm("Install Custom", "Do you want to install custom tables?", JOptionPane.YES_NO_OPTION);
-			if (ch == 0)
+			
+			_frontend.reportInfo(false, "Installing basic SQL scripts...");
+			for (File f : sqlDir.listFiles(new SQLFilter()))
 			{
-				_frame.appendToProgressArea("Installing Custom Tables...");
-				exec.execSqlBatch(cusDir);
-				_frame.appendToProgressArea("Custom Tables Installed!");
+				try
+				{
+					_frontend.reportInfo(false, "Installing {0}...", f);
+					SQLUtil.executeSQLScript(_con, f);
+				}
+				catch (Exception e)
+				{
+					_frontend.reportError(true, e, "Failed to execute basics SQL file {0}!", f);
+					return;
+				}
 			}
-		}
-		
-		File modDir = new File(_sqlDir, "mods");
-		if (modDir.exists())
-		{
-			int ch = _frame.requestConfirm("Install Mods", "Do you want to install mod tables?", JOptionPane.YES_NO_OPTION);
-			if (ch == 0)
+			
+			File cusDir = new File(_sqlDir, "custom");
+			if (cusDir.exists() && _frontend.requestUserConfirm("Install custom tables? (Y/N) "))
 			{
-				_frame.appendToProgressArea("Installing Mods Tables...");
-				exec.execSqlBatch(modDir);
-				_frame.appendToProgressArea("Mods Tables Installed!");
+				_frontend.reportInfo(false, "Installing custom tables...");
+				for (File f : cusDir.listFiles(new SQLFilter()))
+				{
+					try
+					{
+						_frontend.reportInfo(false, "Installing {0}...", f);
+						SQLUtil.executeSQLScript(_con, f);
+					}
+					catch (Exception e)
+					{
+						_frontend.reportError(true, e, "Failed to execute customs SQL file {0}!", f);
+					}
+				}
 			}
+			
+			File modsDir = new File(_sqlDir, "mods");
+			if (modsDir.exists() && _frontend.requestUserConfirm("Install mod tables? (Y/N) "))
+			{
+				_frontend.reportInfo(false, "Installing mod tables...");
+				for (File f : modsDir.listFiles(new SQLFilter()))
+				{
+					try
+					{
+						_frontend.reportInfo(false, "Installing {0}...", f);
+						SQLUtil.executeSQLScript(_con, f);
+					}
+					catch (Exception e)
+					{
+						_frontend.reportError(true, e, "Failed to execute mods SQL file {0}!", f);
+					}
+				}
+			}
+			
+			_frontend.reportInfo(true, "Database installation complete.");
 		}
-		
-		try
+		finally
 		{
-			_frame.getConnection().close();
+			SQLUtil.close(_con);
+			_frontend.close();
 		}
-		catch (SQLException e)
-		{
-			JOptionPane.showMessageDialog(null, "Cannot close MySQL Connection: " + e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-		}
-		
-		_frame.setFrameVisible(false);
-		_frame.showMessage("Done!", "Database Installation Complete!", JOptionPane.INFORMATION_MESSAGE);
-		System.exit(0);
-		
 	}
-	
 }

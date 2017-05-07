@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2016 L2J Server
+ * Copyright (C) 2004-2017 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -16,16 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.tools.dbinstaller;
+package com.l2jserver.tools.util.swing;
 
 /**
- * Main for the login database installer.
- * @author mrTJO, HorridoJoho
+ * @author HorridoJoho
  */
-public class LauncherLS
+@FunctionalInterface
+public interface BackgroundTaskSupplier<T>
 {
-	public static void main(String[] args)
-	{
-		new DatabaseInstaller("../sql/login/", "ls_cleanup.sql", "l2jls").run(args);
-	}
+	T get() throws Throwable;
 }
