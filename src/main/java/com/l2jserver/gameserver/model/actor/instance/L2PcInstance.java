@@ -1090,6 +1090,10 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public final int getLevel()
 	{
+		if (isSubClassActive())
+		{
+			return getSubClasses().get(getClassIndex()).getStat().getLevel();
+		}
 		return getStat().getLevel();
 	}
 	
@@ -2246,6 +2250,10 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public long getExp()
 	{
+		if (isSubClassActive())
+		{
+			return getSubClasses().get(getClassIndex()).getStat().getExp();
+		}
 		return getStat().getExp();
 	}
 	
@@ -2260,7 +2268,14 @@ public final class L2PcInstance extends L2Playable
 			LOG.warn("For player {} is set negative amount of exp [{}]", this, exp, new IllegalArgumentException());
 			exp = 0;
 		}
-		getStat().setExp(exp);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().setExp(exp);
+		}
+		else
+		{
+			getStat().setExp(exp);
+		}
 	}
 	
 	public int getActiveEnchantAttrItemId()
@@ -2570,7 +2585,7 @@ public final class L2PcInstance extends L2Playable
 	 */
 	public int getSp()
 	{
-		return getStat().getSp();
+		return isSubClassActive() ? getSubClasses().get(getClassIndex()).getStat().getSp() : getStat().getSp();
 	}
 	
 	/**
@@ -2583,8 +2598,14 @@ public final class L2PcInstance extends L2Playable
 		{
 			sp = 0;
 		}
-		
-		super.getStat().setSp(sp);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().setSp(sp);
+		}
+		else
+		{
+			super.getStat().setSp(sp);
+		}
 	}
 	
 	/**
@@ -5445,7 +5466,14 @@ public final class L2PcInstance extends L2Playable
 		if (getExpBeforeDeath() > 0)
 		{
 			// Restore the specified % of lost experience.
-			getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100), true);
+			if (isSubClassActive())
+			{
+				getSubClasses().get(getClassIndex()).getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100), true);
+			}
+			else
+			{
+				getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100), true);
+			}
 			setExpBeforeDeath(0);
 		}
 	}
@@ -5507,7 +5535,14 @@ public final class L2PcInstance extends L2Playable
 		
 		setExpBeforeDeath(getExp());
 		
-		getStat().removeExp(lostExp);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().removeExp(lostExp);
+		}
+		else
+		{
+			getStat().removeExp(lostExp);
+		}
 	}
 	
 	public boolean isPartyWaiting()
@@ -8783,7 +8818,7 @@ public final class L2PcInstance extends L2Playable
 			
 			// Note: Never change _classIndex in any method other than setActiveClass().
 			
-			SubClass newClass = new SubClass();
+			SubClass newClass = new SubClass(this);
 			newClass.setClassId(classId);
 			newClass.setClassIndex(classIndex);
 			
@@ -9590,22 +9625,50 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void addExpAndSp(long addToExp, int addToSp)
 	{
-		getStat().addExpAndSp(addToExp, addToSp, false);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().addExpAndSp(addToExp, addToSp, false);
+		}
+		else
+		{
+			getStat().addExpAndSp(addToExp, addToSp, false);
+		}
 	}
 	
 	public void addExpAndSp(long addToExp, int addToSp, boolean useVitality)
 	{
-		getStat().addExpAndSp(addToExp, addToSp, useVitality);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().addExpAndSp(addToExp, addToSp, useVitality);
+		}
+		else
+		{
+			getStat().addExpAndSp(addToExp, addToSp, useVitality);
+		}
 	}
 	
 	public void removeExpAndSp(long removeExp, int removeSp)
 	{
-		getStat().removeExpAndSp(removeExp, removeSp, true);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().removeExpAndSp(removeExp, removeSp, true);
+		}
+		else
+		{
+			getStat().removeExpAndSp(removeExp, removeSp, true);
+		}
 	}
 	
 	public void removeExpAndSp(long removeExp, int removeSp, boolean sendMessage)
 	{
-		getStat().removeExpAndSp(removeExp, removeSp, sendMessage);
+		if (isSubClassActive())
+		{
+			getSubClasses().get(getClassIndex()).getStat().removeExpAndSp(removeExp, removeSp, sendMessage);
+		}
+		else
+		{
+			getStat().removeExpAndSp(removeExp, removeSp, sendMessage);
+		}
 	}
 	
 	@Override

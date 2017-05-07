@@ -18,12 +18,14 @@
  */
 package com.l2jserver.gameserver.model.actor.stat;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import com.l2jserver.Config;
+import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.actor.L2Playable;
-import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableExpChanged;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
@@ -33,10 +35,79 @@ import com.l2jserver.gameserver.model.zone.type.L2SwampZone;
 public class PlayableStat extends CharStat
 {
 	protected static final Logger _log = Logger.getLogger(PlayableStat.class.getName());
+	private final AtomicLong _exp = new AtomicLong();
+	private final AtomicInteger _sp = new AtomicInteger();
 	
 	public PlayableStat(L2Playable activeChar)
 	{
 		super(activeChar);
+	}
+	
+	public long getExp()
+	{
+		return _exp.get();
+	}
+	
+	public int getSp()
+	{
+		return _sp.get();
+	}
+	
+	/**
+	 * This method not contains checks!
+	 * @param exp
+	 */
+	public void setExp(long exp)
+	{
+		_exp.set(exp);
+	}
+	
+	/**
+	 * This method not contains checks!
+	 * @param sp
+	 */
+	public void setSp(int sp)
+	{
+		_sp.set(sp);
+	}
+	
+	/**
+	 * Contains only under zero check
+	 * @param exp
+	 * @return
+	 */
+	public boolean removeExp(long exp)
+	{
+		final long currentExp = getExp();
+		if (currentExp < exp)
+		{
+			_exp.addAndGet(-currentExp);
+		}
+		else
+		{
+			_exp.addAndGet(-exp);
+		}
+		incrementLevel();
+		return true;
+	}
+	
+	/**
+	 * Contains only under zero check
+	 * @param sp
+	 * @return
+	 */
+	public boolean removeSp(int sp)
+	{
+		final int currentSp = getSp();
+		if (currentSp < sp)
+		{
+			_sp.addAndGet(-currentSp);
+		}
+		else
+		{
+			_sp.addAndGet(-sp);
+		}
+		return true;
 	}
 	
 	public boolean addExp(long value)
@@ -59,24 +130,33 @@ public class PlayableStat extends CharStat
 			value = getExpForLevel(getMaxLevel()) - 1 - getExp();
 		}
 		
-		increaseExp(value);
-		
+		_exp.addAndGet(value);
 		incrementLevel();
 		
 		return true;
 	}
 	
-	public boolean removeExp(long value)
+	public boolean addSp(int sp)
 	{
-		final long currentExp = getExp();
-		if ((currentExp - value) < 0)
+		if (sp < 0)
 		{
-			value = currentExp - 1;
+			_log.warning("addSp acept only possitive numbers!");
+			return false;
+		}
+		int currentSp = getSp();
+		if (currentSp == Integer.MAX_VALUE)
+		{
+			return false;
 		}
 		
-		decreaseExp(value);
-		
-		incrementLevel();
+		if ((currentSp + sp) >= Integer.MAX_VALUE)
+		{
+			_sp.set(Integer.MAX_VALUE);
+		}
+		else
+		{
+			_sp.addAndGet(sp);
+		}
 		return true;
 	}
 	
@@ -107,18 +187,17 @@ public class PlayableStat extends CharStat
 	
 	public boolean removeExpAndSp(long removeExp, int removeSp)
 	{
-		boolean expRemoved = false;
-		boolean spRemoved = false;
+		boolean change = false;
 		if (removeExp > 0)
 		{
-			expRemoved = removeExp(removeExp);
+			change = removeExp(removeExp);
 		}
 		if (removeSp > 0)
 		{
-			spRemoved = removeSp(removeSp);
+			change |= removeSp(removeSp);
 		}
 		
-		return expRemoved || spRemoved;
+		return change;
 	}
 	
 	public boolean addLevel(int value)
@@ -128,7 +207,7 @@ public class PlayableStat extends CharStat
 		{
 			if (currentLevel < (getMaxLevel() - 1))
 			{
-				value = (byte) (getMaxLevel() - 1 - currentLevel);
+				value = (getMaxLevel() - 1 - currentLevel);
 			}
 			else
 			{
@@ -146,11 +225,6 @@ public class PlayableStat extends CharStat
 			setExp(getExpForLevel(getLevel()));
 		}
 		
-		if (!levelIncreased && (getActiveChar() instanceof L2PcInstance) && !getActiveChar().isGM() && Config.DECREASE_SKILL_LEVEL)
-		{
-			((L2PcInstance) getActiveChar()).checkPlayerSkills();
-		}
-		
 		if (!levelIncreased)
 		{
 			return false;
@@ -162,42 +236,28 @@ public class PlayableStat extends CharStat
 		return true;
 	}
 	
-	public boolean addSp(int value)
-	{
-		if (value < 0)
-		{
-			_log.warning("wrong usage");
-			return false;
-		}
-		int currentSp = getSp();
-		if (currentSp == Integer.MAX_VALUE)
-		{
-			return false;
-		}
-		
-		if (currentSp > (Integer.MAX_VALUE - value))
-		{
-			value = Integer.MAX_VALUE - currentSp;
-		}
-		
-		setSp(currentSp + value);
-		return true;
-	}
-	
-	public boolean removeSp(int value)
-	{
-		int currentSp = getSp();
-		if (currentSp < value)
-		{
-			value = currentSp;
-		}
-		setSp(getSp() - value);
-		return true;
-	}
-	
+	/**
+	 * Get required exp for specific level
+	 * @param level
+	 * @return
+	 */
 	public long getExpForLevel(int level)
 	{
-		return level;
+		return ExperienceData.getInstance().getExpForLevel(level);
+	}
+	
+	/**
+	 * @return max level for Playable
+	 */
+	public int getMaxLevel()
+	{
+		return Config.MAX_PLAYER_LEVEL;
+	}
+	
+	@Override
+	public L2Playable getActiveChar()
+	{
+		return (L2Playable) super.getActiveChar();
 	}
 	
 	@Override
@@ -226,16 +286,5 @@ public class PlayableStat extends CharStat
 			}
 		}
 		return super.getWalkSpeed();
-	}
-	
-	@Override
-	public L2Playable getActiveChar()
-	{
-		return (L2Playable) super.getActiveChar();
-	}
-	
-	public int getMaxLevel()
-	{
-		return Config.MAX_PLAYER_LEVEL;
 	}
 }

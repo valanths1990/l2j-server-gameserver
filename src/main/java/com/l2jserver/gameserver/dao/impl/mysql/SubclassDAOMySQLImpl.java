@@ -121,10 +121,10 @@ public class SubclassDAOMySQLImpl implements SubclassDAO
 			{
 				while (rs.next())
 				{
-					final SubClass subClass = new SubClass();
+					final SubClass subClass = new SubClass(player);
 					subClass.setClassId(rs.getInt("class_id"));
-					subClass.setLevel(rs.getByte("level"));
 					subClass.setExp(rs.getLong("exp"));
+					subClass.setLevel(rs.getInt("level"));
 					subClass.setSp(rs.getInt("sp"));
 					subClass.setClassIndex(rs.getInt("class_index"));
 					

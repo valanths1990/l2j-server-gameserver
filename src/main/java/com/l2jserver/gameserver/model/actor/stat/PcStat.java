@@ -88,22 +88,14 @@ public class PcStat extends PlayableStat
 		L2PcInstance activeChar = getActiveChar();
 		
 		// Allowed to gain exp?
-		if (!getActiveChar().getAccessLevel().canGainExp())
+		if (!activeChar.getAccessLevel().canGainExp())
 		{
 			return false;
 		}
 		
-		if (getActiveChar().isSubClassActive())
+		if (!super.addExp(exp))
 		{
-			getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).addExp(exp);
-			super.incrementLevel();
-		}
-		else
-		{
-			if (!super.addExp(exp))
-			{
-				return false;
-			}
+			return false;
 		}
 		
 		if (!isRessurect)
@@ -126,23 +118,6 @@ public class PcStat extends PlayableStat
 		}
 		changeKarma(exp);
 		return true;
-	}
-	
-	public void changeKarma(long exp)
-	{
-		L2PcInstance activeChar = getActiveChar();
-		
-		if (!activeChar.isCursedWeaponEquipped() && (activeChar.getKarma() > 0) && (activeChar.isGM() || !activeChar.isInsideZone(ZoneId.PVP)))
-		{
-			int karmaLost = Formulas.calculateKarmaLost(activeChar, exp);
-			if (karmaLost > 0)
-			{
-				activeChar.setKarma(activeChar.getKarma() - karmaLost);
-				final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.YOUR_KARMA_HAS_BEEN_CHANGED_TO_S1);
-				msg.addInt(activeChar.getKarma());
-				activeChar.sendPacket(msg);
-			}
-		}
 	}
 	
 	public boolean addExpAndSp(long addToExp, int addToSp, boolean useBonuses)
@@ -276,7 +251,7 @@ public class PcStat extends PlayableStat
 	@Override
 	public final boolean addLevel(int value)
 	{
-		if ((getLevel() + value) > (Config.MAX_PLAYER_LEVEL - 1))
+		if ((getLevel() + value) > (getMaxLevel() - 1))
 		{
 			return false;
 		}
@@ -290,6 +265,13 @@ public class PcStat extends PlayableStat
 			getActiveChar().setCurrentCp(getMaxCp());
 			getActiveChar().broadcastPacket(new SocialAction(getActiveChar().getObjectId(), SocialAction.LEVEL_UP));
 			getActiveChar().sendPacket(SystemMessageId.YOU_INCREASED_YOUR_LEVEL);
+		}
+		else
+		{
+			if (!getActiveChar().isGM() && Config.DECREASE_SKILL_LEVEL)
+			{
+				getActiveChar().checkPlayerSkills();
+			}
 		}
 		
 		// Give AutoGet skills and all normal skills if Auto-Learn is activated.
@@ -365,38 +347,30 @@ public class PcStat extends PlayableStat
 		return ExperienceData.getInstance().getExpForLevel(level);
 	}
 	
-	@Override
-	public final L2PcInstance getActiveChar()
-	{
-		return (L2PcInstance) super.getActiveChar();
-	}
-	
-	@Override
-	public final long getExp()
-	{
-		if (getActiveChar().isSubClassActive())
-		{
-			return getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).getExp();
-		}
-		
-		return super.getExp();
-	}
-	
 	public final long getBaseExp()
 	{
 		return super.getExp();
 	}
 	
-	@Override
-	public final void setExp(long value)
+	public final int getBaseSp()
 	{
-		if (getActiveChar().isSubClassActive())
+		return super.getSp();
+	}
+	
+	public void changeKarma(long exp)
+	{
+		L2PcInstance activeChar = getActiveChar();
+		
+		if (!activeChar.isCursedWeaponEquipped() && (activeChar.getKarma() > 0) && (activeChar.isGM() || !activeChar.isInsideZone(ZoneId.PVP)))
 		{
-			getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).setExp(value);
-		}
-		else
-		{
-			super.setExp(value);
+			int karmaLost = Formulas.calculateKarmaLost(activeChar, exp);
+			if (karmaLost > 0)
+			{
+				activeChar.setKarma(activeChar.getKarma() - karmaLost);
+				final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.YOUR_KARMA_HAS_BEEN_CHANGED_TO_S1);
+				msg.addInt(activeChar.getKarma());
+				activeChar.sendPacket(msg);
+			}
 		}
 	}
 	
@@ -455,17 +429,6 @@ public class PcStat extends PlayableStat
 		_cloakSlot = cloakSlot;
 	}
 	
-	@Override
-	public final int getLevel()
-	{
-		if (getActiveChar().isSubClassActive())
-		{
-			return getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).getLevel();
-		}
-		
-		return super.getLevel();
-	}
-	
 	public final int getBaseLevel()
 	{
 		return super.getLevel();
@@ -474,19 +437,9 @@ public class PcStat extends PlayableStat
 	@Override
 	public final void setLevel(int value)
 	{
-		if (value > (Config.MAX_PLAYER_LEVEL - 1))
-		{
-			value = Config.MAX_PLAYER_LEVEL - 1;
-		}
-		
-		if (getActiveChar().isSubClassActive())
-		{
-			getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).setLevel(value);
-		}
-		else
-		{
-			super.setLevel(value);
-		}
+		value = Math.min(value, getMaxLevel() - 1);
+		super.setLevel(value);
+		super.incrementLevel();
 	}
 	
 	@Override
@@ -544,35 +497,6 @@ public class PcStat extends PlayableStat
 		}
 		
 		return val;
-	}
-	
-	@Override
-	public final int getSp()
-	{
-		if (getActiveChar().isSubClassActive())
-		{
-			return getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).getSp();
-		}
-		
-		return super.getSp();
-	}
-	
-	public final int getBaseSp()
-	{
-		return super.getSp();
-	}
-	
-	@Override
-	public final void setSp(int value)
-	{
-		if (getActiveChar().isSubClassActive())
-		{
-			getActiveChar().getSubClasses().get(getActiveChar().getClassIndex()).setSp(value);
-		}
-		else
-		{
-			super.setSp(value);
-		}
 	}
 	
 	/**
@@ -922,5 +846,17 @@ public class PcStat extends PlayableStat
 		bonus = Math.min(bonus, Config.MAX_BONUS_SP);
 		
 		return bonus;
+	}
+	
+	@Override
+	public int getMaxLevel()
+	{
+		return getActiveChar().isSubClassActive() ? Config.MAX_SUBCLASS_LEVEL + 1 : Config.MAX_PLAYER_LEVEL;
+	}
+	
+	@Override
+	public final L2PcInstance getActiveChar()
+	{
+		return (L2PcInstance) super.getActiveChar();
 	}
 }

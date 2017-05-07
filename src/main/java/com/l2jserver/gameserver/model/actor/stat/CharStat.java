@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.model.actor.stat;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.Elementals;
@@ -37,8 +36,6 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
 public class CharStat
 {
 	private final L2Character _activeChar;
-	private final AtomicLong _exp = new AtomicLong();
-	private int _sp = 0;
 	private int _level = 1;
 	private final float[] _attackTraits = new float[TraitType.values().length];
 	private final int[] _attackTraitsCount = new int[TraitType.values().length];
@@ -216,26 +213,6 @@ public class CharStat
 		}
 		
 		return val;
-	}
-	
-	public long getExp()
-	{
-		return _exp.get();
-	}
-	
-	public void increaseExp(long value)
-	{
-		_exp.addAndGet(value);
-	}
-	
-	public void decreaseExp(long value)
-	{
-		_exp.addAndGet(-value);
-	}
-	
-	public void setExp(long value)
-	{
-		_exp.set(value);
 	}
 	
 	/**
@@ -583,16 +560,6 @@ public class CharStat
 	public final int getShldDef()
 	{
 		return (int) calcStat(Stats.SHIELD_DEFENCE, 0);
-	}
-	
-	public int getSp()
-	{
-		return _sp;
-	}
-	
-	public void setSp(int value)
-	{
-		_sp = value;
 	}
 	
 	/**
