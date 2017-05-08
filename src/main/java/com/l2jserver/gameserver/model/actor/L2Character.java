@@ -5556,16 +5556,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				{
 					getActingPlayer().decreaseCharges(skill.getChargeConsume());
 				}
-				
-				// Consume Souls if necessary
-				if (skill.getMaxSoulConsumeCount() > 0)
-				{
-					if (!getActingPlayer().decreaseSouls(skill.getMaxSoulConsumeCount(), skill))
-					{
-						abortCast();
-						return;
-					}
-				}
 			}
 			
 			// Launch the magic skill in order to calculate its effects

@@ -67,6 +67,8 @@ public final class BuffInfo
 	/** If {@code true} then this effect is in use (or has been stop because an Herb took place). */
 	private boolean _isInUse = true;
 	
+	private int _charges = 0;
+	
 	/**
 	 * Buff Info constructor.
 	 * @param effector
@@ -464,6 +466,22 @@ public final class BuffInfo
 			}
 		}
 		return 0;
+	}
+	
+	/**
+	 * @return the loaded charges
+	 */
+	public int getCharges()
+	{
+		return _charges;
+	}
+	
+	/**
+	 * @param set loaded charges
+	 */
+	public void setCharges(int charges)
+	{
+		_charges = charges;
 	}
 	
 	@Override

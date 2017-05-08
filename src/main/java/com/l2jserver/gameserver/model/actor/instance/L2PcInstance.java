@@ -11053,28 +11053,31 @@ public final class L2PcInstance extends L2Playable
 	 * Decreases existing Souls.
 	 * @param count
 	 * @param skill
-	 * @return
+	 * @return consumed souls count
 	 */
-	public boolean decreaseSouls(int count, Skill skill)
+	public int decreaseSouls(int count)
 	{
-		_souls -= count;
-		
-		if (getChargedSouls() < 0)
+		if (_souls == 0)
 		{
-			_souls = 0;
+			return 0;
 		}
 		
-		if (getChargedSouls() == 0)
+		int consumedSouls;
+		if (_souls <= count)
 		{
+			consumedSouls = _souls;
+			_souls = 0;
 			stopSoulTask();
 		}
 		else
 		{
+			_souls -= count;
+			consumedSouls = count;
 			restartSoulTask();
 		}
 		
 		sendPacket(new EtcStatusUpdate(this));
-		return true;
+		return consumedSouls;
 	}
 	
 	/**

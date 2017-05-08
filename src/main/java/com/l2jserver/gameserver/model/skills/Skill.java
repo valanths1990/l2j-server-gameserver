@@ -1399,6 +1399,12 @@ public class Skill implements IIdentifiable
 		if (!self && !passive)
 		{
 			final BuffInfo info = new BuffInfo(effector, effected, this);
+			
+			if (effector.isPlayer() && (getMaxSoulConsumeCount() > 0))
+			{
+				info.setCharges(effector.getActingPlayer().decreaseSouls(getMaxSoulConsumeCount()));
+			}
+			
 			if (addContinuousEffects && (abnormalTime > 0))
 			{
 				info.setAbnormalTime(abnormalTime);
