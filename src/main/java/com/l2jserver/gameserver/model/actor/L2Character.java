@@ -121,7 +121,6 @@ import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.skills.SkillChannelized;
 import com.l2jserver.gameserver.model.skills.SkillChannelizer;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
-import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Calculator;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.Stats;
@@ -6347,22 +6346,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public int getMaxLoad()
 	{
-		if (isPlayer() || isPet())
-		{
-			// Weight Limit = (CON Modifier*69000) * Skills
-			// Source http://l2p.bravehost.com/weightlimit.html (May 2007)
-			double baseLoad = Math.floor(BaseStats.CON.calcBonus(this) * 69000 * Config.ALT_WEIGHT_LIMIT);
-			return (int) calcStat(Stats.WEIGHT_LIMIT, baseLoad, this, null);
-		}
 		return 0;
 	}
 	
 	public int getBonusWeightPenalty()
 	{
-		if (isPlayer() || isPet())
-		{
-			return (int) calcStat(Stats.WEIGHT_PENALTY, 1, this, null);
-		}
 		return 0;
 	}
 	
@@ -6371,10 +6359,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public int getCurrentLoad()
 	{
-		if (isPlayer() || isPet())
-		{
-			return getInventory().getTotalWeight();
-		}
 		return 0;
 	}
 	

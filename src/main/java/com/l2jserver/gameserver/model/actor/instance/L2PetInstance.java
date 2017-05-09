@@ -55,6 +55,8 @@ import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
+import com.l2jserver.gameserver.model.stats.BaseStats;
+import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
@@ -929,6 +931,24 @@ public class L2PetInstance extends L2Summon
 	}
 	
 	@Override
+	public int getMaxLoad()
+	{
+		return (int) calcStat(Stats.WEIGHT_LIMIT, Math.floor(BaseStats.CON.calcBonus(this) * 34500 * Config.ALT_WEIGHT_LIMIT), this, null);
+	}
+	
+	@Override
+	public int getBonusWeightPenalty()
+	{
+		return (int) calcStat(Stats.WEIGHT_PENALTY, 1, this, null);
+	}
+	
+	@Override
+	public int getCurrentLoad()
+	{
+		return getInventory().getTotalWeight();
+	}
+	
+	@Override
 	public synchronized void unSummon(L2PcInstance owner)
 	{
 		stopFeed();
@@ -1056,7 +1076,7 @@ public class L2PetInstance extends L2Summon
 		int maxLoad = getMaxLoad();
 		if (maxLoad > 0)
 		{
-			long weightproc = (((getCurrentLoad() - getBonusWeightPenalty()) * 1000) / maxLoad);
+			long weightproc = (((getCurrentLoad() - getBonusWeightPenalty()) * 1000L) / maxLoad);
 			int newWeightPenalty;
 			if ((weightproc < 500) || getOwner().getDietMode())
 			{

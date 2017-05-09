@@ -239,6 +239,7 @@ import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.CommonSkill;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
+import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.variables.AccountVariables;
@@ -11229,6 +11230,24 @@ public final class L2PcInstance extends L2Playable
 	public L2PcInstance getActingPlayer()
 	{
 		return this;
+	}
+	
+	@Override
+	public int getMaxLoad()
+	{
+		return (int) calcStat(Stats.WEIGHT_LIMIT, Math.floor(BaseStats.CON.calcBonus(this) * 69000 * Config.ALT_WEIGHT_LIMIT), this, null);
+	}
+	
+	@Override
+	public int getBonusWeightPenalty()
+	{
+		return (int) calcStat(Stats.WEIGHT_PENALTY, 1, this, null);
+	}
+	
+	@Override
+	public int getCurrentLoad()
+	{
+		return getInventory().getTotalWeight();
 	}
 	
 	@Override

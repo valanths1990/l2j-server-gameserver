@@ -37,7 +37,6 @@ public class L2PetData
 	
 	private final int _npcId;
 	private final int _itemId;
-	private int _load = 20000;
 	private int _hungryLimit = 1;
 	private int _minlvl = Byte.MAX_VALUE;
 	private boolean _syncLevel = false;
@@ -88,14 +87,6 @@ public class L2PetData
 	}
 	
 	/**
-	 * @return the pet's weight load.
-	 */
-	public int getLoad()
-	{
-		return _load;
-	}
-	
-	/**
 	 * @return the pet's hunger limit.
 	 */
 	public int getHungryLimit()
@@ -133,14 +124,6 @@ public class L2PetData
 	public void addFood(Integer foodId)
 	{
 		_food.add(foodId);
-	}
-	
-	/**
-	 * @param load the weight load to set.
-	 */
-	public void setLoad(int load)
-	{
-		_load = load;
 	}
 	
 	/**

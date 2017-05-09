@@ -82,10 +82,6 @@ public final class PetDataTable implements IXmlReader
 								data.addFood(Integer.valueOf(foodId));
 							}
 						}
-						else if ("load".equals(type))
-						{
-							data.setLoad(parseInteger(attrs, "val"));
-						}
 						else if ("hungry_limit".equals(type))
 						{
 							data.setHungryLimit(parseInteger(attrs, "val"));
