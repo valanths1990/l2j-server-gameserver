@@ -51,7 +51,7 @@ public class L2PetLevelData
 	public L2PetLevelData(StatsSet set)
 	{
 		_ownerExpTaken = set.getInt("get_exp_type");
-		_petMaxExp = set.getLong("exp");
+		_petMaxExp = (long) set.getDouble("exp");
 		_petMaxHP = set.getFloat("org_hp");
 		_petMaxMP = set.getFloat("org_mp");
 		_petPAtk = set.getFloat("org_pattack");

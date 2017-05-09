@@ -4343,7 +4343,7 @@ public final class L2PcInstance extends L2Playable
 	@Override
 	public void doPickupItem(L2Object object)
 	{
-		if (isAlikeDead() || isFakeDeath())
+		if (isAlikeDead() || isFakeDeath() || isInvisible())
 		{
 			return;
 		}
