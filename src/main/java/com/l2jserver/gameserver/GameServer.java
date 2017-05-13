@@ -72,6 +72,7 @@ import com.l2jserver.gameserver.data.xml.impl.MultisellData;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.data.xml.impl.OptionData;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
+import com.l2jserver.gameserver.data.xml.impl.PlayerCreationPointData;
 import com.l2jserver.gameserver.data.xml.impl.PlayerTemplateData;
 import com.l2jserver.gameserver.data.xml.impl.PlayerXpPercentLostData;
 import com.l2jserver.gameserver.data.xml.impl.RecipeData;
@@ -230,6 +231,7 @@ public final class GameServer
 		KarmaData.getInstance();
 		HitConditionBonusData.getInstance();
 		PlayerTemplateData.getInstance();
+		PlayerCreationPointData.getInstance();
 		CharNameTable.getInstance();
 		AdminData.getInstance();
 		RaidBossPointsManager.getInstance();

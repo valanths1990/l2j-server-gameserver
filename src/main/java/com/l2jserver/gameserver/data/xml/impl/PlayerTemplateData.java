@@ -18,16 +18,13 @@
  */
 package com.l2jserver.gameserver.data.xml.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.templates.L2PcTemplate;
 import com.l2jserver.gameserver.model.base.ClassId;
@@ -77,8 +74,6 @@ public final class PlayerTemplateData implements IXmlReader
 					{
 						StatsSet set = new StatsSet();
 						set.set("classId", classId);
-						List<Location> creationPoints = new ArrayList<>();
-						
 						for (Node nd = d.getFirstChild(); nd != null; nd = nd.getNextSibling())
 						{
 							// Skip odd nodes
@@ -103,12 +98,7 @@ public final class PlayerTemplateData implements IXmlReader
 											set.set("collisionHeight", cnd.getTextContent());
 										}
 									}
-									if ("node".equalsIgnoreCase(cnd.getNodeName()))
-									{
-										attrs = cnd.getAttributes();
-										creationPoints.add(new Location(parseInteger(attrs, "x"), parseInteger(attrs, "y"), parseInteger(attrs, "z")));
-									}
-									else if ("walk".equalsIgnoreCase(cnd.getNodeName()))
+									if ("walk".equalsIgnoreCase(cnd.getNodeName()))
 									{
 										set.set("baseWalkSpd", cnd.getTextContent());
 									}
@@ -139,7 +129,7 @@ public final class PlayerTemplateData implements IXmlReader
 						set.set("basePDef", (set.getInt("basePDefchest", 0) + set.getInt("basePDeflegs", 0) + set.getInt("basePDefhead", 0) + set.getInt("basePDeffeet", 0) + set.getInt("basePDefgloves", 0) + set.getInt("basePDefunderwear", 0) + set.getInt("basePDefcloak", 0)));
 						set.set("baseMDef", (set.getInt("baseMDefrear", 0) + set.getInt("baseMDeflear", 0) + set.getInt("baseMDefrfinger", 0) + set.getInt("baseMDefrfinger", 0) + set.getInt("baseMDefneck", 0)));
 						
-						_playerTemplates.put(ClassId.getClassId(classId), new L2PcTemplate(set, creationPoints));
+						_playerTemplates.put(ClassId.getClassId(classId), new L2PcTemplate(set));
 					}
 					else if ("lvlUpgainData".equalsIgnoreCase(d.getNodeName()))
 					{

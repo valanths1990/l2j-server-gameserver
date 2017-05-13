@@ -27,6 +27,7 @@ import com.l2jserver.Config;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.xml.impl.InitialEquipmentData;
 import com.l2jserver.gameserver.data.xml.impl.InitialShortcutData;
+import com.l2jserver.gameserver.data.xml.impl.PlayerCreationPointData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.model.L2SkillLearn;
@@ -215,7 +216,7 @@ public final class CharacterCreate extends L2GameClientPacket
 		}
 		
 		final L2PcTemplate template = newChar.getTemplate();
-		Location createLoc = template.getCreationPoint();
+		Location createLoc = PlayerCreationPointData.getInstance().getCreationPoint(template.getClassId());
 		newChar.setXYZInvisible(createLoc.getX(), createLoc.getY(), createLoc.getZ());
 		newChar.setTitle("");
 		
