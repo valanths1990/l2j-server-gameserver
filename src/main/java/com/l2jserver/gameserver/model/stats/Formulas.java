@@ -1911,6 +1911,7 @@ public final class Formulas
 			{
 				attacker.reduceCurrentHp(counterdmg, target, skill);
 			}
+			target.notifyDamageReceived(counterdmg, attacker, skill, crit, false, true);
 		}
 	}
 	
