@@ -25,8 +25,6 @@ import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.serverpackets.SocialAction;
-import com.l2jserver.gameserver.network.serverpackets.StatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 public class PetStat extends SummonStat
@@ -65,44 +63,11 @@ public class PetStat extends SummonStat
 	}
 	
 	@Override
-	public final boolean addLevel(int value)
-	{
-		if ((getLevel() + value) > (getMaxLevel() - 1))
-		{
-			return false;
-		}
-		
-		boolean levelIncreased = super.addLevel(value);
-		
-		// Sync up exp with current level
-		// if (getExp() > getExpForLevel(getLevel() + 1) || getExp() < getExpForLevel(getLevel())) setExp(Experience.LEVEL[getLevel()]);
-		
-		StatusUpdate su = new StatusUpdate(getActiveChar());
-		su.addAttribute(StatusUpdate.LEVEL, getLevel());
-		su.addAttribute(StatusUpdate.MAX_HP, getMaxHp());
-		su.addAttribute(StatusUpdate.MAX_MP, getMaxMp());
-		getActiveChar().broadcastPacket(su);
-		if (levelIncreased)
-		{
-			getActiveChar().broadcastPacket(new SocialAction(getActiveChar().getObjectId(), SocialAction.LEVEL_UP));
-		}
-		// Send a Server->Client packet PetInfo to the L2PcInstance
-		getActiveChar().updateAndBroadcastStatus(1);
-		
-		if (getActiveChar().getControlItem() != null)
-		{
-			getActiveChar().getControlItem().setEnchantLevel(getLevel());
-		}
-		
-		return levelIncreased;
-	}
-	
-	@Override
 	public final long getExpForLevel(int level)
 	{
 		try
 		{
-			return PetDataTable.getInstance().getPetLevelData(getActiveChar().getId(), level).getPetMaxExp();
+			return PetDataTable.getInstance().getPetLevelData(getActiveChar().getId(), Math.min(level, getMaxExpLevel())).getPetMaxExp();
 		}
 		catch (NullPointerException e)
 		{
@@ -112,22 +77,6 @@ public class PetStat extends SummonStat
 			}
 			throw e;
 		}
-	}
-	
-	@Override
-	public L2PetInstance getActiveChar()
-	{
-		return (L2PetInstance) super.getActiveChar();
-	}
-	
-	public final int getFeedBattle()
-	{
-		return getActiveChar().getPetLevelData().getPetFeedBattle();
-	}
-	
-	public final int getFeedNormal()
-	{
-		return getActiveChar().getPetLevelData().getPetFeedNormal();
 	}
 	
 	@Override
@@ -147,6 +96,34 @@ public class PetStat extends SummonStat
 		{
 			getActiveChar().getControlItem().setEnchantLevel(getLevel());
 		}
+	}
+	
+	@Override
+	public int getMaxLevel()
+	{
+		return Config.MAX_PET_LEVEL;
+	}
+	
+	@Override
+	public int getMaxExpLevel()
+	{
+		return Config.MAX_PET_LEVEL + 1;
+	}
+	
+	@Override
+	public L2PetInstance getActiveChar()
+	{
+		return (L2PetInstance) super.getActiveChar();
+	}
+	
+	public final int getFeedBattle()
+	{
+		return getActiveChar().getPetLevelData().getPetFeedBattle();
+	}
+	
+	public final int getFeedNormal()
+	{
+		return getActiveChar().getPetLevelData().getPetFeedNormal();
 	}
 	
 	public final int getMaxFeed()
@@ -210,11 +187,5 @@ public class PetStat extends SummonStat
 			val = val / 2;
 		}
 		return val;
-	}
-	
-	@Override
-	public int getMaxLevel()
-	{
-		return Config.MAX_PET_LEVEL;
 	}
 }

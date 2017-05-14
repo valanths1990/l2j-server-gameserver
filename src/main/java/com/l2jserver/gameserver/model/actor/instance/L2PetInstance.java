@@ -63,6 +63,7 @@ import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.ExChangeNpcState;
 import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.PetInventoryUpdate;
+import com.l2jserver.gameserver.network.serverpackets.SocialAction;
 import com.l2jserver.gameserver.network.serverpackets.StatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.StopMove;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
@@ -997,17 +998,25 @@ public class L2PetInstance extends L2Summon
 		getStat().removeExp(lostExp);
 	}
 	
+	public void addExp(long exp)
+	{
+		getStat().addExp(exp);
+	}
+	
+	public long getExpForLevel(int level)
+	{
+		return getStat().getExpForLevel(level);
+	}
+	
 	@Override
 	public void addExpAndSp(long addToExp, int addToSp)
 	{
-		if (getId() == 12564)
-		{
-			getStat().addExpAndSp(Math.round(addToExp * Config.SINEATER_XP_RATE), addToSp);
-		}
-		else
-		{
-			getStat().addExpAndSp(Math.round(addToExp * Config.PET_XP_RATE), addToSp);
-		}
+		getStat().addExpAndSp(Math.round(addToExp * (isSinEater() ? Config.SINEATER_XP_RATE : Config.PET_XP_RATE)), addToSp);
+	}
+	
+	public boolean isSinEater()
+	{
+		return getId() == 12564;
 	}
 	
 	@Override
@@ -1020,6 +1029,56 @@ public class L2PetInstance extends L2Summon
 	public long getExpForNextLevel()
 	{
 		return getStat().getExpForLevel(getLevel() + 1);
+	}
+	
+	@Override
+	public final boolean addLevel(int value)
+	{
+		if ((getLevel() + value) > getStat().getMaxLevel())
+		{
+			return false;
+		}
+		
+		boolean levelIncreased = getStat().addLevel(value);
+		onLevelChange(levelIncreased);
+		return levelIncreased;
+	}
+	
+	@Override
+	public long getExp()
+	{
+		return getStat().getExp();
+	}
+	
+	public void setExp(long exp)
+	{
+		getStat().setExp(exp);
+	}
+	
+	public void setSp(int sp)
+	{
+		getStat().setSp(sp);
+	}
+	
+	@Override
+	public void onLevelChange(boolean levelIncreased)
+	{
+		StatusUpdate su = new StatusUpdate(getStat().getActiveChar());
+		su.addAttribute(StatusUpdate.LEVEL, getLevel());
+		su.addAttribute(StatusUpdate.MAX_HP, getMaxHp());
+		su.addAttribute(StatusUpdate.MAX_MP, getMaxMp());
+		getStat().getActiveChar().broadcastPacket(su);
+		if (levelIncreased)
+		{
+			getStat().getActiveChar().broadcastPacket(new SocialAction(getObjectId(), SocialAction.LEVEL_UP));
+		}
+		// Send a Server->Client packet PetInfo to the L2PcInstance
+		getStat().getActiveChar().updateAndBroadcastStatus(1);
+		
+		if (getStat().getActiveChar().getControlItem() != null)
+		{
+			getStat().getActiveChar().getControlItem().setEnchantLevel(getLevel());
+		}
 	}
 	
 	@Override

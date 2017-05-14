@@ -69,7 +69,7 @@ public final class Evolve
 		}
 		
 		L2ItemInstance item = null;
-		long petexp = currentPet.getStat().getExp();
+		long petexp = currentPet.getExp();
 		String oldname = currentPet.getName();
 		int oldX = currentPet.getX();
 		int oldY = currentPet.getY();
@@ -127,7 +127,7 @@ public final class Evolve
 			petexp = _minimumexp;
 		}
 		
-		petSummon.getStat().addExp(petexp);
+		petSummon.addExp(petexp);
 		petSummon.setCurrentHp(petSummon.getMaxHp());
 		petSummon.setCurrentMp(petSummon.getMaxMp());
 		petSummon.setCurrentFed(petSummon.getMaxFed());
@@ -214,9 +214,9 @@ public final class Evolve
 			return false;
 		}
 		
-		long _maxexp = petSummon.getStat().getExpForLevel(oldpetlvl);
+		long _maxexp = petSummon.getExpForLevel(oldpetlvl);
 		
-		petSummon.getStat().addExp(_maxexp);
+		petSummon.addExp(_maxexp);
 		petSummon.setCurrentHp(petSummon.getMaxHp());
 		petSummon.setCurrentMp(petSummon.getMaxMp());
 		petSummon.setCurrentFed(petSummon.getMaxFed());

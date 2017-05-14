@@ -1630,12 +1630,7 @@ public class L2Attackable extends L2Npc
 	 */
 	public boolean useVitalityRate()
 	{
-		if (isChampion() && !Config.L2JMOD_CHAMPION_ENABLE_VITALITY)
-		{
-			return false;
-		}
-		
-		return true;
+		return Config.L2JMOD_CHAMPION_ENABLE_VITALITY && !isChampion();
 	}
 	
 	/** Return True if the L2Character is RaidBoss or his minion. */

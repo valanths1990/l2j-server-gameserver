@@ -130,8 +130,8 @@ public class PetDAOMySQLImpl implements PetDAO
 					exp = info.getPetMaxExp();
 				}
 				
-				pet.getStat().setExp(exp);
-				pet.getStat().setSp(rset.getInt("sp"));
+				pet.setExp(exp);
+				pet.setSp(rset.getInt("sp"));
 				
 				pet.getStatus().setCurrentHp(rset.getInt("curHp"));
 				pet.getStatus().setCurrentMp(rset.getInt("curMp"));
@@ -171,11 +171,11 @@ public class PetDAOMySQLImpl implements PetDAO
 			PreparedStatement ps = con.prepareStatement(query))
 		{
 			ps.setString(1, pet.getName());
-			ps.setInt(2, pet.getStat().getLevel());
+			ps.setInt(2, pet.getLevel());
 			ps.setDouble(3, pet.getStatus().getCurrentHp());
 			ps.setDouble(4, pet.getStatus().getCurrentMp());
-			ps.setLong(5, pet.getStat().getExp());
-			ps.setInt(6, pet.getStat().getSp());
+			ps.setLong(5, pet.getExp());
+			ps.setInt(6, pet.getSp());
 			ps.setInt(7, pet.getCurrentFed());
 			ps.setInt(8, pet.getOwner().getObjectId());
 			ps.setString(9, String.valueOf(pet.isRestoreSummon())); // True restores pet on login

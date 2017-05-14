@@ -150,7 +150,7 @@ public final class RequestExEnchantSkillUntrain extends L2GameClientPacket
 			return;
 		}
 		
-		player.getStat().addSp((int) (requiredSp * 0.8));
+		player.addSp((int) (requiredSp * 0.8));
 		
 		if (Config.LOG_SKILL_ENCHANTS)
 		{

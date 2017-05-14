@@ -131,7 +131,7 @@ public final class RequestExEnchantSkill extends L2GameClientPacket
 				return;
 			}
 			
-			boolean check = player.getStat().removeExpAndSp(0, requiredSp, false);
+			boolean check = player.removeSp(requiredSp);
 			if (Config.ES_SP_BOOK_NEEDED && usesBook)
 			{
 				check &= player.destroyItem("Consume", spb.getObjectId(), 1, player, true);

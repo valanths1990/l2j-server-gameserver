@@ -189,6 +189,7 @@ import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerEquip
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerFameChanged;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerHennaRemove;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerKarmaChanged;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLevelChanged;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogin;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogout;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPKChanged;
@@ -268,6 +269,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExPrivateStoreSetWholeMsg;
 import com.l2jserver.gameserver.network.serverpackets.ExSetCompassZoneCode;
 import com.l2jserver.gameserver.network.serverpackets.ExStartScenePlayer;
 import com.l2jserver.gameserver.network.serverpackets.ExStorageMaxCount;
+import com.l2jserver.gameserver.network.serverpackets.ExVoteSystemInfo;
 import com.l2jserver.gameserver.network.serverpackets.FlyToLocation.FlyType;
 import com.l2jserver.gameserver.network.serverpackets.FriendStatusPacket;
 import com.l2jserver.gameserver.network.serverpackets.GameGuardQuery;
@@ -1087,6 +1089,21 @@ public final class L2PcInstance extends L2Playable
 			return getSubClasses().get(getClassIndex()).getStat().getLevel();
 		}
 		return getStat().getLevel();
+	}
+	
+	public int getBaseLevel()
+	{
+		return getStat().getLevel();
+	}
+	
+	public long getBaseExp()
+	{
+		return getStat().getExp();
+	}
+	
+	public int getBaseSp()
+	{
+		return getStat().getSp();
 	}
 	
 	@Override
@@ -2240,6 +2257,7 @@ public final class L2PcInstance extends L2Playable
 	/**
 	 * @return the Experience of the L2PcInstance.
 	 */
+	@Override
 	public long getExp()
 	{
 		if (isSubClassActive())
@@ -2260,14 +2278,111 @@ public final class L2PcInstance extends L2Playable
 			LOG.warn("For player {} is set negative amount of exp [{}]", this, exp, new IllegalArgumentException());
 			exp = 0;
 		}
-		if (isSubClassActive())
+		getSubStat().setExp(exp);
+	}
+	
+	public void setLevel(int level)
+	{
+		getSubStat().setLevel(Math.min(level, getMaxLevel()));
+	}
+	
+	public final int getMaxLevel()
+	{
+		return getSubStat().getMaxLevel();
+	}
+	
+	public final int getMaxExpLevel()
+	{
+		return getSubStat().getMaxExpLevel();
+	}
+	
+	private final PcStat getSubStat()
+	{
+		return isSubClassActive() ? getSubClasses().get(getClassIndex()).getStat() : getStat();
+	}
+	
+	@Override
+	public final boolean addLevel(int value)
+	{
+		if ((getLevel() + value) > getMaxLevel())
 		{
-			getSubClasses().get(getClassIndex()).getStat().setExp(exp);
+			return false;
+		}
+		
+		// Notify to scripts
+		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerLevelChanged(this, getLevel(), getLevel() + value), this);
+		
+		boolean levelIncreased = getSubStat().addLevel(value);
+		onLevelChange(levelIncreased);
+		
+		return levelIncreased;
+	}
+	
+	@Override
+	public void onLevelChange(boolean levelIncreased)
+	{
+		if (levelIncreased)
+		{
+			setCurrentCp(getMaxCp());
+			broadcastPacket(new SocialAction(getObjectId(), SocialAction.LEVEL_UP));
+			sendPacket(SystemMessageId.YOU_INCREASED_YOUR_LEVEL);
 		}
 		else
 		{
-			getStat().setExp(exp);
+			if (!isGM() && Config.DECREASE_SKILL_LEVEL)
+			{
+				checkPlayerSkills();
+			}
 		}
+		
+		// Give AutoGet skills and all normal skills if Auto-Learn is activated.
+		rewardSkills();
+		
+		if (getClan() != null)
+		{
+			getClan().updateClanMember(this);
+			getClan().broadcastToOnlineMembers(new PledgeShowMemberListUpdate(this));
+		}
+		if (isInParty())
+		{
+			getParty().recalculatePartyLevel(); // Recalculate the party level
+		}
+		
+		if (isTransformed() || isInStance())
+		{
+			getTransformation().onLevelUp(this);
+		}
+		
+		// Synchronize level with pet if possible.
+		if (hasPet())
+		{
+			final L2PetInstance pet = (L2PetInstance) getSummon();
+			if (pet.getPetData().isSynchLevel() && (pet.getLevel() != getLevel()))
+			{
+				pet.getStat().setLevel(getLevel());
+				pet.getStat().getExpForLevel(getLevel());
+				pet.setCurrentHp(pet.getMaxHp());
+				pet.setCurrentMp(pet.getMaxMp());
+				pet.broadcastPacket(new SocialAction(getObjectId(), SocialAction.LEVEL_UP));
+				pet.updateAndBroadcastStatus(1);
+			}
+		}
+		
+		StatusUpdate su = new StatusUpdate(this);
+		su.addAttribute(StatusUpdate.LEVEL, getLevel());
+		su.addAttribute(StatusUpdate.MAX_CP, getMaxCp());
+		su.addAttribute(StatusUpdate.MAX_HP, getMaxHp());
+		su.addAttribute(StatusUpdate.MAX_MP, getMaxMp());
+		sendPacket(su);
+		
+		// Update the overloaded status of the L2PcInstance
+		refreshOverloaded();
+		// Update the expertise status of the L2PcInstance
+		refreshExpertisePenalty();
+		// Send a Server->Client packet UserInfo to the L2PcInstance
+		sendPacket(new UserInfo(this));
+		sendPacket(new ExBrExtraUserInfo(this));
+		sendPacket(new ExVoteSystemInfo(this));
 	}
 	
 	public int getActiveEnchantAttrItemId()
@@ -2572,9 +2687,12 @@ public final class L2PcInstance extends L2Playable
 		_minimapAllowed = b;
 	}
 	
-	/**
-	 * @return the SP amount of the L2PcInstance.
-	 */
+	public void addSp(int sp)
+	{
+		getSubStat().addSp(sp);
+	}
+	
+	@Override
 	public int getSp()
 	{
 		return isSubClassActive() ? getSubClasses().get(getClassIndex()).getStat().getSp() : getStat().getSp();
@@ -5457,19 +5575,144 @@ public final class L2PcInstance extends L2Playable
 	{
 		if (getExpBeforeDeath() > 0)
 		{
-			// Restore the specified % of lost experience.
-			if (isSubClassActive())
-			{
-				getSubClasses().get(getClassIndex()).getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100), true);
-			}
-			else
-			{
-				getStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100), true);
-			}
+			getSubStat().addExp(Math.round(((getExpBeforeDeath() - getExp()) * restorePercent) / 100));
 			setExpBeforeDeath(0);
 		}
 	}
 	
+	@Override
+	public void addExpAndSp(long addToExp, int addToSp)
+	{
+		addExpAndSp(addToExp, addToSp, false);
+	}
+	
+	/**
+	 * Used for quest no bonus and no pet consume
+	 * @param addToExp
+	 * @param addToSp
+	 * @param useBonuses
+	 */
+	public final void addExpAndSpQuest(long addToExp, int addToSp)
+	{
+		if (addToExp != 0)
+		{
+			getSubStat().addExp(addToExp);
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S1_EXPERIENCE);
+			sm.addLong(addToExp);
+			sendPacket(sm);
+		}
+		
+		if (addToSp != 0)
+		{
+			getSubStat().addSp(addToSp);
+			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.ACQUIRED_S1_SP);
+			sm.addInt(addToSp);
+			sendPacket(sm);
+		}
+		sendPacket(new UserInfo(this));
+		sendPacket(new ExBrExtraUserInfo(this));
+	}
+	
+	public final void removeExpAndSp(long removeFromExp, int removeFromSp)
+	{
+		getSubStat().removeExp(removeFromExp);
+		getSubStat().removeSp(removeFromSp);
+		
+		sendPacket(new UserInfo(this));
+		sendPacket(new ExBrExtraUserInfo(this));
+	}
+	
+	public final void addExpAndSp(long addToExp, int addToSp, boolean useBonuses)
+	{
+		// Allowed to gain exp?
+		if (!getAccessLevel().canGainExp())
+		{
+			return;
+		}
+		changeKarma(addToExp);
+		
+		long baseExp = addToExp;
+		int baseSp = addToSp;
+		
+		if (useBonuses)
+		{
+			addToExp *= getStat().getExpBonusMultiplier();
+			addToSp *= getStat().getSpBonusMultiplier();
+		}
+		
+		float ratioTakenByPlayer = 0;
+		
+		// if this player has a pet and it is in his range he takes from the owner's Exp, give the pet Exp now
+		if (hasPet() && Util.checkIfInShortRadius(Config.ALT_PARTY_RANGE, this, getSummon(), false))
+		{
+			L2PetInstance pet = (L2PetInstance) getSummon();
+			ratioTakenByPlayer = pet.getPetLevelData().getOwnerExpTaken() / 100f;
+			
+			// only give exp/sp to the pet by taking from the owner if the pet has a non-zero, positive ratio
+			// allow possible customizations that would have the pet earning more than 100% of the owner's exp/sp
+			if (ratioTakenByPlayer > 1)
+			{
+				ratioTakenByPlayer = 1;
+			}
+			
+			if (!pet.isDead())
+			{
+				pet.addExpAndSp((long) (addToExp * (1 - ratioTakenByPlayer)), (int) (addToSp * (1 - ratioTakenByPlayer)));
+			}
+			
+			// now adjust the max ratio to avoid the owner earning negative exp/sp
+			baseExp = (long) (addToExp * ratioTakenByPlayer);
+			baseSp = (int) (addToSp * ratioTakenByPlayer);
+			addToExp = (long) (addToExp * ratioTakenByPlayer);
+			addToSp = (int) (addToSp * ratioTakenByPlayer);
+		}
+		
+		getSubStat().addExp(addToExp);
+		getSubStat().addSp(addToSp);
+		
+		SystemMessage sm = null;
+		
+		sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_EARNED_S1_EXP_BONUS_S2_AND_S3_SP_BONUS_S4);
+		sm.addLong(addToExp);
+		sm.addLong(addToExp - baseExp);
+		sm.addInt(addToSp);
+		sm.addInt(addToSp - baseSp);
+		
+		sendPacket(sm);
+		sendPacket(new UserInfo(this));
+		sendPacket(new ExBrExtraUserInfo(this));
+	}
+	
+	public final void removeExp(long exp)
+	{
+		changeKarma(exp);
+		getSubStat().removeExp(exp);
+		
+		sendPacket(new UserInfo(this));
+		sendPacket(new ExBrExtraUserInfo(this));
+	}
+	
+	private void changeKarma(long exp)
+	{
+		if (!isCursedWeaponEquipped() && (getKarma() > 0) && (isGM() || !isInsideZone(ZoneId.PVP)))
+		{
+			int karmaLost = Formulas.calculateKarmaLost(this, exp);
+			if (karmaLost > 0)
+			{
+				setKarma(getKarma() - karmaLost);
+				final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.YOUR_KARMA_HAS_BEEN_CHANGED_TO_S1);
+				msg.addInt(getKarma());
+				sendPacket(msg);
+			}
+		}
+	}
+	
+	public final boolean removeSp(int sp)
+	{
+		return getSubStat().removeSp(sp);
+	}
+	
+	//
 	/**
 	 * Reduce the Experience (and level if necessary) of the L2PcInstance in function of the calculated Death Penalty.<BR>
 	 * <B><U> Actions</U> :</B>
@@ -5516,7 +5759,7 @@ public final class L2PcInstance extends L2Playable
 			}
 			else
 			{
-				lostExp = Math.round(((getStat().getExpForLevel(Config.MAX_PLAYER_LEVEL) - getStat().getExpForLevel(Config.MAX_PLAYER_LEVEL - 1)) * percentLost) / 100);
+				lostExp = Math.round(((getStat().getExpForLevel(Config.MAX_PLAYER_LEVEL + 1) - getStat().getExpForLevel(Config.MAX_PLAYER_LEVEL)) * percentLost) / 100);
 			}
 		}
 		
@@ -5527,14 +5770,7 @@ public final class L2PcInstance extends L2Playable
 		
 		setExpBeforeDeath(getExp());
 		
-		if (isSubClassActive())
-		{
-			getSubClasses().get(getClassIndex()).getStat().removeExp(lostExp);
-		}
-		else
-		{
-			getStat().removeExp(lostExp);
-		}
+		removeExp(lostExp);
 	}
 	
 	public boolean isPartyWaiting()
@@ -9598,55 +9834,6 @@ public final class L2PcInstance extends L2Playable
 	public int getLastServerDistance(int x, int y, int z)
 	{
 		return (int) Util.calculateDistance(x, y, z, _lastServerPosition.getX(), _lastServerPosition.getY(), _lastServerPosition.getZ(), true, false);
-	}
-	
-	@Override
-	public void addExpAndSp(long addToExp, int addToSp)
-	{
-		if (isSubClassActive())
-		{
-			getSubClasses().get(getClassIndex()).getStat().addExpAndSp(addToExp, addToSp, false);
-		}
-		else
-		{
-			getStat().addExpAndSp(addToExp, addToSp, false);
-		}
-	}
-	
-	public void addExpAndSp(long addToExp, int addToSp, boolean useVitality)
-	{
-		if (isSubClassActive())
-		{
-			getSubClasses().get(getClassIndex()).getStat().addExpAndSp(addToExp, addToSp, useVitality);
-		}
-		else
-		{
-			getStat().addExpAndSp(addToExp, addToSp, useVitality);
-		}
-	}
-	
-	public void removeExpAndSp(long removeExp, int removeSp)
-	{
-		if (isSubClassActive())
-		{
-			getSubClasses().get(getClassIndex()).getStat().removeExpAndSp(removeExp, removeSp, true);
-		}
-		else
-		{
-			getStat().removeExpAndSp(removeExp, removeSp, true);
-		}
-	}
-	
-	public void removeExpAndSp(long removeExp, int removeSp, boolean sendMessage)
-	{
-		if (isSubClassActive())
-		{
-			getSubClasses().get(getClassIndex()).getStat().removeExpAndSp(removeExp, removeSp, sendMessage);
-		}
-		else
-		{
-			getStat().removeExpAndSp(removeExp, removeSp, sendMessage);
-		}
 	}
 	
 	@Override

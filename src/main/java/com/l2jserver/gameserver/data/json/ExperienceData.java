@@ -68,7 +68,6 @@ public final class ExperienceData
 		{
 			LOG.warn("Failed to load expData.json for: ", ioe);
 		}
-		
 	}
 	
 	/**
