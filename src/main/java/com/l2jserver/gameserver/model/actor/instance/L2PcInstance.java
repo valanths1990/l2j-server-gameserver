@@ -595,6 +595,7 @@ public final class L2PcInstance extends L2Playable
 	private boolean _canRevive = true;
 	private int _reviveRequested = 0;
 	private double _revivePower = 0;
+	private int _reviveRecovery = 0;
 	private boolean _revivePet = false;
 	
 	private double _cpUpdateIncCheck = .0;
@@ -9587,7 +9588,7 @@ public final class L2PcInstance extends L2Playable
 		doRevive();
 	}
 	
-	public void reviveRequest(L2PcInstance reviver, Skill skill, boolean Pet, int power)
+	public void reviveRequest(L2PcInstance reviver, Skill skill, boolean Pet, int resPower, int resRecovery)
 	{
 		if (isResurrectionBlocked())
 		{
@@ -9613,12 +9614,14 @@ public final class L2PcInstance extends L2Playable
 			}
 			return;
 		}
+		
 		if ((Pet && hasPet() && getSummon().isDead()) || (!Pet && isDead()))
 		{
 			_reviveRequested = 1;
+			_reviveRecovery = resRecovery;
 			int restoreExp = 0;
 			
-			_revivePower = Formulas.calculateSkillResurrectRestorePercent(power, reviver);
+			_revivePower = Formulas.calculateSkillResurrectRestorePercent(resPower, reviver);
 			restoreExp = (int) Math.round(((getExpBeforeDeath() - getExp()) * _revivePower) / 100);
 			_revivePet = Pet;
 			
@@ -9631,7 +9634,7 @@ public final class L2PcInstance extends L2Playable
 			}
 			ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.RESURRECTION_REQUEST_BY_C1_FOR_S2_XP.getId());
 			dlg.addPcName(reviver);
-			dlg.addString(Integer.toString(restoreExp));
+			dlg.addString(Integer.toString(Math.abs(restoreExp)));
 			sendPacket(dlg);
 		}
 	}
@@ -9655,6 +9658,12 @@ public final class L2PcInstance extends L2Playable
 				{
 					doRevive();
 				}
+				
+				if (_reviveRecovery != 0)
+				{
+					setCurrentHpMp(getMaxHp() * (_reviveRecovery / 100.0), getMaxMp() * (_reviveRecovery / 100.0));
+					setCurrentCp(0);
+				}
 			}
 			else if (hasPet())
 			{
@@ -9666,11 +9675,17 @@ public final class L2PcInstance extends L2Playable
 				{
 					getSummon().doRevive();
 				}
+				
+				if (_reviveRecovery != 0)
+				{
+					getSummon().setCurrentHpMp(getSummon().getMaxHp() * (_reviveRecovery / 100.0), getSummon().getMaxMp() * (_reviveRecovery / 100.0));
+				}
 			}
 		}
 		_revivePet = false;
 		_reviveRequested = 0;
 		_revivePower = 0;
+		_reviveRecovery = 0;
 	}
 	
 	public boolean isReviveRequested()

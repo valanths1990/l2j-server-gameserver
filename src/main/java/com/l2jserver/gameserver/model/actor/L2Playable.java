@@ -155,7 +155,7 @@ public abstract class L2Playable extends L2Character
 			{
 				if (activeChar.isInSiege())
 				{
-					getActingPlayer().reviveRequest(getActingPlayer(), null, false, 0);
+					getActingPlayer().reviveRequest(getActingPlayer(), null, false, 0, 0);
 				}
 				activeChar.setCharmOfCourage(false);
 				activeChar.sendPacket(new EtcStatusUpdate(activeChar));
