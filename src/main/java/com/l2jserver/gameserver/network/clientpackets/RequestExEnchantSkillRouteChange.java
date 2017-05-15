@@ -143,7 +143,7 @@ public final class RequestExEnchantSkillRouteChange extends L2GameClientPacket
 			}
 			
 			boolean check;
-			check = player.getStat().removeExpAndSp(0, requiredSp, false);
+			check = player.removeSp(requiredSp);
 			if (Config.ES_SP_BOOK_NEEDED)
 			{
 				check &= player.destroyItem("Consume", spb.getObjectId(), 1, player, true);

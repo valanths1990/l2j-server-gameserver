@@ -156,7 +156,7 @@ public class CharSummonTable
 		{
 			pet.setCurrentHp(pet.getMaxHp());
 			pet.setCurrentMp(pet.getMaxMp());
-			pet.getStat().setExp(pet.getExpForThisLevel());
+			pet.setExp(pet.getExpForThisLevel());
 			pet.setCurrentFed(pet.getMaxFed());
 		}
 		

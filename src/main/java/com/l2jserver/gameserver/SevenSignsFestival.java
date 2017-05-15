@@ -845,7 +845,7 @@ public class SevenSignsFestival implements SpawnListener
 	 */
 	public static final int getMaxLevelForFestival(int festivalId)
 	{
-		int maxLevel = Config.MAX_PLAYER_LEVEL - 1;
+		int maxLevel = Config.MAX_PLAYER_LEVEL;
 		
 		switch (festivalId)
 		{

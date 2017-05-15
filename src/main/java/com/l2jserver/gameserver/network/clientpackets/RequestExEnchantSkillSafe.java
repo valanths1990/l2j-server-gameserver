@@ -132,7 +132,7 @@ public final class RequestExEnchantSkillSafe extends L2GameClientPacket
 				return;
 			}
 			
-			boolean check = player.getStat().removeExpAndSp(0, requiredSp, false);
+			boolean check = player.removeSp(requiredSp);
 			check &= player.destroyItem("Consume", spb.getObjectId(), 1, player, true);
 			
 			check &= player.destroyItemByItemId("Consume", Inventory.ADENA_ID, requireditems, player, true);

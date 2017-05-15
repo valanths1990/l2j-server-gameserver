@@ -90,6 +90,7 @@ task configuratorJar(type: Jar, dependsOn: classes) {
 task dbInstLsJar(type: Jar, dependsOn: classes) {
 	from(sourceSets.main.output)
 	archiveName = 'dbinst_ls.jar'
+	include '**/tools/*'
 	include '**/dbinstaller/**'
 	include '**/images/**'
 	include '**/util/**'
@@ -104,6 +105,7 @@ task dbInstLsJar(type: Jar, dependsOn: classes) {
 task dbInstGsJar(type: Jar, dependsOn: classes) {
 	from(sourceSets.main.output)
 	archiveName = 'dbinst_gs.jar'
+	include '**/tools/*'
 	include('**/dbinstaller/**')
 	include('**/images/**')
 	include('**/util/**')

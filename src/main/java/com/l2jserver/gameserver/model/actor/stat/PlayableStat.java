@@ -28,6 +28,7 @@ import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.actor.L2Playable;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableExpChanged;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLevelChanged;
 import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2SwampZone;
@@ -87,7 +88,7 @@ public class PlayableStat extends CharStat
 		{
 			_exp.addAndGet(-exp);
 		}
-		incrementLevel();
+		syncExpLevel(false);
 		return true;
 	}
 	
@@ -120,20 +121,86 @@ public class PlayableStat extends CharStat
 			return false;
 		}
 		
-		if (((getExp() + value) < 0) || ((value > 0) && (currentExp == (getExpForLevel(getMaxLevel()) - 1))))
+		if ((totalExp < 0) || ((value > 0) && (currentExp == (getExpForLevel(getMaxExpLevel()) - 1))))
 		{
 			return true;
 		}
 		
-		if (totalExp >= getExpForLevel(getMaxLevel()))
+		if (totalExp >= getExpForLevel(getMaxExpLevel()))
 		{
-			value = getExpForLevel(getMaxLevel()) - 1 - getExp();
+			value = (getExpForLevel(getMaxExpLevel()) - 1 - currentExp);
 		}
 		
-		_exp.addAndGet(value);
-		incrementLevel();
+		if (_exp.addAndGet(value) >= getExpForLevel(getLevel() + 1))
+		{
+			syncExpLevel(true);
+		}
 		
 		return true;
+	}
+	
+	/**
+	 * Check if level need to be increased / decreased
+	 * @param isExpIncreased
+	 */
+	public void syncExpLevel(boolean isExpIncreased)
+	{
+		int minimumLevel = getActiveChar().getMinLevel();
+		long currentExp = getExp();
+		int maxLevel = getMaxLevel();
+		int currentLevel = getLevel();
+		
+		if (isExpIncreased)
+		{
+			for (int tmp = currentLevel; tmp <= maxLevel; tmp++)
+			{
+				if (currentExp >= getExpForLevel(tmp))
+				{
+					if (currentExp >= getExpForLevel(tmp + 1))
+					{
+						continue;
+					}
+					if (tmp < minimumLevel)
+					{
+						tmp = minimumLevel;
+					}
+					
+					if (tmp != currentLevel)
+					{
+						int newLevel = tmp - currentLevel;
+						EventDispatcher.getInstance().notifyEventAsync(new OnPlayerLevelChanged(getActiveChar().getActingPlayer(), currentLevel, newLevel), getActiveChar());
+						getActiveChar().addLevel(newLevel);
+					}
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (int tmp = currentLevel; tmp >= minimumLevel; tmp--)
+			{
+				if (currentExp < getExpForLevel(tmp))
+				{
+					if (currentExp < getExpForLevel(tmp - 1))
+					{
+						continue;
+					}
+					--tmp;
+					if (tmp < minimumLevel)
+					{
+						tmp = minimumLevel;
+					}
+					
+					if (tmp != currentLevel)
+					{
+						int newLevel = tmp - currentLevel;
+						EventDispatcher.getInstance().notifyEventAsync(new OnPlayerLevelChanged(getActiveChar().getActingPlayer(), currentLevel, newLevel), getActiveChar());
+						getActiveChar().addLevel(newLevel);
+					}
+					break;
+				}
+			}
+		}
 	}
 	
 	public boolean addSp(int sp)
@@ -149,7 +216,7 @@ public class PlayableStat extends CharStat
 			return false;
 		}
 		
-		if ((currentSp + sp) >= Integer.MAX_VALUE)
+		if (sp > (Integer.MAX_VALUE - currentSp))
 		{
 			_sp.set(Integer.MAX_VALUE);
 		}
@@ -160,54 +227,14 @@ public class PlayableStat extends CharStat
 		return true;
 	}
 	
-	/**
-	 * Check Playable exp and increase level if is needed.
-	 */
-	public void incrementLevel()
-	{
-		int minimumLevel = getActiveChar().getMinLevel();
-		int level = minimumLevel;
-		long currentExp = getExp();
-		int maxLevel = getMaxLevel();
-		
-		for (int tmp = level; tmp <= maxLevel; tmp++)
-		{
-			if (currentExp >= getExpForLevel(tmp))
-			{
-				continue;
-			}
-			level = --tmp;
-			break;
-		}
-		if ((level != getLevel()) && (level >= minimumLevel))
-		{
-			addLevel(level - getLevel());
-		}
-	}
-	
-	public boolean removeExpAndSp(long removeExp, int removeSp)
-	{
-		boolean change = false;
-		if (removeExp > 0)
-		{
-			change = removeExp(removeExp);
-		}
-		if (removeSp > 0)
-		{
-			change |= removeSp(removeSp);
-		}
-		
-		return change;
-	}
-	
 	public boolean addLevel(int value)
 	{
 		final int currentLevel = getLevel();
-		if ((currentLevel + value) > (getMaxLevel() - 1))
+		if ((currentLevel + value) > getMaxLevel())
 		{
-			if (currentLevel < (getMaxLevel() - 1))
+			if (currentLevel < getMaxLevel())
 			{
-				value = (getMaxLevel() - 1 - currentLevel);
+				value = getMaxLevel() - currentLevel;
 			}
 			else
 			{
@@ -247,11 +274,27 @@ public class PlayableStat extends CharStat
 	}
 	
 	/**
-	 * @return max level for Playable
+	 * Get maximum level that playable can reach.<br>
+	 * <B><U> Overridden in </U> :</B>
+	 * <li>PcStat</li>
+	 * <li>PetStat</li>
 	 */
 	public int getMaxLevel()
 	{
+		// Dummy method
 		return Config.MAX_PLAYER_LEVEL;
+	}
+	
+	/**
+	 * Get maximum level of expirince is max level +1 for get (100%)<br>
+	 * <B><U> Overridden in </U> :</B>
+	 * <li>PcStat</li>
+	 * <li>PetStat</li>
+	 */
+	public int getMaxExpLevel()
+	{
+		// Dummy method
+		return Config.MAX_PLAYER_LEVEL + 1;
 	}
 	
 	@Override

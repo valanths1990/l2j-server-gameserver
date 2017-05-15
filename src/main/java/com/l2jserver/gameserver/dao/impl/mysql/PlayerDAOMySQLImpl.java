@@ -72,10 +72,10 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 					player = new L2PcInstance(objectId, activeClassId, rset.getString("account_name"), app);
 					player.setName(rset.getString("char_name"));
 					player.setLastAccess(rset.getLong("lastAccess"));
-					player.getStat().setExp(rset.getLong("exp"));
+					player.setExp(rset.getLong("exp"));
 					player.setExpBeforeDeath(rset.getLong("expBeforeDeath"));
-					player.getStat().setLevel(rset.getByte("level"));
-					player.getStat().setSp(rset.getInt("sp"));
+					player.setLevel(rset.getInt("level"));
+					player.setSp(rset.getInt("sp"));
 					player.setWantsPeace(rset.getInt("wantspeace"));
 					player.setHeading(rset.getInt("heading"));
 					player.setKarma(rset.getInt("karma"));
@@ -241,7 +241,7 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 			ps.setString(1, player.getAccountName());
 			ps.setInt(2, player.getObjectId());
 			ps.setString(3, player.getName());
-			ps.setInt(4, player.getLevel());
+			ps.setInt(4, player.getBaseLevel());
 			ps.setInt(5, player.getMaxHp());
 			ps.setDouble(6, player.getCurrentHp());
 			ps.setInt(7, player.getMaxCp());
@@ -252,8 +252,8 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 			ps.setInt(12, player.getAppearance().getHairStyle());
 			ps.setInt(13, player.getAppearance().getHairColor());
 			ps.setInt(14, player.getAppearance().getSex() ? 1 : 0);
-			ps.setLong(15, player.getExp());
-			ps.setInt(16, player.getSp());
+			ps.setLong(15, player.getBaseExp());
+			ps.setInt(16, player.getBaseSp());
 			ps.setInt(17, player.getKarma());
 			ps.setInt(18, player.getFame());
 			ps.setInt(19, player.getPvpKills());
@@ -297,7 +297,7 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 		try (Connection con = ConnectionFactory.getInstance().getConnection();
 			PreparedStatement ps = con.prepareStatement(UPDATE))
 		{
-			ps.setInt(1, player.getStat().getBaseLevel());
+			ps.setInt(1, player.getBaseLevel());
 			ps.setInt(2, player.getMaxHp());
 			ps.setDouble(3, player.getCurrentHp());
 			ps.setInt(4, player.getMaxCp());
@@ -312,9 +312,9 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 			ps.setInt(13, player.inObserverMode() ? player.getLastLocation().getX() : player.getX());
 			ps.setInt(14, player.inObserverMode() ? player.getLastLocation().getY() : player.getY());
 			ps.setInt(15, player.inObserverMode() ? player.getLastLocation().getZ() : player.getZ());
-			ps.setLong(16, player.getStat().getBaseExp());
+			ps.setLong(16, player.getBaseExp());
 			ps.setLong(17, player.getExpBeforeDeath());
-			ps.setInt(18, player.getStat().getBaseSp());
+			ps.setInt(18, player.getBaseSp());
 			ps.setInt(19, player.getKarma());
 			ps.setInt(20, player.getFame());
 			ps.setInt(21, player.getPvpKills());

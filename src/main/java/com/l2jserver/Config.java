@@ -174,8 +174,8 @@ public final class Config
 	public static int MAX_PLAYER_LEVEL;
 	public static int MAX_PET_LEVEL;
 	public static byte MAX_SUBCLASS;
-	public static byte BASE_SUBCLASS_LEVEL;
-	public static byte MAX_SUBCLASS_LEVEL;
+	public static int BASE_SUBCLASS_LEVEL;
+	public static int MAX_SUBCLASS_LEVEL;
 	public static int MAX_PVTSTORESELL_SLOTS_DWARF;
 	public static int MAX_PVTSTORESELL_SLOTS_OTHER;
 	public static int MAX_PVTSTOREBUY_SLOTS_DWARF;
@@ -230,7 +230,7 @@ public final class Config
 	public static boolean ALT_LEAVE_PARTY_LEADER;
 	public static boolean INITIAL_EQUIPMENT_EVENT;
 	public static long STARTING_ADENA;
-	public static byte STARTING_LEVEL;
+	public static int STARTING_LEVEL;
 	public static int STARTING_SP;
 	public static long MAX_ADENA;
 	public static boolean AUTO_LOOT;
@@ -1507,11 +1507,11 @@ public final class Config
 			MAX_EVASION = character.getInt("MaxEvasion", 250);
 			MIN_ABNORMAL_STATE_SUCCESS_RATE = character.getInt("MinAbnormalStateSuccessRate", 10);
 			MAX_ABNORMAL_STATE_SUCCESS_RATE = character.getInt("MaxAbnormalStateSuccessRate", 90);
-			MAX_PLAYER_LEVEL = character.getInt("MaxPlayerLevel", 85) + 1;
-			MAX_PET_LEVEL = character.getInt("MaxPetLevel", 86) + 1;
+			MAX_PLAYER_LEVEL = character.getInt("MaxPlayerLevel", 85);
+			MAX_PET_LEVEL = character.getInt("MaxPetLevel", 86);
 			MAX_SUBCLASS = character.getByte("MaxSubclass", (byte) 3);
-			BASE_SUBCLASS_LEVEL = character.getByte("BaseSubclassLevel", (byte) 40);
-			MAX_SUBCLASS_LEVEL = character.getByte("MaxSubclassLevel", (byte) 80);
+			BASE_SUBCLASS_LEVEL = character.getInt("BaseSubclassLevel", 40);
+			MAX_SUBCLASS_LEVEL = character.getInt("MaxSubclassLevel", 80);
 			MAX_PVTSTORESELL_SLOTS_DWARF = character.getInt("MaxPvtStoreSellSlotsDwarf", 4);
 			MAX_PVTSTORESELL_SLOTS_OTHER = character.getInt("MaxPvtStoreSellSlotsOther", 3);
 			MAX_PVTSTOREBUY_SLOTS_DWARF = character.getInt("MaxPvtStoreBuySlotsDwarf", 5);
@@ -1632,7 +1632,7 @@ public final class Config
 			ALT_LEAVE_PARTY_LEADER = character.getBoolean("AltLeavePartyLeader", false);
 			INITIAL_EQUIPMENT_EVENT = character.getBoolean("InitialEquipmentEvent", false);
 			STARTING_ADENA = character.getLong("StartingAdena", 0);
-			STARTING_LEVEL = character.getByte("StartingLevel", (byte) 1);
+			STARTING_LEVEL = character.getInt("StartingLevel", 1);
 			STARTING_SP = character.getInt("StartingSP", 0);
 			MAX_ADENA = character.getLong("MaxAdena", 99900000000L);
 			if (MAX_ADENA < 0)

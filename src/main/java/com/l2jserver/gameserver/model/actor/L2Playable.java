@@ -155,7 +155,7 @@ public abstract class L2Playable extends L2Character
 			{
 				if (activeChar.isInSiege())
 				{
-					getActingPlayer().reviveRequest(getActingPlayer(), null, false, 0);
+					getActingPlayer().reviveRequest(getActingPlayer(), null, false, 0, 0);
 				}
 				activeChar.setCharmOfCourage(false);
 				activeChar.sendPacket(new EtcStatusUpdate(activeChar));
@@ -342,6 +342,51 @@ public abstract class L2Playable extends L2Character
 	public L2PcInstance getTransferingDamageTo()
 	{
 		return transferDmgTo;
+	}
+	
+	/**
+	 * Handle level add.<br>
+	 * <B><U> Overridden in </U> :</B>
+	 * <li>L2PcInstance</li>
+	 * <li>L2PetInstance</li>
+	 * @param levelAdd
+	 */
+	public boolean addLevel(int levelAdd)
+	{
+		return false;
+	}
+	
+	/**
+	 * <B><U> Overridden in </U> :</B>
+	 * <li>L2PcInstance</li>
+	 * <li>L2PetInstance</li>
+	 */
+	public long getExp()
+	{
+		return 0;
+	}
+	
+	/**
+	 * <B><U> Overridden in </U> :</B>
+	 * <li>L2PcInstance</li>
+	 * <li>L2PetInstance</li>
+	 * @return the SP amount
+	 */
+	public int getSp()
+	{
+		return 0;
+	}
+	
+	/**
+	 * Handle packets send on level change.<br>
+	 * <B><U> Overridden in </U> :</B>
+	 * <li>L2PcInstance</li>
+	 * <li>L2PetInstance</li>
+	 * @param levelIncreased
+	 */
+	public void onLevelChange(boolean levelIncreased)
+	{
+		
 	}
 	
 	public abstract void doPickupItem(L2Object object);

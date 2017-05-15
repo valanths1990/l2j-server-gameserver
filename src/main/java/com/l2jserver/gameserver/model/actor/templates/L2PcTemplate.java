@@ -53,12 +53,12 @@ public class L2PcTemplate extends L2CharTemplate
 		super(set);
 		_classId = ClassId.getClassId(set.getInt("classId"));
 		setRace(_classId.getRace());
-		_baseHp = new float[Config.MAX_PLAYER_LEVEL];
-		_baseMp = new float[Config.MAX_PLAYER_LEVEL];
-		_baseCp = new float[Config.MAX_PLAYER_LEVEL];
-		_baseHpReg = new double[Config.MAX_PLAYER_LEVEL];
-		_baseMpReg = new double[Config.MAX_PLAYER_LEVEL];
-		_baseCpReg = new double[Config.MAX_PLAYER_LEVEL];
+		_baseHp = new float[Config.MAX_PLAYER_LEVEL + 1];
+		_baseMp = new float[Config.MAX_PLAYER_LEVEL + 1];
+		_baseCp = new float[Config.MAX_PLAYER_LEVEL + 1];
+		_baseHpReg = new double[Config.MAX_PLAYER_LEVEL + 1];
+		_baseMpReg = new double[Config.MAX_PLAYER_LEVEL + 1];
+		_baseCpReg = new double[Config.MAX_PLAYER_LEVEL + 1];
 		
 		_baseSlotDef = new HashMap<>(12);
 		_baseSlotDef.put(Inventory.PAPERDOLL_CHEST, set.getInt("basePDefchest", 0));
