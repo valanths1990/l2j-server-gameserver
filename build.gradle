@@ -16,6 +16,7 @@ configurations.all {
 
 dependencies {
 	compile 'com.mchange:c3p0:0.9.5.2'
+	compile 'com.mchange:mchange-commons-java:0.2.12'
 	compile 'com.jolbox:bonecp:0.8.0.RELEASE'
 	compile 'com.sun.mail:javax.mail:1.5.6'
 	compile 'com.zaxxer:HikariCP:2.6.1'

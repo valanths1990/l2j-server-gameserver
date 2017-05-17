@@ -5,7 +5,7 @@ title Game Server Console
 echo Starting L2J Game Server.
 echo.
 
-java -Djava.util.logging.manager=com.l2jserver.util.L2LogManager -Dpython.cachedir=../cachedir -Xms1024m -Xmx1536m -jar l2jserver.jar
+java -Dpython.cachedir=../cachedir -Xms1024m -Xmx1792m -jar l2jserver.jar
 
 REM NOTE: If you have a powerful machine, you could modify/add some extra parameters for performance, like:
 REM -Xms1536m
