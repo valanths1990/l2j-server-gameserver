@@ -87,7 +87,6 @@ public enum Stats
 	CRITICAL_RATE_POS("critRatePos"),
 	BLOW_RATE("blowRate"),
 	MCRITICAL_RATE("mCritRate"),
-	EXPSP_RATE("rExp"),
 	BONUS_EXP("bonusExp"),
 	BONUS_SP("bonusSp"),
 	ATTACK_CANCEL("cancel"),
