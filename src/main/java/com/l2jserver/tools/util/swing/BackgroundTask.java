@@ -22,7 +22,7 @@ package com.l2jserver.tools.util.swing;
  * @author HorridoJoho
  */
 @FunctionalInterface
-public interface BackgroundTaskSupplier<T>
+public interface BackgroundTask<T>
 {
 	T get() throws Throwable;
 }

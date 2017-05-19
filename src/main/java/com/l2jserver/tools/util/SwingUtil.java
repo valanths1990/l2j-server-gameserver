@@ -24,15 +24,15 @@ import java.awt.Window;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
+import com.l2jserver.tools.util.swing.BackgroundTask;
 import com.l2jserver.tools.util.swing.BackgroundTaskRunner;
-import com.l2jserver.tools.util.swing.BackgroundTaskSupplier;
 
 /**
  * @author HorridoJoho
  */
 public final class SwingUtil
 {
-	public static <T> T runBackgroundTaskWithDialog(Window owner, String title, Container contentPane, BackgroundTaskSupplier<T> task) throws Throwable
+	public static <T> T runBackgroundTaskWithDialog(Window owner, String title, Container contentPane, BackgroundTask<T> task) throws Throwable
 	{
 		final JDialog dialog = new JDialog(owner, title);
 		dialog.setContentPane(contentPane);
