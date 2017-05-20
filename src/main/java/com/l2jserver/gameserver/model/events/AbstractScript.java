@@ -3186,8 +3186,9 @@ public abstract class AbstractScript implements INamable
 	 */
 	public void teleportPlayer(L2PcInstance player, Location loc, int instanceId, boolean allowRandomOffset)
 	{
-		loc.setInstanceId(instanceId);
-		player.teleToLocation(loc, allowRandomOffset);
+		Location copy = new Location(loc.getX(), loc.getY(), loc.getZ());
+		copy.setInstanceId(instanceId);
+		player.teleToLocation(copy, allowRandomOffset);
 	}
 	
 	/**
