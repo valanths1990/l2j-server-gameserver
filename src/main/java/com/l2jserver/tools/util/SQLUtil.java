@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.tools.dbinstaller.util;
+package com.l2jserver.tools.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.TimeZone;
 
+import com.l2jserver.tools.util.io.FileWriterStdout;
 import com.l2jserver.util.file.filter.SQLFilter;
 
 /**
@@ -64,14 +65,7 @@ public final class SQLUtil
 	
 	public static void close(Connection con)
 	{
-		try
-		{
-			con.close();
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
+		ResourceUtil.close(con);
 	}
 	
 	public static void createDump(Connection con, String db) throws IOException, SQLException

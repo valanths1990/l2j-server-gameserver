@@ -35,10 +35,10 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 
 import com.l2jserver.tools.dbinstaller.RunTasks;
-import com.l2jserver.tools.dbinstaller.util.SQLUtil;
-import com.l2jserver.tools.dbinstaller.util.swing.SpringUtilities;
 import com.l2jserver.tools.images.ImagesTable;
+import com.l2jserver.tools.util.SQLUtil;
 import com.l2jserver.tools.util.SwingUtil;
+import com.l2jserver.tools.util.swing.SpringUtilities;
 
 /**
  * @author mrTJO, HorridoJoho

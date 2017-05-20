@@ -22,8 +22,8 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.prefs.Preferences;
 
-import com.l2jserver.tools.IApplicationFrontend;
-import com.l2jserver.tools.dbinstaller.util.SQLUtil;
+import com.l2jserver.tools.util.SQLUtil;
+import com.l2jserver.tools.util.app.IApplicationFrontend;
 import com.l2jserver.util.file.filter.SQLFilter;
 
 /**

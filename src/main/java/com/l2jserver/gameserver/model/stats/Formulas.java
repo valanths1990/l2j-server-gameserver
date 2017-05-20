@@ -27,6 +27,7 @@ import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.data.xml.impl.HitConditionBonusData;
 import com.l2jserver.gameserver.data.xml.impl.KarmaData;
+import com.l2jserver.gameserver.enums.DispelCategory;
 import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
@@ -1972,12 +1973,12 @@ public final class Formulas
 		return Rnd.get(100) < rate;
 	}
 	
-	public static List<BuffInfo> calcCancelStealEffects(L2Character activeChar, L2Character target, Skill skill, String slot, int rate, int max)
+	public static List<BuffInfo> calcCancelEffects(L2Character activeChar, L2Character target, Skill skill, DispelCategory slot, int rate, int max)
 	{
 		final List<BuffInfo> canceled = new ArrayList<>(max);
 		switch (slot)
 		{
-			case "buff":
+			case BUFF:
 			{
 				// Resist Modifier.
 				int cancelMagicLvl = skill.getMagicLevel();
@@ -1999,13 +2000,13 @@ public final class Formulas
 				
 				// Prevent initialization.
 				final List<BuffInfo> buffs = target.getEffectList().hasBuffs() ? new ArrayList<>(target.getEffectList().getBuffs()) : new ArrayList<>(1);
-				if (target.getEffectList().hasTriggered())
-				{
-					buffs.addAll(target.getEffectList().getTriggered());
-				}
 				if (target.getEffectList().hasDances())
 				{
 					buffs.addAll(target.getEffectList().getDances());
+				}
+				if (target.getEffectList().hasTriggered())
+				{
+					buffs.addAll(target.getEffectList().getTriggered());
 				}
 				for (int i = buffs.size() - 1; i >= 0; i--) // reverse order
 				{
@@ -2022,7 +2023,68 @@ public final class Formulas
 				}
 				break;
 			}
-			case "debuff":
+			case DEBUFF:
+			{
+				final List<BuffInfo> debuffs = new ArrayList<>(target.getEffectList().getDebuffs());
+				for (int i = debuffs.size() - 1; i >= 0; i--)
+				{
+					BuffInfo info = debuffs.get(i);
+					if (info.getSkill().isDebuff() && info.getSkill().canBeDispeled() && (Rnd.get(100) <= rate))
+					{
+						canceled.add(info);
+						if (canceled.size() >= max)
+						{
+							break;
+						}
+					}
+				}
+				break;
+			}
+		}
+		return canceled;
+	}
+	
+	public static List<BuffInfo> calcStealEffects(L2Character activeChar, L2Character target, Skill skill, DispelCategory slot, int rate, int max)
+	{
+		final List<BuffInfo> canceled = new ArrayList<>(max);
+		final int cancelMagicLvl = skill.getMagicLevel();
+		switch (slot)
+		{
+			case BUFF:
+			{
+				// Prevent initialization.
+				final List<BuffInfo> buffs = target.getEffectList().hasBuffs() ? new ArrayList<>(target.getEffectList().getBuffs()) : new ArrayList<>(max);
+				if (target.getEffectList().hasDances())
+				{
+					buffs.addAll(target.getEffectList().getDances());
+				}
+				if (target.getEffectList().hasTriggered())
+				{
+					buffs.addAll(target.getEffectList().getTriggered());
+				}
+				
+				int pos = max;
+				for (int i = buffs.size() - 1; i >= 0; i--)
+				{
+					BuffInfo info = buffs.get(i);
+					if (!info.getSkill().canBeStolen())
+					{
+						continue;
+					}
+					pos--;
+					if (calcCancelSuccess(info, cancelMagicLvl, rate, skill))
+					{
+						canceled.add(info);
+					}
+					
+					if (pos < 1)
+					{
+						break;
+					}
+				}
+				break;
+			}
+			case DEBUFF:
 			{
 				final List<BuffInfo> debuffs = new ArrayList<>(target.getEffectList().getDebuffs());
 				for (int i = debuffs.size() - 1; i >= 0; i--)

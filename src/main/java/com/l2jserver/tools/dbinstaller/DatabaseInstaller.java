@@ -22,9 +22,9 @@ import java.awt.HeadlessException;
 
 import javax.swing.UIManager;
 
-import com.l2jserver.tools.IApplicationFrontend;
 import com.l2jserver.tools.dbinstaller.frontend.stdio.DBInstallerStdio;
 import com.l2jserver.tools.dbinstaller.frontend.swing.DBConfigGUI;
+import com.l2jserver.tools.util.app.IApplicationFrontend;
 
 /**
  * Code basically merged from LauncherLS/GS to remove the code duplication.

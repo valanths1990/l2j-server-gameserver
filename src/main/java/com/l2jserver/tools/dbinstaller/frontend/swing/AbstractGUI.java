@@ -23,7 +23,7 @@ import java.text.MessageFormat;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import com.l2jserver.tools.IApplicationFrontend;
+import com.l2jserver.tools.util.app.IApplicationFrontend;
 
 /**
  * @author HorridoJoho
