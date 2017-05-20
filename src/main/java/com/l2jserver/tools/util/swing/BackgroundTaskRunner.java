@@ -30,19 +30,19 @@ import java.util.Objects;
 public class BackgroundTaskRunner<T> implements Runnable, ComponentListener
 {
 	private final Dialog _dialog;
-	private final BackgroundTaskSupplier<T> _task;
+	private final BackgroundTask<T> _task;
 	private final Thread _thread;
 	
 	private Throwable _thrown;
 	private T _result;
 	
-	public BackgroundTaskRunner(Dialog dialog, BackgroundTaskSupplier<T> task)
+	public BackgroundTaskRunner(Dialog dialog, BackgroundTask<T> task)
 	{
 		Objects.requireNonNull(dialog);
 		Objects.requireNonNull(task);
 		_dialog = dialog;
 		_task = task;
-		_thread = new Thread(this, "SWING-BackgroundTaskRunner");
+		_thread = new Thread(this, "L2J-TOOLS-BackgroundTaskRunner");
 		
 		_dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 		_dialog.addComponentListener(this);
@@ -62,11 +62,16 @@ public class BackgroundTaskRunner<T> implements Runnable, ComponentListener
 		}
 		finally
 		{
-			if (_dialog != null)
-			{
-				_dialog.setVisible(false);
-				_dialog.removeComponentListener(this);
-			}
+			finishDialog();
+		}
+	}
+	
+	private void finishDialog()
+	{
+		if (_dialog != null)
+		{
+			_dialog.removeComponentListener(this);
+			_dialog.setVisible(false);
 		}
 	}
 	
@@ -93,7 +98,15 @@ public class BackgroundTaskRunner<T> implements Runnable, ComponentListener
 	@Override
 	public void componentShown(ComponentEvent e)
 	{
-		_thread.start();
+		try
+		{
+			_thread.start();
+		}
+		catch (Throwable t)
+		{
+			_thrown = t;
+			finishDialog();
+		}
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2017 L2J Server
+ * Copyright (C) 2004-2016 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.tools.util.swing;
+package com.l2jserver.gameserver.enums;
 
 /**
- * @author HorridoJoho
+ * @author Zealar
  */
-@FunctionalInterface
-public interface BackgroundTaskSupplier<T>
+public enum DispelCategory
 {
-	T get() throws Throwable;
+	ALL,
+	BUFF,
+	DEBUFF
 }

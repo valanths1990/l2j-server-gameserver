@@ -25,10 +25,10 @@ import java.text.MessageFormat;
 import java.util.Scanner;
 import java.util.prefs.Preferences;
 
-import com.l2jserver.tools.IApplicationFrontend;
 import com.l2jserver.tools.dbinstaller.RunTasks;
-import com.l2jserver.tools.dbinstaller.util.CloseShieldedInputStream;
-import com.l2jserver.tools.dbinstaller.util.SQLUtil;
+import com.l2jserver.tools.util.SQLUtil;
+import com.l2jserver.tools.util.app.IApplicationFrontend;
+import com.l2jserver.tools.util.io.CloseShieldedInputStream;
 
 /**
  * @author mrTJO, HorridoJoho

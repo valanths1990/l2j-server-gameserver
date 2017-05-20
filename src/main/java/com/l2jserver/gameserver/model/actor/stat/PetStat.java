@@ -24,8 +24,6 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
-import com.l2jserver.gameserver.network.SystemMessageId;
-import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 public class PetStat extends SummonStat
 {
@@ -55,10 +53,9 @@ public class PetStat extends SummonStat
 			return false;
 		}
 		
-		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PET_EARNED_S1_EXP);
-		sm.addLong(addToExp);
+		// Not used in H5
+		// SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PET_EARNED_S1_EXP).addLong(addToExp);
 		getActiveChar().updateAndBroadcastStatus(1);
-		getActiveChar().sendPacket(sm);
 		return true;
 	}
 	
