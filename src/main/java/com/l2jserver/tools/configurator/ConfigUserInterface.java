@@ -286,7 +286,7 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 				}
 				else if (line.indexOf('=') >= 0)
 				{
-					String[] kv = line.split("=");
+					String[] kv = line.split("=", 2);
 					String key = kv[0].trim();
 					StringBuilder value = new StringBuilder();
 					if (kv.length > 1)
@@ -703,7 +703,8 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 		}
 		else if (cmd.equals("about"))
 		{
-			JOptionPane.showMessageDialog(ConfigUserInterface.this, getBundle().getString("credits") + EOL + "http://www.l2jserver.com" + EOL + EOL + getBundle().getString("icons") + EOL + EOL + getBundle().getString("langText") + EOL + getBundle().getString("translation"), getBundle().getString("aboutItem"), JOptionPane.INFORMATION_MESSAGE, ImagesTable.getImage("l2jserverlogo.png"));
+			JOptionPane.showMessageDialog(ConfigUserInterface.this, getBundle().getString("credits") + EOL + "http://www.l2jserver.com" + EOL + EOL + getBundle().getString("icons") + EOL + EOL + getBundle().getString("langText") + EOL
+				+ getBundle().getString("translation"), getBundle().getString("aboutItem"), JOptionPane.INFORMATION_MESSAGE, ImagesTable.getImage("l2jserverlogo.png"));
 		}
 	}
 	

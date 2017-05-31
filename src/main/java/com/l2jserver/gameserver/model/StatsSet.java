@@ -80,6 +80,11 @@ public class StatsSet implements IParserAdvUtils
 		return _set.isEmpty();
 	}
 	
+	public boolean containsKey(String key)
+	{
+		return _set.containsKey(key);
+	}
+	
 	/**
 	 * Return the boolean value associated with key.
 	 * @param key : String designating the key in the set
@@ -641,7 +646,7 @@ public class StatsSet implements IParserAdvUtils
 	
 	public void safeSet(String key, int value, int min, int max, String reference)
 	{
-		assert!(((min <= max) && ((value < min) || (value >= max))));
+		assert !(((min <= max) && ((value < min) || (value >= max))));
 		if ((min <= max) && ((value < min) || (value >= max)))
 		{
 			_log.log(Level.SEVERE, "Incorrect value: " + value + "for: " + key + "Ref: " + reference);

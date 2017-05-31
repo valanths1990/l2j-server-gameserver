@@ -63,6 +63,11 @@ public class SkillHolder
 		return SkillData.getInstance().getSkill(_skillId, Math.max(_skillLvl, 1));
 	}
 	
+	public final Skill getSkill(int levelOverride)
+	{
+		return SkillData.getInstance().getSkill(_skillId, Math.max(levelOverride, 1));
+	}
+	
 	@Override
 	public String toString()
 	{

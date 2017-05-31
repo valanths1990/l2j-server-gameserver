@@ -6340,6 +6340,16 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		getStatus().setCurrentHp(newHp);
 	}
 	
+	public final int getHpPercentage()
+	{
+		return (int) ((getCurrentHp() / getMaxHp()) * 100.0);
+	}
+	
+	public final int getMpPercentage()
+	{
+		return (int) ((getCurrentMp() / getMaxMp()) * 100.0);
+	}
+	
 	public final void setCurrentHpMp(double newHp, double newMp)
 	{
 		getStatus().setCurrentHpMp(newHp, newMp);
