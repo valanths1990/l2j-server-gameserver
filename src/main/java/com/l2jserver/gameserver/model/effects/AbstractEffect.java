@@ -87,7 +87,7 @@ public abstract class AbstractEffect
 		final Class<? extends AbstractEffect> handler = EffectHandler.getInstance().getHandler(name);
 		if (handler == null)
 		{
-			_log.warning(AbstractEffect.class.getSimpleName() + ": Requested unexistent effect handler: " + name);
+			_log.warning(AbstractEffect.class.getSimpleName() + ": Requested unexistent effect handler: " + name + " in skill[" + set.getInt("id") + "]");
 			return null;
 		}
 		
@@ -98,7 +98,7 @@ public abstract class AbstractEffect
 		}
 		catch (NoSuchMethodException | SecurityException e)
 		{
-			_log.warning(AbstractEffect.class.getSimpleName() + ": Requested unexistent constructor for effect handler: " + name + ": " + e.getMessage());
+			_log.warning(AbstractEffect.class.getSimpleName() + ": Requested unexistent constructor for effect handler: " + name + " in skill[" + set.getInt("id") + "] : " + e.getMessage());
 			return null;
 		}
 		
@@ -108,7 +108,7 @@ public abstract class AbstractEffect
 		}
 		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 		{
-			_log.warning(AbstractEffect.class.getSimpleName() + ": Unable to initialize effect handler: " + name + ": " + e.getMessage());
+			_log.warning(AbstractEffect.class.getSimpleName() + ": Unable to initialize effect handler: " + name + " in skill[" + set.getInt("id") + "] : " + e.getMessage());
 		}
 		return null;
 	}
