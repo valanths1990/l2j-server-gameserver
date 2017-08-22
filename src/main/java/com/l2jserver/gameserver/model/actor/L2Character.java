@@ -4301,7 +4301,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		double dx = (x - curX);
 		double dy = (y - curY);
 		double dz = (z - curZ);
-		double distance = Math.sqrt((dx * dx) + (dy * dy));
+		double distance = Math.hypot(dx, dy);
 		
 		final boolean verticalMovementOnly = isFlying() && (distance == 0) && (dz != 0);
 		if (verticalMovementOnly)
@@ -4320,7 +4320,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			dx = (x - curX);
 			dy = (y - curY);
 			dz = (z - curZ);
-			distance = Math.sqrt((dx * dx) + (dy * dy));
+			distance = Math.hypot(dx, dy);
 		}
 		
 		// @formatter:off
@@ -4446,7 +4446,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				dx = x - curX;
 				dy = y - curY;
 				dz = z - curZ;
-				distance = verticalMovementOnly ? Math.abs(dz * dz) : Math.sqrt((dx * dx) + (dy * dy));
+				distance = verticalMovementOnly ? Math.pow(dz, 2) : Math.hypot(dx, dy);
 			}
 			// Pathfinding checks. Only when geodata setting is 2, the LoS check gives shorter result
 			// than the original movement was and the LoS gives a shorter distance than 2000
@@ -4511,7 +4511,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 						dx = x - curX;
 						dy = y - curY;
 						dz = z - curZ;
-						distance = verticalMovementOnly ? Math.abs(dz * dz) : Math.sqrt((dx * dx) + (dy * dy));
+						distance = verticalMovementOnly ? Math.pow(dz, 2) : Math.hypot(dx, dy);
 						sin = dy / distance;
 						cos = dx / distance;
 					}
@@ -4532,7 +4532,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		// Apply Z distance for flying or swimming for correct timing calculations
 		if ((isFlying() || isInsideZone(ZoneId.WATER)) && !verticalMovementOnly)
 		{
-			distance = Math.sqrt((distance * distance) + (dz * dz));
+			distance = Math.hypot(distance, dz);
 		}
 		
 		// Caclulate the Nb of ticks between the current position and the destination
@@ -4616,9 +4616,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			m._yDestination = md.geoPath.get(m.onGeodataPathIndex).getY();
 			m._zDestination = md.geoPath.get(m.onGeodataPathIndex).getZ();
 		}
-		double dx = (m._xDestination - super.getX());
-		double dy = (m._yDestination - super.getY());
-		double distance = Math.sqrt((dx * dx) + (dy * dy));
+		
+		double distance = Math.hypot(m._xDestination - super.getX(), m._yDestination - super.getY());
 		// Calculate and set the heading of the L2Character
 		if (distance != 0)
 		{

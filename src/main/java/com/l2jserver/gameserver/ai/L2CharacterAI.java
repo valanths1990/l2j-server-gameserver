@@ -1019,7 +1019,7 @@ public class L2CharacterAI extends AbstractAI
 			double dx = worldPosition.getX() - x;
 			double dy = worldPosition.getY() - y;
 			
-			double dist = Math.sqrt((dx * dx) + (dy * dy));
+			double dist = Math.hypot(dx, dy);
 			
 			double sin = dy / dist;
 			double cos = dx / dist;

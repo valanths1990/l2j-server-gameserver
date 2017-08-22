@@ -180,9 +180,7 @@ public class BoatManager
 	{
 		for (L2PcInstance player : L2World.getInstance().getPlayers())
 		{
-			double dx = (double) player.getX() - point1.getX();
-			double dy = (double) player.getY() - point1.getY();
-			if (Math.sqrt((dx * dx) + (dy * dy)) < Config.BOAT_BROADCAST_RADIUS)
+			if (Math.hypot(player.getX() - point1.getX(), player.getY() - point1.getY()) < Config.BOAT_BROADCAST_RADIUS)
 			{
 				for (L2GameServerPacket p : packets)
 				{
@@ -191,9 +189,7 @@ public class BoatManager
 			}
 			else
 			{
-				dx = (double) player.getX() - point2.getX();
-				dy = (double) player.getY() - point2.getY();
-				if (Math.sqrt((dx * dx) + (dy * dy)) < Config.BOAT_BROADCAST_RADIUS)
+				if (Math.hypot(player.getX() - point2.getX(), player.getY() - point2.getY()) < Config.BOAT_BROADCAST_RADIUS)
 				{
 					for (L2GameServerPacket p : packets)
 					{
