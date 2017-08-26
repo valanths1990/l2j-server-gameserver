@@ -93,8 +93,7 @@ public final class Util
 	
 	public static final double convertHeadingToDegree(int clientHeading)
 	{
-		double degree = clientHeading / 182.044444444;
-		return degree;
+		return clientHeading / 182.044444444;
 	}
 	
 	public static final int convertDegreeToClientHeading(double degree)
@@ -247,16 +246,12 @@ public final class Util
 			rad += ((L2Character) obj2).getTemplate().getCollisionRadius();
 		}
 		
-		double dx = obj1.getX() - obj2.getX();
-		double dy = obj1.getY() - obj2.getY();
-		double d = (dx * dx) + (dy * dy);
-		
+		double d = Math.hypot(obj1.getX() - obj2.getX(), obj1.getY() - obj2.getY());
 		if (includeZAxis)
 		{
-			double dz = obj1.getZ() - obj2.getZ();
-			d += (dz * dz);
+			d = Math.hypot(d, obj1.getZ() - obj2.getZ());
 		}
-		return d <= ((range * range) + (2 * range * rad) + (rad * rad));
+		return (d - (rad / 2)) <= range;
 	}
 	
 	/**
@@ -278,15 +273,12 @@ public final class Util
 			return true; // not limited
 		}
 		
-		int dx = obj1.getX() - obj2.getX();
-		int dy = obj1.getY() - obj2.getY();
-		
+		double d = Math.hypot(obj1.getX() - obj2.getX(), obj1.getY() - obj2.getY());
 		if (includeZAxis)
 		{
-			int dz = obj1.getZ() - obj2.getZ();
-			return ((dx * dx) + (dy * dy) + (dz * dz)) <= (radius * radius);
+			return Math.hypot(d, obj1.getZ() - obj2.getZ()) <= radius;
 		}
-		return ((dx * dx) + (dy * dy)) <= (radius * radius);
+		return d <= radius;
 	}
 	
 	/**

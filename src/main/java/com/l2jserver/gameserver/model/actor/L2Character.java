@@ -1167,7 +1167,6 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	private boolean doAttackHitByBow(Attack attack, L2Character target, int sAtk, int reuse)
 	{
-		
 		int damage1 = 0;
 		byte shld1 = 0;
 		boolean crit1 = false;
@@ -4927,7 +4926,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					
 					if (absorbDamage > maxCanAbsorb)
 					{
-						absorbDamage = maxCanAbsorb; // Can't absord more than max hp
+						absorbDamage = maxCanAbsorb; // Can't absorb more than max hp
 					}
 					
 					if (absorbDamage > 0)

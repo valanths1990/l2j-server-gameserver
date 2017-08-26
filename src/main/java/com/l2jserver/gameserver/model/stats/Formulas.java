@@ -1165,24 +1165,6 @@ public final class Formulas
 		return Rnd.get(100) < rate;
 	}
 	
-	/**
-	 * Calculate delay (in milliseconds) before next ATTACK
-	 * @param attacker
-	 * @param target
-	 * @param rate
-	 * @return
-	 */
-	public static final int calcPAtkSpd(L2Character attacker, L2Character target, double rate)
-	{
-		// measured Oct 2006 by Tank6585, formula by Sami
-		// attack speed 312 equals 1500 ms delay... (or 300 + 40 ms delay?)
-		if (rate < 2)
-		{
-			return 2700;
-		}
-		return (int) (470000 / rate);
-	}
-	
 	public static double calcCastTime(L2Character character, Skill skill)
 	{
 		double skillAnimTime = skill.getHitTime();
@@ -1928,8 +1910,7 @@ public final class Formulas
 		{
 			return false;
 		}
-		final double reflectChance = target.calcStat(skill.isMagic() ? Stats.REFLECT_SKILL_MAGIC : Stats.REFLECT_SKILL_PHYSIC, 0, null, skill);
-		return reflectChance > Rnd.get(100);
+		return target.calcStat(skill.isMagic() ? Stats.REFLECT_SKILL_MAGIC : Stats.REFLECT_SKILL_PHYSIC, 0, null, skill) > Rnd.get(100);
 	}
 	
 	/**
@@ -1944,8 +1925,7 @@ public final class Formulas
 		{
 			return 0;
 		}
-		final double damage = cha.calcStat(Stats.FALL, (fallHeight * cha.getMaxHp()) / 1000.0, null, null);
-		return damage;
+		return cha.calcStat(Stats.FALL, (fallHeight * cha.getMaxHp()) / 1000.0, null, null);
 	}
 	
 	public static boolean calcBlowSuccess(L2Character activeChar, L2Character target, Skill skill)
