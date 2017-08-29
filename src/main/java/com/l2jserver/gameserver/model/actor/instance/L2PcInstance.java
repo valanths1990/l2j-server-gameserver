@@ -7888,6 +7888,7 @@ public final class L2PcInstance extends L2Playable
 			case AREA_SUMMON:
 			case GROUND:
 			case SELF:
+			case ENEMY:
 				break;
 			default:
 				// Verify that player can attack a player or summon
@@ -7979,7 +7980,7 @@ public final class L2PcInstance extends L2Playable
 			
 			final boolean isCtrlPressed = (getCurrentSkill() != null) && getCurrentSkill().isCtrlPressed();
 			
-			// Pece Zone
+			// Peace Zone
 			if (target.isInsideZone(ZoneId.PEACE))
 			{
 				return false;

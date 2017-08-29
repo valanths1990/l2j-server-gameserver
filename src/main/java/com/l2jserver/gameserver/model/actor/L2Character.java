@@ -5794,9 +5794,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					// EVT_ATTACKED and PvPStatus
 					if (target instanceof L2Character)
 					{
-						if (skill.getEffectPoint() <= 0)
+						if (skill.isBad())
 						{
-							if ((target.isPlayable() || target.isTrap()) && skill.isBad())
+							if (target.isPlayable() || target.isTrap())
 							{
 								// Casted on target_self but don't harm self
 								if (!target.equals(this))
@@ -5817,7 +5817,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 									
 									// attack of the own pet does not flag player
 									// triggering trap not flag trap owner
-									if ((player.getSummon() != target) && !isTrap() && !((skill.getEffectPoint() == 0) && (skill.getAffectRange() > 0)))
+									if ((player.getSummon() != target) && !isTrap() && (skill.getAffectRange() <= 0))
 									{
 										player.updatePvPStatus((L2Character) target);
 									}

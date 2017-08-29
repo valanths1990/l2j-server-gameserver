@@ -56,6 +56,7 @@ import com.l2jserver.gameserver.model.effects.L2EffectType;
 import com.l2jserver.gameserver.model.entity.TvTEvent;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
+import com.l2jserver.gameserver.model.skills.targets.AffectScope;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Formulas;
@@ -137,6 +138,7 @@ public class Skill implements IIdentifiable
 	
 	/** Target type of the skill : SELF, PARTY, CLAN, PET... */
 	private final L2TargetType _targetType;
+	private final AffectScope _affectScope;
 	private final int _feed;
 	// base success chance
 	private final double _power;
@@ -322,6 +324,7 @@ public class Skill implements IIdentifiable
 		}
 		
 		_targetType = set.getEnum("targetType", L2TargetType.class, L2TargetType.SELF);
+		_affectScope = set.getEnum("affectScope", AffectScope.class, AffectScope.NONE);
 		_power = set.getFloat("power", 0.f);
 		_pvpPower = set.getFloat("pvpPower", (float) getPower());
 		_pvePower = set.getFloat("pvePower", (float) getPower());
@@ -412,6 +415,15 @@ public class Skill implements IIdentifiable
 	public L2TargetType getTargetType()
 	{
 		return _targetType;
+	}
+	
+	/**
+	 * Gets the affect scope of the skill.
+	 * @return the affect scope
+	 */
+	public AffectScope getAffectScope()
+	{
+		return _affectScope;
 	}
 	
 	public boolean isAOE()
