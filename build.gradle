@@ -18,21 +18,20 @@ dependencies {
 	compile 'com.mchange:c3p0:0.9.5.2'
 	compile 'com.mchange:mchange-commons-java:0.2.12'
 	compile 'com.jolbox:bonecp:0.8.0.RELEASE'
-	compile 'com.sun.mail:javax.mail:1.5.6'
-	compile 'com.zaxxer:HikariCP:2.6.1'
+	compile 'com.sun.mail:javax.mail:1.6.0'
+	compile 'com.zaxxer:HikariCP:2.6.3'
 	compile 'mysql:mysql-connector-java:6.0.6'
-	compile 'org.mariadb.jdbc:mariadb-java-client:1.5.9'
+	compile 'org.mariadb.jdbc:mariadb-java-client:2.1.0'
 	compile 'org.bitlet:weupnp:0.1.4'
 	compile 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
-	compile 'com.google.code.gson:gson:2.8.0'
-	compile 'com.google.guava:guava:21.0'
+	compile 'com.google.code.gson:gson:2.8.1'
+	compile 'com.google.guava:guava:23.0'
 	compile 'org.python:jython:2.2.1'
 	compile 'org.slf4j:slf4j-api:1.7.25'
 	compile 'org.slf4j:slf4j-jdk14:1.7.25'
 	compile fileTree(dir: 'dist/libs', include: '*.jar')
 	testCompile 'org.testng:testng:6.11'
-	testCompile 'com.beust:jcommander:1.69'
-	testCompile 'org.jmockit:jmockit:1.31'
+	testCompile 'org.jmockit:jmockit:1.34'
 }
 
 def generalManifest = manifest {
