@@ -278,7 +278,7 @@ public final class CharEffectList
 		{
 			effects = getDebuffs();
 		}
-		else if (skill.isTriggeredSkill())
+		else if (skill.isTrigger())
 		{
 			effects = getTriggered();
 		}
@@ -1328,7 +1328,7 @@ public final class CharEffectList
 			{
 				buffsToRemove = getDanceCount() - Config.DANCES_MAX_AMOUNT;
 			}
-			else if (skill.isTriggeredSkill())
+			else if (skill.isTrigger())
 			{
 				buffsToRemove = getTriggeredBuffCount() - Config.TRIGGERED_BUFFS_MAX_AMOUNT;
 			}
