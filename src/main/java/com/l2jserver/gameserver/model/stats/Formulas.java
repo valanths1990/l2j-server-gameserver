@@ -1180,7 +1180,7 @@ public final class Formulas
 			// Calculate the Casting Time of Magic Skills (reduced in 40% if using SPS/BSPS)
 			if (skill.isMagic() && (character.isChargedShot(ShotType.SPIRITSHOTS) || character.isChargedShot(ShotType.BLESSED_SPIRITSHOTS)))
 			{
-				skillAnimTime = (int) (skillAnimTime / 1.4);
+				skillAnimTime = skillAnimTime * 0.6;
 			}
 			
 			if ((skillAnimTime < 500) && (skill.getHitTime() > 500))
