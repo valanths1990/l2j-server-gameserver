@@ -1223,11 +1223,6 @@ public final class Formulas
 	 */
 	public static byte calcShldUse(L2Character attacker, L2Character target, Skill skill, boolean sendSysMsg)
 	{
-		if ((skill != null) && skill.ignoreShield())
-		{
-			return 0;
-		}
-		
 		L2Item item = target.getSecondaryWeaponItem();
 		if ((item == null) || !(item instanceof L2Armor) || (((L2Armor) item).getItemType() == ArmorType.SIGIL))
 		{
@@ -1278,7 +1273,6 @@ public final class Formulas
 					break;
 			}
 		}
-		
 		return shldSuccess;
 	}
 	

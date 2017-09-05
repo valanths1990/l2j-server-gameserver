@@ -200,8 +200,6 @@ public class Skill implements IIdentifiable
 	
 	private final String _attribute;
 	
-	private final boolean _ignoreShield;
-	
 	private final boolean _isSuicideAttack;
 	private final boolean _canBeDispeled;
 	
@@ -332,7 +330,6 @@ public class Skill implements IIdentifiable
 		_activateRate = set.getInt("activateRate", -1);
 		_minChance = set.getInt("minChance", Config.MIN_ABNORMAL_STATE_SUCCESS_RATE);
 		_maxChance = set.getInt("maxChance", Config.MAX_ABNORMAL_STATE_SUCCESS_RATE);
-		_ignoreShield = set.getBoolean("ignoreShld", false);
 		
 		_nextActionIsAttack = set.getBoolean("nextActionAttack", false);
 		
@@ -1682,11 +1679,6 @@ public class Skill implements IIdentifiable
 	public int getBlowChance()
 	{
 		return _blowChance;
-	}
-	
-	public boolean ignoreShield()
-	{
-		return _ignoreShield;
 	}
 	
 	public boolean canBeDispeled()
