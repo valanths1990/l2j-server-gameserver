@@ -1922,11 +1922,10 @@ public final class Formulas
 		return cha.calcStat(Stats.FALL, (fallHeight * cha.getMaxHp()) / 1000.0, null, null);
 	}
 	
-	public static boolean calcBlowSuccess(L2Character activeChar, L2Character target, Skill skill)
+	public static boolean calcBlowSuccess(L2Character activeChar, L2Character target, Skill skill, int blowChance)
 	{
-		double dexMod = BaseStats.DEX.calcBonus(activeChar);
 		// Apply DEX Mod.
-		double blowChance = skill.getBlowChance();
+		double dexMod = BaseStats.DEX.calcBonus(activeChar);
 		// Apply Position Bonus (TODO: values are unconfirmed, possibly custom, remove or update when confirmed).
 		double sideMod = (activeChar.isInFrontOfTarget()) ? 1 : (activeChar.isBehindTarget()) ? 2 : 1.5;
 		// Apply all mods.
