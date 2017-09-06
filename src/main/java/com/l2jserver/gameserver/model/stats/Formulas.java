@@ -892,6 +892,126 @@ public final class Formulas
 		return damage;
 	}
 	
+	/**
+	 * Calculated damage caused by skill ATTACK of attacker on target.
+	 * @param attacker player or NPC that makes ATTACK
+	 * @param target player or NPC, target of ATTACK
+	 * @param shld
+	 * @param crit if the ATTACK have critical success
+	 * @param ss if weapon item was charged by soulshot
+	 * @return
+	 */
+	public static final double calcSkillPhysDam(L2Character attacker, L2Character target, byte shld, boolean crit, boolean ss, double power)
+	{
+		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
+		double damage = attacker.getPAtk(target);
+		double defence = target.getPDef(attacker);
+		
+		// Defense bonuses in PvP fight
+		if (isPvP)
+		{
+			defence *= target.calcStat(Stats.PVP_PHYS_SKILL_DEF, 1, null, null);
+		}
+		
+		switch (shld)
+		{
+			case SHIELD_DEFENSE_SUCCEED:
+			{
+				if (!Config.ALT_GAME_SHIELD_BLOCKS)
+				{
+					defence += target.getShldDef();
+				}
+				break;
+			}
+			case SHIELD_DEFENSE_PERFECT_BLOCK: // perfect block
+			{
+				return 1.;
+			}
+		}
+		
+		// Add soulshot boost.
+		int ssBoost = ss ? 2 : 1;
+		damage = (damage * ssBoost) + power;
+		
+		damage = (76 * damage * proximityBonus) / defence;
+		
+		damage *= calcAttackTraitBonus(attacker, target);
+		
+		// Weapon random damage
+		damage *= attacker.getRandomDamageMultiplier();
+		
+		if ((damage > 0) && (damage < 1))
+		{
+			damage = 1;
+		}
+		else if (damage < 0)
+		{
+			damage = 0;
+		}
+		
+		// Dmg bonuses in PvP fight
+		if (isPvP)
+		{
+			damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);
+		}
+		
+		// Physical skill dmg boost
+		damage = attacker.calcStat(Stats.PHYSICAL_SKILL_POWER, damage, null, null);
+		
+		damage *= calcAttributeBonus(attacker, target, null);
+		if (target.isAttackable())
+		{
+			final L2Weapon weapon = attacker.getActiveWeaponItem();
+			if ((weapon != null) && ((weapon.getItemType() == WeaponType.BOW) || (weapon.getItemType() == WeaponType.CROSSBOW)))
+			{
+				damage *= attacker.calcStat(Stats.PVE_BOW_SKILL_DMG, 1, null, null);
+			}
+			else
+			{
+				damage *= attacker.calcStat(Stats.PVE_PHYSICAL_DMG, 1, null, null);
+			}
+			
+			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
+			{
+				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
+				
+				if (lvlDiff >= Config.NPC_SKILL_DMG_PENALTY.size())
+				{
+					damage *= Config.NPC_SKILL_DMG_PENALTY.get(Config.NPC_SKILL_DMG_PENALTY.size() - 1);
+				}
+				else
+				{
+					damage *= Config.NPC_SKILL_DMG_PENALTY.get(lvlDiff);
+				}
+				
+				if (crit)
+				{
+					if (lvlDiff >= Config.NPC_CRIT_DMG_PENALTY.size())
+					{
+						damage *= Config.NPC_CRIT_DMG_PENALTY.get(Config.NPC_CRIT_DMG_PENALTY.size() - 1);
+					}
+					else
+					{
+						damage *= Config.NPC_CRIT_DMG_PENALTY.get(lvlDiff);
+					}
+				}
+				else
+				{
+					if (lvlDiff >= Config.NPC_DMG_PENALTY.size())
+					{
+						damage *= Config.NPC_DMG_PENALTY.get(Config.NPC_DMG_PENALTY.size() - 1);
+					}
+					else
+					{
+						damage *= Config.NPC_DMG_PENALTY.get(lvlDiff);
+					}
+				}
+			}
+		}
+		return damage;
+	}
+	
 	public static final double calcMagicDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean sps, boolean bss, boolean mcrit)
 	{
 		double mDef = target.getMDef(attacker, skill);
