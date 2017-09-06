@@ -436,7 +436,7 @@ public class Skill implements IIdentifiable
 	
 	public boolean isDamage()
 	{
-		return hasEffectType(L2EffectType.MAGICAL_ATTACK, L2EffectType.HP_DRAIN, L2EffectType.PHYSICAL_ATTACK, L2EffectType.PHYSICAL_ATTACK_HP_LINK);
+		return hasEffectType(L2EffectType.MAGICAL_ATTACK, L2EffectType.HP_DRAIN, L2EffectType.PHYSICAL_ATTACK);
 	}
 	
 	public boolean isOverhit()
@@ -467,11 +467,6 @@ public class Skill implements IIdentifiable
 		if (hasEffectType(L2EffectType.DEATH_LINK))
 		{
 			return getPower(isPvP, isPvE) * (-((activeChar.getCurrentHp() * 2) / activeChar.getMaxHp()) + 2);
-		}
-		
-		if (hasEffectType(L2EffectType.PHYSICAL_ATTACK_HP_LINK))
-		{
-			return getPower(isPvP, isPvE) * (-((target.getCurrentHp() * 2) / target.getMaxHp()) + 2);
 		}
 		return getPower(isPvP, isPvE);
 	}
@@ -915,7 +910,7 @@ public class Skill implements IIdentifiable
 	
 	public boolean useSoulShot()
 	{
-		return hasEffectType(L2EffectType.PHYSICAL_ATTACK, L2EffectType.PHYSICAL_ATTACK_HP_LINK);
+		return hasEffectType(L2EffectType.PHYSICAL_ATTACK);
 	}
 	
 	public boolean useSpiritShot()

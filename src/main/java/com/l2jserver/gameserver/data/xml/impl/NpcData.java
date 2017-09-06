@@ -552,7 +552,7 @@ public class NpcData implements IXmlReader
 										{
 											aiSkillScopes.add(AISkillScope.HEAL);
 										}
-										else if (skill.hasEffectType(L2EffectType.PHYSICAL_ATTACK, L2EffectType.PHYSICAL_ATTACK_HP_LINK, L2EffectType.MAGICAL_ATTACK, L2EffectType.DEATH_LINK, L2EffectType.HP_DRAIN))
+										else if (skill.hasEffectType(L2EffectType.PHYSICAL_ATTACK, L2EffectType.MAGICAL_ATTACK, L2EffectType.DEATH_LINK, L2EffectType.HP_DRAIN))
 										{
 											aiSkillScopes.add(AISkillScope.ATTACK);
 											aiSkillScopes.add(AISkillScope.UNIVERSAL);
