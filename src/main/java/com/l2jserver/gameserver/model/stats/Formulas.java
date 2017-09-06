@@ -1087,30 +1087,28 @@ public final class Formulas
 		return damage;
 	}
 	
+	/**
+	 * Returns true in case of critical hit
+	 * @param attacker
+	 * @param target
+	 * @return
+	 */
 	public static final boolean calcCrit(L2Character attacker, L2Character target)
 	{
-		return calcCrit(attacker, target, null);
+		double rate = attacker.getStat().calcStat(Stats.CRITICAL_RATE_POS, attacker.getStat().getCriticalHit(target, null));
+		return (target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE, rate, null, null) + target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE_ADD, 0, null, null)) > Rnd.get(1000);
 	}
 	
 	/**
-	 * Returns true in case of critical hit
+	 * Returns true in case of physical skill critical hit
 	 * @param attacker
 	 * @param target
 	 * @param skill
 	 * @return
 	 */
-	public static final boolean calcCrit(L2Character attacker, L2Character target, Skill skill)
+	public static final boolean calcSkillCrit(L2Character attacker, L2Character target, int criticalChance)
 	{
-		double rate = 0.d;
-		if (skill != null)
-		{
-			rate = skill.getBaseCritRate() * 10 * BaseStats.STR.calcBonus(attacker);
-		}
-		else
-		{
-			rate = (int) attacker.getStat().calcStat(Stats.CRITICAL_RATE_POS, attacker.getStat().getCriticalHit(target, null));
-		}
-		return (target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE, rate, null, null) + target.getStat().calcStat(Stats.DEFENCE_CRITICAL_RATE_ADD, 0, null, null)) > Rnd.get(1000);
+		return (BaseStats.STR.calcBonus(attacker) * criticalChance) > (Rnd.nextDouble() * 100);
 	}
 	
 	public static final boolean calcMCrit(double mRate)
