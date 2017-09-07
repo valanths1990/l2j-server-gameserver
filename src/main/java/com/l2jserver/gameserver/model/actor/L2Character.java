@@ -1189,7 +1189,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			crit1 = Formulas.calcCrit(this, target);
 			
 			// Calculate physical damages
-			damage1 = (int) Formulas.calcPhysDam(this, target, null, shld1, crit1, attack.hasSoulshot());
+			damage1 = (int) Formulas.calcPhysDam(this, target, shld1, crit1, attack.hasSoulshot());
 			
 			// Bows Ranged Damage Formula (Damage gradually decreases when 60% or lower than full hit range, and increases when 60% or higher).
 			// full hit range is 500 which is the base bow range, and the 60% of this is 800.
@@ -1258,7 +1258,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			crit1 = Formulas.calcCrit(this, target);
 			
 			// Calculate physical damages
-			damage1 = (int) Formulas.calcPhysDam(this, target, null, shld1, crit1, attack.hasSoulshot());
+			damage1 = (int) Formulas.calcPhysDam(this, target, shld1, crit1, attack.hasSoulshot());
 		}
 		
 		// Check if the L2Character is a L2PcInstance
@@ -1324,7 +1324,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			crit1 = Formulas.calcCrit(this, target);
 			
 			// Calculate physical damages of hit 1
-			damage1 = (int) Formulas.calcPhysDam(this, target, null, shld1, crit1, attack.hasSoulshot());
+			damage1 = (int) Formulas.calcPhysDam(this, target, shld1, crit1, attack.hasSoulshot());
 			damage1 /= 2;
 		}
 		
@@ -1338,7 +1338,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			crit2 = Formulas.calcCrit(this, target);
 			
 			// Calculate physical damages of hit 2
-			damage2 = (int) Formulas.calcPhysDam(this, target, null, shld2, crit2, attack.hasSoulshot());
+			damage2 = (int) Formulas.calcPhysDam(this, target, shld2, crit2, attack.hasSoulshot());
 			damage2 /= 2;
 		}
 		
@@ -1519,7 +1519,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			crit1 = Formulas.calcCrit(this, target);
 			
 			// Calculate physical damages
-			damage1 = (int) Formulas.calcPhysDam(this, target, null, shld1, crit1, attack.hasSoulshot());
+			damage1 = (int) Formulas.calcPhysDam(this, target, shld1, crit1, attack.hasSoulshot());
 			
 			if (attackpercent != 100)
 			{

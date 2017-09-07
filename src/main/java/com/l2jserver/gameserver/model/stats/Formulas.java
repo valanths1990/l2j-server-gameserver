@@ -740,16 +740,14 @@ public final class Formulas
 	 * Calculated damage caused by ATTACK of attacker on target.
 	 * @param attacker player or NPC that makes ATTACK
 	 * @param target player or NPC, target of ATTACK
-	 * @param skill
 	 * @param shld
 	 * @param crit if the ATTACK have critical success
 	 * @param ss if weapon item was charged by soulshot
 	 * @return
 	 */
-	public static final double calcPhysDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean crit, boolean ss)
+	public static final double calcPhysDam(L2Character attacker, L2Character target, byte shld, boolean crit, boolean ss)
 	{
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		final boolean isPvE = attacker.isPlayable() && target.isAttackable();
 		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
 		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
@@ -757,7 +755,7 @@ public final class Formulas
 		// Defense bonuses in PvP fight
 		if (isPvP)
 		{
-			defence *= (skill == null) ? target.calcStat(Stats.PVP_PHYSICAL_DEF, 1, null, null) : target.calcStat(Stats.PVP_PHYS_SKILL_DEF, 1, null, null);
+			defence *= target.calcStat(Stats.PVP_PHYSICAL_DEF, 1, null, null);
 		}
 		
 		switch (shld)
@@ -778,13 +776,14 @@ public final class Formulas
 		
 		// Add soulshot boost.
 		int ssBoost = ss ? 2 : 1;
-		damage = (skill != null) ? ((damage * ssBoost) + skill.getPower(attacker, target, isPvP, isPvE)) : (damage * ssBoost);
+		damage *= ssBoost;
+		
 		if (crit)
 		{
 			// H5 Damage Formula
-			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill) * attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((76 * damage * proximityBonus) / defence);
-			damage += ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, skill) * 77) / defence);
-			damage += target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, skill);
+			damage = 2 * attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, null) * attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, null) * target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE, 1, target, null) * ((76 * damage * proximityBonus) / defence);
+			damage += ((attacker.calcStat(Stats.CRITICAL_DAMAGE_ADD, 0, target, null) * 77) / defence);
+			damage += target.calcStat(Stats.DEFENCE_CRITICAL_DAMAGE_ADD, 0, target, null);
 		}
 		else
 		{
@@ -816,36 +815,16 @@ public final class Formulas
 		// Dmg bonuses in PvP fight
 		if (isPvP)
 		{
-			if (skill == null)
-			{
-				damage *= attacker.calcStat(Stats.PVP_PHYSICAL_DMG, 1, null, null);
-			}
-			else
-			{
-				damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);
-			}
+			damage *= attacker.calcStat(Stats.PVP_PHYSICAL_DMG, 1, null, null);
 		}
 		
-		// Physical skill dmg boost
-		if (skill != null)
-		{
-			damage = attacker.calcStat(Stats.PHYSICAL_SKILL_POWER, damage, null, null);
-		}
-		
-		damage *= calcAttributeBonus(attacker, target, skill);
+		damage *= calcAttributeBonus(attacker, target, null);
 		if (target.isAttackable())
 		{
 			final L2Weapon weapon = attacker.getActiveWeaponItem();
 			if ((weapon != null) && ((weapon.getItemType() == WeaponType.BOW) || (weapon.getItemType() == WeaponType.CROSSBOW)))
 			{
-				if (skill != null)
-				{
-					damage *= attacker.calcStat(Stats.PVE_BOW_SKILL_DMG, 1, null, null);
-				}
-				else
-				{
-					damage *= attacker.calcStat(Stats.PVE_BOW_DMG, 1, null, null);
-				}
+				damage *= attacker.calcStat(Stats.PVE_BOW_DMG, 1, null, null);
 			}
 			else
 			{
@@ -854,18 +833,8 @@ public final class Formulas
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
 			{
 				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
-				if (skill != null)
-				{
-					if (lvlDiff >= Config.NPC_SKILL_DMG_PENALTY.size())
-					{
-						damage *= Config.NPC_SKILL_DMG_PENALTY.get(Config.NPC_SKILL_DMG_PENALTY.size() - 1);
-					}
-					else
-					{
-						damage *= Config.NPC_SKILL_DMG_PENALTY.get(lvlDiff);
-					}
-				}
-				else if (crit)
+				
+				if (crit)
 				{
 					if (lvlDiff >= Config.NPC_CRIT_DMG_PENALTY.size())
 					{
