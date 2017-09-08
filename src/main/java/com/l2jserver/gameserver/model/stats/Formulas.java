@@ -555,7 +555,7 @@ public final class Formulas
 		return 1.5; // If all is true, then modifier will be 50% more
 	}
 	
-	public static double calcBlowDamage(L2Character attacker, L2Character target, Skill skill, byte shld, boolean ss)
+	public static double calcBlowDamage(L2Character attacker, L2Character target, Skill skill, byte shld, boolean ss, double power)
 	{
 		double defence = target.getPDef(attacker);
 		
@@ -573,8 +573,6 @@ public final class Formulas
 		}
 		
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		final boolean isPvE = attacker.isPlayable() && target.isAttackable();
-		double power = skill.getPower(isPvP, isPvE);
 		double damage = 0;
 		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed);
 		double ssboost = ss ? 1.458 : 1;
@@ -625,7 +623,7 @@ public final class Formulas
 		if (attacker.isDebug())
 		{
 			final StatsSet set = new StatsSet();
-			set.set("skillPower", skill.getPower(isPvP, isPvE));
+			set.set("skillPower", power);
 			set.set("ssboost", ssboost);
 			set.set("proximityBonus", proximityBonus);
 			set.set("pvpBonus", pvpBonus);
@@ -647,7 +645,7 @@ public final class Formulas
 		return Math.max(damage, 1);
 	}
 	
-	public static double calcBackstabDamage(L2Character attacker, L2Character target, Skill skill, byte shld, boolean ss)
+	public static double calcBackstabDamage(L2Character attacker, L2Character target, Skill skill, byte shld, boolean ss, double power)
 	{
 		double defence = target.getPDef(attacker);
 		
@@ -680,7 +678,7 @@ public final class Formulas
 		}
 		
 		// Initial damage
-		double baseMod = ((77 * (skill.getPower(isPvP, isPvE) + attacker.getPAtk(target))) / defence) * ssboost;
+		double baseMod = ((77 * (power + attacker.getPAtk(target))) / defence) * ssboost;
 		// Critical
 		double criticalMod = (attacker.calcStat(Stats.CRITICAL_DAMAGE, 1, target, skill));
 		double criticalModPos = (((attacker.calcStat(Stats.CRITICAL_DAMAGE_POS, 1, target, skill) - 1) / 2) + 1);
