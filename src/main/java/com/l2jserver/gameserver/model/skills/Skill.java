@@ -142,8 +142,6 @@ public class Skill implements IIdentifiable
 	private final int _feed;
 	// base success chance
 	private final double _power;
-	private final double _pvpPower;
-	private final double _pvePower;
 	private final int _magicLevel;
 	private final int _lvlBonusRate;
 	private final int _activateRate;
@@ -321,8 +319,6 @@ public class Skill implements IIdentifiable
 		_targetType = set.getEnum("targetType", L2TargetType.class, L2TargetType.SELF);
 		_affectScope = set.getEnum("affectScope", AffectScope.class, AffectScope.NONE);
 		_power = set.getFloat("power", 0.f);
-		_pvpPower = set.getFloat("pvpPower", (float) getPower());
-		_pvePower = set.getFloat("pvePower", (float) getPower());
 		_magicLevel = set.getInt("magicLvl", 0);
 		_lvlBonusRate = set.getInt("lvlBonusRate", 0);
 		_activateRate = set.getInt("activateRate", -1);
@@ -449,36 +445,9 @@ public class Skill implements IIdentifiable
 		return _isSuicideAttack;
 	}
 	
-	/**
-	 * Return the power of the skill.
-	 * @param activeChar
-	 * @param target
-	 * @param isPvP
-	 * @param isPvE
-	 * @return
-	 */
-	public double getPower(L2Character activeChar, L2Character target, boolean isPvP, boolean isPvE)
-	{
-		if (activeChar == null)
-		{
-			return getPower(isPvP, isPvE);
-		}
-		
-		if (hasEffectType(L2EffectType.DEATH_LINK))
-		{
-			return getPower(isPvP, isPvE) * (-((activeChar.getCurrentHp() * 2) / activeChar.getMaxHp()) + 2);
-		}
-		return getPower(isPvP, isPvE);
-	}
-	
 	public double getPower()
 	{
 		return _power;
-	}
-	
-	public double getPower(boolean isPvP, boolean isPvE)
-	{
-		return isPvE ? _pvePower : isPvP ? _pvpPower : _power;
 	}
 	
 	/**

@@ -663,7 +663,6 @@ public final class Formulas
 		}
 		
 		boolean isPvP = attacker.isPlayable() && target.isPlayer();
-		boolean isPvE = attacker.isPlayable() && target.isAttackable();
 		double damage = 0;
 		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
 		double ssboost = ss ? 1.458 : 1;
@@ -714,7 +713,7 @@ public final class Formulas
 		if (attacker.isDebug())
 		{
 			final StatsSet set = new StatsSet();
-			set.set("skillPower", skill.getPower(isPvP, isPvE));
+			set.set("skillPower", power);
 			set.set("ssboost", ssboost);
 			set.set("proximityBonus", proximityBonus);
 			set.set("pvpBonus", pvpBonus);
@@ -979,7 +978,7 @@ public final class Formulas
 		return damage;
 	}
 	
-	public static final double calcMagicDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean sps, boolean bss, boolean mcrit)
+	public static final double calcMagicDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean sps, boolean bss, boolean mcrit, double power)
 	{
 		double mDef = target.getMDef(attacker, skill);
 		switch (shld)
@@ -997,7 +996,6 @@ public final class Formulas
 		
 		double mAtk = attacker.getMAtk(target, skill);
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		final boolean isPvE = attacker.isPlayable() && target.isAttackable();
 		
 		// PvP bonuses for defense
 		if (isPvP)
@@ -1015,7 +1013,7 @@ public final class Formulas
 		// Bonus Spirit shot
 		mAtk *= bss ? 4 : sps ? 2 : 1;
 		// MDAM Formula.
-		double damage = ((91 * Math.sqrt(mAtk)) / mDef) * skill.getPower(attacker, target, isPvP, isPvE);
+		double damage = ((91 * Math.sqrt(mAtk)) / mDef) * power;
 		
 		// Failure calculation
 		if (Config.ALT_GAME_MAGICFAILURES && !calcMagicSuccess(attacker, target, skill))
@@ -1101,11 +1099,9 @@ public final class Formulas
 		}
 		
 		int mAtk = attacker.getCubicPower();
-		final boolean isPvP = target.isPlayable();
-		final boolean isPvE = target.isAttackable();
 		
 		// Cubics MDAM Formula (similar to PDAM formula, but using 91 instead of 70, also resisted by mDef).
-		double damage = 91 * ((mAtk + skill.getPower(isPvP, isPvE)) / mDef);
+		double damage = 91 * ((mAtk + skill.getPower()) / mDef);
 		
 		// Failure calculation
 		L2PcInstance owner = attacker.getOwner();
