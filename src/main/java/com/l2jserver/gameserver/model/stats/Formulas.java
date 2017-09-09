@@ -911,10 +911,8 @@ public final class Formulas
 		if (isPvP)
 		{
 			damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);
+			damage = attacker.calcStat(Stats.PHYSICAL_SKILL_POWER, damage, null, null); // // Physical skill dmg boost
 		}
-		
-		// Physical skill dmg boost
-		damage = attacker.calcStat(Stats.PHYSICAL_SKILL_POWER, damage, null, null);
 		
 		damage *= calcAttributeBonus(attacker, target, null);
 		if (target.isAttackable())
