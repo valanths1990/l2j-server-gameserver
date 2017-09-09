@@ -818,15 +818,6 @@ public final class Formulas
 		damage *= calcAttributeBonus(attacker, target, null);
 		if (target.isAttackable())
 		{
-			final L2Weapon weapon = attacker.getActiveWeaponItem();
-			if ((weapon != null) && ((weapon.getItemType() == WeaponType.BOW) || (weapon.getItemType() == WeaponType.CROSSBOW)))
-			{
-				damage *= attacker.calcStat(Stats.PVE_BOW_DMG, 1, null, null);
-			}
-			else
-			{
-				damage *= attacker.calcStat(Stats.PVE_PHYSICAL_DMG, 1, null, null);
-			}
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
 			{
 				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
@@ -928,16 +919,6 @@ public final class Formulas
 		damage *= calcAttributeBonus(attacker, target, null);
 		if (target.isAttackable())
 		{
-			final L2Weapon weapon = attacker.getActiveWeaponItem();
-			if ((weapon != null) && ((weapon.getItemType() == WeaponType.BOW) || (weapon.getItemType() == WeaponType.CROSSBOW)))
-			{
-				damage *= attacker.calcStat(Stats.PVE_BOW_SKILL_DMG, 1, null, null);
-			}
-			else
-			{
-				damage *= attacker.calcStat(Stats.PVE_PHYSICAL_DMG, 1, null, null);
-			}
-			
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
 			{
 				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
@@ -1069,7 +1050,6 @@ public final class Formulas
 		
 		if (target.isAttackable())
 		{
-			damage *= attacker.calcStat(Stats.PVE_MAGICAL_DMG, 1, null, null);
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
 			{
 				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
@@ -1153,7 +1133,6 @@ public final class Formulas
 		
 		if (target.isAttackable())
 		{
-			damage *= attacker.getOwner().calcStat(Stats.PVE_MAGICAL_DMG, 1, null, null);
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getOwner() != null) && ((target.getLevel() - attacker.getOwner().getLevel()) >= 2))
 			{
 				int lvlDiff = target.getLevel() - attacker.getOwner().getLevel() - 1;
@@ -1630,7 +1609,6 @@ public final class Formulas
 		
 		if (target.isAttackable())
 		{
-			damage *= attacker.calcStat(Stats.PVE_MAGICAL_DMG, 1, null, null);
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
 			{
 				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;

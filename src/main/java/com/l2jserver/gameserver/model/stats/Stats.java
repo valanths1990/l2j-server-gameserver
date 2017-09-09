@@ -68,13 +68,6 @@ public enum Stats
 	PVP_MAGICAL_DEF("pvpMagicalDef"),
 	PVP_PHYS_SKILL_DEF("pvpPhysSkillsDef"),
 	
-	// PVE BONUS
-	PVE_PHYSICAL_DMG("pvePhysDmg"),
-	PVE_PHYS_SKILL_DMG("pvePhysSkillsDmg"),
-	PVE_BOW_DMG("pveBowDmg"),
-	PVE_BOW_SKILL_DMG("pveBowSkillsDmg"),
-	PVE_MAGICAL_DMG("pveMagicalDmg"),
-	
 	// ATTACK & DEFENCE RATES
 	EVASION_RATE("rEvas"),
 	P_SKILL_EVASION("pSkillEvas"),
