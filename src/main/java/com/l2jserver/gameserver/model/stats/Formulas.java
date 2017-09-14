@@ -744,16 +744,7 @@ public final class Formulas
 	 */
 	public static final double calcPhysDam(L2Character attacker, L2Character target, byte shld, boolean crit, boolean ss)
 	{
-		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
-		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
-		
-		// Defense bonuses in PvP fight
-		if (isPvP)
-		{
-			defence *= target.calcStat(Stats.PVP_PHYSICAL_DEF, 1, null, null);
-		}
 		
 		switch (shld)
 		{
@@ -769,6 +760,16 @@ public final class Formulas
 			{
 				return 1.;
 			}
+		}
+		
+		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
+		double damage = attacker.getPAtk(target);
+		
+		if (isPvP)
+		{
+			// Defense bonuses in PvP fight
+			defence *= target.calcStat(Stats.PVP_PHYSICAL_DEF, 1, null, null);
 		}
 		
 		// Add soulshot boost.
@@ -853,23 +854,15 @@ public final class Formulas
 	 * Calculated damage caused by skill ATTACK of attacker on target.
 	 * @param attacker player or NPC that makes ATTACK
 	 * @param target player or NPC, target of ATTACK
+	 * @param skill
 	 * @param shld
 	 * @param crit if the ATTACK have critical success
 	 * @param ss if weapon item was charged by soulshot
 	 * @return
 	 */
-	public static final double calcSkillPhysDam(L2Character attacker, L2Character target, byte shld, boolean crit, boolean ss, double power)
+	public static final double calcSkillPhysDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean crit, boolean ss, double power)
 	{
-		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
-		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
-		
-		// Defense bonuses in PvP fight
-		if (isPvP)
-		{
-			defence *= target.calcStat(Stats.PVP_PHYS_SKILL_DEF, 1, null, null);
-		}
 		
 		switch (shld)
 		{
@@ -885,6 +878,16 @@ public final class Formulas
 			{
 				return 1.;
 			}
+		}
+		
+		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
+		double damage = attacker.getPAtk(target);
+		
+		if (isPvP)
+		{
+			// Defense bonuses in PvP fight
+			defence *= target.calcStat(Stats.PVP_PHYS_SKILL_DEF, 1, null, null);
 		}
 		
 		// Add soulshot boost.
@@ -916,7 +919,7 @@ public final class Formulas
 		// Physical skill dmg boost
 		damage = attacker.calcStat(Stats.PHYSICAL_SKILL_POWER, damage, null, null);
 		
-		damage *= calcAttributeBonus(attacker, target, null);
+		damage *= calcAttributeBonus(attacker, target, skill);
 		if (target.isAttackable())
 		{
 			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
