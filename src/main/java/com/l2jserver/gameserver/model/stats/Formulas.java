@@ -881,85 +881,68 @@ public final class Formulas
 		}
 		
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
-		double damage = attacker.getPAtk(target);
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed)
+		double damage = 0;
+		double ssBoost = ss ? 2 : 1;
+		double pvpBonus = 1;
 		
 		if (isPvP)
 		{
+			// Damage bonuses in PvP fight
+			pvpBonus = attacker.getStat().calcStat(Stats.PVP_PHYS_SKILL_DMG, 1.0);
 			// Defense bonuses in PvP fight
-			defence *= target.calcStat(Stats.PVP_PHYS_SKILL_DEF, 1, null, null);
+			defence *= target.getStat().calcStat(Stats.PVP_PHYS_SKILL_DEF, 1.0);
 		}
 		
-		// Add soulshot boost.
-		int ssBoost = ss ? 2 : 1;
-		damage = (damage * ssBoost) + power;
+		// Initial damage
+		double baseMod = ((77 * (power + (attacker.getPAtk(target) * ssBoost))) / defence);
 		
-		damage = (76 * damage * proximityBonus) / defence;
-		
-		damage *= calcAttackTraitBonus(attacker, target);
-		
-		// Weapon random damage
-		damage *= attacker.getRandomDamageMultiplier();
-		
-		if ((damage > 0) && (damage < 1))
+		double penaltyMod = 1;
+		if ((target instanceof L2Attackable) && !target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
 		{
-			damage = 1;
-		}
-		else if (damage < 0)
-		{
-			damage = 0;
-		}
-		
-		// Dmg bonuses in PvP fight
-		if (isPvP)
-		{
-			damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);
-		}
-		
-		// Physical skill dmg boost
-		damage = attacker.calcStat(Stats.PHYSICAL_SKILL_POWER, damage, null, null);
-		
-		damage *= calcAttributeBonus(attacker, target, skill);
-		if (target.isAttackable())
-		{
-			if (!target.isRaid() && !target.isRaidMinion() && (target.getLevel() >= Config.MIN_NPC_LVL_DMG_PENALTY) && (attacker.getActingPlayer() != null) && ((target.getLevel() - attacker.getActingPlayer().getLevel()) >= 2))
+			int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
+			
+			if (lvlDiff >= Config.NPC_SKILL_DMG_PENALTY.size())
 			{
-				int lvlDiff = target.getLevel() - attacker.getActingPlayer().getLevel() - 1;
-				
-				if (lvlDiff >= Config.NPC_SKILL_DMG_PENALTY.size())
+				penaltyMod *= Config.NPC_SKILL_DMG_PENALTY.get(Config.NPC_SKILL_DMG_PENALTY.size() - 1);
+			}
+			else
+			{
+				penaltyMod *= Config.NPC_SKILL_DMG_PENALTY.get(lvlDiff);
+			}
+			
+			if (crit)
+			{
+				if (lvlDiff >= Config.NPC_CRIT_DMG_PENALTY.size())
 				{
-					damage *= Config.NPC_SKILL_DMG_PENALTY.get(Config.NPC_SKILL_DMG_PENALTY.size() - 1);
+					penaltyMod *= Config.NPC_CRIT_DMG_PENALTY.get(Config.NPC_CRIT_DMG_PENALTY.size() - 1);
 				}
 				else
 				{
-					damage *= Config.NPC_SKILL_DMG_PENALTY.get(lvlDiff);
+					penaltyMod *= Config.NPC_CRIT_DMG_PENALTY.get(lvlDiff);
 				}
-				
-				if (crit)
+			}
+			else
+			{
+				if (lvlDiff >= Config.NPC_DMG_PENALTY.size())
 				{
-					if (lvlDiff >= Config.NPC_CRIT_DMG_PENALTY.size())
-					{
-						damage *= Config.NPC_CRIT_DMG_PENALTY.get(Config.NPC_CRIT_DMG_PENALTY.size() - 1);
-					}
-					else
-					{
-						damage *= Config.NPC_CRIT_DMG_PENALTY.get(lvlDiff);
-					}
+					penaltyMod *= Config.NPC_DMG_PENALTY.get(Config.NPC_DMG_PENALTY.size() - 1);
 				}
 				else
 				{
-					if (lvlDiff >= Config.NPC_DMG_PENALTY.size())
-					{
-						damage *= Config.NPC_DMG_PENALTY.get(Config.NPC_DMG_PENALTY.size() - 1);
-					}
-					else
-					{
-						damage *= Config.NPC_DMG_PENALTY.get(lvlDiff);
-					}
+					penaltyMod *= Config.NPC_DMG_PENALTY.get(lvlDiff);
 				}
 			}
 		}
-		return damage;
+		
+		damage = baseMod * proximityBonus * pvpBonus;
+		damage *= calcAttackTraitBonus(attacker, target);
+		damage *= calcAttributeBonus(attacker, target, skill);
+		damage *= attacker.getRandomDamageMultiplier();
+		damage *= penaltyMod;
+		damage = attacker.getStat().calcStat(Stats.PHYSICAL_SKILL_POWER, damage);
+		
+		return Math.max(damage, 1);
 	}
 	
 	public static final double calcMagicDam(L2Character attacker, L2Character target, Skill skill, byte shld, boolean sps, boolean bss, boolean mcrit, double power)
