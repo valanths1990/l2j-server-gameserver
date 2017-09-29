@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
-import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.xml.impl.InitialEquipmentData;
 import com.l2jserver.gameserver.data.xml.impl.InitialShortcutData;
@@ -227,7 +226,7 @@ public final class CharacterCreate extends L2GameClientPacket
 		}
 		if (Config.STARTING_LEVEL > 1)
 		{
-			newChar.setExp(ExperienceData.getInstance().getExpForLevel(Config.STARTING_LEVEL - 1));
+			newChar.addLevel(Config.STARTING_LEVEL - 1);
 		}
 		if (Config.STARTING_SP > 0)
 		{
