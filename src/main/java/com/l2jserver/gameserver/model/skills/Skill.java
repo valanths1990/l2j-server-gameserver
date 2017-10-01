@@ -194,8 +194,6 @@ public class Skill implements IIdentifiable
 	
 	private final boolean _isDebuff;
 	
-	private final String _attribute;
-	
 	private final boolean _isSuicideAttack;
 	private final boolean _canBeDispeled;
 	
@@ -253,8 +251,6 @@ public class Skill implements IIdentifiable
 		_abnormalTime = abnormalTime;
 		_isAbnormalInstant = set.getBoolean("abnormalInstant", false);
 		parseAbnormalVisualEffect(set.getString("abnormalVisualEffect", null));
-		
-		_attribute = set.getString("attribute", "");
 		
 		_stayAfterDeath = set.getBoolean("stayAfterDeath", false);
 		_stayOnSubclassChange = set.getBoolean("stayOnSubclassChange", true);
@@ -1621,11 +1617,6 @@ public class Skill implements IIdentifiable
 	public void setReferenceItemId(int val)
 	{
 		_refId = val;
-	}
-	
-	public String getAttributeName()
-	{
-		return _attribute;
 	}
 	
 	public boolean canBeDispeled()
