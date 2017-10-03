@@ -198,7 +198,7 @@ public class L2Attackable extends L2Npc
 			return;
 		}
 		
-		if ((getCurrentMp() < (getStat().getMpConsume(skill) + getStat().getMpInitialConsume(skill))) || (getCurrentHp() <= skill.getHpConsume()))
+		if ((getCurrentMp() < (getStat().getMpConsume1(skill) + getStat().getMpConsume2(skill))) || (getCurrentHp() <= skill.getHpConsume()))
 		{
 			return;
 		}

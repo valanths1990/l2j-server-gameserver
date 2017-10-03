@@ -156,7 +156,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 			
 			for (Skill sk : _actor.getAllSkills())
 			{
-				if (Util.checkIfInRange(sk.getCastRange(), _actor, getAttackTarget(), true) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume(sk)))
+				if (Util.checkIfInRange(sk.getCastRange(), _actor, getAttackTarget(), true) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
 				{
 					_actor.doCast(sk);
 					return;
@@ -206,7 +206,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 			{
 				int castRange = sk.getCastRange();
 				
-				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume(sk)))
+				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
 				{
 					_actor.doCast(sk);
 					return;
@@ -246,7 +246,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 			{
 				int castRange = sk.getCastRange();
 				
-				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume(sk)))
+				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
 				{
 					_actor.doCast(sk);
 					return;
@@ -319,7 +319,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 				{
 					int castRange = sk.getCastRange();
 					
-					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume(sk)))
+					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
 					{
 						_actor.doCast(sk);
 						return;
@@ -361,7 +361,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 				{
 					int castRange = sk.getCastRange();
 					
-					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() < _actor.getStat().getMpConsume(sk)))
+					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() < _actor.getStat().getMpConsume2(sk)))
 					{
 						_actor.doCast(sk);
 						return;

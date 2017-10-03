@@ -1880,7 +1880,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			return false;
 		}
 		// Not enough MP.
-		if (skill.getMpConsume() >= caster.getCurrentMp())
+		if (skill.getMpConsume2() >= caster.getCurrentMp())
 		{
 			return false;
 		}

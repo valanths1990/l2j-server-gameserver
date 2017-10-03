@@ -91,10 +91,10 @@ public class Skill implements IIdentifiable
 	private final int _magic;
 	private final TraitType _traitType;
 	private final boolean _staticReuse;
-	/** MP consumption. */
-	private final int _mpConsume;
 	/** Initial MP consumption. */
-	private final int _mpInitialConsume;
+	private final int _mpConsume1;
+	/** MP consumption. */
+	private final int _mpConsume2;
 	/** MP consumption per channeling. */
 	private final int _mpPerChanneling;
 	/** HP consumption. */
@@ -223,9 +223,9 @@ public class Skill implements IIdentifiable
 		_magic = set.getInt("isMagic", 0);
 		_traitType = set.getEnum("trait", TraitType.class, TraitType.NONE);
 		_staticReuse = set.getBoolean("staticReuse", false);
-		_mpConsume = set.getInt("mpConsume", 0);
-		_mpInitialConsume = set.getInt("mpInitialConsume", 0);
-		_mpPerChanneling = set.getInt("mpPerChanneling", _mpConsume);
+		_mpConsume1 = set.getInt("mpConsume1", 0);
+		_mpConsume2 = set.getInt("mpConsume2", 0);
+		_mpPerChanneling = set.getInt("mpPerChanneling", _mpConsume2);
 		_hpConsume = set.getInt("hpConsume", 0);
 		_itemConsumeCount = set.getInt("itemConsumeCount", 0);
 		_itemConsumeId = set.getInt("itemConsumeId", 0);
@@ -762,19 +762,19 @@ public class Skill implements IIdentifiable
 	}
 	
 	/**
-	 * @return Returns the mpConsume.
+	 * @return Returns the mpConsume1.
 	 */
-	public int getMpConsume()
+	public int getMpConsume1()
 	{
-		return _mpConsume;
+		return _mpConsume1;
 	}
 	
 	/**
-	 * @return Returns the mpInitialConsume.
+	 * @return Returns the mpConsume2.
 	 */
-	public int getMpInitialConsume()
+	public int getMpConsume2()
 	{
-		return _mpInitialConsume;
+		return _mpConsume2;
 	}
 	
 	/**

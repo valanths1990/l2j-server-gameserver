@@ -1824,7 +1824,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		
 		// Check if this skill consume mp on start casting
-		int initmpcons = getStat().getMpInitialConsume(skill);
+		int initmpcons = getStat().getMpConsume1(skill);
 		if (initmpcons > 0)
 		{
 			getStatus().reduceMp(initmpcons);
@@ -1993,7 +1993,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		
 		// Check if the caster has enough MP
-		if (getCurrentMp() < (getStat().getMpConsume(skill) + getStat().getMpInitialConsume(skill)))
+		if (getCurrentMp() < (getStat().getMpConsume1(skill) + getStat().getMpConsume2(skill)))
 		{
 			// Send a System Message to the caster
 			sendPacket(SystemMessageId.NOT_ENOUGH_MP);
@@ -5536,18 +5536,18 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			boolean isSendStatus = false;
 			
 			// Consume MP of the L2Character and Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
-			double mpConsume = getStat().getMpConsume(skill);
+			double mpConsume2 = getStat().getMpConsume2(skill);
 			
-			if (mpConsume > 0)
+			if (mpConsume2 > 0)
 			{
-				if (mpConsume > getCurrentMp())
+				if (mpConsume2 > getCurrentMp())
 				{
 					sendPacket(SystemMessageId.NOT_ENOUGH_MP);
 					abortCast();
 					return;
 				}
 				
-				getStatus().reduceMp(mpConsume);
+				getStatus().reduceMp(mpConsume2);
 				su.addAttribute(StatusUpdate.CUR_MP, (int) getCurrentMp());
 				isSendStatus = true;
 			}

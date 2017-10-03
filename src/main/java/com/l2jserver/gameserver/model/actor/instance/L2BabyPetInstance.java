@@ -289,7 +289,7 @@ public final class L2BabyPetInstance extends L2PetInstance
 					skill = _majorHeal.getSkill();
 					if (!_baby.isSkillDisabled(skill) && (Rnd.get(100) <= 75))
 					{
-						if (_baby.getCurrentMp() >= skill.getMpConsume())
+						if (_baby.getCurrentMp() >= skill.getMpConsume2())
 						{
 							castSkill(skill);
 							return;
@@ -302,7 +302,7 @@ public final class L2BabyPetInstance extends L2PetInstance
 					skill = _minorHeal.getSkill();
 					if (!_baby.isSkillDisabled(skill) && (Rnd.get(100) <= 25))
 					{
-						if (_baby.getCurrentMp() >= skill.getMpConsume())
+						if (_baby.getCurrentMp() >= skill.getMpConsume2())
 						{
 							castSkill(skill);
 							return;
@@ -325,7 +325,7 @@ public final class L2BabyPetInstance extends L2PetInstance
 							continue;
 						}
 						
-						if (_baby.getCurrentMp() < skill.getMpConsume())
+						if (_baby.getCurrentMp() < skill.getMpConsume2())
 						{
 							continue;
 						}
@@ -359,7 +359,7 @@ public final class L2BabyPetInstance extends L2PetInstance
 			if ((_recharge != null) && owner.isInCombat() && ((owner.getCurrentMp() / owner.getMaxMp()) < 0.6) && (Rnd.get(100) <= 60))
 			{
 				skill = _recharge.getSkill();
-				if (!_baby.isSkillDisabled(skill) && (_baby.getCurrentMp() >= skill.getMpConsume()))
+				if (!_baby.isSkillDisabled(skill) && (_baby.getCurrentMp() >= skill.getMpConsume2()))
 				{
 					castSkill(skill);
 				}
