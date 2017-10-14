@@ -5794,7 +5794,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					// EVT_ATTACKED and PvPStatus
 					if (target instanceof L2Character)
 					{
-						if (skill.isBad())
+						if (skill.getEffectPoint() <= 0)
 						{
 							if (target.isPlayable() || target.isTrap())
 							{

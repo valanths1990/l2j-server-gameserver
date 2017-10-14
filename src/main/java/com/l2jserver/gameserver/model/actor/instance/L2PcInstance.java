@@ -7492,7 +7492,7 @@ public final class L2PcInstance extends L2Playable
 	 * <li>Check if the skill isn't toggle and is offensive</li>
 	 * <li>Check if the target is in the skill cast range</li>
 	 * <li>Check if the skill is Spoil type and if the target isn't already spoiled</li>
-	 * <li>Check if the caster owns enought consummed Item, enough HP and MP to cast the skill</li>
+	 * <li>Check if the caster owns enough consumed Item, enough HP and MP to cast the skill</li>
 	 * <li>Check if the caster isn't sitting</li>
 	 * <li>Check if all skills are enabled and this skill is enabled</li>
 	 * <li>Check if the caster own the weapon needed</li>
