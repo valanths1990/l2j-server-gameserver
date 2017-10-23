@@ -5817,7 +5817,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 									
 									// attack of the own pet does not flag player
 									// triggering trap not flag trap owner
-									if ((player.getSummon() != target) && !isTrap() && (skill.getAffectRange() <= 0))
+									if ((player.getSummon() != target) && !isTrap() && skill.isBad())
 									{
 										player.updatePvPStatus((L2Character) target);
 									}
