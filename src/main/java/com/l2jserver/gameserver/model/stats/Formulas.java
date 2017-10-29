@@ -1532,11 +1532,6 @@ public final class Formulas
 	
 	public static boolean calcMagicSuccess(L2Character attacker, L2Character target, Skill skill)
 	{
-		if (skill.getPower() == -1)
-		{
-			return true;
-		}
-		
 		// FIXME: Fix this LevelMod Formula.
 		int lvlDifference = (target.getLevel() - (skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getLevel()));
 		double lvlModifier = Math.pow(1.3, lvlDifference);
