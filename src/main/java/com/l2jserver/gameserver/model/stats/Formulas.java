@@ -1468,16 +1468,9 @@ public final class Formulas
 	
 	public static boolean calcCubicSkillSuccess(L2CubicInstance attacker, L2Character target, Skill skill, byte shld)
 	{
-		if (skill.isDebuff())
+		if (skill.isDebuff() && target.isDebuffBlocked())
 		{
-			if (skill.getPower() == -1)
-			{
-				return true;
-			}
-			else if (target.isDebuffBlocked())
-			{
-				return false;
-			}
+			return false;
 		}
 		
 		// Perfect Shield Block.
@@ -1493,7 +1486,7 @@ public final class Formulas
 		}
 		
 		// Calculate BaseRate.
-		double baseRate = skill.getPower();
+		double baseRate = skill.getActivateRate();
 		double statMod = skill.getBasicProperty().calcBonus(target);
 		double rate = (baseRate / statMod);
 		
