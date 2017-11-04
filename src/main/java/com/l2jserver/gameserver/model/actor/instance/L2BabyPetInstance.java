@@ -118,12 +118,12 @@ public final class L2BabyPetInstance extends L2PetInstance
 					// set both heal types to the same skill
 					_majorHeal = new SkillHolder(skill);
 					_minorHeal = _majorHeal;
-					healPower = skill.getPower();
+					healPower = skill.getEffectPoint();
 				}
 				else
 				{
 					// another heal skill found - search for most powerful
-					if (skill.getPower() > healPower)
+					if (skill.getEffectPoint() > healPower)
 					{
 						_majorHeal = new SkillHolder(skill);
 					}
@@ -289,7 +289,7 @@ public final class L2BabyPetInstance extends L2PetInstance
 					skill = _majorHeal.getSkill();
 					if (!_baby.isSkillDisabled(skill) && (Rnd.get(100) <= 75))
 					{
-						if (_baby.getCurrentMp() >= skill.getMpConsume2())
+						if (_baby.getCurrentMp() >= (skill.getMpConsume1() + skill.getMpConsume2()))
 						{
 							castSkill(skill);
 							return;
@@ -302,7 +302,7 @@ public final class L2BabyPetInstance extends L2PetInstance
 					skill = _minorHeal.getSkill();
 					if (!_baby.isSkillDisabled(skill) && (Rnd.get(100) <= 25))
 					{
-						if (_baby.getCurrentMp() >= skill.getMpConsume2())
+						if (_baby.getCurrentMp() >= (skill.getMpConsume1() + skill.getMpConsume2()))
 						{
 							castSkill(skill);
 							return;
