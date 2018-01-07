@@ -1657,6 +1657,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			case FRONT_AURA:
 			case BEHIND_AURA:
 			case GROUND:
+			case AURA_FRIENDLY:
 				target = this;
 				break;
 			case SELF:
@@ -5379,6 +5380,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				case FRONT_AURA:
 				case BEHIND_AURA:
 				case AURA_CORPSE_MOB:
+				case AURA_FRIENDLY:
 					break;
 				default:
 					abortCast();
