@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2017 L2J Server
+ * Copyright (C) 2004-2018 L2J Server
  * 
  * This file is part of L2J Server.
  * 
