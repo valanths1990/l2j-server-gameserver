@@ -758,13 +758,14 @@ public final class Formulas
 			}
 			case SHIELD_DEFENSE_PERFECT_BLOCK: // perfect block
 			{
-				return 1.;
+				return 1;
 			}
 		}
 		
 		final boolean isPvP = attacker.isPlayable() && target.isPlayable();
-		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10%
+		double proximityBonus = attacker.isBehindTarget() ? 1.2 : attacker.isInFrontOfTarget() ? 1 : 1.1; // Behind: +20% - Side: +10% (TODO: values are unconfirmed, possibly custom, remove or update when confirmed)
 		double damage = attacker.getPAtk(target);
+		double ssboost = ss ? 2 : 1;
 		
 		if (isPvP)
 		{
@@ -772,9 +773,7 @@ public final class Formulas
 			defence *= target.calcStat(Stats.PVP_PHYSICAL_DEF, 1, null, null);
 		}
 		
-		// Add soulshot boost.
-		int ssBoost = ss ? 2 : 1;
-		damage *= ssBoost;
+		damage *= ssboost;
 		
 		if (crit)
 		{
@@ -792,23 +791,6 @@ public final class Formulas
 		
 		// Weapon random damage
 		damage *= attacker.getRandomDamageMultiplier();
-		if ((shld > 0) && Config.ALT_GAME_SHIELD_BLOCKS)
-		{
-			damage -= target.getShldDef();
-			if (damage < 0)
-			{
-				damage = 0;
-			}
-		}
-		
-		if ((damage > 0) && (damage < 1))
-		{
-			damage = 1;
-		}
-		else if (damage < 0)
-		{
-			damage = 0;
-		}
 		
 		// Dmg bonuses in PvP fight
 		if (isPvP)
@@ -847,7 +829,8 @@ public final class Formulas
 				}
 			}
 		}
-		return damage;
+		
+		return Math.max(damage, 1);
 	}
 	
 	/**
