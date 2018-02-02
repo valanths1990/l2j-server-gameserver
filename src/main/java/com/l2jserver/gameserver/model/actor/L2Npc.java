@@ -59,7 +59,6 @@ import com.l2jserver.gameserver.model.L2WorldRegion;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2ClanHallManagerInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2DoormenInstance;
-import com.l2jserver.gameserver.model.actor.instance.L2FishermanInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2MerchantInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2TeleporterInstance;
@@ -952,13 +951,6 @@ public class L2Npc extends L2Character
 					return;
 				}
 			}
-			else if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && (this instanceof L2FishermanInstance))
-			{
-				if (showPkDenyChatWindow(player, "fisherman"))
-				{
-					return;
-				}
-			}
 		}
 		
 		if (getTemplate().isType("L2Auctioneer") && (val == 0))
@@ -1499,7 +1491,7 @@ public class L2Npc extends L2Character
 			{
 				deleteMe();
 			}
-		} , delay);
+		}, delay);
 		return this;
 	}
 	
