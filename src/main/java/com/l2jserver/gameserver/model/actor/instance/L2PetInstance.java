@@ -87,6 +87,8 @@ public class L2PetInstance extends L2Summon
 	private long _expBeforeDeath = 0;
 	private int _curWeightPenalty = 0;
 	
+	protected boolean _bufferMode = true;
+	
 	/**
 	 * Creates a pet.
 	 * @param template the pet NPC template
@@ -1104,18 +1106,6 @@ public class L2PetInstance extends L2Summon
 		return getStat().getCriticalHit(target, skill);
 	}
 	
-	@Override
-	public final int getSkillLevel(int skillId)
-	{
-		if (getKnownSkill(skillId) == null)
-		{
-			return -1;
-		}
-		
-		final int lvl = getLevel();
-		return lvl > 70 ? 7 + ((lvl - 70) / 5) : lvl / 10;
-	}
-	
 	public void updateRefOwner(L2PcInstance owner)
 	{
 		int oldOwnerId = getOwner().getObjectId();
@@ -1302,5 +1292,14 @@ public class L2PetInstance extends L2Summon
 			return isRunning() ? getSwimRunSpeed() : getSwimWalkSpeed();
 		}
 		return isRunning() ? getRunSpeed() : getWalkSpeed();
+	}
+	
+	/**
+	 * Verify if this pet is in support mode.
+	 * @return {@code true} if this baby pet is in support mode, {@code false} otherwise
+	 */
+	public boolean isInSupportMode()
+	{
+		return _bufferMode;
 	}
 }

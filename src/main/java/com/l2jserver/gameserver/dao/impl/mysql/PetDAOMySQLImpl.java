@@ -29,7 +29,6 @@ import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
 import com.l2jserver.gameserver.dao.PetDAO;
 import com.l2jserver.gameserver.data.xml.impl.PetDataTable;
 import com.l2jserver.gameserver.model.L2PetLevelData;
-import com.l2jserver.gameserver.model.actor.instance.L2BabyPetInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
@@ -98,26 +97,10 @@ public class PetDAOMySQLImpl implements PetDAO
 				L2PetInstance pet;
 				if (!rset.next())
 				{
-					if (template.isType("L2BabyPet"))
-					{
-						pet = new L2BabyPetInstance(template, owner, control);
-					}
-					else
-					{
-						pet = new L2PetInstance(template, owner, control);
-					}
-					return pet;
+					return new L2PetInstance(template, owner, control);
 				}
 				
-				if (template.isType("L2BabyPet"))
-				{
-					pet = new L2BabyPetInstance(template, owner, control, rset.getByte("level"));
-				}
-				else
-				{
-					pet = new L2PetInstance(template, owner, control, rset.getByte("level"));
-				}
-				
+				pet = new L2PetInstance(template, owner, control, rset.getByte("level"));
 				pet.setRespawned(true);
 				pet.setName(rset.getString("name"));
 				
