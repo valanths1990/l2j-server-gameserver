@@ -6158,25 +6158,25 @@ public final class SystemMessageId
 	 * ID: 1066<br>
 	 * Message: $s1 HP has been restored.
 	 */
-	public static final SystemMessageId S1_HP_RESTORED = new SystemMessageId(1066);
+	public static final SystemMessageId S1_HP_HAS_BEEN_RESTORED = new SystemMessageId(1066);
 	
 	/**
 	 * ID: 1067<br>
 	 * Message: $s2 HP has been restored by $c1.
 	 */
-	public static final SystemMessageId S2_HP_RESTORED_BY_C1 = new SystemMessageId(1067);
+	public static final SystemMessageId S2_HP_HAS_BEEN_RESTORED_BY_C1 = new SystemMessageId(1067);
 	
 	/**
 	 * ID: 1068<br>
 	 * Message: $s1 MP has been restored.
 	 */
-	public static final SystemMessageId S1_MP_RESTORED = new SystemMessageId(1068);
+	public static final SystemMessageId S1_MP_HAS_BEEN_RESTORED = new SystemMessageId(1068);
 	
 	/**
 	 * ID: 1069<br>
 	 * Message: $s2 MP has been restored by $c1.
 	 */
-	public static final SystemMessageId S2_MP_RESTORED_BY_C1 = new SystemMessageId(1069);
+	public static final SystemMessageId S2_MP_HAS_BEEN_RESTORED_BY_C1 = new SystemMessageId(1069);
 	
 	/**
 	 * ID: 1070<br>

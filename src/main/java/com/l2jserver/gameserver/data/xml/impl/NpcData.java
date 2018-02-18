@@ -548,7 +548,7 @@ public class NpcData implements IXmlReader
 											aiSkillScopes.add(AISkillScope.NEGATIVE);
 											aiSkillScopes.add(shortOrLongRangeScope);
 										}
-										else if (skill.hasEffectType(L2EffectType.HEAL))
+										else if (skill.hasEffectType(L2EffectType.HP))
 										{
 											aiSkillScopes.add(AISkillScope.HEAL);
 										}

@@ -380,7 +380,7 @@ public final class L2TamedBeastInstance extends L2FeedableBeastInstance
 			for (Skill skill : getTemplate().getSkills().values())
 			{
 				// if the skill is a buff, check if the owner has it already [ owner.getEffect(L2Skill skill) ]
-				if ((Rnd.get(5) < chance) && skill.hasEffectType(L2EffectType.CP, L2EffectType.HEAL, L2EffectType.MANAHEAL_BY_LEVEL, L2EffectType.MANAHEAL_PERCENT))
+				if ((Rnd.get(5) < chance) && skill.hasEffectType(L2EffectType.CP, L2EffectType.HP, L2EffectType.MANAHEAL_BY_LEVEL, L2EffectType.MANAHEAL_PERCENT))
 				{
 					sitCastAndFollow(skill, _owner);
 				}

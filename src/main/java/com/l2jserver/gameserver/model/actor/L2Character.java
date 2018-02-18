@@ -1690,7 +1690,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					return;
 				}
 				
-				if ((skill.isContinuous() && !skill.isDebuff()) || skill.hasEffectType(L2EffectType.CP, L2EffectType.HEAL))
+				if ((skill.isContinuous() && !skill.isDebuff()) || skill.hasEffectType(L2EffectType.CP, L2EffectType.HP))
 				{
 					doit = true;
 				}
@@ -5416,7 +5416,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 					
 					// Healing party members should ignore LOS.
-					if (((skill.getTargetType() != L2TargetType.PARTY) || !skill.hasEffectType(L2EffectType.HEAL)) //
+					if (((skill.getTargetType() != L2TargetType.PARTY) || !skill.hasEffectType(L2EffectType.HP)) //
 						&& !GeoData.getInstance().canSeeTarget(this, target))
 					{
 						skipLOS++;

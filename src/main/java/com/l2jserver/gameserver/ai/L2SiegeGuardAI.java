@@ -572,10 +572,10 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
 				{
 					
 					L2Object OldTarget = _actor.getTarget();
-					if ((sk.isContinuous() && !sk.isDebuff()) || (sk.hasEffectType(L2EffectType.HEAL)))
+					if ((sk.isContinuous() && !sk.isDebuff()) || (sk.hasEffectType(L2EffectType.HP)))
 					{
 						boolean useSkillSelf = true;
-						if ((sk.hasEffectType(L2EffectType.HEAL)) && (_actor.getCurrentHp() > (int) (_actor.getMaxHp() / 1.5)))
+						if ((sk.hasEffectType(L2EffectType.HP)) && (_actor.getCurrentHp() > (int) (_actor.getMaxHp() / 1.5)))
 						{
 							useSkillSelf = false;
 							break;
@@ -713,10 +713,10 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
 					if (((castRange * castRange) >= dist_2) && !sk.isPassive() && (_actor.getCurrentMp() >= _actor.getStat().getMpConsume2(sk)) && !_actor.isSkillDisabled(sk))
 					{
 						L2Object OldTarget = _actor.getTarget();
-						if ((sk.isContinuous() && !sk.isDebuff()) || (sk.hasEffectType(L2EffectType.HEAL)))
+						if ((sk.isContinuous() && !sk.isDebuff()) || (sk.hasEffectType(L2EffectType.HP)))
 						{
 							boolean useSkillSelf = true;
-							if ((sk.hasEffectType(L2EffectType.HEAL)) && (_actor.getCurrentHp() > (int) (_actor.getMaxHp() / 1.5)))
+							if ((sk.hasEffectType(L2EffectType.HP)) && (_actor.getCurrentHp() > (int) (_actor.getMaxHp() / 1.5)))
 							{
 								useSkillSelf = false;
 								break;

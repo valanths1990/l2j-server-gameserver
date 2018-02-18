@@ -1435,7 +1435,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			}
 		}
 		
-		if (sk.hasEffectType(L2EffectType.HEAL))
+		if (sk.hasEffectType(L2EffectType.HP))
 		{
 			double percentage = (caster.getCurrentHp() / caster.getMaxHp()) * 100;
 			if (caster.isMinion() && (sk.getTargetType() != L2TargetType.SELF))
