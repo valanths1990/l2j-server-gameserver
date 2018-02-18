@@ -8194,13 +8194,13 @@ public final class SystemMessageId
 	 * ID: 1405<br>
 	 * Message: $s1 CP has been restored.
 	 */
-	public static final SystemMessageId S1_CP_WILL_BE_RESTORED = new SystemMessageId(1405);
+	public static final SystemMessageId S1_CP_HAS_BEEN_RESTORED = new SystemMessageId(1405);
 	
 	/**
 	 * ID: 1406<br>
 	 * Message: $s2 CP has been restored by $c1.
 	 */
-	public static final SystemMessageId S2_CP_WILL_BE_RESTORED_BY_C1 = new SystemMessageId(1406);
+	public static final SystemMessageId S2_CP_HAS_BEEN_RESTORED_BY_C1 = new SystemMessageId(1406);
 	
 	/**
 	 * ID: 1407<br>

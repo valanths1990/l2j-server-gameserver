@@ -31,7 +31,7 @@ public enum L2EffectType
 	BUFF,
 	CHARM_OF_LUCK,
 	CHAT_BLOCK,
-	CPHEAL,
+	CP,
 	DEBUFF,
 	DISPEL,
 	DISPEL_BY_SLOT,
