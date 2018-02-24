@@ -139,7 +139,6 @@ public class Skill implements IIdentifiable
 	/** Target type of the skill : SELF, PARTY, CLAN, PET... */
 	private final L2TargetType _targetType;
 	private final AffectScope _affectScope;
-	private final int _feed;
 	// base success chance
 	private final double _power;
 	private final int _magicLevel;
@@ -257,7 +256,6 @@ public class Skill implements IIdentifiable
 		_coolTime = set.getInt("coolTime", 0);
 		_isDebuff = set.getBoolean("isDebuff", false);
 		_isRecoveryHerb = set.getBoolean("isRecoveryHerb", false);
-		_feed = set.getInt("feed", 0);
 		_reuseHashCode = SkillData.getSkillHashCode(_id, _level);
 		
 		if (Config.ENABLE_MODIFY_SKILL_REUSE && Config.SKILL_REUSE_LIST.containsKey(_id))
@@ -1581,14 +1579,6 @@ public class Skill implements IIdentifiable
 	public String toString()
 	{
 		return "Skill " + _name + "(" + _id + "," + _level + ")";
-	}
-	
-	/**
-	 * @return pet food
-	 */
-	public int getFeed()
-	{
-		return _feed;
 	}
 	
 	/**
