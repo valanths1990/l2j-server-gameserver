@@ -1315,6 +1315,17 @@ public final class L2PcInstance extends L2Playable
 	}
 	
 	/**
+	 * Verify if this player has completed the given quest.
+	 * @param quest to check if its completed or not.
+	 * @return {@code true} if the player has completed the given quest, {@code false} otherwise.
+	 */
+	public boolean hasQuestCompleted(String quest)
+	{
+		final QuestState qs = _quests.get(quest);
+		return (qs != null) && qs.isCompleted();
+	}
+	
+	/**
 	 * Remove a QuestState from the table _quest containing all quests began by the L2PcInstance.
 	 * @param quest The name of the quest
 	 */
