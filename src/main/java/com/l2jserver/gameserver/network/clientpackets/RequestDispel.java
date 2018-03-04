@@ -60,7 +60,7 @@ public class RequestDispel extends L2GameClientPacket
 		{
 			return;
 		}
-		if (!skill.canBeDispeled() || skill.isStayAfterDeath() || skill.isDebuff())
+		if (skill.isIrreplaceableBuff() || skill.isStayAfterDeath() || skill.isDebuff())
 		{
 			return;
 		}

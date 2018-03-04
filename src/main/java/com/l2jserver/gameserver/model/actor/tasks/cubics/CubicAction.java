@@ -98,7 +98,7 @@ public final class CubicAction implements Runnable
 			{
 				for (BuffInfo info : _cubic.getOwner().getEffectList().getDebuffs())
 				{
-					if (info.getSkill().canBeDispeled())
+					if (!info.getSkill().isIrreplaceableBuff())
 					{
 						useCubicCure = true;
 						info.getEffected().getEffectList().stopSkillEffects(true, info.getSkill());

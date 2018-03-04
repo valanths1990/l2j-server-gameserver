@@ -2016,7 +2016,7 @@ public final class Formulas
 				for (int i = debuffs.size() - 1; i >= 0; i--)
 				{
 					BuffInfo info = debuffs.get(i);
-					if (info.getSkill().isDebuff() && info.getSkill().canBeDispeled() && (Rnd.get(100) <= rate))
+					if (info.getSkill().isDebuff() && !info.getSkill().isIrreplaceableBuff() && (Rnd.get(100) <= rate))
 					{
 						canceled.add(info);
 						if (canceled.size() >= max)
@@ -2077,7 +2077,7 @@ public final class Formulas
 				for (int i = debuffs.size() - 1; i >= 0; i--)
 				{
 					BuffInfo info = debuffs.get(i);
-					if (info.getSkill().isDebuff() && info.getSkill().canBeDispeled() && (Rnd.get(100) <= rate))
+					if (info.getSkill().isDebuff() && !info.getSkill().isIrreplaceableBuff() && (Rnd.get(100) <= rate))
 					{
 						canceled.add(info);
 						if (canceled.size() >= max)
