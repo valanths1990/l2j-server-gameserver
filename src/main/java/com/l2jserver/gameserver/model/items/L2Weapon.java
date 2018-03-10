@@ -388,7 +388,7 @@ public final class L2Weapon extends L2Item
 		}
 		
 		// No Trigger if not Magic Skill
-		if (!trigger.isMagic() && !onMagicSkill.isMagic())
+		if (trigger.isMagic() != onMagicSkill.isMagic())
 		{
 			return;
 		}

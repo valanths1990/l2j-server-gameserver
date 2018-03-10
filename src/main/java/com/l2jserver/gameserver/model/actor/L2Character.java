@@ -1925,9 +1925,9 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		}
 		
 		// Before start AI Cast Broadcast Fly Effect is Need
-		if (skill.getFlyType() != null)
+		if (skill.isFlyType())
 		{
-			ThreadPoolManager.getInstance().scheduleEffect(new FlyToLocationTask(this, target, skill), 50);
+			ThreadPoolManager.getInstance().scheduleEffect(new FlyToLocationTask(this, target, FlyType.CHARGE), 50);
 		}
 		
 		MagicUseTask mut = new MagicUseTask(this, targets, skill, (int) skillAnimTime, simultaneously);
@@ -1986,7 +1986,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 */
 	public boolean checkDoCastConditions(Skill skill)
 	{
-		if ((skill == null) || isSkillDisabled(skill) || ((skill.getFlyType() == FlyType.CHARGE) && isMovementDisabled()))
+		if ((skill == null) || isSkillDisabled(skill) || (skill.isFlyType() && isMovementDisabled()))
 		{
 			// Send a Server->Client packet ActionFailed to the L2PcInstance
 			sendPacket(ActionFailed.STATIC_PACKET);
@@ -5350,8 +5350,8 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	 * Manage the magic skill launching task (MP, HP, Item consumation...) and display the magic skill animation on client.<br>
 	 * <B><U>Actions</U>:</B>
 	 * <ul>
-	 * <li>Send a Server->Client packet MagicSkillLaunched (to display magic skill animation) to all L2PcInstance of L2Charcater _knownPlayers</li>
-	 * <li>Consumme MP, HP and Item if necessary</li>
+	 * <li>Send a Server->Client packet MagicSkillLaunched (to display magic skill animation) to all L2PcInstance of L2Character _knownPlayers</li>
+	 * <li>Consume MP, HP and Item if necessary</li>
 	 * <li>Send a Server->Client packet StatusUpdate with MP modification to the L2PcInstance</li>
 	 * <li>Launch the magic skill in order to calculate its effects</li>
 	 * <li>If the skill type is PDAM, notify the AI of the target with AI_INTENTION_ATTACK</li>

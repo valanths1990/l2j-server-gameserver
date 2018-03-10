@@ -167,4 +167,20 @@ public enum SkillOperateType
 				return false;
 		}
 	}
+	
+	/**
+	 * Verifies if the operative type correspond to a fly skill.
+	 * @return {@code true} if the operative skill type is fly, {@code false} otherwise
+	 */
+	public boolean isFlyType()
+	{
+		switch (this)
+		{
+			case DA1:
+			case DA2:
+				return true;
+			default:
+				return false;
+		}
+	}
 }
