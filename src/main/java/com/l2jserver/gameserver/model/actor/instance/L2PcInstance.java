@@ -10882,7 +10882,43 @@ public final class L2PcInstance extends L2Playable
 		final BuffInfo info = getEffectList().getBuffInfoBySkillId(2274);
 		if (info != null)
 		{
-			skilllvl = (int) info.getSkill().getPower();
+			// TODO (Adry_85): Unhardcode
+			skilllvl = 0;
+			switch (info.getSkill().getLevel())
+			{
+				case 1:
+				{
+					skilllvl = 2;
+				}
+				case 2:
+				{
+					skilllvl = 5;
+				}
+				case 3:
+				{
+					skilllvl = 8;
+				}
+				case 4:
+				{
+					skilllvl = 11;
+				}
+				case 5:
+				{
+					skilllvl = 14;
+				}
+				case 6:
+				{
+					skilllvl = 17;
+				}
+				case 7:
+				{
+					skilllvl = 20;
+				}
+				case 8:
+				{
+					skilllvl = 23;
+				}
+			}
 		}
 		if (skilllvl <= 0)
 		{

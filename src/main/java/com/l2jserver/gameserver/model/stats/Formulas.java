@@ -1047,10 +1047,8 @@ public final class Formulas
 				return 1;
 		}
 		
-		int mAtk = attacker.getCubicPower();
-		
 		// Cubics MDAM Formula (similar to PDAM formula, but using 91 instead of 70, also resisted by mDef).
-		double damage = 91 * ((mAtk + skill.getPower()) / mDef);
+		double damage = (91 * attacker.getCubicPower()) / mDef;
 		
 		// Failure calculation
 		L2PcInstance owner = attacker.getOwner();

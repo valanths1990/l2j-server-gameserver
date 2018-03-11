@@ -543,7 +543,7 @@ public class NpcData implements IXmlReader
 									}
 									else
 									{
-										if (skill.hasEffectType(L2EffectType.DISPEL, L2EffectType.DISPEL_BY_SLOT))
+										if (skill.hasEffectType(L2EffectType.DISPEL))
 										{
 											aiSkillScopes.add(AISkillScope.NEGATIVE);
 											aiSkillScopes.add(shortOrLongRangeScope);

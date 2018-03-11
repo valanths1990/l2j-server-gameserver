@@ -139,7 +139,6 @@ public class Skill implements IIdentifiable
 	private final L2TargetType _targetType;
 	private final AffectScope _affectScope;
 	// base success chance
-	private final double _power;
 	private final int _magicLevel;
 	private final int _lvlBonusRate;
 	private final int _activateRate;
@@ -301,7 +300,6 @@ public class Skill implements IIdentifiable
 		
 		_targetType = set.getEnum("targetType", L2TargetType.class, L2TargetType.SELF);
 		_affectScope = set.getEnum("affectScope", AffectScope.class, AffectScope.NONE);
-		_power = set.getFloat("power", 0.f);
 		_magicLevel = set.getInt("magicLvl", 0);
 		_lvlBonusRate = set.getInt("lvlBonusRate", 0);
 		_activateRate = set.getInt("activateRate", -1);
@@ -417,11 +415,6 @@ public class Skill implements IIdentifiable
 	public boolean isSuicideAttack()
 	{
 		return _isSuicideAttack;
-	}
-	
-	public double getPower()
-	{
-		return _power;
 	}
 	
 	/**

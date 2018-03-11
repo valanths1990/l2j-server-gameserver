@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.ai.CtrlEvent;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.instancemanager.DuelManager;
 import com.l2jserver.gameserver.model.L2Object;
@@ -515,7 +514,7 @@ public final class L2CubicInstance implements IIdentifiable
 			
 			boolean mcrit = Formulas.calcMCrit(_owner.getMCriticalHit(target, skill));
 			byte shld = Formulas.calcShldUse(_owner, target, skill);
-			int damage = (int) Formulas.calcMagicDam(this, target, skill, mcrit, shld);
+			double damage = Formulas.calcMagicDam(this, target, skill, mcrit, shld);
 			
 			if (Config.DEBUG)
 			{
@@ -538,7 +537,7 @@ public final class L2CubicInstance implements IIdentifiable
 				}
 				else
 				{
-					_owner.sendDamageMessage(target, damage, mcrit, false, false);
+					_owner.sendDamageMessage(target, (int) damage, mcrit, false, false);
 					target.reduceCurrentHp(damage, _owner, skill);
 				}
 			}
@@ -562,7 +561,7 @@ public final class L2CubicInstance implements IIdentifiable
 			boolean mcrit = Formulas.calcMCrit(_owner.getMCriticalHit(target, skill));
 			byte shld = Formulas.calcShldUse(_owner, target, skill);
 			
-			int damage = (int) Formulas.calcMagicDam(this, target, skill, mcrit, shld);
+			double damage = Formulas.calcMagicDam(this, target, skill, mcrit, shld);
 			if (Config.DEBUG)
 			{
 				LOG.debug("L2SkillDrain: useCubicSkill() -> damage = " + damage);
@@ -586,7 +585,7 @@ public final class L2CubicInstance implements IIdentifiable
 					target.breakAttack();
 					target.breakCast();
 				}
-				owner.sendDamageMessage(target, damage, mcrit, false, false);
+				owner.sendDamageMessage(target, (int) damage, mcrit, false, false);
 			}
 		}
 	}
@@ -607,36 +606,10 @@ public final class L2CubicInstance implements IIdentifiable
 			
 			byte shld = Formulas.calcShldUse(_owner, target, skill);
 			
-			if (skill.hasEffectType(L2EffectType.STUN, L2EffectType.PARALYZE, L2EffectType.ROOT))
+			if (skill.hasEffectType(L2EffectType.STUN, L2EffectType.PARALYZE, L2EffectType.ROOT, L2EffectType.AGGRESSION))
 			{
 				if (Formulas.calcCubicSkillSuccess(this, target, skill, shld))
 				{
-					// Apply effects
-					skill.applyEffects(_owner, target, false, false, true, 0);
-					
-					if (Config.DEBUG)
-					{
-						LOG.debug("Disablers: useCubicSkill() -> success");
-					}
-				}
-				else
-				{
-					if (Config.DEBUG)
-					{
-						LOG.debug("Disablers: useCubicSkill() -> failed");
-					}
-				}
-			}
-			
-			if (skill.hasEffectType(L2EffectType.AGGRESSION))
-			{
-				if (Formulas.calcCubicSkillSuccess(this, target, skill, shld))
-				{
-					if (target.isAttackable())
-					{
-						target.getAI().notifyEvent(CtrlEvent.EVT_AGGRESSION, _owner, (int) ((150 * skill.getPower()) / (target.getLevel() + 7)));
-					}
-					
 					// Apply effects
 					skill.applyEffects(_owner, target, false, false, true, 0);
 					
