@@ -590,8 +590,7 @@ public final class RequestAcquireSkill extends L2GameClientPacket
 		{
 			return true;
 		}
-		final QuestState st = player.getQuestState("Q00136_MoreThanMeetsTheEye");
-		return (st != null) && st.isCompleted();
+		return player.hasQuestCompleted("Q00136_MoreThanMeetsTheEye");
 	}
 	
 	@Override

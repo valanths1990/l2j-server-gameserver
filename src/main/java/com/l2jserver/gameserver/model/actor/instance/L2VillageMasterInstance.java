@@ -45,7 +45,6 @@ import com.l2jserver.gameserver.model.base.PlayerClass;
 import com.l2jserver.gameserver.model.base.SubClass;
 import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Fort;
-import com.l2jserver.gameserver.model.quest.QuestState;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.AcquireSkillList;
@@ -694,25 +693,7 @@ public class L2VillageMasterInstance extends L2NpcInstance
 	
 	protected boolean checkQuests(L2PcInstance player)
 	{
-		// Noble players can add Sub-Classes without quests
-		if (player.isNoble())
-		{
-			return true;
-		}
-		
-		QuestState qs = player.getQuestState("Q00234_FatesWhisper");
-		if ((qs == null) || !qs.isCompleted())
-		{
-			return false;
-		}
-		
-		qs = player.getQuestState("Q00235_MimirsElixir");
-		if ((qs == null) || !qs.isCompleted())
-		{
-			return false;
-		}
-		
-		return true;
+		return player.isNoble() || player.hasQuestCompleted("Q00234_FatesWhisper") || player.hasQuestCompleted("Q00235_MimirsElixir");
 	}
 	
 	/**
