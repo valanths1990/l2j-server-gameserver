@@ -153,13 +153,10 @@ public class Skill implements IIdentifiable
 	
 	private final boolean _nextActionIsAttack;
 	
-	private final boolean _removedOnAnyActionExceptMove;
-	private final boolean _removedOnDamage;
-	
 	private final boolean _blockedInOlympiad;
 	
-	private final byte _element;
-	private final int _elementPower;
+	private final AttributeType _attributeType;
+	private final int _attributePower;
 	
 	private final BaseStats _basicProperty;
 	
@@ -308,13 +305,10 @@ public class Skill implements IIdentifiable
 		
 		_nextActionIsAttack = set.getBoolean("nextActionAttack", false);
 		
-		_removedOnAnyActionExceptMove = (_abnormalType == AbnormalType.INVINCIBILITY) || (_abnormalType == AbnormalType.HIDE);
-		_removedOnDamage = (_abnormalType == AbnormalType.SLEEP) || (_abnormalType == AbnormalType.FORCE_MEDITATION) || (_abnormalType == AbnormalType.HIDE);
-		
 		_blockedInOlympiad = set.getBoolean("blockedInOlympiad", false);
 		
-		_element = set.getByte("element", (byte) -1);
-		_elementPower = set.getInt("elementPower", 0);
+		_attributeType = set.getEnum("attributeType", AttributeType.class, AttributeType.NONE);
+		_attributePower = set.getInt("attributePower", 0);
 		
 		_basicProperty = set.getEnum("basicProperty", BaseStats.class, BaseStats.NONE);
 		
@@ -357,14 +351,14 @@ public class Skill implements IIdentifiable
 		return _traitType;
 	}
 	
-	public byte getElement()
+	public AttributeType getAttributeType()
 	{
-		return _element;
+		return _attributeType;
 	}
 	
-	public int getElementPower()
+	public int getAttributePower()
 	{
-		return _elementPower;
+		return _attributePower;
 	}
 	
 	/**
@@ -552,7 +546,7 @@ public class Skill implements IIdentifiable
 	 */
 	public boolean isRemovedOnAnyActionExceptMove()
 	{
-		return _removedOnAnyActionExceptMove;
+		return (_abnormalType == AbnormalType.INVINCIBILITY) || (_abnormalType == AbnormalType.HIDE);
 	}
 	
 	/**
@@ -560,7 +554,7 @@ public class Skill implements IIdentifiable
 	 */
 	public boolean isRemovedOnDamage()
 	{
-		return _removedOnDamage;
+		return (_abnormalType == AbnormalType.SLEEP) || (_abnormalType == AbnormalType.FORCE_MEDITATION) || (_abnormalType == AbnormalType.HIDE);
 	}
 	
 	/**
