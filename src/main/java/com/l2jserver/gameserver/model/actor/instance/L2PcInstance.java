@@ -4596,7 +4596,7 @@ public final class L2PcInstance extends L2Playable
 		}
 		else
 		{
-			// if item is instance of L2ArmorType or L2WeaponType broadcast an "Attention" system message
+			// if item is instance of ArmorType or WeaponType broadcast an "Attention" system message
 			if ((target.getItemType() instanceof ArmorType) || (target.getItemType() instanceof WeaponType))
 			{
 				if (target.getEnchantLevel() > 0)
@@ -7572,6 +7572,7 @@ public final class L2PcInstance extends L2Playable
 			case AURA_CORPSE_MOB:
 			case COMMAND_CHANNEL:
 			case AURA_FRIENDLY:
+			case AURA_UNDEAD_ENEMY:
 				target = this;
 				break;
 			default:
@@ -7676,6 +7677,7 @@ public final class L2PcInstance extends L2Playable
 			case AURA_CORPSE_MOB:
 			case COMMAND_CHANNEL:
 			case AURA_FRIENDLY:
+			case AURA_UNDEAD_ENEMY:
 				target = this;
 				break;
 			case PET:
@@ -7847,6 +7849,7 @@ public final class L2PcInstance extends L2Playable
 					case AREA_SUMMON:
 					case UNLOCKABLE:
 					case AURA_FRIENDLY:
+					case AURA_UNDEAD_ENEMY:
 						break;
 					default: // Send a Server->Client packet ActionFailed to the L2PcInstance
 						sendPacket(ActionFailed.STATIC_PACKET);

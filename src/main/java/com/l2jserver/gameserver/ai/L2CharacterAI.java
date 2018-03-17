@@ -1509,7 +1509,7 @@ public class L2CharacterAI extends AbstractAI
 	
 	public boolean canAura(Skill sk)
 	{
-		if ((sk.getTargetType() == L2TargetType.AURA) || (sk.getTargetType() == L2TargetType.BEHIND_AURA) || (sk.getTargetType() == L2TargetType.FRONT_AURA) || (sk.getTargetType() == L2TargetType.AURA_CORPSE_MOB))
+		if ((sk.getTargetType() == L2TargetType.AURA) || (sk.getTargetType() == L2TargetType.BEHIND_AURA) || (sk.getTargetType() == L2TargetType.FRONT_AURA) || (sk.getTargetType() == L2TargetType.AURA_CORPSE_MOB) || (sk.getTargetType() == L2TargetType.AURA_UNDEAD_ENEMY))
 		{
 			for (L2Object target : _actor.getKnownList().getKnownCharactersInRadius(sk.getAffectRange()))
 			{
@@ -1526,7 +1526,7 @@ public class L2CharacterAI extends AbstractAI
 	{
 		if (sk.hasEffectType(L2EffectType.DISPEL))
 		{
-			if ((sk.getTargetType() == L2TargetType.AURA) || (sk.getTargetType() == L2TargetType.BEHIND_AURA) || (sk.getTargetType() == L2TargetType.FRONT_AURA) || (sk.getTargetType() == L2TargetType.AURA_CORPSE_MOB))
+			if ((sk.getTargetType() == L2TargetType.AURA) || (sk.getTargetType() == L2TargetType.BEHIND_AURA) || (sk.getTargetType() == L2TargetType.FRONT_AURA) || (sk.getTargetType() == L2TargetType.AURA_CORPSE_MOB) || (sk.getTargetType() == L2TargetType.AURA_UNDEAD_ENEMY))
 			{
 				boolean cancast = true;
 				for (L2Character target : _actor.getKnownList().getKnownCharactersInRadius(sk.getAffectRange()))
@@ -1587,7 +1587,7 @@ public class L2CharacterAI extends AbstractAI
 		}
 		else
 		{
-			if ((sk.getTargetType() == L2TargetType.AURA) || (sk.getTargetType() == L2TargetType.BEHIND_AURA) || (sk.getTargetType() == L2TargetType.FRONT_AURA) || (sk.getTargetType() == L2TargetType.AURA_CORPSE_MOB))
+			if ((sk.getTargetType() == L2TargetType.AURA) || (sk.getTargetType() == L2TargetType.BEHIND_AURA) || (sk.getTargetType() == L2TargetType.FRONT_AURA) || (sk.getTargetType() == L2TargetType.AURA_CORPSE_MOB) || (sk.getTargetType() == L2TargetType.AURA_UNDEAD_ENEMY))
 			{
 				boolean cancast = false;
 				for (L2Character target : _actor.getKnownList().getKnownCharactersInRadius(sk.getAffectRange()))
