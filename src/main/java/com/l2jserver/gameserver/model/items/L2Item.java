@@ -42,6 +42,8 @@ import com.l2jserver.gameserver.model.items.type.ActionType;
 import com.l2jserver.gameserver.model.items.type.CrystalType;
 import com.l2jserver.gameserver.model.items.type.EtcItemType;
 import com.l2jserver.gameserver.model.items.type.ItemType;
+import com.l2jserver.gameserver.model.items.type.ItemType1;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.items.type.MaterialType;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
@@ -62,17 +64,6 @@ import com.l2jserver.util.StringUtil;
 public abstract class L2Item extends ListenersContainer implements IIdentifiable
 {
 	protected static final Logger _log = Logger.getLogger(L2Item.class.getName());
-	
-	public static final int TYPE1_WEAPON_RING_EARRING_NECKLACE = 0;
-	public static final int TYPE1_SHIELD_ARMOR = 1;
-	public static final int TYPE1_ITEM_QUESTITEM_ADENA = 4;
-	
-	public static final int TYPE2_WEAPON = 0;
-	public static final int TYPE2_SHIELD_ARMOR = 1;
-	public static final int TYPE2_ACCESSORY = 2;
-	public static final int TYPE2_QUEST = 3;
-	public static final int TYPE2_MONEY = 4;
-	public static final int TYPE2_OTHER = 5;
 	
 	public static final int SLOT_NONE = 0x0000;
 	public static final int SLOT_UNDERWEAR = 0x0001;
@@ -144,8 +135,8 @@ public abstract class L2Item extends ListenersContainer implements IIdentifiable
 	private final int _defaultEnchantLevel;
 	private final ActionType _defaultAction;
 	
-	protected int _type1; // needed for item list (inventory)
-	protected int _type2; // different lists for armor, weapon, etc
+	protected ItemType1 _type1; // needed for item list (inventory)
+	protected ItemType2 _type2; // different lists for armor, weapon, etc
 	protected Elementals[] _elementals = null;
 	protected List<FuncTemplate> _funcTemplates;
 	protected List<Condition> _preConditions;
@@ -273,7 +264,8 @@ public abstract class L2Item extends ListenersContainer implements IIdentifiable
 		
 		_common = ((_itemId >= 11605) && (_itemId <= 12361));
 		_heroItem = ((_itemId >= 6611) && (_itemId <= 6621)) || ((_itemId >= 9388) && (_itemId <= 9390)) || (_itemId == 6842);
-		_pvpItem = ((_itemId >= 10667) && (_itemId <= 10835)) || ((_itemId >= 12852) && (_itemId <= 12977)) || ((_itemId >= 14363) && (_itemId <= 14525)) || (_itemId == 14528) || (_itemId == 14529) || (_itemId == 14558) || ((_itemId >= 15913) && (_itemId <= 16024)) || ((_itemId >= 16134) && (_itemId <= 16147)) || (_itemId == 16149) || (_itemId == 16151) || (_itemId == 16153) || (_itemId == 16155) || (_itemId == 16157) || (_itemId == 16159) || ((_itemId >= 16168) && (_itemId <= 16176)) || ((_itemId >= 16179) && (_itemId <= 16220));
+		_pvpItem = ((_itemId >= 10667) && (_itemId <= 10835)) || ((_itemId >= 12852) && (_itemId <= 12977)) || ((_itemId >= 14363) && (_itemId <= 14525)) || (_itemId == 14528) || (_itemId == 14529) || (_itemId == 14558) || ((_itemId >= 15913) && (_itemId <= 16024))
+			|| ((_itemId >= 16134) && (_itemId <= 16147)) || (_itemId == 16149) || (_itemId == 16151) || (_itemId == 16153) || (_itemId == 16155) || (_itemId == 16157) || (_itemId == 16159) || ((_itemId >= 16168) && (_itemId <= 16176)) || ((_itemId >= 16179) && (_itemId <= 16220));
 	}
 	
 	/**
@@ -357,9 +349,9 @@ public abstract class L2Item extends ListenersContainer implements IIdentifiable
 	
 	/**
 	 * Returns the type 2 of the item
-	 * @return int
+	 * @return ItemType2
 	 */
-	public final int getType2()
+	public final ItemType2 getType2()
 	{
 		return _type2;
 	}
@@ -446,10 +438,10 @@ public abstract class L2Item extends ListenersContainer implements IIdentifiable
 		{
 			switch (_type2)
 			{
-				case TYPE2_SHIELD_ARMOR:
-				case TYPE2_ACCESSORY:
+				case SHIELD_ARMOR:
+				case ACCESSORY:
 					return _crystalCount + (getCrystalType().getCrystalEnchantBonusArmor() * ((3 * enchantLevel) - 6));
-				case TYPE2_WEAPON:
+				case WEAPON:
 					return _crystalCount + (getCrystalType().getCrystalEnchantBonusWeapon() * ((2 * enchantLevel) - 3));
 				default:
 					return _crystalCount;
@@ -459,10 +451,10 @@ public abstract class L2Item extends ListenersContainer implements IIdentifiable
 		{
 			switch (_type2)
 			{
-				case TYPE2_SHIELD_ARMOR:
-				case TYPE2_ACCESSORY:
+				case SHIELD_ARMOR:
+				case ACCESSORY:
 					return _crystalCount + (getCrystalType().getCrystalEnchantBonusArmor() * enchantLevel);
-				case TYPE2_WEAPON:
+				case WEAPON:
 					return _crystalCount + (getCrystalType().getCrystalEnchantBonusWeapon() * enchantLevel);
 				default:
 					return _crystalCount;
@@ -542,7 +534,7 @@ public abstract class L2Item extends ListenersContainer implements IIdentifiable
 	/**
 	 * @return the type 1 of the item.
 	 */
-	public final int getType1()
+	public final ItemType1 getType1()
 	{
 		return _type1;
 	}

@@ -24,9 +24,9 @@ import com.l2jserver.gameserver.enums.PrivateStoreType;
 import com.l2jserver.gameserver.model.PcCondOverride;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
-import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.EtcItemType;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
@@ -74,7 +74,8 @@ public final class RequestDropItem extends L2GameClientPacket
 		
 		L2ItemInstance item = activeChar.getInventory().getItemByObjectId(_objectId);
 		
-		if ((item == null) || (_count == 0) || !activeChar.validateItemManipulation(_objectId, "drop") || (!Config.ALLOW_DISCARDITEM && !activeChar.canOverrideCond(PcCondOverride.DROP_ALL_ITEMS)) || (!item.isDropable() && !(activeChar.canOverrideCond(PcCondOverride.DROP_ALL_ITEMS) && Config.GM_TRADE_RESTRICTED_ITEMS)) || ((item.getItemType() == EtcItemType.PET_COLLAR) && activeChar.havePetInvItems()) || activeChar.isInsideZone(ZoneId.NO_ITEM_DROP))
+		if ((item == null) || (_count == 0) || !activeChar.validateItemManipulation(_objectId, "drop") || (!Config.ALLOW_DISCARDITEM && !activeChar.canOverrideCond(PcCondOverride.DROP_ALL_ITEMS))
+			|| (!item.isDropable() && !(activeChar.canOverrideCond(PcCondOverride.DROP_ALL_ITEMS) && Config.GM_TRADE_RESTRICTED_ITEMS)) || ((item.getItemType() == EtcItemType.PET_COLLAR) && activeChar.havePetInvItems()) || activeChar.isInsideZone(ZoneId.NO_ITEM_DROP))
 		{
 			activeChar.sendPacket(SystemMessageId.CANNOT_DISCARD_THIS_ITEM);
 			return;
@@ -157,7 +158,7 @@ public final class RequestDropItem extends L2GameClientPacket
 			}
 		}
 		
-		if ((L2Item.TYPE2_QUEST == item.getItem().getType2()) && !activeChar.canOverrideCond(PcCondOverride.DROP_ALL_ITEMS))
+		if ((ItemType2.QUEST == item.getItem().getType2()) && !activeChar.canOverrideCond(PcCondOverride.DROP_ALL_ITEMS))
 		{
 			if (Config.DEBUG)
 			{
@@ -216,7 +217,8 @@ public final class RequestDropItem extends L2GameClientPacket
 		if (activeChar.isGM())
 		{
 			String target = (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target");
-			GMAudit.auditGMAction(activeChar.getName() + " [" + activeChar.getObjectId() + "]", "Drop", target, "(id: " + dropedItem.getId() + " name: " + dropedItem.getItemName() + " objId: " + dropedItem.getObjectId() + " x: " + activeChar.getX() + " y: " + activeChar.getY() + " z: " + activeChar.getZ() + ")");
+			GMAudit.auditGMAction(activeChar.getName() + " [" + activeChar.getObjectId() + "]", "Drop", target, "(id: " + dropedItem.getId() + " name: " + dropedItem.getItemName() + " objId: " + dropedItem.getObjectId() + " x: " + activeChar.getX() + " y: " + activeChar.getY() + " z: "
+				+ activeChar.getZ() + ")");
 		}
 		
 		if ((dropedItem != null) && (dropedItem.getId() == Inventory.ADENA_ID) && (dropedItem.getCount() >= 1000000))

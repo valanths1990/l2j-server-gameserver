@@ -29,6 +29,8 @@ import com.l2jserver.gameserver.model.conditions.ConditionGameChance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillSee;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
+import com.l2jserver.gameserver.model.items.type.ItemType1;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Formulas;
@@ -80,8 +82,8 @@ public final class L2Weapon extends L2Item
 	{
 		super(set);
 		_type = WeaponType.valueOf(set.getString("weapon_type", "none").toUpperCase());
-		_type1 = L2Item.TYPE1_WEAPON_RING_EARRING_NECKLACE;
-		_type2 = L2Item.TYPE2_WEAPON;
+		_type1 = ItemType1.WEAPON_RING_EARRING_NECKLACE;
+		_type2 = ItemType2.WEAPON;
 		_isMagicWeapon = set.getBoolean("is_magic_weapon", false);
 		_soulShotCount = set.getInt("soulshots", 0);
 		_spiritShotCount = set.getInt("spiritshots", 0);

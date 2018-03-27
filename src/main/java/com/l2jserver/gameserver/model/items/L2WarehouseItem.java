@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.model.items;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.CrystalType;
 import com.l2jserver.gameserver.model.items.type.ItemType;
+import com.l2jserver.gameserver.model.items.type.ItemType1;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 
 /**
  * This class contains L2ItemInstance<BR>
@@ -139,7 +141,7 @@ public class L2WarehouseItem
 	/**
 	 * @return the first type.
 	 */
-	public final int getType1()
+	public final ItemType1 getType1()
 	{
 		return _item.getType1();
 	}
@@ -147,7 +149,7 @@ public class L2WarehouseItem
 	/**
 	 * @return the second type.
 	 */
-	public final int getType2()
+	public final ItemType2 getType2()
 	{
 		return _item.getType2();
 	}

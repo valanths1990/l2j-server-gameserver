@@ -70,6 +70,8 @@ import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.type.EtcItemType;
 import com.l2jserver.gameserver.model.items.type.ItemType;
+import com.l2jserver.gameserver.model.items.type.ItemType1;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.options.EnchantOptions;
 import com.l2jserver.gameserver.model.options.Options;
 import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
@@ -851,8 +853,8 @@ public final class L2ItemInstance extends L2Object
 	public boolean isAvailable(L2PcInstance player, boolean allowAdena, boolean allowNonTradeable)
 	{
 		return ((!isEquipped()) // Not equipped
-			&& (getItem().getType2() != L2Item.TYPE2_QUEST) // Not Quest Item
-			&& ((getItem().getType2() != L2Item.TYPE2_MONEY) || (getItem().getType1() != L2Item.TYPE1_SHIELD_ARMOR)) // not money, not shield
+			&& (getItem().getType2() != ItemType2.QUEST) // Not Quest Item
+			&& ((getItem().getType2() != ItemType2.MONEY) || (getItem().getType1() != ItemType1.SHIELD_ARMOR)) // not money, not shield
 			&& (!player.hasSummon() || (getObjectId() != player.getSummon().getControlObjectId())) // Not Control item of currently summoned pet
 			&& (player.getActiveEnchantItemId() != getObjectId()) // Not momentarily used enchant scroll
 			&& (player.getActiveEnchantSupportItemId() != getObjectId()) // Not momentarily used enchant support item

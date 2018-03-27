@@ -54,11 +54,11 @@ public class SellListProcure extends L2GameServerPacket
 		
 		for (L2ItemInstance item : _sellList.keySet())
 		{
-			writeH(item.getItem().getType1());
+			writeH(item.getItem().getType1().getId());
 			writeD(item.getObjectId());
 			writeD(item.getDisplayId());
 			writeQ(_sellList.get(item)); // count
-			writeH(item.getItem().getType2());
+			writeH(item.getItem().getType2().getId());
 			writeH(0); // unknown
 			writeQ(0); // price, u shouldnt get any adena for crops, only raw materials
 		}

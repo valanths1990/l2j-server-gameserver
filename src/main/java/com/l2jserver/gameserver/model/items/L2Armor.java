@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.model.items;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.holders.SkillHolder;
 import com.l2jserver.gameserver.model.items.type.ArmorType;
+import com.l2jserver.gameserver.model.items.type.ItemType1;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.util.StringUtil;
 
@@ -47,8 +49,8 @@ public final class L2Armor extends L2Item
 		int _bodyPart = getBodyPart();
 		if ((_bodyPart == L2Item.SLOT_NECK) || ((_bodyPart & L2Item.SLOT_L_EAR) != 0) || ((_bodyPart & L2Item.SLOT_L_FINGER) != 0) || ((_bodyPart & L2Item.SLOT_R_BRACELET) != 0) || ((_bodyPart & L2Item.SLOT_L_BRACELET) != 0))
 		{
-			_type1 = L2Item.TYPE1_WEAPON_RING_EARRING_NECKLACE;
-			_type2 = L2Item.TYPE2_ACCESSORY;
+			_type1 = ItemType1.WEAPON_RING_EARRING_NECKLACE;
+			_type2 = ItemType2.ACCESSORY;
 		}
 		else
 		{
@@ -56,8 +58,8 @@ public final class L2Armor extends L2Item
 			{
 				_type = ArmorType.SHIELD;
 			}
-			_type1 = L2Item.TYPE1_SHIELD_ARMOR;
-			_type2 = L2Item.TYPE2_SHIELD_ARMOR;
+			_type1 = ItemType1.SHIELD_ARMOR;
+			_type2 = ItemType2.SHIELD_ARMOR;
 		}
 		
 		String skill = set.getString("enchant4_skill", null);

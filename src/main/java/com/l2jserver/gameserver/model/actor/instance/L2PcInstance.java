@@ -226,6 +226,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.ActionType;
 import com.l2jserver.gameserver.model.items.type.ArmorType;
 import com.l2jserver.gameserver.model.items.type.EtcItemType;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.multisell.PreparedListContainer;
 import com.l2jserver.gameserver.model.olympiad.OlympiadGameManager;
@@ -5368,7 +5369,7 @@ public final class L2PcInstance extends L2Playable
 					if (itemDrop.isShadowItem() || // Dont drop Shadow Items
 						itemDrop.isTimeLimitedItem() || // Dont drop Time Limited Items
 						!itemDrop.isDropable() || (itemDrop.getId() == Inventory.ADENA_ID) || // Adena
-						(itemDrop.getItem().getType2() == L2Item.TYPE2_QUEST) || // Quest Items
+						(itemDrop.getItem().getType2() == ItemType2.QUEST) || // Quest Items
 						(hasSummon() && (getSummon().getControlObjectId() == itemDrop.getId())) || // Control Item of active pet
 						(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_ITEMS, itemDrop.getId()) >= 0) || // Item listed in the non droppable item list
 						(Arrays.binarySearch(Config.KARMA_LIST_NONDROPPABLE_PET_ITEMS, itemDrop.getId()) >= 0 // Item listed in the non droppable pet item list
@@ -5380,7 +5381,7 @@ public final class L2PcInstance extends L2Playable
 					if (itemDrop.isEquipped())
 					{
 						// Set proper chance according to Item type of equipped Item
-						itemDropPercent = itemDrop.getItem().getType2() == L2Item.TYPE2_WEAPON ? dropEquipWeapon : dropEquip;
+						itemDropPercent = itemDrop.getItem().getType2() == ItemType2.WEAPON ? dropEquipWeapon : dropEquip;
 						getInventory().unEquipItemInSlot(itemDrop.getLocationSlot());
 					}
 					else

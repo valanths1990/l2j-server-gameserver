@@ -25,6 +25,8 @@ import com.l2jserver.gameserver.model.L2ExtractableProduct;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.items.type.EtcItemType;
+import com.l2jserver.gameserver.model.items.type.ItemType1;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.util.StringUtil;
 
 /**
@@ -59,16 +61,16 @@ public final class L2EtcItem extends L2Item
 			}
 		}
 		
-		_type1 = L2Item.TYPE1_ITEM_QUESTITEM_ADENA;
-		_type2 = L2Item.TYPE2_OTHER; // default is other
+		_type1 = ItemType1.ITEM_QUESTITEM_ADENA;
+		_type2 = ItemType2.OTHER; // default is other
 		
 		if (isQuestItem())
 		{
-			_type2 = L2Item.TYPE2_QUEST;
+			_type2 = ItemType2.QUEST;
 		}
 		else if ((getId() == Inventory.ADENA_ID) || (getId() == Inventory.ANCIENT_ADENA_ID))
 		{
-			_type2 = L2Item.TYPE2_MONEY;
+			_type2 = ItemType2.MONEY;
 		}
 		
 		_handler = set.getString("handler", null); // ! null !

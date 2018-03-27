@@ -41,6 +41,7 @@ import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.ArmorType;
+import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.SystemMessageId;
@@ -122,7 +123,7 @@ public final class UseItem extends L2GameClientPacket
 			return;
 		}
 		
-		if (item.getItem().getType2() == L2Item.TYPE2_QUEST)
+		if (item.getItem().getType2() == ItemType2.QUEST)
 		{
 			activeChar.sendPacket(SystemMessageId.CANNOT_USE_QUEST_ITEMS);
 			return;
@@ -327,7 +328,8 @@ public final class UseItem extends L2GameClientPacket
 		else
 		{
 			final L2Weapon weaponItem = activeChar.getActiveWeaponItem();
-			if (((weaponItem != null) && (weaponItem.getItemType() == WeaponType.FISHINGROD)) && (((_itemId >= 6519) && (_itemId <= 6527)) || ((_itemId >= 7610) && (_itemId <= 7613)) || ((_itemId >= 7807) && (_itemId <= 7809)) || ((_itemId >= 8484) && (_itemId <= 8486)) || ((_itemId >= 8505) && (_itemId <= 8513))))
+			if (((weaponItem != null) && (weaponItem.getItemType() == WeaponType.FISHINGROD))
+				&& (((_itemId >= 6519) && (_itemId <= 6527)) || ((_itemId >= 7610) && (_itemId <= 7613)) || ((_itemId >= 7807) && (_itemId <= 7809)) || ((_itemId >= 8484) && (_itemId <= 8486)) || ((_itemId >= 8505) && (_itemId <= 8513))))
 			{
 				activeChar.getInventory().setPaperdollItem(Inventory.PAPERDOLL_LHAND, item);
 				activeChar.broadcastUserInfo();

@@ -196,8 +196,10 @@ public class ItemTable
 	}
 	
 	/**
-	 * Create the L2ItemInstance corresponding to the Item Identifier and quantitiy add logs the activity. <B><U> Actions</U> :</B> <li>Create and Init the L2ItemInstance corresponding to the Item Identifier and quantity</li> <li>Add the L2ItemInstance object to _allObjects of L2world</li> <li>Logs
-	 * Item creation according to log settings</li>
+	 * Create the L2ItemInstance corresponding to the Item Identifier and quantitiy add logs the activity. <B><U> Actions</U> :</B>
+	 * <li>Create and Init the L2ItemInstance corresponding to the Item Identifier and quantity</li>
+	 * <li>Add the L2ItemInstance object to _allObjects of L2world</li>
+	 * <li>Logs Item creation according to log settings</li>
 	 * @param process : String Identifier of process triggering this action
 	 * @param itemId : int Item Identifier of the item to be created
 	 * @param count : int Quantity of items to be created for stackable items
