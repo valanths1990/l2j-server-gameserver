@@ -1800,7 +1800,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 		
 		// Calculate the Reuse Time of the Skill
 		int reuseDelay;
-		if (skill.isStaticReuse() || skill.isStatic())
+		if (skill.isReuseDelayLocked() || skill.isStatic())
 		{
 			reuseDelay = (skill.getReuseDelay());
 		}
