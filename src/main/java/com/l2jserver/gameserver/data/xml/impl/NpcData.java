@@ -577,7 +577,7 @@ public class NpcData implements IXmlReader
 											aiSkillScopes.add(AISkillScope.IMMOBILIZE);
 											aiSkillScopes.add(shortOrLongRangeScope);
 										}
-										else if (skill.hasEffectType(L2EffectType.DMG_OVER_TIME, L2EffectType.DMG_OVER_TIME_PERCENT))
+										else if (skill.hasEffectType(L2EffectType.DMG_OVER_TIME))
 										{
 											aiSkillScopes.add(shortOrLongRangeScope);
 										}

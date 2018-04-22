@@ -194,7 +194,7 @@ public final class CubicAction implements Runnable
 						}
 						_cubic.useCubicDisabler(skill, targets);
 					}
-					else if (skill.hasEffectType(L2EffectType.DMG_OVER_TIME, L2EffectType.DMG_OVER_TIME_PERCENT))
+					else if (skill.hasEffectType(L2EffectType.DMG_OVER_TIME))
 					{
 						if (Config.DEBUG)
 						{

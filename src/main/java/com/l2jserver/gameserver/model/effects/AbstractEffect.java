@@ -56,7 +56,7 @@ public abstract class AbstractEffect
 	/** Effect name. */
 	private final String _name;
 	/** Ticks. */
-	private final int _ticks;
+	private int _ticks;
 	
 	/**
 	 * Abstract effect constructor.
@@ -70,7 +70,6 @@ public abstract class AbstractEffect
 		_attachCond = attachCond;
 		// _applyCond = applyCond;
 		_name = set.getString("name");
-		_ticks = set.getInt("ticks", 0);
 	}
 	
 	/**
@@ -154,6 +153,15 @@ public abstract class AbstractEffect
 	public int getTicks()
 	{
 		return _ticks;
+	}
+	
+	/**
+	 * Sets the effect ticks
+	 * @param ticks the ticks
+	 */
+	protected void setTicks(int ticks)
+	{
+		_ticks = ticks;
 	}
 	
 	public double getTicksMultiplier()
