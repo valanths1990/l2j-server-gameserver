@@ -1,4 +1,4 @@
-image: java:8
+image: openjdk:10.0.2-13-jre-sid
 
 pipelines:
   default:

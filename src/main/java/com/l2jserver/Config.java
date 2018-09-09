@@ -78,6 +78,12 @@ public final class Config
 {
 	private static final Logger LOG = LoggerFactory.getLogger(Config.class);
 	
+	/**
+	 * Informs(logs) the scripts being loaded.<BR>
+	 * Apply only when executing script from files.<BR>
+	 */
+	public static final boolean VERBOSE_LOADING = false;
+	
 	// --------------------------------------------------
 	// Constants
 	// --------------------------------------------------
@@ -461,8 +467,8 @@ public final class Config
 	public static boolean HTML_ACTION_CACHE_DEBUG;
 	public static boolean PACKET_HANDLER_DEBUG;
 	public static boolean DEVELOPER;
-	public static boolean ALT_DEV_NO_HANDLERS;
-	public static boolean ALT_DEV_NO_QUESTS;
+	public static boolean NO_HANDLERS;
+	public static boolean NO_QUESTS;
 	public static boolean ALT_DEV_NO_SPAWNS;
 	public static boolean ALT_DEV_SHOW_QUESTS_LOAD_IN_LOGS;
 	public static boolean ALT_DEV_SHOW_SCRIPTS_LOAD_IN_LOGS;
@@ -1760,8 +1766,8 @@ public final class Config
 			HTML_ACTION_CACHE_DEBUG = General.getBoolean("HtmlActionCacheDebug", false);
 			PACKET_HANDLER_DEBUG = General.getBoolean("PacketHandlerDebug", false);
 			DEVELOPER = General.getBoolean("Developer", false);
-			ALT_DEV_NO_HANDLERS = General.getBoolean("AltDevNoHandlers", false) || Boolean.getBoolean("nohandlers");
-			ALT_DEV_NO_QUESTS = General.getBoolean("AltDevNoQuests", false) || Boolean.getBoolean("noquests");
+			NO_HANDLERS = General.getBoolean("NoHandlers", false) || Boolean.getBoolean("nohandlers");
+			NO_QUESTS = General.getBoolean("NoQuests", false) || Boolean.getBoolean("noquests");
 			ALT_DEV_NO_SPAWNS = General.getBoolean("AltDevNoSpawns", false) || Boolean.getBoolean("nospawns");
 			ALT_DEV_SHOW_QUESTS_LOAD_IN_LOGS = General.getBoolean("AltDevShowQuestsLoadInLogs", false);
 			ALT_DEV_SHOW_SCRIPTS_LOAD_IN_LOGS = General.getBoolean("AltDevShowScriptsLoadInLogs", false);
@@ -3937,7 +3943,6 @@ public final class Config
 				parseFile(new File(IP_CONFIG_FILE));
 			}
 			else
-			// Auto configuration...
 			{
 				LOG.info("Using automatic network configuration.");
 				autoIpConfig();

@@ -19,7 +19,6 @@
 package com.l2jserver.gameserver.instancemanager;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -27,7 +26,7 @@ import java.util.logging.Logger;
 
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.model.quest.Quest;
-import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
+import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 import com.l2jserver.gameserver.scripting.ScriptManager;
 import com.l2jserver.util.Util;
 
@@ -90,7 +89,9 @@ public final class QuestManager extends ScriptManager<Quest>
 				quest.unload(false);
 			}
 		}
+		
 		_quests.clear();
+		
 		// Unload scripts.
 		for (Quest script : _scripts.values())
 		{
@@ -103,9 +104,9 @@ public final class QuestManager extends ScriptManager<Quest>
 		
 		try
 		{
-			L2ScriptEngineManager.getInstance().executeScriptList(new File(Config.DATAPACK_ROOT, "data/scripts.cfg"));
+			ScriptEngineManager.getInstance().executeScriptList(new File(Config.DATAPACK_ROOT, "data/scripts.cfg"));
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Failed loading scripts.cfg, no script going to be loaded!", e);
 		}

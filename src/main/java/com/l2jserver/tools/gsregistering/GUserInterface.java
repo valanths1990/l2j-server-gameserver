@@ -41,6 +41,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -68,7 +69,7 @@ public class GUserInterface extends BaseGameServerRegister implements ActionList
 		_frame = new JFrame();
 		getFrame().setTitle(getBundle().getString("toolName"));
 		getFrame().setSize(600, 400);
-		getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getFrame().setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		getFrame().setLayout(new GridBagLayout());
 		GridBagConstraints cons = new GridBagConstraints();
 		
@@ -251,7 +252,8 @@ public class GUserInterface extends BaseGameServerRegister implements ActionList
 		}
 		else if (cmd.equals("about"))
 		{
-			JOptionPane.showMessageDialog(getFrame(), getBundle().getString("credits") + Config.EOL + "http://www.l2jserver.com" + Config.EOL + Config.EOL + getBundle().getString("icons") + Config.EOL + Config.EOL + getBundle().getString("langText") + Config.EOL + getBundle().getString("translation"), getBundle().getString("aboutItem"), JOptionPane.INFORMATION_MESSAGE, ImagesTable.getImage("l2jserverlogo.png"));
+			JOptionPane.showMessageDialog(getFrame(), getBundle().getString("credits") + Config.EOL + "http://www.l2jserver.com" + Config.EOL + Config.EOL + getBundle().getString("icons") + Config.EOL + Config.EOL + getBundle().getString("langText") + Config.EOL
+				+ getBundle().getString("translation"), getBundle().getString("aboutItem"), JOptionPane.INFORMATION_MESSAGE, ImagesTable.getImage("l2jserverlogo.png"));
 		}
 		else if (cmd.equals("removeAll"))
 		{

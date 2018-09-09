@@ -259,7 +259,7 @@ public final class Rnd
 		
 		public ThreadLocalRandom()
 		{
-			_seedLocal = new ThreadLocal<Seed>()
+			_seedLocal = new ThreadLocal<>()
 			{
 				@Override
 				public final Seed initialValue()
@@ -271,7 +271,7 @@ public final class Rnd
 		
 		public ThreadLocalRandom(final long seed)
 		{
-			_seedLocal = new ThreadLocal<Seed>()
+			_seedLocal = new ThreadLocal<>()
 			{
 				@Override
 				public final Seed initialValue()

@@ -39,8 +39,6 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.ScriptException;
-
 import com.l2jserver.Config;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.ai.CtrlIntention;
@@ -144,7 +142,7 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SpecialCamera;
 import com.l2jserver.gameserver.network.serverpackets.StatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
+import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 import com.l2jserver.gameserver.scripting.ScriptManager;
 import com.l2jserver.gameserver.util.MinionList;
 import com.l2jserver.util.Rnd;
@@ -164,7 +162,7 @@ public abstract class AbstractScript implements INamable
 	
 	public AbstractScript()
 	{
-		_scriptFile = L2ScriptEngineManager.getInstance().getCurrentLoadingScript();
+		_scriptFile = ScriptEngineManager.getInstance().getCurrentLoadingScript();
 		initializeAnnotationListeners();
 	}
 	
@@ -336,10 +334,10 @@ public abstract class AbstractScript implements INamable
 	{
 		try
 		{
-			L2ScriptEngineManager.getInstance().executeScript(getScriptFile());
+			ScriptEngineManager.getInstance().executeScript(getScriptFile());
 			return true;
 		}
-		catch (ScriptException e)
+		catch (Exception e)
 		{
 			return false;
 		}

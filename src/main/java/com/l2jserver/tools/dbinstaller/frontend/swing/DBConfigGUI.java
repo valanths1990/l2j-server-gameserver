@@ -26,13 +26,13 @@ import java.text.MessageFormat;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import com.l2jserver.tools.dbinstaller.RunTasks;
 import com.l2jserver.tools.images.ImagesTable;
@@ -74,7 +74,7 @@ public class DBConfigGUI extends AbstractGUI
 		int height = 240;
 		Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds((resolution.width - width) / 2, (resolution.height - height) / 2, width, height);
 		setResizable(false);
 		

@@ -62,6 +62,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
 import com.l2jserver.tools.configurator.ConfigUserInterface.ConfigFile.ConfigComment;
 import com.l2jserver.tools.configurator.ConfigUserInterface.ConfigFile.ConfigProperty;
@@ -83,9 +84,6 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 	
 	private ResourceBundle _bundle;
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args)
 	{
 		try
@@ -110,7 +108,7 @@ public class ConfigUserInterface extends JFrame implements ActionListener
 	{
 		setBundle(bundle);
 		setTitle(bundle.getString("toolName"));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setSize(750, 500);
 		setLayout(new GridBagLayout());
 		

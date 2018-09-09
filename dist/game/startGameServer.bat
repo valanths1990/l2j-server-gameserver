@@ -5,14 +5,7 @@ title Game Server Console
 echo Starting L2J Game Server.
 echo.
 
-java -Dpython.cachedir=../cachedir -Xms1024m -Xmx1792m -jar l2jserver.jar
-
-REM NOTE: If you have a powerful machine, you could modify/add some extra parameters for performance, like:
-REM -Xms1536m
-REM -Xmx3072m
-REM -XX:+AggressiveOpts
-REM Use this parameters carefully, some of them could cause abnormal behavior, deadlocks, etc.
-REM More info here: http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html
+java -Xms512m -Xmx2g -jar l2jserver.jar
 
 if ERRORLEVEL 2 goto restart
 if ERRORLEVEL 1 goto error

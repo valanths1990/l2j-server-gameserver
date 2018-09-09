@@ -244,7 +244,7 @@ public enum BaseStats
 		}
 		else
 		{
-			throw new Error("[BaseStats] File not found: " + file.getName());
+			throw new Error("[BaseStats] File not found: " + file.getAbsolutePath());
 		}
 	}
 }

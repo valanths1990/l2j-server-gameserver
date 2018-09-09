@@ -18,12 +18,11 @@
  */
 package com.l2jserver.gameserver.handler;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.l2jserver.gameserver.model.effects.AbstractEffect;
-import com.l2jserver.gameserver.scripting.L2ScriptEngineManager;
+import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 
 /**
  * @author BiggBoss, UnAfraid
@@ -61,27 +60,18 @@ public final class EffectHandler implements IHandler<Class<? extends AbstractEff
 		return _handlers.size();
 	}
 	
-	public void executeScript()
+	public void executeScript() throws Exception
 	{
-		try
-		{
-			
-			File file = new File(L2ScriptEngineManager.SCRIPT_FOLDER, "handlers/EffectMasterHandler.java");
-			L2ScriptEngineManager.getInstance().executeScript(file);
-		}
-		catch (Exception e)
-		{
-			throw new Error("Problems while running EffectMansterHandler", e);
-		}
-	}
-	
-	private static final class SingletonHolder
-	{
-		protected static final EffectHandler _instance = new EffectHandler();
+		ScriptEngineManager.getInstance().executeScript("handlers/EffectMasterHandler.java");
 	}
 	
 	public static EffectHandler getInstance()
 	{
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
+	}
+	
+	private static final class SingletonHolder
+	{
+		protected static final EffectHandler INSTANCE = new EffectHandler();
 	}
 }
