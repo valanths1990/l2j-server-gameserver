@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
-import java.util.TimeZone;
 
 import com.l2jserver.tools.util.io.FileWriterStdout;
 import com.l2jserver.util.file.filter.SQLFilter;
@@ -50,17 +48,14 @@ public final class SQLUtil
 {
 	public static Connection connect(String host, String port, String user, String password, String db) throws SQLException
 	{
-		try (Formatter form = new Formatter())
-		{
-			String url = form.format("jdbc:mysql://%s:%s", host, port).toString();
-			Driver driver = DriverManager.getDriver(url);
-			Properties info = new Properties();
-			info.put("user", user);
-			info.put("password", password);
-			info.put("useSSL", "false");
-			info.put("serverTimezone", TimeZone.getDefault().getID());
-			return driver.connect(url, info);
-		}
+		final String url = String.format("jdbc:mysql://%s:%s", host, port);
+		final Properties info = new Properties();
+		info.put("user", user);
+		info.put("password", password);
+		info.put("useSSL", "false");
+		info.put("serverTimezone", "UTC");
+		info.put("allowPublicKeyRetrieval", "true");
+		return DriverManager.getConnection(url, info);
 	}
 	
 	public static void close(Connection con)

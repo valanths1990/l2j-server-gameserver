@@ -1162,10 +1162,10 @@ public final class Config
 			
 			DATABASE_ENGINE = serverSettings.getString("Database", "MySQL");
 			DATABASE_DRIVER = serverSettings.getString("Driver", "com.mysql.jdbc.Driver");
-			DATABASE_URL = serverSettings.getString("URL", "jdbc:mysql://localhost/l2jgs");
+			DATABASE_URL = serverSettings.getString("URL", "jdbc:mysql://localhost/l2jgs?useSSL=false&serverTimezone=UTC");
 			DATABASE_LOGIN = serverSettings.getString("Login", "root");
-			DATABASE_PASSWORD = serverSettings.getString("Password", "");
-			DATABASE_CONNECTION_POOL = serverSettings.getString("ConnectionPool", "C3P0");
+			DATABASE_PASSWORD = serverSettings.getString("Password", "toor");
+			DATABASE_CONNECTION_POOL = serverSettings.getString("ConnectionPool", "HikariCP");
 			DATABASE_MAX_CONNECTIONS = serverSettings.getInt("MaximumDbConnections", 10);
 			DATABASE_MAX_IDLE_TIME = serverSettings.getInt("MaximumDbIdleTime", 0);
 			
@@ -2731,7 +2731,7 @@ public final class Config
 			
 			ENABLE_UPNP = ServerSettings.getBoolean("EnableUPnP", true);
 			GAME_SERVER_LOGIN_HOST = ServerSettings.getString("LoginHostname", "127.0.0.1");
-			GAME_SERVER_LOGIN_PORT = ServerSettings.getInt("LoginPort", 9013);
+			GAME_SERVER_LOGIN_PORT = ServerSettings.getInt("LoginPort", 9014);
 			
 			LOGIN_BIND_ADDRESS = ServerSettings.getString("LoginserverHostname", "*");
 			PORT_LOGIN = ServerSettings.getInt("LoginserverPort", 2106);
@@ -2757,9 +2757,9 @@ public final class Config
 			LOGIN_SERVER_SCHEDULE_RESTART_TIME = ServerSettings.getLong("LoginRestartTime", 24);
 			
 			DATABASE_DRIVER = ServerSettings.getString("Driver", "com.mysql.jdbc.Driver");
-			DATABASE_URL = ServerSettings.getString("URL", "jdbc:mysql://localhost/l2jls");
+			DATABASE_URL = ServerSettings.getString("URL", "jdbc:mysql://localhost/l2jls?useSSL=false&serverTimezone=UTC");
 			DATABASE_LOGIN = ServerSettings.getString("Login", "root");
-			DATABASE_PASSWORD = ServerSettings.getString("Password", "");
+			DATABASE_PASSWORD = ServerSettings.getString("Password", "toor");
 			DATABASE_CONNECTION_POOL = ServerSettings.getString("ConnectionPool", "HikariCP");
 			DATABASE_MAX_CONNECTIONS = ServerSettings.getInt("MaximumDbConnections", 10);
 			DATABASE_MAX_IDLE_TIME = ServerSettings.getInt("MaximumDbIdleTime", 0);
