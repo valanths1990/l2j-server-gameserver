@@ -51,7 +51,7 @@ public final class ScriptEngineManager
 	
 	public static final File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getAbsolutePath(), "data/scripts");
 	
-	private static final String CLASS_PATH = SCRIPT_FOLDER.getAbsolutePath() + ";" + System.getProperty("java.class.path");
+	private static final String CLASS_PATH = SCRIPT_FOLDER.getAbsolutePath() + System.getProperty("path.separator") + System.getProperty("java.class.path");
 	
 	private static final String MAIN = "main";
 	
