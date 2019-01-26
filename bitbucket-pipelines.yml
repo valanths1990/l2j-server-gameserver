@@ -1,4 +1,4 @@
-image: openjdk:10.0.2-13-jre-sid
+image: openjdk:11-jre-slim
 
 pipelines:
   default:
