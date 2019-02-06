@@ -373,21 +373,20 @@ public class Siege implements Siegable
 	}
 	
 	/**
-	 * When control of castle changed during siege<BR>
-	 * <BR>
+	 * When control of castle changed during siege.
 	 */
 	public void midVictory()
 	{
-		if (isInProgress()) // Siege still in progress
+		// Siege still in progress
+		if (isInProgress())
 		{
 			if (getCastle().getOwnerId() > 0)
 			{
 				_siegeGuardManager.removeMercs(); // Remove all merc entry from db
 			}
 			
-			if (getDefenderClans().isEmpty() && // If defender doesn't exist (Pc vs Npc)
-			(getAttackerClans().size() == 1 // Only 1 attacker
-			))
+			// If defender doesn't exist (Pc vs Npc) and only 1 attacker
+			if (getDefenderClans().isEmpty() && (getAttackerClans().size() == 1))
 			{
 				L2SiegeClan sc_newowner = getAttackerClan(getCastle().getOwnerId());
 				removeAttacker(sc_newowner);
@@ -398,8 +397,8 @@ public class Siege implements Siegable
 			if (getCastle().getOwnerId() > 0)
 			{
 				int allyId = ClanTable.getInstance().getClan(getCastle().getOwnerId()).getAllyId();
-				if (getDefenderClans().isEmpty()) // If defender doesn't exist (Pc vs Npc)
-				// and only an alliance attacks
+				// If defender doesn't exist (Pc vs Npc) and only an alliance attacks
+				if (getDefenderClans().isEmpty())
 				{
 					// The player's clan is in an alliance
 					if (allyId != 0)
@@ -467,10 +466,6 @@ public class Siege implements Siegable
 		}
 	}
 	
-	/**
-	 * When siege starts<BR>
-	 * <BR>
-	 */
 	@Override
 	public void startSiege()
 	{
@@ -528,8 +523,7 @@ public class Siege implements Siegable
 	}
 	
 	/**
-	 * Announce to player.<BR>
-	 * <BR>
+	 * Announce to player.
 	 * @param message The SystemMessage to send to player
 	 * @param bothSides True - broadcast to both attackers and defenders. False - only to defenders.
 	 */

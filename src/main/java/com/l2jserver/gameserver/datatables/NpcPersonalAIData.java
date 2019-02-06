@@ -27,7 +27,7 @@ import com.l2jserver.util.Rnd;
 
 /**
  * This class holds parameter, specific to certain NPCs.<br>
- * It can be either general parameters overridden for certain NPC instance instead of template parameters(aggro range, for example), or some optional parameters, handled by datapack scripts.<br>
+ * It can be either general parameters overridden for certain NPC instance instead of template parameters(aggro range, for example), or some optional parameters, handled by datapack scripts.
  * @author GKR
  */
 public class NpcPersonalAIData

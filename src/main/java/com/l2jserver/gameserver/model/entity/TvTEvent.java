@@ -77,16 +77,16 @@ public class TvTEvent
 	
 	protected static final Logger _log = Logger.getLogger(TvTEvent.class.getName());
 	/** html path **/
-	private static final String htmlPath = "data/scripts/custom/events/TvT/TvTManager/";
-	/** The teams of the TvTEvent<br> */
+	private static final String HTML_PATH = "data/scripts/custom/events/TvT/TvTManager/";
+	/** The teams of the TvTEvent. */
 	private static TvTEventTeam[] _teams = new TvTEventTeam[2];
-	/** The state of the TvTEvent<br> */
+	/** The state of the TvTEvent. */
 	private static EventState _state = EventState.INACTIVE;
-	/** The spawn of the participation npc<br> */
+	/** The spawn of the participation npc. */
 	private static L2Spawn _npcSpawn = null;
-	/** the npc instance of the participation npc<br> */
+	/** The npc instance of the participation npc. */
 	private static L2Npc _lastNpcSpawn = null;
-	/** Instance id<br> */
+	/** Instance Id. */
 	private static int _TvTEventInstance = 0;
 	
 	private TvTEvent()
@@ -94,9 +94,7 @@ public class TvTEvent
 		// Prevent external initialization.
 	}
 	
-	/**
-	 * Teams initializing<br>
-	 */
+	/** Teams initializing. */
 	public static void init()
 	{
 		AntiFeedManager.getInstance().registerEvent(AntiFeedManager.TVT_ID);
@@ -107,9 +105,8 @@ public class TvTEvent
 	/**
 	 * Starts the participation of the TvTEvent<br>
 	 * 1. Get L2NpcTemplate by Config.TVT_EVENT_PARTICIPATION_NPC_ID<br>
-	 * 2. Try to spawn a new npc of it<br>
-	 * <br>
-	 * @return boolean: true if success, otherwise false<br>
+	 * 2. Try to spawn a new npc of it
+	 * @return true if success, otherwise false
 	 */
 	public static boolean startParticipation()
 	{
@@ -165,9 +162,8 @@ public class TvTEvent
 	 * 2. Close doors specified in configs<br>
 	 * 3. Abort if not enough participants(return false)<br>
 	 * 4. Set state EventState.STARTED<br>
-	 * 5. Teleport all participants to team spot<br>
-	 * <br>
-	 * @return boolean: true if success, otherwise false<br>
+	 * 5. Teleport all participants to team spot
+	 * @return true if success, otherwise false
 	 */
 	public static boolean startFight()
 	{
@@ -314,9 +310,8 @@ public class TvTEvent
 	 * 2. Wait till teams are not at a tie anymore<br>
 	 * 3. Set state EvcentState.REWARDING<br>
 	 * 4. Reward team with more points<br>
-	 * 5. Show win html to wining team participants<br>
-	 * <br>
-	 * @return String: winning team name<br>
+	 * 5. Show win html to wining team participants
+	 * @return winning team name
 	 */
 	public static String calculateRewards()
 	{
@@ -407,7 +402,7 @@ public class TvTEvent
 			final NpcHtmlMessage npcHtmlMessage = new NpcHtmlMessage();
 			
 			statusUpdate.addAttribute(StatusUpdate.CUR_LOAD, playerInstance.getCurrentLoad());
-			npcHtmlMessage.setHtml(HtmCache.getInstance().getHtm(playerInstance.getHtmlPrefix(), htmlPath + "Reward.html"));
+			npcHtmlMessage.setHtml(HtmCache.getInstance().getHtm(playerInstance.getHtmlPrefix(), HTML_PATH + "Reward.html"));
 			playerInstance.sendPacket(statusUpdate);
 			playerInstance.sendPacket(npcHtmlMessage);
 		}
@@ -420,7 +415,7 @@ public class TvTEvent
 	 * 3. Open doors specified in configs<br>
 	 * 4. Teleport all participants back to participation npc location<br>
 	 * 5. Teams cleaning<br>
-	 * 6. Set state EventState.INACTIVE<br>
+	 * 6. Set state EventState.INACTIVE
 	 */
 	public static void stopFight()
 	{
@@ -460,14 +455,12 @@ public class TvTEvent
 	/**
 	 * Adds a player to a TvTEvent team<br>
 	 * 1. Calculate the id of the team in which the player should be added<br>
-	 * 2. Add the player to the calculated team<br>
-	 * <br>
-	 * @param playerInstance as L2PcInstance<br>
-	 * @return boolean: true if success, otherwise false<br>
+	 * 2. Add the player to the calculated team
+	 * @param playerInstance as L2PcInstance
+	 * @return boolean: true if success, otherwise false
 	 */
 	public static synchronized boolean addParticipant(L2PcInstance playerInstance)
 	{
-		// Check for nullpoitner
 		if (playerInstance == null)
 		{
 			return false;
@@ -491,10 +484,9 @@ public class TvTEvent
 	/**
 	 * Removes a TvTEvent player from it's team<br>
 	 * 1. Get team id of the player<br>
-	 * 2. Remove player from it's team<br>
-	 * <br>
+	 * 2. Remove player from it's team
 	 * @param playerObjectId
-	 * @return boolean: true if success, otherwise false
+	 * @return true if success, otherwise false
 	 */
 	public static boolean removeParticipant(int playerObjectId)
 	{
@@ -549,9 +541,8 @@ public class TvTEvent
 	/**
 	 * Send a SystemMessage to all participated players<br>
 	 * 1. Send the message to all players of team number one<br>
-	 * 2. Send the message to all players of team number two<br>
-	 * <br>
-	 * @param message as String<br>
+	 * 2. Send the message to all players of team number two
+	 * @param message the message
 	 */
 	public static void sysMsgToAllParticipants(String message)
 	{
@@ -637,9 +628,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called when a player logs in<br>
-	 * <br>
-	 * @param playerInstance as L2PcInstance<br>
+	 * Called when a player logs in.
+	 * @param playerInstance the player
 	 */
 	public static void onLogin(L2PcInstance playerInstance)
 	{
@@ -660,9 +650,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called when a player logs out<br>
-	 * <br>
-	 * @param playerInstance as L2PcInstance<br>
+	 * Called when a player logs out.
+	 * @param playerInstance the player
 	 */
 	public static void onLogout(L2PcInstance playerInstance)
 	{
@@ -676,11 +665,10 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called on every onAction in L2PcIstance<br>
-	 * <br>
+	 * Called on every onAction in L2PcIstance.
 	 * @param playerInstance
 	 * @param targetedPlayerObjectId
-	 * @return boolean: true if player is allowed to target, otherwise false
+	 * @return true if player is allowed to target, otherwise false
 	 */
 	public static boolean onAction(L2PcInstance playerInstance, int targetedPlayerObjectId)
 	{
@@ -711,10 +699,9 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called on every scroll use<br>
-	 * <br>
+	 * Called on every scroll use.
 	 * @param playerObjectId
-	 * @return boolean: true if player is allowed to use scroll, otherwise false
+	 * @return true if player is allowed to use scroll, otherwise false
 	 */
 	public static boolean onScrollUse(int playerObjectId)
 	{
@@ -732,9 +719,9 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called on every potion use
+	 * Called on every potion use.
 	 * @param playerObjectId
-	 * @return boolean: true if player is allowed to use potions, otherwise false
+	 * @return true if player is allowed to use potions, otherwise false
 	 */
 	public static boolean onPotionUse(int playerObjectId)
 	{
@@ -752,9 +739,9 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called on every escape use(thanks to nbd)
+	 * Called on every escape use.
 	 * @param playerObjectId
-	 * @return boolean: true if player is not in tvt event, otherwise false
+	 * @return true if player is not in tvt event, otherwise false
 	 */
 	public static boolean onEscapeUse(int playerObjectId)
 	{
@@ -772,9 +759,9 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called on every summon item use
+	 * Called on every summon item use.
 	 * @param playerObjectId
-	 * @return boolean: true if player is allowed to summon by item, otherwise false
+	 * @return true if player is allowed to summon by item, otherwise false
 	 */
 	public static boolean onItemSummon(int playerObjectId)
 	{
@@ -792,10 +779,9 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is called when a player is killed<br>
-	 * <br>
-	 * @param killerCharacter as L2Character<br>
-	 * @param killedPlayerInstance as L2PcInstance<br>
+	 * Is called when a player is killed.
+	 * @param killerCharacter as L2Character
+	 * @param killedPlayerInstance as L2PcInstance
 	 */
 	public static void onKill(L2Character killerCharacter, L2PcInstance killedPlayerInstance)
 	{
@@ -862,7 +848,7 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Called on Appearing packet received (player finished teleporting)
+	 * Called on Appearing packet received (player finished teleporting).
 	 * @param playerInstance
 	 */
 	public static void onTeleported(L2PcInstance playerInstance)
@@ -942,9 +928,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Sets the TvTEvent state<br>
-	 * <br>
-	 * @param state as EventState<br>
+	 * Sets the TvTEvent state.
+	 * @param state as EventState
 	 */
 	private static void setState(EventState state)
 	{
@@ -955,9 +940,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is TvTEvent inactive?<br>
-	 * <br>
-	 * @return boolean: true if event is inactive(waiting for next event cycle), otherwise false<br>
+	 * Is TvTEvent inactive?
+	 * @return true if event is inactive(waiting for next event cycle), otherwise false
 	 */
 	public static boolean isInactive()
 	{
@@ -972,9 +956,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is TvTEvent in inactivating?<br>
-	 * <br>
-	 * @return boolean: true if event is in inactivating progress, otherwise false<br>
+	 * Is TvTEvent in inactivating?.
+	 * @return true if event is in inactivating progress, otherwise false
 	 */
 	public static boolean isInactivating()
 	{
@@ -989,9 +972,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is TvTEvent in participation?<br>
-	 * <br>
-	 * @return boolean: true if event is in participation progress, otherwise false<br>
+	 * Is TvTEvent in participation?.
+	 * @return true if event is in participation progress, otherwise false
 	 */
 	public static boolean isParticipating()
 	{
@@ -1006,9 +988,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is TvTEvent starting?<br>
-	 * <br>
-	 * @return boolean: true if event is starting up(setting up fighting spot, teleport players etc.), otherwise false<br>
+	 * Is TvTEvent starting?
+	 * @return true if event is starting up(setting up fighting spot, teleport players etc.), otherwise false
 	 */
 	public static boolean isStarting()
 	{
@@ -1023,9 +1004,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is TvTEvent started?<br>
-	 * <br>
-	 * @return boolean: true if event is started, otherwise false<br>
+	 * Is TvTEvent started?
+	 * @return true if event is started, otherwise false
 	 */
 	public static boolean isStarted()
 	{
@@ -1040,9 +1020,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Is TvTEvent rewarding?<br>
-	 * <br>
-	 * @return boolean: true if event is currently rewarding, otherwise false<br>
+	 * Is TvTEvent rewarding?
+	 * @return true if event is currently rewarding, otherwise false
 	 */
 	public static boolean isRewarding()
 	{
@@ -1059,7 +1038,7 @@ public class TvTEvent
 	/**
 	 * Returns the team id of a player, if player is not participant it returns -1
 	 * @param playerObjectId
-	 * @return byte: team name of the given playerName, if not in event -1
+	 * @return team name of the given playerName, if not in event -1
 	 */
 	public static byte getParticipantTeamId(int playerObjectId)
 	{
@@ -1069,7 +1048,7 @@ public class TvTEvent
 	/**
 	 * Returns the team of a player, if player is not participant it returns null
 	 * @param playerObjectId
-	 * @return TvTEventTeam: team of the given playerObjectId, if not in event null
+	 * @return team of the given playerObjectId, if not in event null
 	 */
 	public static TvTEventTeam getParticipantTeam(int playerObjectId)
 	{
@@ -1079,7 +1058,7 @@ public class TvTEvent
 	/**
 	 * Returns the enemy team of a player, if player is not participant it returns null
 	 * @param playerObjectId
-	 * @return TvTEventTeam: enemy team of the given playerObjectId, if not in event null
+	 * @return enemy team of the given playerObjectId, if not in event null
 	 */
 	public static TvTEventTeam getParticipantEnemyTeam(int playerObjectId)
 	{
@@ -1089,7 +1068,7 @@ public class TvTEvent
 	/**
 	 * Returns the team coordinates in which the player is in, if player is not in a team return null
 	 * @param playerObjectId
-	 * @return int[]: coordinates of teams, 2 elements, index 0 for team 1 and index 1 for team 2
+	 * @return coordinates of teams, 2 elements, index 0 for team 1 and index 1 for team 2
 	 */
 	public static int[] getParticipantTeamCoordinates(int playerObjectId)
 	{
@@ -1099,7 +1078,7 @@ public class TvTEvent
 	/**
 	 * Is given player participant of the event?
 	 * @param playerObjectId
-	 * @return boolean: true if player is participant, ohterwise false
+	 * @return true if player is participant, ohterwise false
 	 */
 	public static boolean isPlayerParticipant(int playerObjectId)
 	{
@@ -1112,9 +1091,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Returns participated player count<br>
-	 * <br>
-	 * @return int: amount of players registered in the event<br>
+	 * Returns participated player count.
+	 * @return amount of players registered in the event
 	 */
 	public static int getParticipatedPlayersCount()
 	{
@@ -1127,9 +1105,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Returns teams names<br>
-	 * <br>
-	 * @return String[]: names of teams, 2 elements, index 0 for team 1 and index 1 for team 2<br>
+	 * Returns teams names.
+	 * @return names of teams, 2 elements, index 0 for team 1 and index 1 for team 2
 	 */
 	public static String[] getTeamNames()
 	{
@@ -1141,9 +1118,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Returns player count of both teams<br>
-	 * <br>
-	 * @return int[]: player count of teams, 2 elements, index 0 for team 1 and index 1 for team 2<br>
+	 * Returns player count of both teams.
+	 * @return player count of teams, 2 elements, index 0 for team 1 and index 1 for team 2
 	 */
 	public static int[] getTeamsPlayerCounts()
 	{
@@ -1155,8 +1131,8 @@ public class TvTEvent
 	}
 	
 	/**
-	 * Returns points count of both teams
-	 * @return int[]: points of teams, 2 elements, index 0 for team 1 and index 1 for team 2<br>
+	 * Returns points count of both teams.
+	 * @return int[]: points of teams, 2 elements, index 0 for team 1 and index 1 for team 2
 	 */
 	public static int[] getTeamsPoints()
 	{

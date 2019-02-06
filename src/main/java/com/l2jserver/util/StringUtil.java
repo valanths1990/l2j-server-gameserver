@@ -22,9 +22,9 @@ import com.l2jserver.Config;
 
 /**
  * String utilities optimized for the best performance.<br>
- * <h1>How to Use It</h1> <h2>concat() or append()</h2> If concatenating strings<br>
- * in single call, use StringUtil.concat(), otherwise use StringUtil.append()<br>
- * and its variants.<br>
+ * <h1>How to Use It</h1>
+ * <h2>concat() or append()</h2><br>
+ * If concatenating strings in single call, use StringUtil.concat(), otherwise use StringUtil.append() and its variants.<br>
  * <br>
  * <h2>Minimum Calls</h2><br>
  * Bad:
@@ -136,8 +136,10 @@ import com.l2jserver.Config;
  * StringUtil.append(sbString, &quot;text 3&quot;, String.valueOf(npcId), &quot;text 4&quot;);
  * </pre>
  * 
- * Why?</br> In first case, new memory has to be allocated for the second string. In second case already allocated memory is reused, but only in case the new string is not longer than the previously allocated string. Anyway, the second way is better because the string either fits in the memory and
- * some memory is saved, or it does not fit in the memory, and in that case it works as in the first case. <h2>Primitives to Strings</h2> To convert primitives to string, use String.valueOf().<br>
+ * Why?</br>
+ * In first case, new memory has to be allocated for the second string. In second case already allocated memory is reused, but only in case the new string is not longer than the previously allocated string. Anyway, the second way is better because the string either fits in the memory and some memory
+ * is saved, or it does not fit in the memory, and in that case it works as in the first case.
+ * <h2>Primitives to Strings</h2> To convert primitives to string, use String.valueOf().<br>
  * <br>
  * <h2>How much faster is it?</h2><br>
  * Here are some results of my tests. Count is number of strings concatenated. Don't take the numbers as 100% true as the numbers are affected by other programs running on my computer at the same time. Anyway, from the results it is obvious that using StringBuilder with predefined size is the
@@ -182,6 +184,7 @@ import com.l2jserver.Config;
  * StringBuilder: 3081
  * StringBuilder with size: 2139
  * </pre>
+ * 
  * @author fordfrog
  */
 public final class StringUtil

@@ -27,18 +27,15 @@ import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.util.Broadcast;
 
 /**
+ * TVT Manager.
  * @author HorridoJoho
  */
 public class TvTManager
 {
 	protected static final Logger _log = Logger.getLogger(TvTManager.class.getName());
 	
-	/** Task for event cycles<br> */
 	private TvTStartTask _task;
 	
-	/**
-	 * New instance only by getInstance()<br>
-	 */
 	protected TvTManager()
 	{
 		if (Config.TVT_EVENT_ENABLED)
@@ -54,14 +51,9 @@ public class TvTManager
 		}
 	}
 	
-	/**
-	 * Initialize new/Returns the one and only instance<br>
-	 * <br>
-	 * @return TvTManager<br>
-	 */
 	public static TvTManager getInstance()
 	{
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	/**
@@ -292,6 +284,6 @@ public class TvTManager
 	
 	private static class SingletonHolder
 	{
-		protected static final TvTManager _instance = new TvTManager();
+		protected static final TvTManager INSTANCE = new TvTManager();
 	}
 }

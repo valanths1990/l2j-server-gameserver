@@ -116,7 +116,7 @@ public final class DuelManager
 	}
 	
 	/**
-	 * Checks if this player might join / start a duel.<br>
+	 * Checks if this player might join / start a duel.
 	 * @param player
 	 * @param target
 	 * @param partyDuel

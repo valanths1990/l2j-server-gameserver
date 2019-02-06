@@ -18,6 +18,8 @@
  */
 package com.l2jserver.gameserver.model.drops;
 
+import static com.l2jserver.gameserver.model.drops.strategy.IKillerChanceModifierStrategy.NO_RULES;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -142,7 +144,7 @@ public final class GroupedGeneralDropItem implements IDropItem
 			sumchance += (item.getChance() * getChance()) / 100;
 		}
 		final double sumchance1 = sumchance;
-		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1, getDropCalculationStrategy(), IKillerChanceModifierStrategy.NO_RULES, getPreciseStrategy());
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance1, getDropCalculationStrategy(), NO_RULES, getPreciseStrategy());
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (final GeneralDropItem item : getItems())
 		{
@@ -216,12 +218,17 @@ public final class GroupedGeneralDropItem implements IDropItem
 		{
 			sumchance += (item.getChance(victim) * getChance() * chanceModifier) / 100;
 		}
-		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance, getDropCalculationStrategy(), IKillerChanceModifierStrategy.NO_RULES, getPreciseStrategy()); // to discard further deep blue calculations
+		
+		// to discard further deep blue calculations
+		GroupedGeneralDropItem group = new GroupedGeneralDropItem(sumchance, getDropCalculationStrategy(), NO_RULES, getPreciseStrategy());
 		List<GeneralDropItem> items = new ArrayList<>();
 		for (GeneralDropItem item : getItems())
 		{
 			// the item is made almost "static"
-			items.add(new GeneralDropItem(item.getItemId(), item.getMin(victim), item.getMax(victim), (item.getChance(victim) * getChance() * chanceModifier) / sumchance, IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.STATIC, getPreciseStrategy(), IKillerChanceModifierStrategy.NO_RULES, item.getDropCalculationStrategy()));
+			items.add(new GeneralDropItem(item.getItemId(), item.getMin(victim), item.getMax(victim), //
+				(item.getChance(victim) * getChance() * chanceModifier) / sumchance, //
+				IAmountMultiplierStrategy.STATIC, IChanceMultiplierStrategy.STATIC, getPreciseStrategy(), //
+				NO_RULES, item.getDropCalculationStrategy()));
 		}
 		group.setItems(items);
 		return group;

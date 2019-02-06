@@ -433,14 +433,17 @@ public final class ItemAuction
 		switch (getAuctionState())
 		{
 			case CREATED:
+			{
 				return false;
-				
+			}
 			case FINISHED:
+			{
 				if (_startingTime < (System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(Config.ALT_ITEM_AUCTION_EXPIRED_AFTER, TimeUnit.DAYS)))
 				{
 					return false;
 				}
 				break;
+			}
 		}
 		
 		final int playerObjId = player.getObjectId();

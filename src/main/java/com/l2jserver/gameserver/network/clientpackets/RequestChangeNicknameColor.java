@@ -39,8 +39,7 @@ public class RequestChangeNicknameColor extends L2GameClientPacket
 		0xA0A601, // Peacock Green
 		0x7898AF, // Yellow Ochre
 		0x486295, // Chocolate
-		0x999999
-	// Silver
+		0x999999 // Silver
 	};
 	
 	private int _colorNum, _itemObjectId;

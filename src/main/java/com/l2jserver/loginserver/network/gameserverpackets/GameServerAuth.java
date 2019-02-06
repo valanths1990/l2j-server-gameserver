@@ -42,6 +42,7 @@ import com.l2jserver.util.network.BaseRecievePacket;
  * d hexid size
  * b hexid
  * </pre>
+ * 
  * @author -Wooden-
  */
 public class GameServerAuth extends BaseRecievePacket

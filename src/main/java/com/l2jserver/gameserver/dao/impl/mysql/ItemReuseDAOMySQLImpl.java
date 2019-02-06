@@ -103,11 +103,9 @@ public class ItemReuseDAOMySQLImpl implements ItemReuseDAO
 			{
 				while (rs.next())
 				{
-					int itemId = rs.getInt("itemId");
-					@SuppressWarnings("unused")
-					int itemObjId = rs.getInt("itemObjId");
-					long reuseDelay = rs.getLong("reuseDelay");
-					long systime = rs.getLong("systime");
+					final int itemId = rs.getInt("itemId");
+					final long reuseDelay = rs.getLong("reuseDelay");
+					final long systime = rs.getLong("systime");
 					boolean isInInventory = true;
 					
 					// Using item Id

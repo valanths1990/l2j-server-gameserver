@@ -46,7 +46,8 @@ public interface IGroupedItemDropCalculationStrategy
 		private GeneralDropItem getSingleItem(GroupedGeneralDropItem dropItem)
 		{
 			final GeneralDropItem item1 = dropItem.getItems().iterator().next();
-			singleItemCache.putIfAbsent(dropItem, new GeneralDropItem(item1.getItemId(), item1.getMin(), item1.getMax(), (item1.getChance() * dropItem.getChance()) / 100, item1.getAmountStrategy(), item1.getChanceStrategy(), dropItem.getPreciseStrategy(), dropItem.getKillerChanceModifierStrategy(), item1.getDropCalculationStrategy()));
+			singleItemCache.putIfAbsent(dropItem, new GeneralDropItem(item1.getItemId(), item1.getMin(), item1.getMax(), (item1.getChance() * dropItem.getChance()) / 100, //
+				item1.getAmountStrategy(), item1.getChanceStrategy(), dropItem.getPreciseStrategy(), dropItem.getKillerChanceModifierStrategy(), item1.getDropCalculationStrategy()));
 			return singleItemCache.get(dropItem);
 		}
 		

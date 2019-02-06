@@ -24,28 +24,18 @@ import java.util.Map;
 import com.l2jserver.gameserver.model.items.L2EtcItem;
 
 /**
- * This class manages handlers of items
+ * Item handlers.
  * @author UnAfraid
  */
 public class ItemHandler implements IHandler<IItemHandler, L2EtcItem>
 {
 	private final Map<String, IItemHandler> _datatable;
 	
-	/**
-	 * Constructor of ItemHandler
-	 */
 	protected ItemHandler()
 	{
 		_datatable = new HashMap<>();
 	}
 	
-	/**
-	 * Adds handler of item type in <I>datatable</I>.<BR>
-	 * <BR>
-	 * <B><I>Concept :</I></U><BR>
-	 * This handler is put in <I>datatable</I> Map &lt;String ; IItemHandler &gt; for each ID corresponding to an item type (existing in classes of package itemhandlers) sets as key of the Map.
-	 * @param handler (IItemHandler)
-	 */
 	@Override
 	public void registerHandler(IItemHandler handler)
 	{
@@ -58,11 +48,6 @@ public class ItemHandler implements IHandler<IItemHandler, L2EtcItem>
 		_datatable.remove(handler.getClass().getSimpleName());
 	}
 	
-	/**
-	 * Returns the handler of the item
-	 * @param item
-	 * @return IItemHandler
-	 */
 	@Override
 	public IItemHandler getHandler(L2EtcItem item)
 	{
@@ -73,27 +58,19 @@ public class ItemHandler implements IHandler<IItemHandler, L2EtcItem>
 		return _datatable.get(item.getHandlerName());
 	}
 	
-	/**
-	 * Returns the number of elements contained in datatable
-	 * @return int : Size of the datatable
-	 */
 	@Override
 	public int size()
 	{
 		return _datatable.size();
 	}
 	
-	/**
-	 * Create ItemHandler if doesn't exist and returns ItemHandler
-	 * @return ItemHandler
-	 */
 	public static ItemHandler getInstance()
 	{
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder
 	{
-		protected static final ItemHandler _instance = new ItemHandler();
+		protected static final ItemHandler INSTANCE = new ItemHandler();
 	}
 }

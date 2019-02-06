@@ -40,9 +40,7 @@ import com.l2jserver.loginserver.network.serverpackets.ServerList;
 
 /**
  * <pre>
- * Format: x
- * 0 (a leading null)
- * x: the rsa encrypted block with the login an password.
+ * Format: x 0 (a leading null) x: the rsa encrypted block with the login an password.
  * 
  * <pre>
  */

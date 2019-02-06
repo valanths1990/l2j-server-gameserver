@@ -1181,7 +1181,6 @@ public final class FourSepulchersManager
 				case 31484:
 					_viscountMobs.put(npcId, mobs);
 					break;
-					
 				case 31472:
 				case 31477:
 				case 31482:

@@ -442,7 +442,7 @@ public final class L2TrapInstance extends L2Npc
 	@Override
 	public void updateAbnormalEffect()
 	{
-	
+		
 	}
 	
 	public boolean hasLifeTime()

@@ -69,7 +69,8 @@ public class RecipeData implements IXmlReader
 		{
 			if ("list".equalsIgnoreCase(n.getNodeName()))
 			{
-				RECIPES_FILE: for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
+				RECIPES_FILE:
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
 				{
 					if ("item".equalsIgnoreCase(d.getNodeName()))
 					{

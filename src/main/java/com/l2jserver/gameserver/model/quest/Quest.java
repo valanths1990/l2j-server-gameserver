@@ -92,7 +92,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	protected boolean _onEnterWorld = false;
 	private boolean _isCustom = false;
 	
-	public int[] questItemIds = null;
+	public int[] _questItemIds = null;
 	
 	private static final String DEFAULT_NO_QUEST_MSG = "<html><body>You are either not on a quest that involves this NPC, or you don't meet this NPC's minimum quest requirements.</body></html>";
 	private static final String DEFAULT_ALREADY_COMPLETED_MSG = "<html><body>This quest has already been completed.</body></html>";
@@ -2804,7 +2804,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public int[] getRegisteredItemIds()
 	{
-		return questItemIds;
+		return _questItemIds;
 	}
 	
 	/**
@@ -2813,7 +2813,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void registerQuestItems(int... items)
 	{
-		questItemIds = items;
+		_questItemIds = items;
 	}
 	
 	/**
@@ -2822,7 +2822,7 @@ public class Quest extends AbstractScript implements IIdentifiable
 	 */
 	public void removeRegisteredQuestItems(L2PcInstance player)
 	{
-		takeItems(player, -1, questItemIds);
+		takeItems(player, -1, _questItemIds);
 	}
 	
 	@Override

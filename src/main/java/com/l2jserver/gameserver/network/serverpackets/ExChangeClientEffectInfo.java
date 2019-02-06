@@ -29,7 +29,8 @@ public class ExChangeClientEffectInfo extends L2GameServerPacket
 	private final int _type, _key, _value;
 	
 	/**
-	 * @param type <ul>
+	 * @param type
+	 *            <ul>
 	 *            <li>0 - ChangeZoneState</li>
 	 *            <li>1 - SetL2Fog</li>
 	 *            <li>2 - postEffectData</li>

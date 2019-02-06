@@ -49,7 +49,7 @@ public final class PrimeFinder
 	 * desired capacity, which in turn avoids wasting memory.<br>
 	 * For example, the list includes<br>
 	 * 1039,1117,1201,1277,1361,1439,1523,1597,1759,1907,2081.<br>
-	 * So if you need a prime >= 1040, you will find a prime <= 1040*1.11=1154.<br>
+	 * So if you need a prime >= 1040, you will find a prime &lt;= 1040*1.11=1154.<br>
 	 * Chunks are chosen such that they are optimized for a hashtable growthfactor of 2.0;<br>
 	 * If your hashtable has such a growthfactor then, after initially<br>
 	 * "rounding to a prime" upon hashtable construction, it will<br>

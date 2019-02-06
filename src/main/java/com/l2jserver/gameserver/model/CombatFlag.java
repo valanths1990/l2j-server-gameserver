@@ -37,12 +37,9 @@ public class CombatFlag
 	private L2ItemInstance _itemInstance;
 	private final Location _location;
 	private final int _itemId;
-	@SuppressWarnings("unused")
-	private final int _fortId;
 	
 	public CombatFlag(int fort_id, int x, int y, int z, int heading, int item_id)
 	{
-		_fortId = fort_id;
 		_location = new Location(x, y, z, heading);
 		_itemId = item_id;
 	}

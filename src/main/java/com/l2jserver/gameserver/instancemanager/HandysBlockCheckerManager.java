@@ -40,8 +40,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExCubeGameRemovePlayer;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 /**
- * This class manage the player add/remove, team change and event arena status,<br>
- * as the clearance of the participants list or liberate the arena.
+ * This class manage the player add/remove, team change and event arena status, as the clearance of the participants list or liberate the arena.
  * @author BiggBoss
  */
 public final class HandysBlockCheckerManager

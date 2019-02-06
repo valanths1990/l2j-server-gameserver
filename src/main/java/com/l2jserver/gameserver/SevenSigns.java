@@ -143,7 +143,7 @@ public class SevenSigns
 	private static final String UPDATE_STATUS = "UPDATE seven_signs_status SET current_cycle=?, active_period=?, previous_winner=?, " + "dawn_stone_score=?, dawn_festival_score=?, dusk_stone_score=?, dusk_festival_score=?, "
 		+ "avarice_owner=?, gnosis_owner=?, strife_owner=?, avarice_dawn_score=?, gnosis_dawn_score=?, " + "strife_dawn_score=?, avarice_dusk_score=?, gnosis_dusk_score=?, strife_dusk_score=?, " + "festival_cycle=?, accumulated_bonus0=?, accumulated_bonus1=?, accumulated_bonus2=?,"
 		+ "accumulated_bonus3=?, accumulated_bonus4=?, date=? WHERE id=0";
-		
+	
 	protected SevenSigns()
 	{
 		try
@@ -338,7 +338,7 @@ public class SevenSigns
 							AutoSpawnHandler.getInstance().setSpawnActive(duskCrest, false);
 						}
 						break;
-						
+					
 					case CABAL_DUSK:
 						if (!AutoSpawnHandler.getInstance().getAutoSpawnInstance(anakimSpawn.getObjectId(), true).isSpawnActive())
 						{

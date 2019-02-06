@@ -134,11 +134,9 @@ public final class RequestPreviewItem extends L2GameClientPacket
 		}
 		
 		// Check current target of the player and the INTERACTION_DISTANCE
-		L2Object target = activeChar.getTarget();
-		if (!activeChar.isGM() && ((target == null // No target (i.e. GM Shop)
-			) || !((target instanceof L2MerchantInstance)) // Target not a merchant
-		|| !activeChar.isInsideRadius(target, L2Npc.INTERACTION_DISTANCE, false, false) // Distance is too far
-		))
+		final L2Object target = activeChar.getTarget();
+		if (!activeChar.isGM() && ((target == null) || !(target instanceof L2MerchantInstance) || //
+			!activeChar.isInsideRadius(target, L2Npc.INTERACTION_DISTANCE, false, false)))
 		{
 			return;
 		}

@@ -228,13 +228,13 @@ public abstract class BaseGameServerRegister
 			"",
 			bundle.getString("credits"),
 			bundle.getString("bugReports") + " http://www.l2jserver.com"
-		
-		/*
-		 * "-b, --fallback\t\t\t\tIf an register operation fails due to ID already being in use it will then try to register first available ID", "-c, --cmd\t\t\t\tForces application to run in command-line mode even if the GUI is supported.",
-		 * "-f, --force\t\t\t\tForces GameServer register operations to overwrite a server if necessary", "-h, --help\t\t\t\tPrints this help message", "-l, --language <locale>\t\t\t\tAsks the application to use the specified locale, overriding auto-detection",
-		 * "-r, --register <id> <hexid_dest_dir>\tRegister GameServer with ID <id> and output hexid on <hexid_dest_dir>", "\t\t\t\t\tUse a negative value on <id> to register the first available ID", "\t\t\t\t\tFails if <id> already in use, unless --force is used (overwrites)", "",
-		 * "-u, --unregister <id>|all\t\tRemoves GameServer denoted by <id>, use \"all\" for removing all registered GameServers", "", "Copyright (C) L2J Team 2008-2012.", "Report bugs: http://www.l2jserver.com"
-		 */
+			
+			/*
+			 * "-b, --fallback\t\t\t\tIf an register operation fails due to ID already being in use it will then try to register first available ID", "-c, --cmd\t\t\t\tForces application to run in command-line mode even if the GUI is supported.",
+			 * "-f, --force\t\t\t\tForces GameServer register operations to overwrite a server if necessary", "-h, --help\t\t\t\tPrints this help message", "-l, --language <locale>\t\t\t\tAsks the application to use the specified locale, overriding auto-detection",
+			 * "-r, --register <id> <hexid_dest_dir>\tRegister GameServer with ID <id> and output hexid on <hexid_dest_dir>", "\t\t\t\t\tUse a negative value on <id> to register the first available ID", "\t\t\t\t\tFails if <id> already in use, unless --force is used (overwrites)", "",
+			 * "-u, --unregister <id>|all\t\tRemoves GameServer denoted by <id>, use \"all\" for removing all registered GameServers", "", "Copyright (C) L2J Team 2008-2012.", "Report bugs: http://www.l2jserver.com"
+			 */
 		};
 		
 		for (String str : help)
@@ -480,18 +480,6 @@ public abstract class BaseGameServerRegister
 		{
 			_id = id;
 			_outDir = outDir;
-			_force = force;
-			_fallback = fallback;
-		}
-		
-		/**
-		 * Sets the actions.
-		 * @param force the force.
-		 * @param fallback the fallback.
-		 */
-		@SuppressWarnings("unused")
-		public void setActions(boolean force, boolean fallback)
-		{
 			_force = force;
 			_fallback = fallback;
 		}

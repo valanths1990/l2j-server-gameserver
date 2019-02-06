@@ -34,11 +34,28 @@ public interface IHandler<K, V>
 		registerHandler((K) object);
 	}
 	
-	public void registerHandler(K object);
+	/**
+	 * Registers the handler.
+	 * @param handler the handler
+	 */
+	void registerHandler(K handler);
 	
-	public void removeHandler(K handler);
+	/**
+	 * Removes the handler.
+	 * @param handler the handler to remove
+	 */
+	void removeHandler(K handler);
 	
-	public K getHandler(V val);
+	/**
+	 * Gets the handler for the given object.
+	 * @param val the object
+	 * @return the handler
+	 */
+	K getHandler(V val);
 	
-	public int size();
+	/**
+	 * Gets the amount of handlers.
+	 * @return the amount of handlers
+	 */
+	int size();
 }

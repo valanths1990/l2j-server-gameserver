@@ -4886,11 +4886,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					target.sendPacket(sm);
 				}
 				
-				if (this.isSummon())
+				if (isSummon())
 				{
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_RECEIVED_DAMAGE_OF_S3_FROM_C2);
 					sm.addCharName(this).addCharName(target).addInt(reflectedDamage);
-					this.getActingPlayer().sendPacket(sm);
+					getActingPlayer().sendPacket(sm);
 				}
 				
 				reduceCurrentHp(reflectedDamage, target, true, false, null);

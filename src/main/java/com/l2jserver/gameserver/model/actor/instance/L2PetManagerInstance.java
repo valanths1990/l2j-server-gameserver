@@ -101,8 +101,8 @@ public class L2PetManagerInstance extends L2MerchantInstance
 			boolean ok = false;
 			switch (val)
 			{
-			// Info evolve(player, "curent pet summon item", "new pet summon item", "lvl required to evolve")
-			// To ignore evolve just put value 0 where do you like example: evolve(player, 0, 9882, 55);
+				// Info evolve(player, "curent pet summon item", "new pet summon item", "lvl required to evolve")
+				// To ignore evolve just put value 0 where do you like example: evolve(player, 0, 9882, 55);
 				case 1:
 					ok = Evolve.doEvolve(player, this, 2375, 9882, 55);
 					break;
@@ -134,7 +134,7 @@ public class L2PetManagerInstance extends L2MerchantInstance
 			boolean ok = false;
 			switch (val)
 			{
-			// Info evolve(player, "curent pet summon item", "new pet summon item", "lvl required to evolve")
+				// Info evolve(player, "curent pet summon item", "new pet summon item", "lvl required to evolve")
 				case 1:
 					ok = Evolve.doRestore(player, this, 10307, 9882, 55);
 					break;

@@ -339,7 +339,7 @@ public final class AdminData implements IXmlReader
 	
 	/**
 	 * Gets the single instance of AdminTable.
-	 * @return AccessLevels: the one and only instance of this class<br>
+	 * @return the one and only instance of this class
 	 */
 	public static AdminData getInstance()
 	{
