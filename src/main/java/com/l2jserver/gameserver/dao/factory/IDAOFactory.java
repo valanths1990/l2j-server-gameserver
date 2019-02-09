@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.dao.factory;
 
+import com.l2jserver.gameserver.dao.ClanDAO;
 import com.l2jserver.gameserver.dao.FriendDAO;
 import com.l2jserver.gameserver.dao.HennaDAO;
 import com.l2jserver.gameserver.dao.ItemDAO;
@@ -40,8 +41,7 @@ import com.l2jserver.gameserver.dao.TeleportBookmarkDAO;
  * DAO Factory interface.
  * @author Zoey76
  */
-public interface IDAOFactory
-{
+public interface IDAOFactory {
 	FriendDAO getFriendDAO();
 	
 	HennaDAO getHennaDAO();
@@ -75,4 +75,6 @@ public interface IDAOFactory
 	SubclassDAO getSubclassDAO();
 	
 	TeleportBookmarkDAO getTeleportBookmarkDAO();
+	
+	ClanDAO getClanDAO();
 }

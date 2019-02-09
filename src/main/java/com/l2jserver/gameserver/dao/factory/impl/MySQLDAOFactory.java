@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.dao.factory.impl;
 
+import com.l2jserver.gameserver.dao.ClanDAO;
 import com.l2jserver.gameserver.dao.FriendDAO;
 import com.l2jserver.gameserver.dao.HennaDAO;
 import com.l2jserver.gameserver.dao.ItemDAO;
@@ -36,6 +37,7 @@ import com.l2jserver.gameserver.dao.SkillDAO;
 import com.l2jserver.gameserver.dao.SubclassDAO;
 import com.l2jserver.gameserver.dao.TeleportBookmarkDAO;
 import com.l2jserver.gameserver.dao.factory.IDAOFactory;
+import com.l2jserver.gameserver.dao.impl.mysql.ClanDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.FriendDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.HennaDAOMySQLImpl;
 import com.l2jserver.gameserver.dao.impl.mysql.ItemDAOMySQLImpl;
@@ -58,8 +60,7 @@ import com.l2jserver.gameserver.dao.impl.mysql.TeleportBookmarkDAOMySQLImpl;
  * MySQL DAO Factory implementation.
  * @author Zoey76
  */
-enum MySQLDAOFactory implements IDAOFactory
-{
+enum MySQLDAOFactory implements IDAOFactory {
 	INSTANCE;
 	
 	private final FriendDAO friendDAO = new FriendDAOMySQLImpl();
@@ -79,106 +80,95 @@ enum MySQLDAOFactory implements IDAOFactory
 	private final SkillDAO skillDAO = new SkillDAOMySQLImpl();
 	private final SubclassDAO subclassDAO = new SubclassDAOMySQLImpl();
 	private final TeleportBookmarkDAO teleportBookmarkDAO = new TeleportBookmarkDAOMySQLImpl();
+	private final ClanDAO clanDAO = new ClanDAOMySQLImpl();
 	
 	@Override
-	public FriendDAO getFriendDAO()
-	{
+	public FriendDAO getFriendDAO() {
 		return friendDAO;
 	}
 	
 	@Override
-	public HennaDAO getHennaDAO()
-	{
+	public HennaDAO getHennaDAO() {
 		return hennaDAO;
 	}
 	
 	@Override
-	public ItemDAO getItemDAO()
-	{
+	public ItemDAO getItemDAO() {
 		return itemDAO;
 	}
 	
 	@Override
-	public ItemReuseDAO getItemReuseDAO()
-	{
+	public ItemReuseDAO getItemReuseDAO() {
 		return itemReuseDAO;
 	}
 	
 	@Override
-	public PetDAO getPetDAO()
-	{
+	public PetDAO getPetDAO() {
 		return petDAO;
 	}
 	
 	@Override
-	public PetSkillSaveDAO getPetSkillSaveDAO()
-	{
+	public PetSkillSaveDAO getPetSkillSaveDAO() {
 		return petSkillSaveDAO;
 	}
 	
 	@Override
-	public PlayerDAO getPlayerDAO()
-	{
+	public PlayerDAO getPlayerDAO() {
 		return playerDAO;
 	}
 	
 	@Override
-	public PlayerSkillSaveDAO getPlayerSkillSaveDAO()
-	{
+	public PlayerSkillSaveDAO getPlayerSkillSaveDAO() {
 		return playerSkillSaveDAO;
 	}
 	
 	@Override
-	public PremiumItemDAO getPremiumItemDAO()
-	{
+	public PremiumItemDAO getPremiumItemDAO() {
 		return premiumItemDAO;
 	}
 	
 	@Override
-	public RecipeBookDAO getRecipeBookDAO()
-	{
+	public RecipeBookDAO getRecipeBookDAO() {
 		return recipeBookDAO;
 	}
 	
 	@Override
-	public RecipeShopListDAO getRecipeShopListDAO()
-	{
+	public RecipeShopListDAO getRecipeShopListDAO() {
 		return recipeShopListDAO;
 	}
 	
 	@Override
-	public RecommendationBonusDAO getRecommendationBonusDAO()
-	{
+	public RecommendationBonusDAO getRecommendationBonusDAO() {
 		return recommendationBonusDAO;
 	}
 	
 	@Override
-	public ServitorSkillSaveDAO getServitorSkillSaveDAO()
-	{
+	public ServitorSkillSaveDAO getServitorSkillSaveDAO() {
 		return servitorSkillSaveDAO;
 	}
 	
 	@Override
-	public ShortcutDAO getShortcutDAO()
-	{
+	public ShortcutDAO getShortcutDAO() {
 		return shortcutDAO;
 	}
 	
 	@Override
-	public SkillDAO getSkillDAO()
-	{
+	public SkillDAO getSkillDAO() {
 		return skillDAO;
 	}
 	
 	@Override
-	public SubclassDAO getSubclassDAO()
-	{
+	public SubclassDAO getSubclassDAO() {
 		return subclassDAO;
 	}
 	
 	@Override
-	public TeleportBookmarkDAO getTeleportBookmarkDAO()
-	{
+	public TeleportBookmarkDAO getTeleportBookmarkDAO() {
 		return teleportBookmarkDAO;
+	}
+	
+	@Override
+	public ClanDAO getClanDAO() {
+		return clanDAO;
 	}
 }
