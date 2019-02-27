@@ -41,16 +41,13 @@ import com.l2jserver.util.Util;
  * Note: If for a given exception a packet needs to be handled on more then one state, then it should be added to all these states.
  * @author KenM
  */
-public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, IClientFactory<L2GameClient>, IMMOExecutor<L2GameClient>
-{
+public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, IClientFactory<L2GameClient>, IMMOExecutor<L2GameClient> {
 	private static final Logger _log = Logger.getLogger(L2GamePacketHandler.class.getName());
 	
 	// implementation
 	@Override
-	public ReceivablePacket<L2GameClient> handlePacket(ByteBuffer buf, L2GameClient client)
-	{
-		if (client.dropPacket())
-		{
+	public ReceivablePacket<L2GameClient> handlePacket(ByteBuffer buf, L2GameClient client) {
+		if (client.dropPacket()) {
 			return null;
 		}
 		
@@ -60,11 +57,9 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 		ReceivablePacket<L2GameClient> msg = null;
 		GameClientState state = client.getState();
 		
-		switch (state)
-		{
+		switch (state) {
 			case CONNECTED:
-				switch (opcode)
-				{
+				switch (opcode) {
 					case 0x0e:
 						msg = new ProtocolVersion();
 						break;
@@ -77,8 +72,7 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 				}
 				break;
 			case AUTHED:
-				switch (opcode)
-				{
+				switch (opcode) {
 					case 0x00:
 						msg = new Logout();
 						break;
@@ -99,21 +93,16 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 						break;
 					case 0xd0:
 						int id2 = -1;
-						if (buf.remaining() >= 2)
-						{
+						if (buf.remaining() >= 2) {
 							id2 = buf.getShort() & 0xffff;
-						}
-						else
-						{
-							if (Config.PACKET_HANDLER_DEBUG)
-							{
+						} else {
+							if (Config.PACKET_HANDLER_DEBUG) {
 								_log.warning("Client: " + client.toString() + " sent a 0xd0 without the second opcode.");
 							}
 							break;
 						}
 						
-						switch (id2)
-						{
+						switch (id2) {
 							case 0x36:
 								msg = new RequestGotoLobby();
 								break;
@@ -135,9 +124,43 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 						break;
 				}
 				break;
+			case JOINING: {
+				switch (opcode) {
+					case 0x11: {
+						msg = new EnterWorld();
+						break;
+					}
+					case 0xd0: {
+						int id2 = -1;
+						if (buf.remaining() >= 2) {
+							id2 = buf.getShort() & 0xffff;
+						} else {
+							if (Config.PACKET_HANDLER_DEBUG) {
+								_log.warning("Client: " + client.toString() + " sent a 0xd0 without the second opcode.");
+							}
+							break;
+						}
+						
+						switch (id2) {
+							case 0x01: {
+								msg = new RequestManorList();
+								break;
+							}
+							default: {
+								printDebugDoubleOpcode(opcode, id2, buf, state, client);
+								break;
+							}
+						}
+					}
+					default: {
+						printDebug(opcode, buf, state, client);
+						break;
+					}
+				}
+				break;
+			}
 			case IN_GAME:
-				switch (opcode)
-				{
+				switch (opcode) {
 					case 0x00:
 						msg = new Logout();
 						break;
@@ -173,9 +196,6 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 						break;
 					case 0x10:
 						// Say
-						break;
-					case 0x11:
-						msg = new EnterWorld();
 						break;
 					case 0x12:
 						// CharacterSelect, in case of player spam clicks on loginscreen
@@ -278,8 +298,7 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 						msg = new Appearing();
 						break;
 					case 0x3b:
-						if (Config.ALLOW_WAREHOUSE)
-						{
+						if (Config.ALLOW_WAREHOUSE) {
 							msg = new SendWareHouseDepositList();
 						}
 						break;
@@ -324,20 +343,15 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 						break;
 					case 0x4a:
 						int id_2 = -1;
-						if (buf.remaining() >= 2)
-						{
+						if (buf.remaining() >= 2) {
 							id_2 = buf.getShort() & 0xffff;
-						}
-						else
-						{
-							if (Config.PACKET_HANDLER_DEBUG)
-							{
+						} else {
+							if (Config.PACKET_HANDLER_DEBUG) {
 								_log.warning("Client: " + client.toString() + " sent a 0x4a without the second opcode.");
 							}
 							break;
 						}
-						switch (id_2)
-						{
+						switch (id_2) {
 							case 0x00:
 								// SuperCmdCharacterInfo
 								break;
@@ -693,21 +707,16 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 						break;
 					case 0xd0:
 						int id2 = -1;
-						if (buf.remaining() >= 2)
-						{
+						if (buf.remaining() >= 2) {
 							id2 = buf.getShort() & 0xffff;
-						}
-						else
-						{
-							if (Config.PACKET_HANDLER_DEBUG)
-							{
+						} else {
+							if (Config.PACKET_HANDLER_DEBUG) {
 								_log.warning("Client: " + client.toString() + " sent a 0xd0 without the second opcode.");
 							}
 							break;
 						}
 						
-						switch (id2)
-						{
+						switch (id2) {
 							case 0x01:
 								msg = new RequestManorList();
 								break;
@@ -953,17 +962,13 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 								break;
 							case 0x51:
 								id3 = 0;
-								if (buf.remaining() >= 4)
-								{
+								if (buf.remaining() >= 4) {
 									id3 = buf.getInt();
-								}
-								else
-								{
+								} else {
 									_log.warning("Client: " + client.toString() + " sent a 0xd0:0x51 without the third opcode.");
 									break;
 								}
-								switch (id3)
-								{
+								switch (id3) {
 									case 0x00:
 										msg = new RequestBookMarkSlotInfo();
 										break;
@@ -1157,11 +1162,9 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 		return msg;
 	}
 	
-	private void printDebug(int opcode, ByteBuffer buf, GameClientState state, L2GameClient client)
-	{
+	private void printDebug(int opcode, ByteBuffer buf, GameClientState state, L2GameClient client) {
 		client.onUnknownPacket();
-		if (!Config.PACKET_HANDLER_DEBUG)
-		{
+		if (!Config.PACKET_HANDLER_DEBUG) {
 			return;
 		}
 		
@@ -1172,11 +1175,9 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 		_log.warning(Util.printData(array, size));
 	}
 	
-	private void printDebugDoubleOpcode(int opcode, int id2, ByteBuffer buf, GameClientState state, L2GameClient client)
-	{
+	private void printDebugDoubleOpcode(int opcode, int id2, ByteBuffer buf, GameClientState state, L2GameClient client) {
 		client.onUnknownPacket();
-		if (!Config.PACKET_HANDLER_DEBUG)
-		{
+		if (!Config.PACKET_HANDLER_DEBUG) {
 			return;
 		}
 		
@@ -1189,14 +1190,12 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 	
 	// impl
 	@Override
-	public L2GameClient create(MMOConnection<L2GameClient> con)
-	{
+	public L2GameClient create(MMOConnection<L2GameClient> con) {
 		return new L2GameClient(con);
 	}
 	
 	@Override
-	public void execute(ReceivablePacket<L2GameClient> rp)
-	{
+	public void execute(ReceivablePacket<L2GameClient> rp) {
 		rp.getClient().execute(rp);
 	}
 }

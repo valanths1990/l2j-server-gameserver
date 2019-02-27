@@ -25,6 +25,7 @@ import static com.l2jserver.gameserver.model.TeleportWhereType.TOWN;
 import static com.l2jserver.gameserver.model.skills.CommonSkill.THE_VANQUISHED_OF_WAR;
 import static com.l2jserver.gameserver.model.skills.CommonSkill.THE_VICTOR_OF_WAR;
 import static com.l2jserver.gameserver.model.zone.ZoneId.SIEGE;
+import static com.l2jserver.gameserver.network.L2GameClient.GameClientState.IN_GAME;
 import static com.l2jserver.gameserver.network.SystemMessageId.CLAN_MEMBERSHIP_TERMINATED;
 import static com.l2jserver.gameserver.network.SystemMessageId.CLAN_MEMBER_S1_LOGGED_IN;
 import static com.l2jserver.gameserver.network.SystemMessageId.FRIEND_S1_HAS_LOGGED_IN;
@@ -164,6 +165,8 @@ public class EnterWorld extends L2GameClientPacket {
 				_log.warning("User already exists in Object ID map! User " + activeChar.getName() + " is a character clone.");
 			}
 		}
+		
+		getClient().setState(IN_GAME);
 		
 		// Apply special GM properties to the GM when entering
 		if (activeChar.isGM()) {

@@ -28,74 +28,58 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.L2GameClient;
 import com.l2jserver.util.StringUtil;
 
-public class AccountingFormatter extends Formatter
-{
+public class AccountingFormatter extends Formatter {
 	private final SimpleDateFormat dateFmt = new SimpleDateFormat("dd MMM H:mm:ss");
 	
 	@Override
-	public String format(LogRecord record)
-	{
+	public String format(LogRecord record) {
 		final Object[] params = record.getParameters();
 		final StringBuilder output = StringUtil.startAppend(30 + record.getMessage().length() + (params == null ? 0 : params.length * 10), "[", dateFmt.format(new Date(record.getMillis())), "] ", record.getMessage());
 		
-		if (params != null)
-		{
-			for (Object p : params)
-			{
-				if (p == null)
-				{
+		if (params != null) {
+			for (Object p : params) {
+				if (p == null) {
 					continue;
 				}
 				
 				StringUtil.append(output, ", ");
 				
-				if (p instanceof L2GameClient)
-				{
+				if (p instanceof L2GameClient) {
 					final L2GameClient client = (L2GameClient) p;
 					String address = null;
-					try
-					{
-						if (!client.isDetached())
-						{
+					try {
+						if (!client.isDetached()) {
 							address = client.getConnection().getInetAddress().getHostAddress();
 						}
 					}
-					catch (Exception e)
-					{
+					catch (Exception e) {
 						
 					}
 					
-					switch (client.getState())
-					{
+					switch (client.getState()) {
+						case JOINING:
 						case IN_GAME:
-							if (client.getActiveChar() != null)
-							{
+							if (client.getActiveChar() != null) {
 								StringUtil.append(output, client.getActiveChar().getName());
 								StringUtil.append(output, "(", String.valueOf(client.getActiveChar().getObjectId()), ") ");
 							}
 						case AUTHED:
-							if (client.getAccountName() != null)
-							{
+							if (client.getAccountName() != null) {
 								StringUtil.append(output, client.getAccountName(), " ");
 							}
 						case CONNECTED:
-							if (address != null)
-							{
+							if (address != null) {
 								StringUtil.append(output, address);
 							}
 							break;
 						default:
 							throw new IllegalStateException("Missing state on switch");
 					}
-				}
-				else if (p instanceof L2PcInstance)
-				{
+				} else if (p instanceof L2PcInstance) {
 					L2PcInstance player = (L2PcInstance) p;
 					StringUtil.append(output, player.getName());
 					StringUtil.append(output, "(", String.valueOf(player.getObjectId()), ")");
-				}
-				else
-				{
+				} else {
 					StringUtil.append(output, p.toString());
 				}
 			}
