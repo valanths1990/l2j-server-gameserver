@@ -46,9 +46,7 @@ def generalManifest = manifest {
 
 jar {
 	archiveName = 'l2jserver.jar'
-	exclude('**/dbinstaller/**')
 	exclude('**/loginserver/**')
-	exclude('**/accountmanager/**')
 	exclude('**/gsregistering/**')
 	manifest {
 		from(generalManifest)
@@ -59,7 +57,6 @@ jar {
 task loginJar(type: Jar, dependsOn: classes) {
 	from(sourceSets.main.output)
 	archiveName = 'l2jlogin.jar'
-	exclude('**/dbinstaller/**')
 	exclude('**/gameserver/**')
 	manifest {
 		from(generalManifest)
@@ -73,8 +70,6 @@ task configuratorJar(type: Jar, dependsOn: classes) {
 	include('**/configurator/**')
 	include('**/i18n/**')
 	include('**/images/**')
-	exclude('**/accountmanager/**')
-	exclude('**/dbinstaller/**')
 	exclude('**/gameserver/**')
 	exclude('**/gsregistering/**')
 	exclude('**/log/**')
@@ -90,38 +85,8 @@ task configuratorJar(type: Jar, dependsOn: classes) {
 	}
 }
 
-task dbInstLsJar(type: Jar, dependsOn: classes) {
-	from(sourceSets.main.output)
-	archiveName = 'dbinst_ls.jar'
-	include '**/tools/*'
-	include '**/dbinstaller/**'
-	include '**/images/**'
-	include '**/util/**'
-	include '**/SQLFilter**'
-	exclude '**/LauncherGS*'
-	manifest {
-		from(generalManifest)
-		attributes('Main-Class': 'com.l2jserver.tools.dbinstaller.LauncherLS')
-	}
-}
-
-task dbInstGsJar(type: Jar, dependsOn: classes) {
-	from(sourceSets.main.output)
-	archiveName = 'dbinst_gs.jar'
-	include '**/tools/*'
-	include('**/dbinstaller/**')
-	include('**/images/**')
-	include('**/util/**')
-	include('**/SQLFilter**')
-	exclude('**/LauncherLS*')
-	manifest {
-		from(generalManifest)
-		attributes 'Main-Class': 'com.l2jserver.tools.dbinstaller.LauncherGS'
-	}
-}
-
 artifacts {
-	archives loginJar, configuratorJar, dbInstLsJar, dbInstGsJar
+	archives loginJar, configuratorJar
 }
 
 task zip(type: Zip, dependsOn: build) {
@@ -137,10 +102,6 @@ task zip(type: Zip, dependsOn: build) {
 	}
 	into('login') {
 		from(loginJar)
-	}
-	into('tools') {
-		from(dbInstLsJar)
-		from(dbInstGsJar)
 	}
 	
 	baseName = 'L2J_Server_' + new Date().format("yyyy-MM-dd")
