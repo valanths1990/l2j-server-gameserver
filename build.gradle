@@ -47,7 +47,6 @@ def generalManifest = manifest {
 jar {
 	archiveName = 'l2jserver.jar'
 	exclude('**/loginserver/**')
-	exclude('**/gsregistering/**')
 	manifest {
 		from(generalManifest)
 		attributes('Main-Class': 'com.l2jserver.gameserver.GameServer')
@@ -57,36 +56,14 @@ jar {
 task loginJar(type: Jar, dependsOn: classes) {
 	from(sourceSets.main.output)
 	archiveName = 'l2jlogin.jar'
-	exclude('**/gameserver/**')
 	manifest {
 		from(generalManifest)
 		attributes('Main-Class': 'com.l2jserver.loginserver.L2LoginServer')
 	}
 }
 
-task configuratorJar(type: Jar, dependsOn: classes) {
-	from(sourceSets.main.output)
-	archiveName = 'L2J_Configurator.jar'
-	include('**/configurator/**')
-	include('**/i18n/**')
-	include('**/images/**')
-	exclude('**/gameserver/**')
-	exclude('**/gsregistering/**')
-	exclude('**/log/**')
-	exclude('**/loginserver/**')
-	exclude('**/status/**')
-	exclude('**/util/**')
-	exclude('**/Config/**')
-	exclude('**/ConnectionFactory/**')
-	exclude('**/Server/**')
-	manifest {
-		from(generalManifest)
-		attributes('Main-Class': 'com.l2jserver.tools.configurator.ConfigUserInterface')
-	}
-}
-
 artifacts {
-	archives loginJar, configuratorJar
+	archives loginJar
 }
 
 task zip(type: Zip, dependsOn: build) {
@@ -98,7 +75,6 @@ task zip(type: Zip, dependsOn: build) {
 	}
 	into('game') {
 		from(jar)
-		from(configuratorJar)
 	}
 	into('login') {
 		from(loginJar)
