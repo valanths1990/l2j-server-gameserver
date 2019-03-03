@@ -35,8 +35,7 @@ import com.l2jserver.util.StringUtil;
  * Flood protector implementation.
  * @author fordfrog
  */
-public final class FloodProtectorAction
-{
+public final class FloodProtectorAction {
 	/**
 	 * Logger
 	 */
@@ -71,8 +70,7 @@ public final class FloodProtectorAction
 	 * @param client the game client for which flood protection is being created
 	 * @param config flood protector configuration
 	 */
-	public FloodProtectorAction(final L2GameClient client, final FloodProtectorConfig config)
-	{
+	public FloodProtectorAction(final L2GameClient client, final FloodProtectorConfig config) {
 		super();
 		_client = client;
 		_config = config;
@@ -83,39 +81,29 @@ public final class FloodProtectorAction
 	 * @param command command issued or short command description
 	 * @return true if action is allowed, otherwise false
 	 */
-	public boolean tryPerformAction(final String command)
-	{
+	public boolean tryPerformAction(final String command) {
 		final int curTick = GameTimeController.getInstance().getGameTicks();
 		
-		if ((_client.getActiveChar() != null) && _client.getActiveChar().canOverrideCond(PcCondOverride.FLOOD_CONDITIONS))
-		{
+		if ((_client.getActiveChar() != null) && _client.getActiveChar().canOverrideCond(PcCondOverride.FLOOD_CONDITIONS)) {
 			return true;
 		}
 		
-		if ((curTick < _nextGameTick) || _punishmentInProgress)
-		{
-			if (_config.LOG_FLOODING && !_logged && _log.isLoggable(Level.WARNING))
-			{
+		if ((curTick < _nextGameTick) || _punishmentInProgress) {
+			if (_config.LOG_FLOODING && !_logged && _log.isLoggable(Level.WARNING)) {
 				log(" called command ", command, " ~", String.valueOf((_config.FLOOD_PROTECTION_INTERVAL - (_nextGameTick - curTick)) * GameTimeController.MILLIS_IN_TICK), " ms after previous command");
 				_logged = true;
 			}
 			
 			_count.incrementAndGet();
 			
-			if (!_punishmentInProgress && (_config.PUNISHMENT_LIMIT > 0) && (_count.get() >= _config.PUNISHMENT_LIMIT) && (_config.PUNISHMENT_TYPE != null))
-			{
+			if (!_punishmentInProgress && (_config.PUNISHMENT_LIMIT > 0) && (_count.get() >= _config.PUNISHMENT_LIMIT) && (_config.PUNISHMENT_TYPE != null)) {
 				_punishmentInProgress = true;
 				
-				if ("kick".equals(_config.PUNISHMENT_TYPE))
-				{
+				if ("kick".equals(_config.PUNISHMENT_TYPE)) {
 					kickPlayer();
-				}
-				else if ("ban".equals(_config.PUNISHMENT_TYPE))
-				{
+				} else if ("ban".equals(_config.PUNISHMENT_TYPE)) {
 					banAccount();
-				}
-				else if ("jail".equals(_config.PUNISHMENT_TYPE))
-				{
+				} else if ("jail".equals(_config.PUNISHMENT_TYPE)) {
 					jailChar();
 				}
 				
@@ -124,10 +112,8 @@ public final class FloodProtectorAction
 			return false;
 		}
 		
-		if (_count.get() > 0)
-		{
-			if (_config.LOG_FLOODING && _log.isLoggable(Level.WARNING))
-			{
+		if (_count.get() > 0) {
+			if (_config.LOG_FLOODING && _log.isLoggable(Level.WARNING)) {
 				log(" issued ", String.valueOf(_count), " extra requests within ~", String.valueOf(_config.FLOOD_PROTECTION_INTERVAL * GameTimeController.MILLIS_IN_TICK), " ms");
 			}
 		}
@@ -141,19 +127,14 @@ public final class FloodProtectorAction
 	/**
 	 * Kick player from game (close network connection).
 	 */
-	private void kickPlayer()
-	{
-		if (_client.getActiveChar() != null)
-		{
+	private void kickPlayer() {
+		if (_client.getActiveChar() != null) {
 			_client.getActiveChar().logout(false);
-		}
-		else
-		{
+		} else {
 			_client.closeNow();
 		}
 		
-		if (_log.isLoggable(Level.WARNING))
-		{
+		if (_log.isLoggable(Level.WARNING)) {
 			log("kicked for flooding");
 		}
 	}
@@ -161,11 +142,9 @@ public final class FloodProtectorAction
 	/**
 	 * Bans char account and logs out the char.
 	 */
-	private void banAccount()
-	{
+	private void banAccount() {
 		PunishmentManager.getInstance().startPunishment(new PunishmentTask(_client.getAccountName(), PunishmentAffect.ACCOUNT, PunishmentType.BAN, System.currentTimeMillis() + _config.PUNISHMENT_TIME, "", getClass().getSimpleName()));
-		if (_log.isLoggable(Level.WARNING))
-		{
+		if (_log.isLoggable(Level.WARNING)) {
 			log(" banned for flooding ", _config.PUNISHMENT_TIME <= 0 ? "forever" : "for " + (_config.PUNISHMENT_TIME / 60000) + " mins");
 		}
 	}
@@ -173,61 +152,53 @@ public final class FloodProtectorAction
 	/**
 	 * Jails char.
 	 */
-	private void jailChar()
-	{
-		if (_client.getActiveChar() != null)
-		{
+	private void jailChar() {
+		if (_client.getActiveChar() != null) {
 			int charId = _client.getActiveChar().getObjectId();
-			if (charId > 0)
-			{
+			if (charId > 0) {
 				PunishmentManager.getInstance().startPunishment(new PunishmentTask(charId, PunishmentAffect.CHARACTER, PunishmentType.JAIL, System.currentTimeMillis() + _config.PUNISHMENT_TIME, "", getClass().getSimpleName()));
 			}
 			
-			if (_log.isLoggable(Level.WARNING))
-			{
+			if (_log.isLoggable(Level.WARNING)) {
 				log(" jailed for flooding ", _config.PUNISHMENT_TIME <= 0 ? "forever" : "for " + (_config.PUNISHMENT_TIME / 60000) + " mins");
 			}
 		}
 	}
 	
-	private void log(String... lines)
-	{
+	private void log(String... lines) {
 		final StringBuilder output = StringUtil.startAppend(100, _config.FLOOD_PROTECTOR_TYPE, ": ");
 		String address = null;
-		try
-		{
-			if (!_client.isDetached())
-			{
+		try {
+			if (!_client.isDetached()) {
 				address = _client.getConnection().getInetAddress().getHostAddress();
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 		}
 		
-		switch (_client.getState())
-		{
-			case IN_GAME:
-				if (_client.getActiveChar() != null)
-				{
+		switch (_client.getState()) {
+			case JOINING:
+			case IN_GAME: {
+				if (_client.getActiveChar() != null) {
 					StringUtil.append(output, _client.getActiveChar().getName());
 					StringUtil.append(output, "(", String.valueOf(_client.getActiveChar().getObjectId()), ") ");
 				}
 				break;
-			case AUTHED:
-				if (_client.getAccountName() != null)
-				{
+			}
+			case AUTHED: {
+				if (_client.getAccountName() != null) {
 					StringUtil.append(output, _client.getAccountName(), " ");
 				}
 				break;
-			case CONNECTED:
-				if (address != null)
-				{
+			}
+			case CONNECTED: {
+				if (address != null) {
 					StringUtil.append(output, address);
 				}
 				break;
-			default:
+			}
+			default: {
 				throw new IllegalStateException("Missing state on switch");
+			}
 		}
 		
 		StringUtil.append(output, lines);

@@ -151,6 +151,7 @@ public final class L2GamePacketHandler implements IPacketHandler<L2GameClient>, 
 								break;
 							}
 						}
+						break;
 					}
 					default: {
 						printDebug(opcode, buf, state, client);
