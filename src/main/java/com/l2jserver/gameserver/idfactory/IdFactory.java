@@ -21,19 +21,20 @@ package com.l2jserver.gameserver.idfactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
 
 /**
- * This class ...
- * @version $Revision: 1.3.2.1.2.7 $ $Date: 2005/04/11 10:06:12 $
+ * Id Factory.
+ * @version 2.6.1.0
  */
 public abstract class IdFactory {
 	
-	protected static final Logger _log = Logger.getLogger(IdFactory.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(IdFactory.class);
 	
 	@Deprecated
 	protected static final String[] ID_UPDATES = {
@@ -156,22 +157,16 @@ public abstract class IdFactory {
 		}
 	}
 	
-	/**
-	 * Sets all character offline
-	 */
 	private void setAllCharacterOffline() {
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var s = con.createStatement()) {
 			s.executeUpdate("UPDATE characters SET online = 0");
-			_log.info("Updated characters online status.");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Could not update characters online status: " + e.getMessage(), e);
+			LOG.info("Updated characters online status.");
+		} catch (Exception ex) {
+			LOG.warn("Could not update characters online status!", ex);
 		}
 	}
 	
-	/**
-	 * Cleans up Database
-	 */
 	private void cleanUpDB() {
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var stmt = con.createStatement()) {
@@ -276,9 +271,9 @@ public abstract class IdFactory {
 			stmt.executeUpdate("UPDATE clanhall SET ownerId=0, paidUntil=0, paid=0 WHERE clanhall.ownerId NOT IN (SELECT clan_id FROM clan_data);");
 			stmt.executeUpdate("UPDATE fort SET owner=0 WHERE owner NOT IN (SELECT clan_id FROM clan_data);");
 			
-			_log.info("Cleaned " + cleanCount + " elements from database in " + ((System.currentTimeMillis() - cleanupStart) / 1000) + " s");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Could not clean up database: " + e.getMessage(), e);
+			LOG.info("Cleaned {} elements from database in {} s.", cleanCount, (System.currentTimeMillis() - cleanupStart) / 1000);
+		} catch (Exception ex) {
+			LOG.warn("Could not clean up database!", ex);
 		}
 	}
 	
@@ -287,9 +282,9 @@ public abstract class IdFactory {
 			var s = con.createStatement()) {
 			s.executeUpdate("DELETE FROM mods_wedding WHERE player1Id NOT IN (SELECT charId FROM characters)");
 			s.executeUpdate("DELETE FROM mods_wedding WHERE player2Id NOT IN (SELECT charId FROM characters)");
-			_log.info("Cleaned up invalid Weddings.");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Could not clean up invalid Weddings: " + e.getMessage(), e);
+			LOG.info("Cleaned up invalid weddings.");
+		} catch (Exception ex) {
+			LOG.warn("Could not clean up invalid weddings!", ex);
 		}
 	}
 	
@@ -302,16 +297,11 @@ public abstract class IdFactory {
 					cleanCount += stmt.executeUpdate();
 				}
 			}
-			_log.info("Cleaned " + cleanCount + " expired timestamps from database.");
+			LOG.info("Cleaned {} expired timestamps from database.", cleanCount);
 		} catch (Exception e) {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 * @throws SQLException
-	 */
 	protected final Integer[] extractUsedObjectIDTable() throws Exception {
 		final List<Integer> temp = new ArrayList<>();
 		try (var con = ConnectionFactory.getInstance().getConnection();

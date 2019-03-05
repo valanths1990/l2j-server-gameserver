@@ -22,14 +22,19 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Stack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
 
 /**
- * This class ...
- * @version $Revision: 1.3.2.1.2.7 $ $Date: 2005/04/11 10:06:12 $
+ * Stack ID Factory.
+ * @version 2.6.1.0
  */
 public class StackIDFactory extends IdFactory {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(IdFactory.class);
 	
 	private int _curOID;
 	
@@ -43,13 +48,11 @@ public class StackIDFactory extends IdFactory {
 		_tempOID = FIRST_OID;
 		
 		try (var con = ConnectionFactory.getInstance().getConnection()) {
-			// con.createStatement().execute("drop table if exists tmp_obj_id");
-			
 			Integer[] tmp_obj_ids = extractUsedObjectIDTable();
 			if (tmp_obj_ids.length > 0) {
 				_curOID = tmp_obj_ids[tmp_obj_ids.length - 1];
 			}
-			_log.info("Max Id = " + _curOID);
+			LOG.info("Max Id = {}.", _curOID);
 			
 			int N = tmp_obj_ids.length;
 			for (int idx = 0; idx < N; idx++) {
@@ -57,10 +60,10 @@ public class StackIDFactory extends IdFactory {
 			}
 			
 			_curOID++;
-			_log.info("IdFactory: Next usable Object ID is: " + _curOID);
+			LOG.info("Next usable Object Id is {}.", _curOID);
 			_initialized = true;
-		} catch (Exception e) {
-			_log.severe(getClass().getSimpleName() + ": Could not be initialized properly:" + e.getMessage());
+		} catch (Exception ex) {
+			LOG.error("Could not be initialized properly!", ex);
 		}
 	}
 	
@@ -80,7 +83,7 @@ public class StackIDFactory extends IdFactory {
 					try (var rs = ps.executeQuery()) {
 						while (rs.next()) {
 							int badId = rs.getInt(1);
-							_log.severe("Bad ID " + badId + " in DB found by: " + check);
+							LOG.error("Bad Id {} in DB found by {}!", badId, check);
 							throw new RuntimeException();
 						}
 					}

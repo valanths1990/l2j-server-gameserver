@@ -20,15 +20,12 @@ package com.l2jserver.gameserver;
 
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LogManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,20 +145,25 @@ import com.l2jserver.util.IPv4Filter;
 import com.l2jserver.util.Util;
 
 public final class GameServer {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
-	private static final String LOG_FOLDER = "log"; // Name of folder for log file
-	private static final String LOG_NAME = "./log.cfg"; // Name of log file
+	
 	private static final String DATAPACK = "-dp";
+	
 	private static final String GEODATA = "-gd";
 	
 	private final SelectorThread<L2GameClient> _selectorThread;
+	
 	private final L2GamePacketHandler _gamePacketHandler;
+	
 	private final DeadLockDetector _deadDetectThread;
+	
 	public static GameServer gameServer;
+	
 	public static final Calendar dateTimeServerStarted = Calendar.getInstance();
 	
 	public GameServer() throws Exception {
-		long serverLoadStart = System.currentTimeMillis();
+		final var serverLoadStart = System.currentTimeMillis();
 		
 		LOG.info("{}: Used memory: {}MB.", getClass().getSimpleName(), getUsedMemoryMB());
 		
@@ -172,13 +174,9 @@ public final class GameServer {
 		
 		ThreadPoolManager.getInstance();
 		EventDispatcher.getInstance();
-		
-		new File("log/game").mkdirs();
-		
 		ScriptEngineManager.getInstance();
 		
 		printSection("World");
-		// start game time control early
 		GameTimeController.init();
 		InstanceManager.getInstance();
 		L2World.getInstance();
@@ -302,12 +300,11 @@ public final class GameServer {
 		FortManager.getInstance().activateInstances();
 		FortSiegeManager.getInstance();
 		SiegeScheduleData.getInstance();
-		
 		MerchantPriceConfigTable.getInstance().updateReferences();
 		TerritoryWarManager.getInstance();
 		CastleManorManager.getInstance();
 		MercTicketManager.getInstance();
-		
+		printSection("Quests");
 		QuestManager.getInstance().report();
 		
 		if (Config.SAVE_DROPPED_ITEM) {
@@ -319,13 +316,10 @@ public final class GameServer {
 		}
 		
 		MonsterRace.getInstance();
-		
 		SevenSigns.getInstance().spawnSevenSignsNPC();
 		SevenSignsFestival.getInstance();
 		AutoSpawnHandler.getInstance();
-		
 		FaenorScriptEngine.getInstance();
-		// Init of a cursed weapon manager
 		
 		LOG.info("AutoSpawnHandler: Loaded {} handlers in total.", AutoSpawnHandler.getInstance().size());
 		
@@ -410,7 +404,6 @@ public final class GameServer {
 	public static void main(String[] args) throws Exception {
 		Server.serverMode = Server.MODE_GAMESERVER;
 		
-		// Initialize configurations.
 		Config.load();
 		
 		final String dp = Util.parseArg(args, DATAPACK, true);
@@ -423,18 +416,7 @@ public final class GameServer {
 			Config.GEODATA_PATH = Paths.get(gd);
 		}
 		
-		// Create log folder
-		File logFolder = new File(Config.DATAPACK_ROOT, LOG_FOLDER);
-		logFolder.mkdir();
-		
-		// Create input stream for log file -- or store file data into memory
-		try (InputStream is = new FileInputStream(new File(LOG_NAME))) {
-			LogManager.getLogManager().readConfiguration(is);
-		}
-		
 		printSection("Database");
-		DAOFactory.getInstance();
-		
 		ConnectionFactory.builder() //
 			.withDriver(Config.DATABASE_DRIVER) //
 			.withUrl(Config.DATABASE_URL) //
@@ -444,6 +426,8 @@ public final class GameServer {
 			.withMaxIdleTime(Config.DATABASE_MAX_IDLE_TIME) //
 			.withMaxPoolSize(Config.DATABASE_MAX_CONNECTIONS) //
 			.build();
+		
+		DAOFactory.getInstance();
 		
 		gameServer = new GameServer();
 		

@@ -19,8 +19,9 @@
 package com.l2jserver.gameserver.instancemanager;
 
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.variables.AbstractVariables;
@@ -31,7 +32,7 @@ import com.l2jserver.gameserver.model.variables.AbstractVariables;
  */
 public final class GlobalVariablesManager extends AbstractVariables {
 	
-	private static final Logger _log = Logger.getLogger(GlobalVariablesManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(GlobalVariablesManager.class);
 	
 	private static final String SELECT_QUERY = "SELECT * FROM global_variables";
 	
@@ -52,13 +53,13 @@ public final class GlobalVariablesManager extends AbstractVariables {
 			while (rset.next()) {
 				set(rset.getString("var"), rset.getString("value"));
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't restore global variables");
+		} catch (Exception ex) {
+			LOG.warn("Couldn't restore global variables!", ex);
 			return false;
 		} finally {
 			compareAndSetChanges(true, false);
 		}
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded " + getSet().size() + " variables.");
+		LOG.info("Loaded {} variables.", getSet().size());
 		return true;
 	}
 	
@@ -82,20 +83,16 @@ public final class GlobalVariablesManager extends AbstractVariables {
 				st.addBatch();
 			}
 			st.executeBatch();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't save global variables to database.", e);
+		} catch (Exception ex) {
+			LOG.warn("Couldn't save global variables to database!", ex);
 			return false;
 		} finally {
 			compareAndSetChanges(true, false);
 		}
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Stored " + getSet().size() + " variables.");
+		LOG.info("Stored {} variables.", getSet().size());
 		return true;
 	}
 	
-	/**
-	 * Gets the single instance of {@code GlobalVariablesManager}.
-	 * @return single instance of {@code GlobalVariablesManager}
-	 */
 	public static final GlobalVariablesManager getInstance() {
 		return SingletonHolder._instance;
 	}

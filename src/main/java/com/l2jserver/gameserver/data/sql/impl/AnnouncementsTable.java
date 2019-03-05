@@ -52,7 +52,7 @@ public final class AnnouncementsTable {
 		_announcements.clear();
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var st = con.createStatement();
-			var rs = st.executeQuery("SELECT id, type, initial, delay, repeat, author, content FROM announcements")) {
+			var rs = st.executeQuery("SELECT `id`, `type`, `initial`, `delay`, `repeat`, `author`, `content` FROM announcements")) {
 			while (rs.next()) {
 				final AnnouncementType type = AnnouncementType.findById(rs.getInt("type"));
 				final var author = rs.getString("author");

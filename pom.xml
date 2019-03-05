@@ -11,6 +11,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.25</slf4j.version>
 		<log4j.version>2.11.1</log4j.version>
+		<InMemoryJavaCompiler.version>1.3.0</InMemoryJavaCompiler.version>
+		<gson.version>2.8.5</gson.version>
+		<weupnp.version>0.1.4</weupnp.version>
+		<!-- Test -->
+		<testng.version>6.14.3</testng.version>
+		<mockito-core.version>2.24.5</mockito-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -31,17 +37,17 @@
 		<dependency>
 			<groupId>org.mdkt.compiler</groupId>
 			<artifactId>InMemoryJavaCompiler</artifactId>
-			<version>1.3.0</version>
+			<version>${InMemoryJavaCompiler.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.8.5</version>
+			<version>${gson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bitlet</groupId>
 			<artifactId>weupnp</artifactId>
-			<version>0.1.4</version>
+			<version>${weupnp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.l2jserver</groupId>
@@ -59,13 +65,13 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>6.14.3</version>
+			<version>${testng.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.24.5</version>
+			<version>${mockito-core.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -21,16 +21,24 @@ package com.l2jserver.gameserver.idfactory;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.util.PrimeFinder;
 
 /**
- * This class ..
- * @version $Revision: 1.2 $ $Date: 2004/06/27 08:12:59 $
+ * BitSet ID Factory.
+ * @version 2.6.1.0
  */
 public class BitSetIDFactory extends IdFactory {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(BitSetIDFactory.class);
+	
 	private BitSet _freeIds;
+	
 	private AtomicInteger _freeIdCount;
+	
 	private AtomicInteger _nextFreeId;
 	
 	protected class BitSetCapacityCheck implements Runnable {
@@ -51,7 +59,7 @@ public class BitSetIDFactory extends IdFactory {
 			ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new BitSetCapacityCheck(), 30000, 30000);
 			initialize();
 		}
-		_log.info(getClass().getSimpleName() + ": " + _freeIds.size() + " id's available.");
+		LOG.info("{} Ids available.", _freeIds.size());
 	}
 	
 	public void initialize() {
@@ -63,7 +71,7 @@ public class BitSetIDFactory extends IdFactory {
 			for (int usedObjectId : extractUsedObjectIDTable()) {
 				int objectID = usedObjectId - FIRST_OID;
 				if (objectID < 0) {
-					_log.warning(getClass().getSimpleName() + ": Object ID " + usedObjectId + " in DB is less than minimum ID of " + FIRST_OID);
+					LOG.warn("Object Id {} in DB is less than minimum ID of {}!", usedObjectId, FIRST_OID);
 					continue;
 				}
 				_freeIds.set(usedObjectId - FIRST_OID);
@@ -72,19 +80,19 @@ public class BitSetIDFactory extends IdFactory {
 			
 			_nextFreeId = new AtomicInteger(_freeIds.nextClearBit(0));
 			_initialized = true;
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			_initialized = false;
-			_log.severe(getClass().getSimpleName() + ": Could not be initialized properly: " + e.getMessage());
+			LOG.error("Could not be initialized properly!", ex);
 		}
 	}
 	
 	@Override
-	public synchronized void releaseId(int objectID) {
-		if ((objectID - FIRST_OID) > -1) {
-			_freeIds.clear(objectID - FIRST_OID);
+	public synchronized void releaseId(int objectId) {
+		if ((objectId - FIRST_OID) > -1) {
+			_freeIds.clear(objectId - FIRST_OID);
 			_freeIdCount.incrementAndGet();
 		} else {
-			_log.warning(getClass().getSimpleName() + ": Release objectID " + objectID + " failed (< " + FIRST_OID + ")");
+			LOG.warn("Release objectID {} failed (< {}).", objectId, FIRST_OID);
 		}
 	}
 	

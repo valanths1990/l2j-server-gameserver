@@ -21,6 +21,9 @@ package com.l2jserver.gameserver.idfactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
 
@@ -29,6 +32,8 @@ import com.l2jserver.gameserver.config.Config;
  */
 @Deprecated
 public class CompactionIDFactory extends IdFactory {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CompactionIDFactory.class);
 	
 	private int _curOID;
 	
@@ -47,10 +52,10 @@ public class CompactionIDFactory extends IdFactory {
 				N = insertUntil(tmp_obj_ids, idx, N, con);
 			}
 			_curOID++;
-			_log.info(getClass().getSimpleName() + ": Next usable Object ID is: " + _curOID);
+			LOG.info("Next usable Object Id is {}.", _curOID);
 			_initialized = true;
-		} catch (Exception e) {
-			_log.severe(getClass().getSimpleName() + ": Could not initialize properly: " + e.getMessage());
+		} catch (Exception ex) {
+			LOG.error("Could not initialize properly!", ex);
 		}
 	}
 	
@@ -69,7 +74,7 @@ public class CompactionIDFactory extends IdFactory {
 					try (var rs = ps.executeQuery()) {
 						while (rs.next()) {
 							int badId = rs.getInt(1);
-							_log.severe(getClass().getSimpleName() + ": Bad ID " + badId + " in DB found by: " + check);
+							LOG.error("Bad Id {} in DB found by {}!", badId, check);
 							throw new RuntimeException();
 						}
 					}
@@ -83,7 +88,7 @@ public class CompactionIDFactory extends IdFactory {
 		}
 		for (int i = 1; i <= hole; i++) {
 			id = tmp_obj_ids[N - i];
-			_log.info(getClass().getSimpleName() + ": Compacting DB object ID=" + id + " into " + (_curOID));
+			LOG.info("Compacting DB object Id={} into {}.", id, _curOID);
 			for (String update : ID_UPDATES) {
 				try (var ps = con.prepareStatement(update)) {
 					ps.setInt(1, _curOID);
