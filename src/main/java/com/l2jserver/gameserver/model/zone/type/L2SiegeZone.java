@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.model.zone.type;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.MountType;
 import com.l2jserver.gameserver.instancemanager.CHSiegeManager;

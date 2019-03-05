@@ -20,7 +20,7 @@ package com.l2jserver.gameserver.network.clientpackets;
 
 import java.util.logging.Level;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;

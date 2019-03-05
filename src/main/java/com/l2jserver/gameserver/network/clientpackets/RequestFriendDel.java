@@ -18,11 +18,9 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.logging.Level;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -34,56 +32,49 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * This class ...
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestFriendDel extends L2GameClientPacket
-{
+public final class RequestFriendDel extends L2GameClientPacket {
 	
 	private static final String _C__7A_REQUESTFRIENDDEL = "[C] 7A RequestFriendDel";
 	
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		SystemMessage sm;
 		
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		int id = CharNameTable.getInstance().getIdByName(_name);
 		
-		if (id == -1)
-		{
+		if (id == -1) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_NOT_ON_YOUR_FRIENDS_LIST);
 			sm.addString(_name);
 			activeChar.sendPacket(sm);
 			return;
 		}
 		
-		if (!activeChar.isFriend(id))
-		{
+		if (!activeChar.isFriend(id)) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_NOT_ON_YOUR_FRIENDS_LIST);
 			sm.addString(_name);
 			activeChar.sendPacket(sm);
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("DELETE FROM character_friends WHERE (charId=? AND friendId=?) OR (charId=? AND friendId=?)"))
-		{
-			statement.setInt(1, activeChar.getObjectId());
-			statement.setInt(2, id);
-			statement.setInt(3, id);
-			statement.setInt(4, activeChar.getObjectId());
-			statement.execute();
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("DELETE FROM character_friends WHERE (charId=? AND friendId=?) OR (charId=? AND friendId=?)")) {
+			ps.setInt(1, activeChar.getObjectId());
+			ps.setInt(2, id);
+			ps.setInt(3, id);
+			ps.setInt(4, activeChar.getObjectId());
+			ps.execute();
 			
 			// Player deleted from your friend list
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_HAS_BEEN_DELETED_FROM_YOUR_FRIENDS_LIST);
@@ -94,21 +85,17 @@ public final class RequestFriendDel extends L2GameClientPacket
 			activeChar.sendPacket(new FriendPacket(false, id));
 			
 			final L2PcInstance friend = L2World.getInstance().getPlayer(_name);
-			if (friend != null)
-			{
+			if (friend != null) {
 				friend.removeFriend(activeChar.getObjectId());
 				friend.sendPacket(new FriendPacket(false, activeChar.getObjectId()));
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "could not del friend objectid: ", e);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__7A_REQUESTFRIENDDEL;
 	}
 }

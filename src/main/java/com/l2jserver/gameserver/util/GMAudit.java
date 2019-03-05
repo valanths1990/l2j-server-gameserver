@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * Audits Game Master's actions.

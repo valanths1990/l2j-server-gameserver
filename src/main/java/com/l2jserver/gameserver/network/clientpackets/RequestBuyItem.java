@@ -24,7 +24,7 @@ import static com.l2jserver.gameserver.model.itemcontainer.Inventory.MAX_ADENA;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.BuyListData;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Character;

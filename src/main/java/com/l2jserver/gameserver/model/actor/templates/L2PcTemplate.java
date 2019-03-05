@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model.actor.templates;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;

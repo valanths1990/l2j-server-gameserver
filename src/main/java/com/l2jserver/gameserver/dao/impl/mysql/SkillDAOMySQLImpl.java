@@ -18,17 +18,13 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.SkillDAO;
 import com.l2jserver.gameserver.data.xml.impl.ClassListData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
@@ -43,37 +39,37 @@ import com.l2jserver.gameserver.util.Util;
  * Skill DAO MySQL implementation.
  * @author Zoey76
  */
-public class SkillDAOMySQLImpl implements SkillDAO
-{
+public class SkillDAOMySQLImpl implements SkillDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(SkillDAOMySQLImpl.class);
 	
 	private static final String SELECT = "SELECT skill_id,skill_level FROM character_skills WHERE charId=? AND class_index=?";
+	
 	private static final String INSERT = "INSERT INTO character_skills (charId,skill_id,skill_level,class_index) VALUES (?,?,?,?)";
+	
 	private static final String UPDATE = "UPDATE character_skills SET skill_level=? WHERE skill_id=? AND charId=? AND class_index=?";
+	
 	private static final String REPLACE = "REPLACE INTO character_skills (charId,skill_id,skill_level,class_index) VALUES (?,?,?,?)";
+	
 	private static final String DELETE_ONE = "DELETE FROM character_skills WHERE skill_id=? AND charId=? AND class_index=?";
+	
 	private static final String DELETE_ALL = "DELETE FROM character_skills WHERE charId=? AND class_index=?";
 	
 	@Override
-	public void load(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+	public void load(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, player.getClassIndex());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					final int id = rs.getInt("skill_id");
 					final int level = rs.getInt("skill_level");
 					
 					// Create a L2Skill object for each record
 					final Skill skill = SkillData.getInstance().getSkill(id, level);
 					
-					if (skill == null)
-					{
+					if (skill == null) {
 						LOG.warn("Skipped null skill Id: {}, Level: {} while restoring player skills for {}", id, level, this);
 						continue;
 					}
@@ -81,60 +77,47 @@ public class SkillDAOMySQLImpl implements SkillDAO
 					// Add the L2Skill object to the L2Character _skills and its Func objects to the calculator set of the L2Character
 					player.addSkill(skill);
 					
-					if (Config.SKILL_CHECK_ENABLE && (!player.canOverrideCond(PcCondOverride.SKILL_CONDITIONS) || Config.SKILL_CHECK_GM))
-					{
-						if (!SkillTreesData.getInstance().isSkillAllowed(player, skill))
-						{
+					if (Config.SKILL_CHECK_ENABLE && (!player.canOverrideCond(PcCondOverride.SKILL_CONDITIONS) || Config.SKILL_CHECK_GM)) {
+						if (!SkillTreesData.getInstance().isSkillAllowed(player, skill)) {
 							Util.handleIllegalPlayerAction(player, "Player " + player.getName() + " has invalid skill " + skill.getName() + " (" + skill.getId() + "/" + skill.getLevel() + "), class:"
 								+ ClassListData.getInstance().getClass(player.getClassId()).getClassName(), IllegalActionPunishmentType.BROADCAST);
-							if (Config.SKILL_CHECK_REMOVE)
-							{
+							if (Config.SKILL_CHECK_REMOVE) {
 								player.removeSkill(skill);
 							}
 						}
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore {} skills: {}", player, e);
 		}
 	}
 	
 	@Override
-	public void insert(L2PcInstance player, int classIndex, Skill skill)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+	public void insert(L2PcInstance player, int classIndex, Skill skill) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, skill.getId());
 			ps.setInt(3, skill.getLevel());
 			ps.setInt(4, classIndex);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Error could not store char skills: {}", e);
 		}
 	}
 	
 	@Override
-	public void insert(L2PcInstance player, int newClassIndex, List<Skill> newSkills)
-	{
-		if (newSkills.isEmpty())
-		{
+	public void insert(L2PcInstance player, int newClassIndex, List<Skill> newSkills) {
+		if (newSkills.isEmpty()) {
 			return;
 		}
 		
 		final int classIndex = (newClassIndex > -1) ? newClassIndex : player.getClassIndex();
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(REPLACE))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(REPLACE)) {
 			con.setAutoCommit(false);
-			for (final Skill addSkill : newSkills)
-			{
+			for (final Skill addSkill : newSkills) {
 				
 				ps.setInt(1, player.getObjectId());
 				ps.setInt(2, addSkill.getId());
@@ -144,60 +127,46 @@ public class SkillDAOMySQLImpl implements SkillDAO
 			}
 			ps.executeBatch();
 			con.commit();
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOG.error("Error could not store {} skills: {}", player, e);
 		}
 	}
 	
 	@Override
-	public void update(L2PcInstance player, int classIndex, Skill newSkill, Skill oldSkill)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE))
-		{
+	public void update(L2PcInstance player, int classIndex, Skill newSkill, Skill oldSkill) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(UPDATE)) {
 			ps.setInt(1, newSkill.getLevel());
 			ps.setInt(2, oldSkill.getId());
 			ps.setInt(3, player.getObjectId());
 			ps.setInt(4, classIndex);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Error could not store char skills: {}", e);
 		}
 	}
 	
 	@Override
-	public void delete(L2PcInstance player, Skill skill)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE_ONE))
-		{
+	public void delete(L2PcInstance player, Skill skill) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE_ONE)) {
 			ps.setInt(1, skill.getId());
 			ps.setInt(2, player.getObjectId());
 			ps.setInt(3, player.getClassIndex());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Error could not delete skill: {}", e);
 		}
 	}
 	
 	@Override
-	public void deleteAll(L2PcInstance player, int classIndex)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE_ALL))
-		{
+	public void deleteAll(L2PcInstance player, int classIndex) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE_ALL)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, classIndex);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Error could not delete skill: {}", e);
 		}
 	}

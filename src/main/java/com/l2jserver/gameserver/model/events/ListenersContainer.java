@@ -25,7 +25,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.function.Predicate;
 
 import com.l2jserver.gameserver.model.events.listeners.AbstractEventListener;
-import com.l2jserver.util.EmptyQueue;
+import com.l2jserver.gameserver.util.EmptyQueue;
 
 /**
  * @author UnAfraid

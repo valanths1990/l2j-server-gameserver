@@ -19,68 +19,55 @@
 package com.l2jserver.gameserver.idfactory;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * 18.8.2010 - JIV: Disabling until someone update it
  */
 @Deprecated
-public class CompactionIDFactory extends IdFactory
-{
+public class CompactionIDFactory extends IdFactory {
+	
 	private int _curOID;
+	
 	private final int _freeSize;
 	
-	protected CompactionIDFactory()
-	{
+	protected CompactionIDFactory() {
 		super();
 		_curOID = FIRST_OID;
 		_freeSize = 0;
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
 			Integer[] tmp_obj_ids = extractUsedObjectIDTable();
 			
 			int N = tmp_obj_ids.length;
-			for (int idx = 0; idx < N; idx++)
-			{
+			for (int idx = 0; idx < N; idx++) {
 				N = insertUntil(tmp_obj_ids, idx, N, con);
 			}
 			_curOID++;
 			_log.info(getClass().getSimpleName() + ": Next usable Object ID is: " + _curOID);
 			_initialized = true;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.severe(getClass().getSimpleName() + ": Could not initialize properly: " + e.getMessage());
 		}
 	}
 	
-	private int insertUntil(Integer[] tmp_obj_ids, int idx, int N, Connection con) throws SQLException
-	{
+	private int insertUntil(Integer[] tmp_obj_ids, int idx, int N, Connection con) throws SQLException {
 		int id = tmp_obj_ids[idx];
-		if (id == _curOID)
-		{
+		if (id == _curOID) {
 			_curOID++;
 			return N;
 		}
 		// check these IDs not present in DB
-		if (Config.BAD_ID_CHECKING)
-		{
-			for (String check : ID_CHECKS)
-			{
-				try (PreparedStatement ps = con.prepareStatement(check))
-				{
+		if (Config.BAD_ID_CHECKING) {
+			for (String check : ID_CHECKS) {
+				try (var ps = con.prepareStatement(check)) {
 					ps.setInt(1, _curOID);
 					ps.setInt(2, id);
-					try (ResultSet rs = ps.executeQuery())
-					{
-						while (rs.next())
-						{
+					try (var rs = ps.executeQuery()) {
+						while (rs.next()) {
 							int badId = rs.getInt(1);
 							_log.severe(getClass().getSimpleName() + ": Bad ID " + badId + " in DB found by: " + check);
 							throw new RuntimeException();
@@ -91,18 +78,14 @@ public class CompactionIDFactory extends IdFactory
 		}
 		
 		int hole = id - _curOID;
-		if (hole > (N - idx))
-		{
+		if (hole > (N - idx)) {
 			hole = N - idx;
 		}
-		for (int i = 1; i <= hole; i++)
-		{
+		for (int i = 1; i <= hole; i++) {
 			id = tmp_obj_ids[N - i];
 			_log.info(getClass().getSimpleName() + ": Compacting DB object ID=" + id + " into " + (_curOID));
-			for (String update : ID_UPDATES)
-			{
-				try (PreparedStatement ps = con.prepareStatement(update))
-				{
+			for (String update : ID_UPDATES) {
+				try (var ps = con.prepareStatement(update)) {
 					ps.setInt(1, _curOID);
 					ps.setInt(2, id);
 					ps.execute();
@@ -110,16 +93,14 @@ public class CompactionIDFactory extends IdFactory
 			}
 			_curOID++;
 		}
-		if (hole < (N - idx))
-		{
+		if (hole < (N - idx)) {
 			_curOID++;
 		}
 		return N - hole;
 	}
 	
 	@Override
-	public synchronized int getNextId()
-	{
+	public synchronized int getNextId() {
 		// @formatter:off
 		/*
 		 * if (_freeSize == 0)
@@ -133,8 +114,7 @@ public class CompactionIDFactory extends IdFactory
 	}
 	
 	@Override
-	public synchronized void releaseId(int id)
-	{
+	public synchronized void releaseId(int id) {
 		// Don't release Ids until we are sure it isn't messing up
 		// @formatter:off
 		/*
@@ -150,8 +130,7 @@ public class CompactionIDFactory extends IdFactory
 	}
 	
 	@Override
-	public int size()
-	{
+	public int size() {
 		return (_freeSize + LAST_OID) - FIRST_OID;
 	}
 }

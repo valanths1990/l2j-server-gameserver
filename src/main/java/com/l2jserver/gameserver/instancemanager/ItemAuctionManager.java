@@ -19,11 +19,6 @@
 package com.l2jserver.gameserver.instancemanager;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,47 +31,41 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.itemauction.ItemAuctionInstance;
 
 /**
+ * Item Auction Manager.
  * @author Forsaiken
  */
-public final class ItemAuctionManager
-{
+public final class ItemAuctionManager {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ItemAuctionManager.class);
 	
 	private final Map<Integer, ItemAuctionInstance> _managerInstances = new HashMap<>();
 	private final AtomicInteger _auctionIds;
 	
-	protected ItemAuctionManager()
-	{
+	protected ItemAuctionManager() {
 		_auctionIds = new AtomicInteger(1);
 		
-		if (!Config.ALT_ITEM_AUCTION_ENABLED)
-		{
+		if (!Config.ALT_ITEM_AUCTION_ENABLED) {
 			LOG.info("Auction Manager disabled by config.");
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement();
-			ResultSet rs = s.executeQuery("SELECT auctionId FROM item_auction ORDER BY auctionId DESC LIMIT 0, 1"))
-		{
-			if (rs.next())
-			{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement();
+			var rs = s.executeQuery("SELECT auctionId FROM item_auction ORDER BY auctionId DESC LIMIT 0, 1")) {
+			if (rs.next()) {
 				_auctionIds.set(rs.getInt(1) + 1);
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOG.error("Failed loading auctions!", e);
 		}
 		
 		final File file = new File(Config.DATAPACK_ROOT + "/data/ItemAuctions.xml");
-		if (!file.exists())
-		{
+		if (!file.exists()) {
 			LOG.warn("Missing ItemAuctions.xml!");
 			return;
 		}
@@ -86,22 +75,16 @@ public final class ItemAuctionManager
 		factory.setValidating(false);
 		factory.setIgnoringComments(true);
 		
-		try
-		{
+		try {
 			final Document doc = factory.newDocumentBuilder().parse(file);
-			for (Node na = doc.getFirstChild(); na != null; na = na.getNextSibling())
-			{
-				if ("list".equalsIgnoreCase(na.getNodeName()))
-				{
-					for (Node nb = na.getFirstChild(); nb != null; nb = nb.getNextSibling())
-					{
-						if ("instance".equalsIgnoreCase(nb.getNodeName()))
-						{
+			for (Node na = doc.getFirstChild(); na != null; na = na.getNextSibling()) {
+				if ("list".equalsIgnoreCase(na.getNodeName())) {
+					for (Node nb = na.getFirstChild(); nb != null; nb = nb.getNextSibling()) {
+						if ("instance".equalsIgnoreCase(nb.getNodeName())) {
 							final NamedNodeMap nab = nb.getAttributes();
 							final int instanceId = Integer.parseInt(nab.getNamedItem("id").getNodeValue());
 							
-							if (_managerInstances.containsKey(instanceId))
-							{
+							if (_managerInstances.containsKey(instanceId)) {
 								throw new Exception("Dublicated instanceId " + instanceId);
 							}
 							
@@ -112,49 +95,37 @@ public final class ItemAuctionManager
 				}
 			}
 			LOG.info("Loaded " + _managerInstances.size() + " auction manager instance(s).");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Failed loading auctions from xml!", e);
 		}
 	}
 	
-	public final void shutdown()
-	{
-		for (ItemAuctionInstance instance : _managerInstances.values())
-		{
+	public final void shutdown() {
+		for (ItemAuctionInstance instance : _managerInstances.values()) {
 			instance.shutdown();
 		}
 	}
 	
-	public final ItemAuctionInstance getManagerInstance(final int instanceId)
-	{
+	public final ItemAuctionInstance getManagerInstance(final int instanceId) {
 		return _managerInstances.get(instanceId);
 	}
 	
-	public final int getNextAuctionId()
-	{
+	public final int getNextAuctionId() {
 		return _auctionIds.getAndIncrement();
 	}
 	
-	public static final void deleteAuction(final int auctionId)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM item_auction WHERE auctionId=?"))
-			{
+	public static final void deleteAuction(final int auctionId) {
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
+			try (var ps = con.prepareStatement("DELETE FROM item_auction WHERE auctionId=?")) {
 				ps.setInt(1, auctionId);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM item_auction_bid WHERE auctionId=?"))
-			{
+			try (var ps = con.prepareStatement("DELETE FROM item_auction_bid WHERE auctionId=?")) {
 				ps.setInt(1, auctionId);
 				ps.execute();
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOG.error("Failed deleting auction ID {}!", auctionId, e);
 		}
 	}
@@ -163,13 +134,11 @@ public final class ItemAuctionManager
 	 * Gets the single instance of {@code ItemAuctionManager}.
 	 * @return single instance of {@code ItemAuctionManager}
 	 */
-	public static final ItemAuctionManager getInstance()
-	{
+	public static final ItemAuctionManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final ItemAuctionManager INSTANCE = new ItemAuctionManager();
 	}
 }

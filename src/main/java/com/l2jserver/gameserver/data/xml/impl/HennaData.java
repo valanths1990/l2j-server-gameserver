@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.items.L2Henna;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * This class holds the henna related information.<br>
@@ -39,37 +39,30 @@ import com.l2jserver.util.data.xml.IXmlReader;
  * Allowed classes to wear each henna.
  * @author Zoey76
  */
-public final class HennaData implements IXmlReader
-{
+public final class HennaData implements IXmlReader {
+	
 	private final Map<Integer, L2Henna> _hennaList = new HashMap<>();
 	
 	/**
 	 * Instantiates a new henna data.
 	 */
-	protected HennaData()
-	{
+	protected HennaData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_hennaList.clear();
 		parseDatapackFile("data/stats/hennaList.xml");
 		LOG.info("{}: Loaded {} Henna data.", getClass().getSimpleName(), _hennaList.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equals(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("henna".equals(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equals(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("henna".equals(d.getNodeName())) {
 						parseHenna(d);
 					}
 				}
@@ -81,51 +74,42 @@ public final class HennaData implements IXmlReader
 	 * Parses the henna.
 	 * @param d the d
 	 */
-	private void parseHenna(Node d)
-	{
+	private void parseHenna(Node d) {
 		final StatsSet set = new StatsSet();
 		final List<ClassId> wearClassIds = new ArrayList<>();
 		NamedNodeMap attrs = d.getAttributes();
 		Node attr;
-		for (int i = 0; i < attrs.getLength(); i++)
-		{
+		for (int i = 0; i < attrs.getLength(); i++) {
 			attr = attrs.item(i);
 			set.set(attr.getNodeName(), attr.getNodeValue());
 		}
 		
-		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
-		{
+		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
 			final String name = c.getNodeName();
 			attrs = c.getAttributes();
-			switch (name)
-			{
-				case "stats":
-				{
-					for (int i = 0; i < attrs.getLength(); i++)
-					{
+			switch (name) {
+				case "stats": {
+					for (int i = 0; i < attrs.getLength(); i++) {
 						attr = attrs.item(i);
 						set.set(attr.getNodeName(), attr.getNodeValue());
 					}
 					break;
 				}
-				case "wear":
-				{
+				case "wear": {
 					attr = attrs.getNamedItem("count");
 					set.set("wear_count", attr.getNodeValue());
 					attr = attrs.getNamedItem("fee");
 					set.set("wear_fee", attr.getNodeValue());
 					break;
 				}
-				case "cancel":
-				{
+				case "cancel": {
 					attr = attrs.getNamedItem("count");
 					set.set("cancel_count", attr.getNodeValue());
 					attr = attrs.getNamedItem("fee");
 					set.set("cancel_fee", attr.getNodeValue());
 					break;
 				}
-				case "classId":
-				{
+				case "classId": {
 					wearClassIds.add(ClassId.getClassId(Integer.parseInt(c.getTextContent())));
 					break;
 				}
@@ -141,8 +125,7 @@ public final class HennaData implements IXmlReader
 	 * @param id of the dye.
 	 * @return the dye with that id.
 	 */
-	public L2Henna getHenna(int id)
-	{
+	public L2Henna getHenna(int id) {
 		return _hennaList.get(id);
 	}
 	
@@ -151,13 +134,10 @@ public final class HennaData implements IXmlReader
 	 * @param classId the player's class Id.
 	 * @return the list with all the allowed dyes.
 	 */
-	public List<L2Henna> getHennaList(ClassId classId)
-	{
+	public List<L2Henna> getHennaList(ClassId classId) {
 		final List<L2Henna> list = new ArrayList<>();
-		for (L2Henna henna : _hennaList.values())
-		{
-			if (henna.isAllowedClass(classId))
-			{
+		for (L2Henna henna : _hennaList.values()) {
+			if (henna.isAllowedClass(classId)) {
 				list.add(henna);
 			}
 		}
@@ -168,13 +148,11 @@ public final class HennaData implements IXmlReader
 	 * Gets the single instance of HennaData.
 	 * @return single instance of HennaData
 	 */
-	public static HennaData getInstance()
-	{
+	public static HennaData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final HennaData _instance = new HennaData();
 	}
 }

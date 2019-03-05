@@ -23,7 +23,7 @@ import static com.l2jserver.gameserver.model.itemcontainer.Inventory.ADENA_ID;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.holders.ItemHolder;

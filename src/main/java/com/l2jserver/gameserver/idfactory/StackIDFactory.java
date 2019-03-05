@@ -19,80 +19,66 @@
 package com.l2jserver.gameserver.idfactory;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Stack;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * This class ...
  * @version $Revision: 1.3.2.1.2.7 $ $Date: 2005/04/11 10:06:12 $
  */
-public class StackIDFactory extends IdFactory
-{
+public class StackIDFactory extends IdFactory {
+	
 	private int _curOID;
+	
 	private int _tempOID;
 	
 	private final Stack<Integer> _freeOIDStack = new Stack<>();
 	
-	protected StackIDFactory()
-	{
+	protected StackIDFactory() {
 		super();
 		_curOID = FIRST_OID;
 		_tempOID = FIRST_OID;
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
 			// con.createStatement().execute("drop table if exists tmp_obj_id");
 			
 			Integer[] tmp_obj_ids = extractUsedObjectIDTable();
-			if (tmp_obj_ids.length > 0)
-			{
+			if (tmp_obj_ids.length > 0) {
 				_curOID = tmp_obj_ids[tmp_obj_ids.length - 1];
 			}
 			_log.info("Max Id = " + _curOID);
 			
 			int N = tmp_obj_ids.length;
-			for (int idx = 0; idx < N; idx++)
-			{
+			for (int idx = 0; idx < N; idx++) {
 				N = insertUntil(tmp_obj_ids, idx, N, con);
 			}
 			
 			_curOID++;
 			_log.info("IdFactory: Next usable Object ID is: " + _curOID);
 			_initialized = true;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.severe(getClass().getSimpleName() + ": Could not be initialized properly:" + e.getMessage());
 		}
 	}
 	
-	private int insertUntil(Integer[] tmp_obj_ids, int idx, int N, Connection con) throws SQLException
-	{
+	private int insertUntil(Integer[] tmp_obj_ids, int idx, int N, Connection con) throws SQLException {
 		int id = tmp_obj_ids[idx];
-		if (id == _tempOID)
-		{
+		if (id == _tempOID) {
 			_tempOID++;
 			return N;
 		}
 		// check these IDs not present in DB
-		if (Config.BAD_ID_CHECKING)
-		{
-			for (String check : ID_CHECKS)
-			{
-				try (PreparedStatement ps = con.prepareStatement(check))
-				{
+		if (Config.BAD_ID_CHECKING) {
+			for (String check : ID_CHECKS) {
+				try (var ps = con.prepareStatement(check)) {
 					ps.setInt(1, _tempOID);
 					// ps.setInt(1, _curOID);
 					ps.setInt(2, id);
-					try (ResultSet rs = ps.executeQuery())
-					{
-						while (rs.next())
-						{
+					try (var rs = ps.executeQuery()) {
+						while (rs.next()) {
 							int badId = rs.getInt(1);
 							_log.severe("Bad ID " + badId + " in DB found by: " + check);
 							throw new RuntimeException();
@@ -104,39 +90,31 @@ public class StackIDFactory extends IdFactory
 		
 		// int hole = id - _curOID;
 		int hole = id - _tempOID;
-		if (hole > (N - idx))
-		{
+		if (hole > (N - idx)) {
 			hole = N - idx;
 		}
-		for (int i = 1; i <= hole; i++)
-		{
+		for (int i = 1; i <= hole; i++) {
 			// log.info("Free ID added " + (_tempOID));
 			_freeOIDStack.push(_tempOID);
 			_tempOID++;
 			// _curOID++;
 		}
-		if (hole < (N - idx))
-		{
+		if (hole < (N - idx)) {
 			_tempOID++;
 		}
 		return N - hole;
 	}
 	
-	public static IdFactory getInstance()
-	{
+	public static IdFactory getInstance() {
 		return _instance;
 	}
 	
 	@Override
-	public synchronized int getNextId()
-	{
+	public synchronized int getNextId() {
 		int id;
-		if (!_freeOIDStack.empty())
-		{
+		if (!_freeOIDStack.empty()) {
 			id = _freeOIDStack.pop();
-		}
-		else
-		{
+		} else {
 			id = _curOID;
 			_curOID = _curOID + 1;
 		}
@@ -148,14 +126,12 @@ public class StackIDFactory extends IdFactory
 	 * @param id
 	 */
 	@Override
-	public synchronized void releaseId(int id)
-	{
+	public synchronized void releaseId(int id) {
 		_freeOIDStack.push(id);
 	}
 	
 	@Override
-	public int size()
-	{
+	public int size() {
 		return (FREE_OBJECT_ID_SIZE - _curOID) + FIRST_OID + _freeOIDStack.size();
 	}
 }

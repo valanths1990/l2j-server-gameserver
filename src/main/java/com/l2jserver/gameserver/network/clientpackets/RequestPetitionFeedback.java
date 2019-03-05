@@ -18,19 +18,16 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.logging.Level;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
  * @author Plim
  */
-public class RequestPetitionFeedback extends L2GameClientPacket
-{
+public class RequestPetitionFeedback extends L2GameClientPacket {
+	
 	private static final String _C__C9_REQUESTPETITIONFEEDBACK = "[C] C9 RequestPetitionFeedback";
 	
 	private static final String INSERT_FEEDBACK = "INSERT INTO petition_feedback VALUES (?,?,?,?,?)";
@@ -41,8 +38,7 @@ public class RequestPetitionFeedback extends L2GameClientPacket
 	private String _message;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// _unknown =
 		readD(); // unknown
 		_rate = readD();
@@ -50,39 +46,32 @@ public class RequestPetitionFeedback extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
 		
-		if ((player == null) || (player.getLastPetitionGmName() == null))
-		{
+		if ((player == null) || (player.getLastPetitionGmName() == null)) {
 			return;
 		}
 		
-		if ((_rate > 4) || (_rate < 0))
-		{
+		if ((_rate > 4) || (_rate < 0)) {
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement(INSERT_FEEDBACK))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var statement = con.prepareStatement(INSERT_FEEDBACK)) {
 			statement.setString(1, player.getName());
 			statement.setString(2, player.getLastPetitionGmName());
 			statement.setInt(3, _rate);
 			statement.setString(4, _message);
 			statement.setLong(5, System.currentTimeMillis());
 			statement.execute();
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error while saving petition feedback");
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__C9_REQUESTPETITIONFEEDBACK;
 	}
 }

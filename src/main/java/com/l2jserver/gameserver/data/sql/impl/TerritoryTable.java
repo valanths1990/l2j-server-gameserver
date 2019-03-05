@@ -18,24 +18,19 @@
  */
 package com.l2jserver.gameserver.data.sql.impl;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.L2Territory;
 import com.l2jserver.gameserver.model.Location;
 
 /**
- * @author Balancer, Mr
+ * @author MrBalancer
  */
-public class TerritoryTable
-{
+public class TerritoryTable {
 	private static final Logger LOGGER = Logger.getLogger(TerritoryTable.class.getName());
 	
 	private static final Map<Integer, L2Territory> _territory = new HashMap<>();
@@ -43,8 +38,7 @@ public class TerritoryTable
 	/**
 	 * Instantiates a new territory.
 	 */
-	protected TerritoryTable()
-	{
+	protected TerritoryTable() {
 		load();
 	}
 	
@@ -53,8 +47,7 @@ public class TerritoryTable
 	 * @param terr the territory Id?
 	 * @return the random point
 	 */
-	public Location getRandomPoint(int terr)
-	{
+	public Location getRandomPoint(int terr) {
 		return _territory.get(terr).getRandomPoint();
 	}
 	
@@ -63,36 +56,29 @@ public class TerritoryTable
 	 * @param terr the territory Id?
 	 * @return the proc max
 	 */
-	public int getProcMax(int terr)
-	{
+	public int getProcMax(int terr) {
 		return _territory.get(terr).getProcMax();
 	}
 	
 	/**
 	 * Load the data from database.
 	 */
-	public void load()
-	{
+	public void load() {
 		_territory.clear();
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement stmt = con.createStatement();
-			ResultSet rset = stmt.executeQuery("SELECT * FROM locations WHERE loc_id>0"))
-		{
-			while (rset.next())
-			{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var stmt = con.createStatement();
+			var rset = stmt.executeQuery("SELECT * FROM locations WHERE loc_id>0")) {
+			while (rset.next()) {
 				int terrId = rset.getInt("loc_id");
 				L2Territory terr = _territory.get(terrId);
-				if (terr == null)
-				{
+				if (terr == null) {
 					terr = new L2Territory(terrId);
 					_territory.put(terrId, terr);
 				}
 				terr.add(rset.getInt("loc_x"), rset.getInt("loc_y"), rset.getInt("loc_zmin"), rset.getInt("loc_zmax"), rset.getInt("proc"));
 			}
 			LOGGER.info("TerritoryTable: Loaded " + _territory.size() + " territories from database.");
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "TerritoryTable: Failed to load territories from database!", e);
 		}
 	}
@@ -101,13 +87,11 @@ public class TerritoryTable
 	 * Gets the single instance of Territory.
 	 * @return single instance of Territory
 	 */
-	public static TerritoryTable getInstance()
-	{
+	public static TerritoryTable getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final TerritoryTable _instance = new TerritoryTable();
 	}
 }

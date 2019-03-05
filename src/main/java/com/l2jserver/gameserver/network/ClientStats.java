@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 
 public class ClientStats
 {

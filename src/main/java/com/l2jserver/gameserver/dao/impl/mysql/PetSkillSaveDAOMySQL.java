@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.PetSkillSaveDAO;
 import com.l2jserver.gameserver.data.sql.impl.SummonEffectsTable;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -42,20 +39,21 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Pet Skill Save MySQL implementation.
  * @author Zoey76
  */
-public class PetSkillSaveDAOMySQL implements PetSkillSaveDAO
-{
+public class PetSkillSaveDAOMySQL implements PetSkillSaveDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(PetSkillSaveDAOMySQL.class);
+	
 	private static final String ADD_SKILL_SAVE = "INSERT INTO character_pet_skills_save (petObjItemId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?)";
+	
 	private static final String RESTORE_SKILL_SAVE = "SELECT petObjItemId,skill_id,skill_level,remaining_time,buff_index FROM character_pet_skills_save WHERE petObjItemId=? ORDER BY buff_index ASC";
+	
 	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_pet_skills_save WHERE petObjItemId=?";
 	
 	@Override
-	public void insert(L2PetInstance pet, boolean storeEffects)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps1 = con.prepareStatement(DELETE_SKILL_SAVE);
-			PreparedStatement ps2 = con.prepareStatement(ADD_SKILL_SAVE))
-		{
+	public void insert(L2PetInstance pet, boolean storeEffects) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps1 = con.prepareStatement(DELETE_SKILL_SAVE);
+			var ps2 = con.prepareStatement(ADD_SKILL_SAVE)) {
 			// Delete all current stored effects for summon to avoid dupe
 			ps1.setInt(1, pet.getControlObjectId());
 			ps1.execute();
@@ -65,35 +63,28 @@ public class PetSkillSaveDAOMySQL implements PetSkillSaveDAO
 			final List<Integer> storedSkills = new LinkedList<>();
 			
 			// Store all effect data along with calculated remaining
-			if (storeEffects)
-			{
-				for (BuffInfo info : pet.getEffectList().getEffects())
-				{
-					if (info == null)
-					{
+			if (storeEffects) {
+				for (BuffInfo info : pet.getEffectList().getEffects()) {
+					if (info == null) {
 						continue;
 					}
 					
 					final Skill skill = info.getSkill();
 					// Do not save heals.
-					if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS)
-					{
+					if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS) {
 						continue;
 					}
 					
-					if (skill.isToggle())
-					{
+					if (skill.isToggle()) {
 						continue;
 					}
 					
 					// Dances and songs are not kept in retail.
-					if (skill.isDance() && !Config.ALT_STORE_DANCES)
-					{
+					if (skill.isDance() && !Config.ALT_STORE_DANCES) {
 						continue;
 					}
 					
-					if (storedSkills.contains(skill.getReuseHashCode()))
-					{
+					if (storedSkills.contains(skill.getReuseHashCode())) {
 						continue;
 					}
 					
@@ -109,37 +100,28 @@ public class PetSkillSaveDAOMySQL implements PetSkillSaveDAO
 					SummonEffectsTable.getInstance().addPetEffect(pet.getControlObjectId(), skill, info.getTime());
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Could not store pet effect data!", e);
 		}
 	}
 	
 	@Override
-	public void load(L2PetInstance pet)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps1 = con.prepareStatement(RESTORE_SKILL_SAVE);
-			PreparedStatement ps2 = con.prepareStatement(DELETE_SKILL_SAVE))
-		{
-			if (!SummonEffectsTable.getInstance().containsPetId(pet.getControlObjectId()))
-			{
+	public void load(L2PetInstance pet) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps1 = con.prepareStatement(RESTORE_SKILL_SAVE);
+			var ps2 = con.prepareStatement(DELETE_SKILL_SAVE)) {
+			if (!SummonEffectsTable.getInstance().containsPetId(pet.getControlObjectId())) {
 				ps1.setInt(1, pet.getControlObjectId());
-				try (ResultSet rs = ps1.executeQuery())
-				{
-					while (rs.next())
-					{
+				try (var rs = ps1.executeQuery()) {
+					while (rs.next()) {
 						int effectCurTime = rs.getInt("remaining_time");
 						
 						final Skill skill = SkillData.getInstance().getSkill(rs.getInt("skill_id"), rs.getInt("skill_level"));
-						if (skill == null)
-						{
+						if (skill == null) {
 							continue;
 						}
 						
-						if (skill.hasEffects(EffectScope.GENERAL))
-						{
+						if (skill.hasEffects(EffectScope.GENERAL)) {
 							SummonEffectsTable.getInstance().addPetEffect(pet.getControlObjectId(), skill, effectCurTime);
 						}
 					}
@@ -148,9 +130,7 @@ public class PetSkillSaveDAOMySQL implements PetSkillSaveDAO
 			
 			ps2.setInt(1, pet.getControlObjectId());
 			ps2.executeUpdate();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Could not restore {} active effect data!", pet, e);
 		}
 	}

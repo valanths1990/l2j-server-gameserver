@@ -18,9 +18,6 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +26,8 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.PlayerSkillSaveDAO;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.model.TimeStamp;
@@ -43,76 +40,64 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Player Skill Save DAO MySQL implementation.
  * @author Zoey76
  */
-public class PlayerSkillSaveDAOMySQLImpl implements PlayerSkillSaveDAO
-{
+public class PlayerSkillSaveDAOMySQLImpl implements PlayerSkillSaveDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(PlayerSkillSaveDAOMySQLImpl.class);
 	
 	private static final String INSERT = "INSERT INTO character_skills_save (charId,skill_id,skill_level,remaining_time,reuse_delay,systime,restore_type,class_index,buff_index) VALUES (?,?,?,?,?,?,?,?,?)";
+	
 	private static final String SELECT = "SELECT skill_id,skill_level,remaining_time, reuse_delay, systime, restore_type FROM character_skills_save WHERE charId=? AND class_index=? ORDER BY buff_index ASC";
+	
 	private static final String DELETE = "DELETE FROM character_skills_save WHERE charId=? AND class_index=?";
 	
 	@Override
-	public void delete(L2PcInstance player, int classIndex)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE))
-		{
+	public void delete(L2PcInstance player, int classIndex) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, classIndex);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not delete all effect data!", player, e);
 		}
 	}
 	
 	@Override
-	public void delete(L2PcInstance player)
-	{
+	public void delete(L2PcInstance player) {
 		delete(player, player.getClassIndex());
 	}
 	
 	@Override
-	public void insert(L2PcInstance player, boolean storeEffects)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+	public void insert(L2PcInstance player, boolean storeEffects) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			int buff_index = 0;
 			final List<Integer> storedSkills = new ArrayList<>();
 			
 			// Store all effect data along with calculated remaining
 			// reuse delays for matching skills. 'restore_type'= 0.
-			if (storeEffects)
-			{
-				for (BuffInfo info : player.getEffectList().getEffects())
-				{
-					if (info == null)
-					{
+			if (storeEffects) {
+				for (BuffInfo info : player.getEffectList().getEffects()) {
+					if (info == null) {
 						continue;
 					}
 					
 					final Skill skill = info.getSkill();
 					// Do not save heals.
-					if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS)
-					{
+					if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS) {
 						continue;
 					}
 					
-					if (skill.isToggle())
-					{
+					if (skill.isToggle()) {
 						continue;
 					}
 					
 					// Dances and songs are not kept in retail.
-					if (skill.isDance() && !Config.ALT_STORE_DANCES)
-					{
+					if (skill.isDance() && !Config.ALT_STORE_DANCES) {
 						continue;
 					}
 					
-					if (storedSkills.contains(skill.getReuseHashCode()))
-					{
+					if (storedSkills.contains(skill.getReuseHashCode())) {
 						continue;
 					}
 					
@@ -136,19 +121,15 @@ public class PlayerSkillSaveDAOMySQLImpl implements PlayerSkillSaveDAO
 			
 			// Skills under reuse.
 			final Map<Integer, TimeStamp> reuseTimeStamps = player.getSkillReuseTimeStamps();
-			if (reuseTimeStamps != null)
-			{
-				for (Entry<Integer, TimeStamp> ts : reuseTimeStamps.entrySet())
-				{
+			if (reuseTimeStamps != null) {
+				for (Entry<Integer, TimeStamp> ts : reuseTimeStamps.entrySet()) {
 					final int hash = ts.getKey();
-					if (storedSkills.contains(hash))
-					{
+					if (storedSkills.contains(hash)) {
 						continue;
 					}
 					
 					final TimeStamp t = ts.getValue();
-					if ((t != null) && t.hasNotPassed())
-					{
+					if ((t != null) && t.hasNotPassed()) {
 						storedSkills.add(hash);
 						
 						ps.setInt(1, player.getObjectId());
@@ -164,46 +145,37 @@ public class PlayerSkillSaveDAOMySQLImpl implements PlayerSkillSaveDAO
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not store {} effect data!", player, e);
 		}
 	}
 	
 	@Override
-	public void load(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+	public void load(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, player.getClassIndex());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					int remainingTime = rs.getInt("remaining_time");
 					long reuseDelay = rs.getLong("reuse_delay");
 					long systime = rs.getLong("systime");
 					int restoreType = rs.getInt("restore_type");
 					
 					final Skill skill = SkillData.getInstance().getSkill(rs.getInt("skill_id"), rs.getInt("skill_level"));
-					if (skill == null)
-					{
+					if (skill == null) {
 						continue;
 					}
 					
 					final long time = systime - System.currentTimeMillis();
-					if (time > 10)
-					{
+					if (time > 10) {
 						player.disableSkill(skill, time);
 						player.addTimeStamp(skill, reuseDelay, systime);
 					}
 					
 					// Restore Type 1 The remaining skills lost effect upon logout but were still under a high reuse delay.
-					if (restoreType > 0)
-					{
+					if (restoreType > 0) {
 						continue;
 					}
 					
@@ -212,9 +184,7 @@ public class PlayerSkillSaveDAOMySQLImpl implements PlayerSkillSaveDAO
 					skill.applyEffects(player, player, false, remainingTime);
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore {} active effect data!", player, e);
 		}
 	}

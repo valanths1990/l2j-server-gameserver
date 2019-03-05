@@ -18,10 +18,7 @@
  */
 package com.l2jserver.gameserver.taskmanager.tasks;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.taskmanager.Task;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
 import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
@@ -30,45 +27,37 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
 /**
  * @author Layane
  */
-public class TaskRecom extends Task
-{
+public class TaskRecom extends Task {
+	
 	private static final String NAME = "recommendations";
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 	
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
-			try (PreparedStatement ps = con.prepareStatement("UPDATE character_reco_bonus SET rec_left=?, time_left=?, rec_have=0 WHERE rec_have <=  20"))
-			{
+	public void onTimeElapsed(ExecutedTask task) {
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
+			try (var ps = con.prepareStatement("UPDATE character_reco_bonus SET rec_left=?, time_left=?, rec_have=0 WHERE rec_have <=  20")) {
 				ps.setInt(1, 0); // Rec left = 0
 				ps.setInt(2, 3600000); // Timer = 1 hour
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("UPDATE character_reco_bonus SET rec_left=?, time_left=?, rec_have=GREATEST(rec_have-20,0) WHERE rec_have > 20"))
-			{
+			try (var ps = con.prepareStatement("UPDATE character_reco_bonus SET rec_left=?, time_left=?, rec_have=GREATEST(rec_have-20,0) WHERE rec_have > 20")) {
 				ps.setInt(1, 0); // Rec left = 0
 				ps.setInt(2, 3600000); // Timer = 1 hour
 				ps.execute();
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.severe(getClass().getSimpleName() + ": Could not reset Recommendations System: " + e);
 		}
 		_log.info("Recommendations System reseted");
 	}
 	
 	@Override
-	public void initializate()
-	{
+	public void initializate() {
 		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", "06:30:00", "");
 	}

@@ -18,14 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.ItemDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
@@ -33,26 +29,21 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Item DAO MySQL implementation.
  * @author Zoey76
  */
-public class ItemDAOMySQLImpl implements ItemDAO
-{
+public class ItemDAOMySQLImpl implements ItemDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ItemDAOMySQLImpl.class);
 	
 	private static final String SELECT = "SELECT object_id FROM `items` WHERE `owner_id`=? AND (`loc`='PET' OR `loc`='PET_EQUIP') LIMIT 1;";
 	
 	@Override
-	public void loadPetInventory(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+	public void loadPetInventory(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			ps.setInt(1, player.getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
+			try (var rs = ps.executeQuery()) {
 				player.setPetInvItems(rs.next() && (rs.getInt("object_id") > 0));
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not check Items in Pet Inventory for {}, {}", player, e);
 		}
 	}

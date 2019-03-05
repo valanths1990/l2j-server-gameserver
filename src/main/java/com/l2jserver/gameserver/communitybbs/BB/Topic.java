@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.communitybbs.BB;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.communitybbs.Manager.TopicBBSManager;
 
-public class Topic
-{
+public class Topic {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(Topic.class);
 	
 	public static final int MORMAL = 0;
@@ -43,19 +40,7 @@ public class Topic
 	private final int _type;
 	private final int _cReply;
 	
-	/**
-	 * @param ct
-	 * @param id
-	 * @param fid
-	 * @param name
-	 * @param date
-	 * @param oname
-	 * @param oid
-	 * @param type
-	 * @param Creply
-	 */
-	public Topic(ConstructorType ct, int id, int fid, String name, long date, String oname, int oid, int type, int Creply)
-	{
+	public Topic(ConstructorType ct, int id, int fid, String name, long date, String oname, int oid, int type, int Creply) {
 		_id = id;
 		_forumId = fid;
 		_topicName = name;
@@ -66,18 +51,14 @@ public class Topic
 		_cReply = Creply;
 		TopicBBSManager.getInstance().addTopic(this);
 		
-		if (ct == ConstructorType.CREATE)
-		{
-			
+		if (ct == ConstructorType.CREATE) {
 			insertindb();
 		}
 	}
 	
-	public void insertindb()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("INSERT INTO topic (topic_id,topic_forum_id,topic_name,topic_date,topic_ownername,topic_ownerid,topic_type,topic_reply) values (?,?,?,?,?,?,?,?)"))
-		{
+	public void insertindb() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("INSERT INTO topic (topic_id,topic_forum_id,topic_name,topic_date,topic_ownername,topic_ownerid,topic_type,topic_reply) values (?,?,?,?,?,?,?,?)")) {
 			ps.setInt(1, _id);
 			ps.setInt(2, _forumId);
 			ps.setString(3, _topicName);
@@ -87,70 +68,46 @@ public class Topic
 			ps.setInt(7, _type);
 			ps.setInt(8, _cReply);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Error while saving new Topic to database!", e);
 		}
 	}
 	
-	public enum ConstructorType
-	{
+	public enum ConstructorType {
 		RESTORE,
 		CREATE
 	}
 	
-	/**
-	 * @return the topic Id
-	 */
-	public int getID()
-	{
+	public int getID() {
 		return _id;
 	}
 	
-	public int getForumID()
-	{
+	public int getForumID() {
 		return _forumId;
 	}
 	
-	/**
-	 * @return the topic name
-	 */
-	public String getName()
-	{
+	public String getName() {
 		return _topicName;
 	}
 	
-	public String getOwnerName()
-	{
+	public String getOwnerName() {
 		return _ownerName;
 	}
 	
-	/**
-	 * @param f
-	 */
-	public void deleteme(Forum f)
-	{
+	public long getDate() {
+		return _date;
+	}
+	
+	public void deleteme(Forum f) {
 		TopicBBSManager.getInstance().delTopic(this);
 		f.rmTopicByID(getID());
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM topic WHERE topic_id=? AND topic_forum_id=?"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("DELETE FROM topic WHERE topic_id=? AND topic_forum_id=?")) {
 			ps.setInt(1, getID());
 			ps.setInt(2, f.getID());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Error while deleting topic ID {} from database!", getID(), e);
 		}
-	}
-	
-	/**
-	 * @return the topic date
-	 */
-	public long getDate()
-	{
-		return _date;
 	}
 }

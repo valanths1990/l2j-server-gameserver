@@ -36,27 +36,30 @@ import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2DoorTemplate;
 import com.l2jserver.gameserver.pathfinding.AbstractNodeLoc;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Loads doors.
- * @author JIV, GodKratos, UnAfraid
+ * @author JIV
+ * @author GodKratos
+ * @authro UnAfraid
  */
-public class DoorData implements IXmlReader
-{
+public class DoorData implements IXmlReader {
+	
 	private static final Map<String, Set<Integer>> _groups = new HashMap<>();
+	
 	private final Map<Integer, L2DoorInstance> _doors = new HashMap<>();
+	
 	private final Map<Integer, StatsSet> _templates = new HashMap<>();
+	
 	private final Map<Integer, List<L2DoorInstance>> _regions = new HashMap<>();
 	
-	protected DoorData()
-	{
+	protected DoorData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_doors.clear();
 		_groups.clear();
 		_regions.clear();
@@ -65,21 +68,15 @@ public class DoorData implements IXmlReader
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node a = doc.getFirstChild(); a != null; a = a.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(a.getNodeName()))
-			{
-				for (Node b = a.getFirstChild(); b != null; b = b.getNextSibling())
-				{
-					if ("door".equalsIgnoreCase(b.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node a = doc.getFirstChild(); a != null; a = a.getNextSibling()) {
+			if ("list".equalsIgnoreCase(a.getNodeName())) {
+				for (Node b = a.getFirstChild(); b != null; b = b.getNextSibling()) {
+					if ("door".equalsIgnoreCase(b.getNodeName())) {
 						final NamedNodeMap attrs = b.getAttributes();
 						final StatsSet set = new StatsSet();
 						set.set("baseHpMax", 1); // Avoid doors without HP value created dead due to default value 0 in L2CharTemplate
-						for (int i = 0; i < attrs.getLength(); i++)
-						{
+						for (int i = 0; i < attrs.getLength(); i++) {
 							final Node att = attrs.item(i);
 							set.set(att.getNodeName(), att.getNodeValue());
 						}
@@ -91,8 +88,7 @@ public class DoorData implements IXmlReader
 		}
 	}
 	
-	public void insertCollisionData(StatsSet set)
-	{
+	public void insertCollisionData(StatsSet set) {
 		int posX, posY, nodeX, nodeY, height;
 		height = set.getInt("height");
 		String[] pos = set.getString("node1").split(",");
@@ -103,8 +99,7 @@ public class DoorData implements IXmlReader
 		posY = Integer.parseInt(pos[1]);
 		int collisionRadius; // (max) radius for movement checks
 		collisionRadius = Math.min(Math.abs(nodeX - posX), Math.abs(nodeY - posY));
-		if (collisionRadius < 20)
-		{
+		if (collisionRadius < 20) {
 			collisionRadius = 20;
 		}
 		
@@ -115,8 +110,7 @@ public class DoorData implements IXmlReader
 	/**
 	 * @param set
 	 */
-	private void makeDoor(StatsSet set)
-	{
+	private void makeDoor(StatsSet set) {
 		insertCollisionData(set);
 		L2DoorTemplate template = new L2DoorTemplate(set);
 		L2DoorInstance door = new L2DoorInstance(template);
@@ -125,55 +119,45 @@ public class DoorData implements IXmlReader
 		putDoor(door, MapRegionManager.getInstance().getMapRegionLocId(door));
 	}
 	
-	public StatsSet getDoorTemplate(int doorId)
-	{
+	public StatsSet getDoorTemplate(int doorId) {
 		return _templates.get(doorId);
 	}
 	
-	public L2DoorInstance getDoor(int doorId)
-	{
+	public L2DoorInstance getDoor(int doorId) {
 		return _doors.get(doorId);
 	}
 	
-	public void putDoor(L2DoorInstance door, int region)
-	{
+	public void putDoor(L2DoorInstance door, int region) {
 		_doors.put(door.getId(), door);
 		
-		if (!_regions.containsKey(region))
-		{
+		if (!_regions.containsKey(region)) {
 			_regions.put(region, new ArrayList<L2DoorInstance>());
 		}
 		_regions.get(region).add(door);
 	}
 	
-	public static void addDoorGroup(String groupName, int doorId)
-	{
+	public static void addDoorGroup(String groupName, int doorId) {
 		Set<Integer> set = _groups.get(groupName);
-		if (set == null)
-		{
+		if (set == null) {
 			set = new HashSet<>();
 			_groups.put(groupName, set);
 		}
 		set.add(doorId);
 	}
 	
-	public static Set<Integer> getDoorsByGroup(String groupName)
-	{
+	public static Set<Integer> getDoorsByGroup(String groupName) {
 		return _groups.get(groupName);
 	}
 	
-	public Collection<L2DoorInstance> getDoors()
-	{
+	public Collection<L2DoorInstance> getDoors() {
 		return _doors.values();
 	}
 	
-	public boolean checkIfDoorsBetween(AbstractNodeLoc start, AbstractNodeLoc end, int instanceId)
-	{
+	public boolean checkIfDoorsBetween(AbstractNodeLoc start, AbstractNodeLoc end, int instanceId) {
 		return checkIfDoorsBetween(start.getX(), start.getY(), start.getZ(), end.getX(), end.getY(), end.getZ(), instanceId);
 	}
 	
-	public boolean checkIfDoorsBetween(int x, int y, int z, int tx, int ty, int tz, int instanceId)
-	{
+	public boolean checkIfDoorsBetween(int x, int y, int z, int tx, int ty, int tz, int instanceId) {
 		return checkIfDoorsBetween(x, y, z, tx, ty, tz, instanceId, false);
 	}
 	
@@ -189,53 +173,41 @@ public class DoorData implements IXmlReader
 	 * @param doubleFaceCheck
 	 * @return {@code boolean}
 	 */
-	public boolean checkIfDoorsBetween(int x, int y, int z, int tx, int ty, int tz, int instanceId, boolean doubleFaceCheck)
-	{
+	public boolean checkIfDoorsBetween(int x, int y, int z, int tx, int ty, int tz, int instanceId, boolean doubleFaceCheck) {
 		Collection<L2DoorInstance> allDoors;
-		if ((instanceId > 0) && (InstanceManager.getInstance().getInstance(instanceId) != null))
-		{
+		if ((instanceId > 0) && (InstanceManager.getInstance().getInstance(instanceId) != null)) {
 			allDoors = InstanceManager.getInstance().getInstance(instanceId).getDoors();
-		}
-		else
-		{
+		} else {
 			allDoors = _regions.get(MapRegionManager.getInstance().getMapRegionLocId(x, y));
 		}
 		
-		if (allDoors == null)
-		{
+		if (allDoors == null) {
 			return false;
 		}
 		
-		for (L2DoorInstance doorInst : allDoors)
-		{
+		for (L2DoorInstance doorInst : allDoors) {
 			// check dead and open
-			if (doorInst.isDead() || doorInst.getOpen() || !doorInst.checkCollision() || (doorInst.getX(0) == 0))
-			{
+			if (doorInst.isDead() || doorInst.getOpen() || !doorInst.checkCollision() || (doorInst.getX(0) == 0)) {
 				continue;
 			}
 			
 			boolean intersectFace = false;
-			for (int i = 0; i < 4; i++)
-			{
+			for (int i = 0; i < 4; i++) {
 				int j = (i + 1) < 4 ? i + 1 : 0;
 				// lower part of the multiplier fraction, if it is 0 we avoid an error and also know that the lines are parallel
 				int denominator = ((ty - y) * (doorInst.getX(i) - doorInst.getX(j))) - ((tx - x) * (doorInst.getY(i) - doorInst.getY(j)));
-				if (denominator == 0)
-				{
+				if (denominator == 0) {
 					continue;
 				}
 				
 				// multipliers to the equations of the lines. If they are lower than 0 or bigger than 1, we know that segments don't intersect
 				float multiplier1 = (float) (((doorInst.getX(j) - doorInst.getX(i)) * (y - doorInst.getY(i))) - ((doorInst.getY(j) - doorInst.getY(i)) * (x - doorInst.getX(i)))) / denominator;
 				float multiplier2 = (float) (((tx - x) * (y - doorInst.getY(i))) - ((ty - y) * (x - doorInst.getX(i)))) / denominator;
-				if ((multiplier1 >= 0) && (multiplier1 <= 1) && (multiplier2 >= 0) && (multiplier2 <= 1))
-				{
+				if ((multiplier1 >= 0) && (multiplier1 <= 1) && (multiplier2 >= 0) && (multiplier2 <= 1)) {
 					int intersectZ = Math.round(z + (multiplier1 * (tz - z)));
 					// now checking if the resulting point is between door's min and max z
-					if ((intersectZ > doorInst.getZMin()) && (intersectZ < doorInst.getZMax()))
-					{
-						if (!doubleFaceCheck || intersectFace)
-						{
+					if ((intersectZ > doorInst.getZMin()) && (intersectZ < doorInst.getZMax())) {
+						if (!doubleFaceCheck || intersectFace) {
 							return true;
 						}
 						intersectFace = true;
@@ -246,13 +218,11 @@ public class DoorData implements IXmlReader
 		return false;
 	}
 	
-	public static DoorData getInstance()
-	{
+	public static DoorData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final DoorData _instance = new DoorData();
 	}
 }

@@ -18,14 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.PremiumItemDAO;
 import com.l2jserver.gameserver.model.L2PremiumItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -34,23 +30,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Premium Item DAO MySQL implementation.
  * @author Zoey76
  */
-public class PremiumItemDAOMySQLImpl implements PremiumItemDAO
-{
+public class PremiumItemDAOMySQLImpl implements PremiumItemDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(PremiumItemDAOMySQLImpl.class);
 	
 	private static final String GET_PREMIUM_ITEMS = "SELECT itemNum, itemId, itemCount, itemSender FROM character_premium_items WHERE charId=?";
 	
 	@Override
-	public void load(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(GET_PREMIUM_ITEMS))
-		{
+	public void load(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(GET_PREMIUM_ITEMS)) {
 			ps.setInt(1, player.getObjectId());
-			try (ResultSet rset = ps.executeQuery())
-			{
-				while (rset.next())
-				{
+			try (var rset = ps.executeQuery()) {
+				while (rset.next()) {
 					int itemNum = rset.getInt("itemNum");
 					int itemId = rset.getInt("itemId");
 					long itemCount = rset.getLong("itemCount");
@@ -58,42 +50,32 @@ public class PremiumItemDAOMySQLImpl implements PremiumItemDAO
 					player.getPremiumItemList().put(itemNum, new L2PremiumItem(itemId, itemCount, itemSender));
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore premium items: {}", e);
 		}
 	}
 	
 	@Override
-	public void update(L2PcInstance player, int itemNum, long newcount)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("UPDATE character_premium_items SET itemCount=? WHERE charId=? AND itemNum=? "))
-		{
+	public void update(L2PcInstance player, int itemNum, long newcount) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("UPDATE character_premium_items SET itemCount=? WHERE charId=? AND itemNum=? ")) {
 			ps.setLong(1, newcount);
 			ps.setInt(2, player.getObjectId());
 			ps.setInt(3, itemNum);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not update premium items: {}", e);
 		}
 	}
 	
 	@Override
-	public void delete(L2PcInstance player, int itemNum)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM character_premium_items WHERE charId=? AND itemNum=? "))
-		{
+	public void delete(L2PcInstance player, int itemNum) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("DELETE FROM character_premium_items WHERE charId=? AND itemNum=? ")) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, itemNum);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not delete premium item: {}" + e);
 		}
 	}

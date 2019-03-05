@@ -38,7 +38,7 @@ import static com.l2jserver.gameserver.network.SystemMessageId.YOUR_SPONSOR_C1_H
 
 import java.util.Base64;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.LoginServerThread;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.cache.HtmCache;

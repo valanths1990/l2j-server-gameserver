@@ -18,17 +18,12 @@
  */
 package com.l2jserver.gameserver.instancemanager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.AirShipTeleportList;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.VehiclePathPoint;
@@ -38,8 +33,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2CharTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ExAirShipTeleportList;
 
-public class AirShipManager
-{
+public class AirShipManager {
 	private static final Logger _log = Logger.getLogger(AirShipManager.class.getName());
 	
 	private static final String LOAD_DB = "SELECT * FROM airships";
@@ -51,8 +45,7 @@ public class AirShipManager
 	private final Map<Integer, L2AirShipInstance> _airShips = new HashMap<>();
 	private final Map<Integer, AirShipTeleportList> _teleports = new HashMap<>();
 	
-	protected AirShipManager()
-	{
+	protected AirShipManager() {
 		StatsSet npcDat = new StatsSet();
 		npcDat.set("npcId", 9);
 		npcDat.set("level", 0);
@@ -101,8 +94,7 @@ public class AirShipManager
 		load();
 	}
 	
-	public L2AirShipInstance getNewAirShip(int x, int y, int z, int heading)
-	{
+	public L2AirShipInstance getNewAirShip(int x, int y, int z, int heading) {
 		final L2AirShipInstance airShip = new L2AirShipInstance(_airShipTemplate);
 		
 		airShip.setHeading(heading);
@@ -113,22 +105,17 @@ public class AirShipManager
 		return airShip;
 	}
 	
-	public L2AirShipInstance getNewAirShip(int x, int y, int z, int heading, int ownerId)
-	{
+	public L2AirShipInstance getNewAirShip(int x, int y, int z, int heading, int ownerId) {
 		final StatsSet info = _airShipsInfo.get(ownerId);
-		if (info == null)
-		{
+		if (info == null) {
 			return null;
 		}
 		
 		final L2AirShipInstance airShip;
-		if (_airShips.containsKey(ownerId))
-		{
+		if (_airShips.containsKey(ownerId)) {
 			airShip = _airShips.get(ownerId);
 			airShip.refreshID();
-		}
-		else
-		{
+		} else {
 			airShip = new L2ControllableAirShipInstance(_airShipTemplate, ownerId);
 			_airShips.put(ownerId, airShip);
 			
@@ -144,88 +131,67 @@ public class AirShipManager
 		return airShip;
 	}
 	
-	public void removeAirShip(L2AirShipInstance ship)
-	{
-		if (ship.getOwnerId() != 0)
-		{
+	public void removeAirShip(L2AirShipInstance ship) {
+		if (ship.getOwnerId() != 0) {
 			storeInDb(ship.getOwnerId());
 			final StatsSet info = _airShipsInfo.get(ship.getOwnerId());
-			if (info != null)
-			{
+			if (info != null) {
 				info.set("fuel", ship.getFuel());
 			}
 		}
 	}
 	
-	public boolean hasAirShipLicense(int ownerId)
-	{
+	public boolean hasAirShipLicense(int ownerId) {
 		return _airShipsInfo.containsKey(ownerId);
 	}
 	
-	public void registerLicense(int ownerId)
-	{
-		if (!_airShipsInfo.containsKey(ownerId))
-		{
+	public void registerLicense(int ownerId) {
+		if (!_airShipsInfo.containsKey(ownerId)) {
 			final StatsSet info = new StatsSet();
 			info.set("fuel", 600);
 			
 			_airShipsInfo.put(ownerId, info);
 			
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(ADD_DB))
-			{
+			try (var con = ConnectionFactory.getInstance().getConnection();
+				var ps = con.prepareStatement(ADD_DB)) {
 				ps.setInt(1, ownerId);
 				ps.setInt(2, info.getInt("fuel"));
 				ps.executeUpdate();
-			}
-			catch (SQLException e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not add new airship license: " + e.getMessage(), e);
-			}
-			catch (Exception e)
-			{
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while initializing: " + e.getMessage(), e);
 			}
 		}
 	}
 	
-	public boolean hasAirShip(int ownerId)
-	{
+	public boolean hasAirShip(int ownerId) {
 		final L2AirShipInstance ship = _airShips.get(ownerId);
-		if ((ship == null) || !(ship.isVisible() || ship.isTeleporting()))
-		{
+		if ((ship == null) || !(ship.isVisible() || ship.isTeleporting())) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	public void registerAirShipTeleportList(int dockId, int locationId, VehiclePathPoint[][] tp, int[] fuelConsumption)
-	{
-		if (tp.length != fuelConsumption.length)
-		{
+	public void registerAirShipTeleportList(int dockId, int locationId, VehiclePathPoint[][] tp, int[] fuelConsumption) {
+		if (tp.length != fuelConsumption.length) {
 			return;
 		}
 		
 		_teleports.put(dockId, new AirShipTeleportList(locationId, fuelConsumption, tp));
 	}
 	
-	public void sendAirShipTeleportList(L2PcInstance player)
-	{
-		if ((player == null) || !player.isInAirShip())
-		{
+	public void sendAirShipTeleportList(L2PcInstance player) {
+		if ((player == null) || !player.isInAirShip()) {
 			return;
 		}
 		
 		final L2AirShipInstance ship = player.getAirShip();
-		if (!ship.isCaptain(player) || !ship.isInDock() || ship.isMoving())
-		{
+		if (!ship.isCaptain(player) || !ship.isInDock() || ship.isMoving()) {
 			return;
 		}
 		
 		int dockId = ship.getDockId();
-		if (!_teleports.containsKey(dockId))
-		{
+		if (!_teleports.containsKey(dockId)) {
 			return;
 		}
 		
@@ -233,95 +199,69 @@ public class AirShipManager
 		player.sendPacket(new ExAirShipTeleportList(all.getLocation(), all.getRoute(), all.getFuel()));
 	}
 	
-	public VehiclePathPoint[] getTeleportDestination(int dockId, int index)
-	{
+	public VehiclePathPoint[] getTeleportDestination(int dockId, int index) {
 		final AirShipTeleportList all = _teleports.get(dockId);
-		if (all == null)
-		{
+		if (all == null) {
 			return null;
 		}
 		
-		if ((index < -1) || (index >= all.getRoute().length))
-		{
+		if ((index < -1) || (index >= all.getRoute().length)) {
 			return null;
 		}
 		
 		return all.getRoute()[index + 1];
 	}
 	
-	public int getFuelConsumption(int dockId, int index)
-	{
+	public int getFuelConsumption(int dockId, int index) {
 		final AirShipTeleportList all = _teleports.get(dockId);
-		if (all == null)
-		{
+		if (all == null) {
 			return 0;
 		}
 		
-		if ((index < -1) || (index >= all.getFuel().length))
-		{
+		if ((index < -1) || (index >= all.getFuel().length)) {
 			return 0;
 		}
 		
 		return all.getFuel()[index + 1];
 	}
 	
-	private void load()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement();
-			ResultSet rs = s.executeQuery(LOAD_DB))
-		{
+	private void load() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement();
+			var rs = s.executeQuery(LOAD_DB)) {
 			StatsSet info;
-			while (rs.next())
-			{
+			while (rs.next()) {
 				info = new StatsSet();
 				info.set("fuel", rs.getInt("fuel"));
 				_airShipsInfo.put(rs.getInt("owner_id"), info);
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not load airships table: " + e.getMessage(), e);
-		}
-		catch (Exception e)
-		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while initializing: " + e.getMessage(), e);
 		}
 		_log.info(getClass().getSimpleName() + ": Loaded " + _airShipsInfo.size() + " private airships");
 	}
 	
-	private void storeInDb(int ownerId)
-	{
+	private void storeInDb(int ownerId) {
 		StatsSet info = _airShipsInfo.get(ownerId);
-		if (info == null)
-		{
+		if (info == null) {
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE_DB))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(UPDATE_DB)) {
 			ps.setInt(1, info.getInt("fuel"));
 			ps.setInt(2, ownerId);
 			ps.executeUpdate();
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not update airships table: " + e.getMessage(), e);
-		}
-		catch (Exception e)
-		{
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while save: " + e.getMessage(), e);
 		}
 	}
 	
-	public static final AirShipManager getInstance()
-	{
+	public static final AirShipManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final AirShipManager _instance = new AirShipManager();
 	}
 }

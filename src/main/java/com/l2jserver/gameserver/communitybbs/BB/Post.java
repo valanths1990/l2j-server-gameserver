@@ -18,27 +18,23 @@
  */
 package com.l2jserver.gameserver.communitybbs.BB;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.communitybbs.Manager.PostBBSManager;
 
 /**
  * @author Maktakien
  */
-public class Post
-{
+public class Post {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(Post.class);
 	
-	public static class CPost
-	{
+	public static class CPost {
 		public int postId;
 		public String postOwner;
 		public int postOwnerId;
@@ -58,8 +54,7 @@ public class Post
 	 * @param _PostForumID
 	 * @param txt
 	 */
-	public Post(String _PostOwner, int _PostOwnerID, long date, int tid, int _PostForumID, String txt)
-	{
+	public Post(String _PostOwner, int _PostOwnerID, long date, int tid, int _PostForumID, String txt) {
 		final CPost cp = new CPost();
 		cp.postId = 0;
 		cp.postOwner = _PostOwner;
@@ -73,16 +68,13 @@ public class Post
 		
 	}
 	
-	public Post(Topic t)
-	{
+	public Post(Topic t) {
 		load(t);
 	}
 	
-	public void insertindb(CPost cp)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("INSERT INTO posts (post_id,post_owner_name,post_ownerid,post_date,post_topic_id,post_forum_id,post_txt) values (?,?,?,?,?,?,?)"))
-		{
+	public void insertindb(CPost cp) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("INSERT INTO posts (post_id,post_owner_name,post_ownerid,post_date,post_topic_id,post_forum_id,post_txt) values (?,?,?,?,?,?,?)")) {
 			ps.setInt(1, cp.postId);
 			ps.setString(2, cp.postOwner);
 			ps.setInt(3, cp.postOwnerId);
@@ -91,48 +83,34 @@ public class Post
 			ps.setInt(6, cp.postForumId);
 			ps.setString(7, cp.postTxt);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Could not save post ID {} in database!", cp.postId, e);
 		}
 	}
 	
-	public CPost getCPost(int id)
-	{
+	public CPost getCPost(int id) {
 		return _post.get(id);
 	}
 	
-	public void deleteme(Topic t)
-	{
+	public void deleteme(Topic t) {
 		PostBBSManager.getInstance().delPostByTopic(t);
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM posts WHERE post_forum_id=? AND post_topic_id=?"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("DELETE FROM posts WHERE post_forum_id=? AND post_topic_id=?")) {
 			ps.setInt(1, t.getForumID());
 			ps.setInt(2, t.getID());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Unable to delete post for topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
 		}
 	}
 	
-	/**
-	 * @param t
-	 */
-	private void load(Topic t)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT * FROM posts WHERE post_forum_id=? AND post_topic_id=? ORDER BY post_id ASC"))
-		{
+	private void load(Topic t) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("SELECT * FROM posts WHERE post_forum_id=? AND post_topic_id=? ORDER BY post_id ASC")) {
 			ps.setInt(1, t.getForumID());
 			ps.setInt(2, t.getID());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					final CPost cp = new CPost();
 					cp.postId = rs.getInt("post_id");
 					cp.postOwner = rs.getString("post_owner_name");
@@ -144,30 +122,21 @@ public class Post
 					_post.add(cp);
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Unable to get post from topic ID {} in forum ID {} from database!", t.getForumID(), t.getID(), e);
 		}
 	}
 	
-	/**
-	 * @param i
-	 */
-	public void updatetxt(int i)
-	{
+	public void updatetxt(int i) {
 		final CPost cp = getCPost(i);
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("UPDATE posts SET post_txt=? WHERE post_id=? AND post_topic_id=? AND post_forum_id=?"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("UPDATE posts SET post_txt=? WHERE post_id=? AND post_topic_id=? AND post_forum_id=?")) {
 			ps.setString(1, cp.postTxt);
 			ps.setInt(2, cp.postId);
 			ps.setInt(3, cp.postTopicId);
 			ps.setInt(4, cp.postForumId);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Unable to store post ID {} in database!", cp.postId, e);
 		}
 	}

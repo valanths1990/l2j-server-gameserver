@@ -20,7 +20,7 @@ package com.l2jserver.gameserver.model.actor;
 
 import static com.l2jserver.gameserver.enums.InstanceType.L2Summon;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2SummonAI;

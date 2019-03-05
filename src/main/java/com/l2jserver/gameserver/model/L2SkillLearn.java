@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.base.SocialClass;

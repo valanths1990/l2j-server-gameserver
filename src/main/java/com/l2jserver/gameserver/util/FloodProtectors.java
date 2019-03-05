@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.util;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.network.L2GameClient;
 
 /**

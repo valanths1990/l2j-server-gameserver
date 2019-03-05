@@ -22,28 +22,24 @@ import java.util.List;
 
 import com.l2jserver.util.StringUtil;
 
-public class ShowBoard extends L2GameServerPacket
-{
+public class ShowBoard extends L2GameServerPacket {
+	
 	private final String _content;
 	
-	public ShowBoard(String htmlCode, String id)
-	{
+	public ShowBoard(String htmlCode, String id) {
 		_content = id + "\u0008" + htmlCode;
 	}
 	
-	public ShowBoard(List<String> arg)
-	{
+	public ShowBoard(List<String> arg) {
 		StringBuilder builder = new StringBuilder(5 + StringUtil.getLength(arg) + arg.size()).append("1002\u0008");
-		for (String str : arg)
-		{
+		for (String str : arg) {
 			builder.append(str).append("\u0008");
 		}
 		_content = builder.toString();
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x7B);
 		writeC(0x01); // c4 1 to show community 00 to hide
 		writeS("bypass _bbshome"); // top

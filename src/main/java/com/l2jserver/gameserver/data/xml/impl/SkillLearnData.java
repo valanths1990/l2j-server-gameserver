@@ -27,45 +27,36 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.model.base.ClassId;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Holds all skill learn data for all NPCs.
  * @author xban1x
  */
-public final class SkillLearnData implements IXmlReader
-{
+public final class SkillLearnData implements IXmlReader {
+	
 	private final Map<Integer, List<ClassId>> _skillLearn = new HashMap<>();
 	
-	protected SkillLearnData()
-	{
+	protected SkillLearnData() {
 		load();
 	}
 	
 	@Override
-	public synchronized void load()
-	{
+	public synchronized void load() {
 		_skillLearn.clear();
 		parseDatapackFile("data/skillLearn.xml");
 		LOG.info("{}: Loaded {} Skill Learn data.", getClass().getSimpleName(), _skillLearn.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(node.getNodeName()))
-			{
-				for (Node list_node = node.getFirstChild(); list_node != null; list_node = list_node.getNextSibling())
-				{
-					if ("npc".equalsIgnoreCase(list_node.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling()) {
+			if ("list".equalsIgnoreCase(node.getNodeName())) {
+				for (Node list_node = node.getFirstChild(); list_node != null; list_node = list_node.getNextSibling()) {
+					if ("npc".equalsIgnoreCase(list_node.getNodeName())) {
 						final List<ClassId> classIds = new ArrayList<>();
-						for (Node c = list_node.getFirstChild(); c != null; c = c.getNextSibling())
-						{
-							if ("classId".equalsIgnoreCase(c.getNodeName()))
-							{
+						for (Node c = list_node.getFirstChild(); c != null; c = c.getNextSibling()) {
+							if ("classId".equalsIgnoreCase(c.getNodeName())) {
 								classIds.add(ClassId.getClassId(Integer.parseInt(c.getTextContent())));
 							}
 						}
@@ -80,8 +71,7 @@ public final class SkillLearnData implements IXmlReader
 	 * @param npcId
 	 * @return {@link List} of {@link ClassId}'s that this npcId can teach.
 	 */
-	public List<ClassId> getSkillLearnData(int npcId)
-	{
+	public List<ClassId> getSkillLearnData(int npcId) {
 		return _skillLearn.get(npcId);
 	}
 	
@@ -89,13 +79,11 @@ public final class SkillLearnData implements IXmlReader
 	 * Gets the single instance of SkillLearnData.
 	 * @return single instance of SkillLearnData
 	 */
-	public static SkillLearnData getInstance()
-	{
+	public static SkillLearnData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final SkillLearnData _instance = new SkillLearnData();
 	}
 }

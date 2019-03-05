@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.fishing.L2Fish;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * This class holds the Fish information.

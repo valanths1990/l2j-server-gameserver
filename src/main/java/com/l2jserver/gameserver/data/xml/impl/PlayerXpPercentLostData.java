@@ -24,40 +24,33 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.Config;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * This class holds the Player Xp Percent Lost Data for each level for players.
  * @author Zealar
  */
-public final class PlayerXpPercentLostData implements IXmlReader
-{
+public final class PlayerXpPercentLostData implements IXmlReader {
+	
 	private final double[] _playerXpPercentLost = new double[Config.MAX_PLAYER_LEVEL + 1];
 	
-	protected PlayerXpPercentLostData()
-	{
+	protected PlayerXpPercentLostData() {
 		Arrays.fill(_playerXpPercentLost, 1.);
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		parseDatapackFile("data/stats/chars/playerXpPercentLost.xml");
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("xpLost".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("xpLost".equalsIgnoreCase(d.getNodeName())) {
 						NamedNodeMap attrs = d.getAttributes();
 						_playerXpPercentLost[parseInteger(attrs, "level")] = parseDouble(attrs, "val");
 					}
@@ -66,10 +59,8 @@ public final class PlayerXpPercentLostData implements IXmlReader
 		}
 	}
 	
-	public double getXpPercent(final int level)
-	{
-		if (level > Config.MAX_PLAYER_LEVEL)
-		{
+	public double getXpPercent(final int level) {
+		if (level > Config.MAX_PLAYER_LEVEL) {
 			LOG.warn("Require to high level inside PlayerXpPercentLostData ({})", level);
 			return _playerXpPercentLost[Config.MAX_PLAYER_LEVEL];
 		}
@@ -80,13 +71,11 @@ public final class PlayerXpPercentLostData implements IXmlReader
 	 * Gets the single instance of PlayerXpPercentLostData.
 	 * @return single instance of PlayerXpPercentLostData.
 	 */
-	public static PlayerXpPercentLostData getInstance()
-	{
+	public static PlayerXpPercentLostData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final PlayerXpPercentLostData _instance = new PlayerXpPercentLostData();
 	}
 }

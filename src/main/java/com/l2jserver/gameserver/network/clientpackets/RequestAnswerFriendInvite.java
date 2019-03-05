@@ -18,56 +18,47 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.logging.Level;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.FriendPacket;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-public final class RequestAnswerFriendInvite extends L2GameClientPacket
-{
+public final class RequestAnswerFriendInvite extends L2GameClientPacket {
+	
 	private static final String _C__78_REQUESTANSWERFRIENDINVITE = "[C] 78 RequestAnswerFriendInvite";
 	
 	private int _response;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_response = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
 		final L2PcInstance requestor = player.getActiveRequester();
-		if (requestor == null)
-		{
+		if (requestor == null) {
 			return;
 		}
 		
-		if (player.isFriend(requestor.getObjectId()) || requestor.isFriend(player.getObjectId()))
-		{
+		if (player.isFriend(requestor.getObjectId()) || requestor.isFriend(player.getObjectId())) {
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_IN_FRIENDS_LIST);
 			sm.addCharName(player);
 			requestor.sendPacket(sm);
 			return;
 		}
 		
-		if (_response == 1)
-		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement("INSERT INTO character_friends (charId, friendId) VALUES (?, ?), (?, ?)"))
-			{
+		if (_response == 1) {
+			try (var con = ConnectionFactory.getInstance().getConnection();
+				var statement = con.prepareStatement("INSERT INTO character_friends (charId, friendId) VALUES (?, ?), (?, ?)")) {
 				statement.setInt(1, requestor.getObjectId());
 				statement.setInt(2, player.getObjectId());
 				statement.setInt(3, player.getObjectId());
@@ -91,14 +82,10 @@ public final class RequestAnswerFriendInvite extends L2GameClientPacket
 				// Send notifications for both player in order to show them online
 				player.sendPacket(new FriendPacket(true, requestor.getObjectId()));
 				requestor.sendPacket(new FriendPacket(true, player.getObjectId()));
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.WARNING, "Could not add friend objectid: " + e.getMessage(), e);
 			}
-		}
-		else
-		{
+		} else {
 			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.FAILED_TO_INVITE_A_FRIEND);
 			requestor.sendPacket(msg);
 		}
@@ -108,8 +95,7 @@ public final class RequestAnswerFriendInvite extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__78_REQUESTANSWERFRIENDINVITE;
 	}
 }

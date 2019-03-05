@@ -27,25 +27,24 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.model.ActionKey;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * UI Data parser.
  * @author Zoey76
  */
-public class UIData implements IXmlReader
-{
+public class UIData implements IXmlReader {
+	
 	private final Map<Integer, List<ActionKey>> _storedKeys = new HashMap<>();
+	
 	private final Map<Integer, List<Integer>> _storedCategories = new HashMap<>();
 	
-	protected UIData()
-	{
+	protected UIData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_storedKeys.clear();
 		_storedCategories.clear();
 		parseDatapackFile("data/ui/ui_en.xml");
@@ -53,16 +52,11 @@ public class UIData implements IXmlReader
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("category".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("category".equalsIgnoreCase(d.getNodeName())) {
 						parseCategory(d);
 					}
 				}
@@ -70,68 +64,50 @@ public class UIData implements IXmlReader
 		}
 	}
 	
-	private void parseCategory(Node n)
-	{
+	private void parseCategory(Node n) {
 		final int cat = parseInteger(n.getAttributes(), "id");
-		for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-		{
-			if ("commands".equalsIgnoreCase(d.getNodeName()))
-			{
+		for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+			if ("commands".equalsIgnoreCase(d.getNodeName())) {
 				parseCommands(cat, d);
-			}
-			else if ("keys".equalsIgnoreCase(d.getNodeName()))
-			{
+			} else if ("keys".equalsIgnoreCase(d.getNodeName())) {
 				parseKeys(cat, d);
 			}
 		}
 	}
 	
-	private void parseCommands(int cat, Node d)
-	{
-		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
-		{
-			if ("cmd".equalsIgnoreCase(c.getNodeName()))
-			{
+	private void parseCommands(int cat, Node d) {
+		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
+			if ("cmd".equalsIgnoreCase(c.getNodeName())) {
 				addCategory(_storedCategories, cat, Integer.parseInt(c.getTextContent()));
 			}
 		}
 	}
 	
-	private void parseKeys(int cat, Node d)
-	{
-		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
-		{
-			if ("key".equalsIgnoreCase(c.getNodeName()))
-			{
+	private void parseKeys(int cat, Node d) {
+		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
+			if ("key".equalsIgnoreCase(c.getNodeName())) {
 				final ActionKey akey = new ActionKey(cat);
-				for (int i = 0; i < c.getAttributes().getLength(); i++)
-				{
+				for (int i = 0; i < c.getAttributes().getLength(); i++) {
 					final Node att = c.getAttributes().item(i);
 					final int val = Integer.parseInt(att.getNodeValue());
-					switch (att.getNodeName())
-					{
-						case "cmd":
-						{
+					switch (att.getNodeName()) {
+						case "cmd": {
 							akey.setCommandId(val);
 							break;
 						}
-						case "key":
-						{
+						case "key": {
 							akey.setKeyId(val);
 							break;
 						}
-						case "toggleKey1":
-						{
+						case "toggleKey1": {
 							akey.setToogleKey1(val);
 							break;
 						}
-						case "toggleKey2":
-						{
+						case "toggleKey2": {
 							akey.setToogleKey2(val);
 							break;
 						}
-						case "showType":
-						{
+						case "showType": {
 							akey.setShowStatus(val);
 							break;
 						}
@@ -148,8 +124,7 @@ public class UIData implements IXmlReader
 	 * @param cat the category
 	 * @param cmd the command
 	 */
-	public static void addCategory(Map<Integer, List<Integer>> map, int cat, int cmd)
-	{
+	public static void addCategory(Map<Integer, List<Integer>> map, int cat, int cmd) {
 		map.computeIfAbsent(cat, k -> new ArrayList<>()).add(cmd);
 	}
 	
@@ -159,34 +134,29 @@ public class UIData implements IXmlReader
 	 * @param cat the category
 	 * @param akey the action key
 	 */
-	public static void addKey(Map<Integer, List<ActionKey>> map, int cat, ActionKey akey)
-	{
+	public static void addKey(Map<Integer, List<ActionKey>> map, int cat, ActionKey akey) {
 		map.computeIfAbsent(cat, k -> new ArrayList<>()).add(akey);
 	}
 	
 	/**
 	 * @return the categories
 	 */
-	public Map<Integer, List<Integer>> getCategories()
-	{
+	public Map<Integer, List<Integer>> getCategories() {
 		return _storedCategories;
 	}
 	
 	/**
 	 * @return the keys
 	 */
-	public Map<Integer, List<ActionKey>> getKeys()
-	{
+	public Map<Integer, List<ActionKey>> getKeys() {
 		return _storedKeys;
 	}
 	
-	public static UIData getInstance()
-	{
+	public static UIData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final UIData _instance = new UIData();
 	}
 }

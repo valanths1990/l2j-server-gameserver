@@ -31,9 +31,6 @@ import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +41,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.L2GameClient;
@@ -78,8 +75,7 @@ import com.l2jserver.util.Util;
 import com.l2jserver.util.crypt.NewCrypt;
 import com.l2jserver.util.network.BaseSendablePacket;
 
-public class LoginServerThread extends Thread
-{
+public class LoginServerThread extends Thread {
 	protected static final Logger LOG = LoggerFactory.getLogger(LoginServerThread.class);
 	protected static final Logger LOG_ACCOUNTING = LoggerFactory.getLogger("accounting");
 	
@@ -116,20 +112,16 @@ public class LoginServerThread extends Thread
 	/**
 	 * Instantiates a new login server thread.
 	 */
-	protected LoginServerThread()
-	{
+	protected LoginServerThread() {
 		super("LoginServerThread");
 		_port = Config.GAME_SERVER_LOGIN_PORT;
 		_gamePort = Config.PORT_GAME;
 		_hostname = Config.GAME_SERVER_LOGIN_HOST;
 		_hexID = Config.HEX_ID;
-		if (_hexID == null)
-		{
+		if (_hexID == null) {
 			_requestID = Config.REQUEST_ID;
 			_hexID = Util.generateHex(16);
-		}
-		else
-		{
+		} else {
 			_requestID = Config.SERVER_ID;
 		}
 		_acceptAlternate = Config.ACCEPT_ALTERNATE_ID;
@@ -141,16 +133,13 @@ public class LoginServerThread extends Thread
 	}
 	
 	@Override
-	public void run()
-	{
-		while (!isInterrupted())
-		{
+	public void run() {
+		while (!isInterrupted()) {
 			int lengthHi = 0;
 			int lengthLo = 0;
 			int length = 0;
 			boolean checksumOk = false;
-			try
-			{
+			try {
 				// Connection
 				LOG.info("Connecting to login on {}:{}", _hostname, _port);
 				_loginSocket = new Socket(_hostname, _port);
@@ -160,19 +149,16 @@ public class LoginServerThread extends Thread
 				// init Blowfish
 				byte[] blowfishKey = Util.generateHex(40);
 				// Protect the new blowfish key what cannot begin with zero
-				if (blowfishKey[0] == 0)
-				{
+				if (blowfishKey[0] == 0) {
 					blowfishKey[0] = (byte) Rnd.get(32, 64);
 				}
 				_blowfish = new NewCrypt("_;v.]05-31!|+-%xT!^[$\00");
-				while (!isInterrupted())
-				{
+				while (!isInterrupted()) {
 					lengthLo = in.read();
 					lengthHi = in.read();
 					length = (lengthHi * 256) + lengthLo;
 					
-					if (lengthHi < 0)
-					{
+					if (lengthHi < 0) {
 						LOG.info("LoginServerThread: Login terminated the connection.");
 						break;
 					}
@@ -182,15 +168,13 @@ public class LoginServerThread extends Thread
 					int receivedBytes = 0;
 					int newBytes = 0;
 					int left = length - 2;
-					while ((newBytes != -1) && (receivedBytes < (length - 2)))
-					{
+					while ((newBytes != -1) && (receivedBytes < (length - 2))) {
 						newBytes = in.read(incoming, receivedBytes, left);
 						receivedBytes = receivedBytes + newBytes;
 						left -= newBytes;
 					}
 					
-					if (receivedBytes != (length - 2))
-					{
+					if (receivedBytes != (length - 2)) {
 						LOG.warn("Incomplete Packet is sent to the server, closing connection.(LS)");
 						break;
 					}
@@ -199,19 +183,16 @@ public class LoginServerThread extends Thread
 					_blowfish.decrypt(incoming, 0, incoming.length);
 					checksumOk = NewCrypt.verifyChecksum(incoming);
 					
-					if (!checksumOk)
-					{
+					if (!checksumOk) {
 						LOG.warn("Incorrect packet checksum, ignoring packet (LS)");
 						break;
 					}
 					
 					int packetType = incoming[0] & 0xff;
-					switch (packetType)
-					{
+					switch (packetType) {
 						case 0x00:
 							InitLS init = new InitLS(incoming);
-							if (init.getRevision() != REVISION)
-							{
+							if (init.getRevision() != REVISION) {
 								// TODO: revision mismatch
 								LOG.warn("/!\\ Revision mismatch between LS and GS /!\\");
 								break;
@@ -219,15 +200,12 @@ public class LoginServerThread extends Thread
 							
 							RSAPublicKey publicKey;
 							
-							try
-							{
+							try {
 								KeyFactory kfac = KeyFactory.getInstance("RSA");
 								BigInteger modulus = new BigInteger(init.getRSAKey());
 								RSAPublicKeySpec kspec1 = new RSAPublicKeySpec(modulus, RSAKeyGenParameterSpec.F4);
 								publicKey = (RSAPublicKey) kfac.generatePublic(kspec1);
-							}
-							catch (GeneralSecurityException e)
-							{
+							} catch (GeneralSecurityException e) {
 								LOG.warn("Trouble while init the public key send by login");
 								break;
 							}
@@ -249,41 +227,28 @@ public class LoginServerThread extends Thread
 							Config.saveHexid(serverID, hexToString(_hexID));
 							LOG.info("Registered on login as Server {}: {}", serverID, _serverName);
 							ServerStatus st = new ServerStatus();
-							if (Config.SERVER_LIST_BRACKET)
-							{
+							if (Config.SERVER_LIST_BRACKET) {
 								st.addAttribute(ServerStatus.SERVER_LIST_SQUARE_BRACKET, ServerStatus.ON);
-							}
-							else
-							{
+							} else {
 								st.addAttribute(ServerStatus.SERVER_LIST_SQUARE_BRACKET, ServerStatus.OFF);
 							}
 							st.addAttribute(ServerStatus.SERVER_TYPE, Config.SERVER_LIST_TYPE);
-							if (Config.SERVER_GMONLY)
-							{
+							if (Config.SERVER_GMONLY) {
 								st.addAttribute(ServerStatus.SERVER_LIST_STATUS, ServerStatus.STATUS_GM_ONLY);
-							}
-							else
-							{
+							} else {
 								st.addAttribute(ServerStatus.SERVER_LIST_STATUS, ServerStatus.STATUS_AUTO);
 							}
-							if (Config.SERVER_LIST_AGE == 15)
-							{
+							if (Config.SERVER_LIST_AGE == 15) {
 								st.addAttribute(ServerStatus.SERVER_AGE, ServerStatus.SERVER_AGE_15);
-							}
-							else if (Config.SERVER_LIST_AGE == 18)
-							{
+							} else if (Config.SERVER_LIST_AGE == 18) {
 								st.addAttribute(ServerStatus.SERVER_AGE, ServerStatus.SERVER_AGE_18);
-							}
-							else
-							{
+							} else {
 								st.addAttribute(ServerStatus.SERVER_AGE, ServerStatus.SERVER_AGE_ALL);
 							}
 							sendPacket(st);
-							if (L2World.getInstance().getAllPlayersCount() > 0)
-							{
+							if (L2World.getInstance().getAllPlayersCount() > 0) {
 								final List<String> playerList = new ArrayList<>();
-								for (L2PcInstance player : L2World.getInstance().getPlayers())
-								{
+								for (L2PcInstance player : L2World.getInstance().getPlayers()) {
 									playerList.add(player.getAccountName());
 								}
 								sendPacket(new PlayerInGame(playerList));
@@ -293,20 +258,15 @@ public class LoginServerThread extends Thread
 							PlayerAuthResponse par = new PlayerAuthResponse(incoming);
 							String account = par.getAccount();
 							WaitingClient wcToRemove = null;
-							synchronized (_waitingClients)
-							{
-								for (WaitingClient wc : _waitingClients)
-								{
-									if (wc.account.equals(account))
-									{
+							synchronized (_waitingClients) {
+								for (WaitingClient wc : _waitingClients) {
+									if (wc.account.equals(account)) {
 										wcToRemove = wc;
 									}
 								}
 							}
-							if (wcToRemove != null)
-							{
-								if (par.isAuthed())
-								{
+							if (wcToRemove != null) {
+								if (par.isAuthed()) {
 									PlayerInGame pig = new PlayerInGame(par.getAccount());
 									sendPacket(pig);
 									wcToRemove.gameClient.setState(GameClientState.AUTHED);
@@ -314,9 +274,7 @@ public class LoginServerThread extends Thread
 									CharSelectionInfo cl = new CharSelectionInfo(wcToRemove.account, wcToRemove.gameClient.getSessionId().playOkID1);
 									wcToRemove.gameClient.getConnection().sendPacket(cl);
 									wcToRemove.gameClient.setCharSelection(cl.getCharInfo());
-								}
-								else
-								{
+								} else {
 									LOG.warn("Session key is not correct. Closing connection for account {}.", wcToRemove.account);
 									// wcToRemove.gameClient.getConnection().sendPacket(new LoginFail(LoginFail.SYSTEM_ERROR_LOGIN_LATER));
 									wcToRemove.gameClient.close(new LoginFail(LoginFail.SYSTEM_ERROR_LOGIN_LATER));
@@ -338,40 +296,25 @@ public class LoginServerThread extends Thread
 							break;
 					}
 				}
-			}
-			catch (UnknownHostException e)
-			{
+			} catch (UnknownHostException e) {
 				LOG.warn("Unknown host!", e);
-			}
-			catch (SocketException e)
-			{
+			} catch (SocketException e) {
 				LOG.warn("LoginServer not avaible, trying to reconnect...");
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				LOG.warn("Disconnected from Login, Trying to reconnect!", e);
-			}
-			finally
-			{
-				try
-				{
+			} finally {
+				try {
 					_loginSocket.close();
-					if (isInterrupted())
-					{
+					if (isInterrupted()) {
 						return;
 					}
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 				}
 			}
 			
-			try
-			{
+			try {
 				Thread.sleep(5000); // 5 seconds tempo.
-			}
-			catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				return; // never swallow an interrupt!
 			}
 		}
@@ -383,20 +326,15 @@ public class LoginServerThread extends Thread
 	 * @param client the game client
 	 * @param key the session key
 	 */
-	public void addWaitingClientAndSendRequest(String acc, L2GameClient client, SessionKey key)
-	{
+	public void addWaitingClientAndSendRequest(String acc, L2GameClient client, SessionKey key) {
 		WaitingClient wc = new WaitingClient(acc, client, key);
-		synchronized (_waitingClients)
-		{
+		synchronized (_waitingClients) {
 			_waitingClients.add(wc);
 		}
 		PlayerAuthRequest par = new PlayerAuthRequest(acc, key);
-		try
-		{
+		try {
 			sendPacket(par);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			LOG.warn("Error while sending player auth request!");
 		}
 	}
@@ -405,20 +343,15 @@ public class LoginServerThread extends Thread
 	 * Removes the waiting client.
 	 * @param client the client
 	 */
-	public void removeWaitingClient(L2GameClient client)
-	{
+	public void removeWaitingClient(L2GameClient client) {
 		WaitingClient toRemove = null;
-		synchronized (_waitingClients)
-		{
-			for (WaitingClient c : _waitingClients)
-			{
-				if (c.gameClient == client)
-				{
+		synchronized (_waitingClients) {
+			for (WaitingClient c : _waitingClients) {
+				if (c.gameClient == client) {
 					toRemove = c;
 				}
 			}
-			if (toRemove != null)
-			{
+			if (toRemove != null) {
 				_waitingClients.remove(toRemove);
 			}
 		}
@@ -428,23 +361,16 @@ public class LoginServerThread extends Thread
 	 * Send logout for the given account.
 	 * @param account the account
 	 */
-	public void sendLogout(String account)
-	{
-		if (account == null)
-		{
+	public void sendLogout(String account) {
+		if (account == null) {
 			return;
 		}
 		PlayerLogout pl = new PlayerLogout(account);
-		try
-		{
+		try {
 			sendPacket(pl);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			LOG.warn("Error while sending logout packet to login!");
-		}
-		finally
-		{
+		} finally {
 			_accountsInGameServer.remove(account);
 		}
 	}
@@ -455,8 +381,7 @@ public class LoginServerThread extends Thread
 	 * @param client the client
 	 * @return {@code true} if account was not already logged in, {@code false} otherwise
 	 */
-	public boolean addGameServerLogin(String account, L2GameClient client)
-	{
+	public boolean addGameServerLogin(String account, L2GameClient client) {
 		return _accountsInGameServer.putIfAbsent(account, client) == null;
 	}
 	
@@ -465,15 +390,11 @@ public class LoginServerThread extends Thread
 	 * @param account the account
 	 * @param level the access level
 	 */
-	public void sendAccessLevel(String account, int level)
-	{
+	public void sendAccessLevel(String account, int level) {
 		ChangeAccessLevel cal = new ChangeAccessLevel(account, level);
-		try
-		{
+		try {
 			sendPacket(cal);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -482,15 +403,11 @@ public class LoginServerThread extends Thread
 	 * @param account the account
 	 * @param address the address
 	 */
-	public void sendClientTracert(String account, String[] address)
-	{
+	public void sendClientTracert(String account, String[] address) {
 		PlayerTracert ptc = new PlayerTracert(account, address[0], address[1], address[2], address[3], address[4]);
-		try
-		{
+		try {
 			sendPacket(ptc);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -500,15 +417,11 @@ public class LoginServerThread extends Thread
 	 * @param mailId the mail id
 	 * @param args the args
 	 */
-	public void sendMail(String account, String mailId, String... args)
-	{
+	public void sendMail(String account, String mailId, String... args) {
 		SendMail sem = new SendMail(account, mailId, args);
-		try
-		{
+		try {
 			sendPacket(sem);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -518,15 +431,11 @@ public class LoginServerThread extends Thread
 	 * @param ip the ip
 	 * @param time the time
 	 */
-	public void sendTempBan(String account, String ip, long time)
-	{
+	public void sendTempBan(String account, String ip, long time) {
 		TempBan tbn = new TempBan(account, ip, time);
-		try
-		{
+		try {
 			sendPacket(tbn);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -535,8 +444,7 @@ public class LoginServerThread extends Thread
 	 * @param hex the hex value
 	 * @return the hex value as string
 	 */
-	private String hexToString(byte[] hex)
-	{
+	private String hexToString(byte[] hex) {
 		return new BigInteger(hex).toString(16);
 	}
 	
@@ -544,11 +452,9 @@ public class LoginServerThread extends Thread
 	 * Kick player for the given account.
 	 * @param account the account
 	 */
-	public void doKickPlayer(String account)
-	{
+	public void doKickPlayer(String account) {
 		L2GameClient client = _accountsInGameServer.get(account);
-		if (client != null)
-		{
+		if (client != null) {
 			LOG_ACCOUNTING.warn("Kicked by login: {}", client);
 			client.setAditionalClosePacket(SystemMessage.getSystemMessage(SystemMessageId.ANOTHER_LOGIN_WITH_ACCOUNT));
 			client.closeNow();
@@ -559,40 +465,30 @@ public class LoginServerThread extends Thread
 	 * Gets the chars on server.
 	 * @param account the account
 	 */
-	private void getCharsOnServer(String account)
-	{
+	private void getCharsOnServer(String account) {
 		
 		int chars = 0;
 		List<Long> charToDel = new ArrayList<>();
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT deletetime FROM characters WHERE account_name=?"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("SELECT deletetime FROM characters WHERE account_name=?")) {
 			ps.setString(1, account);
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					chars++;
 					long delTime = rs.getLong("deletetime");
-					if (delTime != 0)
-					{
+					if (delTime != 0) {
 						charToDel.add(delTime);
 					}
 				}
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			LOG.warn("Exception: getCharsOnServer!", e);
 		}
 		
 		ReplyCharacters rec = new ReplyCharacters(account, chars, charToDel);
-		try
-		{
+		try {
 			sendPacket(rec);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -601,8 +497,7 @@ public class LoginServerThread extends Thread
 	 * @param sl the sendable packet
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	private void sendPacket(BaseSendablePacket sl) throws IOException
-	{
+	private void sendPacket(BaseSendablePacket sl) throws IOException {
 		byte[] data = sl.getContent();
 		NewCrypt.appendChecksum(data);
 		_blowfish.crypt(data, 0, data.length);
@@ -621,8 +516,7 @@ public class LoginServerThread extends Thread
 	 * Sets the max player.
 	 * @param maxPlayer The maxPlayer to set.
 	 */
-	public void setMaxPlayer(int maxPlayer)
-	{
+	public void setMaxPlayer(int maxPlayer) {
 		sendServerStatus(ServerStatus.MAX_PLAYERS, maxPlayer);
 		_maxPlayer = maxPlayer;
 	}
@@ -631,8 +525,7 @@ public class LoginServerThread extends Thread
 	 * Gets the max player.
 	 * @return Returns the maxPlayer.
 	 */
-	public int getMaxPlayer()
-	{
+	public int getMaxPlayer() {
 		return _maxPlayer;
 	}
 	
@@ -641,32 +534,24 @@ public class LoginServerThread extends Thread
 	 * @param id the id
 	 * @param value the value
 	 */
-	public void sendServerStatus(int id, int value)
-	{
+	public void sendServerStatus(int id, int value) {
 		ServerStatus ss = new ServerStatus();
 		ss.addAttribute(id, value);
-		try
-		{
+		try {
 			sendPacket(ss);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
 	/**
 	 * Send Server Type Config to LS.
 	 */
-	public void sendServerType()
-	{
+	public void sendServerType() {
 		ServerStatus ss = new ServerStatus();
 		ss.addAttribute(ServerStatus.SERVER_TYPE, Config.SERVER_LIST_TYPE);
-		try
-		{
+		try {
 			sendPacket(ss);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -677,15 +562,11 @@ public class LoginServerThread extends Thread
 	 * @param oldpass the old pass
 	 * @param newpass the new pass
 	 */
-	public void sendChangePassword(String accountName, String charName, String oldpass, String newpass)
-	{
+	public void sendChangePassword(String accountName, String charName, String oldpass, String newpass) {
 		ChangePassword cp = new ChangePassword(accountName, charName, oldpass, newpass);
-		try
-		{
+		try {
 			sendPacket(cp);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 	}
 	
@@ -693,8 +574,7 @@ public class LoginServerThread extends Thread
 	 * Gets the status string.
 	 * @return the status string
 	 */
-	public String getStatusString()
-	{
+	public String getStatusString() {
 		return ServerStatus.STATUS_STRING[_status];
 	}
 	
@@ -702,8 +582,7 @@ public class LoginServerThread extends Thread
 	 * Gets the server name.
 	 * @return the server name.
 	 */
-	public String getServerName()
-	{
+	public String getServerName() {
 		return _serverName;
 	}
 	
@@ -711,10 +590,8 @@ public class LoginServerThread extends Thread
 	 * Sets the server status.
 	 * @param status the new server status
 	 */
-	public void setServerStatus(int status)
-	{
-		switch (status)
-		{
+	public void setServerStatus(int status) {
+		switch (status) {
 			case ServerStatus.STATUS_AUTO:
 				sendServerStatus(ServerStatus.SERVER_LIST_STATUS, ServerStatus.STATUS_AUTO);
 				_status = status;
@@ -744,13 +621,11 @@ public class LoginServerThread extends Thread
 		}
 	}
 	
-	public L2GameClient getClient(String name)
-	{
+	public L2GameClient getClient(String name) {
 		return name != null ? _accountsInGameServer.get(name) : null;
 	}
 	
-	public static class SessionKey
-	{
+	public static class SessionKey {
 		public int playOkID1;
 		public int playOkID2;
 		public int loginOkID1;
@@ -763,8 +638,7 @@ public class LoginServerThread extends Thread
 		 * @param playOK1 the play o k1
 		 * @param playOK2 the play o k2
 		 */
-		public SessionKey(int loginOK1, int loginOK2, int playOK1, int playOK2)
-		{
+		public SessionKey(int loginOK1, int loginOK2, int playOK1, int playOK2) {
 			playOkID1 = playOK1;
 			playOkID2 = playOK2;
 			loginOkID1 = loginOK1;
@@ -772,14 +646,12 @@ public class LoginServerThread extends Thread
 		}
 		
 		@Override
-		public String toString()
-		{
+		public String toString() {
 			return "PlayOk: " + playOkID1 + " " + playOkID2 + " LoginOk:" + loginOkID1 + " " + loginOkID2;
 		}
 	}
 	
-	private static class WaitingClient
-	{
+	private static class WaitingClient {
 		public String account;
 		public L2GameClient gameClient;
 		public SessionKey session;
@@ -790,8 +662,7 @@ public class LoginServerThread extends Thread
 		 * @param client the client
 		 * @param key the key
 		 */
-		public WaitingClient(String acc, L2GameClient client, SessionKey key)
-		{
+		public WaitingClient(String acc, L2GameClient client, SessionKey key) {
 			account = acc;
 			gameClient = client;
 			session = key;
@@ -802,13 +673,11 @@ public class LoginServerThread extends Thread
 	 * Gets the single instance of LoginServerThread.
 	 * @return single instance of LoginServerThread
 	 */
-	public static LoginServerThread getInstance()
-	{
+	public static LoginServerThread getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final LoginServerThread _instance = new LoginServerThread();
 	}
 }

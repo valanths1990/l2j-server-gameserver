@@ -25,40 +25,33 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Karma data.
  * @author UnAfraid
  */
-public class KarmaData implements IXmlReader
-{
+public class KarmaData implements IXmlReader {
+	
 	private final Map<Integer, Double> _karmaTable = new HashMap<>();
 	
-	public KarmaData()
-	{
+	public KarmaData() {
 		load();
 	}
 	
 	@Override
-	public synchronized void load()
-	{
+	public synchronized void load() {
 		_karmaTable.clear();
 		parseDatapackFile("data/stats/chars/pcKarmaIncrease.xml");
 		LOG.info("{}: Loaded {} karma modifiers.", getClass().getSimpleName(), _karmaTable.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("pcKarmaIncrease".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("increase".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("pcKarmaIncrease".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("increase".equalsIgnoreCase(d.getNodeName())) {
 						final NamedNodeMap attrs = d.getAttributes();
 						_karmaTable.put(parseInteger(attrs, "lvl"), parseDouble(attrs, "val"));
 					}
@@ -71,8 +64,7 @@ public class KarmaData implements IXmlReader
 	 * @param level
 	 * @return {@code double} modifier used to calculate karma lost upon death.
 	 */
-	public double getMultiplier(int level)
-	{
+	public double getMultiplier(int level) {
 		return _karmaTable.get(level);
 	}
 	
@@ -80,13 +72,11 @@ public class KarmaData implements IXmlReader
 	 * Gets the single instance of KarmaData.
 	 * @return single instance of KarmaData
 	 */
-	public static KarmaData getInstance()
-	{
+	public static KarmaData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final KarmaData _instance = new KarmaData();
 	}
 }

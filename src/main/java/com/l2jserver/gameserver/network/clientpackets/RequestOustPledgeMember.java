@@ -20,7 +20,7 @@ package com.l2jserver.gameserver.network.clientpackets;
 
 import java.util.concurrent.TimeUnit;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2ClanMember;

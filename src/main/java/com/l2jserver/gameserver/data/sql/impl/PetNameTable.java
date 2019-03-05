@@ -18,50 +18,38 @@
  */
 package com.l2jserver.gameserver.data.sql.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 
-public class PetNameTable
-{
-	private static Logger LOGGER = Logger.getLogger(PetNameTable.class.getName());
+public class PetNameTable {
 	
-	public static PetNameTable getInstance()
-	{
+	private static final Logger LOGGER = Logger.getLogger(PetNameTable.class.getName());
+	
+	public static PetNameTable getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	public boolean doesPetNameExist(String name)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT name FROM pets WHERE name=?"))
-		{
+	public boolean doesPetNameExist(String name) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("SELECT name FROM pets WHERE name=?")) {
 			ps.setString(1, name);
-			try (ResultSet rs = ps.executeQuery())
-			{
+			try (var rs = ps.executeQuery()) {
 				return rs.next();
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing petname:" + e.getMessage(), e);
 		}
 		return false;
 	}
 	
-	public boolean isValidPetName(String name)
-	{
+	public boolean isValidPetName(String name) {
 		return Config.PET_NAME_TEMPLATE.matcher(name).matches();
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final PetNameTable _instance = new PetNameTable();
 	}
 }

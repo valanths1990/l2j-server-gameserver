@@ -24,33 +24,37 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * This class load, holds and calculates the hit condition bonuses.
  * @author Nik
  */
-public final class HitConditionBonusData implements IXmlReader
-{
+public final class HitConditionBonusData implements IXmlReader {
+	
 	private int frontBonus = 0;
+	
 	private int sideBonus = 0;
+	
 	private int backBonus = 0;
+	
 	private int highBonus = 0;
+	
 	private int lowBonus = 0;
+	
 	private int darkBonus = 0;
+	
 	private int rainBonus = 0;
 	
 	/**
 	 * Instantiates a new hit condition bonus.
 	 */
-	protected HitConditionBonusData()
-	{
+	protected HitConditionBonusData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		parseDatapackFile("data/stats/hitConditionBonus.xml");
 		LOG.info("{}: Loaded Hit Condition bonuses.", getClass().getSimpleName());
 		LOG.debug("{}: Front bonus: {}", getClass().getSimpleName(), frontBonus);
@@ -63,45 +67,35 @@ public final class HitConditionBonusData implements IXmlReader
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node d = doc.getFirstChild().getFirstChild(); d != null; d = d.getNextSibling())
-		{
+	public void parseDocument(Document doc) {
+		for (Node d = doc.getFirstChild().getFirstChild(); d != null; d = d.getNextSibling()) {
 			NamedNodeMap attrs = d.getAttributes();
-			switch (d.getNodeName())
-			{
-				case "front":
-				{
+			switch (d.getNodeName()) {
+				case "front": {
 					frontBonus = parseInteger(attrs, "val");
 					break;
 				}
-				case "side":
-				{
+				case "side": {
 					sideBonus = parseInteger(attrs, "val");
 					break;
 				}
-				case "back":
-				{
+				case "back": {
 					backBonus = parseInteger(attrs, "val");
 					break;
 				}
-				case "high":
-				{
+				case "high": {
 					highBonus = parseInteger(attrs, "val");
 					break;
 				}
-				case "low":
-				{
+				case "low": {
 					lowBonus = parseInteger(attrs, "val");
 					break;
 				}
-				case "dark":
-				{
+				case "dark": {
 					darkBonus = parseInteger(attrs, "val");
 					break;
 				}
-				case "rain":
-				{
+				case "rain": {
 					rainBonus = parseInteger(attrs, "val");
 					break;
 				}
@@ -115,38 +109,28 @@ public final class HitConditionBonusData implements IXmlReader
 	 * @param target the attacked character.
 	 * @return the bonus of the attacker against the target.
 	 */
-	public double getConditionBonus(L2Character attacker, L2Character target)
-	{
+	public double getConditionBonus(L2Character attacker, L2Character target) {
 		double mod = 100;
 		// Get high or low bonus
-		if ((attacker.getZ() - target.getZ()) > 50)
-		{
+		if ((attacker.getZ() - target.getZ()) > 50) {
 			mod += highBonus;
-		}
-		else if ((attacker.getZ() - target.getZ()) < -50)
-		{
+		} else if ((attacker.getZ() - target.getZ()) < -50) {
 			mod += lowBonus;
 		}
 		
 		// Get weather bonus
-		if (GameTimeController.getInstance().isNight())
-		{
+		if (GameTimeController.getInstance().isNight()) {
 			mod += darkBonus;
 			// else if () No rain support yet.
 			// chance += hitConditionBonus.rainBonus;
 		}
 		
 		// Get side bonus
-		if (attacker.isBehindTarget())
-		{
+		if (attacker.isBehindTarget()) {
 			mod += backBonus;
-		}
-		else if (attacker.isInFrontOfTarget())
-		{
+		} else if (attacker.isInFrontOfTarget()) {
 			mod += frontBonus;
-		}
-		else
-		{
+		} else {
 			mod += sideBonus;
 		}
 		
@@ -158,13 +142,11 @@ public final class HitConditionBonusData implements IXmlReader
 	 * Gets the single instance of HitConditionBonus.
 	 * @return single instance of HitConditionBonus
 	 */
-	public static HitConditionBonusData getInstance()
-	{
+	public static HitConditionBonusData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final HitConditionBonusData _instance = new HitConditionBonusData();
 	}
 }

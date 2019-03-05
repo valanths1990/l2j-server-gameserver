@@ -20,7 +20,7 @@ package com.l2jserver.gameserver.model.actor.stat;
 
 import java.util.Arrays;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.Elementals;
 import com.l2jserver.gameserver.model.PcCondOverride;
 import com.l2jserver.gameserver.model.actor.L2Character;

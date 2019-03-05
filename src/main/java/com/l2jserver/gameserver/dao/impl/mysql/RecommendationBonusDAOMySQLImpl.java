@@ -18,14 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.RecommendationBonusDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
@@ -33,8 +29,8 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Recommendation Bonus DAO MySQL implementation.
  * @author Zoey76
  */
-public class RecommendationBonusDAOMySQLImpl implements RecommendationBonusDAO
-{
+public class RecommendationBonusDAOMySQLImpl implements RecommendationBonusDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(RecommendationBonusDAOMySQLImpl.class);
 	
 	private static final String SELECT = "SELECT rec_have,rec_left,time_left FROM character_reco_bonus WHERE charId=? LIMIT 1";
@@ -42,40 +38,30 @@ public class RecommendationBonusDAOMySQLImpl implements RecommendationBonusDAO
 	private static final String INSERT = "INSERT INTO character_reco_bonus (charId,rec_have,rec_left,time_left) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE rec_have=?, rec_left=?, time_left=?";
 	
 	@Override
-	public long load(L2PcInstance player)
-	{
+	public long load(L2PcInstance player) {
 		long timeLeft = 0;
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			ps.setInt(1, player.getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				if (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				if (rs.next()) {
 					player.setRecomHave(rs.getInt("rec_have"));
 					player.setRecomLeft(rs.getInt("rec_left"));
 					timeLeft = rs.getLong("time_left");
-				}
-				else
-				{
+				} else {
 					timeLeft = 3600000;
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore Recommendations for {}, {}", player, e);
 		}
 		return timeLeft;
 	}
 	
 	@Override
-	public void insert(L2PcInstance player, long recoTaskEnd)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+	public void insert(L2PcInstance player, long recoTaskEnd) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, player.getRecomHave());
 			ps.setInt(3, player.getRecomLeft());
@@ -85,9 +71,7 @@ public class RecommendationBonusDAOMySQLImpl implements RecommendationBonusDAO
 			ps.setInt(6, player.getRecomLeft());
 			ps.setLong(7, recoTaskEnd);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not update Recommendations for player: {}", player, e);
 		}
 	}

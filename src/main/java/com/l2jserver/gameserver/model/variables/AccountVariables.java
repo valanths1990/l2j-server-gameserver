@@ -18,102 +18,81 @@
  */
 package com.l2jserver.gameserver.model.variables;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 
 /**
  * @author UnAfraid
  */
-public class AccountVariables extends AbstractVariables
-{
+public class AccountVariables extends AbstractVariables {
+	
 	private static final Logger _log = Logger.getLogger(AccountVariables.class.getName());
 	
 	// SQL Queries.
 	private static final String SELECT_QUERY = "SELECT * FROM account_gsdata WHERE account_name = ?";
+	
 	private static final String DELETE_QUERY = "DELETE FROM account_gsdata WHERE account_name = ?";
+	
 	private static final String INSERT_QUERY = "INSERT INTO account_gsdata (account_name, var, value) VALUES (?, ?, ?)";
 	
 	private final String _accountName;
 	
-	public AccountVariables(String accountName)
-	{
+	public AccountVariables(String accountName) {
 		_accountName = accountName;
 		restoreMe();
 	}
 	
 	@Override
-	public boolean restoreMe()
-	{
+	public boolean restoreMe() {
 		// Restore previous variables.
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement st = con.prepareStatement(SELECT_QUERY))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var st = con.prepareStatement(SELECT_QUERY)) {
 			st.setString(1, _accountName);
-			try (ResultSet rset = st.executeQuery())
-			{
-				while (rset.next())
-				{
+			try (var rset = st.executeQuery()) {
+				while (rset.next()) {
 					set(rset.getString("var"), rset.getString("value"));
 				}
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't restore variables for: " + _accountName, e);
 			return false;
-		}
-		finally
-		{
+		} finally {
 			compareAndSetChanges(true, false);
 		}
 		return true;
 	}
 	
 	@Override
-	public boolean storeMe()
-	{
+	public boolean storeMe() {
 		// No changes, nothing to store.
-		if (!hasChanges())
-		{
+		if (!hasChanges()) {
 			return false;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
 			// Clear previous entries.
-			try (PreparedStatement st = con.prepareStatement(DELETE_QUERY))
-			{
+			try (var st = con.prepareStatement(DELETE_QUERY)) {
 				st.setString(1, _accountName);
 				st.execute();
 			}
 			
 			// Insert all variables.
-			try (PreparedStatement st = con.prepareStatement(INSERT_QUERY))
-			{
+			try (var st = con.prepareStatement(INSERT_QUERY)) {
 				st.setString(1, _accountName);
-				for (Entry<String, Object> entry : getSet().entrySet())
-				{
+				for (Entry<String, Object> entry : getSet().entrySet()) {
 					st.setString(2, entry.getKey());
 					st.setString(3, String.valueOf(entry.getValue()));
 					st.addBatch();
 				}
 				st.executeBatch();
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't update variables for: " + _accountName, e);
 			return false;
-		}
-		finally
-		{
+		} finally {
 			compareAndSetChanges(true, false);
 		}
 		return true;

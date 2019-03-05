@@ -18,13 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.ShortcutDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
@@ -32,24 +29,20 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Shortcut DAO MySQL implementation.
  * @author Zoey76
  */
-public class ShortcutDAOMySQLImpl implements ShortcutDAO
-{
+public class ShortcutDAOMySQLImpl implements ShortcutDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ShortcutDAOMySQLImpl.class);
 	
 	private static final String DELETE = "DELETE FROM character_shortcuts WHERE charId=? AND class_index=?";
 	
 	@Override
-	public boolean delete(L2PcInstance player, int classIndex)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE))
-		{
+	public boolean delete(L2PcInstance player, int classIndex) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, classIndex);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not modify sub class for {} to class index {}, {}", player, classIndex, e);
 			return false;
 		}

@@ -36,30 +36,30 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.base.ClassId;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.serverpackets.ShortCutRegister;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * This class holds the Initial Shortcuts information.<br>
  * What shortcuts get each newly created character.
  * @author Zoey76
  */
-public final class InitialShortcutData implements IXmlReader
-{
+public final class InitialShortcutData implements IXmlReader {
+	
 	private final Map<ClassId, List<Shortcut>> _initialShortcutData = new HashMap<>();
+	
 	private final List<Shortcut> _initialGlobalShortcutList = new ArrayList<>();
+	
 	private final Map<Integer, Macro> _macroPresets = new HashMap<>();
 	
 	/**
 	 * Instantiates a new initial shortcuts data.
 	 */
-	protected InitialShortcutData()
-	{
+	protected InitialShortcutData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_initialShortcutData.clear();
 		_initialGlobalShortcutList.clear();
 		
@@ -71,23 +71,16 @@ public final class InitialShortcutData implements IXmlReader
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equals(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					switch (d.getNodeName())
-					{
-						case "shortcuts":
-						{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equals(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					switch (d.getNodeName()) {
+						case "shortcuts": {
 							parseShortcuts(d);
 							break;
 						}
-						case "macros":
-						{
+						case "macros": {
 							parseMacros(d);
 							break;
 						}
@@ -101,33 +94,25 @@ public final class InitialShortcutData implements IXmlReader
 	 * Parses a shortcut.
 	 * @param d the node
 	 */
-	private void parseShortcuts(Node d)
-	{
+	private void parseShortcuts(Node d) {
 		NamedNodeMap attrs = d.getAttributes();
 		final Node classIdNode = attrs.getNamedItem("classId");
 		final List<Shortcut> list = new ArrayList<>();
-		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
-		{
-			if ("page".equals(c.getNodeName()))
-			{
+		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
+			if ("page".equals(c.getNodeName())) {
 				attrs = c.getAttributes();
 				final int pageId = parseInteger(attrs, "pageId");
-				for (Node b = c.getFirstChild(); b != null; b = b.getNextSibling())
-				{
-					if ("slot".equals(b.getNodeName()))
-					{
+				for (Node b = c.getFirstChild(); b != null; b = b.getNextSibling()) {
+					if ("slot".equals(b.getNodeName())) {
 						list.add(createShortcut(pageId, b));
 					}
 				}
 			}
 		}
 		
-		if (classIdNode != null)
-		{
+		if (classIdNode != null) {
 			_initialShortcutData.put(ClassId.getClassId(Integer.parseInt(classIdNode.getNodeValue())), list);
-		}
-		else
-		{
+		} else {
 			_initialGlobalShortcutList.addAll(list);
 		}
 	}
@@ -136,15 +121,11 @@ public final class InitialShortcutData implements IXmlReader
 	 * Parses a macro.
 	 * @param d the node
 	 */
-	private void parseMacros(Node d)
-	{
-		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
-		{
-			if ("macro".equals(c.getNodeName()))
-			{
+	private void parseMacros(Node d) {
+		for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
+			if ("macro".equals(c.getNodeName())) {
 				NamedNodeMap attrs = c.getAttributes();
-				if (!parseBoolean(attrs, "enabled", true))
-				{
+				if (!parseBoolean(attrs, "enabled", true)) {
 					continue;
 				}
 				
@@ -155,48 +136,39 @@ public final class InitialShortcutData implements IXmlReader
 				final String acronym = parseString(attrs, "acronym");
 				final List<MacroCmd> commands = new ArrayList<>(1);
 				int entry = 0;
-				for (Node b = c.getFirstChild(); b != null; b = b.getNextSibling())
-				{
-					if ("command".equals(b.getNodeName()))
-					{
+				for (Node b = c.getFirstChild(); b != null; b = b.getNextSibling()) {
+					if ("command".equals(b.getNodeName())) {
 						attrs = b.getAttributes();
 						final MacroType type = parseEnum(attrs, MacroType.class, "type");
 						int d1 = 0;
 						int d2 = 0;
 						final String cmd = b.getTextContent();
-						switch (type)
-						{
-							case SKILL:
-							{
+						switch (type) {
+							case SKILL: {
 								d1 = parseInteger(attrs, "skillId"); // Skill ID
 								d2 = parseInteger(attrs, "skillLvl", 0); // Skill level
 								break;
 							}
-							case ACTION:
-							{
+							case ACTION: {
 								// Not handled by client.
 								d1 = parseInteger(attrs, "actionId");
 								break;
 							}
-							case TEXT:
-							{
+							case TEXT: {
 								// Doesn't have numeric parameters.
 								break;
 							}
-							case SHORTCUT:
-							{
+							case SHORTCUT: {
 								d1 = parseInteger(attrs, "page"); // Page
 								d2 = parseInteger(attrs, "slot", 0); // Slot
 								break;
 							}
-							case ITEM:
-							{
+							case ITEM: {
 								// Not handled by client.
 								d1 = parseInteger(attrs, "itemId");
 								break;
 							}
-							case DELAY:
-							{
+							case DELAY: {
 								d1 = parseInteger(attrs, "delay"); // Delay in seconds
 								break;
 							}
@@ -215,8 +187,7 @@ public final class InitialShortcutData implements IXmlReader
 	 * @param b the node to parse
 	 * @return the new shortcut
 	 */
-	private Shortcut createShortcut(int pageId, Node b)
-	{
+	private Shortcut createShortcut(int pageId, Node b) {
 		final NamedNodeMap attrs = b.getAttributes();
 		final int slotId = parseInteger(attrs, "slotId");
 		final ShortcutType shortcutType = parseEnum(attrs, ShortcutType.class, "shortcutType");
@@ -231,8 +202,7 @@ public final class InitialShortcutData implements IXmlReader
 	 * @param cId the class ID for the shortcut list
 	 * @return the shortcut list for the give class ID
 	 */
-	public List<Shortcut> getShortcutList(ClassId cId)
-	{
+	public List<Shortcut> getShortcutList(ClassId cId) {
 		return _initialShortcutData.get(cId);
 	}
 	
@@ -241,8 +211,7 @@ public final class InitialShortcutData implements IXmlReader
 	 * @param cId the class ID for the shortcut list
 	 * @return the shortcut list for the give class ID
 	 */
-	public List<Shortcut> getShortcutList(int cId)
-	{
+	public List<Shortcut> getShortcutList(int cId) {
 		return _initialShortcutData.get(ClassId.getClassId(cId));
 	}
 	
@@ -250,8 +219,7 @@ public final class InitialShortcutData implements IXmlReader
 	 * Gets the global shortcut list.
 	 * @return the global shortcut list
 	 */
-	public List<Shortcut> getGlobalMacroList()
-	{
+	public List<Shortcut> getGlobalMacroList() {
 		return _initialGlobalShortcutList;
 	}
 	
@@ -259,42 +227,32 @@ public final class InitialShortcutData implements IXmlReader
 	 * Register all the available shortcuts for the given player.
 	 * @param player the player
 	 */
-	public void registerAllShortcuts(L2PcInstance player)
-	{
-		if (player == null)
-		{
+	public void registerAllShortcuts(L2PcInstance player) {
+		if (player == null) {
 			return;
 		}
 		
 		// Register global shortcuts.
-		for (Shortcut shortcut : _initialGlobalShortcutList)
-		{
+		for (Shortcut shortcut : _initialGlobalShortcutList) {
 			int shortcutId = shortcut.getId();
-			switch (shortcut.getType())
-			{
-				case ITEM:
-				{
+			switch (shortcut.getType()) {
+				case ITEM: {
 					final L2ItemInstance item = player.getInventory().getItemByItemId(shortcutId);
-					if (item == null)
-					{
+					if (item == null) {
 						continue;
 					}
 					shortcutId = item.getObjectId();
 					break;
 				}
-				case SKILL:
-				{
-					if (!player.getSkills().containsKey(shortcutId))
-					{
+				case SKILL: {
+					if (!player.getSkills().containsKey(shortcutId)) {
 						continue;
 					}
 					break;
 				}
-				case MACRO:
-				{
+				case MACRO: {
 					final Macro macro = _macroPresets.get(shortcutId);
-					if (macro == null)
-					{
+					if (macro == null) {
 						continue;
 					}
 					player.registerMacro(macro);
@@ -309,36 +267,27 @@ public final class InitialShortcutData implements IXmlReader
 		}
 		
 		// Register class specific shortcuts.
-		if (_initialShortcutData.containsKey(player.getClassId()))
-		{
-			for (Shortcut shortcut : _initialShortcutData.get(player.getClassId()))
-			{
+		if (_initialShortcutData.containsKey(player.getClassId())) {
+			for (Shortcut shortcut : _initialShortcutData.get(player.getClassId())) {
 				int shortcutId = shortcut.getId();
-				switch (shortcut.getType())
-				{
-					case ITEM:
-					{
+				switch (shortcut.getType()) {
+					case ITEM: {
 						final L2ItemInstance item = player.getInventory().getItemByItemId(shortcutId);
-						if (item == null)
-						{
+						if (item == null) {
 							continue;
 						}
 						shortcutId = item.getObjectId();
 						break;
 					}
-					case SKILL:
-					{
-						if (!player.getSkills().containsKey(shortcut.getId()))
-						{
+					case SKILL: {
+						if (!player.getSkills().containsKey(shortcut.getId())) {
 							continue;
 						}
 						break;
 					}
-					case MACRO:
-					{
+					case MACRO: {
 						final Macro macro = _macroPresets.get(shortcutId);
-						if (macro == null)
-						{
+						if (macro == null) {
 							continue;
 						}
 						player.registerMacro(macro);
@@ -357,13 +306,11 @@ public final class InitialShortcutData implements IXmlReader
 	 * Gets the single instance of InitialEquipmentData.
 	 * @return single instance of InitialEquipmentData
 	 */
-	public static InitialShortcutData getInstance()
-	{
+	public static InitialShortcutData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final InitialShortcutData _instance = new InitialShortcutData();
 	}
 }

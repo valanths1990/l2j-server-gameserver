@@ -18,15 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.ItemReuseDAO;
 import com.l2jserver.gameserver.model.TimeStamp;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -37,44 +32,37 @@ import com.l2jserver.gameserver.network.serverpackets.ExUseSharedGroupItem;
  * Item Reuse DAO MySQL implementation.
  * @author Zoey76
  */
-public class ItemReuseDAOMySQLImpl implements ItemReuseDAO
-{
+public class ItemReuseDAOMySQLImpl implements ItemReuseDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ItemReuseDAOMySQLImpl.class);
 	
 	private static final String INSERT = "INSERT INTO character_item_reuse_save (charId,itemId,itemObjId,reuseDelay,systime) VALUES (?,?,?,?,?)";
+	
 	private static final String SELECT = "SELECT charId,itemId,itemObjId,reuseDelay,systime FROM character_item_reuse_save WHERE charId=?";
+	
 	private static final String DELETE = "DELETE FROM character_item_reuse_save WHERE charId=?";
 	
 	@Override
-	public void delete(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE))
-		{
+	public void delete(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE)) {
 			ps.setInt(1, player.getObjectId());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Could not delete player's {} item reuse data!", player, e);
 		}
 	}
 	
 	@Override
-	public void insert(L2PcInstance player)
-	{
+	public void insert(L2PcInstance player) {
 		delete(player);
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
-			final Map<Integer, TimeStamp> itemReuseTimeStamps = player.getItemReuseTimeStamps();
-			if (itemReuseTimeStamps != null)
-			{
-				for (TimeStamp ts : itemReuseTimeStamps.values())
-				{
-					if ((ts != null) && ts.hasNotPassed())
-					{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
+			final var itemReuseTimeStamps = player.getItemReuseTimeStamps();
+			if (itemReuseTimeStamps != null) {
+				for (TimeStamp ts : itemReuseTimeStamps.values()) {
+					if ((ts != null) && ts.hasNotPassed()) {
 						ps.setInt(1, player.getObjectId());
 						ps.setInt(2, ts.getItemId());
 						ps.setInt(3, ts.getItemObjectId());
@@ -85,24 +73,18 @@ public class ItemReuseDAOMySQLImpl implements ItemReuseDAO
 				}
 				ps.executeBatch();
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Could not store player's {} item reuse data!", player, e);
 		}
 	}
 	
 	@Override
-	public void load(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+	public void load(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			ps.setInt(1, player.getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					final int itemId = rs.getInt("itemId");
 					final long reuseDelay = rs.getLong("reuseDelay");
 					final long systime = rs.getLong("systime");
@@ -110,25 +92,20 @@ public class ItemReuseDAOMySQLImpl implements ItemReuseDAO
 					
 					// Using item Id
 					L2ItemInstance item = player.getInventory().getItemByItemId(itemId);
-					if (item == null)
-					{
+					if (item == null) {
 						item = player.getWarehouse().getItemByItemId(itemId);
 						isInInventory = false;
 					}
 					
-					if ((item != null) && (item.getId() == itemId) && (item.getReuseDelay() > 0))
-					{
+					if ((item != null) && (item.getId() == itemId) && (item.getReuseDelay() > 0)) {
 						long remainingTime = systime - System.currentTimeMillis();
 						// Hardcoded to 10 seconds.
-						if (remainingTime > 10)
-						{
+						if (remainingTime > 10) {
 							player.addTimeStampItem(item, reuseDelay, systime);
 							
-							if (isInInventory && item.isEtcItem())
-							{
+							if (isInInventory && item.isEtcItem()) {
 								final int group = item.getSharedReuseGroup();
-								if (group > 0)
-								{
+								if (group > 0) {
 									player.sendPacket(new ExUseSharedGroupItem(itemId, group, (int) remainingTime, (int) reuseDelay));
 								}
 							}
@@ -139,9 +116,7 @@ public class ItemReuseDAOMySQLImpl implements ItemReuseDAO
 			
 			// Deletes item reuse.
 			delete(player);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore {} Item Reuse data: {}", player, e);
 		}
 	}

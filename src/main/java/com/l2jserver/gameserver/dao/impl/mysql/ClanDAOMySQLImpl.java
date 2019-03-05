@@ -24,7 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.ClanDAO;
 
 /**
@@ -54,8 +54,7 @@ public class ClanDAOMySQLImpl implements ClanDAO {
 					result.put(rank, rs.getInt("privs"));
 				}
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			LOG.error("Unable to restore clan privileges for clan Id {}!", clanId, ex);
 		}
 		return result;
@@ -71,8 +70,7 @@ public class ClanDAOMySQLImpl implements ClanDAO {
 			ps.setInt(4, privileges);
 			ps.setInt(5, privileges);
 			ps.execute();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			LOG.error("Unable to store clan privileges for clan Id {}!", clanId, ex);
 		}
 	}

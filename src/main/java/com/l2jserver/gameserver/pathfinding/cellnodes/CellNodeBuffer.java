@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * @author DS Credits to Diamond

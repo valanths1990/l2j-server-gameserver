@@ -18,27 +18,24 @@
  */
 package com.l2jserver.gameserver.instancemanager;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.entity.Auction;
 
 /**
  * Zoey76: TODO: Rewrite it and unharcode it.
  */
-public final class AuctionManager
-{
-	protected static final Logger _log = Logger.getLogger(AuctionManager.class.getName());
+public final class AuctionManager {
+	
+	private static final Logger _log = Logger.getLogger(AuctionManager.class.getName());
+	
 	private final List<Auction> _auctions = new ArrayList<>();
 	
-	private static final String[] ITEM_INIT_DATA =
-	{
+	private static final String[] ITEM_INIT_DATA = {
 		"(22, 0, 'NPC', 'NPC Clan', 'ClanHall', 22, 0, 'Moonstone Hall', 1, 20000000, 0, 1073037600000)",
 		"(23, 0, 'NPC', 'NPC Clan', 'ClanHall', 23, 0, 'Onyx Hall', 1, 20000000, 0, 1073037600000)",
 		"(24, 0, 'NPC', 'NPC Clan', 'ClanHall', 24, 0, 'Topaz Hall', 1, 20000000, 0, 1073037600000)",
@@ -87,104 +84,78 @@ public final class AuctionManager
 	};
 	// @formatter:on
 	
-	protected AuctionManager()
-	{
+	protected AuctionManager() {
 		load();
 	}
 	
-	public void reload()
-	{
+	public void reload() {
 		_auctions.clear();
 		load();
 	}
 	
-	private final void load()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement();
-			ResultSet rs = s.executeQuery("SELECT id FROM auction ORDER BY id"))
-		{
-			while (rs.next())
-			{
+	private final void load() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement();
+			var rs = s.executeQuery("SELECT id FROM auction ORDER BY id")) {
+			while (rs.next()) {
 				_auctions.add(new Auction(rs.getInt("id")));
 			}
 			_log.info(getClass().getSimpleName() + ": Loaded: " + _auctions.size() + " auction(s)");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Exception: AuctionManager.load(): " + e.getMessage(), e);
 		}
 	}
 	
-	public final Auction getAuction(int auctionId)
-	{
+	public final Auction getAuction(int auctionId) {
 		int index = getAuctionIndex(auctionId);
-		if (index >= 0)
-		{
+		if (index >= 0) {
 			return _auctions.get(index);
 		}
 		return null;
 	}
 	
-	public final int getAuctionIndex(int auctionId)
-	{
+	public final int getAuctionIndex(int auctionId) {
 		Auction auction;
-		for (int i = 0; i < _auctions.size(); i++)
-		{
+		for (int i = 0; i < _auctions.size(); i++) {
 			auction = _auctions.get(i);
-			if ((auction != null) && (auction.getId() == auctionId))
-			{
+			if ((auction != null) && (auction.getId() == auctionId)) {
 				return i;
 			}
 		}
 		return -1;
 	}
 	
-	public final List<Auction> getAuctions()
-	{
+	public final List<Auction> getAuctions() {
 		return _auctions;
 	}
 	
-	/**
-	 * Init Clan NPC aution
-	 * @param id
-	 */
-	public void initNPC(int id)
-	{
+	public void initNPC(int id) {
 		int i;
-		for (i = 0; i < ItemInitDataId.length; i++)
-		{
-			if (ItemInitDataId[i] == id)
-			{
+		for (i = 0; i < ItemInitDataId.length; i++) {
+			if (ItemInitDataId[i] == id) {
 				break;
 			}
 		}
-		if ((i >= ItemInitDataId.length) || (ItemInitDataId[i] != id))
-		{
+		if ((i >= ItemInitDataId.length) || (ItemInitDataId[i] != id)) {
 			_log.warning(getClass().getSimpleName() + ": Clan Hall auction not found for Id :" + id);
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement())
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement()) {
 			s.executeUpdate("INSERT INTO `auction` VALUES " + ITEM_INIT_DATA[i]);
 			_auctions.add(new Auction(id));
 			_log.info(getClass().getSimpleName() + ": Created auction for ClanHall: " + id);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Exception: Auction.initNPC(): " + e.getMessage(), e);
 		}
 	}
 	
-	public static final AuctionManager getInstance()
-	{
+	public static final AuctionManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final AuctionManager _instance = new AuctionManager();
 	}
 }

@@ -18,14 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.RecipeShopListDAO;
 import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -34,66 +30,54 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Recipe Shop List DAO MySQL implementation.
  * @author Zoey76
  */
-public class RecipeShopListDAOMySQLImpl implements RecipeShopListDAO
-{
+public class RecipeShopListDAOMySQLImpl implements RecipeShopListDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(RecipeShopListDAOMySQLImpl.class);
 	
 	private static final String DELETE = "DELETE FROM character_recipeshoplist WHERE charId=?";
+	
 	private static final String INSERT = "REPLACE INTO character_recipeshoplist (`charId`, `recipeId`, `price`, `index`) VALUES (?, ?, ?, ?)";
+	
 	private static final String SELECT = "SELECT * FROM character_recipeshoplist WHERE charId=? ORDER BY `index`";
 	
 	@Override
-	public void load(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+	public void load(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			player.getManufactureItems().clear();
 			
 			ps.setInt(1, player.getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					player.getManufactureItems().put(rs.getInt("recipeId"), new L2ManufactureItem(rs.getInt("recipeId"), rs.getLong("price")));
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore recipe shop list data for {}, {}", player, e);
 		}
 	}
 	
 	@Override
-	public void delete(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE))
-		{
+	public void delete(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE)) {
 			ps.setInt(1, player.getObjectId());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not store recipe shop for {}, {}", player, e);
 		}
 	}
 	
 	@Override
-	public void insert(L2PcInstance player)
-	{
-		if (!player.hasManufactureShop())
-		{
+	public void insert(L2PcInstance player) {
+		if (!player.hasManufactureShop()) {
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			int i = 1;
-			for (L2ManufactureItem item : player.getManufactureItems().values())
-			{
+			for (L2ManufactureItem item : player.getManufactureItems().values()) {
 				ps.setInt(1, player.getObjectId());
 				ps.setInt(2, item.getRecipeId());
 				ps.setLong(3, item.getCost());
@@ -101,9 +85,7 @@ public class RecipeShopListDAOMySQLImpl implements RecipeShopListDAO
 				ps.addBatch();
 			}
 			ps.executeBatch();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not store recipe shop for {}, {}", player, e);
 		}
 	}

@@ -20,9 +20,6 @@ package com.l2jserver.gameserver.data.xml.impl;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,92 +27,77 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.buylist.L2BuyList;
 import com.l2jserver.gameserver.model.buylist.Product;
 import com.l2jserver.gameserver.model.items.L2Item;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 import com.l2jserver.util.file.filter.NumericNameFilter;
 
 /**
  * Loads buy lists for NPCs.
  * @author NosBit
  */
-public final class BuyListData implements IXmlReader
-{
+public final class BuyListData implements IXmlReader {
+	
 	private final Map<Integer, L2BuyList> _buyLists = new HashMap<>();
+	
 	private static final FileFilter NUMERIC_FILTER = new NumericNameFilter();
 	
-	protected BuyListData()
-	{
+	protected BuyListData() {
 		load();
 	}
 	
 	@Override
-	public synchronized void load()
-	{
+	public synchronized void load() {
 		_buyLists.clear();
 		parseDatapackDirectory("data/buylists", false);
-		if (Config.CUSTOM_BUYLIST_LOAD)
-		{
+		if (Config.CUSTOM_BUYLIST_LOAD) {
 			parseDatapackDirectory("data/buylists/custom", false);
 		}
 		
 		LOG.info("{}: Loaded {} BuyLists.", getClass().getSimpleName(), _buyLists.size());
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement statement = con.createStatement();
-			ResultSet rs = statement.executeQuery("SELECT * FROM `buylists`"))
-		{
-			while (rs.next())
-			{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var statement = con.createStatement();
+			var rs = statement.executeQuery("SELECT * FROM `buylists`")) {
+			while (rs.next()) {
 				int buyListId = rs.getInt("buylist_id");
 				int itemId = rs.getInt("item_id");
 				long count = rs.getLong("count");
 				long nextRestockTime = rs.getLong("next_restock_time");
 				final L2BuyList buyList = getBuyList(buyListId);
-				if (buyList == null)
-				{
+				if (buyList == null) {
 					LOG.warn("BuyList found in database but not loaded from xml! BuyListId: {}", buyListId);
 					continue;
 				}
 				final Product product = buyList.getProductByItemId(itemId);
-				if (product == null)
-				{
+				if (product == null) {
 					LOG.warn("ItemId found in database but not loaded from xml! BuyListId: {} Item ID: {}", buyListId, itemId);
 					continue;
 				}
-				if (count < product.getMaxCount())
-				{
+				if (count < product.getMaxCount()) {
 					product.setCount(count);
 					product.restartRestockTask(nextRestockTime);
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Failed to load buyList data from database.", e);
 		}
 	}
 	
 	@Override
-	public void parseDocument(Document doc, File f)
-	{
-		try
-		{
+	public void parseDocument(Document doc, File f) {
+		try {
 			final int buyListId = Integer.parseInt(f.getName().replaceAll(".xml", ""));
 			
-			for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling())
-			{
-				if ("list".equalsIgnoreCase(node.getNodeName()))
-				{
+			for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling()) {
+				if ("list".equalsIgnoreCase(node.getNodeName())) {
 					final L2BuyList buyList = new L2BuyList(buyListId);
-					for (Node list_node = node.getFirstChild(); list_node != null; list_node = list_node.getNextSibling())
-					{
-						if ("item".equalsIgnoreCase(list_node.getNodeName()))
-						{
+					for (Node list_node = node.getFirstChild(); list_node != null; list_node = list_node.getNextSibling()) {
+						if ("item".equalsIgnoreCase(list_node.getNodeName())) {
 							int itemId = -1;
 							long price = -1;
 							long restockDelay = -1;
@@ -124,36 +106,26 @@ public final class BuyListData implements IXmlReader
 							Node attr = attrs.getNamedItem("id");
 							itemId = Integer.parseInt(attr.getNodeValue());
 							attr = attrs.getNamedItem("price");
-							if (attr != null)
-							{
+							if (attr != null) {
 								price = Long.parseLong(attr.getNodeValue());
 							}
 							attr = attrs.getNamedItem("restock_delay");
-							if (attr != null)
-							{
+							if (attr != null) {
 								restockDelay = Long.parseLong(attr.getNodeValue());
 							}
 							attr = attrs.getNamedItem("count");
-							if (attr != null)
-							{
+							if (attr != null) {
 								count = Long.parseLong(attr.getNodeValue());
 							}
 							final L2Item item = ItemTable.getInstance().getTemplate(itemId);
-							if (item != null)
-							{
+							if (item != null) {
 								buyList.addProduct(new Product(buyList.getListId(), item, price, restockDelay, count));
-							}
-							else
-							{
+							} else {
 								LOG.warn("Item not found. BuyList: {} Item ID: {} File: {}", buyList.getListId(), itemId, f.getName());
 							}
-						}
-						else if ("npcs".equalsIgnoreCase(list_node.getNodeName()))
-						{
-							for (Node npcs_node = list_node.getFirstChild(); npcs_node != null; npcs_node = npcs_node.getNextSibling())
-							{
-								if ("npc".equalsIgnoreCase(npcs_node.getNodeName()))
-								{
+						} else if ("npcs".equalsIgnoreCase(list_node.getNodeName())) {
+							for (Node npcs_node = list_node.getFirstChild(); npcs_node != null; npcs_node = npcs_node.getNextSibling()) {
+								if ("npc".equalsIgnoreCase(npcs_node.getNodeName())) {
 									int npcId = Integer.parseInt(npcs_node.getTextContent());
 									buyList.addAllowedNpc(npcId);
 								}
@@ -163,31 +135,25 @@ public final class BuyListData implements IXmlReader
 					_buyLists.put(buyList.getListId(), buyList);
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("Failed to load buyList data from xml File: {}", f.getName(), e);
 		}
 	}
 	
 	@Override
-	public FileFilter getCurrentFileFilter()
-	{
+	public FileFilter getCurrentFileFilter() {
 		return NUMERIC_FILTER;
 	}
 	
-	public L2BuyList getBuyList(int listId)
-	{
+	public L2BuyList getBuyList(int listId) {
 		return _buyLists.get(listId);
 	}
 	
-	public static BuyListData getInstance()
-	{
+	public static BuyListData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final BuyListData _instance = new BuyListData();
 	}
 }

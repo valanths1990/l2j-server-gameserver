@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.model.actor.status;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.enums.DuelState;
 import com.l2jserver.gameserver.enums.PrivateStoreType;

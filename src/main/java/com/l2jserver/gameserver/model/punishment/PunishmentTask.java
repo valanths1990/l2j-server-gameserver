@@ -18,16 +18,13 @@
  */
 package com.l2jserver.gameserver.model.punishment;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.handler.IPunishmentHandler;
 import com.l2jserver.gameserver.handler.PunishmentHandler;
@@ -36,11 +33,12 @@ import com.l2jserver.gameserver.instancemanager.PunishmentManager;
 /**
  * @author UnAfraid
  */
-public class PunishmentTask implements Runnable
-{
-	protected static final Logger _log = Logger.getLogger(PunishmentTask.class.getName());
+public class PunishmentTask implements Runnable {
+	
+	private static final Logger _log = Logger.getLogger(PunishmentTask.class.getName());
 	
 	private static final String INSERT_QUERY = "INSERT INTO punishments (`key`, `affect`, `type`, `expiration`, `reason`, `punishedBy`) VALUES (?, ?, ?, ?, ?, ?)";
+	
 	private static final String UPDATE_QUERY = "UPDATE punishments SET expiration = ? WHERE id = ?";
 	
 	private int _id;
@@ -53,13 +51,11 @@ public class PunishmentTask implements Runnable
 	private boolean _isStored;
 	private ScheduledFuture<?> _task = null;
 	
-	public PunishmentTask(Object key, PunishmentAffect affect, PunishmentType type, long expirationTime, String reason, String punishedBy)
-	{
+	public PunishmentTask(Object key, PunishmentAffect affect, PunishmentType type, long expirationTime, String reason, String punishedBy) {
 		this(0, key, affect, type, expirationTime, reason, punishedBy, false);
 	}
 	
-	public PunishmentTask(int id, Object key, PunishmentAffect affect, PunishmentType type, long expirationTime, String reason, String punishedBy, boolean isStored)
-	{
+	public PunishmentTask(int id, Object key, PunishmentAffect affect, PunishmentType type, long expirationTime, String reason, String punishedBy, boolean isStored) {
 		_id = id;
 		_key = String.valueOf(key);
 		_affect = affect;
@@ -75,74 +71,64 @@ public class PunishmentTask implements Runnable
 	/**
 	 * @return affection value charId, account, ip, etc..
 	 */
-	public Object getKey()
-	{
+	public Object getKey() {
 		return _key;
 	}
 	
 	/**
 	 * @return {@link PunishmentAffect} affection type, account, character, ip, etc..
 	 */
-	public PunishmentAffect getAffect()
-	{
+	public PunishmentAffect getAffect() {
 		return _affect;
 	}
 	
 	/**
 	 * @return {@link PunishmentType} type of current punishment.
 	 */
-	public PunishmentType getType()
-	{
+	public PunishmentType getType() {
 		return _type;
 	}
 	
 	/**
 	 * @return milliseconds to the end of the current punishment, -1 for infinity.
 	 */
-	public final long getExpirationTime()
-	{
+	public final long getExpirationTime() {
 		return _expirationTime;
 	}
 	
 	/**
 	 * @return the reason for this punishment.
 	 */
-	public String getReason()
-	{
+	public String getReason() {
 		return _reason;
 	}
 	
 	/**
 	 * @return name of the punishment issuer.
 	 */
-	public String getPunishedBy()
-	{
+	public String getPunishedBy() {
 		return _punishedBy;
 	}
 	
 	/**
 	 * @return {@code true} if current punishment task is stored in database, {@code false} otherwise.
 	 */
-	public boolean isStored()
-	{
+	public boolean isStored() {
 		return _isStored;
 	}
 	
 	/**
 	 * @return {@code true} if current punishment task has expired, {@code false} otherwise.
 	 */
-	public final boolean isExpired()
-	{
+	public final boolean isExpired() {
 		return (_expirationTime > 0) && (System.currentTimeMillis() > _expirationTime);
 	}
 	
 	/**
 	 * Activates the punishment task.
 	 */
-	private void startPunishment()
-	{
-		if (isExpired())
-		{
+	private void startPunishment() {
+		if (isExpired()) {
 			return;
 		}
 		
@@ -156,8 +142,7 @@ public class PunishmentTask implements Runnable
 	/**
 	 * Stops the punishment task.
 	 */
-	public final void stopPunishment()
-	{
+	public final void stopPunishment() {
 		abortTask();
 		onEnd();
 	}
@@ -165,12 +150,9 @@ public class PunishmentTask implements Runnable
 	/**
 	 * Aborts the scheduled task.
 	 */
-	private void abortTask()
-	{
-		if (_task != null)
-		{
-			if (!_task.isCancelled() && !_task.isDone())
-			{
+	private void abortTask() {
+		if (_task != null) {
+			if (!_task.isCancelled() && !_task.isDone()) {
 				_task.cancel(false);
 			}
 			_task = null;
@@ -180,13 +162,10 @@ public class PunishmentTask implements Runnable
 	/**
 	 * Store and activate punishment upon start.
 	 */
-	private void onStart()
-	{
-		if (!_isStored)
-		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS))
-			{
+	private void onStart() {
+		if (!_isStored) {
+			try (var con = ConnectionFactory.getInstance().getConnection();
+				var ps = con.prepareStatement(INSERT_QUERY, RETURN_GENERATED_KEYS)) {
 				ps.setString(1, _key);
 				ps.setString(2, _affect.name());
 				ps.setString(3, _type.name());
@@ -194,24 +173,19 @@ public class PunishmentTask implements Runnable
 				ps.setString(5, _reason);
 				ps.setString(6, _punishedBy);
 				ps.execute();
-				try (ResultSet rset = ps.getGeneratedKeys())
-				{
-					if (rset.next())
-					{
+				try (var rset = ps.getGeneratedKeys()) {
+					if (rset.next()) {
 						_id = rset.getInt(1);
 					}
 				}
 				_isStored = true;
-			}
-			catch (SQLException e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't store punishment task for: " + _affect + " " + _key, e);
 			}
 		}
 		
 		final IPunishmentHandler handler = PunishmentHandler.getInstance().getHandler(_type);
-		if (handler != null)
-		{
+		if (handler != null) {
 			handler.onStart(this);
 		}
 	}
@@ -219,26 +193,20 @@ public class PunishmentTask implements Runnable
 	/**
 	 * Remove and deactivate punishment when it ends.
 	 */
-	private void onEnd()
-	{
-		if (_isStored)
-		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement ps = con.prepareStatement(UPDATE_QUERY))
-			{
+	private void onEnd() {
+		if (_isStored) {
+			try (var con = ConnectionFactory.getInstance().getConnection();
+				var ps = con.prepareStatement(UPDATE_QUERY)) {
 				ps.setLong(1, System.currentTimeMillis());
 				ps.setLong(2, _id);
 				ps.execute();
-			}
-			catch (SQLException e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't update punishment task for: " + _affect + " " + _key + " id: " + _id, e);
 			}
 		}
 		
 		final IPunishmentHandler handler = PunishmentHandler.getInstance().getHandler(_type);
-		if (handler != null)
-		{
+		if (handler != null) {
 			handler.onEnd(this);
 		}
 	}
@@ -247,8 +215,7 @@ public class PunishmentTask implements Runnable
 	 * Runs when punishment task ends in order to stop and remove it.
 	 */
 	@Override
-	public final void run()
-	{
+	public final void run() {
 		PunishmentManager.getInstance().stopPunishment(_key, _affect, _type);
 	}
 }

@@ -30,7 +30,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 

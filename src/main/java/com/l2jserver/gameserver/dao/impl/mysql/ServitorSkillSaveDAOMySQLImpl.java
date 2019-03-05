@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.ServitorSkillSaveDAO;
 import com.l2jserver.gameserver.data.sql.impl.SummonEffectsTable;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -42,19 +39,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Servitor Skill Save DAO MySQL implementation.
  * @author Zoey76
  */
-public class ServitorSkillSaveDAOMySQLImpl implements ServitorSkillSaveDAO
-{
+public class ServitorSkillSaveDAOMySQLImpl implements ServitorSkillSaveDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ServitorSkillSaveDAOMySQLImpl.class);
+	
 	private static final String ADD_SKILL_SAVE = "INSERT INTO character_summon_skills_save (ownerId,ownerClassIndex,summonSkillId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?,?,?)";
+	
 	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,remaining_time,buff_index FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=? ORDER BY buff_index ASC";
+	
 	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=?";
 	
 	@Override
-	public void insert(L2ServitorInstance servitor, boolean storeEffects)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE_SKILL_SAVE))
-		{
+	public void insert(L2ServitorInstance servitor, boolean storeEffects) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE_SKILL_SAVE)) {
 			con.setAutoCommit(false);
 			// Delete all current stored effects for summon to avoid dupe
 			ps.setInt(1, servitor.getOwner().getObjectId());
@@ -67,37 +65,29 @@ public class ServitorSkillSaveDAOMySQLImpl implements ServitorSkillSaveDAO
 			final List<Integer> storedSkills = new LinkedList<>();
 			
 			// Store all effect data along with calculated remaining
-			if (storeEffects)
-			{
-				try (PreparedStatement ps2 = con.prepareStatement(ADD_SKILL_SAVE))
-				{
-					for (BuffInfo info : servitor.getEffectList().getEffects())
-					{
-						if (info == null)
-						{
+			if (storeEffects) {
+				try (var ps2 = con.prepareStatement(ADD_SKILL_SAVE)) {
+					for (BuffInfo info : servitor.getEffectList().getEffects()) {
+						if (info == null) {
 							continue;
 						}
 						
 						final Skill skill = info.getSkill();
 						// Do not save heals.
-						if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS)
-						{
+						if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS) {
 							continue;
 						}
 						
-						if (skill.isToggle())
-						{
+						if (skill.isToggle()) {
 							continue;
 						}
 						
 						// Dances and songs are not kept in retail.
-						if (skill.isDance() && !Config.ALT_STORE_DANCES)
-						{
+						if (skill.isDance() && !Config.ALT_STORE_DANCES) {
 							continue;
 						}
 						
-						if (storedSkills.contains(skill.getReuseHashCode()))
-						{
+						if (storedSkills.contains(skill.getReuseHashCode())) {
 							continue;
 						}
 						
@@ -118,39 +108,29 @@ public class ServitorSkillSaveDAOMySQLImpl implements ServitorSkillSaveDAO
 				}
 			}
 			con.commit();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not store summon effect data for owner {},  class index {}, skill {}!", servitor.getOwner().getObjectId(), servitor.getOwner().getClassIndex(), servitor.getReferenceSkill(), e);
 		}
 	}
 	
 	@Override
-	public void load(L2ServitorInstance servitor)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
-			if (!SummonEffectsTable.getInstance().containsSkill(servitor.getOwner(), servitor.getReferenceSkill()))
-			{
-				try (PreparedStatement ps = con.prepareStatement(RESTORE_SKILL_SAVE))
-				{
+	public void load(L2ServitorInstance servitor) {
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
+			if (!SummonEffectsTable.getInstance().containsSkill(servitor.getOwner(), servitor.getReferenceSkill())) {
+				try (var ps = con.prepareStatement(RESTORE_SKILL_SAVE)) {
 					ps.setInt(1, servitor.getOwner().getObjectId());
 					ps.setInt(2, servitor.getOwner().getClassIndex());
 					ps.setInt(3, servitor.getReferenceSkill());
-					try (ResultSet rs = ps.executeQuery())
-					{
-						while (rs.next())
-						{
+					try (var rs = ps.executeQuery()) {
+						while (rs.next()) {
 							int effectCurTime = rs.getInt("remaining_time");
 							
 							final Skill skill = SkillData.getInstance().getSkill(rs.getInt("skill_id"), rs.getInt("skill_level"));
-							if (skill == null)
-							{
+							if (skill == null) {
 								continue;
 							}
 							
-							if (skill.hasEffects(EffectScope.GENERAL))
-							{
+							if (skill.hasEffects(EffectScope.GENERAL)) {
 								SummonEffectsTable.getInstance().addServitorEffect(servitor.getOwner(), servitor.getReferenceSkill(), skill, effectCurTime);
 							}
 						}
@@ -158,16 +138,13 @@ public class ServitorSkillSaveDAOMySQLImpl implements ServitorSkillSaveDAO
 				}
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement(DELETE_SKILL_SAVE))
-			{
+			try (var ps = con.prepareStatement(DELETE_SKILL_SAVE)) {
 				ps.setInt(1, servitor.getOwner().getObjectId());
 				ps.setInt(2, servitor.getOwner().getClassIndex());
 				ps.setInt(3, servitor.getReferenceSkill());
 				ps.executeUpdate();
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore {} active effect data!", servitor, e);
 		}
 	}

@@ -34,50 +34,42 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.CrystalType;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * This class holds the Enchant HP Bonus Data.
- * @author MrPoke, Zoey76
+ * @author MrPoke
+ * @author Zoey76
  */
-public class EnchantItemHPBonusData implements IXmlReader
-{
-	private final Map<CrystalType, List<Integer>> _armorHPBonuses = new EnumMap<>(CrystalType.class);
+public class EnchantItemHPBonusData implements IXmlReader {
 	
 	private static final float FULL_ARMOR_MODIFIER = 1.5f; // TODO: Move it to config!
+	
+	private final Map<CrystalType, List<Integer>> _armorHPBonuses = new EnumMap<>(CrystalType.class);
 	
 	/**
 	 * Instantiates a new enchant hp bonus data.
 	 */
-	protected EnchantItemHPBonusData()
-	{
+	protected EnchantItemHPBonusData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_armorHPBonuses.clear();
 		parseDatapackFile("data/stats/enchantHPBonus.xml");
 		LOG.info("{}: Loaded {} Enchant HP Bonuses.", getClass().getSimpleName(), _armorHPBonuses.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("enchantHP".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("enchantHP".equalsIgnoreCase(d.getNodeName())) {
 						final List<Integer> bonuses = new ArrayList<>(12);
-						for (Node e = d.getFirstChild(); e != null; e = e.getNextSibling())
-						{
-							if ("bonus".equalsIgnoreCase(e.getNodeName()))
-							{
+						for (Node e = d.getFirstChild(); e != null; e = e.getNextSibling()) {
+							if ("bonus".equalsIgnoreCase(e.getNodeName())) {
 								bonuses.add(Integer.parseInt(e.getTextContent()));
 							}
 						}
@@ -87,18 +79,14 @@ public class EnchantItemHPBonusData implements IXmlReader
 			}
 		}
 		
-		if (!_armorHPBonuses.isEmpty())
-		{
+		if (!_armorHPBonuses.isEmpty()) {
 			final ItemTable it = ItemTable.getInstance();
 			// Armors
 			final Collection<Integer> armorIds = it.getAllArmorsId();
-			for (Integer itemId : armorIds)
-			{
+			for (Integer itemId : armorIds) {
 				L2Item item = it.getTemplate(itemId);
-				if ((item != null) && (item.getCrystalType() != CrystalType.NONE))
-				{
-					switch (item.getBodyPart())
-					{
+				if ((item != null) && (item.getCrystalType() != CrystalType.NONE)) {
+					switch (item.getBodyPart()) {
 						case L2Item.SLOT_CHEST:
 						case L2Item.SLOT_FEET:
 						case L2Item.SLOT_GLOVES:
@@ -124,17 +112,14 @@ public class EnchantItemHPBonusData implements IXmlReader
 	 * @param item the item
 	 * @return the HP bonus
 	 */
-	public final int getHPBonus(L2ItemInstance item)
-	{
+	public final int getHPBonus(L2ItemInstance item) {
 		final List<Integer> values = _armorHPBonuses.get(item.getItem().getItemGradeSPlus());
-		if ((values == null) || values.isEmpty() || (item.getOlyEnchantLevel() <= 0))
-		{
+		if ((values == null) || values.isEmpty() || (item.getOlyEnchantLevel() <= 0)) {
 			return 0;
 		}
 		
 		final int bonus = values.get(Math.min(item.getOlyEnchantLevel(), values.size()) - 1);
-		if (item.getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR)
-		{
+		if (item.getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR) {
 			return (int) (bonus * FULL_ARMOR_MODIFIER);
 		}
 		return bonus;
@@ -144,13 +129,11 @@ public class EnchantItemHPBonusData implements IXmlReader
 	 * Gets the single instance of EnchantHPBonusData.
 	 * @return single instance of EnchantHPBonusData
 	 */
-	public static final EnchantItemHPBonusData getInstance()
-	{
+	public static final EnchantItemHPBonusData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final EnchantItemHPBonusData _instance = new EnchantItemHPBonusData();
 	}
 }

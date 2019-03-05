@@ -18,14 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.SubclassDAO;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.base.SubClass;
@@ -34,28 +30,27 @@ import com.l2jserver.gameserver.model.base.SubClass;
  * Subclass DAO MySQL implementation.
  * @author Zoey76
  */
-public class SubclassDAOMySQLImpl implements SubclassDAO
-{
+public class SubclassDAOMySQLImpl implements SubclassDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(SubclassDAOMySQLImpl.class);
 	
 	private static final String SELECT = "SELECT class_id,exp,sp,level,class_index FROM character_subclasses WHERE charId=? ORDER BY class_index ASC";
+	
 	private static final String INSERT = "INSERT INTO character_subclasses (charId,class_id,exp,sp,level,class_index) VALUES (?,?,?,?,?,?)";
+	
 	private static final String UPDATE = "UPDATE character_subclasses SET exp=?,sp=?,level=?,class_id=? WHERE charId=? AND class_index =?";
+	
 	private static final String DELETE = "DELETE FROM character_subclasses WHERE charId=? AND class_index=?";
 	
 	@Override
-	public void update(L2PcInstance player)
-	{
-		if (player.getTotalSubClasses() <= 0)
-		{
+	public void update(L2PcInstance player) {
+		if (player.getTotalSubClasses() <= 0) {
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE))
-		{
-			for (SubClass subClass : player.getSubClasses().values())
-			{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(UPDATE)) {
+			for (SubClass subClass : player.getSubClasses().values()) {
 				ps.setLong(1, subClass.getExp());
 				ps.setInt(2, subClass.getSp());
 				ps.setInt(3, subClass.getLevel());
@@ -65,19 +60,15 @@ public class SubclassDAOMySQLImpl implements SubclassDAO
 				ps.addBatch();
 			}
 			ps.executeBatch();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not store sub class data for {} : {}", player, e);
 		}
 	}
 	
 	@Override
-	public boolean insert(L2PcInstance player, SubClass newClass)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+	public boolean insert(L2PcInstance player, SubClass newClass) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, newClass.getClassId());
 			ps.setLong(3, newClass.getExp());
@@ -85,9 +76,7 @@ public class SubclassDAOMySQLImpl implements SubclassDAO
 			ps.setInt(5, newClass.getLevel());
 			ps.setInt(6, newClass.getClassIndex());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not add character sub class for {}, {}", player, e);
 			return false;
 		}
@@ -95,32 +84,24 @@ public class SubclassDAOMySQLImpl implements SubclassDAO
 	}
 	
 	@Override
-	public void delete(L2PcInstance player, int classIndex)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE))
-		{
+	public void delete(L2PcInstance player, int classIndex) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, classIndex);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not delete subclass for {} to class index {}, {}", player, classIndex, e);
 		}
 	}
 	
 	@Override
-	public void load(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+	public void load(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			ps.setInt(1, player.getObjectId());
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					final SubClass subClass = new SubClass(player);
 					subClass.setClassId(rs.getInt("class_id"));
 					subClass.setExp(rs.getLong("exp"));
@@ -132,9 +113,7 @@ public class SubclassDAOMySQLImpl implements SubclassDAO
 					player.getSubClasses().put(subClass.getClassIndex(), subClass);
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore classes for {}, {}", player, e);
 		}
 	}

@@ -31,53 +31,41 @@ import com.l2jserver.gameserver.model.options.OptionsSkillHolder;
 import com.l2jserver.gameserver.model.options.OptionsSkillType;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.functions.FuncTemplate;
-import com.l2jserver.util.data.xml.IXmlReader;
+import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Item Option data.
  * @author UnAfraid
  */
-public class OptionData implements IXmlReader
-{
+public class OptionData implements IXmlReader {
+	
 	private final Map<Integer, Options> _optionData = new HashMap<>();
 	
-	protected OptionData()
-	{
+	protected OptionData() {
 		load();
 	}
 	
 	@Override
-	public synchronized void load()
-	{
+	public synchronized void load() {
 		_optionData.clear();
 		parseDatapackDirectory("data/stats/options", false);
 		LOG.info("{}: Loaded: {} Options.", getClass().getSimpleName(), _optionData.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("option".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("option".equalsIgnoreCase(d.getNodeName())) {
 						final int id = parseInteger(d.getAttributes(), "id");
 						final Options op = new Options(id);
 						
-						for (Node cd = d.getFirstChild(); cd != null; cd = cd.getNextSibling())
-						{
-							switch (cd.getNodeName())
-							{
-								case "for":
-								{
-									for (Node fd = cd.getFirstChild(); fd != null; fd = fd.getNextSibling())
-									{
-										switch (fd.getNodeName())
-										{
+						for (Node cd = d.getFirstChild(); cd != null; cd = cd.getNextSibling()) {
+							switch (cd.getNodeName()) {
+								case "for": {
+									for (Node fd = cd.getFirstChild(); fd != null; fd = fd.getNextSibling()) {
+										switch (fd.getNodeName()) {
 											case "add":
 											case "sub":
 											case "mul":
@@ -85,8 +73,7 @@ public class OptionData implements IXmlReader
 											case "set":
 											case "share":
 											case "enchant":
-											case "enchanthp":
-											{
+											case "enchanthp": {
 												parseFuncs(fd.getAttributes(), fd.getNodeName(), op);
 											}
 										}
@@ -94,28 +81,23 @@ public class OptionData implements IXmlReader
 									}
 									break;
 								}
-								case "active_skill":
-								{
+								case "active_skill": {
 									op.setActiveSkill(new SkillHolder(parseInteger(cd.getAttributes(), "id"), parseInteger(cd.getAttributes(), "level")));
 									break;
 								}
-								case "passive_skill":
-								{
+								case "passive_skill": {
 									op.setPassiveSkill(new SkillHolder(parseInteger(cd.getAttributes(), "id"), parseInteger(cd.getAttributes(), "level")));
 									break;
 								}
-								case "attack_skill":
-								{
+								case "attack_skill": {
 									op.addActivationSkill(new OptionsSkillHolder(parseInteger(cd.getAttributes(), "id"), parseInteger(cd.getAttributes(), "level"), parseDouble(cd.getAttributes(), "chance"), OptionsSkillType.ATTACK));
 									break;
 								}
-								case "magic_skill":
-								{
+								case "magic_skill": {
 									op.addActivationSkill(new OptionsSkillHolder(parseInteger(cd.getAttributes(), "id"), parseInteger(cd.getAttributes(), "level"), parseDouble(cd.getAttributes(), "chance"), OptionsSkillType.MAGIC));
 									break;
 								}
-								case "critical_skill":
-								{
+								case "critical_skill": {
 									op.addActivationSkill(new OptionsSkillHolder(parseInteger(cd.getAttributes(), "id"), parseInteger(cd.getAttributes(), "level"), parseDouble(cd.getAttributes(), "chance"), OptionsSkillType.CRITICAL));
 									break;
 								}
@@ -128,21 +110,18 @@ public class OptionData implements IXmlReader
 		}
 	}
 	
-	private void parseFuncs(NamedNodeMap attrs, String functionName, Options op)
-	{
+	private void parseFuncs(NamedNodeMap attrs, String functionName, Options op) {
 		Stats stat = Stats.valueOfXml(parseString(attrs, "stat"));
 		double val = parseDouble(attrs, "val");
 		int order = -1;
 		final Node orderNode = attrs.getNamedItem("order");
-		if (orderNode != null)
-		{
+		if (orderNode != null) {
 			order = Integer.parseInt(orderNode.getNodeValue());
 		}
 		op.addFunc(new FuncTemplate(null, null, functionName, order, stat, val));
 	}
 	
-	public Options getOptions(int id)
-	{
+	public Options getOptions(int id) {
 		return _optionData.get(id);
 	}
 	
@@ -150,13 +129,11 @@ public class OptionData implements IXmlReader
 	 * Gets the single instance of OptionsData.
 	 * @return single instance of OptionsData
 	 */
-	public static final OptionData getInstance()
-	{
+	public static final OptionData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final OptionData _instance = new OptionData();
 	}
 }

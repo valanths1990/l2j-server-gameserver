@@ -18,15 +18,12 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Timestamp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.PlayerDAO;
 import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
@@ -42,29 +39,29 @@ import com.l2jserver.gameserver.model.entity.Hero;
  * Player DAO MySQL implementation.
  * @author Zoey76
  */
-public class PlayerDAOMySQLImpl implements PlayerDAO
-{
+public class PlayerDAOMySQLImpl implements PlayerDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(PlayerDAOMySQLImpl.class);
 	
 	private static final String INSERT = "INSERT INTO characters (account_name,charId,char_name,level,maxHp,curHp,maxCp,curCp,maxMp,curMp,face,hairStyle,hairColor,sex,exp,sp,karma,fame,pvpkills,pkkills,clanid,race,classid,deletetime,cancraft,title,title_color,accesslevel,online,isin7sdungeon,clan_privs,wantspeace,base_class,newbie,nobless,power_grade,createDate) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	
 	private static final String SELECT = "SELECT * FROM characters WHERE charId=?";
+	
 	private static final String UPDATE = "UPDATE characters SET level=?,maxHp=?,curHp=?,maxCp=?,curCp=?,maxMp=?,curMp=?,face=?,hairStyle=?,hairColor=?,sex=?,heading=?,x=?,y=?,z=?,exp=?,expBeforeDeath=?,sp=?,karma=?,fame=?,pvpkills=?,pkkills=?,clanid=?,race=?,classid=?,deletetime=?,title=?,title_color=?,accesslevel=?,online=?,isin7sdungeon=?,clan_privs=?,wantspeace=?,base_class=?,onlinetime=?,newbie=?,nobless=?,power_grade=?,subpledge=?,lvl_joined_academy=?,apprentice=?,sponsor=?,clan_join_expiry_time=?,clan_create_expiry_time=?,char_name=?,death_penalty_level=?,bookmarkslot=?,vitality_points=?,language=? WHERE charId=?";
+	
 	private static final String UPDATE_ONLINE = "UPDATE characters SET online=?, lastAccess=? WHERE charId=?";
+	
 	private static final String SELECT_CHARACTERS = "SELECT charId, char_name FROM characters WHERE account_name=? AND charId<>?";
 	
 	@Override
-	public L2PcInstance load(int objectId)
-	{
+	public L2PcInstance load(int objectId) {
 		L2PcInstance player = null;
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(SELECT))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(SELECT)) {
 			// Retrieve the L2PcInstance from the characters table of the database
 			ps.setInt(1, objectId);
-			try (ResultSet rset = ps.executeQuery())
-			{
-				if (rset.next())
-				{
+			try (var rset = ps.executeQuery()) {
+				if (rset.next()) {
 					final int activeClassId = rset.getInt("classid");
 					final boolean female = rset.getInt("sex") != Sex.MALE.ordinal();
 					PcAppearance app = new PcAppearance(rset.getByte("face"), rset.getByte("hairColor"), rset.getByte("hairStyle"), female);
@@ -87,13 +84,11 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 					player.setNoble(rset.getInt("nobless") == 1);
 					
 					player.setClanJoinExpiryTime(rset.getLong("clan_join_expiry_time"));
-					if (player.getClanJoinExpiryTime() < System.currentTimeMillis())
-					{
+					if (player.getClanJoinExpiryTime() < System.currentTimeMillis()) {
 						player.setClanJoinExpiryTime(0);
 					}
 					player.setClanCreateExpiryTime(rset.getLong("clan_create_expiry_time"));
-					if (player.getClanCreateExpiryTime() < System.currentTimeMillis())
-					{
+					if (player.getClanCreateExpiryTime() < System.currentTimeMillis()) {
 						player.setClanCreateExpiryTime(0);
 					}
 					
@@ -117,27 +112,21 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 					// Restore Subclass Data (cannot be done earlier in function)
 					DAOFactory.getInstance().getSubclassDAO().load(player);
 					
-					if (activeClassId != player.getBaseClass())
-					{
-						for (SubClass subClass : player.getSubClasses().values())
-						{
-							if (subClass.getClassId() == activeClassId)
-							{
+					if (activeClassId != player.getBaseClass()) {
+						for (SubClass subClass : player.getSubClasses().values()) {
+							if (subClass.getClassId() == activeClassId) {
 								player.setClassIndex(subClass.getClassIndex());
 							}
 						}
 					}
 					
-					if ((player.getClassIndex() == 0) && (activeClassId != player.getBaseClass()))
-					{
+					if ((player.getClassIndex() == 0) && (activeClassId != player.getBaseClass())) {
 						// Subclass in use but doesn't exist in DB -
 						// a possible restart-while-modify-subclass cheat has been attempted.
 						// Switching to use base class
 						player.setClassId(player.getBaseClass());
 						LOG.warn("{} reverted to base class. Possibly has tried a relogin exploit while subclassing.", player);
-					}
-					else
-					{
+					} else {
 						player.setActiveClass(activeClassId);
 					}
 					
@@ -169,32 +158,23 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 					
 					player.setClan(ClanTable.getInstance().getClan(rset.getInt("clanid")));
 					
-					if (player.getClan() != null)
-					{
-						if (player.getClan().getLeaderId() != player.getObjectId())
-						{
-							if (player.getPowerGrade() == 0)
-							{
+					if (player.getClan() != null) {
+						if (player.getClan().getLeaderId() != player.getObjectId()) {
+							if (player.getPowerGrade() == 0) {
 								player.setPowerGrade(5);
 							}
 							player.setClanPrivileges(player.getClan().getRankPrivs(player.getPowerGrade()));
-						}
-						else
-						{
+						} else {
 							player.getClanPrivileges().setAll();
 							player.setPowerGrade(1);
 						}
 						player.setPledgeClass(L2ClanMember.calculatePledgeClass(player));
-					}
-					else
-					{
-						if (player.isNoble())
-						{
+					} else {
+						if (player.isNoble()) {
 							player.setPledgeClass(5);
 						}
 						
-						if (player.isHero())
-						{
+						if (player.isHero()) {
 							player.setPledgeClass(8);
 						}
 						
@@ -202,42 +182,32 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Failed loading character. {}", e);
 		}
 		return player;
 	}
 	
 	@Override
-	public void loadCharacters(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement stmt = con.prepareStatement(SELECT_CHARACTERS))
-		{
+	public void loadCharacters(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var stmt = con.prepareStatement(SELECT_CHARACTERS)) {
 			stmt.setString(1, player.getAccountName());
 			stmt.setInt(2, player.getObjectId());
-			try (ResultSet rs = stmt.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = stmt.executeQuery()) {
+				while (rs.next()) {
 					player.getAccountChars().put(rs.getInt("charId"), rs.getString("char_name"));
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Failed to load {} characters.", player, e);
 		}
 	}
 	
 	@Override
-	public boolean insert(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+	public boolean insert(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			ps.setString(1, player.getAccountName());
 			ps.setInt(2, player.getObjectId());
 			ps.setString(3, player.getName());
@@ -276,9 +246,7 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 			ps.setLong(36, 0);
 			ps.setTimestamp(37, new Timestamp(player.getCreateDate().getTimeInMillis()));
 			ps.executeUpdate();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not insert char data: {}", e);
 			return false;
 		}
@@ -286,17 +254,14 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 	}
 	
 	@Override
-	public void storeCharBase(L2PcInstance player)
-	{
+	public void storeCharBase(L2PcInstance player) {
 		long totalOnlineTime = player.getOnlineTime();
-		if (player.getOnlineBeginTime() > 0)
-		{
+		if (player.getOnlineBeginTime() > 0) {
 			totalOnlineTime += (System.currentTimeMillis() - player.getOnlineBeginTime()) / 1000;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(UPDATE)) {
 			ps.setInt(1, player.getBaseLevel());
 			ps.setInt(2, player.getMaxHp());
 			ps.setDouble(3, player.getCurrentHp());
@@ -349,26 +314,20 @@ public class PlayerDAOMySQLImpl implements PlayerDAO
 			ps.setInt(50, player.getObjectId());
 			
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not store {} base data: {}", player, e);
 		}
 	}
 	
 	@Override
-	public void updateOnlineStatus(L2PcInstance player)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(UPDATE_ONLINE))
-		{
+	public void updateOnlineStatus(L2PcInstance player) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(UPDATE_ONLINE)) {
 			ps.setInt(1, player.isOnlineInt());
 			ps.setLong(2, System.currentTimeMillis());
 			ps.setInt(3, player.getObjectId());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Failed updating character online status. {}", e);
 		}
 	}

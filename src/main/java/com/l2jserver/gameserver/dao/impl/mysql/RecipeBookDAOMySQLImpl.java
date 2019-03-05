@@ -18,15 +18,10 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.dao.RecipeBookDAO;
 import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 import com.l2jserver.gameserver.model.L2RecipeList;
@@ -36,8 +31,8 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Recipe Book DAO MySQL implementation.
  * @author Zoey76
  */
-public class RecipeBookDAOMySQLImpl implements RecipeBookDAO
-{
+public class RecipeBookDAOMySQLImpl implements RecipeBookDAO {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(RecipeBookDAOMySQLImpl.class);
 	
 	private static final String INSERT = "INSERT INTO character_recipebook (charId, id, classIndex, type) values(?,?,?,?)";
@@ -49,86 +44,64 @@ public class RecipeBookDAOMySQLImpl implements RecipeBookDAO
 	private static final String SELECT = "SELECT id FROM character_recipebook WHERE charId=? AND classIndex=? AND type = 1";
 	
 	@Override
-	public void insert(L2PcInstance player, int recipeId, boolean isDwarf)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(INSERT))
-		{
+	public void insert(L2PcInstance player, int recipeId, boolean isDwarf) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(INSERT)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, recipeId);
 			ps.setInt(3, isDwarf ? player.getClassIndex() : 0);
 			ps.setInt(4, isDwarf ? 1 : 0);
 			ps.execute();
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOG.warn("SQL exception while inserting recipe: {} from player {}", recipeId, player, e);
 		}
 	}
 	
 	@Override
-	public void delete(L2PcInstance player, int recipeId, boolean isDwarf)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(DELETE))
-		{
+	public void delete(L2PcInstance player, int recipeId, boolean isDwarf) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(DELETE)) {
 			ps.setInt(1, player.getObjectId());
 			ps.setInt(2, recipeId);
 			ps.setInt(3, isDwarf ? player.getClassIndex() : 0);
 			ps.execute();
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			LOG.warn("SQL exception while deleting recipe: {} from player {}", recipeId, player, e);
 		}
 	}
 	
 	@Override
-	public void load(L2PcInstance player, boolean loadCommon)
-	{
+	public void load(L2PcInstance player, boolean loadCommon) {
 		// TODO(Zoey76): Split into two methods.
 		final String sql = loadCommon ? SELECT_COMMON : SELECT;
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement(sql))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement(sql)) {
 			ps.setInt(1, player.getObjectId());
-			if (!loadCommon)
-			{
+			if (!loadCommon) {
 				ps.setInt(2, player.getClassIndex());
 			}
 			
-			try (ResultSet rset = ps.executeQuery())
-			{
+			try (var rset = ps.executeQuery()) {
 				// TODO(Zoey76): Why only dwarven is cleared?
 				player.getDwarvenRecipeBookClear();
 				
 				final RecipeData rd = RecipeData.getInstance();
-				while (rset.next())
-				{
+				while (rset.next()) {
 					final L2RecipeList recipe = rd.getRecipeList(rset.getInt("id"));
-					if (loadCommon)
-					{
-						if (rset.getInt(2) == 1)
-						{
-							if (rset.getInt(3) == player.getClassIndex())
-							{
+					if (loadCommon) {
+						if (rset.getInt(2) == 1) {
+							if (rset.getInt(3) == player.getClassIndex()) {
 								player.registerDwarvenRecipeList(recipe, false);
 							}
-						}
-						else
-						{
+						} else {
 							player.registerCommonRecipeList(recipe, false);
 						}
-					}
-					else
-					{
+					} else {
 						player.registerDwarvenRecipeList(recipe, false);
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("Could not restore recipe book data: {}", e);
 		}
 	}

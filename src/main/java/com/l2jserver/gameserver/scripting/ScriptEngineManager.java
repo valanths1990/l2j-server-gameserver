@@ -18,8 +18,6 @@
  */
 package com.l2jserver.gameserver.scripting;
 
-import static com.l2jserver.Config.VERBOSE_LOADING;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,15 +36,14 @@ import org.mdkt.compiler.InMemoryJavaCompiler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * Script engine manager.
  * @author KenM
  * @author Zoey76
  */
-public final class ScriptEngineManager
-{
+public final class ScriptEngineManager {
 	private static final Logger LOG = LoggerFactory.getLogger(ScriptEngineManager.class);
 	
 	public static final File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getAbsolutePath(), "data/scripts");
@@ -57,242 +54,180 @@ public final class ScriptEngineManager
 	
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
-	private static final Class<?>[] ARG_MAIN = new Class[]
-	{
+	private static final Class<?>[] ARG_MAIN = new Class[] {
 		String[].class
 	};
 	
 	private static final InMemoryJavaCompiler COMPILER = InMemoryJavaCompiler.newInstance().useOptions("-classpath", CLASS_PATH);
 	
-	public void executeScriptList(File list) throws Exception
-	{
-		if (Config.NO_QUESTS)
-		{
-			if (!Config.NO_HANDLERS)
-			{
+	public void executeScriptList(File list) throws Exception {
+		if (Config.NO_QUESTS) {
+			if (!Config.NO_HANDLERS) {
 				addSource(new File(SCRIPT_FOLDER, "handlers/MasterHandler.java"));
 				LOG.info("Handlers loaded, all other scripts skipped!");
 			}
 			return;
 		}
 		
-		if (list.isFile())
-		{
+		if (list.isFile()) {
 			try (FileInputStream fis = new FileInputStream(list);
 				InputStreamReader isr = new InputStreamReader(fis);
-				LineNumberReader lnr = new LineNumberReader(isr))
-			{
+				LineNumberReader lnr = new LineNumberReader(isr)) {
 				String line;
-				while ((line = lnr.readLine()) != null)
-				{
-					if (Config.NO_HANDLERS && line.contains("MasterHandler.java"))
-					{
+				while ((line = lnr.readLine()) != null) {
+					if (Config.NO_HANDLERS && line.contains("MasterHandler.java")) {
 						continue;
 					}
 					
 					String[] parts = line.trim().split("#");
 					
-					if ((parts.length > 0) && !parts[0].isEmpty() && (parts[0].charAt(0) != '#'))
-					{
+					if ((parts.length > 0) && !parts[0].isEmpty() && (parts[0].charAt(0) != '#')) {
 						line = parts[0];
 						
-						if (line.endsWith("/**"))
-						{
+						if (line.endsWith("/**")) {
 							line = line.substring(0, line.length() - 3);
-						}
-						else if (line.endsWith("/*"))
-						{
+						} else if (line.endsWith("/*")) {
 							line = line.substring(0, line.length() - 2);
 						}
 						
 						final File file = new File(SCRIPT_FOLDER, line);
-						if (file.isDirectory() && parts[0].endsWith("/**"))
-						{
+						if (file.isDirectory() && parts[0].endsWith("/**")) {
 							executeAllScriptsInDirectory(file, true);
-						}
-						else if (file.isDirectory() && parts[0].endsWith("/*"))
-						{
+						} else if (file.isDirectory() && parts[0].endsWith("/*")) {
 							executeAllScriptsInDirectory(file, false);
-						}
-						else if (file.isFile())
-						{
+						} else if (file.isFile()) {
 							addSource(file);
-						}
-						else
-						{
+						} else {
 							LOG.warn("Failed loading: ({}) @ {}:{} - Reason: doesnt exists or is not a file.", file.getCanonicalPath(), list.getName(), lnr.getLineNumber());
 						}
 					}
 				}
 			}
-		}
-		else
-		{
+		} else {
 			throw new IllegalArgumentException("Argument must be an file containing a list of scripts to be loaded");
 		}
 		
 		final Map<String, Class<?>> classes = COMPILER.compileAll();
-		for (Entry<String, Class<?>> e : classes.entrySet())
-		{
+		for (Entry<String, Class<?>> e : classes.entrySet()) {
 			runMain(e.getValue());
 		}
 	}
 	
-	private void executeAllScriptsInDirectory(File dir, boolean recurseDown)
-	{
-		if (dir.isDirectory())
-		{
+	private void executeAllScriptsInDirectory(File dir, boolean recurseDown) {
+		if (dir.isDirectory()) {
 			final File[] files = dir.listFiles();
-			if (files == null)
-			{
+			if (files == null) {
 				return;
 			}
 			
-			for (File file : files)
-			{
-				if (file.isDirectory() && recurseDown)
-				{
-					if (VERBOSE_LOADING)
-					{
+			for (File file : files) {
+				if (file.isDirectory() && recurseDown) {
+					if (Config.VERBOSE_LOADING) {
 						LOG.info("Entering folder: {}", file.getName());
 					}
 					executeAllScriptsInDirectory(file, recurseDown);
-				}
-				else if (file.isFile())
-				{
+				} else if (file.isFile()) {
 					addSource(file);
 				}
 			}
-		}
-		else
-		{
+		} else {
 			throw new IllegalArgumentException("The argument directory either doesnt exists or is not an directory.");
 		}
 	}
 	
-	public Class<?> compileScript(File file)
-	{
+	public Class<?> compileScript(File file) {
 		try (FileInputStream fis = new FileInputStream(file);
 			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader reader = new BufferedReader(isr))
-		{
+			BufferedReader reader = new BufferedReader(isr)) {
 			return COMPILER.compile(getClassForFile(file), readerToString(reader));
-		}
-		catch (Exception ex)
-		{
+		} catch (Exception ex) {
 			LOG.warn("Error executing script!", ex);
 		}
 		return null;
 	}
 	
-	public void executeScript(File file) throws Exception
-	{
+	public void executeScript(File file) throws Exception {
 		final Class<?> clazz = compileScript(file);
 		
 		runMain(clazz);
 	}
 	
-	public void executeScript(String file) throws Exception
-	{
+	public void executeScript(String file) throws Exception {
 		executeScript(new File(SCRIPT_FOLDER, file));
 	}
 	
-	public void addSource(File file)
-	{
-		if (VERBOSE_LOADING)
-		{
+	public void addSource(File file) {
+		if (Config.VERBOSE_LOADING) {
 			LOG.info("Loading Script: {}", file.getAbsolutePath());
 		}
 		
 		try (FileInputStream fis = new FileInputStream(file);
 			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader reader = new BufferedReader(isr))
-		{
+			BufferedReader reader = new BufferedReader(isr)) {
 			COMPILER.addSource(getClassForFile(file), readerToString(reader));
-		}
-		catch (Exception ex)
-		{
+		} catch (Exception ex) {
 			LOG.warn("Error executing script!", ex);
 		}
 	}
 	
-	private static String getClassForFile(File script)
-	{
+	private static String getClassForFile(File script) {
 		final String path = script.getAbsolutePath();
 		final String scpPath = SCRIPT_FOLDER.getAbsolutePath();
-		if (path.startsWith(scpPath))
-		{
+		if (path.startsWith(scpPath)) {
 			final int idx = path.lastIndexOf('.');
 			return path.substring(scpPath.length() + 1, idx).replace('/', '.').replace('\\', '.');
 		}
 		return null;
 	}
 	
-	private static void runMain(Class<?> clazz) throws Exception
-	{
+	private static void runMain(Class<?> clazz) throws Exception {
 		final boolean isPublicClazz = Modifier.isPublic(clazz.getModifiers());
 		final Method mainMethod = findMethod(clazz, MAIN, ARG_MAIN);
-		if (mainMethod != null)
-		{
-			if (!isPublicClazz)
-			{
+		if (mainMethod != null) {
+			if (!isPublicClazz) {
 				mainMethod.setAccessible(true);
 			}
 			
-			mainMethod.invoke(null, new Object[]
-			{
+			mainMethod.invoke(null, new Object[] {
 				EMPTY_STRING_ARRAY
 			});
 		}
 	}
 	
-	private static String readerToString(Reader reader) throws ScriptException
-	{
-		try (BufferedReader in = new BufferedReader(reader))
-		{
+	private static String readerToString(Reader reader) throws ScriptException {
+		try (BufferedReader in = new BufferedReader(reader)) {
 			final StringBuilder result = new StringBuilder();
 			String line;
-			while ((line = in.readLine()) != null)
-			{
+			while ((line = in.readLine()) != null) {
 				result.append(line).append(System.lineSeparator());
 			}
 			return result.toString();
-		}
-		catch (IOException ex)
-		{
+		} catch (IOException ex) {
 			throw new ScriptException(ex);
 		}
 	}
 	
-	private static Method findMethod(Class<?> clazz, String methodName, Class<?>[] args)
-	{
-		try
-		{
+	private static Method findMethod(Class<?> clazz, String methodName, Class<?>[] args) {
+		try {
 			final Method mainMethod = clazz.getMethod(methodName, args);
 			final int modifiers = mainMethod.getModifiers();
-			if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers))
-			{
+			if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
 				return mainMethod;
 			}
-		}
-		catch (NoSuchMethodException ignored)
-		{
+		} catch (NoSuchMethodException ignored) {
 		}
 		return null;
 	}
 	
-	public File getCurrentLoadingScript()
-	{
+	public File getCurrentLoadingScript() {
 		return null;
 	}
 	
-	public static ScriptEngineManager getInstance()
-	{
+	public static ScriptEngineManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final ScriptEngineManager INSTANCE = new ScriptEngineManager();
 	}
 }

@@ -20,7 +20,7 @@ package com.l2jserver.gameserver.model.olympiad;
 
 import java.util.List;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * @author DS

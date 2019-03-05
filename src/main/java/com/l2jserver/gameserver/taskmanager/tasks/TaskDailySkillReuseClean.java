@@ -18,55 +18,45 @@
  */
 package com.l2jserver.gameserver.taskmanager.tasks;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.taskmanager.Task;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
 import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
 import com.l2jserver.gameserver.taskmanager.TaskTypes;
 
-public class TaskDailySkillReuseClean extends Task
-{
+public class TaskDailySkillReuseClean extends Task {
+	
 	private static final String NAME = "daily_skill_clean";
 	
-	private static final int[] _daily_skills =
-	{
+	private static final int[] _daily_skills = {
 		2510,
 		22180
 	};
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 	
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
-			for (int skill_id : _daily_skills)
-			{
-				try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_skills_save WHERE skill_id=?;"))
-				{
+	public void onTimeElapsed(ExecutedTask task) {
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
+			for (int skill_id : _daily_skills) {
+				try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_skills_save WHERE skill_id=?;")) {
 					ps.setInt(1, skill_id);
 					ps.execute();
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.severe(getClass().getSimpleName() + ": Could not reset daily skill reuse: " + e);
 		}
 		_log.info("Daily skill reuse cleaned.");
 	}
 	
 	@Override
-	public void initializate()
-	{
+	public void initializate() {
 		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", "06:30:00", "");
 	}

@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -42,13 +42,11 @@ import com.l2jserver.gameserver.network.serverpackets.ExBrExtraUserInfo;
 import com.l2jserver.gameserver.network.serverpackets.MultiSellList;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
+import com.l2jserver.gameserver.util.IXmlReader;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.data.xml.IXmlReader;
 import com.l2jserver.util.file.filter.NumericNameFilter;
 
-public final class MultisellData implements IXmlReader
-{
-	private final Map<Integer, ListContainer> _entries = new HashMap<>();
+public final class MultisellData implements IXmlReader {
 	
 	public static final int PAGE_SIZE = 40;
 	// Special IDs.
@@ -58,18 +56,17 @@ public final class MultisellData implements IXmlReader
 	// Misc
 	private static final FileFilter NUMERIC_FILTER = new NumericNameFilter();
 	
-	protected MultisellData()
-	{
+	private final Map<Integer, ListContainer> _entries = new HashMap<>();
+	
+	protected MultisellData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_entries.clear();
 		parseDatapackDirectory("data/multisell", false);
-		if (Config.CUSTOM_MULTISELL_LOAD)
-		{
+		if (Config.CUSTOM_MULTISELL_LOAD) {
 			parseDatapackDirectory("data/multisell/custom", false);
 		}
 		
@@ -78,49 +75,35 @@ public final class MultisellData implements IXmlReader
 	}
 	
 	@Override
-	public void parseDocument(Document doc, File f)
-	{
-		try
-		{
+	public void parseDocument(Document doc, File f) {
+		try {
 			int id = Integer.parseInt(f.getName().replaceAll(".xml", ""));
 			int entryId = 1;
 			Node att;
 			final ListContainer list = new ListContainer(id);
 			
-			for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-			{
-				if ("list".equalsIgnoreCase(n.getNodeName()))
-				{
+			for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+				if ("list".equalsIgnoreCase(n.getNodeName())) {
 					att = n.getAttributes().getNamedItem("applyTaxes");
 					list.setApplyTaxes((att != null) && Boolean.parseBoolean(att.getNodeValue()));
 					
 					att = n.getAttributes().getNamedItem("useRate");
-					if (att != null)
-					{
-						try
-						{
+					if (att != null) {
+						try {
 							
 							list.setUseRate(Double.valueOf(att.getNodeValue()));
-							if (list.getUseRate() <= 1e-6)
-							{
+							if (list.getUseRate() <= 1e-6) {
 								throw new NumberFormatException("The value cannot be 0"); // threat 0 as invalid value
 							}
-						}
-						catch (NumberFormatException e)
-						{
-							try
-							{
+						} catch (NumberFormatException e) {
+							try {
 								list.setUseRate(Config.class.getField(att.getNodeValue()).getDouble(Config.class));
-							}
-							catch (Exception e1)
-							{
+							} catch (Exception e1) {
 								LOG.warn("{}: Unable to parse {}", getClass().getSimpleName(), doc.getLocalName(), e1);
 								list.setUseRate(1.0);
 							}
 							
-						}
-						catch (DOMException e)
-						{
+						} catch (DOMException e) {
 							LOG.warn("{}: Unable to parse {}", getClass().getSimpleName(), doc.getLocalName(), e);
 						}
 					}
@@ -128,21 +111,14 @@ public final class MultisellData implements IXmlReader
 					att = n.getAttributes().getNamedItem("maintainEnchantment");
 					list.setMaintainEnchantment((att != null) && Boolean.parseBoolean(att.getNodeValue()));
 					
-					for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-					{
-						if ("item".equalsIgnoreCase(d.getNodeName()))
-						{
+					for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+						if ("item".equalsIgnoreCase(d.getNodeName())) {
 							Entry e = parseEntry(d, entryId++, list);
 							list.getEntries().add(e);
-						}
-						else if ("npcs".equalsIgnoreCase(d.getNodeName()))
-						{
-							for (Node b = d.getFirstChild(); b != null; b = b.getNextSibling())
-							{
-								if ("npc".equalsIgnoreCase(b.getNodeName()))
-								{
-									if (Util.isDigit(b.getTextContent()))
-									{
+						} else if ("npcs".equalsIgnoreCase(d.getNodeName())) {
+							for (Node b = d.getFirstChild(); b != null; b = b.getNextSibling()) {
+								if ("npc".equalsIgnoreCase(b.getNodeName())) {
+									if (Util.isDigit(b.getTextContent())) {
 										list.allowNpc(Integer.parseInt(b.getTextContent()));
 									}
 								}
@@ -152,21 +128,17 @@ public final class MultisellData implements IXmlReader
 				}
 			}
 			_entries.put(id, list);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("{}: Error in file {}", getClass().getSimpleName(), f, e);
 		}
 	}
 	
 	@Override
-	public FileFilter getCurrentFileFilter()
-	{
+	public FileFilter getCurrentFileFilter() {
 		return NUMERIC_FILTER;
 	}
 	
-	private final Entry parseEntry(Node n, int entryId, ListContainer list)
-	{
+	private final Entry parseEntry(Node n, int entryId, ListContainer list) {
 		Node first = n.getFirstChild();
 		final Entry entry = new Entry(entryId);
 		
@@ -174,25 +146,19 @@ public final class MultisellData implements IXmlReader
 		Node att;
 		StatsSet set;
 		
-		for (n = first; n != null; n = n.getNextSibling())
-		{
-			if ("ingredient".equalsIgnoreCase(n.getNodeName()))
-			{
+		for (n = first; n != null; n = n.getNextSibling()) {
+			if ("ingredient".equalsIgnoreCase(n.getNodeName())) {
 				attrs = n.getAttributes();
 				set = new StatsSet();
-				for (int i = 0; i < attrs.getLength(); i++)
-				{
+				for (int i = 0; i < attrs.getLength(); i++) {
 					att = attrs.item(i);
 					set.set(att.getNodeName(), att.getNodeValue());
 				}
 				entry.addIngredient(new Ingredient(set));
-			}
-			else if ("production".equalsIgnoreCase(n.getNodeName()))
-			{
+			} else if ("production".equalsIgnoreCase(n.getNodeName())) {
 				attrs = n.getAttributes();
 				set = new StatsSet();
-				for (int i = 0; i < attrs.getLength(); i++)
-				{
+				for (int i = 0; i < attrs.getLength(); i++) {
 					att = attrs.item(i);
 					set.set(att.getNodeName(), att.getNodeValue());
 				}
@@ -232,17 +198,14 @@ public final class MultisellData implements IXmlReader
 	 * @param productMultiplier
 	 * @param ingredientMultiplier
 	 */
-	public final void separateAndSend(int listId, L2PcInstance player, L2Npc npc, boolean inventoryOnly, double productMultiplier, double ingredientMultiplier)
-	{
+	public final void separateAndSend(int listId, L2PcInstance player, L2Npc npc, boolean inventoryOnly, double productMultiplier, double ingredientMultiplier) {
 		ListContainer template = _entries.get(listId);
-		if (template == null)
-		{
+		if (template == null) {
 			LOG.warn("{}: Cannot find list ID: {} requested by player: {}, NPC ID: {}!", getClass().getSimpleName(), listId, player, (npc != null ? npc.getId() : 0));
 			return;
 		}
 		
-		if (((npc != null) && !template.isNpcAllowed(npc.getId())) || ((npc == null) && template.isNpcOnly()))
-		{
+		if (((npc != null) && !template.isNpcAllowed(npc.getId())) || ((npc == null) && template.isNpcOnly())) {
 			LOG.warn("{}: Player {} attempted to open multisell {} from npc {} which is not allowed!", getClass().getSimpleName(), player, listId, npc);
 			return;
 		}
@@ -250,10 +213,8 @@ public final class MultisellData implements IXmlReader
 		final PreparedListContainer list = new PreparedListContainer(template, inventoryOnly, player, npc);
 		
 		// Pass through this only when multipliers are different from 1
-		if ((productMultiplier != 1) || (ingredientMultiplier != 1))
-		{
-			list.getEntries().forEach(entry ->
-			{
+		if ((productMultiplier != 1) || (ingredientMultiplier != 1)) {
+			list.getEntries().forEach(entry -> {
 				// Math.max used here to avoid dropping count to 0
 				entry.getProducts().forEach(product -> product.setItemCount((long) Math.max(product.getItemCount() * productMultiplier, 1)));
 				
@@ -262,8 +223,7 @@ public final class MultisellData implements IXmlReader
 			});
 		}
 		int index = 0;
-		do
-		{
+		do {
 			// send list at least once even if size = 0
 			player.sendPacket(new MultiSellList(list, index));
 			index += PAGE_SIZE;
@@ -273,35 +233,28 @@ public final class MultisellData implements IXmlReader
 		player.setMultiSell(list);
 	}
 	
-	public final void separateAndSend(int listId, L2PcInstance player, L2Npc npc, boolean inventoryOnly)
-	{
+	public final void separateAndSend(int listId, L2PcInstance player, L2Npc npc, boolean inventoryOnly) {
 		separateAndSend(listId, player, npc, inventoryOnly, 1, 1);
 	}
 	
-	public static final boolean hasSpecialIngredient(int id, long amount, L2PcInstance player)
-	{
-		switch (id)
-		{
+	public static final boolean hasSpecialIngredient(int id, long amount, L2PcInstance player) {
+		switch (id) {
 			case CLAN_REPUTATION:
-				if (player.getClan() == null)
-				{
+				if (player.getClan() == null) {
 					player.sendPacket(SystemMessageId.YOU_ARE_NOT_A_CLAN_MEMBER);
 					break;
 				}
-				if (!player.isClanLeader())
-				{
+				if (!player.isClanLeader()) {
 					player.sendPacket(SystemMessageId.ONLY_THE_CLAN_LEADER_IS_ENABLED);
 					break;
 				}
-				if (player.getClan().getReputationScore() < amount)
-				{
+				if (player.getClan().getReputationScore() < amount) {
 					player.sendPacket(SystemMessageId.THE_CLAN_REPUTATION_SCORE_IS_TOO_LOW);
 					break;
 				}
 				return true;
 			case FAME:
-				if (player.getFame() < amount)
-				{
+				if (player.getFame() < amount) {
 					player.sendPacket(SystemMessageId.NOT_ENOUGH_FAME_POINTS);
 					break;
 				}
@@ -310,10 +263,8 @@ public final class MultisellData implements IXmlReader
 		return false;
 	}
 	
-	public static final boolean takeSpecialIngredient(int id, long amount, L2PcInstance player)
-	{
-		switch (id)
-		{
+	public static final boolean takeSpecialIngredient(int id, long amount, L2PcInstance player) {
+		switch (id) {
 			case CLAN_REPUTATION:
 				player.getClan().takeReputationScore((int) amount, true);
 				SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
@@ -329,10 +280,8 @@ public final class MultisellData implements IXmlReader
 		return false;
 	}
 	
-	public static final void giveSpecialProduct(int id, long amount, L2PcInstance player)
-	{
-		switch (id)
-		{
+	public static final void giveSpecialProduct(int id, long amount, L2PcInstance player) {
+		switch (id) {
 			case CLAN_REPUTATION:
 				player.getClan().addReputationScore((int) amount, true);
 				break;
@@ -344,27 +293,20 @@ public final class MultisellData implements IXmlReader
 		}
 	}
 	
-	private final void verify()
-	{
+	private final void verify() {
 		ListContainer list;
 		final Iterator<ListContainer> iter = _entries.values().iterator();
-		while (iter.hasNext())
-		{
+		while (iter.hasNext()) {
 			list = iter.next();
 			
-			for (Entry ent : list.getEntries())
-			{
-				for (Ingredient ing : ent.getIngredients())
-				{
-					if (!verifyIngredient(ing))
-					{
+			for (Entry ent : list.getEntries()) {
+				for (Ingredient ing : ent.getIngredients()) {
+					if (!verifyIngredient(ing)) {
 						LOG.warn("{}: Cannot find ingredient with item ID: {} in list: {}!", getClass().getSimpleName(), ing.getItemId(), list.getListId());
 					}
 				}
-				for (Ingredient ing : ent.getProducts())
-				{
-					if (!verifyIngredient(ing))
-					{
+				for (Ingredient ing : ent.getProducts()) {
+					if (!verifyIngredient(ing)) {
 						LOG.warn("{}: Cannot find product with item ID: {} in list: {}!", getClass().getSimpleName(), ing.getItemId(), list.getListId());
 					}
 				}
@@ -372,10 +314,8 @@ public final class MultisellData implements IXmlReader
 		}
 	}
 	
-	private final boolean verifyIngredient(Ingredient ing)
-	{
-		switch (ing.getItemId())
-		{
+	private final boolean verifyIngredient(Ingredient ing) {
+		switch (ing.getItemId()) {
 			case CLAN_REPUTATION:
 			case FAME:
 				return true;
@@ -384,13 +324,11 @@ public final class MultisellData implements IXmlReader
 		}
 	}
 	
-	public static MultisellData getInstance()
-	{
+	public static MultisellData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final MultisellData _instance = new MultisellData();
 	}
 }

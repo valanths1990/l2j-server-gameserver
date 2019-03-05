@@ -26,57 +26,45 @@ import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.options.EnchantOptions;
+import com.l2jserver.gameserver.util.IXmlReader;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.data.xml.IXmlReader;
 
 /**
  * @author UnAfraid
  */
-public class EnchantItemOptionsData implements IXmlReader
-{
+public class EnchantItemOptionsData implements IXmlReader {
+	
 	private final Map<Integer, Map<Integer, EnchantOptions>> _data = new HashMap<>();
 	
-	protected EnchantItemOptionsData()
-	{
+	protected EnchantItemOptionsData() {
 		load();
 	}
 	
 	@Override
-	public synchronized void load()
-	{
+	public synchronized void load() {
 		_data.clear();
 		parseDatapackFile("data/enchantItemOptions.xml");
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
+	public void parseDocument(Document doc) {
 		int counter = 0;
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("item".equalsIgnoreCase(d.getNodeName()))
-					{
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("item".equalsIgnoreCase(d.getNodeName())) {
 						int itemId = parseInteger(d.getAttributes(), "id");
-						if (!_data.containsKey(itemId))
-						{
+						if (!_data.containsKey(itemId)) {
 							_data.put(itemId, new HashMap<Integer, EnchantOptions>());
 						}
-						for (Node cd = d.getFirstChild(); cd != null; cd = cd.getNextSibling())
-						{
-							if ("options".equalsIgnoreCase(cd.getNodeName()))
-							{
+						for (Node cd = d.getFirstChild(); cd != null; cd = cd.getNextSibling()) {
+							if ("options".equalsIgnoreCase(cd.getNodeName())) {
 								final EnchantOptions op = new EnchantOptions(parseInteger(cd.getAttributes(), "level"));
 								_data.get(itemId).put(op.getLevel(), op);
 								
-								for (byte i = 0; i < 3; i++)
-								{
+								for (byte i = 0; i < 3; i++) {
 									final Node att = cd.getAttributes().getNamedItem("option" + (i + 1));
-									if ((att != null) && Util.isDigit(att.getNodeValue()))
-									{
+									if ((att != null) && Util.isDigit(att.getNodeValue())) {
 										op.setOption(i, parseInteger(att));
 									}
 								}
@@ -95,10 +83,8 @@ public class EnchantItemOptionsData implements IXmlReader
 	 * @param enchantLevel
 	 * @return enchant effects information.
 	 */
-	public EnchantOptions getOptions(int itemId, int enchantLevel)
-	{
-		if (!_data.containsKey(itemId) || !_data.get(itemId).containsKey(enchantLevel))
-		{
+	public EnchantOptions getOptions(int itemId, int enchantLevel) {
+		if (!_data.containsKey(itemId) || !_data.get(itemId).containsKey(enchantLevel)) {
 			return null;
 		}
 		return _data.get(itemId).get(enchantLevel);
@@ -108,8 +94,7 @@ public class EnchantItemOptionsData implements IXmlReader
 	 * @param item
 	 * @return enchant effects information.
 	 */
-	public EnchantOptions getOptions(L2ItemInstance item)
-	{
+	public EnchantOptions getOptions(L2ItemInstance item) {
 		return item != null ? getOptions(item.getId(), item.getEnchantLevel()) : null;
 	}
 	
@@ -117,13 +102,11 @@ public class EnchantItemOptionsData implements IXmlReader
 	 * Gets the single instance of EnchantOptionsData.
 	 * @return single instance of EnchantOptionsData
 	 */
-	public static final EnchantItemOptionsData getInstance()
-	{
+	public static final EnchantItemOptionsData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final EnchantItemOptionsData _instance = new EnchantItemOptionsData();
 	}
 }

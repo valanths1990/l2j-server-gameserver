@@ -18,56 +18,44 @@
  */
 package com.l2jserver.gameserver.instancemanager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.variables.AbstractVariables;
 
 /**
  * Global Variables Manager.
  * @author xban1x
  */
-public final class GlobalVariablesManager extends AbstractVariables
-{
+public final class GlobalVariablesManager extends AbstractVariables {
+	
 	private static final Logger _log = Logger.getLogger(GlobalVariablesManager.class.getName());
 	
-	// SQL Queries.
 	private static final String SELECT_QUERY = "SELECT * FROM global_variables";
+	
 	private static final String DELETE_QUERY = "DELETE FROM global_variables";
+	
 	private static final String INSERT_QUERY = "INSERT INTO global_variables (var, value) VALUES (?, ?)";
 	
-	protected GlobalVariablesManager()
-	{
+	protected GlobalVariablesManager() {
 		restoreMe();
 	}
 	
 	@Override
-	public boolean restoreMe()
-	{
+	public boolean restoreMe() {
 		// Restore previous variables.
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement st = con.createStatement();
-			ResultSet rset = st.executeQuery(SELECT_QUERY))
-		{
-			while (rset.next())
-			{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var st = con.createStatement();
+			var rset = st.executeQuery(SELECT_QUERY)) {
+			while (rset.next()) {
 				set(rset.getString("var"), rset.getString("value"));
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't restore global variables");
 			return false;
-		}
-		finally
-		{
+		} finally {
 			compareAndSetChanges(true, false);
 		}
 		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded " + getSet().size() + " variables.");
@@ -75,37 +63,29 @@ public final class GlobalVariablesManager extends AbstractVariables
 	}
 	
 	@Override
-	public boolean storeMe()
-	{
+	public boolean storeMe() {
 		// No changes, nothing to store.
-		if (!hasChanges())
-		{
+		if (!hasChanges()) {
 			return false;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement del = con.createStatement();
-			PreparedStatement st = con.prepareStatement(INSERT_QUERY))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var del = con.createStatement();
+			var st = con.prepareStatement(INSERT_QUERY)) {
 			// Clear previous entries.
 			del.execute(DELETE_QUERY);
 			
 			// Insert all variables.
-			for (Entry<String, Object> entry : getSet().entrySet())
-			{
+			for (Entry<String, Object> entry : getSet().entrySet()) {
 				st.setString(1, entry.getKey());
 				st.setString(2, String.valueOf(entry.getValue()));
 				st.addBatch();
 			}
 			st.executeBatch();
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't save global variables to database.", e);
 			return false;
-		}
-		finally
-		{
+		} finally {
 			compareAndSetChanges(true, false);
 		}
 		_log.log(Level.INFO, getClass().getSimpleName() + ": Stored " + getSet().size() + " variables.");
@@ -116,13 +96,11 @@ public final class GlobalVariablesManager extends AbstractVariables
 	 * Gets the single instance of {@code GlobalVariablesManager}.
 	 * @return single instance of {@code GlobalVariablesManager}
 	 */
-	public static final GlobalVariablesManager getInstance()
-	{
+	public static final GlobalVariablesManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final GlobalVariablesManager _instance = new GlobalVariablesManager();
 	}
 }

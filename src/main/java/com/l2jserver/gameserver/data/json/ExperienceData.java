@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.l2jserver.Config;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * @author Zealar

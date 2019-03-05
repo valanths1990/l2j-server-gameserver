@@ -18,22 +18,19 @@
  */
 package com.l2jserver.gameserver.model.entity;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
 /**
  * @author evill33t
  */
-public class Couple
-{
+public class Couple {
+	
 	private static final Logger _log = Logger.getLogger(Couple.class.getName());
 	
 	private int _Id = 0;
@@ -43,18 +40,14 @@ public class Couple
 	private Calendar _affiancedDate;
 	private Calendar _weddingDate;
 	
-	public Couple(int coupleId)
-	{
+	public Couple(int coupleId) {
 		_Id = coupleId;
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT * FROM mods_wedding WHERE id = ?"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("SELECT * FROM mods_wedding WHERE id = ?")) {
 			ps.setInt(1, _Id);
-			try (ResultSet rs = ps.executeQuery())
-			{
-				while (rs.next())
-				{
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
 					_player1Id = rs.getInt("player1Id");
 					_player2Id = rs.getInt("player2Id");
 					_maried = rs.getBoolean("married");
@@ -66,15 +59,12 @@ public class Couple
 					_weddingDate.setTimeInMillis(rs.getLong("weddingDate"));
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Exception: Couple.load(): " + e.getMessage(), e);
 		}
 	}
 	
-	public Couple(L2PcInstance player1, L2PcInstance player2)
-	{
+	public Couple(L2PcInstance player1, L2PcInstance player2) {
 		int _tempPlayer1Id = player1.getObjectId();
 		int _tempPlayer2Id = player2.getObjectId();
 		
@@ -87,9 +77,8 @@ public class Couple
 		_weddingDate = Calendar.getInstance();
 		_weddingDate.setTimeInMillis(Calendar.getInstance().getTimeInMillis());
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("INSERT INTO mods_wedding (id, player1Id, player2Id, married, affianceDate, weddingDate) VALUES (?, ?, ?, ?, ?, ?)"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("INSERT INTO mods_wedding (id, player1Id, player2Id, married, affianceDate, weddingDate) VALUES (?, ?, ?, ?, ?, ?)")) {
 			_Id = IdFactory.getInstance().getNextId();
 			ps.setInt(1, _Id);
 			ps.setInt(2, _player1Id);
@@ -98,72 +87,56 @@ public class Couple
 			ps.setLong(5, _affiancedDate.getTimeInMillis());
 			ps.setLong(6, _weddingDate.getTimeInMillis());
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Could not create couple: " + e.getMessage(), e);
 		}
 	}
 	
-	public void marry()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("UPDATE mods_wedding set married = ?, weddingDate = ? where id = ?"))
-		{
+	public void marry() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("UPDATE mods_wedding set married = ?, weddingDate = ? where id = ?")) {
 			ps.setBoolean(1, true);
 			_weddingDate = Calendar.getInstance();
 			ps.setLong(2, _weddingDate.getTimeInMillis());
 			ps.setInt(3, _Id);
 			ps.execute();
 			_maried = true;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Could not marry: " + e.getMessage(), e);
 		}
 	}
 	
-	public void divorce()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement ps = con.prepareStatement("DELETE FROM mods_wedding WHERE id=?"))
-		{
+	public void divorce() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("DELETE FROM mods_wedding WHERE id=?")) {
 			ps.setInt(1, _Id);
 			ps.execute();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Exception: Couple.divorce(): " + e.getMessage(), e);
 		}
 	}
 	
-	public final int getId()
-	{
+	public final int getId() {
 		return _Id;
 	}
 	
-	public final int getPlayer1Id()
-	{
+	public final int getPlayer1Id() {
 		return _player1Id;
 	}
 	
-	public final int getPlayer2Id()
-	{
+	public final int getPlayer2Id() {
 		return _player2Id;
 	}
 	
-	public final boolean getMaried()
-	{
+	public final boolean getMaried() {
 		return _maried;
 	}
 	
-	public final Calendar getAffiancedDate()
-	{
+	public final Calendar getAffiancedDate() {
 		return _affiancedDate;
 	}
 	
-	public final Calendar getWeddingDate()
-	{
+	public final Calendar getWeddingDate() {
 		return _weddingDate;
 	}
 }

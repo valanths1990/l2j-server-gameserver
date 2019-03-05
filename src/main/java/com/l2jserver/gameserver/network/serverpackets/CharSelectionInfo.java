@@ -18,16 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.CharSelectInfoPackage;
@@ -35,12 +33,16 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.network.L2GameClient;
 
-public class CharSelectionInfo extends L2GameServerPacket
-{
-	private static Logger _log = Logger.getLogger(CharSelectionInfo.class.getName());
+public class CharSelectionInfo extends L2GameServerPacket {
+	
+	private static final Logger _log = Logger.getLogger(CharSelectionInfo.class.getName());
+	
 	private final String _loginName;
+	
 	private final int _sessionId;
+	
 	private int _activeId;
+	
 	private final List<CharSelectInfoPackage> _characterPackages;
 	
 	/**
@@ -48,30 +50,26 @@ public class CharSelectionInfo extends L2GameServerPacket
 	 * @param loginName
 	 * @param sessionId
 	 */
-	public CharSelectionInfo(String loginName, int sessionId)
-	{
+	public CharSelectionInfo(String loginName, int sessionId) {
 		_sessionId = sessionId;
 		_loginName = loginName;
 		_characterPackages = loadCharacterSelectInfo(_loginName);
 		_activeId = -1;
 	}
 	
-	public CharSelectionInfo(String loginName, int sessionId, int activeId)
-	{
+	public CharSelectionInfo(String loginName, int sessionId, int activeId) {
 		_sessionId = sessionId;
 		_loginName = loginName;
 		_characterPackages = loadCharacterSelectInfo(_loginName);
 		_activeId = activeId;
 	}
 	
-	public List<CharSelectInfoPackage> getCharInfo()
-	{
+	public List<CharSelectInfoPackage> getCharInfo() {
 		return _characterPackages;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x09);
 		int size = (_characterPackages.size());
 		writeD(size);
@@ -82,21 +80,17 @@ public class CharSelectionInfo extends L2GameServerPacket
 		
 		long lastAccess = 0L;
 		
-		if (_activeId == -1)
-		{
-			for (int i = 0; i < size; i++)
-			{
+		if (_activeId == -1) {
+			for (int i = 0; i < size; i++) {
 				final CharSelectInfoPackage charInfoPackage = _characterPackages.get(i);
-				if (lastAccess < charInfoPackage.getLastAccess())
-				{
+				if (lastAccess < charInfoPackage.getLastAccess()) {
 					lastAccess = charInfoPackage.getLastAccess();
 					_activeId = i;
 				}
 			}
 		}
 		
-		for (int i = 0; i < size; i++)
-		{
+		for (int i = 0; i < size; i++) {
 			final CharSelectInfoPackage charInfoPackage = _characterPackages.get(i);
 			
 			writeS(charInfoPackage.getName());
@@ -137,8 +131,7 @@ public class CharSelectionInfo extends L2GameServerPacket
 			writeD(0x00);
 			writeD(0x00);
 			
-			for (int slot : getPaperdollOrder())
-			{
+			for (int slot : getPaperdollOrder()) {
 				writeD(charInfoPackage.getPaperdollItemId(slot));
 			}
 			
@@ -173,69 +166,53 @@ public class CharSelectionInfo extends L2GameServerPacket
 		}
 	}
 	
-	private static List<CharSelectInfoPackage> loadCharacterSelectInfo(String loginName)
-	{
+	private static List<CharSelectInfoPackage> loadCharacterSelectInfo(String loginName) {
 		final List<CharSelectInfoPackage> characterList = new ArrayList<>();
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT * FROM characters WHERE account_name=? ORDER BY createDate"))
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var statement = con.prepareStatement("SELECT * FROM characters WHERE account_name=? ORDER BY createDate")) {
 			statement.setString(1, loginName);
-			try (ResultSet charList = statement.executeQuery())
-			{
+			try (var charList = statement.executeQuery()) {
 				while (charList.next())// fills the package
 				{
 					CharSelectInfoPackage charInfopackage = restoreChar(charList);
-					if (charInfopackage != null)
-					{
+					if (charInfopackage != null) {
 						characterList.add(charInfopackage);
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Could not restore char info: " + e.getMessage(), e);
 		}
 		return characterList;
 	}
 	
-	private static void loadCharacterSubclassInfo(CharSelectInfoPackage charInfopackage, int ObjectId, int activeClassId)
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT exp, sp, level FROM character_subclasses WHERE charId=? && class_id=? ORDER BY charId"))
-		{
+	private static void loadCharacterSubclassInfo(CharSelectInfoPackage charInfopackage, int ObjectId, int activeClassId) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var statement = con.prepareStatement("SELECT exp, sp, level FROM character_subclasses WHERE charId=? && class_id=? ORDER BY charId")) {
 			statement.setInt(1, ObjectId);
 			statement.setInt(2, activeClassId);
-			try (ResultSet charList = statement.executeQuery())
-			{
-				if (charList.next())
-				{
+			try (var charList = statement.executeQuery()) {
+				if (charList.next()) {
 					charInfopackage.setExp(charList.getLong("exp"));
 					charInfopackage.setSp(charList.getInt("sp"));
 					charInfopackage.setLevel(charList.getInt("level"));
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Could not restore char subclass info: " + e.getMessage(), e);
 		}
 	}
 	
-	private static CharSelectInfoPackage restoreChar(ResultSet chardata) throws Exception
-	{
+	private static CharSelectInfoPackage restoreChar(ResultSet chardata) throws Exception {
 		int objectId = chardata.getInt("charId");
 		String name = chardata.getString("char_name");
 		
 		// See if the char must be deleted
 		long deletetime = chardata.getLong("deletetime");
-		if (deletetime > 0)
-		{
-			if (System.currentTimeMillis() > deletetime)
-			{
+		if (deletetime > 0) {
+			if (System.currentTimeMillis() > deletetime) {
 				L2Clan clan = ClanTable.getInstance().getClan(chardata.getInt("clanid"));
-				if (clan != null)
-				{
+				if (clan != null) {
 					clan.removeClanMember(objectId, 0);
 				}
 				
@@ -273,19 +250,16 @@ public class CharSelectionInfo extends L2GameServerPacket
 		charInfopackage.setY(chardata.getInt("y"));
 		charInfopackage.setZ(chardata.getInt("z"));
 		
-		if (Config.L2JMOD_MULTILANG_ENABLE)
-		{
+		if (Config.L2JMOD_MULTILANG_ENABLE) {
 			String lang = chardata.getString("language");
-			if (!Config.L2JMOD_MULTILANG_ALLOWED.contains(lang))
-			{
+			if (!Config.L2JMOD_MULTILANG_ALLOWED.contains(lang)) {
 				lang = Config.L2JMOD_MULTILANG_DEFAULT;
 			}
 			charInfopackage.setHtmlPrefix("data/lang/" + lang + "/");
 		}
 		
 		// if is in subclass, load subclass exp, sp, lvl info
-		if (baseClassId != activeClassId)
-		{
+		if (baseClassId != activeClassId) {
 			loadCharacterSubclassInfo(charInfopackage, objectId, activeClassId);
 		}
 		
@@ -293,39 +267,29 @@ public class CharSelectionInfo extends L2GameServerPacket
 		
 		// Get the augmentation id for equipped weapon
 		int weaponObjId = charInfopackage.getPaperdollObjectId(Inventory.PAPERDOLL_RHAND);
-		if (weaponObjId < 1)
-		{
+		if (weaponObjId < 1) {
 			weaponObjId = charInfopackage.getPaperdollObjectId(Inventory.PAPERDOLL_RHAND);
 		}
 		
-		if (weaponObjId > 0)
-		{
-			try (Connection con = ConnectionFactory.getInstance().getConnection();
-				PreparedStatement statement = con.prepareStatement("SELECT augAttributes FROM item_attributes WHERE itemId=?"))
-			{
+		if (weaponObjId > 0) {
+			try (var con = ConnectionFactory.getInstance().getConnection();
+				var statement = con.prepareStatement("SELECT augAttributes FROM item_attributes WHERE itemId=?")) {
 				statement.setInt(1, weaponObjId);
-				try (ResultSet result = statement.executeQuery())
-				{
-					if (result.next())
-					{
+				try (var result = statement.executeQuery()) {
+					if (result.next()) {
 						int augment = result.getInt("augAttributes");
 						charInfopackage.setAugmentationId(augment == -1 ? 0 : augment);
 					}
 				}
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.WARNING, "Could not restore augmentation info: " + e.getMessage(), e);
 			}
 		}
 		
 		// Check if the base class is set to zero and also doesn't match with the current active class, otherwise send the base class ID. This prevents chars created before base class was introduced from being displayed incorrectly.
-		if ((baseClassId == 0) && (activeClassId > 0))
-		{
+		if ((baseClassId == 0) && (activeClassId > 0)) {
 			charInfopackage.setBaseClassId(activeClassId);
-		}
-		else
-		{
+		} else {
 			charInfopackage.setBaseClassId(baseClassId);
 		}
 		

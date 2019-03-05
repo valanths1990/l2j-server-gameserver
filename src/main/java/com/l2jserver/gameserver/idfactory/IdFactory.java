@@ -18,31 +18,25 @@
  */
 package com.l2jserver.gameserver.idfactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * This class ...
  * @version $Revision: 1.3.2.1.2.7 $ $Date: 2005/04/11 10:06:12 $
  */
-public abstract class IdFactory
-{
-	protected final Logger _log = Logger.getLogger(getClass().getName());
+public abstract class IdFactory {
+	
+	protected static final Logger _log = Logger.getLogger(IdFactory.class.getName());
 	
 	@Deprecated
-	protected static final String[] ID_UPDATES =
-	{
+	protected static final String[] ID_UPDATES = {
 		"UPDATE items                 SET owner_id = ?    WHERE owner_id = ?",
 		"UPDATE items                 SET object_id = ?   WHERE object_id = ?",
 		"UPDATE character_quests      SET charId = ?     WHERE charId = ?",
@@ -81,8 +75,7 @@ public abstract class IdFactory
 		"UPDATE clanhall             SET ownerId = ?       WHERE ownerId = ?"
 	};
 	
-	protected static final String[] ID_CHECKS =
-	{
+	protected static final String[] ID_CHECKS = {
 		"SELECT owner_id    FROM items                 WHERE object_id >= ?   AND object_id < ?",
 		"SELECT object_id   FROM items                 WHERE object_id >= ?   AND object_id < ?",
 		"SELECT charId     FROM character_quests      WHERE charId >= ?     AND charId < ?",
@@ -121,8 +114,7 @@ public abstract class IdFactory
 	};
 	//@formatter:on
 	
-	private static final String[] TIMESTAMPS_CLEAN =
-	{
+	private static final String[] TIMESTAMPS_CLEAN = {
 		"DELETE FROM character_instance_time WHERE time <= ?",
 		"DELETE FROM character_skills_save WHERE restore_type = 1 AND systime <= ?"
 	};
@@ -135,13 +127,10 @@ public abstract class IdFactory
 	
 	protected static final IdFactory _instance;
 	
-	protected IdFactory()
-	{
+	protected IdFactory() {
 		setAllCharacterOffline();
-		if (Config.DATABASE_CLEAN_UP)
-		{
-			if (Config.L2JMOD_ALLOW_WEDDING)
-			{
+		if (Config.DATABASE_CLEAN_UP) {
+			if (Config.L2JMOD_ALLOW_WEDDING) {
 				cleanInvalidWeddings();
 			}
 			cleanUpDB();
@@ -149,10 +138,8 @@ public abstract class IdFactory
 		cleanUpTimeStamps();
 	}
 	
-	static
-	{
-		switch (Config.IDFACTORY_TYPE)
-		{
+	static {
+		switch (Config.IDFACTORY_TYPE) {
 			case Compaction:
 				throw new UnsupportedOperationException("Compaction IdFactory is disabled.");
 				// _instance = new CompactionIDFactory();
@@ -172,16 +159,12 @@ public abstract class IdFactory
 	/**
 	 * Sets all character offline
 	 */
-	private void setAllCharacterOffline()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement())
-		{
+	private void setAllCharacterOffline() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement()) {
 			s.executeUpdate("UPDATE characters SET online = 0");
 			_log.info("Updated characters online status.");
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Could not update characters online status: " + e.getMessage(), e);
 		}
 	}
@@ -189,11 +172,9 @@ public abstract class IdFactory
 	/**
 	 * Cleans up Database
 	 */
-	private void cleanUpDB()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement stmt = con.createStatement())
-		{
+	private void cleanUpDB() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var stmt = con.createStatement()) {
 			long cleanupStart = System.currentTimeMillis();
 			int cleanCount = 0;
 			// Misc/Account Related
@@ -296,45 +277,33 @@ public abstract class IdFactory
 			stmt.executeUpdate("UPDATE fort SET owner=0 WHERE owner NOT IN (SELECT clan_id FROM clan_data);");
 			
 			_log.info("Cleaned " + cleanCount + " elements from database in " + ((System.currentTimeMillis() - cleanupStart) / 1000) + " s");
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Could not clean up database: " + e.getMessage(), e);
 		}
 	}
 	
-	private void cleanInvalidWeddings()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement())
-		{
+	private void cleanInvalidWeddings() {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement()) {
 			s.executeUpdate("DELETE FROM mods_wedding WHERE player1Id NOT IN (SELECT charId FROM characters)");
 			s.executeUpdate("DELETE FROM mods_wedding WHERE player2Id NOT IN (SELECT charId FROM characters)");
 			_log.info("Cleaned up invalid Weddings.");
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Could not clean up invalid Weddings: " + e.getMessage(), e);
 		}
 	}
 	
-	private void cleanUpTimeStamps()
-	{
-		try (Connection con = ConnectionFactory.getInstance().getConnection())
-		{
+	private void cleanUpTimeStamps() {
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
 			int cleanCount = 0;
-			for (String line : TIMESTAMPS_CLEAN)
-			{
-				try (PreparedStatement stmt = con.prepareStatement(line))
-				{
+			for (String line : TIMESTAMPS_CLEAN) {
+				try (var stmt = con.prepareStatement(line)) {
 					stmt.setLong(1, System.currentTimeMillis());
 					cleanCount += stmt.executeUpdate();
 				}
 			}
 			_log.info("Cleaned " + cleanCount + " expired timestamps from database.");
-		}
-		catch (SQLException e)
-		{
+		} catch (Exception e) {
 		}
 	}
 	
@@ -343,25 +312,20 @@ public abstract class IdFactory
 	 * @throws Exception
 	 * @throws SQLException
 	 */
-	protected final Integer[] extractUsedObjectIDTable() throws Exception
-	{
+	protected final Integer[] extractUsedObjectIDTable() throws Exception {
 		final List<Integer> temp = new ArrayList<>();
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			Statement s = con.createStatement())
-		{
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var s = con.createStatement()) {
 			
 			String extractUsedObjectIdsQuery = "";
 			
-			for (String[] tblClmn : ID_EXTRACTS)
-			{
+			for (String[] tblClmn : ID_EXTRACTS) {
 				extractUsedObjectIdsQuery += "SELECT " + tblClmn[1] + " FROM " + tblClmn[0] + " UNION ";
 			}
 			
 			extractUsedObjectIdsQuery = extractUsedObjectIdsQuery.substring(0, extractUsedObjectIdsQuery.length() - 7); // Remove the last " UNION "
-			try (ResultSet rs = s.executeQuery(extractUsedObjectIdsQuery))
-			{
-				while (rs.next())
-				{
+			try (var rs = s.executeQuery(extractUsedObjectIdsQuery)) {
+				while (rs.next()) {
 					temp.add(rs.getInt(1));
 				}
 			}
@@ -370,13 +334,11 @@ public abstract class IdFactory
 		return temp.toArray(new Integer[temp.size()]);
 	}
 	
-	public boolean isInitialized()
-	{
+	public boolean isInitialized() {
 		return _initialized;
 	}
 	
-	public static IdFactory getInstance()
-	{
+	public static IdFactory getInstance() {
 		return _instance;
 	}
 	

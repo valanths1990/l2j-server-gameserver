@@ -23,9 +23,6 @@ import static com.l2jserver.gameserver.model.PcCondOverride.SEE_ALL_PLAYERS;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
@@ -36,8 +33,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import com.l2jserver.Config;
-import com.l2jserver.commons.database.pool.impl.ConnectionFactory;
+import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.LoginServerThread;
 import com.l2jserver.gameserver.LoginServerThread.SessionKey;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -67,7 +64,9 @@ import com.l2jserver.mmocore.ReceivablePacket;
  * @author KenM
  */
 public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> implements Runnable {
+	
 	protected static final Logger _log = Logger.getLogger(L2GameClient.class.getName());
+	
 	protected static final Logger _logAccounting = Logger.getLogger("accounting");
 	
 	/**
@@ -139,8 +138,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		
 		try {
 			_addr = con != null ? con.getInetAddress() : InetAddress.getLocalHost();
-		}
-		catch (UnknownHostException e) {
+		} catch (UnknownHostException e) {
 			throw new Error("Unable to determine localhost address.");
 		}
 	}
@@ -273,11 +271,11 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 			return -1;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT clanId FROM characters WHERE charId=?")) {
-			statement.setInt(1, objid);
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("SELECT clanId FROM characters WHERE charId=?")) {
+			ps.setInt(1, objid);
 			byte answer = 0;
-			try (ResultSet rs = statement.executeQuery()) {
+			try (var rs = ps.executeQuery()) {
 				int clanId = rs.next() ? rs.getInt(1) : 0;
 				if (clanId != 0) {
 					L2Clan clan = ClanTable.getInstance().getClan(clanId);
@@ -296,7 +294,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					if (Config.DELETE_DAYS == 0) {
 						deleteCharByObjId(objid);
 					} else {
-						try (PreparedStatement ps2 = con.prepareStatement("UPDATE characters SET deletetime=? WHERE charId=?")) {
+						try (var ps2 = con.prepareStatement("UPDATE characters SET deletetime=? WHERE charId=?")) {
 							ps2.setLong(1, System.currentTimeMillis() + (Config.DELETE_DAYS * 86400000L)); // 24*60*60*1000 = 86400000
 							ps2.setInt(2, objid);
 							ps2.execute();
@@ -312,8 +310,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 				}
 			}
 			return answer;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error updating delete time of character.", e);
 			return -1;
 		}
@@ -332,8 +329,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					getActiveChar().getWarehouse().updateDatabase();
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error saving character..", e);
 		}
 	}
@@ -344,12 +340,11 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 			return;
 		}
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("UPDATE characters SET deletetime=0 WHERE charId=?")) {
-			statement.setInt(1, objid);
-			statement.execute();
-		}
-		catch (Exception e) {
+		try (var con = ConnectionFactory.getInstance().getConnection();
+			var ps = con.prepareStatement("UPDATE characters SET deletetime=0 WHERE charId=?")) {
+			ps.setInt(1, objid);
+			ps.execute();
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error restoring character.", e);
 		}
 		
@@ -368,133 +363,132 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		
 		CharNameTable.getInstance().removeName(objid);
 		
-		try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_contacts WHERE charId=? OR contactId=?")) {
+		try (var con = ConnectionFactory.getInstance().getConnection()) {
+			try (var ps = con.prepareStatement("DELETE FROM character_contacts WHERE charId=? OR contactId=?")) {
 				ps.setInt(1, objid);
 				ps.setInt(2, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_friends WHERE charId=? OR friendId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_friends WHERE charId=? OR friendId=?")) {
 				ps.setInt(1, objid);
 				ps.setInt(2, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_hennas WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_hennas WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_macroses WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_macroses WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_quests WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_quests WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_quest_global_data WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_quest_global_data WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.executeUpdate();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_recipebook WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_recipebook WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_shortcuts WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_shortcuts WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_skills WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_skills WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_skills_save WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_skills_save WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_subclasses WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_subclasses WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM heroes WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM heroes WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM olympiad_nobles WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM olympiad_nobles WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM seven_signs WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM seven_signs WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM pets WHERE item_obj_id IN (SELECT object_id FROM items WHERE items.owner_id=?)")) {
+			try (var ps = con.prepareStatement("DELETE FROM pets WHERE item_obj_id IN (SELECT object_id FROM items WHERE items.owner_id=?)")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM item_attributes WHERE itemId IN (SELECT object_id FROM items WHERE items.owner_id=?)")) {
+			try (var ps = con.prepareStatement("DELETE FROM item_attributes WHERE itemId IN (SELECT object_id FROM items WHERE items.owner_id=?)")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM items WHERE owner_id=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM items WHERE owner_id=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM merchant_lease WHERE player_id=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM merchant_lease WHERE player_id=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_raid_points WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_raid_points WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_reco_bonus WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_reco_bonus WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_instance_time WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_instance_time WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM character_variables WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM character_variables WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
-			try (PreparedStatement ps = con.prepareStatement("DELETE FROM characters WHERE charId=?")) {
+			try (var ps = con.prepareStatement("DELETE FROM characters WHERE charId=?")) {
 				ps.setInt(1, objid);
 				ps.execute();
 			}
 			
 			if (Config.L2JMOD_ALLOW_WEDDING) {
-				try (PreparedStatement ps = con.prepareStatement("DELETE FROM mods_wedding WHERE player1Id = ? OR player2Id = ?")) {
+				try (var ps = con.prepareStatement("DELETE FROM mods_wedding WHERE player1Id = ? OR player2Id = ?")) {
 					ps.setInt(1, objid);
 					ps.setInt(2, objid);
 					ps.execute();
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error deleting character.", e);
 		}
 	}
@@ -594,8 +588,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		// no long running tasks here, do it async
 		try {
 			ThreadPoolManager.getInstance().executeGeneral(new DisconnectTask());
-		}
-		catch (RejectedExecutionException e) {
+		} catch (RejectedExecutionException e) {
 			// server is closing
 		}
 	}
@@ -632,8 +625,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 				default:
 					throw new IllegalStateException("Missing state on switch");
 			}
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			return "[Character read failed due to disconnect]";
 		}
 	}
@@ -679,8 +671,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					fast = !getActiveChar().isInCombat() && !getActiveChar().isLocked();
 				}
 				cleanMe(fast);
-			}
-			catch (Exception e1) {
+			} catch (Exception e1) {
 				_log.log(Level.WARNING, "Error while disconnecting client.", e1);
 			}
 		}
@@ -726,8 +717,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					_cleanupTask = ThreadPoolManager.getInstance().scheduleGeneral(new CleanupTask(), fast ? 5 : 15000L);
 				}
 			}
-		}
-		catch (Exception e1) {
+		} catch (Exception e1) {
 			_log.log(Level.WARNING, "Error during cleanup.", e1);
 		}
 	}
@@ -762,11 +752,9 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					}
 				}
 				setActiveChar(null);
-			}
-			catch (Exception e1) {
+			} catch (Exception e1) {
 				_log.log(Level.WARNING, "Error while cleanup client.", e1);
-			}
-			finally {
+			} finally {
 				LoginServerThread.getInstance().sendLogout(getAccountName());
 			}
 		}
@@ -784,8 +772,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 						player.getSummon().storeMe();
 					}
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				_log.log(Level.SEVERE, "Error on AutoSaveTask.", e);
 			}
 		}
@@ -903,8 +890,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 			} else {
 				ThreadPoolManager.getInstance().executePacket(this);
 			}
-		}
-		catch (RejectedExecutionException e) {
+		} catch (RejectedExecutionException e) {
 			// if the server is shutdown we ignore
 			if (!ThreadPoolManager.getInstance().isShutdown()) {
 				_log.severe("Failed executing: " + packet.getClass().getSimpleName() + " for Client: " + toString());
@@ -935,8 +921,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 				
 				try {
 					packet.run();
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					_log.severe("Exception during execution " + packet.getClass().getSimpleName() + ", client: " + toString() + "," + e.getMessage());
 				}
 				
@@ -945,8 +930,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					return;
 				}
 			}
-		}
-		finally {
+		} finally {
 			_queueLock.unlock();
 		}
 	}
