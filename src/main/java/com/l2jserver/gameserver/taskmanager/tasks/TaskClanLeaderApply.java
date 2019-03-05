@@ -32,29 +32,22 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
 /**
  * @author UnAfraid
  */
-public class TaskClanLeaderApply extends Task
-{
+public class TaskClanLeaderApply extends Task {
 	private static final String NAME = "clanleaderapply";
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 	
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
+	public void onTimeElapsed(ExecutedTask task) {
 		Calendar cal = Calendar.getInstance();
-		if (cal.get(Calendar.DAY_OF_WEEK) == Config.ALT_CLAN_LEADER_DATE_CHANGE)
-		{
-			for (L2Clan clan : ClanTable.getInstance().getClans())
-			{
-				if (clan.getNewLeaderId() != 0)
-				{
+		if (cal.get(Calendar.DAY_OF_WEEK) == Config.ALT_CLAN_LEADER_DATE_CHANGE) {
+			for (L2Clan clan : ClanTable.getInstance().getClans()) {
+				if (clan.getNewLeaderId() != 0) {
 					final L2ClanMember member = clan.getClanMember(clan.getNewLeaderId());
-					if (member == null)
-					{
+					if (member == null) {
 						continue;
 					}
 					
@@ -66,8 +59,7 @@ public class TaskClanLeaderApply extends Task
 	}
 	
 	@Override
-	public void initializate()
-	{
+	public void initializate() {
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", Config.ALT_CLAN_LEADER_HOUR_CHANGE, "");
 	}
 }

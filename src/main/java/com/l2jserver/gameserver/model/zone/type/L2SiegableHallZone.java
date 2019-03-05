@@ -27,43 +27,32 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author BiggBoss
  */
-public final class L2SiegableHallZone extends L2ClanHallZone
-{
+public final class L2SiegableHallZone extends L2ClanHallZone {
 	private List<Location> _challengerLocations;
 	
-	public L2SiegableHallZone(int id)
-	{
+	public L2SiegableHallZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void parseLoc(int x, int y, int z, String type)
-	{
-		if ((type != null) && type.equals("challenger"))
-		{
-			if (_challengerLocations == null)
-			{
+	public void parseLoc(int x, int y, int z, String type) {
+		if ((type != null) && type.equals("challenger")) {
+			if (_challengerLocations == null) {
 				_challengerLocations = new ArrayList<>();
 			}
 			_challengerLocations.add(new Location(x, y, z));
-		}
-		else
-		{
+		} else {
 			super.parseLoc(x, y, z, type);
 		}
 	}
 	
-	public List<Location> getChallengerSpawns()
-	{
+	public List<Location> getChallengerSpawns() {
 		return _challengerLocations;
 	}
 	
-	public void banishNonSiegeParticipants()
-	{
-		for (L2PcInstance player : getPlayersInside())
-		{
-			if ((player != null) && player.isInHideoutSiege())
-			{
+	public void banishNonSiegeParticipants() {
+		for (L2PcInstance player : getPlayersInside()) {
+			if ((player != null) && player.isInHideoutSiege()) {
 				player.teleToLocation(getBanishSpawnLoc(), true);
 			}
 		}

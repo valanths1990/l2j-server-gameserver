@@ -21,20 +21,17 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author mochitto
  */
-public class ExNevitAdventTimeChange extends L2GameServerPacket
-{
+public class ExNevitAdventTimeChange extends L2GameServerPacket {
 	private final boolean _paused;
 	private final int _time;
 	
-	public ExNevitAdventTimeChange(int time)
-	{
+	public ExNevitAdventTimeChange(int time) {
 		_time = time > 240000 ? 240000 : time;
 		_paused = _time < 1;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xE1);
 		// state 0 - pause 1 - started

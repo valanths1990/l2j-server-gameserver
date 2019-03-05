@@ -26,30 +26,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerClanCreate implements IBaseEvent
-{
+public class OnPlayerClanCreate implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final L2Clan _clan;
 	
-	public OnPlayerClanCreate(L2PcInstance activeChar, L2Clan clan)
-	{
+	public OnPlayerClanCreate(L2PcInstance activeChar, L2Clan clan) {
 		_activeChar = activeChar;
 		_clan = clan;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public L2Clan getClan()
-	{
+	public L2Clan getClan() {
 		return _clan;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_CLAN_CREATE;
 	}
 }

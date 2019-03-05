@@ -30,7 +30,6 @@ import com.l2jserver.gameserver.model.events.ListenerRegisterType;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface RegisterType
-{
+public @interface RegisterType {
 	public ListenerRegisterType value();
 }

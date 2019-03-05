@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Format: (ch) dSdS
  * @author -Wooden-
  */
-public final class RequestPledgeReorganizeMember extends L2GameClientPacket
-{
+public final class RequestPledgeReorganizeMember extends L2GameClientPacket {
 	private static final String _C__D0_2C_REQUESTPLEDGEREORGANIZEMEMBER = "[C] D0:2C RequestPledgeReorganizeMember";
 	
 	private int _isMemberSelected;
@@ -37,8 +36,7 @@ public final class RequestPledgeReorganizeMember extends L2GameClientPacket
 	private String _selectedMember;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_isMemberSelected = readD();
 		_memberName = readS();
 		_newPledgeType = readD();
@@ -46,45 +44,37 @@ public final class RequestPledgeReorganizeMember extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (_isMemberSelected == 0)
-		{
+	protected void runImpl() {
+		if (_isMemberSelected == 0) {
 			return;
 		}
 		
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Clan clan = activeChar.getClan();
-		if (clan == null)
-		{
+		if (clan == null) {
 			return;
 		}
 		
-		if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_MANAGE_RANKS))
-		{
+		if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_MANAGE_RANKS)) {
 			return;
 		}
 		
 		final L2ClanMember member1 = clan.getClanMember(_memberName);
-		if ((member1 == null) || (member1.getObjectId() == clan.getLeaderId()))
-		{
+		if ((member1 == null) || (member1.getObjectId() == clan.getLeaderId())) {
 			return;
 		}
 		
 		final L2ClanMember member2 = clan.getClanMember(_selectedMember);
-		if ((member2 == null) || (member2.getObjectId() == clan.getLeaderId()))
-		{
+		if ((member2 == null) || (member2.getObjectId() == clan.getLeaderId())) {
 			return;
 		}
 		
 		final int oldPledgeType = member1.getPledgeType();
-		if (oldPledgeType == _newPledgeType)
-		{
+		if (oldPledgeType == _newPledgeType) {
 			return;
 		}
 		
@@ -94,8 +84,7 @@ public final class RequestPledgeReorganizeMember extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_2C_REQUESTPLEDGEREORGANIZEMEMBER;
 	}
 }

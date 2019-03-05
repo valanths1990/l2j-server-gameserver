@@ -29,11 +29,9 @@ import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
  * Four Sepulchers change entry time task.
  * @author xban1x
  */
-public final class FourSepulchersChangeEntryTimeTask implements Runnable
-{
+public final class FourSepulchersChangeEntryTimeTask implements Runnable {
 	@Override
-	public void run()
-	{
+	public void run() {
 		final FourSepulchersManager manager = FourSepulchersManager.getInstance();
 		manager.setIsEntryTime(true);
 		manager.setIsWarmUpTime(false);
@@ -46,12 +44,9 @@ public final class FourSepulchersChangeEntryTimeTask implements Runnable
 		// counting difference between time when entry time ends and current
 		// time
 		// and then launching change time task
-		if (manager.isFirstTimeRun())
-		{
+		if (manager.isFirstTimeRun()) {
 			interval = manager.getEntrytTimeEnd() - Calendar.getInstance().getTimeInMillis();
-		}
-		else
-		{
+		} else {
 			interval = Config.FS_TIME_ENTRY * 60000L; // else use stupid
 			// method
 		}
@@ -61,8 +56,7 @@ public final class FourSepulchersChangeEntryTimeTask implements Runnable
 		manager.setChangeWarmUpTimeTask(ThreadPoolManager.getInstance().scheduleEffect(new FourSepulchersChangeWarmUpTimeTask(), interval));
 		final ScheduledFuture<?> changeEntryTimeTask = manager.getChangeEntryTimeTask();
 		
-		if (changeEntryTimeTask != null)
-		{
+		if (changeEntryTimeTask != null) {
 			changeEntryTimeTask.cancel(true);
 			manager.setChangeEntryTimeTask(null);
 		}

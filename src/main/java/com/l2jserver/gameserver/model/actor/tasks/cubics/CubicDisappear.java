@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.actor.instance.L2CubicInstance;
  * Cubic disappear task.
  * @author Zoey76
  */
-public final class CubicDisappear implements Runnable
-{
+public final class CubicDisappear implements Runnable {
 	private final L2CubicInstance _cubic;
 	
-	public CubicDisappear(L2CubicInstance cubic)
-	{
+	public CubicDisappear(L2CubicInstance cubic) {
 		_cubic = cubic;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_cubic != null)
-		{
+	public void run() {
+		if (_cubic != null) {
 			_cubic.stopAction();
 			_cubic.getOwner().getCubics().remove(_cubic.getId());
 			_cubic.getOwner().broadcastUserInfo();

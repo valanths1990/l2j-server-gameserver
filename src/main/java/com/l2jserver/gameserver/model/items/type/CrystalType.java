@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.items.type;
  * Crystal Type enumerated.
  * @author Adry_85
  */
-public enum CrystalType
-{
+public enum CrystalType {
 	NONE(0, 0, 0, 0),
 	D(1, 1458, 11, 90),
 	C(2, 1459, 6, 45),
@@ -38,8 +37,7 @@ public enum CrystalType
 	private final int _crystalEnchantBonusArmor;
 	private final int _crystalEnchantBonusWeapon;
 	
-	private CrystalType(int id, int crystalId, int crystalEnchantBonusArmor, int crystalEnchantBonusWeapon)
-	{
+	private CrystalType(int id, int crystalId, int crystalEnchantBonusArmor, int crystalEnchantBonusWeapon) {
 		_id = id;
 		_crystalId = crystalId;
 		_crystalEnchantBonusArmor = crystalEnchantBonusArmor;
@@ -50,8 +48,7 @@ public enum CrystalType
 	 * Gets the crystal type ID.
 	 * @return the crystal type ID
 	 */
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
@@ -59,28 +56,23 @@ public enum CrystalType
 	 * Gets the item ID of the crystal.
 	 * @return the item ID of the crystal
 	 */
-	public int getCrystalId()
-	{
+	public int getCrystalId() {
 		return _crystalId;
 	}
 	
-	public int getCrystalEnchantBonusArmor()
-	{
+	public int getCrystalEnchantBonusArmor() {
 		return _crystalEnchantBonusArmor;
 	}
 	
-	public int getCrystalEnchantBonusWeapon()
-	{
+	public int getCrystalEnchantBonusWeapon() {
 		return _crystalEnchantBonusWeapon;
 	}
 	
-	public boolean isGreater(CrystalType crystalType)
-	{
+	public boolean isGreater(CrystalType crystalType) {
 		return getId() > crystalType.getId();
 	}
 	
-	public boolean isLesser(CrystalType crystalType)
-	{
+	public boolean isLesser(CrystalType crystalType) {
 		return getId() < crystalType.getId();
 	}
 }

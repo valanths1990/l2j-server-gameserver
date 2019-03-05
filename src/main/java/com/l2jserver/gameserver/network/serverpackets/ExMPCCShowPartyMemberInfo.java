@@ -24,23 +24,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author chris_00
  */
-public class ExMPCCShowPartyMemberInfo extends L2GameServerPacket
-{
+public class ExMPCCShowPartyMemberInfo extends L2GameServerPacket {
 	private final L2Party _party;
 	
-	public ExMPCCShowPartyMemberInfo(L2Party party)
-	{
+	public ExMPCCShowPartyMemberInfo(L2Party party) {
 		_party = party;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x4B);
 		writeD(_party.getMemberCount());
-		for (L2PcInstance pc : _party.getMembers())
-		{
+		for (L2PcInstance pc : _party.getMembers()) {
 			writeS(pc.getName());
 			writeD(pc.getObjectId());
 			writeD(pc.getClassId().getId());

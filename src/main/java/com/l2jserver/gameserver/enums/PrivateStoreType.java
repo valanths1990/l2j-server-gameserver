@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author NosBit
  */
-public enum PrivateStoreType
-{
+public enum PrivateStoreType {
 	NONE(0),
 	SELL(1),
 	SELL_MANAGE(2),
@@ -33,22 +32,17 @@ public enum PrivateStoreType
 	
 	private int _id;
 	
-	private PrivateStoreType(int id)
-	{
+	private PrivateStoreType(int id) {
 		_id = id;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public static PrivateStoreType findById(int id)
-	{
-		for (PrivateStoreType privateStoreType : values())
-		{
-			if (privateStoreType.getId() == id)
-			{
+	public static PrivateStoreType findById(int id) {
+		for (PrivateStoreType privateStoreType : values()) {
+			if (privateStoreType.getId() == id) {
 				return privateStoreType;
 			}
 		}

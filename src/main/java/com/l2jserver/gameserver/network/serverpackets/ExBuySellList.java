@@ -24,56 +24,44 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author ShanSoft
  */
-public class ExBuySellList extends AbstractItemPacket
-{
+public class ExBuySellList extends AbstractItemPacket {
 	private L2ItemInstance[] _sellList = null;
 	private L2ItemInstance[] _refundList = null;
 	private final boolean _done;
 	
-	public ExBuySellList(L2PcInstance player, boolean done)
-	{
+	public ExBuySellList(L2PcInstance player, boolean done) {
 		_sellList = player.getInventory().getAvailableItems(false, false, false);
-		if (player.hasRefund())
-		{
+		if (player.hasRefund()) {
 			_refundList = player.getRefund().getItems();
 		}
 		_done = done;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0xB7);
 		writeD(0x01);
 		
-		if ((_sellList != null))
-		{
+		if ((_sellList != null)) {
 			writeH(_sellList.length);
-			for (L2ItemInstance item : _sellList)
-			{
+			for (L2ItemInstance item : _sellList) {
 				writeItem(item);
 				writeQ(item.getItem().getReferencePrice() / 2);
 			}
-		}
-		else
-		{
+		} else {
 			writeH(0x00);
 		}
 		
-		if ((_refundList != null) && (_refundList.length > 0))
-		{
+		if ((_refundList != null) && (_refundList.length > 0)) {
 			writeH(_refundList.length);
 			int i = 0;
-			for (L2ItemInstance item : _refundList)
-			{
+			for (L2ItemInstance item : _refundList) {
 				writeItem(item);
 				writeD(i++);
 				writeQ((item.getItem().getReferencePrice() / 2) * item.getCount());
 			}
-		}
-		else
-		{
+		} else {
 			writeH(0x00);
 		}
 		

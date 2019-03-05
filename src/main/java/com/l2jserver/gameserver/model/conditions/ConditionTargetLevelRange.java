@@ -25,24 +25,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author UnAfraid
  */
-public class ConditionTargetLevelRange extends Condition
-{
+public class ConditionTargetLevelRange extends Condition {
 	private final int[] _levels;
 	
 	/**
 	 * Instantiates a new condition target levels range.
 	 * @param levels the {@code levels} range.
 	 */
-	public ConditionTargetLevelRange(int[] levels)
-	{
+	public ConditionTargetLevelRange(int[] levels) {
 		_levels = levels;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effected == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effected == null) {
 			return false;
 		}
 		final int level = effected.getLevel();

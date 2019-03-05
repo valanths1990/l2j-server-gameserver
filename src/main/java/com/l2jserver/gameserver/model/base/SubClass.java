@@ -28,26 +28,22 @@ import com.l2jserver.gameserver.model.actor.stat.PcStat;
  * Used to store key information about a character's sub-class.
  * @author Zealar
  */
-public final class SubClass
-{
+public final class SubClass {
 	private PlayerClass _class;
 	private int _classIndex = 1;
 	private final PcStat _stats;
 	
-	public SubClass(L2PcInstance activeChar)
-	{
+	public SubClass(L2PcInstance activeChar) {
 		_stats = new PcStat(activeChar);
 		_stats.setExp(ExperienceData.getInstance().getExpForLevel(Config.BASE_SUBCLASS_LEVEL));
 		_stats.setLevel(Config.BASE_SUBCLASS_LEVEL);
 	}
 	
-	public PlayerClass getClassDefinition()
-	{
+	public PlayerClass getClassDefinition() {
 		return _class;
 	}
 	
-	public void setClassIndex(int classIndex)
-	{
+	public void setClassIndex(int classIndex) {
 		_classIndex = classIndex;
 	}
 	
@@ -55,58 +51,47 @@ public final class SubClass
 	 * First Sub-Class is index 1.
 	 * @return int _classIndex
 	 */
-	public int getClassIndex()
-	{
+	public int getClassIndex() {
 		return _classIndex;
 	}
 	
-	public void setClassId(int classId)
-	{
+	public void setClassId(int classId) {
 		_class = PlayerClass.values()[classId];
 	}
 	
-	public int getClassId()
-	{
+	public int getClassId() {
 		return _class.ordinal();
 	}
 	
-	public long getExp()
-	{
+	public long getExp() {
 		return _stats.getExp();
 	}
 	
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _stats.getLevel();
 	}
 	
-	public int getSp()
-	{
+	public int getSp() {
 		return _stats.getSp();
 	}
 	
-	public void setSp(int sp)
-	{
+	public void setSp(int sp) {
 		_stats.setSp(sp);
 	}
 	
-	public void setExp(long exp)
-	{
+	public void setExp(long exp) {
 		_stats.setExp(exp);
 	}
 	
-	public void setLevel(int level)
-	{
+	public void setLevel(int level) {
 		_stats.setLevel(level);
 	}
 	
-	public void addExp(long exp)
-	{
+	public void addExp(long exp) {
 		_stats.addExp(exp);
 	}
 	
-	public PcStat getStat()
-	{
+	public PcStat getStat() {
 		return _stats;
 	}
 }

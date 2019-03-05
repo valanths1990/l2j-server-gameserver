@@ -26,45 +26,36 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Gnacik
  */
-public class PartyMatchWaitingList
-{
+public class PartyMatchWaitingList {
 	private final List<L2PcInstance> _members;
 	
-	protected PartyMatchWaitingList()
-	{
+	protected PartyMatchWaitingList() {
 		_members = new CopyOnWriteArrayList<>();
 	}
 	
-	public void addPlayer(L2PcInstance player)
-	{
+	public void addPlayer(L2PcInstance player) {
 		// player.setPartyWait(1);
-		if (!_members.contains(player))
-		{
+		if (!_members.contains(player)) {
 			_members.add(player);
 		}
 	}
 	
-	public void removePlayer(L2PcInstance player)
-	{
+	public void removePlayer(L2PcInstance player) {
 		// player.setPartyWait(0);
-		if (_members.contains(player))
-		{
+		if (_members.contains(player)) {
 			_members.remove(player);
 		}
 	}
 	
-	public List<L2PcInstance> getPlayers()
-	{
+	public List<L2PcInstance> getPlayers() {
 		return _members;
 	}
 	
-	public static PartyMatchWaitingList getInstance()
-	{
+	public static PartyMatchWaitingList getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final PartyMatchWaitingList _instance = new PartyMatchWaitingList();
 	}
 }

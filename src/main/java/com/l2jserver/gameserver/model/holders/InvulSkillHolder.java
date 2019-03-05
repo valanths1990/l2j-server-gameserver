@@ -23,32 +23,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author UnAfraid
  */
-public class InvulSkillHolder extends SkillHolder
-{
+public class InvulSkillHolder extends SkillHolder {
 	private final AtomicInteger _instances = new AtomicInteger(1);
 	
-	public InvulSkillHolder(int skillId, int skillLevel)
-	{
+	public InvulSkillHolder(int skillId, int skillLevel) {
 		super(skillId, skillLevel);
 	}
 	
-	public InvulSkillHolder(SkillHolder holder)
-	{
+	public InvulSkillHolder(SkillHolder holder) {
 		super(holder.getSkill());
 	}
 	
-	public int getInstances()
-	{
+	public int getInstances() {
 		return _instances.get();
 	}
 	
-	public int increaseInstances()
-	{
+	public int increaseInstances() {
 		return _instances.incrementAndGet();
 	}
 	
-	public int decreaseInstances()
-	{
+	public int decreaseInstances() {
 		return _instances.decrementAndGet();
 	}
 }

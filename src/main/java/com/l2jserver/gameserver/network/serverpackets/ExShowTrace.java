@@ -28,31 +28,26 @@ import com.l2jserver.gameserver.model.interfaces.ILocational;
  * This packet shows the mouse click particle for 30 seconds on every location.
  * @author NosBit
  */
-public final class ExShowTrace extends L2GameServerPacket
-{
+public final class ExShowTrace extends L2GameServerPacket {
 	private final List<Location> _locations = new ArrayList<>();
 	
-	public void addLocation(int x, int y, int z)
-	{
+	public void addLocation(int x, int y, int z) {
 		_locations.add(new Location(x, y, z));
 	}
 	
-	public void addLocation(ILocational loc)
-	{
+	public void addLocation(ILocational loc) {
 		addLocation(loc.getX(), loc.getY(), loc.getZ());
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x67);
 		
 		writeH(0); // type broken in H5
 		writeD(0); // time broken in H5
 		writeH(_locations.size());
-		for (Location loc : _locations)
-		{
+		for (Location loc : _locations) {
 			writeD(loc.getX());
 			writeD(loc.getY());
 			writeD(loc.getZ());

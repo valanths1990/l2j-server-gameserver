@@ -31,44 +31,36 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-public final class L2TerritoryWardInstance extends L2Attackable
-{
+public final class L2TerritoryWardInstance extends L2Attackable {
 	private static final Logger LOG = LoggerFactory.getLogger(L2TerritoryWardInstance.class);
 	
 	/**
 	 * Creates territory ward.
 	 * @param template the territory ward NPC template
 	 */
-	public L2TerritoryWardInstance(L2NpcTemplate template)
-	{
+	public L2TerritoryWardInstance(L2NpcTemplate template) {
 		super(template);
 		
 		disableCoreAI(true);
 	}
 	
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
-		if (isInvul())
-		{
+	public boolean isAutoAttackable(L2Character attacker) {
+		if (isInvul()) {
 			return false;
 		}
-		if ((getCastle() == null) || !getCastle().getZone().isActive())
-		{
+		if ((getCastle() == null) || !getCastle().getZone().isActive()) {
 			return false;
 		}
 		
 		final L2PcInstance actingPlayer = attacker.getActingPlayer();
-		if (actingPlayer == null)
-		{
+		if (actingPlayer == null) {
 			return false;
 		}
-		if (actingPlayer.getSiegeSide() == 0)
-		{
+		if (actingPlayer.getSiegeSide() == 0) {
 			return false;
 		}
-		if (TerritoryWarManager.getInstance().isAllyField(actingPlayer, getCastle().getResidenceId()))
-		{
+		if (TerritoryWarManager.getInstance().isAllyField(actingPlayer, getCastle().getResidenceId())) {
 			return false;
 		}
 		
@@ -76,49 +68,39 @@ public final class L2TerritoryWardInstance extends L2Attackable
 	}
 	
 	@Override
-	public boolean hasRandomAnimation()
-	{
+	public boolean hasRandomAnimation() {
 		return false;
 	}
 	
 	@Override
-	public void onSpawn()
-	{
+	public void onSpawn() {
 		super.onSpawn();
 		
-		if (getCastle() == null)
-		{
+		if (getCastle() == null) {
 			LOG.warn("L2TerritoryWardInstance({}) spawned outside Castle Zone!", getName());
 		}
 	}
 	
 	@Override
-	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake, boolean isDOT, Skill skill)
-	{
-		if ((skill != null) || !TerritoryWarManager.getInstance().isTWInProgress())
-		{
+	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake, boolean isDOT, Skill skill) {
+		if ((skill != null) || !TerritoryWarManager.getInstance().isTWInProgress()) {
 			return;
 		}
 		
 		final L2PcInstance actingPlayer = attacker.getActingPlayer();
-		if (actingPlayer == null)
-		{
+		if (actingPlayer == null) {
 			return;
 		}
-		if (actingPlayer.isCombatFlagEquipped())
-		{
+		if (actingPlayer.isCombatFlagEquipped()) {
 			return;
 		}
-		if (actingPlayer.getSiegeSide() == 0)
-		{
+		if (actingPlayer.getSiegeSide() == 0) {
 			return;
 		}
-		if (getCastle() == null)
-		{
+		if (getCastle() == null) {
 			return;
 		}
-		if (TerritoryWarManager.getInstance().isAllyField(actingPlayer, getCastle().getResidenceId()))
-		{
+		if (TerritoryWarManager.getInstance().isAllyField(actingPlayer, getCastle().getResidenceId())) {
 			return;
 		}
 		
@@ -126,37 +108,28 @@ public final class L2TerritoryWardInstance extends L2Attackable
 	}
 	
 	@Override
-	public void reduceCurrentHpByDOT(double i, L2Character attacker, Skill skill)
-	{
+	public void reduceCurrentHpByDOT(double i, L2Character attacker, Skill skill) {
 		// wards can't be damaged by DOTs
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
+	public boolean doDie(L2Character killer) {
 		// Kill the L2NpcInstance (the corpse disappeared after 7 seconds)
-		if (!super.doDie(killer) || (getCastle() == null) || !TerritoryWarManager.getInstance().isTWInProgress())
-		{
+		if (!super.doDie(killer) || (getCastle() == null) || !TerritoryWarManager.getInstance().isTWInProgress()) {
 			return false;
 		}
 		
-		if (killer instanceof L2PcInstance)
-		{
-			if ((((L2PcInstance) killer).getSiegeSide() > 0) && !((L2PcInstance) killer).isCombatFlagEquipped())
-			{
+		if (killer instanceof L2PcInstance) {
+			if ((((L2PcInstance) killer).getSiegeSide() > 0) && !((L2PcInstance) killer).isCombatFlagEquipped()) {
 				((L2PcInstance) killer).addItem("Pickup", getId() - 23012, 1, null, false);
-			}
-			else
-			{
+			} else {
 				TerritoryWarManager.getInstance().getTerritoryWard(getId() - 36491).spawnMe();
 			}
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.THE_S1_WARD_HAS_BEEN_DESTROYED_C2_HAS_THE_WARD);
 			sm.addString(getName().replaceAll(" Ward", ""));
 			sm.addPcName((L2PcInstance) killer);
 			TerritoryWarManager.getInstance().announceToParticipants(sm, 0, 0);
-		}
-		else
-		{
+		} else {
 			TerritoryWarManager.getInstance().getTerritoryWard(getId() - 36491).spawnMe();
 		}
 		decayMe();
@@ -164,33 +137,24 @@ public final class L2TerritoryWardInstance extends L2Attackable
 	}
 	
 	@Override
-	public void onForcedAttack(L2PcInstance player)
-	{
+	public void onForcedAttack(L2PcInstance player) {
 		onAction(player);
 	}
 	
 	@Override
-	public void onAction(L2PcInstance player, boolean interact)
-	{
-		if ((player == null) || !canTarget(player))
-		{
+	public void onAction(L2PcInstance player, boolean interact) {
+		if ((player == null) || !canTarget(player)) {
 			return;
 		}
 		
 		// Check if the L2PcInstance already target the L2NpcInstance
-		if (this != player.getTarget())
-		{
+		if (this != player.getTarget()) {
 			// Set the target of the L2PcInstance player
 			player.setTarget(this);
-		}
-		else if (interact)
-		{
-			if (isAutoAttackable(player) && (Math.abs(player.getZ() - getZ()) < 100))
-			{
+		} else if (interact) {
+			if (isAutoAttackable(player) && (Math.abs(player.getZ() - getZ()) < 100)) {
 				player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
-			}
-			else
-			{
+			} else {
 				// Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
 				player.sendPacket(ActionFailed.STATIC_PACKET);
 			}

@@ -30,132 +30,98 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * D0 0D 00 5A 00 77 00 65 00 72 00 67 00 00 00
  * @author chris_00
  */
-public final class RequestExAskJoinMPCC extends L2GameClientPacket
-{
+public final class RequestExAskJoinMPCC extends L2GameClientPacket {
 	private static final String _C__D0_06_REQUESTEXASKJOINMPCC = "[C] D0:06 RequestExAskJoinMPCC";
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2PcInstance player = L2World.getInstance().getPlayer(_name);
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		// invite yourself? ;)
-		if (activeChar.isInParty() && player.isInParty() && activeChar.getParty().equals(player.getParty()))
-		{
+		if (activeChar.isInParty() && player.isInParty() && activeChar.getParty().equals(player.getParty())) {
 			return;
 		}
 		
 		SystemMessage sm;
 		// activeChar is in a Party?
-		if (activeChar.isInParty())
-		{
+		if (activeChar.isInParty()) {
 			L2Party activeParty = activeChar.getParty();
 			// activeChar is PartyLeader? && activeChars Party is already in a CommandChannel?
-			if (activeParty.getLeader().equals(activeChar))
-			{
+			if (activeParty.getLeader().equals(activeChar)) {
 				// if activeChars Party is in CC, is activeChar CCLeader?
-				if (activeParty.isInCommandChannel() && activeParty.getCommandChannel().getLeader().equals(activeChar))
-				{
+				if (activeParty.isInCommandChannel() && activeParty.getCommandChannel().getLeader().equals(activeChar)) {
 					// in CC and the CCLeader
 					// target in a party?
-					if (player.isInParty())
-					{
+					if (player.isInParty()) {
 						// targets party already in a CChannel?
-						if (player.getParty().isInCommandChannel())
-						{
+						if (player.getParty().isInCommandChannel()) {
 							sm = SystemMessage.getSystemMessage(SystemMessageId.C1_ALREADY_MEMBER_OF_COMMAND_CHANNEL);
 							sm.addString(player.getName());
 							activeChar.sendPacket(sm);
-						}
-						else
-						{
+						} else {
 							// ready to open a new CC
 							// send request to targets Party's PartyLeader
 							askJoinMPCC(activeChar, player);
 						}
-					}
-					else
-					{
+					} else {
 						activeChar.sendMessage(player.getName() + " doesn't have party and cannot be invited to Command Channel.");
 					}
 					
-				}
-				else if (activeParty.isInCommandChannel() && !activeParty.getCommandChannel().getLeader().equals(activeChar))
-				{
+				} else if (activeParty.isInCommandChannel() && !activeParty.getCommandChannel().getLeader().equals(activeChar)) {
 					// in CC, but not the CCLeader
 					sm = SystemMessage.getSystemMessage(SystemMessageId.CANNOT_INVITE_TO_COMMAND_CHANNEL);
 					activeChar.sendPacket(sm);
-				}
-				else
-				{
+				} else {
 					// target in a party?
-					if (player.isInParty())
-					{
+					if (player.isInParty()) {
 						// targets party already in a CChannel?
-						if (player.getParty().isInCommandChannel())
-						{
+						if (player.getParty().isInCommandChannel()) {
 							sm = SystemMessage.getSystemMessage(SystemMessageId.C1_ALREADY_MEMBER_OF_COMMAND_CHANNEL);
 							sm.addString(player.getName());
 							activeChar.sendPacket(sm);
-						}
-						else
-						{
+						} else {
 							// ready to open a new CC
 							// send request to targets Party's PartyLeader
 							askJoinMPCC(activeChar, player);
 						}
-					}
-					else
-					{
+					} else {
 						activeChar.sendMessage(player.getName() + " doesn't have party and cannot be invited to Command Channel.");
 					}
 				}
-			}
-			else
-			{
+			} else {
 				activeChar.sendPacket(SystemMessageId.CANNOT_INVITE_TO_COMMAND_CHANNEL);
 			}
 		}
 	}
 	
-	private void askJoinMPCC(L2PcInstance requestor, L2PcInstance target)
-	{
+	private void askJoinMPCC(L2PcInstance requestor, L2PcInstance target) {
 		boolean hasRight = false;
-		if (requestor.isClanLeader() && (requestor.getClan().getLevel() >= 5))
-		{
+		if (requestor.isClanLeader() && (requestor.getClan().getLevel() >= 5)) {
 			// Clan leader of lvl5 Clan or higher.
 			hasRight = true;
-		}
-		else if (requestor.getInventory().getItemByItemId(8871) != null)
-		{
+		} else if (requestor.getInventory().getItemByItemId(8871) != null) {
 			// 8871 Strategy Guide.
 			// TODO: Should destroyed after successful invite?
 			hasRight = true;
-		}
-		else if ((requestor.getPledgeClass() >= 5) && (requestor.getKnownSkill(391) != null))
-		{
+		} else if ((requestor.getPledgeClass() >= 5) && (requestor.getKnownSkill(391) != null)) {
 			// At least Baron or higher and the skill Clan Imperium
 			hasRight = true;
 		}
 		
-		if (!hasRight)
-		{
+		if (!hasRight) {
 			requestor.sendPacket(SystemMessageId.COMMAND_CHANNEL_ONLY_BY_LEVEL_5_CLAN_LEADER_PARTY_LEADER);
 			return;
 		}
@@ -163,8 +129,7 @@ public final class RequestExAskJoinMPCC extends L2GameClientPacket
 		// Get the target's party leader, and do whole actions on him.
 		final L2PcInstance targetLeader = target.getParty().getLeader();
 		SystemMessage sm;
-		if (!targetLeader.isProcessingRequest())
-		{
+		if (!targetLeader.isProcessingRequest()) {
 			requestor.onTransactionRequest(targetLeader);
 			sm = SystemMessage.getSystemMessage(SystemMessageId.COMMAND_CHANNEL_CONFIRM_FROM_C1);
 			sm.addString(requestor.getName());
@@ -172,9 +137,7 @@ public final class RequestExAskJoinMPCC extends L2GameClientPacket
 			targetLeader.sendPacket(new ExAskJoinMPCC(requestor.getName()));
 			
 			requestor.sendMessage("You invited " + targetLeader.getName() + " to your Command Channel.");
-		}
-		else
-		{
+		} else {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_BUSY_TRY_LATER);
 			sm.addString(targetLeader.getName());
 			requestor.sendPacket(sm);
@@ -182,8 +145,7 @@ public final class RequestExAskJoinMPCC extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_06_REQUESTEXASKJOINMPCC;
 	}
 }

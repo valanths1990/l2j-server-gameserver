@@ -24,7 +24,6 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Friend DAO interface.
  * @author Zoey76
  */
-public interface FriendDAO
-{
+public interface FriendDAO {
 	void load(L2PcInstance player);
 }

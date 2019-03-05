@@ -27,26 +27,21 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncMAtkCritical extends AbstractFunction
-{
+public class FuncMAtkCritical extends AbstractFunction {
 	private static final FuncMAtkCritical _fac_instance = new FuncMAtkCritical();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fac_instance;
 	}
 	
-	private FuncMAtkCritical()
-	{
+	private FuncMAtkCritical() {
 		super(Stats.MCRITICAL_RATE, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		// CT2: The magic critical rate has been increased to 10 times.
-		if (!effector.isPlayer() || (effector.getActiveWeaponInstance() != null))
-		{
+		if (!effector.isPlayer() || (effector.getActiveWeaponInstance() != null)) {
 			return initVal * BaseStats.WIT.calcBonus(effector) * 10;
 		}
 		return initVal;

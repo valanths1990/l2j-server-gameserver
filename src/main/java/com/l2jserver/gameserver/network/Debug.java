@@ -33,18 +33,14 @@ import com.l2jserver.gameserver.network.serverpackets.TutorialShowHtml;
 /**
  * @author UnAfraid
  */
-public class Debug
-{
-	public static void sendSkillDebug(L2Character attacker, L2Character target, Skill skill, StatsSet set)
-	{
-		if (!attacker.isPlayer())
-		{
+public class Debug {
+	public static void sendSkillDebug(L2Character attacker, L2Character target, Skill skill, StatsSet set) {
+		if (!attacker.isPlayer()) {
 			return;
 		}
 		
 		final StringBuilder sb = new StringBuilder();
-		for (Entry<String, Object> entry : set.getSet().entrySet())
-		{
+		for (Entry<String, Object> entry : set.getSet().entrySet()) {
 			sb.append("<tr><td>" + entry.getKey() + "</td><td><font color=\"LEVEL\">" + entry.getValue() + "</font></td></tr>");
 		}
 		
@@ -79,11 +75,9 @@ public class Debug
 		attacker.sendPacket(new TutorialShowHtml(msg.getHtml()));
 	}
 	
-	public static void sendItemDebug(L2PcInstance player, L2ItemInstance item, StatsSet set)
-	{
+	public static void sendItemDebug(L2PcInstance player, L2ItemInstance item, StatsSet set) {
 		final StringBuilder sb = new StringBuilder();
-		for (Entry<String, Object> entry : set.getSet().entrySet())
-		{
+		for (Entry<String, Object> entry : set.getSet().entrySet()) {
 			sb.append("<tr><td>" + entry.getKey() + "</td><td><font color=\"LEVEL\">" + entry.getValue() + "</font></td></tr>");
 		}
 		
@@ -99,12 +93,9 @@ public class Debug
 		player.sendPacket(new TutorialShowHtml(msg.getHtml()));
 	}
 	
-	private static String getBodyPart(int bodyPart)
-	{
-		for (Entry<String, Integer> entry : ItemTable.SLOTS.entrySet())
-		{
-			if ((entry.getValue() & bodyPart) == bodyPart)
-			{
+	private static String getBodyPart(int bodyPart) {
+		for (Entry<String, Integer> entry : ItemTable.SLOTS.entrySet()) {
+			if ((entry.getValue() & bodyPart) == bodyPart) {
 				return entry.getKey();
 			}
 		}

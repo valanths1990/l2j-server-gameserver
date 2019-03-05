@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class CharCreateFail extends L2GameServerPacket
-{
+public class CharCreateFail extends L2GameServerPacket {
 	/** Your character creation has failed. */
 	public static final int REASON_CREATION_FAILED = 0x00;
 	/** You cannot create another character. Please delete the existing character and try again." Removes all settings that were selected (race, class, etc). */
@@ -39,14 +38,12 @@ public class CharCreateFail extends L2GameServerPacket
 	
 	private final int _error;
 	
-	public CharCreateFail(int errorCode)
-	{
+	public CharCreateFail(int errorCode) {
 		_error = errorCode;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x10);
 		writeD(_error);
 	}

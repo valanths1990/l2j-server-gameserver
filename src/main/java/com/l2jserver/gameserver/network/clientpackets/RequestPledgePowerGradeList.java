@@ -27,31 +27,26 @@ import com.l2jserver.gameserver.network.serverpackets.PledgePowerGradeList;
  * Format: (ch)
  * @author -Wooden-
  */
-public final class RequestPledgePowerGradeList extends L2GameClientPacket
-{
+public final class RequestPledgePowerGradeList extends L2GameClientPacket {
 	private static final String _C__D0_13_REQUESTPLEDGEPOWERGRADELIST = "[C] D0:13 RequestPledgePowerGradeList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
 		L2Clan clan = player.getClan();
-		if (clan != null)
-		{
+		if (clan != null) {
 			RankPrivs[] privs = clan.getAllRankPrivs();
 			player.sendPacket(new PledgePowerGradeList(privs));
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_13_REQUESTPLEDGEPOWERGRADELIST;
 	}
 }

@@ -25,22 +25,18 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowReceivedPostList;
 /**
  * @author Migi, DS
  */
-public final class RequestReceivedPostList extends L2GameClientPacket
-{
+public final class RequestReceivedPostList extends L2GameClientPacket {
 	private static final String _C__D0_67_REQUESTRECEIVEDPOSTLIST = "[C] D0:67 RequestReceivedPostList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger packet
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if ((activeChar == null) || !Config.ALLOW_MAIL)
-		{
+		if ((activeChar == null) || !Config.ALLOW_MAIL) {
 			return;
 		}
 		
@@ -54,14 +50,12 @@ public final class RequestReceivedPostList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_67_REQUESTRECEIVEDPOSTLIST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

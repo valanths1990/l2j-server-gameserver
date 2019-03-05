@@ -28,25 +28,20 @@ import com.l2jserver.gameserver.network.serverpackets.ExVitalityPointInfo;
  * Task dedicated to reward player with vitality.
  * @author UnAfraid
  */
-public class VitalityTask implements Runnable
-{
+public class VitalityTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public VitalityTask(L2PcInstance player)
-	{
+	public VitalityTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (!_player.isInsideZone(ZoneId.PEACE))
-		{
+	public void run() {
+		if (!_player.isInsideZone(ZoneId.PEACE)) {
 			return;
 		}
 		
-		if (_player.getVitalityPoints() >= PcStat.MAX_VITALITY_POINTS)
-		{
+		if (_player.getVitalityPoints() >= PcStat.MAX_VITALITY_POINTS) {
 			return;
 		}
 		

@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author KenM
  */
-public final class ExBasicActionList extends L2GameServerPacket
-{
+public final class ExBasicActionList extends L2GameServerPacket {
 	//@formatter:off
 	public static final int[] ACTIONS_ON_TRANSFORM =
 	{
@@ -64,26 +63,22 @@ public final class ExBasicActionList extends L2GameServerPacket
 	//@formatter:on
 	public static final int[] DEFAULT_ACTION_LIST;
 	
-	static
-	{
+	static {
 		int count1 = 74; // 0 <-> (count1 - 1)
 		int count2 = 99; // 1000 <-> (1000 + count2 - 1)
 		int count3 = 16; // 5000 <-> (5000 + count3 - 1)
 		DEFAULT_ACTION_LIST = new int[count1 + count2 + count3];
 		int i;
 		
-		for (i = count1; i-- > 0;)
-		{
+		for (i = count1; i-- > 0;) {
 			DEFAULT_ACTION_LIST[i] = i;
 		}
 		
-		for (i = count2; i-- > 0;)
-		{
+		for (i = count2; i-- > 0;) {
 			DEFAULT_ACTION_LIST[count1 + i] = 1000 + i;
 		}
 		
-		for (i = count3; i-- > 0;)
-		{
+		for (i = count3; i-- > 0;) {
 			DEFAULT_ACTION_LIST[count1 + count2 + i] = 5000 + i;
 		}
 	}
@@ -92,19 +87,16 @@ public final class ExBasicActionList extends L2GameServerPacket
 	
 	private final int[] _actionIds;
 	
-	public ExBasicActionList(final int[] actionIds)
-	{
+	public ExBasicActionList(final int[] actionIds) {
 		_actionIds = actionIds;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x5f);
 		writeD(_actionIds.length);
-		for (int _actionId : _actionIds)
-		{
+		for (int _actionId : _actionIds) {
 			writeD(_actionId);
 		}
 	}

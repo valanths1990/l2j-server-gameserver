@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Format: (ch) dSS
  * @author -Wooden-
  */
-public final class RequestPledgeSetAcademyMaster extends L2GameClientPacket
-{
+public final class RequestPledgeSetAcademyMaster extends L2GameClientPacket {
 	private static final String _C__D0_12_REQUESTSETPLEADGEACADEMYMASTER = "[C] D0:12 RequestPledgeSetAcademyMaster";
 	
 	private String _currPlayerName;
@@ -38,44 +37,36 @@ public final class RequestPledgeSetAcademyMaster extends L2GameClientPacket
 	private String _targetPlayerName;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_set = readD();
 		_currPlayerName = readS();
 		_targetPlayerName = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
 		L2Clan clan = activeChar.getClan();
-		if (clan == null)
-		{
+		if (clan == null) {
 			return;
 		}
 		
-		if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_APPRENTICE))
-		{
+		if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_APPRENTICE)) {
 			activeChar.sendPacket(SystemMessageId.YOU_DO_NOT_HAVE_THE_RIGHT_TO_DISMISS_AN_APPRENTICE);
 			return;
 		}
 		
 		L2ClanMember currentMember = clan.getClanMember(_currPlayerName);
 		L2ClanMember targetMember = clan.getClanMember(_targetPlayerName);
-		if ((currentMember == null) || (targetMember == null))
-		{
+		if ((currentMember == null) || (targetMember == null)) {
 			return;
 		}
 		
 		L2ClanMember apprenticeMember, sponsorMember;
-		if (currentMember.getPledgeType() == L2Clan.SUBUNIT_ACADEMY)
-		{
+		if (currentMember.getPledgeType() == L2Clan.SUBUNIT_ACADEMY) {
 			apprenticeMember = currentMember;
 			sponsorMember = targetMember;
-		}
-		else
-		{
+		} else {
 			apprenticeMember = targetMember;
 			sponsorMember = currentMember;
 		}
@@ -84,24 +75,17 @@ public final class RequestPledgeSetAcademyMaster extends L2GameClientPacket
 		L2PcInstance sponsor = sponsorMember.getPlayerInstance();
 		
 		SystemMessage sm = null;
-		if (_set == 0)
-		{
+		if (_set == 0) {
 			// test: do we get the current sponsor & apprentice from this packet or no?
-			if (apprentice != null)
-			{
+			if (apprentice != null) {
 				apprentice.setSponsor(0);
-			}
-			else
-			{
+			} else {
 				apprenticeMember.setApprenticeAndSponsor(0, 0);
 			}
 			
-			if (sponsor != null)
-			{
+			if (sponsor != null) {
 				sponsor.setApprentice(0);
-			}
-			else
-			{
+			} else {
 				sponsorMember.setApprenticeAndSponsor(0, 0);
 			}
 			
@@ -109,30 +93,21 @@ public final class RequestPledgeSetAcademyMaster extends L2GameClientPacket
 			sponsorMember.saveApprenticeAndSponsor(0, 0);
 			
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S2_CLAN_MEMBER_C1_APPRENTICE_HAS_BEEN_REMOVED);
-		}
-		else
-		{
-			if ((apprenticeMember.getSponsor() != 0) || (sponsorMember.getApprentice() != 0) || (apprenticeMember.getApprentice() != 0) || (sponsorMember.getSponsor() != 0))
-			{
+		} else {
+			if ((apprenticeMember.getSponsor() != 0) || (sponsorMember.getApprentice() != 0) || (apprenticeMember.getApprentice() != 0) || (sponsorMember.getSponsor() != 0)) {
 				// TODO retail message
 				activeChar.sendMessage("Remove previous connections first.");
 				return;
 			}
-			if (apprentice != null)
-			{
+			if (apprentice != null) {
 				apprentice.setSponsor(sponsorMember.getObjectId());
-			}
-			else
-			{
+			} else {
 				apprenticeMember.setApprenticeAndSponsor(0, sponsorMember.getObjectId());
 			}
 			
-			if (sponsor != null)
-			{
+			if (sponsor != null) {
 				sponsor.setApprentice(apprenticeMember.getObjectId());
-			}
-			else
-			{
+			} else {
 				sponsorMember.setApprenticeAndSponsor(apprenticeMember.getObjectId(), 0);
 			}
 			
@@ -144,23 +119,19 @@ public final class RequestPledgeSetAcademyMaster extends L2GameClientPacket
 		}
 		sm.addString(sponsorMember.getName());
 		sm.addString(apprenticeMember.getName());
-		if ((sponsor != activeChar) && (sponsor != apprentice))
-		{
+		if ((sponsor != activeChar) && (sponsor != apprentice)) {
 			activeChar.sendPacket(sm);
 		}
-		if (sponsor != null)
-		{
+		if (sponsor != null) {
 			sponsor.sendPacket(sm);
 		}
-		if (apprentice != null)
-		{
+		if (apprentice != null) {
 			apprentice.sendPacket(sm);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_12_REQUESTSETPLEADGEACADEMYMASTER;
 	}
 }

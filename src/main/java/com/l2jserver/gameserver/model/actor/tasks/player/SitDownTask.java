@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Task dedicated to put player to sit down.
  * @author UnAfraid
  */
-public class SitDownTask implements Runnable
-{
+public class SitDownTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public SitDownTask(L2PcInstance player)
-	{
+	public SitDownTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			_player.setIsParalyzed(false);
 		}
 	}

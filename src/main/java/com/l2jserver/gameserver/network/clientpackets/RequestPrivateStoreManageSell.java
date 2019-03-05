@@ -25,44 +25,37 @@ import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
  * This class ...
  * @version $Revision: 1.2.2.1.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestPrivateStoreManageSell extends L2GameClientPacket
-{
+public final class RequestPrivateStoreManageSell extends L2GameClientPacket {
 	private static final String _C__30_REQUESTPRIVATESTOREMANAGESELL = "[C] 30 RequestPrivateStoreManageSell";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// TODO: implement me properly
 		// readD();
 		// readQ();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
 		// Player shouldn't be able to set stores if he/she is alike dead (dead or fake death)
-		if (player.isAlikeDead() || player.isInOlympiadMode())
-		{
+		if (player.isAlikeDead() || player.isInOlympiadMode()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__30_REQUESTPRIVATESTOREMANAGESELL;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

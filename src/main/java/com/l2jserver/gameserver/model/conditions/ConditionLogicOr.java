@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionLogicOr.
  * @author mkizub
  */
-public class ConditionLogicOr extends Condition
-{
+public class ConditionLogicOr extends Condition {
 	private static Condition[] _emptyConditions = new Condition[0];
 	public Condition[] conditions = _emptyConditions;
 	
@@ -35,14 +34,11 @@ public class ConditionLogicOr extends Condition
 	 * Adds the.
 	 * @param condition the condition
 	 */
-	public void add(Condition condition)
-	{
-		if (condition == null)
-		{
+	public void add(Condition condition) {
+		if (condition == null) {
 			return;
 		}
-		if (getListener() != null)
-		{
+		if (getListener() != null) {
 			condition.setListener(this);
 		}
 		final int len = conditions.length;
@@ -53,19 +49,13 @@ public class ConditionLogicOr extends Condition
 	}
 	
 	@Override
-	void setListener(ConditionListener listener)
-	{
-		if (listener != null)
-		{
-			for (Condition c : conditions)
-			{
+	void setListener(ConditionListener listener) {
+		if (listener != null) {
+			for (Condition c : conditions) {
 				c.setListener(this);
 			}
-		}
-		else
-		{
-			for (Condition c : conditions)
-			{
+		} else {
+			for (Condition c : conditions) {
 				c.setListener(null);
 			}
 		}
@@ -73,12 +63,9 @@ public class ConditionLogicOr extends Condition
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		for (Condition c : conditions)
-		{
-			if (c.test(effector, effected, skill, item))
-			{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		for (Condition c : conditions) {
+			if (c.test(effector, effected, skill, item)) {
 				return true;
 			}
 		}

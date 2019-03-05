@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExPutCommissionResultForVa
  * Format:(ch) dddd
  * @author -Wooden-
  */
-public final class RequestConfirmGemStone extends AbstractRefinePacket
-{
+public final class RequestConfirmGemStone extends AbstractRefinePacket {
 	private static final String _C__D0_28_REQUESTCONFIRMGEMSTONE = "[C] D0:28 RequestConfirmGemStone";
 	private int _targetItemObjId;
 	private int _refinerItemObjId;
@@ -36,8 +35,7 @@ public final class RequestConfirmGemStone extends AbstractRefinePacket
 	private long _gemStoneCount;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_targetItemObjId = readD();
 		_refinerItemObjId = readD();
 		_gemstoneItemObjId = readD();
@@ -45,45 +43,37 @@ public final class RequestConfirmGemStone extends AbstractRefinePacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		L2ItemInstance targetItem = activeChar.getInventory().getItemByObjectId(_targetItemObjId);
-		if (targetItem == null)
-		{
+		if (targetItem == null) {
 			return;
 		}
 		L2ItemInstance refinerItem = activeChar.getInventory().getItemByObjectId(_refinerItemObjId);
-		if (refinerItem == null)
-		{
+		if (refinerItem == null) {
 			return;
 		}
 		L2ItemInstance gemStoneItem = activeChar.getInventory().getItemByObjectId(_gemstoneItemObjId);
-		if (gemStoneItem == null)
-		{
+		if (gemStoneItem == null) {
 			return;
 		}
 		
 		// Make sure the item is a gemstone
-		if (!isValid(activeChar, targetItem, refinerItem, gemStoneItem))
-		{
+		if (!isValid(activeChar, targetItem, refinerItem, gemStoneItem)) {
 			activeChar.sendPacket(SystemMessageId.THIS_IS_NOT_A_SUITABLE_ITEM);
 			return;
 		}
 		
 		// Check for gemstone count
 		final LifeStone ls = getLifeStone(refinerItem.getId());
-		if (ls == null)
-		{
+		if (ls == null) {
 			return;
 		}
 		
-		if (_gemStoneCount != getGemStoneCount(targetItem.getItem().getItemGrade(), ls.getGrade()))
-		{
+		if (_gemStoneCount != getGemStoneCount(targetItem.getItem().getItemGrade(), ls.getGrade())) {
 			activeChar.sendPacket(SystemMessageId.GEMSTONE_QUANTITY_IS_INCORRECT);
 			return;
 		}
@@ -92,8 +82,7 @@ public final class RequestConfirmGemStone extends AbstractRefinePacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_28_REQUESTCONFIRMGEMSTONE;
 	}
 }

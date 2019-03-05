@@ -22,18 +22,15 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Lets drink to code!
  * @author zabbix
  */
-public class GameGuardQuery extends L2GameServerPacket
-{
+public class GameGuardQuery extends L2GameServerPacket {
 	public static final GameGuardQuery STATIC_PACKET = new GameGuardQuery();
 	
-	private GameGuardQuery()
-	{
+	private GameGuardQuery() {
 		
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0x74);
 		writeD(0x27533DD9);
 		writeD(0x2E72A51D);

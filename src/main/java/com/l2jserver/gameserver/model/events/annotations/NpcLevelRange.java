@@ -30,8 +30,7 @@ import java.lang.annotation.Target;
 @Repeatable(NpcLevelRanges.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface NpcLevelRange
-{
+public @interface NpcLevelRange {
 	public int from();
 	
 	public int to();

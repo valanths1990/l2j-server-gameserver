@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author Zealar
  */
-public enum StartPosType
-{
+public enum StartPosType {
 	FIXED,
 	RANDOM
 }

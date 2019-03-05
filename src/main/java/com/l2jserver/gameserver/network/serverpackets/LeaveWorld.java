@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class LeaveWorld extends L2GameServerPacket
-{
+public final class LeaveWorld extends L2GameServerPacket {
 	public static final LeaveWorld STATIC_PACKET = new LeaveWorld();
 	
-	private LeaveWorld()
-	{
+	private LeaveWorld() {
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x84);
 	}
 }

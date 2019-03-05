@@ -23,18 +23,15 @@ import com.l2jserver.util.network.BaseSendablePacket;
 /**
  * @author -Wooden-
  */
-public class ChangeAccessLevel extends BaseSendablePacket
-{
-	public ChangeAccessLevel(String player, int access)
-	{
+public class ChangeAccessLevel extends BaseSendablePacket {
+	public ChangeAccessLevel(String player, int access) {
 		writeC(0x04);
 		writeD(access);
 		writeS(player);
 	}
 	
 	@Override
-	public byte[] getContent()
-	{
+	public byte[] getContent() {
 		return getBytes();
 	}
 }

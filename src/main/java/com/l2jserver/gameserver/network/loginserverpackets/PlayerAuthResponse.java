@@ -23,8 +23,7 @@ import com.l2jserver.util.network.BaseRecievePacket;
 /**
  * @author -Wooden-
  */
-public class PlayerAuthResponse extends BaseRecievePacket
-{
+public class PlayerAuthResponse extends BaseRecievePacket {
 	
 	private final String _account;
 	private final boolean _authed;
@@ -32,8 +31,7 @@ public class PlayerAuthResponse extends BaseRecievePacket
 	/**
 	 * @param decrypt
 	 */
-	public PlayerAuthResponse(byte[] decrypt)
-	{
+	public PlayerAuthResponse(byte[] decrypt) {
 		super(decrypt);
 		
 		_account = readS();
@@ -43,16 +41,14 @@ public class PlayerAuthResponse extends BaseRecievePacket
 	/**
 	 * @return Returns the account.
 	 */
-	public String getAccount()
-	{
+	public String getAccount() {
 		return _account;
 	}
 	
 	/**
 	 * @return Returns the authed state.
 	 */
-	public boolean isAuthed()
-	{
+	public boolean isAuthed() {
 		return _authed;
 	}
 	

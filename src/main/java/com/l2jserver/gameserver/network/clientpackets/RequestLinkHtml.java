@@ -28,47 +28,39 @@ import com.l2jserver.gameserver.util.Util;
  * Lets drink to code!
  * @author zabbix, HorridoJoho
  */
-public final class RequestLinkHtml extends L2GameClientPacket
-{
+public final class RequestLinkHtml extends L2GameClientPacket {
 	private static final String _C__22_REQUESTLINKHTML = "[C] 22 RequestLinkHtml";
 	private String _link;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_link = readS();
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		L2PcInstance actor = getClient().getActiveChar();
-		if (actor == null)
-		{
+		if (actor == null) {
 			return;
 		}
 		
-		if (_link.isEmpty())
-		{
+		if (_link.isEmpty()) {
 			_log.warning("Player " + actor.getName() + " sent empty html link!");
 			return;
 		}
 		
-		if (_link.contains(".."))
-		{
+		if (_link.contains("..")) {
 			_log.warning("Player " + actor.getName() + " sent invalid html link: link " + _link);
 			return;
 		}
 		
 		int htmlObjectId = actor.validateHtmlAction("link " + _link);
-		if (htmlObjectId == -1)
-		{
+		if (htmlObjectId == -1) {
 			_log.warning("Player " + actor.getName() + " sent non cached  html link: link " + _link);
 			return;
 		}
 		
-		if ((htmlObjectId > 0) && !Util.isInsideRangeOfObjectId(actor, htmlObjectId, L2Npc.INTERACTION_DISTANCE))
-		{
+		if ((htmlObjectId > 0) && !Util.isInsideRangeOfObjectId(actor, htmlObjectId, L2Npc.INTERACTION_DISTANCE)) {
 			// No logging here, this could be a common case
 			return;
 		}
@@ -80,8 +72,7 @@ public final class RequestLinkHtml extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__22_REQUESTLINKHTML;
 	}
 }

@@ -35,24 +35,18 @@ import com.l2jserver.mmocore.ReceivablePacket;
  * Packets received by the game server from clients
  * @author KenM
  */
-public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient>
-{
+public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient> {
 	protected static final Logger _log = Logger.getLogger(L2GameClientPacket.class.getName());
 	
 	@Override
-	public boolean read()
-	{
-		try
-		{
+	public boolean read() {
+		try {
 			readImpl();
 			return true;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Client: " + getClient().toString() + " - Failed reading: " + getType() + " ; " + e.getMessage(), e);
 			
-			if (e instanceof BufferUnderflowException)
-			{
+			if (e instanceof BufferUnderflowException) {
 				getClient().onBufferUnderflow();
 			}
 		}
@@ -62,34 +56,26 @@ public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient>
 	protected abstract void readImpl();
 	
 	@Override
-	public void run()
-	{
-		try
-		{
+	public void run() {
+		try {
 			runImpl();
 			
 			/*
 			 * Removes onspawn protection - player has faster computer than average Since GE: True for all packets except RequestItemList and UseItem (in case the item is a Scroll of Escape (736)
 			 */
-			if (triggersOnActionRequest())
-			{
+			if (triggersOnActionRequest()) {
 				final L2PcInstance actor = getClient().getActiveChar();
-				if ((actor != null) && (actor.isSpawnProtected() || actor.isInvul()))
-				{
+				if ((actor != null) && (actor.isSpawnProtected() || actor.isInvul())) {
 					actor.onActionRequest();
-					if (Config.DEBUG)
-					{
+					if (Config.DEBUG) {
 						_log.info("Spawn protection for player " + actor.getName() + " removed by packet: " + getType());
 					}
 				}
 			}
-		}
-		catch (Throwable t)
-		{
+		} catch (Throwable t) {
 			_log.log(Level.SEVERE, "Client: " + getClient().toString() + " - Failed running: " + getType() + " ; " + t.getMessage(), t);
 			// in case of EnterWorld error kick player from game
-			if (this instanceof EnterWorld)
-			{
+			if (this instanceof EnterWorld) {
 				getClient().closeNow();
 			}
 		}
@@ -101,8 +87,7 @@ public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient>
 	 * Sends a game server packet to the client.
 	 * @param gsp the game server packet
 	 */
-	protected final void sendPacket(L2GameServerPacket gsp)
-	{
+	protected final void sendPacket(L2GameServerPacket gsp) {
 		getClient().sendPacket(gsp);
 	}
 	
@@ -110,8 +95,7 @@ public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient>
 	 * Sends a system message to the client.
 	 * @param id the system message Id
 	 */
-	public void sendPacket(SystemMessageId id)
-	{
+	public void sendPacket(SystemMessageId id) {
 		sendPacket(SystemMessage.getSystemMessage(id));
 	}
 	
@@ -124,23 +108,19 @@ public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient>
 	 * Overridden with true value on some packets that should disable spawn protection (RequestItemList and UseItem only)
 	 * @return
 	 */
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return true;
 	}
 	
 	/**
 	 * @return the active player if exist, otherwise null.
 	 */
-	protected final L2PcInstance getActiveChar()
-	{
+	protected final L2PcInstance getActiveChar() {
 		return getClient().getActiveChar();
 	}
 	
-	protected final void sendActionFailed()
-	{
-		if (getClient() != null)
-		{
+	protected final void sendActionFailed() {
+		if (getClient() != null) {
 			getClient().sendPacket(ActionFailed.STATIC_PACKET);
 		}
 	}

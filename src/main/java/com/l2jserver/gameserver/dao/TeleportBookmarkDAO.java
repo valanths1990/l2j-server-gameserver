@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Teleport Bookmark DAO interface.
  * @author Zoey76
  */
-public interface TeleportBookmarkDAO
-{
+public interface TeleportBookmarkDAO {
 	void delete(L2PcInstance player, int id);
 	
 	void insert(L2PcInstance player, int id, int x, int y, int z, int icon, String tag, String name);

@@ -30,7 +30,6 @@ import java.lang.annotation.Target;
 @Repeatable(Ids.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Id
-{
+public @interface Id {
 	public int[] value();
 }

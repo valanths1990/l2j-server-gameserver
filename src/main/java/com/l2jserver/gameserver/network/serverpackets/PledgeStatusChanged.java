@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.L2Clan;
 
-public final class PledgeStatusChanged extends L2GameServerPacket
-{
+public final class PledgeStatusChanged extends L2GameServerPacket {
 	private final L2Clan _clan;
 	
-	public PledgeStatusChanged(L2Clan clan)
-	{
+	public PledgeStatusChanged(L2Clan clan) {
 		_clan = clan;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xCD);
 		writeD(_clan.getLeaderId());
 		writeD(_clan.getId());

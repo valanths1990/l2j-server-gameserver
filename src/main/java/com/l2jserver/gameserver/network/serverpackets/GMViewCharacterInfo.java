@@ -21,16 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class GMViewCharacterInfo extends L2GameServerPacket
-{
+public class GMViewCharacterInfo extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final int _runSpd, _walkSpd;
 	private final int _swimRunSpd, _swimWalkSpd;
 	private final int _flyRunSpd, _flyWalkSpd;
 	private final double _moveMultiplier;
 	
-	public GMViewCharacterInfo(L2PcInstance cha)
-	{
+	public GMViewCharacterInfo(L2PcInstance cha) {
 		_activeChar = cha;
 		_moveMultiplier = cha.getMovementSpeedMultiplier();
 		_runSpd = (int) Math.round(cha.getRunSpeed() / _moveMultiplier);
@@ -42,8 +40,7 @@ public class GMViewCharacterInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x95);
 		
 		writeD(_activeChar.getX());
@@ -73,18 +70,15 @@ public class GMViewCharacterInfo extends L2GameServerPacket
 		writeD(_activeChar.getMaxLoad());
 		writeD(_activeChar.getPkKills());
 		
-		for (int slot : getPaperdollOrder())
-		{
+		for (int slot : getPaperdollOrder()) {
 			writeD(_activeChar.getInventory().getPaperdollObjectId(slot));
 		}
 		
-		for (int slot : getPaperdollOrder())
-		{
+		for (int slot : getPaperdollOrder()) {
 			writeD(_activeChar.getInventory().getPaperdollItemDisplayId(slot));
 		}
 		
-		for (int slot : getPaperdollOrder())
-		{
+		for (int slot : getPaperdollOrder()) {
 			writeD(_activeChar.getInventory().getPaperdollAugmentationId(slot));
 		}
 		
@@ -155,8 +149,7 @@ public class GMViewCharacterInfo extends L2GameServerPacket
 		byte attackAttribute = _activeChar.getAttackElement();
 		writeH(attackAttribute);
 		writeH(_activeChar.getAttackElementValue(attackAttribute));
-		for (byte i = 0; i < 6; i++)
-		{
+		for (byte i = 0; i < 6; i++) {
 			writeH(_activeChar.getDefenseElementValue(i));
 		}
 		writeD(_activeChar.getFame());

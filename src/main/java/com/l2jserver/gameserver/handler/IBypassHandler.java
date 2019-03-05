@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author nBd
  */
-public interface IBypassHandler
-{
+public interface IBypassHandler {
 	public static Logger _log = Logger.getLogger(IBypassHandler.class.getName());
 	
 	/**

@@ -33,16 +33,14 @@ import com.l2jserver.util.Rnd;
 /**
  * @author BiggBoss
  */
-public class L2BlockInstance extends L2MonsterInstance
-{
+public class L2BlockInstance extends L2MonsterInstance {
 	private int _colorEffect;
 	
 	/**
 	 * Creates a block.
 	 * @param template the block NPC template
 	 */
-	public L2BlockInstance(L2NpcTemplate template)
-	{
+	public L2BlockInstance(L2NpcTemplate template) {
 		super(template);
 	}
 	
@@ -52,22 +50,17 @@ public class L2BlockInstance extends L2MonsterInstance
 	 * @param holder
 	 * @param team
 	 */
-	public void changeColor(L2PcInstance attacker, ArenaParticipantsHolder holder, int team)
-	{
+	public void changeColor(L2PcInstance attacker, ArenaParticipantsHolder holder, int team) {
 		// Do not update color while sending old info
-		synchronized (this)
-		{
+		synchronized (this) {
 			final BlockCheckerEngine event = holder.getEvent();
-			if (_colorEffect == 0x53)
-			{
+			if (_colorEffect == 0x53) {
 				// Change color
 				_colorEffect = 0x00;
 				// BroadCast to all known players
 				this.broadcastPacket(new AbstractNpcInfo.NpcInfo(this, attacker));
 				increaseTeamPointsAndSend(attacker, team, event);
-			}
-			else
-			{
+			} else {
 				// Change color
 				_colorEffect = 0x53;
 				// BroadCast to all known players
@@ -77,12 +70,9 @@ public class L2BlockInstance extends L2MonsterInstance
 			// 30% chance to drop the event items
 			int random = Rnd.get(100);
 			// Bond
-			if ((random > 69) && (random <= 84))
-			{
+			if ((random > 69) && (random <= 84)) {
 				dropItem(13787, event, attacker);
-			}
-			else if (random > 84)
-			{
+			} else if (random > 84) {
 				dropItem(13788, event, attacker);
 			}
 		}
@@ -92,8 +82,7 @@ public class L2BlockInstance extends L2MonsterInstance
 	 * Sets if the block is red or blue. Mainly used in block spawn
 	 * @param isRed
 	 */
-	public void setRed(boolean isRed)
-	{
+	public void setRed(boolean isRed) {
 		_colorEffect = isRed ? 0x53 : 0x00;
 	}
 	
@@ -101,50 +90,40 @@ public class L2BlockInstance extends L2MonsterInstance
 	 * @return {@code true} if the block is red at this moment, {@code false} otherwise
 	 */
 	@Override
-	public int getColorEffect()
-	{
+	public int getColorEffect() {
 		return _colorEffect;
 	}
 	
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
-		if (attacker instanceof L2PcInstance)
-		{
+	public boolean isAutoAttackable(L2Character attacker) {
+		if (attacker instanceof L2PcInstance) {
 			return (attacker.getActingPlayer() != null) && (attacker.getActingPlayer().getBlockCheckerArena() > -1);
 		}
 		return true;
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
+	public boolean doDie(L2Character killer) {
 		return false;
 	}
 	
 	@Override
-	public void onAction(L2PcInstance player, boolean interact)
-	{
-		if (!canTarget(player))
-		{
+	public void onAction(L2PcInstance player, boolean interact) {
+		if (!canTarget(player)) {
 			return;
 		}
 		
 		player.setLastFolkNPC(this);
 		
-		if (player.getTarget() != this)
-		{
+		if (player.getTarget() != this) {
 			player.setTarget(this);
 			getAI(); // wake up ai
-		}
-		else if (interact)
-		{
+		} else if (interact) {
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 		}
 	}
 	
-	private void increaseTeamPointsAndSend(L2PcInstance player, int team, BlockCheckerEngine eng)
-	{
+	private void increaseTeamPointsAndSend(L2PcInstance player, int team, BlockCheckerEngine eng) {
 		eng.increasePlayerPoints(player, team);
 		
 		int timeLeft = (int) ((eng.getStarterTime() - System.currentTimeMillis()) / 1000);
@@ -157,8 +136,7 @@ public class L2BlockInstance extends L2MonsterInstance
 		eng.getHolder().broadCastPacketToTeam(secretPoints);
 	}
 	
-	private void dropItem(int id, BlockCheckerEngine eng, L2PcInstance player)
-	{
+	private void dropItem(int id, BlockCheckerEngine eng, L2PcInstance player) {
 		L2ItemInstance drop = ItemTable.getInstance().createItem("Loot", id, 1, player, this);
 		int x = getX() + Rnd.get(50);
 		int y = getY() + Rnd.get(50);

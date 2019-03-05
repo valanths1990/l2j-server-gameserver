@@ -32,16 +32,14 @@ import com.l2jserver.gameserver.model.zone.type.L2ResidenceZone;
 /**
  * @author xban1x
  */
-public abstract class AbstractResidence extends ListenersContainer implements INamable
-{
+public abstract class AbstractResidence extends ListenersContainer implements INamable {
 	private final int _residenceId;
 	private String _name;
 	
 	private L2ResidenceZone _zone = null;
 	private final List<SkillHolder> _residentialSkills = new ArrayList<>();
 	
-	public AbstractResidence(int residenceId)
-	{
+	public AbstractResidence(int residenceId) {
 		_residenceId = residenceId;
 		initResidentialSkills();
 	}
@@ -50,78 +48,62 @@ public abstract class AbstractResidence extends ListenersContainer implements IN
 	
 	protected abstract void initResidenceZone();
 	
-	protected void initResidentialSkills()
-	{
+	protected void initResidentialSkills() {
 		final List<L2SkillLearn> residentialSkills = SkillTreesData.getInstance().getAvailableResidentialSkills(getResidenceId());
-		for (L2SkillLearn s : residentialSkills)
-		{
+		for (L2SkillLearn s : residentialSkills) {
 			_residentialSkills.add(new SkillHolder(s.getSkillId(), s.getSkillLevel()));
 		}
 	}
 	
-	public final int getResidenceId()
-	{
+	public final int getResidenceId() {
 		return _residenceId;
 	}
 	
 	@Override
-	public final String getName()
-	{
+	public final String getName() {
 		return _name;
 	}
 	
 	// TODO: Remove it later when both castles and forts are loaded from same table.
-	public final void setName(String name)
-	{
+	public final void setName(String name) {
 		_name = name;
 	}
 	
-	public L2ResidenceZone getResidenceZone()
-	{
+	public L2ResidenceZone getResidenceZone() {
 		return _zone;
 	}
 	
-	protected void setResidenceZone(L2ResidenceZone zone)
-	{
+	protected void setResidenceZone(L2ResidenceZone zone) {
 		_zone = zone;
 	}
 	
-	public final List<SkillHolder> getResidentialSkills()
-	{
+	public final List<SkillHolder> getResidentialSkills() {
 		return _residentialSkills;
 	}
 	
-	public void giveResidentialSkills(L2PcInstance player)
-	{
-		if ((_residentialSkills != null) && !_residentialSkills.isEmpty())
-		{
-			for (SkillHolder sh : _residentialSkills)
-			{
+	public void giveResidentialSkills(L2PcInstance player) {
+		if ((_residentialSkills != null) && !_residentialSkills.isEmpty()) {
+			for (SkillHolder sh : _residentialSkills) {
 				player.addSkill(sh.getSkill(), false);
 			}
 		}
 	}
 	
-	public void removeResidentialSkills(L2PcInstance player)
-	{
-		if ((_residentialSkills != null) && !_residentialSkills.isEmpty())
-		{
-			for (SkillHolder sh : _residentialSkills)
-			{
+	public void removeResidentialSkills(L2PcInstance player) {
+		if ((_residentialSkills != null) && !_residentialSkills.isEmpty()) {
+			for (SkillHolder sh : _residentialSkills) {
 				player.removeSkill(sh.getSkill(), false);
 			}
 		}
 	}
 	
 	@Override
-	public boolean equals(Object obj)
-	{
+	public boolean equals(Object obj) {
 		return (obj instanceof AbstractResidence) && (((AbstractResidence) obj).getResidenceId() == getResidenceId());
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return getName() + "(" + getResidenceId() + ")";
 	}
 }

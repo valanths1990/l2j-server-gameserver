@@ -26,15 +26,13 @@ import com.l2jserver.gameserver.model.events.returns.AbstractEventReturn;
 /**
  * @author UnAfraid
  */
-public abstract class AbstractEventListener implements Comparable<AbstractEventListener>
-{
+public abstract class AbstractEventListener implements Comparable<AbstractEventListener> {
 	private int _priority = 0;
 	private final ListenersContainer _container;
 	private final EventType _type;
 	private final Object _owner;
 	
-	public AbstractEventListener(ListenersContainer container, EventType type, Object owner)
-	{
+	public AbstractEventListener(ListenersContainer container, EventType type, Object owner) {
 		_container = container;
 		_type = type;
 		_owner = owner;
@@ -43,32 +41,28 @@ public abstract class AbstractEventListener implements Comparable<AbstractEventL
 	/**
 	 * @return the container on which this listener is being registered (Used to unregister when unloading scripts)
 	 */
-	public ListenersContainer getContainer()
-	{
+	public ListenersContainer getContainer() {
 		return _container;
 	}
 	
 	/**
 	 * @return the type of event which listener is listening for.
 	 */
-	public EventType getType()
-	{
+	public EventType getType() {
 		return _type;
 	}
 	
 	/**
 	 * @return the owner of the listener, the object that registered this listener.
 	 */
-	public Object getOwner()
-	{
+	public Object getOwner() {
 		return _owner;
 	}
 	
 	/**
 	 * @return priority of execution (Higher the sooner)
 	 */
-	public int getPriority()
-	{
+	public int getPriority() {
 		return _priority;
 	}
 	
@@ -76,8 +70,7 @@ public abstract class AbstractEventListener implements Comparable<AbstractEventL
 	 * Sets priority of execution.
 	 * @param priority
 	 */
-	public void setPriority(int priority)
-	{
+	public void setPriority(int priority) {
 		_priority = priority;
 	}
 	
@@ -93,14 +86,12 @@ public abstract class AbstractEventListener implements Comparable<AbstractEventL
 	/**
 	 * Unregisters detaches and unregisters current listener.
 	 */
-	public void unregisterMe()
-	{
+	public void unregisterMe() {
 		getContainer().removeListener(this);
 	}
 	
 	@Override
-	public int compareTo(AbstractEventListener o)
-	{
+	public int compareTo(AbstractEventListener o) {
 		return Integer.compare(o.getPriority(), getPriority());
 	}
 }

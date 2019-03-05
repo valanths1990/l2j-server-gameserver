@@ -24,23 +24,19 @@ import com.l2jserver.gameserver.data.xml.impl.SecondaryAuthData;
  * Format: (ch)S S: numerical password
  * @author mrTJO
  */
-public class RequestEx2ndPasswordVerify extends L2GameClientPacket
-{
+public class RequestEx2ndPasswordVerify extends L2GameClientPacket {
 	private static final String _C__D0_AE_REQUESTEX2NDPASSWORDVERIFY = "[C] D0:AE RequestEx2ndPasswordVerify";
 	
 	private String _password;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_password = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (!SecondaryAuthData.getInstance().isEnabled())
-		{
+	protected void runImpl() {
+		if (!SecondaryAuthData.getInstance().isEnabled()) {
 			return;
 		}
 		
@@ -48,8 +44,7 @@ public class RequestEx2ndPasswordVerify extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_AE_REQUESTEX2NDPASSWORDVERIFY;
 	}
 }

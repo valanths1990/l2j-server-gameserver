@@ -42,8 +42,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  * and required network messages are sent to client's, i.e. if we have incoming event that character's movement was disabled, it causes changing if its behavior,<br>
  * and if client's state for the character is "moving" we send messages to clients to stop the avatar/mob.
  */
-public interface Ctrl
-{
+public interface Ctrl {
 	/**
 	 * Gets the actor.
 	 * @return the actor

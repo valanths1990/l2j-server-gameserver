@@ -24,14 +24,12 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * update 27.8.10
  * @author kerberos, JIV
  */
-public class ExStopMoveInAirShip extends L2GameServerPacket
-{
+public class ExStopMoveInAirShip extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final int _shipObjId;
 	private final int x, y, z, h;
 	
-	public ExStopMoveInAirShip(L2PcInstance player, int shipObjId)
-	{
+	public ExStopMoveInAirShip(L2PcInstance player, int shipObjId) {
 		_activeChar = player;
 		_shipObjId = shipObjId;
 		x = player.getInVehiclePosition().getX();
@@ -41,8 +39,7 @@ public class ExStopMoveInAirShip extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xfe);
 		writeH(0x6e);
 		writeD(_activeChar.getObjectId());

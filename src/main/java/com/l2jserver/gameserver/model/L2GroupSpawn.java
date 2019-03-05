@@ -30,24 +30,19 @@ import com.l2jserver.util.Rnd;
 /**
  * @author littlecrow A special spawn implementation to spawn controllable mob
  */
-public class L2GroupSpawn extends L2Spawn
-{
+public class L2GroupSpawn extends L2Spawn {
 	private final L2NpcTemplate _template;
 	
-	public L2GroupSpawn(L2NpcTemplate mobTemplate) throws SecurityException, ClassNotFoundException, NoSuchMethodException
-	{
+	public L2GroupSpawn(L2NpcTemplate mobTemplate) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
 		super(mobTemplate);
 		_template = mobTemplate;
 		
 		setAmount(1);
 	}
 	
-	public L2Npc doGroupSpawn()
-	{
-		try
-		{
-			if (_template.isType("L2Pet") || _template.isType("L2Minion"))
-			{
+	public L2Npc doGroupSpawn() {
+		try {
+			if (_template.isType("L2Pet") || _template.isType("L2Minion")) {
 				return null;
 			}
 			
@@ -55,23 +50,18 @@ public class L2GroupSpawn extends L2Spawn
 			int newlocy = 0;
 			int newlocz = 0;
 			
-			if ((getX() == 0) && (getY() == 0))
-			{
-				if (getLocationId() == 0)
-				{
+			if ((getX() == 0) && (getY() == 0)) {
+				if (getLocationId() == 0) {
 					return null;
 				}
 				
 				final Location location = TerritoryTable.getInstance().getRandomPoint(getLocationId());
-				if (location != null)
-				{
+				if (location != null) {
 					newlocx = location.getX();
 					newlocy = location.getY();
 					newlocz = location.getZ();
 				}
-			}
-			else
-			{
+			} else {
 				newlocx = getX();
 				newlocy = getY();
 				newlocz = getZ();
@@ -80,12 +70,9 @@ public class L2GroupSpawn extends L2Spawn
 			final L2Npc mob = new L2ControllableMobInstance(_template);
 			mob.setCurrentHpMp(mob.getMaxHp(), mob.getMaxMp());
 			
-			if (getHeading() == -1)
-			{
+			if (getHeading() == -1) {
 				mob.setHeading(Rnd.nextInt(61794));
-			}
-			else
-			{
+			} else {
 				mob.setHeading(getHeading());
 			}
 			
@@ -93,15 +80,12 @@ public class L2GroupSpawn extends L2Spawn
 			mob.spawnMe(newlocx, newlocy, newlocz);
 			mob.onSpawn();
 			
-			if (Config.DEBUG)
-			{
+			if (Config.DEBUG) {
 				_log.finest("Spawned Mob Id: " + _template.getId() + " ,at: X: " + mob.getX() + " Y: " + mob.getY() + " Z: " + mob.getZ());
 			}
 			return mob;
 			
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "NPC class not found: " + e.getMessage(), e);
 			return null;
 		}

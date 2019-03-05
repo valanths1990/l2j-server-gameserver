@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2RaidBossInstance;
 /**
  * @author godson
  */
-public final class DayNightSpawnManager
-{
+public final class DayNightSpawnManager {
 	
 	private static Logger _log = Logger.getLogger(DayNightSpawnManager.class.getName());
 	
@@ -44,39 +43,33 @@ public final class DayNightSpawnManager
 	
 	// private static int _currentState; // 0 = Day, 1 = Night
 	
-	public static DayNightSpawnManager getInstance()
-	{
+	public static DayNightSpawnManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	protected DayNightSpawnManager()
-	{
+	protected DayNightSpawnManager() {
 		// Prevent external initialization.
 	}
 	
-	public void addDayCreature(L2Spawn spawnDat)
-	{
+	public void addDayCreature(L2Spawn spawnDat) {
 		_dayCreatures.add(spawnDat);
 	}
 	
-	public void addNightCreature(L2Spawn spawnDat)
-	{
+	public void addNightCreature(L2Spawn spawnDat) {
 		_nightCreatures.add(spawnDat);
 	}
 	
 	/**
 	 * Spawn Day Creatures, and Unspawn Night Creatures
 	 */
-	public void spawnDayCreatures()
-	{
+	public void spawnDayCreatures() {
 		spawnCreatures(_nightCreatures, _dayCreatures, "night", "day");
 	}
 	
 	/**
 	 * Spawn Night Creatures, and Unspawn Day Creatures
 	 */
-	public void spawnNightCreatures()
-	{
+	public void spawnNightCreatures() {
 		spawnCreatures(_dayCreatures, _nightCreatures, "day", "night");
 	}
 	
@@ -87,24 +80,18 @@ public final class DayNightSpawnManager
 	 * @param UnspawnLogInfo String for log info for unspawned L2NpcInstance
 	 * @param SpawnLogInfo String for log info for spawned L2NpcInstance
 	 */
-	private void spawnCreatures(List<L2Spawn> unSpawnCreatures, List<L2Spawn> spawnCreatures, String UnspawnLogInfo, String SpawnLogInfo)
-	{
-		try
-		{
-			if (!unSpawnCreatures.isEmpty())
-			{
+	private void spawnCreatures(List<L2Spawn> unSpawnCreatures, List<L2Spawn> spawnCreatures, String UnspawnLogInfo, String SpawnLogInfo) {
+		try {
+			if (!unSpawnCreatures.isEmpty()) {
 				int i = 0;
-				for (L2Spawn spawn : unSpawnCreatures)
-				{
-					if (spawn == null)
-					{
+				for (L2Spawn spawn : unSpawnCreatures) {
+					if (spawn == null) {
 						continue;
 					}
 					
 					spawn.stopRespawn();
 					L2Npc last = spawn.getLastSpawn();
-					if (last != null)
-					{
+					if (last != null) {
 						last.deleteMe();
 						i++;
 					}
@@ -113,10 +100,8 @@ public final class DayNightSpawnManager
 			}
 			
 			int i = 0;
-			for (L2Spawn spawnDat : spawnCreatures)
-			{
-				if (spawnDat == null)
-				{
+			for (L2Spawn spawnDat : spawnCreatures) {
+				if (spawnDat == null) {
 					continue;
 				}
 				spawnDat.startRespawn();
@@ -125,22 +110,17 @@ public final class DayNightSpawnManager
 			}
 			
 			_log.info("DayNightSpawnManager: Spawned " + i + " " + SpawnLogInfo + " creatures");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Error while spawning creatures: " + e.getMessage(), e);
 		}
 	}
 	
-	private void changeMode(int mode)
-	{
-		if (_nightCreatures.isEmpty() && _dayCreatures.isEmpty() && _bosses.isEmpty())
-		{
+	private void changeMode(int mode) {
+		if (_nightCreatures.isEmpty() && _dayCreatures.isEmpty() && _bosses.isEmpty()) {
 			return;
 		}
 		
-		switch (mode)
-		{
+		switch (mode) {
 			case 0:
 				spawnDayCreatures();
 				specialNightBoss(0);
@@ -155,84 +135,64 @@ public final class DayNightSpawnManager
 		}
 	}
 	
-	public DayNightSpawnManager trim()
-	{
+	public DayNightSpawnManager trim() {
 		((ArrayList<?>) _nightCreatures).trimToSize();
 		((ArrayList<?>) _dayCreatures).trimToSize();
 		return this;
 	}
 	
-	public void notifyChangeMode()
-	{
-		try
-		{
-			if (GameTimeController.getInstance().isNight())
-			{
+	public void notifyChangeMode() {
+		try {
+			if (GameTimeController.getInstance().isNight()) {
 				changeMode(1);
-			}
-			else
-			{
+			} else {
 				changeMode(0);
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Error while notifyChangeMode(): " + e.getMessage(), e);
 		}
 	}
 	
-	public void cleanUp()
-	{
+	public void cleanUp() {
 		_nightCreatures.clear();
 		_dayCreatures.clear();
 		_bosses.clear();
 	}
 	
-	private void specialNightBoss(int mode)
-	{
-		try
-		{
+	private void specialNightBoss(int mode) {
+		try {
 			L2RaidBossInstance boss;
-			for (L2Spawn spawn : _bosses.keySet())
-			{
+			for (L2Spawn spawn : _bosses.keySet()) {
 				boss = _bosses.get(spawn);
-				if ((boss == null) && (mode == 1))
-				{
+				if ((boss == null) && (mode == 1)) {
 					boss = (L2RaidBossInstance) spawn.doSpawn();
 					RaidBossSpawnManager.getInstance().notifySpawnNightBoss(boss);
 					_bosses.put(spawn, boss);
 					continue;
 				}
 				
-				if ((boss == null) && (mode == 0))
-				{
+				if ((boss == null) && (mode == 0)) {
 					continue;
 				}
 				
-				if ((boss != null) && (boss.getId() == 25328) && boss.getRaidStatus().equals(RaidBossSpawnManager.StatusEnum.ALIVE))
-				{
+				if ((boss != null) && (boss.getId() == 25328) && boss.getRaidStatus().equals(RaidBossSpawnManager.StatusEnum.ALIVE)) {
 					handleHellmans(boss, mode);
 				}
 				return;
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Error while specialNoghtBoss(): " + e.getMessage(), e);
 		}
 	}
 	
-	private void handleHellmans(L2RaidBossInstance boss, int mode)
-	{
-		switch (mode)
-		{
+	private void handleHellmans(L2RaidBossInstance boss, int mode) {
+		switch (mode) {
 			case 0:
 				boss.deleteMe();
 				_log.info(getClass().getSimpleName() + ": Deleting Hellman raidboss");
 				break;
 			case 1:
-				if (!boss.isVisible())
-				{
+				if (!boss.isVisible()) {
 					boss.spawnMe();
 				}
 				_log.info(getClass().getSimpleName() + ": Spawning Hellman raidboss");
@@ -240,15 +200,12 @@ public final class DayNightSpawnManager
 		}
 	}
 	
-	public L2RaidBossInstance handleBoss(L2Spawn spawnDat)
-	{
-		if (_bosses.containsKey(spawnDat))
-		{
+	public L2RaidBossInstance handleBoss(L2Spawn spawnDat) {
+		if (_bosses.containsKey(spawnDat)) {
 			return _bosses.get(spawnDat);
 		}
 		
-		if (GameTimeController.getInstance().isNight())
-		{
+		if (GameTimeController.getInstance().isNight()) {
 			L2RaidBossInstance raidboss = (L2RaidBossInstance) spawnDat.doSpawn();
 			_bosses.put(spawnDat, raidboss);
 			
@@ -257,8 +214,7 @@ public final class DayNightSpawnManager
 		return null;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final DayNightSpawnManager _instance = new DayNightSpawnManager();
 	}
 }

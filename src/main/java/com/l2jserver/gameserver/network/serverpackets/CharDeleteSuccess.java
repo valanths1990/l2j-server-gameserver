@@ -18,11 +18,9 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class CharDeleteSuccess extends L2GameServerPacket
-{
+public class CharDeleteSuccess extends L2GameServerPacket {
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x1d);
 	}
 }

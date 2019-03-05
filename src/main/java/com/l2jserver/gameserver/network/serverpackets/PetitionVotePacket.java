@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author Plim
  */
-public class PetitionVotePacket extends L2GameServerPacket
-{
+public class PetitionVotePacket extends L2GameServerPacket {
 	public static final PetitionVotePacket STATIC_PACKET = new PetitionVotePacket();
 	
-	private PetitionVotePacket()
-	{
+	private PetitionVotePacket() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFC);
 	}
 }

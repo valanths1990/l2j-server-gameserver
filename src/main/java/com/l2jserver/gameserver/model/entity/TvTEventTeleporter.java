@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.util.Rnd;
 
-public class TvTEventTeleporter implements Runnable
-{
+public class TvTEventTeleporter implements Runnable {
 	/** The instance of the player to teleport */
 	private L2PcInstance _playerInstance = null;
 	/** Coordinates of the spot to teleport to */
@@ -42,8 +41,7 @@ public class TvTEventTeleporter implements Runnable
 	 * @param fastSchedule
 	 * @param adminRemove
 	 */
-	public TvTEventTeleporter(L2PcInstance playerInstance, int[] coordinates, boolean fastSchedule, boolean adminRemove)
-	{
+	public TvTEventTeleporter(L2PcInstance playerInstance, int[] coordinates, boolean fastSchedule, boolean adminRemove) {
 		_playerInstance = playerInstance;
 		_coordinates = coordinates;
 		_adminRemove = adminRemove;
@@ -62,44 +60,33 @@ public class TvTEventTeleporter implements Runnable
 	 * 5. Broadcast status and user info
 	 */
 	@Override
-	public void run()
-	{
-		if (_playerInstance == null)
-		{
+	public void run() {
+		if (_playerInstance == null) {
 			return;
 		}
 		
 		L2Summon summon = _playerInstance.getSummon();
 		
-		if (summon != null)
-		{
+		if (summon != null) {
 			summon.unSummon(_playerInstance);
 		}
 		
-		if ((Config.TVT_EVENT_EFFECTS_REMOVAL == 0) || ((Config.TVT_EVENT_EFFECTS_REMOVAL == 1) && ((_playerInstance.getTeam() == Team.NONE) || (_playerInstance.isInDuel() && (_playerInstance.getDuelState() != DuelState.INTERRUPTED)))))
-		{
+		if ((Config.TVT_EVENT_EFFECTS_REMOVAL == 0) || ((Config.TVT_EVENT_EFFECTS_REMOVAL == 1) && ((_playerInstance.getTeam() == Team.NONE) || (_playerInstance.isInDuel() && (_playerInstance.getDuelState() != DuelState.INTERRUPTED))))) {
 			_playerInstance.stopAllEffectsExceptThoseThatLastThroughDeath();
 		}
 		
-		if (_playerInstance.isInDuel())
-		{
+		if (_playerInstance.isInDuel()) {
 			_playerInstance.setDuelState(DuelState.INTERRUPTED);
 		}
 		
 		int TvTInstance = TvTEvent.getTvTEventInstance();
-		if (TvTInstance != 0)
-		{
-			if (TvTEvent.isStarted() && !_adminRemove)
-			{
+		if (TvTInstance != 0) {
+			if (TvTEvent.isStarted() && !_adminRemove) {
 				_playerInstance.setInstanceId(TvTInstance);
-			}
-			else
-			{
+			} else {
 				_playerInstance.setInstanceId(0);
 			}
-		}
-		else
-		{
+		} else {
 			_playerInstance.setInstanceId(0);
 		}
 		
@@ -107,11 +94,9 @@ public class TvTEventTeleporter implements Runnable
 		
 		_playerInstance.teleToLocation((_coordinates[0] + Rnd.get(101)) - 50, (_coordinates[1] + Rnd.get(101)) - 50, _coordinates[2], false);
 		
-		if (TvTEvent.isStarted() && !_adminRemove)
-		{
+		if (TvTEvent.isStarted() && !_adminRemove) {
 			int teamId = TvTEvent.getParticipantTeamId(_playerInstance.getObjectId()) + 1;
-			switch (teamId)
-			{
+			switch (teamId) {
 				case 0:
 					_playerInstance.setTeam(Team.NONE);
 					break;
@@ -122,9 +107,7 @@ public class TvTEventTeleporter implements Runnable
 					_playerInstance.setTeam(Team.RED);
 					break;
 			}
-		}
-		else
-		{
+		} else {
 			_playerInstance.setTeam(Team.NONE);
 		}
 		

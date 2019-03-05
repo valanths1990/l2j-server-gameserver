@@ -22,11 +22,9 @@ import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.util.network.BaseRecievePacket;
 
-public class ChangePasswordResponse extends BaseRecievePacket
-{
+public class ChangePasswordResponse extends BaseRecievePacket {
 	
-	public ChangePasswordResponse(byte[] decrypt)
-	{
+	public ChangePasswordResponse(byte[] decrypt) {
 		super(decrypt);
 		// boolean isSuccessful = readC() > 0;
 		String character = readS();
@@ -34,8 +32,7 @@ public class ChangePasswordResponse extends BaseRecievePacket
 		
 		L2PcInstance player = L2World.getInstance().getPlayer(character);
 		
-		if (player != null)
-		{
+		if (player != null) {
 			player.sendMessage(msgToSend);
 		}
 	}

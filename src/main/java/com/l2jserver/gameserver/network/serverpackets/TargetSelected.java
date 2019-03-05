@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class TargetSelected extends L2GameServerPacket
-{
+public final class TargetSelected extends L2GameServerPacket {
 	private final int _objectId;
 	private final int _targetObjId;
 	private final int _x;
@@ -33,8 +32,7 @@ public final class TargetSelected extends L2GameServerPacket
 	 * @param y
 	 * @param z
 	 */
-	public TargetSelected(int objectId, int targetId, int x, int y, int z)
-	{
+	public TargetSelected(int objectId, int targetId, int x, int y, int z) {
 		_objectId = objectId;
 		_targetObjId = targetId;
 		_x = x;
@@ -43,8 +41,7 @@ public final class TargetSelected extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x23);
 		writeD(_objectId);
 		writeD(_targetObjId);

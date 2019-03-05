@@ -25,36 +25,30 @@ import com.l2jserver.gameserver.network.serverpackets.ShowMiniMap;
  * sample format d
  * @version $Revision: 1 $ $Date: 2005/04/10 00:17:44 $
  */
-public final class RequestShowMiniMap extends L2GameClientPacket
-{
+public final class RequestShowMiniMap extends L2GameClientPacket {
 	private static final String _C__6C_REQUESTSHOWMINIMAP = "[C] 6C RequestShowMiniMap";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected final void runImpl()
-	{
+	protected final void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		activeChar.sendPacket(new ShowMiniMap(1665));
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__6C_REQUESTSHOWMINIMAP;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

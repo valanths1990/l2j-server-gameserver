@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author Zealar
  */
-public enum EffectCalculationType
-{
+public enum EffectCalculationType {
 	DIFF,
 	PER
 }

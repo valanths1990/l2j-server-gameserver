@@ -18,18 +18,15 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ExVariationCancelResult extends L2GameServerPacket
-{
+public class ExVariationCancelResult extends L2GameServerPacket {
 	private final int _result;
 	
-	public ExVariationCancelResult(int result)
-	{
+	public ExVariationCancelResult(int result) {
 		_result = result;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x58);
 		writeD(_result);

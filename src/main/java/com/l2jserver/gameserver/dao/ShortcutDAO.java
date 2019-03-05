@@ -24,7 +24,6 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Shortcut DAO interface.
  * @author Zoey76
  */
-public interface ShortcutDAO
-{
+public interface ShortcutDAO {
 	boolean delete(L2PcInstance player, int classIndex);
 }

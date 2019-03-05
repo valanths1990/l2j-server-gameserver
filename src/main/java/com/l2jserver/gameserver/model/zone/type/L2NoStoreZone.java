@@ -26,27 +26,21 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * Zone where store is not allowed.
  * @author fordfrog
  */
-public class L2NoStoreZone extends L2ZoneType
-{
-	public L2NoStoreZone(final int id)
-	{
+public class L2NoStoreZone extends L2ZoneType {
+	public L2NoStoreZone(final int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(final L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(final L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.NO_STORE, true);
 		}
 	}
 	
 	@Override
-	protected void onExit(final L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(final L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.NO_STORE, false);
 		}
 	}

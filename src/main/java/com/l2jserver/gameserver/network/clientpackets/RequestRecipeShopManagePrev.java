@@ -26,26 +26,20 @@ import com.l2jserver.gameserver.network.serverpackets.RecipeShopSellList;
  * This class ...
  * @version $Revision: 1.1.2.1.2.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestRecipeShopManagePrev extends L2GameClientPacket
-{
+public final class RequestRecipeShopManagePrev extends L2GameClientPacket {
 	private static final String _C__C0_RequestRecipeShopPrev = "[C] C0 RequestRecipeShopPrev";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if ((player == null))
-		{
+		if ((player == null)) {
 			return;
-		}
-		else if (player.isAlikeDead() || (player.getTarget() == null) || !player.getTarget().isPlayer())
-		{
+		} else if (player.isAlikeDead() || (player.getTarget() == null) || !player.getTarget().isPlayer()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
@@ -54,8 +48,7 @@ public final class RequestRecipeShopManagePrev extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__C0_RequestRecipeShopPrev;
 	}
 }

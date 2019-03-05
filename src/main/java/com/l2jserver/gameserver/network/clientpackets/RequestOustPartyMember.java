@@ -25,43 +25,34 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * This class ...
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestOustPartyMember extends L2GameClientPacket
-{
+public final class RequestOustPartyMember extends L2GameClientPacket {
 	private static final String _C__45_REQUESTOUSTPARTYMEMBER = "[C] 45 RequestOustPartyMember";
 	
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (activeChar.isInParty() && activeChar.getParty().isLeader(activeChar))
-		{
-			if (activeChar.getParty().isInDimensionalRift() && !activeChar.getParty().getDimensionalRift().getRevivedAtWaitingRoom().contains(activeChar))
-			{
+		if (activeChar.isInParty() && activeChar.getParty().isLeader(activeChar)) {
+			if (activeChar.getParty().isInDimensionalRift() && !activeChar.getParty().getDimensionalRift().getRevivedAtWaitingRoom().contains(activeChar)) {
 				activeChar.sendMessage("You can't dismiss party member when you are in Dimensional Rift.");
-			}
-			else
-			{
+			} else {
 				activeChar.getParty().removePartyMember(_name, messageType.Expelled);
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__45_REQUESTOUSTPARTYMEMBER;
 	}
 }

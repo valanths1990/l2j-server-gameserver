@@ -23,18 +23,15 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 /**
  * @author Yme
  */
-public class PetStatusShow extends L2GameServerPacket
-{
+public class PetStatusShow extends L2GameServerPacket {
 	private final int _summonType;
 	
-	public PetStatusShow(L2Summon summon)
-	{
+	public PetStatusShow(L2Summon summon) {
 		_summonType = summon.getSummonType();
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xb1);
 		writeD(_summonType);
 	}

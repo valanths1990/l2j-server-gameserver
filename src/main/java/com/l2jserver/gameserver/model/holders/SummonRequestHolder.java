@@ -23,31 +23,26 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author UnAfraid
  */
-public class SummonRequestHolder
-{
+public class SummonRequestHolder {
 	private final L2PcInstance _requester;
 	private final int _itemId;
 	private final int _itemCount;
 	
-	public SummonRequestHolder(L2PcInstance requester, int itemId, int itemCount)
-	{
+	public SummonRequestHolder(L2PcInstance requester, int itemId, int itemCount) {
 		_requester = requester;
 		_itemId = itemId;
 		_itemCount = itemCount;
 	}
 	
-	public L2PcInstance getRequester()
-	{
+	public L2PcInstance getRequester() {
 		return _requester;
 	}
 	
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 	
-	public int getItemCount()
-	{
+	public int getItemCount() {
 		return _itemCount;
 	}
 }

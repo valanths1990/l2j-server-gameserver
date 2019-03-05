@@ -38,34 +38,25 @@ import com.l2jserver.gameserver.config.Config;
  * @author Zealar
  * @since 2.6.0.0
  */
-public final class ExperienceData
-{
+public final class ExperienceData {
 	private static final Logger LOG = LoggerFactory.getLogger(ExperienceData.class);
 	
 	private static final Gson GSON = new Gson();
-	private static final Type TYPE_MAP_INTEGER_LONG = new TypeToken<Map<Integer, Long>>()
-	{
+	private static final Type TYPE_MAP_INTEGER_LONG = new TypeToken<Map<Integer, Long>>() {
 	}.getType();
 	private final Map<Integer, Long> _expTable = new HashMap<>();
 	
-	ExperienceData()
-	{
+	ExperienceData() {
 		load();
 	}
 	
-	public void load()
-	{
+	public void load() {
 		_expTable.clear();
-		try (JsonReader reader = new JsonReader(new FileReader(new File(Config.DATAPACK_ROOT, "data/stats/expData.json"))))
-		{
+		try (JsonReader reader = new JsonReader(new FileReader(new File(Config.DATAPACK_ROOT, "data/stats/expData.json")))) {
 			_expTable.putAll(GSON.fromJson(reader, TYPE_MAP_INTEGER_LONG));
-		}
-		catch (FileNotFoundException fnfe)
-		{
+		} catch (FileNotFoundException fnfe) {
 			LOG.warn("data/stats/expData.json not found!");
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			LOG.warn("Failed to load expData.json for: ", ioe);
 		}
 	}
@@ -75,13 +66,11 @@ public final class ExperienceData
 	 * @param level the level required.
 	 * @return the experience points required to reach the given level.
 	 */
-	public long getExpForLevel(int level)
-	{
+	public long getExpForLevel(int level) {
 		return _expTable.get(level);
 	}
 	
-	public float getPercentFromCurrentLevel(long exp, int level)
-	{
+	public float getPercentFromCurrentLevel(long exp, int level) {
 		long expPerLevel = getExpForLevel(level);
 		long expPerLevel2 = getExpForLevel(level + 1);
 		return (float) (exp - expPerLevel) / (expPerLevel2 - expPerLevel);
@@ -91,13 +80,11 @@ public final class ExperienceData
 	 * Gets the single instance of ExperienceTable.
 	 * @return single instance of ExperienceTable
 	 */
-	public static ExperienceData getInstance()
-	{
+	public static ExperienceData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		static final ExperienceData _instance = new ExperienceData();
 	}
 }

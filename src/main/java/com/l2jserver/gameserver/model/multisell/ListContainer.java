@@ -26,8 +26,7 @@ import java.util.Set;
 /**
  * @author DS
  */
-public class ListContainer
-{
+public class ListContainer {
 	private final int _listId;
 	private boolean _applyTaxes = false;
 	private boolean _maintainEnchantment = false;
@@ -36,38 +35,31 @@ public class ListContainer
 	protected List<Entry> _entries = new ArrayList<>();
 	protected Set<Integer> _npcsAllowed = null;
 	
-	public ListContainer(int listId)
-	{
+	public ListContainer(int listId) {
 		_listId = listId;
 	}
 	
-	public final List<Entry> getEntries()
-	{
+	public final List<Entry> getEntries() {
 		return _entries;
 	}
 	
-	public final int getListId()
-	{
+	public final int getListId() {
 		return _listId;
 	}
 	
-	public final void setApplyTaxes(boolean applyTaxes)
-	{
+	public final void setApplyTaxes(boolean applyTaxes) {
 		_applyTaxes = applyTaxes;
 	}
 	
-	public final boolean getApplyTaxes()
-	{
+	public final boolean getApplyTaxes() {
 		return _applyTaxes;
 	}
 	
-	public final void setMaintainEnchantment(boolean maintainEnchantment)
-	{
+	public final void setMaintainEnchantment(boolean maintainEnchantment) {
 		_maintainEnchantment = maintainEnchantment;
 	}
 	
-	public double getUseRate()
-	{
+	public double getUseRate() {
 		return _useRate;
 	}
 	
@@ -76,32 +68,26 @@ public class ListContainer
 	 * <b>NOTE:</b> It affects only parser, it won't change values of already parsed multisell since MultiSells' parseEntry method handles this feature.
 	 * @param rate
 	 */
-	public void setUseRate(double rate)
-	{
+	public void setUseRate(double rate) {
 		_useRate = rate;
 	}
 	
-	public final boolean getMaintainEnchantment()
-	{
+	public final boolean getMaintainEnchantment() {
 		return _maintainEnchantment;
 	}
 	
-	public void allowNpc(int npcId)
-	{
-		if (_npcsAllowed == null)
-		{
+	public void allowNpc(int npcId) {
+		if (_npcsAllowed == null) {
 			_npcsAllowed = new HashSet<>();
 		}
 		_npcsAllowed.add(npcId);
 	}
 	
-	public boolean isNpcAllowed(int npcId)
-	{
+	public boolean isNpcAllowed(int npcId) {
 		return (_npcsAllowed == null) || _npcsAllowed.contains(npcId);
 	}
 	
-	public boolean isNpcOnly()
-	{
+	public boolean isNpcOnly() {
 		return _npcsAllowed != null;
 	}
 }

@@ -26,34 +26,28 @@ import com.l2jserver.gameserver.model.CropProcure;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class SellListProcure extends L2GameServerPacket
-{
+public class SellListProcure extends L2GameServerPacket {
 	private final long _money;
 	private final Map<L2ItemInstance, Long> _sellList = new HashMap<>();
 	
-	public SellListProcure(L2PcInstance player, int castleId)
-	{
+	public SellListProcure(L2PcInstance player, int castleId) {
 		_money = player.getAdena();
-		for (CropProcure c : CastleManorManager.getInstance().getCropProcure(castleId, false))
-		{
+		for (CropProcure c : CastleManorManager.getInstance().getCropProcure(castleId, false)) {
 			final L2ItemInstance item = player.getInventory().getItemByItemId(c.getId());
-			if ((item != null) && (c.getAmount() > 0))
-			{
+			if ((item != null) && (c.getAmount() > 0)) {
 				_sellList.put(item, c.getAmount());
 			}
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xEF);
 		writeQ(_money); // money
 		writeD(0x00); // lease ?
 		writeH(_sellList.size()); // list size
 		
-		for (L2ItemInstance item : _sellList.keySet())
-		{
+		for (L2ItemInstance item : _sellList.keySet()) {
 			writeH(item.getItem().getType1().getId());
 			writeD(item.getObjectId());
 			writeD(item.getDisplayId());

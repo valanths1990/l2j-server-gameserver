@@ -24,35 +24,29 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowFortressInfo;
 /**
  * @author KenM
  */
-public class RequestAllFortressInfo extends L2GameClientPacket
-{
+public class RequestAllFortressInfo extends L2GameClientPacket {
 	private static final String _C__D0_3D_REQUESTALLFORTRESSINFO = "[C] D0:3D RequestAllFortressInfo";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger packet
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2GameClient client = getClient();
-		if (client != null)
-		{
+		if (client != null) {
 			client.sendPacket(ExShowFortressInfo.STATIC_PACKET);
 		}
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_3D_REQUESTALLFORTRESSINFO;
 	}
 }

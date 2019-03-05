@@ -24,33 +24,27 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * format ch c: (id) 0xD0 h: (subid) 0x12
  * @author -Wooden-
  */
-public final class RequestOlympiadObserverEnd extends L2GameClientPacket
-{
+public final class RequestOlympiadObserverEnd extends L2GameClientPacket {
 	private static final String _C__D0_29_REQUESTOLYMPIADOBSERVEREND = "[C] D0:29 RequestOlympiadObserverEnd";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
-		if (activeChar.inObserverMode())
-		{
+		if (activeChar.inObserverMode()) {
 			activeChar.leaveOlympiadObserverMode();
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_29_REQUESTOLYMPIADOBSERVEREND;
 	}
 }

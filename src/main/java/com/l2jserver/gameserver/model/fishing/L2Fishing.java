@@ -32,8 +32,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExFishingStartCombat;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.util.Rnd;
 
-public class L2Fishing implements Runnable
-{
+public class L2Fishing implements Runnable {
 	private L2PcInstance _fisher;
 	private int _time;
 	private int _stop = 0;
@@ -51,33 +50,25 @@ public class L2Fishing implements Runnable
 	private final boolean _isUpperGrade;
 	
 	@Override
-	public void run()
-	{
-		if (_fisher == null)
-		{
+	public void run() {
+		if (_fisher == null) {
 			return;
 		}
 		
-		if (_fishCurHp >= (_fishMaxHp * 2))
-		{
+		if (_fishCurHp >= (_fishMaxHp * 2)) {
 			// The fish got away
 			_fisher.sendPacket(SystemMessageId.BAIT_STOLEN_BY_FISH);
 			doDie(false);
-		}
-		else if (_time <= 0)
-		{
+		} else if (_time <= 0) {
 			// Time is up, so that fish got away
 			_fisher.sendPacket(SystemMessageId.FISH_SPIT_THE_HOOK);
 			doDie(false);
-		}
-		else
-		{
+		} else {
 			aiTask();
 		}
 	}
 	
-	public L2Fishing(L2PcInstance Fisher, L2Fish fish, boolean isNoob, boolean isUpperGrade)
-	{
+	public L2Fishing(L2PcInstance Fisher, L2Fish fish, boolean isNoob, boolean isUpperGrade) {
 		_fisher = Fisher;
 		_fishMaxHp = fish.getFishHp();
 		_fishCurHp = _fishMaxHp;
@@ -86,13 +77,10 @@ public class L2Fishing implements Runnable
 		_time = fish.getCombatDuration();
 		_isUpperGrade = isUpperGrade;
 		final int lureType;
-		if (isUpperGrade)
-		{
+		if (isUpperGrade) {
 			_deceptiveMode = ((Rnd.get(100) >= 90) ? 1 : 0);
 			lureType = 2;
-		}
-		else
-		{
+		} else {
 			_deceptiveMode = 0;
 			lureType = (isNoob ? 0 : 1);
 		}
@@ -103,61 +91,47 @@ public class L2Fishing implements Runnable
 		// Succeeded in getting a bite
 		_fisher.sendPacket(SystemMessageId.GOT_A_BITE);
 		
-		if (_fishAiTask == null)
-		{
+		if (_fishAiTask == null) {
 			_fishAiTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(this, 1000, 1000);
 		}
 	}
 	
-	public void changeHp(int hp, int pen)
-	{
+	public void changeHp(int hp, int pen) {
 		_fishCurHp -= hp;
-		if (_fishCurHp < 0)
-		{
+		if (_fishCurHp < 0) {
 			_fishCurHp = 0;
 		}
 		
 		_fisher.broadcastPacket(new ExFishingHpRegen(_fisher, _time, _fishCurHp, _mode, _goodUse, _anim, pen, _deceptiveMode));
 		_anim = 0;
-		if (_fishCurHp > (_fishMaxHp * 2))
-		{
+		if (_fishCurHp > (_fishMaxHp * 2)) {
 			_fishCurHp = _fishMaxHp * 2;
 			doDie(false);
 			return;
-		}
-		else if (_fishCurHp == 0)
-		{
+		} else if (_fishCurHp == 0) {
 			doDie(true);
 			return;
 		}
 	}
 	
-	public synchronized void doDie(boolean win)
-	{
-		if (_fishAiTask != null)
-		{
+	public synchronized void doDie(boolean win) {
+		if (_fishAiTask != null) {
 			_fishAiTask.cancel(false);
 			_fishAiTask = null;
 		}
 		
-		if (_fisher == null)
-		{
+		if (_fisher == null) {
 			return;
 		}
 		
-		if (win)
-		{
+		if (win) {
 			final L2FishingMonster fishingMonster = FishingMonstersData.getInstance().getFishingMonster(_fisher.getLevel());
-			if (fishingMonster != null)
-			{
-				if (Rnd.get(100) <= fishingMonster.getProbability())
-				{
+			if (fishingMonster != null) {
+				if (Rnd.get(100) <= fishingMonster.getProbability()) {
 					_fisher.sendPacket(SystemMessageId.YOU_CAUGHT_SOMETHING_SMELLY_THROW_IT_BACK);
 					final L2Npc monster = AbstractScript.addSpawn(fishingMonster.getFishingMonsterId(), _fisher);
 					monster.setTarget(_fisher);
-				}
-				else
-				{
+				} else {
 					_fisher.sendPacket(SystemMessageId.YOU_CAUGHT_SOMETHING);
 					_fisher.addItem("Fishing", _fishId, 1, null, true);
 				}
@@ -167,101 +141,74 @@ public class L2Fishing implements Runnable
 		_fisher = null;
 	}
 	
-	protected void aiTask()
-	{
-		if (_thinking)
-		{
+	protected void aiTask() {
+		if (_thinking) {
 			return;
 		}
 		_thinking = true;
 		_time--;
 		
-		try
-		{
-			if (_mode == 1)
-			{
-				if (_deceptiveMode == 0)
-				{
+		try {
+			if (_mode == 1) {
+				if (_deceptiveMode == 0) {
+					_fishCurHp += (int) _regenHp;
+				}
+			} else {
+				if (_deceptiveMode == 1) {
 					_fishCurHp += (int) _regenHp;
 				}
 			}
-			else
-			{
-				if (_deceptiveMode == 1)
-				{
-					_fishCurHp += (int) _regenHp;
-				}
-			}
-			if (_stop == 0)
-			{
+			if (_stop == 0) {
 				_stop = 1;
 				int check = Rnd.get(100);
-				if (check >= 70)
-				{
+				if (check >= 70) {
 					_mode = _mode == 0 ? 1 : 0;
 				}
-				if (_isUpperGrade)
-				{
+				if (_isUpperGrade) {
 					check = Rnd.get(100);
-					if (check >= 90)
-					{
+					if (check >= 90) {
 						_deceptiveMode = _deceptiveMode == 0 ? 1 : 0;
 					}
 				}
-			}
-			else
-			{
+			} else {
 				_stop--;
 			}
-		}
-		finally
-		{
+		} finally {
 			_thinking = false;
 			ExFishingHpRegen efhr = new ExFishingHpRegen(_fisher, _time, _fishCurHp, _mode, 0, _anim, 0, _deceptiveMode);
-			if (_anim != 0)
-			{
+			if (_anim != 0) {
 				_fisher.broadcastPacket(efhr);
-			}
-			else
-			{
+			} else {
 				_fisher.sendPacket(efhr);
 			}
 		}
 	}
 	
-	public void useReeling(int dmg, int pen)
-	{
+	public void useReeling(int dmg, int pen) {
 		_anim = 2;
-		if (Rnd.get(100) > 90)
-		{
+		if (Rnd.get(100) > 90) {
 			_fisher.sendPacket(SystemMessageId.FISH_RESISTED_ATTEMPT_TO_BRING_IT_IN);
 			_goodUse = 0;
 			changeHp(0, pen);
 			return;
 		}
-		if (_fisher == null)
-		{
+		if (_fisher == null) {
 			return;
 		}
-		if (_mode == 1)
-		{
-			if (_deceptiveMode == 0)
-			{
+		if (_mode == 1) {
+			if (_deceptiveMode == 0) {
 				// Reeling is successful, Damage: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.REELING_SUCCESFUL_S1_DAMAGE);
 				sm.addInt(dmg);
 				_fisher.sendPacket(sm);
-				if (pen > 0)
-				{
+				if (pen > 0) {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.REELING_SUCCESSFUL_PENALTY_S1);
 					sm.addInt(pen);
 					_fisher.sendPacket(sm);
 				}
 				_goodUse = 1;
 				changeHp(dmg, pen);
-			}
-			else
-			{
+			} else {
 				// Reeling failed, Damage: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.FISH_RESISTED_REELING_S1_HP_REGAINED);
 				sm.addInt(dmg);
@@ -269,26 +216,20 @@ public class L2Fishing implements Runnable
 				_goodUse = 2;
 				changeHp(-dmg, pen);
 			}
-		}
-		else
-		{
-			if (_deceptiveMode == 0)
-			{
+		} else {
+			if (_deceptiveMode == 0) {
 				// Reeling failed, Damage: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.FISH_RESISTED_REELING_S1_HP_REGAINED);
 				sm.addInt(dmg);
 				_fisher.sendPacket(sm);
 				_goodUse = 2;
 				changeHp(-dmg, pen);
-			}
-			else
-			{
+			} else {
 				// Reeling is successful, Damage: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.REELING_SUCCESFUL_S1_DAMAGE);
 				sm.addInt(dmg);
 				_fisher.sendPacket(sm);
-				if (pen > 0)
-				{
+				if (pen > 0) {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.REELING_SUCCESSFUL_PENALTY_S1);
 					sm.addInt(pen);
 					_fisher.sendPacket(sm);
@@ -299,39 +240,31 @@ public class L2Fishing implements Runnable
 		}
 	}
 	
-	public void usePumping(int dmg, int pen)
-	{
+	public void usePumping(int dmg, int pen) {
 		_anim = 1;
-		if (Rnd.get(100) > 90)
-		{
+		if (Rnd.get(100) > 90) {
 			_fisher.sendPacket(SystemMessageId.FISH_RESISTED_ATTEMPT_TO_BRING_IT_IN);
 			_goodUse = 0;
 			changeHp(0, pen);
 			return;
 		}
-		if (_fisher == null)
-		{
+		if (_fisher == null) {
 			return;
 		}
-		if (_mode == 0)
-		{
-			if (_deceptiveMode == 0)
-			{
+		if (_mode == 0) {
+			if (_deceptiveMode == 0) {
 				// Pumping is successful. Damage: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PUMPING_SUCCESFUL_S1_DAMAGE);
 				sm.addInt(dmg);
 				_fisher.sendPacket(sm);
-				if (pen > 0)
-				{
+				if (pen > 0) {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.PUMPING_SUCCESSFUL_PENALTY_S1);
 					sm.addInt(pen);
 					_fisher.sendPacket(sm);
 				}
 				_goodUse = 1;
 				changeHp(dmg, pen);
-			}
-			else
-			{
+			} else {
 				// Pumping failed, Regained: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.FISH_RESISTED_PUMPING_S1_HP_REGAINED);
 				sm.addInt(dmg);
@@ -339,26 +272,20 @@ public class L2Fishing implements Runnable
 				_goodUse = 2;
 				changeHp(-dmg, pen);
 			}
-		}
-		else
-		{
-			if (_deceptiveMode == 0)
-			{
+		} else {
+			if (_deceptiveMode == 0) {
 				// Pumping failed, Regained: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.FISH_RESISTED_PUMPING_S1_HP_REGAINED);
 				sm.addInt(dmg);
 				_fisher.sendPacket(sm);
 				_goodUse = 2;
 				changeHp(-dmg, pen);
-			}
-			else
-			{
+			} else {
 				// Pumping is successful. Damage: $s1
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PUMPING_SUCCESFUL_S1_DAMAGE);
 				sm.addInt(dmg);
 				_fisher.sendPacket(sm);
-				if (pen > 0)
-				{
+				if (pen > 0) {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.PUMPING_SUCCESSFUL_PENALTY_S1);
 					sm.addInt(pen);
 					_fisher.sendPacket(sm);

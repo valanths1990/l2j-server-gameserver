@@ -25,40 +25,33 @@ import com.l2jserver.gameserver.network.serverpackets.ExUISetting;
 /**
  * @author KenM / mrTJO
  */
-public class RequestKeyMapping extends L2GameClientPacket
-{
+public class RequestKeyMapping extends L2GameClientPacket {
 	private static final String _C__D0_21_REQUESTKEYMAPPING = "[C] D0:21 RequestKeyMapping";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger (no data)
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (Config.STORE_UI_SETTINGS)
-		{
+		if (Config.STORE_UI_SETTINGS) {
 			activeChar.sendPacket(new ExUISetting(activeChar));
 		}
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_21_REQUESTKEYMAPPING;
 	}
 }

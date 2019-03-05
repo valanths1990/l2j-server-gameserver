@@ -25,37 +25,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerKarmaChanged implements IBaseEvent
-{
+public class OnPlayerKarmaChanged implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _oldKarma;
 	private final int _newKarma;
 	
-	public OnPlayerKarmaChanged(L2PcInstance activeChar, int oldKarma, int newKarma)
-	{
+	public OnPlayerKarmaChanged(L2PcInstance activeChar, int oldKarma, int newKarma) {
 		_activeChar = activeChar;
 		_oldKarma = oldKarma;
 		_newKarma = newKarma;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getOldKarma()
-	{
+	public int getOldKarma() {
 		return _oldKarma;
 	}
 	
-	public int getNewKarma()
-	{
+	public int getNewKarma() {
 		return _newKarma;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_KARMA_CHANGED;
 	}
 }

@@ -30,8 +30,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author Migi, DS
  */
-public final class RequestDeleteSentPost extends L2GameClientPacket
-{
+public final class RequestDeleteSentPost extends L2GameClientPacket {
 	private static final String _C__D0_6D_REQUESTDELETESENTPOST = "[C] D0:6D RequestDeleteSentPost";
 	
 	private static final int BATCH_LENGTH = 4; // length of the one item
@@ -39,51 +38,41 @@ public final class RequestDeleteSentPost extends L2GameClientPacket
 	int[] _msgIds = null;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		int count = readD();
-		if ((count <= 0) || (count > Config.MAX_ITEM_IN_PACKET) || ((count * BATCH_LENGTH) != _buf.remaining()))
-		{
+		if ((count <= 0) || (count > Config.MAX_ITEM_IN_PACKET) || ((count * BATCH_LENGTH) != _buf.remaining())) {
 			return;
 		}
 		
 		_msgIds = new int[count];
-		for (int i = 0; i < count; i++)
-		{
+		for (int i = 0; i < count; i++) {
 			_msgIds[i] = readD();
 		}
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if ((activeChar == null) || (_msgIds == null) || !Config.ALLOW_MAIL)
-		{
+		if ((activeChar == null) || (_msgIds == null) || !Config.ALLOW_MAIL) {
 			return;
 		}
 		
-		if (!activeChar.isInsideZone(ZoneId.PEACE))
-		{
+		if (!activeChar.isInsideZone(ZoneId.PEACE)) {
 			activeChar.sendPacket(SystemMessageId.CANT_USE_MAIL_OUTSIDE_PEACE_ZONE);
 			return;
 		}
 		
-		for (int msgId : _msgIds)
-		{
+		for (int msgId : _msgIds) {
 			Message msg = MailManager.getInstance().getMessage(msgId);
-			if (msg == null)
-			{
+			if (msg == null) {
 				continue;
 			}
-			if (msg.getSenderId() != activeChar.getObjectId())
-			{
+			if (msg.getSenderId() != activeChar.getObjectId()) {
 				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to delete not own post!", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
-			if (msg.hasAttachments() || msg.isDeletedBySender())
-			{
+			if (msg.hasAttachments() || msg.isDeletedBySender()) {
 				return;
 			}
 			
@@ -93,14 +82,12 @@ public final class RequestDeleteSentPost extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_6D_REQUESTDELETESENTPOST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

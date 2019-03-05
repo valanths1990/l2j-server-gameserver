@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.model.MacroCmd;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public final class RequestMakeMacro extends L2GameClientPacket
-{
+public final class RequestMakeMacro extends L2GameClientPacket {
 	private static final String _C__CD_REQUESTMAKEMACRO = "[C] CD RequestMakeMacro";
 	
 	private Macro _macro;
@@ -38,27 +37,23 @@ public final class RequestMakeMacro extends L2GameClientPacket
 	private static final int MAX_MACRO_LENGTH = 12;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		int _id = readD();
 		String _name = readS();
 		String _desc = readS();
 		String _acronym = readS();
 		int _icon = readC();
 		int _count = readC();
-		if (_count > MAX_MACRO_LENGTH)
-		{
+		if (_count > MAX_MACRO_LENGTH) {
 			_count = MAX_MACRO_LENGTH;
 		}
 		
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			_log.info("Make macro id:" + _id + "\tname:" + _name + "\tdesc:" + _desc + "\tacronym:" + _acronym + "\ticon:" + _icon + "\tcount:" + _count);
 		}
 		
 		final List<MacroCmd> commands = new ArrayList<>(_count);
-		for (int i = 0; i < _count; i++)
-		{
+		for (int i = 0; i < _count; i++) {
 			int entry = readC();
 			int type = readC(); // 1 = skill, 3 = action, 4 = shortcut
 			int d1 = readD(); // skill or page number for shortcuts
@@ -71,33 +66,27 @@ public final class RequestMakeMacro extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
-		if (_commandsLenght > 255)
-		{
+		if (_commandsLenght > 255) {
 			// Invalid macro. Refer to the Help file for instructions.
 			player.sendPacket(SystemMessageId.INVALID_MACRO);
 			return;
 		}
-		if (player.getMacros().getAllMacroses().size() > 48)
-		{
+		if (player.getMacros().getAllMacroses().size() > 48) {
 			// You may create up to 48 macros.
 			player.sendPacket(SystemMessageId.YOU_MAY_CREATE_UP_TO_48_MACROS);
 			return;
 		}
-		if (_macro.getName().isEmpty())
-		{
+		if (_macro.getName().isEmpty()) {
 			// Enter the name of the macro.
 			player.sendPacket(SystemMessageId.ENTER_THE_MACRO_NAME);
 			return;
 		}
-		if (_macro.getDescr().length() > 32)
-		{
+		if (_macro.getDescr().length() > 32) {
 			// Macro descriptions may contain up to 32 characters.
 			player.sendPacket(SystemMessageId.MACRO_DESCRIPTION_MAX_32_CHARS);
 			return;
@@ -106,8 +95,7 @@ public final class RequestMakeMacro extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__CD_REQUESTMAKEMACRO;
 	}
 }

@@ -27,24 +27,20 @@ import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
  * This class ...
  * @version $Revision: 1.4.2.1.2.2 $ $Date: 2005/03/27 15:29:29 $
  */
-public final class CharacterRestore extends L2GameClientPacket
-{
+public final class CharacterRestore extends L2GameClientPacket {
 	private static final String _C__7B_CHARACTERRESTORE = "[C] 7B CharacterRestore";
 	
 	// cd
 	private int _charSlot;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_charSlot = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (!getClient().getFloodProtectors().getCharacterSelect().tryPerformAction("CharacterRestore"))
-		{
+	protected void runImpl() {
+		if (!getClient().getFloodProtectors().getCharacterSelect().tryPerformAction("CharacterRestore")) {
 			return;
 		}
 		
@@ -57,8 +53,7 @@ public final class CharacterRestore extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__7B_CHARACTERRESTORE;
 	}
 }

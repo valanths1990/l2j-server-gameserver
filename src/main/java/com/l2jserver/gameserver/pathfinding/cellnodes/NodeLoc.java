@@ -25,8 +25,7 @@ import com.l2jserver.geodriver.Cell;
 /**
  * @author -Nemesiss-, HorridoJoho
  */
-public class NodeLoc extends AbstractNodeLoc
-{
+public class NodeLoc extends AbstractNodeLoc {
 	private int _x;
 	private int _y;
 	private boolean _goNorth;
@@ -35,13 +34,11 @@ public class NodeLoc extends AbstractNodeLoc
 	private boolean _goWest;
 	private int _geoHeight;
 	
-	public NodeLoc(int x, int y, int z)
-	{
+	public NodeLoc(int x, int y, int z) {
 		set(x, y, z);
 	}
 	
-	public void set(int x, int y, int z)
-	{
+	public void set(int x, int y, int z) {
 		_x = x;
 		_y = y;
 		_goNorth = GeoData.getInstance().checkNearestNswe(x, y, z, Cell.NSWE_NORTH);
@@ -51,95 +48,78 @@ public class NodeLoc extends AbstractNodeLoc
 		_geoHeight = GeoData.getInstance().getNearestZ(x, y, z);
 	}
 	
-	public boolean canGoNorth()
-	{
+	public boolean canGoNorth() {
 		return _goNorth;
 	}
 	
-	public boolean canGoEast()
-	{
+	public boolean canGoEast() {
 		return _goEast;
 	}
 	
-	public boolean canGoSouth()
-	{
+	public boolean canGoSouth() {
 		return _goSouth;
 	}
 	
-	public boolean canGoWest()
-	{
+	public boolean canGoWest() {
 		return _goWest;
 	}
 	
-	public boolean canGoNone()
-	{
+	public boolean canGoNone() {
 		return !canGoNorth() && !canGoEast() && !canGoSouth() && !canGoWest();
 	}
 	
-	public boolean canGoAll()
-	{
+	public boolean canGoAll() {
 		return canGoNorth() && canGoEast() && canGoSouth() && canGoWest();
 	}
 	
 	@Override
-	public int getX()
-	{
+	public int getX() {
 		return GeoData.getInstance().getWorldX(_x);
 	}
 	
 	@Override
-	public int getY()
-	{
+	public int getY() {
 		return GeoData.getInstance().getWorldY(_y);
 	}
 	
 	@Override
-	public int getZ()
-	{
+	public int getZ() {
 		return _geoHeight;
 	}
 	
 	@Override
-	public void setZ(short z)
-	{
+	public void setZ(short z) {
 		//
 	}
 	
 	@Override
-	public int getNodeX()
-	{
+	public int getNodeX() {
 		return _x;
 	}
 	
 	@Override
-	public int getNodeY()
-	{
+	public int getNodeY() {
 		return _y;
 	}
 	
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = (prime * result) + _x;
 		result = (prime * result) + _y;
 		
 		int nswe = 0;
-		if (canGoNorth())
-		{
+		if (canGoNorth()) {
 			nswe |= Cell.NSWE_NORTH;
 		}
-		if (canGoEast())
-		{
+		if (canGoEast()) {
 			nswe |= Cell.NSWE_EAST;
 		}
-		if (canGoSouth())
-		{
+		if (canGoSouth()) {
 			nswe |= Cell.NSWE_SOUTH;
 		}
-		if (canGoWest())
-		{
+		if (canGoWest()) {
 			nswe |= Cell.NSWE_WEST;
 		}
 		
@@ -149,47 +129,36 @@ public class NodeLoc extends AbstractNodeLoc
 	}
 	
 	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (obj == null)
-		{
+		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof NodeLoc))
-		{
+		if (!(obj instanceof NodeLoc)) {
 			return false;
 		}
 		final NodeLoc other = (NodeLoc) obj;
-		if (_x != other._x)
-		{
+		if (_x != other._x) {
 			return false;
 		}
-		if (_y != other._y)
-		{
+		if (_y != other._y) {
 			return false;
 		}
-		if (_goNorth != other._goNorth)
-		{
+		if (_goNorth != other._goNorth) {
 			return false;
 		}
-		if (_goEast != other._goEast)
-		{
+		if (_goEast != other._goEast) {
 			return false;
 		}
-		if (_goSouth != other._goSouth)
-		{
+		if (_goSouth != other._goSouth) {
 			return false;
 		}
-		if (_goWest != other._goWest)
-		{
+		if (_goWest != other._goWest) {
 			return false;
 		}
-		if (_geoHeight != other._geoHeight)
-		{
+		if (_geoHeight != other._geoHeight) {
 			return false;
 		}
 		return true;

@@ -33,63 +33,50 @@ import org.xml.sax.SAXException;
 /**
  *
  */
-public class ScriptDocument
-{
+public class ScriptDocument {
 	private static final Logger _log = Logger.getLogger(ScriptDocument.class.getName());
 	
 	private Document _document;
 	private final String _name;
 	
-	public ScriptDocument(String name, InputStream input)
-	{
+	public ScriptDocument(String name, InputStream input) {
 		_name = name;
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		try
-		{
+		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			_document = builder.parse(input);
 			
-		}
-		catch (SAXException sxe)
-		{
+		} catch (SAXException sxe) {
 			// Error generated during parsing)
 			Exception x = sxe;
-			if (sxe.getException() != null)
-			{
+			if (sxe.getException() != null) {
 				x = sxe.getException();
 			}
 			_log.warning(getClass().getSimpleName() + ": " + x.getMessage());
-		}
-		catch (ParserConfigurationException pce)
-		{
+		} catch (ParserConfigurationException pce) {
 			// Parser with specified options can't be built
 			_log.log(Level.WARNING, "", pce);
 			
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			// I/O error
 			_log.log(Level.WARNING, "", ioe);
 		}
 	}
 	
-	public Document getDocument()
-	{
+	public Document getDocument() {
 		return _document;
 	}
 	
 	/**
 	 * @return Returns the _name.
 	 */
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return _name;
 	}
 	

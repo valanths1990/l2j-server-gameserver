@@ -20,8 +20,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public class ChangeWaitType extends L2GameServerPacket
-{
+public class ChangeWaitType extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _moveType;
 	private final int _x, _y, _z;
@@ -31,8 +30,7 @@ public class ChangeWaitType extends L2GameServerPacket
 	public static final int WT_START_FAKEDEATH = 2;
 	public static final int WT_STOP_FAKEDEATH = 3;
 	
-	public ChangeWaitType(L2Character character, int newMoveType)
-	{
+	public ChangeWaitType(L2Character character, int newMoveType) {
 		_charObjId = character.getObjectId();
 		_moveType = newMoveType;
 		
@@ -42,8 +40,7 @@ public class ChangeWaitType extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x29);
 		writeD(_charObjId);
 		writeD(_moveType);

@@ -29,27 +29,21 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
 /**
  * @author UnAfraid
  */
-public class ConditionPlayerInsideZoneId extends Condition
-{
+public class ConditionPlayerInsideZoneId extends Condition {
 	private final List<Integer> _zones;
 	
-	public ConditionPlayerInsideZoneId(List<Integer> zones)
-	{
+	public ConditionPlayerInsideZoneId(List<Integer> zones) {
 		_zones = zones;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		
-		for (L2ZoneType zone : ZoneManager.getInstance().getZones(effector))
-		{
-			if (_zones.contains(zone.getId()))
-			{
+		for (L2ZoneType zone : ZoneManager.getInstance().getZones(effector)) {
+			if (_zones.contains(zone.getId())) {
 				return true;
 			}
 		}

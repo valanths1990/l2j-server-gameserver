@@ -24,18 +24,15 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
 /**
  * @author Luca Baldi
  */
-public class EtcStatusUpdate extends L2GameServerPacket
-{
+public class EtcStatusUpdate extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	
-	public EtcStatusUpdate(L2PcInstance activeChar)
-	{
+	public EtcStatusUpdate(L2PcInstance activeChar) {
 		_activeChar = activeChar;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xf9); // several icons to a separate line (0 = disabled)
 		writeD(_activeChar.getCharges()); // 1-7 increase force, lvl
 		writeD(_activeChar.getWeightPenalty()); // 1-4 weight penalty, lvl (1=50%, 2=66.6%, 3=80%, 4=100%)

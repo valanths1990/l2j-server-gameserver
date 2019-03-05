@@ -24,51 +24,42 @@ import com.l2jserver.gameserver.enums.HtmlActionScope;
  * NpcHtmlMessage server packet implementation.
  * @author HorridoJoho
  */
-public final class NpcHtmlMessage extends AbstractHtmlPacket
-{
+public final class NpcHtmlMessage extends AbstractHtmlPacket {
 	private final int _itemId;
 	
-	public NpcHtmlMessage()
-	{
+	public NpcHtmlMessage() {
 		_itemId = 0;
 	}
 	
-	public NpcHtmlMessage(int npcObjId)
-	{
+	public NpcHtmlMessage(int npcObjId) {
 		super(npcObjId);
 		_itemId = 0;
 	}
 	
-	public NpcHtmlMessage(String html)
-	{
+	public NpcHtmlMessage(String html) {
 		super(html);
 		_itemId = 0;
 	}
 	
-	public NpcHtmlMessage(int npcObjId, String html)
-	{
+	public NpcHtmlMessage(int npcObjId, String html) {
 		super(npcObjId, html);
 		_itemId = 0;
 	}
 	
-	public NpcHtmlMessage(int npcObjId, int itemId)
-	{
+	public NpcHtmlMessage(int npcObjId, int itemId) {
 		super(npcObjId);
 		
-		if (itemId < 0)
-		{
+		if (itemId < 0) {
 			throw new IllegalArgumentException();
 		}
 		
 		_itemId = itemId;
 	}
 	
-	public NpcHtmlMessage(int npcObjId, int itemId, String html)
-	{
+	public NpcHtmlMessage(int npcObjId, int itemId, String html) {
 		super(npcObjId, html);
 		
-		if (itemId < 0)
-		{
+		if (itemId < 0) {
 			throw new IllegalArgumentException();
 		}
 		
@@ -76,8 +67,7 @@ public final class NpcHtmlMessage extends AbstractHtmlPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x19);
 		
 		writeD(getNpcObjId());
@@ -86,8 +76,7 @@ public final class NpcHtmlMessage extends AbstractHtmlPacket
 	}
 	
 	@Override
-	public HtmlActionScope getScope()
-	{
+	public HtmlActionScope getScope() {
 		return _itemId == 0 ? HtmlActionScope.NPC_HTML : HtmlActionScope.NPC_ITEM_HTML;
 	}
 }

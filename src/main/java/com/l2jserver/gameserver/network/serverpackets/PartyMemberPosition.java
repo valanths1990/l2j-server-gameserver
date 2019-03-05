@@ -28,22 +28,17 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author zabbix
  */
-public class PartyMemberPosition extends L2GameServerPacket
-{
+public class PartyMemberPosition extends L2GameServerPacket {
 	private final Map<Integer, Location> locations = new HashMap<>();
 	
-	public PartyMemberPosition(L2Party party)
-	{
+	public PartyMemberPosition(L2Party party) {
 		reuse(party);
 	}
 	
-	public void reuse(L2Party party)
-	{
+	public void reuse(L2Party party) {
 		locations.clear();
-		for (L2PcInstance member : party.getMembers())
-		{
-			if (member == null)
-			{
+		for (L2PcInstance member : party.getMembers()) {
+			if (member == null) {
 				continue;
 			}
 			locations.put(member.getObjectId(), member.getLocation());
@@ -51,12 +46,10 @@ public class PartyMemberPosition extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xba);
 		writeD(locations.size());
-		for (Map.Entry<Integer, Location> entry : locations.entrySet())
-		{
+		for (Map.Entry<Integer, Location> entry : locations.entrySet()) {
 			Location loc = entry.getValue();
 			writeD(entry.getKey());
 			writeD(loc.getX());

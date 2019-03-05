@@ -24,26 +24,22 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author Kerberos
  */
-public class ExChooseInventoryAttributeItem extends L2GameServerPacket
-{
+public class ExChooseInventoryAttributeItem extends L2GameServerPacket {
 	private final int _itemId;
 	private final byte _atribute;
 	private final int _level;
 	
-	public ExChooseInventoryAttributeItem(L2ItemInstance item)
-	{
+	public ExChooseInventoryAttributeItem(L2ItemInstance item) {
 		_itemId = item.getDisplayId();
 		_atribute = Elementals.getItemElement(_itemId);
-		if (_atribute == Elementals.NONE)
-		{
+		if (_atribute == Elementals.NONE) {
 			throw new IllegalArgumentException("Undefined Atribute item: " + item);
 		}
 		_level = Elementals.getMaxElementLevel(_itemId);
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x62);
 		writeD(_itemId);

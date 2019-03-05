@@ -18,32 +18,27 @@
  */
 package com.l2jserver.gameserver.model;
 
-public final class VehiclePathPoint extends Location
-{
+public final class VehiclePathPoint extends Location {
 	private final int _moveSpeed;
 	private final int _rotationSpeed;
 	
-	public VehiclePathPoint(int x, int y, int z)
-	{
+	public VehiclePathPoint(int x, int y, int z) {
 		super(x, y, z);
 		_moveSpeed = 350;
 		_rotationSpeed = 4000;
 	}
 	
-	public VehiclePathPoint(int x, int y, int z, int moveSpeed, int rotationSpeed)
-	{
+	public VehiclePathPoint(int x, int y, int z, int moveSpeed, int rotationSpeed) {
 		super(x, y, z);
 		_moveSpeed = moveSpeed;
 		_rotationSpeed = rotationSpeed;
 	}
 	
-	public int getMoveSpeed()
-	{
+	public int getMoveSpeed() {
 		return _moveSpeed;
 	}
 	
-	public int getRotationSpeed()
-	{
+	public int getRotationSpeed() {
 		return _rotationSpeed;
 	}
 }

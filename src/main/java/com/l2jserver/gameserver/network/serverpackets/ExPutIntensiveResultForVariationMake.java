@@ -18,16 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ExPutIntensiveResultForVariationMake extends L2GameServerPacket
-{
+public class ExPutIntensiveResultForVariationMake extends L2GameServerPacket {
 	private final int _refinerItemObjId;
 	private final int _lifestoneItemId;
 	private final int _gemstoneItemId;
 	private final int _gemstoneCount;
 	private final int _unk2;
 	
-	public ExPutIntensiveResultForVariationMake(int refinerItemObjId, int lifeStoneId, int gemstoneItemId, int gemstoneCount)
-	{
+	public ExPutIntensiveResultForVariationMake(int refinerItemObjId, int lifeStoneId, int gemstoneItemId, int gemstoneCount) {
 		_refinerItemObjId = refinerItemObjId;
 		_lifestoneItemId = lifeStoneId;
 		_gemstoneItemId = gemstoneItemId;
@@ -36,8 +34,7 @@ public class ExPutIntensiveResultForVariationMake extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x54);
 		writeD(_refinerItemObjId);

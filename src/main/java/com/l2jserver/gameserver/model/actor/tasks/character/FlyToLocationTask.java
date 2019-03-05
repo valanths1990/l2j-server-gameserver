@@ -28,24 +28,20 @@ import com.l2jserver.gameserver.network.serverpackets.FlyToLocation.FlyType;
  * Task dedicated to fly a player to the location
  * @author xban1x
  */
-public final class FlyToLocationTask implements Runnable
-{
+public final class FlyToLocationTask implements Runnable {
 	private final L2Character _character;
 	private final Location _targetLocation;
 	private final FlyType _type;
 	
-	public FlyToLocationTask(L2Character character, L2Object target, FlyType type)
-	{
+	public FlyToLocationTask(L2Character character, L2Object target, FlyType type) {
 		_character = character;
 		_targetLocation = target.getLocation();
 		_type = type;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_character != null)
-		{
+	public void run() {
+		if (_character != null) {
 			_character.broadcastPacket(new FlyToLocation(_character, _targetLocation, _type));
 			_character.setLocation(_targetLocation);
 		}

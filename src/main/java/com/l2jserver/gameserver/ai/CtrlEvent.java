@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.ai;
 /**
  * This class contains an enum of each possibles events that can happen on an AI character.
  */
-public enum CtrlEvent
-{
+public enum CtrlEvent {
 	/**
 	 * Something has changed, usually a previous step has being completed or maybe was completed, the AI must thing on next action.
 	 */

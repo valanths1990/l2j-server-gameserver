@@ -22,8 +22,7 @@ import java.util.ArrayList;
 
 import com.l2jserver.gameserver.model.L2Object;
 
-public final class StatusUpdate extends L2GameServerPacket
-{
+public final class StatusUpdate extends L2GameServerPacket {
 	public static final int LEVEL = 0x01;
 	public static final int EXP = 0x02;
 	public static final int STR = 0x03;
@@ -60,16 +59,14 @@ public final class StatusUpdate extends L2GameServerPacket
 	private final int _objectId;
 	private final ArrayList<Attribute> _attributes = new ArrayList<>();
 	
-	static class Attribute
-	{
+	static class Attribute {
 		/**
 		 * id values 09 - current health 0a - max health 0b - current mana 0c - max mana
 		 */
 		public int id;
 		public int value;
 		
-		Attribute(int pId, int pValue)
-		{
+		Attribute(int pId, int pValue) {
 			id = pId;
 			value = pValue;
 		}
@@ -79,8 +76,7 @@ public final class StatusUpdate extends L2GameServerPacket
 	 * If you have access to object itself use {@link StatusUpdate#StatusUpdate(L2Object)}.
 	 * @param objectId
 	 */
-	public StatusUpdate(int objectId)
-	{
+	public StatusUpdate(int objectId) {
 		_objectId = objectId;
 	}
 	
@@ -88,30 +84,25 @@ public final class StatusUpdate extends L2GameServerPacket
 	 * Create {@link StatusUpdate} packet for given {@link L2Object}.
 	 * @param object
 	 */
-	public StatusUpdate(L2Object object)
-	{
+	public StatusUpdate(L2Object object) {
 		_objectId = object.getObjectId();
 	}
 	
-	public void addAttribute(int id, int level)
-	{
+	public void addAttribute(int id, int level) {
 		_attributes.add(new Attribute(id, level));
 	}
 	
-	public boolean hasAttributes()
-	{
+	public boolean hasAttributes() {
 		return !_attributes.isEmpty();
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x18);
 		writeD(_objectId);
 		writeD(_attributes.size());
 		
-		for (Attribute temp : _attributes)
-		{
+		for (Attribute temp : _attributes) {
 			writeD(temp.id);
 			writeD(temp.value);
 		}

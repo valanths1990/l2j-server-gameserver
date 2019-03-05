@@ -26,26 +26,22 @@ import com.l2jserver.gameserver.model.L2Seed;
 /**
  * @author l3x
  */
-public final class ExShowManorDefaultInfo extends L2GameServerPacket
-{
+public final class ExShowManorDefaultInfo extends L2GameServerPacket {
 	private final List<L2Seed> _crops;
 	private final boolean _hideButtons;
 	
-	public ExShowManorDefaultInfo(boolean hideButtons)
-	{
+	public ExShowManorDefaultInfo(boolean hideButtons) {
 		_crops = CastleManorManager.getInstance().getCrops();
 		_hideButtons = hideButtons;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x25);
 		writeC(_hideButtons ? 0x01 : 0x00); // Hide "Seed Purchase" and "Crop Sales" buttons
 		writeD(_crops.size());
-		for (L2Seed crop : _crops)
-		{
+		for (L2Seed crop : _crops) {
 			writeD(crop.getCropId()); // crop Id
 			writeD(crop.getLevel()); // level
 			writeD(crop.getSeedReferencePrice()); // seed price

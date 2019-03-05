@@ -18,24 +18,20 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class KeyPacket extends L2GameServerPacket
-{
+public final class KeyPacket extends L2GameServerPacket {
 	private final byte[] _key;
 	private final int _id;
 	
-	public KeyPacket(byte[] key, int id)
-	{
+	public KeyPacket(byte[] key, int id) {
 		_key = key;
 		_id = id;
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0x2e);
 		writeC(_id); // 0 - wrong protocol, 1 - protocol ok
-		for (int i = 0; i < 8; i++)
-		{
+		for (int i = 0; i < 8; i++) {
 			writeC(_key[i]); // key
 		}
 		writeD(0x01);

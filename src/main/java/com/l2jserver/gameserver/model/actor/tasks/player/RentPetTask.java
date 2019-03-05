@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Task dedicated to dismount player from rented pet.
  * @author UnAfraid
  */
-public class RentPetTask implements Runnable
-{
+public class RentPetTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public RentPetTask(L2PcInstance player)
-	{
+	public RentPetTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			_player.stopRentPet();
 		}
 	}

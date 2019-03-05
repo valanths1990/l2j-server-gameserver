@@ -25,8 +25,7 @@ import java.util.logging.Logger;
 /**
  * @author UnAfraid
  */
-public interface ITelnetHandler
-{
+public interface ITelnetHandler {
 	public static Logger _log = Logger.getLogger(ITelnetHandler.class.getName());
 	
 	/**

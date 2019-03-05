@@ -23,41 +23,33 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author xban1x
  */
-public final class DamageDoneInfo
-{
+public final class DamageDoneInfo {
 	private final L2PcInstance _attacker;
 	private int _damage = 0;
 	
-	public DamageDoneInfo(L2PcInstance attacker)
-	{
+	public DamageDoneInfo(L2PcInstance attacker) {
 		_attacker = attacker;
 	}
 	
-	public L2PcInstance getAttacker()
-	{
+	public L2PcInstance getAttacker() {
 		return _attacker;
 	}
 	
-	public void addDamage(int damage)
-	{
+	public void addDamage(int damage) {
 		_damage += damage;
 	}
 	
-	public int getDamage()
-	{
+	public int getDamage() {
 		return _damage;
 	}
 	
 	@Override
-	public final boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
+	public final boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
 		
-		if (obj instanceof DamageDoneInfo)
-		{
+		if (obj instanceof DamageDoneInfo) {
 			return (((DamageDoneInfo) obj).getAttacker() == _attacker);
 		}
 		
@@ -65,8 +57,7 @@ public final class DamageDoneInfo
 	}
 	
 	@Override
-	public final int hashCode()
-	{
+	public final int hashCode() {
 		return _attacker.getObjectId();
 	}
 }

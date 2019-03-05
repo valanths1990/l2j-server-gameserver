@@ -25,22 +25,18 @@ import java.util.Map.Entry;
  * @author -Wooden-
  * @author UnAfraid, mrTJO
  */
-public class PackageToList extends L2GameServerPacket
-{
+public class PackageToList extends L2GameServerPacket {
 	private final Map<Integer, String> _players;
 	
-	public PackageToList(Map<Integer, String> chars)
-	{
+	public PackageToList(Map<Integer, String> chars) {
 		_players = chars;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xC8);
 		writeD(_players.size());
-		for (Entry<Integer, String> entry : _players.entrySet())
-		{
+		for (Entry<Integer, String> entry : _players.entrySet()) {
 			writeD(entry.getKey());
 			writeS(entry.getValue());
 		}

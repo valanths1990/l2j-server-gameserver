@@ -27,51 +27,43 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.taskmanager.AttackStanceTaskManager;
 
-public final class RequestStopPledgeWar extends L2GameClientPacket
-{
+public final class RequestStopPledgeWar extends L2GameClientPacket {
 	private static final String _C__05_REQUESTSTOPPLEDGEWAR = "[C] 05 RequestStopPledgeWar";
 	
 	private String _pledgeName;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_pledgeName = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		L2Clan playerClan = player.getClan();
-		if (playerClan == null)
-		{
+		if (playerClan == null) {
 			return;
 		}
 		
 		L2Clan clan = ClanTable.getInstance().getClanByName(_pledgeName);
 		
-		if (clan == null)
-		{
+		if (clan == null) {
 			player.sendMessage("No such clan.");
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (!playerClan.isAtWarWith(clan.getId()))
-		{
+		if (!playerClan.isAtWarWith(clan.getId())) {
 			player.sendMessage("You aren't at war with this clan.");
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Check if player who does the request has the correct rights to do it
-		if (!player.hasClanPrivilege(ClanPrivilege.CL_PLEDGE_WAR))
-		{
+		if (!player.hasClanPrivilege(ClanPrivilege.CL_PLEDGE_WAR)) {
 			player.sendPacket(SystemMessageId.YOU_ARE_NOT_AUTHORIZED_TO_DO_THAT);
 			return;
 		}
@@ -95,14 +87,11 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
 		// return;
 		// }
 		
-		for (L2ClanMember member : playerClan.getMembers())
-		{
-			if ((member == null) || (member.getPlayerInstance() == null))
-			{
+		for (L2ClanMember member : playerClan.getMembers()) {
+			if ((member == null) || (member.getPlayerInstance() == null)) {
 				continue;
 			}
-			if (AttackStanceTaskManager.getInstance().hasAttackStanceTask(member.getPlayerInstance()))
-			{
+			if (AttackStanceTaskManager.getInstance().hasAttackStanceTask(member.getPlayerInstance())) {
 				player.sendPacket(SystemMessageId.CANT_STOP_CLAN_WAR_WHILE_IN_COMBAT);
 				return;
 			}
@@ -110,20 +99,17 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
 		
 		ClanTable.getInstance().deleteclanswars(playerClan.getId(), clan.getId());
 		
-		for (L2PcInstance member : playerClan.getOnlineMembers(0))
-		{
+		for (L2PcInstance member : playerClan.getOnlineMembers(0)) {
 			member.broadcastUserInfo();
 		}
 		
-		for (L2PcInstance member : clan.getOnlineMembers(0))
-		{
+		for (L2PcInstance member : clan.getOnlineMembers(0)) {
 			member.broadcastUserInfo();
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__05_REQUESTSTOPPLEDGEWAR;
 	}
 }

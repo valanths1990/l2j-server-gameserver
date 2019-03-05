@@ -21,28 +21,23 @@ package com.l2jserver.gameserver.network;
 /**
  * @author KenM
  */
-public class GameCrypt
-{
+public class GameCrypt {
 	private final byte[] _inKey = new byte[16];
 	private final byte[] _outKey = new byte[16];
 	private boolean _isEnabled;
 	
-	public void setKey(byte[] key)
-	{
+	public void setKey(byte[] key) {
 		System.arraycopy(key, 0, _inKey, 0, 16);
 		System.arraycopy(key, 0, _outKey, 0, 16);
 	}
 	
-	public void decrypt(byte[] raw, final int offset, final int size)
-	{
-		if (!_isEnabled)
-		{
+	public void decrypt(byte[] raw, final int offset, final int size) {
+		if (!_isEnabled) {
 			return;
 		}
 		
 		int temp = 0;
-		for (int i = 0; i < size; i++)
-		{
+		for (int i = 0; i < size; i++) {
 			int temp2 = raw[offset + i] & 0xFF;
 			raw[offset + i] = (byte) (temp2 ^ _inKey[i & 15] ^ temp);
 			temp = temp2;
@@ -61,17 +56,14 @@ public class GameCrypt
 		_inKey[11] = (byte) ((old >> 0x18) & 0xff);
 	}
 	
-	public void encrypt(byte[] raw, final int offset, final int size)
-	{
-		if (!_isEnabled)
-		{
+	public void encrypt(byte[] raw, final int offset, final int size) {
+		if (!_isEnabled) {
 			_isEnabled = true;
 			return;
 		}
 		
 		int temp = 0;
-		for (int i = 0; i < size; i++)
-		{
+		for (int i = 0; i < size; i++) {
 			int temp2 = raw[offset + i] & 0xFF;
 			temp = temp2 ^ _outKey[i & 15] ^ temp;
 			raw[offset + i] = (byte) temp;

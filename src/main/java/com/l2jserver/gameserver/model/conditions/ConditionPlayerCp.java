@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerCp.
  */
-public class ConditionPlayerCp extends Condition
-{
+public class ConditionPlayerCp extends Condition {
 	
 	private final int _cp;
 	
@@ -34,14 +33,12 @@ public class ConditionPlayerCp extends Condition
 	 * Instantiates a new condition player cp.
 	 * @param cp the cp
 	 */
-	public ConditionPlayerCp(int cp)
-	{
+	public ConditionPlayerCp(int cp) {
 		_cp = cp;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effector != null) && (((effector.getCurrentCp() * 100) / effector.getMaxCp()) >= _cp);
 	}
 }

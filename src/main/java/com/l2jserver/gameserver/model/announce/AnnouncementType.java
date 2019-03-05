@@ -24,8 +24,7 @@ import java.util.logging.Logger;
 /**
  * @author UnAfraid
  */
-public enum AnnouncementType
-{
+public enum AnnouncementType {
 	NORMAL,
 	CRITICAL,
 	EVENT,
@@ -33,12 +32,9 @@ public enum AnnouncementType
 	AUTO_CRITICAL;
 	private static final Logger _log = Logger.getLogger(AnnouncementType.class.getName());
 	
-	public static AnnouncementType findById(int id)
-	{
-		for (AnnouncementType type : values())
-		{
-			if (type.ordinal() == id)
-			{
+	public static AnnouncementType findById(int id) {
+		for (AnnouncementType type : values()) {
+			if (type.ordinal() == id) {
 				return type;
 			}
 		}
@@ -46,12 +42,9 @@ public enum AnnouncementType
 		return NORMAL;
 	}
 	
-	public static AnnouncementType findByName(String name)
-	{
-		for (AnnouncementType type : values())
-		{
-			if (type.name().equalsIgnoreCase(name))
-			{
+	public static AnnouncementType findByName(String name) {
+		for (AnnouncementType type : values()) {
+			if (type.name().equalsIgnoreCase(name)) {
 				return type;
 			}
 		}

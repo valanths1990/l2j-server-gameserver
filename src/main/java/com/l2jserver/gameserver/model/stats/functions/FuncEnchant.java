@@ -27,61 +27,47 @@ import com.l2jserver.gameserver.model.items.type.WeaponType;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Stats;
 
-public class FuncEnchant extends AbstractFunction
-{
-	public FuncEnchant(Stats stat, int order, Object owner, double value, Condition applayCond)
-	{
+public class FuncEnchant extends AbstractFunction {
+	public FuncEnchant(Stats stat, int order, Object owner, double value, Condition applayCond) {
 		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		double value = initVal;
-		if ((getApplayCond() != null) && !getApplayCond().test(effector, effected, skill))
-		{
+		if ((getApplayCond() != null) && !getApplayCond().test(effector, effected, skill)) {
 			return value;
 		}
 		
 		L2ItemInstance item = (L2ItemInstance) getFuncOwner();
 		int enchant = item.getEnchantLevel();
-		if (enchant <= 0)
-		{
+		if (enchant <= 0) {
 			return value;
 		}
 		
 		int overenchant = 0;
-		if (enchant > 3)
-		{
+		if (enchant > 3) {
 			overenchant = enchant - 3;
 			enchant = 3;
 		}
 		
-		if (effector.isPlayer())
-		{
-			if (effector.getActingPlayer().isInOlympiadMode() && (Config.ALT_OLY_ENCHANT_LIMIT >= 0) && ((enchant + overenchant) > Config.ALT_OLY_ENCHANT_LIMIT))
-			{
-				if (Config.ALT_OLY_ENCHANT_LIMIT > 3)
-				{
+		if (effector.isPlayer()) {
+			if (effector.getActingPlayer().isInOlympiadMode() && (Config.ALT_OLY_ENCHANT_LIMIT >= 0) && ((enchant + overenchant) > Config.ALT_OLY_ENCHANT_LIMIT)) {
+				if (Config.ALT_OLY_ENCHANT_LIMIT > 3) {
 					overenchant = Config.ALT_OLY_ENCHANT_LIMIT - 3;
-				}
-				else
-				{
+				} else {
 					overenchant = 0;
 					enchant = Config.ALT_OLY_ENCHANT_LIMIT;
 				}
 			}
 		}
 		
-		if ((getStat() == Stats.MAGIC_DEFENCE) || (getStat() == Stats.POWER_DEFENCE))
-		{
+		if ((getStat() == Stats.MAGIC_DEFENCE) || (getStat() == Stats.POWER_DEFENCE)) {
 			return value + enchant + (3 * overenchant);
 		}
 		
-		if (getStat() == Stats.MAGIC_ATTACK)
-		{
-			switch (item.getItem().getItemGradeSPlus())
-			{
+		if (getStat() == Stats.MAGIC_ATTACK) {
+			switch (item.getItem().getItemGradeSPlus()) {
 				case S:
 					// M. Atk. increases by 4 for all weapons.
 					// Starting at +4, M. Atk. bonus double.
@@ -104,52 +90,38 @@ public class FuncEnchant extends AbstractFunction
 			return value;
 		}
 		
-		if (item.isWeapon())
-		{
+		if (item.isWeapon()) {
 			final WeaponType type = (WeaponType) item.getItemType();
-			switch (item.getItem().getItemGradeSPlus())
-			{
+			switch (item.getItem().getItemGradeSPlus()) {
 				case S:
-					if (item.getWeaponItem().getBodyPart() == L2Item.SLOT_LR_HAND)
-					{
-						if ((type == WeaponType.BOW) || (type == WeaponType.CROSSBOW))
-						{
+					if (item.getWeaponItem().getBodyPart() == L2Item.SLOT_LR_HAND) {
+						if ((type == WeaponType.BOW) || (type == WeaponType.CROSSBOW)) {
 							// P. Atk. increases by 10 for bows.
 							// Starting at +4, P. Atk. bonus double.
 							value += (10 * enchant) + (20 * overenchant);
-						}
-						else
-						{
+						} else {
 							// P. Atk. increases by 6 for two-handed swords, two-handed blunts, dualswords, and two-handed combat weapons.
 							// Starting at +4, P. Atk. bonus double.
 							value += (6 * enchant) + (12 * overenchant);
 						}
-					}
-					else
-					{
+					} else {
 						// P. Atk. increases by 5 for one-handed swords, one-handed blunts, daggers, spears, and other weapons.
 						// Starting at +4, P. Atk. bonus double.
 						value += (5 * enchant) + (10 * overenchant);
 					}
 					break;
 				case A:
-					if (item.getWeaponItem().getBodyPart() == L2Item.SLOT_LR_HAND)
-					{
-						if ((type == WeaponType.BOW) || (type == WeaponType.CROSSBOW))
-						{
+					if (item.getWeaponItem().getBodyPart() == L2Item.SLOT_LR_HAND) {
+						if ((type == WeaponType.BOW) || (type == WeaponType.CROSSBOW)) {
 							// P. Atk. increases by 8 for bows.
 							// Starting at +4, P. Atk. bonus double.
 							value += (8 * enchant) + (16 * overenchant);
-						}
-						else
-						{
+						} else {
 							// P. Atk. increases by 5 for two-handed swords, two-handed blunts, dualswords, and two-handed combat weapons.
 							// Starting at +4, P. Atk. bonus double.
 							value += (5 * enchant) + (10 * overenchant);
 						}
-					}
-					else
-					{
+					} else {
 						// P. Atk. increases by 4 for one-handed swords, one-handed blunts, daggers, spears, and other weapons.
 						// Starting at +4, P. Atk. bonus double.
 						value += (4 * enchant) + (8 * overenchant);
@@ -157,23 +129,17 @@ public class FuncEnchant extends AbstractFunction
 					break;
 				case B:
 				case C:
-					if (item.getWeaponItem().getBodyPart() == L2Item.SLOT_LR_HAND)
-					{
-						if ((type == WeaponType.BOW) || (type == WeaponType.CROSSBOW))
-						{
+					if (item.getWeaponItem().getBodyPart() == L2Item.SLOT_LR_HAND) {
+						if ((type == WeaponType.BOW) || (type == WeaponType.CROSSBOW)) {
 							// P. Atk. increases by 6 for bows.
 							// Starting at +4, P. Atk. bonus double.
 							value += (6 * enchant) + (12 * overenchant);
-						}
-						else
-						{
+						} else {
 							// P. Atk. increases by 4 for two-handed swords, two-handed blunts, dualswords, and two-handed combat weapons.
 							// Starting at +4, P. Atk. bonus double.
 							value += (4 * enchant) + (8 * overenchant);
 						}
-					}
-					else
-					{
+					} else {
 						// P. Atk. increases by 3 for one-handed swords, one-handed blunts, daggers, spears, and other weapons.
 						// Starting at +4, P. Atk. bonus double.
 						value += (3 * enchant) + (6 * overenchant);
@@ -181,11 +147,9 @@ public class FuncEnchant extends AbstractFunction
 					break;
 				case D:
 				case NONE:
-					switch (type)
-					{
+					switch (type) {
 						case BOW:
-						case CROSSBOW:
-						{
+						case CROSSBOW: {
 							// Bows increase by 4.
 							// Starting at +4, P. Atk. bonus double.
 							value += (4 * enchant) + (8 * overenchant);

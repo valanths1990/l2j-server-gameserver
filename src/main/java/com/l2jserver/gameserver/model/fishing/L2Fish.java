@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.StatsSet;
  * Class for the Fish object.
  * @author nonom
  */
-public class L2Fish implements Cloneable
-{
+public class L2Fish implements Cloneable {
 	private final int _fishId;
 	private final int _itemId;
 	private final String _itemName;
@@ -44,8 +43,7 @@ public class L2Fish implements Cloneable
 	private final double _cheatingProb;
 	private final int _fishGrade;
 	
-	public L2Fish(StatsSet set)
-	{
+	public L2Fish(StatsSet set) {
 		_fishId = set.getInt("fishId");
 		_itemId = set.getInt("itemId");
 		_itemName = set.getString("itemName");
@@ -66,14 +64,10 @@ public class L2Fish implements Cloneable
 	}
 	
 	@Override
-	public L2Fish clone()
-	{
-		try
-		{
+	public L2Fish clone() {
+		try {
 			return (L2Fish) super.clone();
-		}
-		catch (CloneNotSupportedException e)
-		{
+		} catch (CloneNotSupportedException e) {
 			return null;
 		}
 	}
@@ -81,144 +75,126 @@ public class L2Fish implements Cloneable
 	/**
 	 * @return the fish Id.
 	 */
-	public int getFishId()
-	{
+	public int getFishId() {
 		return _fishId;
 	}
 	
 	/**
 	 * @return the fish Item Id.
 	 */
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 	
 	/**
 	 * @return the fish Item name Id.
 	 */
-	public String getItemName()
-	{
+	public String getItemName() {
 		return _itemName;
 	}
 	
 	/**
 	 * @return the fish Group.
 	 */
-	public int getFishGroup()
-	{
+	public int getFishGroup() {
 		return _fishGroup;
 	}
 	
 	/**
 	 * @return the fish Level.
 	 */
-	public int getFishLevel()
-	{
+	public int getFishLevel() {
 		return _fishLevel;
 	}
 	
 	/**
 	 * @return the fish Bite Rate.
 	 */
-	public double getFishBiteRate()
-	{
+	public double getFishBiteRate() {
 		return _fishBiteRate;
 	}
 	
 	/**
 	 * @return the fish Guts.
 	 */
-	public double getFishGuts()
-	{
+	public double getFishGuts() {
 		return _fishGuts;
 	}
 	
 	/**
 	 * @return the fish Hp.
 	 */
-	public int getFishHp()
-	{
+	public int getFishHp() {
 		return _fishHp;
 	}
 	
 	/**
 	 * @return the fish Max length.
 	 */
-	public int getFishMaxLength()
-	{
+	public int getFishMaxLength() {
 		return _fishMaxLength;
 	}
 	
 	/**
 	 * @return the fish Length rate.
 	 */
-	public double getFishLengthRate()
-	{
+	public double getFishLengthRate() {
 		return _fishLengthRate;
 	}
 	
 	/**
 	 * @return the fish Hp regen.
 	 */
-	public double getHpRegen()
-	{
+	public double getHpRegen() {
 		return _hpRegen;
 	}
 	
 	/**
 	 * @return the fish start Combat time.
 	 */
-	public int getStartCombatTime()
-	{
+	public int getStartCombatTime() {
 		return _startCombatTime;
 	}
 	
 	/**
 	 * @return the fish Combat duration.
 	 */
-	public int getCombatDuration()
-	{
+	public int getCombatDuration() {
 		return _combatDuration;
 	}
 	
 	/**
 	 * @return the fish Guts check time.
 	 */
-	public int getGutsCheckTime()
-	{
+	public int getGutsCheckTime() {
 		return _gutsCheckTime;
 	}
 	
 	/**
 	 * @return the fish Guts Check probability.
 	 */
-	public double getGutsCheckProbability()
-	{
+	public double getGutsCheckProbability() {
 		return _gutsCheckProbability;
 	}
 	
 	/**
 	 * @return the fish Cheating prob.
 	 */
-	public double getCheatingProb()
-	{
+	public double getCheatingProb() {
 		return _cheatingProb;
 	}
 	
 	/**
 	 * @return the fish Grade.
 	 */
-	public int getFishGrade()
-	{
+	public int getFishGrade() {
 		return _fishGrade;
 	}
 	
 	/**
 	 * @param fg the fish Group.
 	 */
-	public void setFishGroup(int fg)
-	{
+	public void setFishGroup(int fg) {
 		_fishGroup = fg;
 	}
 	
@@ -226,10 +202,8 @@ public class L2Fish implements Cloneable
 	 * @param name the Group Name.
 	 * @return the fish Group Id.
 	 */
-	private int getGroupId(String name)
-	{
-		switch (name)
-		{
+	private int getGroupId(String name) {
+		switch (name) {
 			case "swift":
 				return 1;
 			case "ugly":
@@ -260,10 +234,8 @@ public class L2Fish implements Cloneable
 	 * @param name the Grade Name.
 	 * @return the fish Grade Id.
 	 */
-	private int getGradeId(String name)
-	{
-		switch (name)
-		{
+	private int getGradeId(String name) {
+		switch (name) {
 			case "fish_easy":
 				return 0;
 			case "fish_hard":

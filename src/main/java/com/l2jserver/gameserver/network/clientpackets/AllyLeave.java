@@ -23,41 +23,33 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public final class AllyLeave extends L2GameClientPacket
-{
+public final class AllyLeave extends L2GameClientPacket {
 	private static final String _C__8E_ALLYLEAVE = "[C] 8E AllyLeave";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
-		if (player.getClan() == null)
-		{
+		if (player.getClan() == null) {
 			player.sendPacket(SystemMessageId.YOU_ARE_NOT_A_CLAN_MEMBER);
 			return;
 		}
-		if (!player.isClanLeader())
-		{
+		if (!player.isClanLeader()) {
 			player.sendPacket(SystemMessageId.ONLY_CLAN_LEADER_WITHDRAW_ALLY);
 			return;
 		}
 		L2Clan clan = player.getClan();
-		if (clan.getAllyId() == 0)
-		{
+		if (clan.getAllyId() == 0) {
 			player.sendPacket(SystemMessageId.NO_CURRENT_ALLIANCES);
 			return;
 		}
-		if (clan.getId() == clan.getAllyId())
-		{
+		if (clan.getId() == clan.getAllyId()) {
 			player.sendPacket(SystemMessageId.ALLIANCE_LEADER_CANT_WITHDRAW);
 			return;
 		}
@@ -73,8 +65,7 @@ public final class AllyLeave extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8E_ALLYLEAVE;
 	}
 }

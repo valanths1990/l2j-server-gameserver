@@ -35,55 +35,44 @@ import com.l2jserver.util.file.filter.XMLFilter;
 /**
  * @author mkizub
  */
-public class DocumentEngine
-{
+public class DocumentEngine {
 	private static final Logger _log = Logger.getLogger(DocumentEngine.class.getName());
 	
 	private final List<File> _itemFiles = new ArrayList<>();
 	private final List<File> _skillFiles = new ArrayList<>();
 	
-	public static DocumentEngine getInstance()
-	{
+	public static DocumentEngine getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	protected DocumentEngine()
-	{
+	protected DocumentEngine() {
 		hashFiles("data/stats/items", _itemFiles);
-		if (Config.CUSTOM_ITEMS_LOAD)
-		{
+		if (Config.CUSTOM_ITEMS_LOAD) {
 			hashFiles("data/stats/items/custom", _itemFiles);
 		}
 		hashFiles("data/stats/skills", _skillFiles);
-		if (Config.CUSTOM_SKILLS_LOAD)
-		{
+		if (Config.CUSTOM_SKILLS_LOAD) {
 			hashFiles("data/stats/skills/custom", _skillFiles);
 		}
 	}
 	
-	private void hashFiles(String dirname, List<File> hash)
-	{
+	private void hashFiles(String dirname, List<File> hash) {
 		File dir = new File(Config.DATAPACK_ROOT, dirname);
-		if (!dir.exists())
-		{
+		if (!dir.exists()) {
 			_log.warning("Dir " + dir.getAbsolutePath() + " not exists");
 			return;
 		}
 		
 		final File[] files = dir.listFiles(new XMLFilter());
-		if (files != null)
-		{
-			for (File f : files)
-			{
+		if (files != null) {
+			for (File f : files) {
 				hash.add(f);
 			}
 		}
 	}
 	
-	public List<Skill> loadSkills(File file)
-	{
-		if (file == null)
-		{
+	public List<Skill> loadSkills(File file) {
+		if (file == null) {
 			_log.warning("Skill file not found.");
 			return null;
 		}
@@ -92,18 +81,14 @@ public class DocumentEngine
 		return doc.getSkills();
 	}
 	
-	public void loadAllSkills(final Map<Integer, Skill> allSkills)
-	{
+	public void loadAllSkills(final Map<Integer, Skill> allSkills) {
 		int count = 0;
-		for (File file : _skillFiles)
-		{
+		for (File file : _skillFiles) {
 			List<Skill> s = loadSkills(file);
-			if (s == null)
-			{
+			if (s == null) {
 				continue;
 			}
-			for (Skill skill : s)
-			{
+			for (Skill skill : s) {
 				allSkills.put(SkillData.getSkillHashCode(skill), skill);
 				count++;
 			}
@@ -115,11 +100,9 @@ public class DocumentEngine
 	 * Return created items
 	 * @return List of {@link L2Item}
 	 */
-	public List<L2Item> loadItems()
-	{
+	public List<L2Item> loadItems() {
 		List<L2Item> list = new ArrayList<>();
-		for (File f : _itemFiles)
-		{
+		for (File f : _itemFiles) {
 			DocumentItem document = new DocumentItem(f);
 			document.parse();
 			list.addAll(document.getItemList());
@@ -127,8 +110,7 @@ public class DocumentEngine
 		return list;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final DocumentEngine _instance = new DocumentEngine();
 	}
 }

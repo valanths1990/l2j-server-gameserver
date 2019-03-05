@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class NormalCamera extends L2GameServerPacket
-{
+public class NormalCamera extends L2GameServerPacket {
 	public static final NormalCamera STATIC_PACKET = new NormalCamera();
 	
-	private NormalCamera()
-	{
+	private NormalCamera() {
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xd7);
 	}
 }

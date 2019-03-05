@@ -18,20 +18,17 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ExPutItemResultForVariationMake extends L2GameServerPacket
-{
+public class ExPutItemResultForVariationMake extends L2GameServerPacket {
 	private final int _itemObjId;
 	private final int _itemId;
 	
-	public ExPutItemResultForVariationMake(int itemObjId, int itemId)
-	{
+	public ExPutItemResultForVariationMake(int itemObjId, int itemId) {
 		_itemObjId = itemObjId;
 		_itemId = itemId;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x53);
 		writeD(_itemObjId);

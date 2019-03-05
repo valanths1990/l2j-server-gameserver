@@ -20,14 +20,12 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.instance.L2AirShipInstance;
 
-public class ExAirShipInfo extends L2GameServerPacket
-{
+public class ExAirShipInfo extends L2GameServerPacket {
 	// store some parameters, because they can be changed during broadcast
 	private final L2AirShipInstance _ship;
 	private final int _x, _y, _z, _heading, _moveSpeed, _rotationSpeed, _captain, _helm;
 	
-	public ExAirShipInfo(L2AirShipInstance ship)
-	{
+	public ExAirShipInfo(L2AirShipInstance ship) {
 		_ship = ship;
 		_x = ship.getX();
 		_y = ship.getY();
@@ -40,8 +38,7 @@ public class ExAirShipInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x60);
 		
@@ -55,8 +52,7 @@ public class ExAirShipInfo extends L2GameServerPacket
 		writeD(_moveSpeed);
 		writeD(_rotationSpeed);
 		writeD(_helm);
-		if (_helm != 0)
-		{
+		if (_helm != 0) {
 			// TODO: unhardcode these!
 			writeD(0x16e); // Controller X
 			writeD(0x00); // Controller Y
@@ -64,9 +60,7 @@ public class ExAirShipInfo extends L2GameServerPacket
 			writeD(0x15c); // Captain X
 			writeD(0x00); // Captain Y
 			writeD(0x69); // Captain Z
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 			writeD(0x00);
 			writeD(0x00);

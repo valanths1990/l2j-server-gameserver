@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author kombat
  */
-public enum TriggerType
-{
+public enum TriggerType {
 	// You hit an enemy
 	ON_HIT(1),
 	// You hit an enemy - was crit
@@ -60,13 +59,11 @@ public enum TriggerType
 	
 	private final int _mask;
 	
-	private TriggerType(int mask)
-	{
+	private TriggerType(int mask) {
 		_mask = mask;
 	}
 	
-	public final boolean check(int event)
-	{
+	public final boolean check(int event) {
 		return (_mask & event) != 0; // Trigger (sub-)type contains event (sub-)type
 	}
 }

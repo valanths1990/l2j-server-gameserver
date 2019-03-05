@@ -27,42 +27,30 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
  * @author NightMarez
  * @version $Revision: 1.3.2.2.2.5 $ $Date: 2005/03/27 15:29:32 $
  */
-public final class L2ObservationInstance extends L2Npc
-{
+public final class L2ObservationInstance extends L2Npc {
 	/**
 	 * Creates an observation.
 	 * @param template the observation NPC template
 	 */
-	public L2ObservationInstance(L2NpcTemplate template)
-	{
+	public L2ObservationInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2ObservationInstance);
 	}
 	
 	@Override
-	public void showChatWindow(L2PcInstance player, int val)
-	{
+	public void showChatWindow(L2PcInstance player, int val) {
 		String filename = null;
 		
-		if (isInsideRadius(-79884, 86529, 0, 50, false, true) || isInsideRadius(-78858, 111358, 0, 50, false, true) || isInsideRadius(-76973, 87136, 0, 50, false, true) || isInsideRadius(-75850, 111968, 0, 50, false, true))
-		{
-			if (val == 0)
-			{
+		if (isInsideRadius(-79884, 86529, 0, 50, false, true) || isInsideRadius(-78858, 111358, 0, 50, false, true) || isInsideRadius(-76973, 87136, 0, 50, false, true) || isInsideRadius(-75850, 111968, 0, 50, false, true)) {
+			if (val == 0) {
 				filename = "data/html/observation/" + getId() + "-Oracle.htm";
-			}
-			else
-			{
+			} else {
 				filename = "data/html/observation/" + getId() + "-Oracle-" + val + ".htm";
 			}
-		}
-		else
-		{
-			if (val == 0)
-			{
+		} else {
+			if (val == 0) {
 				filename = "data/html/observation/" + getId() + ".htm";
-			}
-			else
-			{
+			} else {
 				filename = "data/html/observation/" + getId() + "-" + val + ".htm";
 			}
 		}

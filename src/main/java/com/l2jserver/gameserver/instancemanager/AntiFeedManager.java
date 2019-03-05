@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.L2GameClient;
 
-public final class AntiFeedManager
-{
+public final class AntiFeedManager {
 	public static final int GAME_ID = 0;
 	public static final int OLYMPIAD_ID = 1;
 	public static final int TVT_ID = 2;
@@ -37,16 +36,14 @@ public final class AntiFeedManager
 	private final Map<Integer, Long> _lastDeathTimes = new ConcurrentHashMap<>();
 	private final Map<Integer, Map<Integer, AtomicInteger>> _eventIPs = new ConcurrentHashMap<>();
 	
-	protected AntiFeedManager()
-	{
+	protected AntiFeedManager() {
 	}
 	
 	/**
 	 * Set time of the last player's death to current
 	 * @param objectId Player's objectId
 	 */
-	public final void setLastDeathTime(int objectId)
-	{
+	public final void setLastDeathTime(int objectId) {
 		_lastDeathTimes.put(objectId, System.currentTimeMillis());
 	}
 	
@@ -56,44 +53,35 @@ public final class AntiFeedManager
 	 * @param target Target character
 	 * @return True if kill is non-feeded.
 	 */
-	public final boolean check(L2Character attacker, L2Character target)
-	{
-		if (!Config.L2JMOD_ANTIFEED_ENABLE)
-		{
+	public final boolean check(L2Character attacker, L2Character target) {
+		if (!Config.L2JMOD_ANTIFEED_ENABLE) {
 			return true;
 		}
 		
-		if (target == null)
-		{
+		if (target == null) {
 			return false;
 		}
 		
 		final L2PcInstance targetPlayer = target.getActingPlayer();
-		if (targetPlayer == null)
-		{
+		if (targetPlayer == null) {
 			return false;
 		}
 		
-		if ((Config.L2JMOD_ANTIFEED_INTERVAL > 0) && _lastDeathTimes.containsKey(targetPlayer.getObjectId()))
-		{
-			if ((System.currentTimeMillis() - _lastDeathTimes.get(targetPlayer.getObjectId())) < Config.L2JMOD_ANTIFEED_INTERVAL)
-			{
+		if ((Config.L2JMOD_ANTIFEED_INTERVAL > 0) && _lastDeathTimes.containsKey(targetPlayer.getObjectId())) {
+			if ((System.currentTimeMillis() - _lastDeathTimes.get(targetPlayer.getObjectId())) < Config.L2JMOD_ANTIFEED_INTERVAL) {
 				return false;
 			}
 		}
 		
-		if (Config.L2JMOD_ANTIFEED_DUALBOX && (attacker != null))
-		{
+		if (Config.L2JMOD_ANTIFEED_DUALBOX && (attacker != null)) {
 			final L2PcInstance attackerPlayer = attacker.getActingPlayer();
-			if (attackerPlayer == null)
-			{
+			if (attackerPlayer == null) {
 				return false;
 			}
 			
 			final L2GameClient targetClient = targetPlayer.getClient();
 			final L2GameClient attackerClient = attackerPlayer.getClient();
-			if ((targetClient == null) || (attackerClient == null) || targetClient.isDetached() || attackerClient.isDetached())
-			{
+			if ((targetClient == null) || (attackerClient == null) || targetClient.isDetached() || attackerClient.isDetached()) {
 				// unable to check ip address
 				return !Config.L2JMOD_ANTIFEED_DISCONNECTED_AS_DUALBOX;
 			}
@@ -107,8 +95,7 @@ public final class AntiFeedManager
 	/**
 	 * Clears all timestamps
 	 */
-	public final void clear()
-	{
+	public final void clear() {
 		_lastDeathTimes.clear();
 	}
 	
@@ -116,8 +103,7 @@ public final class AntiFeedManager
 	 * Register new event for dualbox check. Should be called only once.
 	 * @param eventId
 	 */
-	public final void registerEvent(int eventId)
-	{
+	public final void registerEvent(int eventId) {
 		_eventIPs.putIfAbsent(eventId, new ConcurrentHashMap<Integer, AtomicInteger>());
 	}
 	
@@ -128,8 +114,7 @@ public final class AntiFeedManager
 	 * @return If number of all simultaneous connections from player's IP address lower than max then increment connection count and return true.<br>
 	 *         False if number of all simultaneous connections from player's IP address higher than max.
 	 */
-	public final boolean tryAddPlayer(int eventId, L2PcInstance player, int max)
-	{
+	public final boolean tryAddPlayer(int eventId, L2PcInstance player, int max) {
 		return tryAddClient(eventId, player.getClient(), max);
 	}
 	
@@ -140,16 +125,13 @@ public final class AntiFeedManager
 	 * @return If number of all simultaneous connections from player's IP address lower than max then increment connection count and return true.<br>
 	 *         False if number of all simultaneous connections from player's IP address higher than max.
 	 */
-	public final boolean tryAddClient(int eventId, L2GameClient client, int max)
-	{
-		if (client == null)
-		{
+	public final boolean tryAddClient(int eventId, L2GameClient client, int max) {
+		if (client == null) {
 			return false; // unable to determine IP address
 		}
 		
 		final Map<Integer, AtomicInteger> event = _eventIPs.get(eventId);
-		if (event == null)
-		{
+		if (event == null) {
 			return false; // no such event registered
 		}
 		
@@ -157,8 +139,7 @@ public final class AntiFeedManager
 		
 		final AtomicInteger connectionCount = event.computeIfAbsent(addrHash, k -> new AtomicInteger());
 		int whiteListCount = Config.L2JMOD_DUALBOX_CHECK_WHITELIST.getOrDefault(addrHash, 0);
-		if ((whiteListCount < 0) || ((connectionCount.get() + 1) <= (max + whiteListCount)))
-		{
+		if ((whiteListCount < 0) || ((connectionCount.get() + 1) <= (max + whiteListCount))) {
 			connectionCount.incrementAndGet();
 			return true;
 		}
@@ -171,8 +152,7 @@ public final class AntiFeedManager
 	 * @param player
 	 * @return true if success and false if any problem detected.
 	 */
-	public final boolean removePlayer(int eventId, L2PcInstance player)
-	{
+	public final boolean removePlayer(int eventId, L2PcInstance player) {
 		return removeClient(eventId, player.getClient());
 	}
 	
@@ -182,25 +162,20 @@ public final class AntiFeedManager
 	 * @param client
 	 * @return true if success and false if any problem detected.
 	 */
-	public final boolean removeClient(int eventId, L2GameClient client)
-	{
-		if (client == null)
-		{
+	public final boolean removeClient(int eventId, L2GameClient client) {
+		if (client == null) {
 			return false; // unable to determine IP address
 		}
 		
 		final Map<Integer, AtomicInteger> event = _eventIPs.get(eventId);
-		if (event == null)
-		{
+		if (event == null) {
 			return false; // no such event registered
 		}
 		
 		final Integer addrHash = Integer.valueOf(client.getConnectionAddress().hashCode());
 		
-		return event.computeIfPresent(addrHash, (k, v) ->
-		{
-			if ((v == null) || (v.decrementAndGet() == 0))
-			{
+		return event.computeIfPresent(addrHash, (k, v) -> {
+			if ((v == null) || (v.decrementAndGet() == 0)) {
 				return null;
 			}
 			return v;
@@ -211,15 +186,12 @@ public final class AntiFeedManager
 	 * Remove player connection IP address from all registered events lists.
 	 * @param client
 	 */
-	public final void onDisconnect(L2GameClient client)
-	{
-		if (client == null)
-		{
+	public final void onDisconnect(L2GameClient client) {
+		if (client == null) {
 			return;
 		}
 		
-		_eventIPs.forEach((k, v) ->
-		{
+		_eventIPs.forEach((k, v) -> {
 			removeClient(k, client);
 		});
 	}
@@ -228,11 +200,9 @@ public final class AntiFeedManager
 	 * Clear all entries for this eventId.
 	 * @param eventId
 	 */
-	public final void clear(int eventId)
-	{
+	public final void clear(int eventId) {
 		final Map<Integer, AtomicInteger> event = _eventIPs.get(eventId);
-		if (event != null)
-		{
+		if (event != null) {
 			event.clear();
 		}
 	}
@@ -242,8 +212,7 @@ public final class AntiFeedManager
 	 * @param max
 	 * @return maximum number of allowed connections (whitelist + max)
 	 */
-	public final int getLimit(L2PcInstance player, int max)
-	{
+	public final int getLimit(L2PcInstance player, int max) {
 		return getLimit(player.getClient(), max);
 	}
 	
@@ -252,29 +221,24 @@ public final class AntiFeedManager
 	 * @param max
 	 * @return maximum number of allowed connections (whitelist + max)
 	 */
-	public final int getLimit(L2GameClient client, int max)
-	{
-		if (client == null)
-		{
+	public final int getLimit(L2GameClient client, int max) {
+		if (client == null) {
 			return max;
 		}
 		
 		final Integer addrHash = Integer.valueOf(client.getConnectionAddress().hashCode());
 		int limit = max;
-		if (Config.L2JMOD_DUALBOX_CHECK_WHITELIST.containsKey(addrHash))
-		{
+		if (Config.L2JMOD_DUALBOX_CHECK_WHITELIST.containsKey(addrHash)) {
 			limit += Config.L2JMOD_DUALBOX_CHECK_WHITELIST.get(addrHash);
 		}
 		return limit;
 	}
 	
-	public static final AntiFeedManager getInstance()
-	{
+	public static final AntiFeedManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final AntiFeedManager _instance = new AntiFeedManager();
 	}
 }

@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.skills;
  * Abnormal Visual Effect enumerated.
  * @author DrHouse, Zoey76
  */
-public enum AbnormalVisualEffect
-{
+public enum AbnormalVisualEffect {
 	NONE(0x0000000, 0),
 	DOT_BLEEDING(0x00000001, 0),
 	DOT_POISON(0x00000002, 0),
@@ -93,8 +92,7 @@ public enum AbnormalVisualEffect
 	/** Type: 0 Normal, 1 Special, 2 Event. */
 	private final int _type;
 	
-	private AbnormalVisualEffect(int mask, int type)
-	{
+	private AbnormalVisualEffect(int mask, int type) {
 		_mask = mask;
 		_type = type;
 	}
@@ -103,8 +101,7 @@ public enum AbnormalVisualEffect
 	 * Gets the int bitmask for the abnormal visual effect.
 	 * @return the int bitmask
 	 */
-	public final int getMask()
-	{
+	public final int getMask() {
 		return _mask;
 	}
 	
@@ -112,8 +109,7 @@ public enum AbnormalVisualEffect
 	 * Verify if it's a special abnormal visual effect.
 	 * @return {@code true} it's a special abnormal visual effect, {@code false} otherwise
 	 */
-	public final boolean isSpecial()
-	{
+	public final boolean isSpecial() {
 		return _type == 1;
 	}
 	
@@ -121,8 +117,7 @@ public enum AbnormalVisualEffect
 	 * Verify if it's an event abnormal visual effect.
 	 * @return {@code true} it's an event abnormal visual effect, {@code false} otherwise
 	 */
-	public final boolean isEvent()
-	{
+	public final boolean isEvent() {
 		return _type == 2;
 	}
 }

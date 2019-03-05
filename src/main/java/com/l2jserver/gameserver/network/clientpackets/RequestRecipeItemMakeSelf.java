@@ -25,40 +25,33 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Administrator
  */
-public final class RequestRecipeItemMakeSelf extends L2GameClientPacket
-{
+public final class RequestRecipeItemMakeSelf extends L2GameClientPacket {
 	private static final String _C__B8_REQUESTRECIPEITEMMAKESELF = "[C] B8 RequestRecipeItemMakeSelf";
 	
 	private int _id;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_id = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getManufacture().tryPerformAction("RecipeMakeSelf"))
-		{
+		if (!getClient().getFloodProtectors().getManufacture().tryPerformAction("RecipeMakeSelf")) {
 			return;
 		}
 		
-		if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE)
-		{
+		if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE) {
 			activeChar.sendMessage("You cannot create items while trading.");
 			return;
 		}
 		
-		if (activeChar.isInCraftMode())
-		{
+		if (activeChar.isInCraftMode()) {
 			activeChar.sendMessage("You are currently in Craft Mode.");
 			return;
 		}
@@ -67,8 +60,7 @@ public final class RequestRecipeItemMakeSelf extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__B8_REQUESTRECIPEITEMMAKESELF;
 	}
 }

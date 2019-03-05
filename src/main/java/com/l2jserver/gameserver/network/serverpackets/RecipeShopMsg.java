@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class RecipeShopMsg extends L2GameServerPacket
-{
+public class RecipeShopMsg extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	
-	public RecipeShopMsg(L2PcInstance player)
-	{
+	public RecipeShopMsg(L2PcInstance player) {
 		_activeChar = player;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xE1);
 		writeD(_activeChar.getObjectId());
 		writeS(_activeChar.getStoreName());

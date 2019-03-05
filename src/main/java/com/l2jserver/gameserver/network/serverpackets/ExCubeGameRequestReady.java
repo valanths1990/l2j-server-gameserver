@@ -22,19 +22,16 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Format: (chd)
  * @author mrTJO
  */
-public class ExCubeGameRequestReady extends L2GameServerPacket
-{
+public class ExCubeGameRequestReady extends L2GameServerPacket {
 	/**
 	 * Show Confirm Dialog for 10 seconds
 	 */
-	public ExCubeGameRequestReady()
-	{
+	public ExCubeGameRequestReady() {
 		
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x97);
 		writeD(0x04);

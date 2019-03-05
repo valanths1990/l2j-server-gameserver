@@ -23,12 +23,10 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 /**
  * @author kerberos
  */
-public class ExStopMoveAirShip extends L2GameServerPacket
-{
+public class ExStopMoveAirShip extends L2GameServerPacket {
 	private final int _objectId, _x, _y, _z, _heading;
 	
-	public ExStopMoveAirShip(L2Character ship)
-	{
+	public ExStopMoveAirShip(L2Character ship) {
 		_objectId = ship.getObjectId();
 		_x = ship.getX();
 		_y = ship.getY();
@@ -37,8 +35,7 @@ public class ExStopMoveAirShip extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0x66);
 		writeD(_objectId);

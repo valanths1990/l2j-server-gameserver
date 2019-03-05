@@ -25,26 +25,22 @@ import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
  * (ch)
  * @author KenM
  */
-public class RequestGotoLobby extends L2GameClientPacket
-{
+public class RequestGotoLobby extends L2GameClientPacket {
 	private static final String _C__D0_38_REQUESTGOTOLOBBY = "[C] D0:38 RequestGotoLobby";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2GameClient client = getClient();
 		client.sendPacket(new CharSelectionInfo(client.getAccountName(), client.getSessionId().playOkID1));
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_38_REQUESTGOTOLOBBY;
 	}
 }

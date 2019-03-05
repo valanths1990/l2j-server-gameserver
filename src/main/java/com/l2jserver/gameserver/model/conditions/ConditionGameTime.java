@@ -27,13 +27,11 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionGameTime.
  * @author mkizub
  */
-public class ConditionGameTime extends Condition
-{
+public class ConditionGameTime extends Condition {
 	/**
 	 * The Enum CheckGameTime.
 	 */
-	public enum CheckGameTime
-	{
+	public enum CheckGameTime {
 		NIGHT
 	}
 	
@@ -45,8 +43,7 @@ public class ConditionGameTime extends Condition
 	 * @param check the check
 	 * @param required the required
 	 */
-	public ConditionGameTime(CheckGameTime check, boolean required)
-	{
+	public ConditionGameTime(CheckGameTime check, boolean required) {
 		_check = check;
 		_required = required;
 	}
@@ -56,10 +53,8 @@ public class ConditionGameTime extends Condition
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		switch (_check)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		switch (_check) {
 			case NIGHT:
 				return GameTimeController.getInstance().isNight() == _required;
 		}

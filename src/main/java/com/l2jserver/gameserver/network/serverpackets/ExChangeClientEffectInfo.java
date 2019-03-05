@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author UnAfraid
  */
-public class ExChangeClientEffectInfo extends L2GameServerPacket
-{
+public class ExChangeClientEffectInfo extends L2GameServerPacket {
 	public static final ExChangeClientEffectInfo STATIC_FREYA_DEFAULT = new ExChangeClientEffectInfo(0, 0, 1);
 	public static final ExChangeClientEffectInfo STATIC_FREYA_DESTROYED = new ExChangeClientEffectInfo(0, 0, 2);
 	
@@ -38,16 +37,14 @@ public class ExChangeClientEffectInfo extends L2GameServerPacket
 	 * @param key
 	 * @param value
 	 */
-	public ExChangeClientEffectInfo(int type, int key, int value)
-	{
+	public ExChangeClientEffectInfo(int type, int key, int value) {
 		_type = type;
 		_key = key;
 		_value = value;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xC2);
 		writeD(_type);

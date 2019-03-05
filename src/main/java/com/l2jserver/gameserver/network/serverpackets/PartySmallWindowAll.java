@@ -21,29 +21,24 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.L2Party;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public final class PartySmallWindowAll extends L2GameServerPacket
-{
+public final class PartySmallWindowAll extends L2GameServerPacket {
 	private final L2Party _party;
 	private final L2PcInstance _exclude;
 	
-	public PartySmallWindowAll(L2PcInstance exclude, L2Party party)
-	{
+	public PartySmallWindowAll(L2PcInstance exclude, L2Party party) {
 		_exclude = exclude;
 		_party = party;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x4e);
 		writeD(_party.getLeaderObjectId());
 		writeD(_party.getDistributionType().getId());
 		writeD(_party.getMemberCount() - 1);
 		
-		for (L2PcInstance member : _party.getMembers())
-		{
-			if ((member != null) && (member != _exclude))
-			{
+		for (L2PcInstance member : _party.getMembers()) {
+			if ((member != null) && (member != _exclude)) {
 				writeD(member.getObjectId());
 				writeS(member.getName());
 				
@@ -60,8 +55,7 @@ public final class PartySmallWindowAll extends L2GameServerPacket
 				writeD(member.getRace().ordinal());
 				writeD(0x00); // T2.3
 				writeD(0x00); // T2.3
-				if (member.hasSummon())
-				{
+				if (member.hasSummon()) {
 					writeD(member.getSummon().getObjectId());
 					writeD(member.getSummon().getId() + 1000000);
 					writeD(member.getSummon().getSummonType());
@@ -71,9 +65,7 @@ public final class PartySmallWindowAll extends L2GameServerPacket
 					writeD((int) member.getSummon().getCurrentMp());
 					writeD(member.getSummon().getMaxMp());
 					writeD(member.getSummon().getLevel());
-				}
-				else
-				{
+				} else {
 					writeD(0x00);
 				}
 			}

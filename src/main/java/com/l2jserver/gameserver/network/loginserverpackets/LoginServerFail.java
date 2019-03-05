@@ -20,11 +20,9 @@ package com.l2jserver.gameserver.network.loginserverpackets;
 
 import com.l2jserver.util.network.BaseRecievePacket;
 
-public class LoginServerFail extends BaseRecievePacket
-{
+public class LoginServerFail extends BaseRecievePacket {
 	
-	private static final String[] REASONS =
-	{
+	private static final String[] REASONS = {
 		"None",
 		"Reason: ip banned",
 		"Reason: ip reserved",
@@ -39,19 +37,16 @@ public class LoginServerFail extends BaseRecievePacket
 	/**
 	 * @param decrypt
 	 */
-	public LoginServerFail(byte[] decrypt)
-	{
+	public LoginServerFail(byte[] decrypt) {
 		super(decrypt);
 		_reason = readC();
 	}
 	
-	public String getReasonString()
-	{
+	public String getReasonString() {
 		return REASONS[_reason];
 	}
 	
-	public int getReason()
-	{
+	public int getReason() {
 		return _reason;
 	}
 	

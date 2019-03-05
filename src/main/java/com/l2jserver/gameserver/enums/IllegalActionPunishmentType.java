@@ -22,20 +22,16 @@ package com.l2jserver.gameserver.enums;
  * Illegal Action Punishment Type.
  * @author xban1x
  */
-public enum IllegalActionPunishmentType
-{
+public enum IllegalActionPunishmentType {
 	NONE,
 	BROADCAST,
 	KICK,
 	KICKBAN,
 	JAIL;
 	
-	public static final IllegalActionPunishmentType findByName(String name)
-	{
-		for (IllegalActionPunishmentType type : values())
-		{
-			if (type.name().toLowerCase().equals(name.toLowerCase()))
-			{
+	public static final IllegalActionPunishmentType findByName(String name) {
+		for (IllegalActionPunishmentType type : values()) {
+			if (type.name().toLowerCase().equals(name.toLowerCase())) {
 				return type;
 			}
 		}

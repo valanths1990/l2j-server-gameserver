@@ -26,39 +26,31 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * This class ...
  * @version $Revision: 1.4.2.1.2.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestReplyStopPledgeWar extends L2GameClientPacket
-{
+public final class RequestReplyStopPledgeWar extends L2GameClientPacket {
 	private static final String _C__06_REQUESTREPLYSTOPPLEDGEWAR = "[C] 06 RequestReplyStopPledgeWar";
 	
 	private int _answer;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		readS();
 		_answer = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		L2PcInstance requestor = activeChar.getActiveRequester();
-		if (requestor == null)
-		{
+		if (requestor == null) {
 			return;
 		}
 		
-		if (_answer == 1)
-		{
+		if (_answer == 1) {
 			ClanTable.getInstance().deleteclanswars(requestor.getClanId(), activeChar.getClanId());
-		}
-		else
-		{
+		} else {
 			requestor.sendPacket(SystemMessageId.REQUEST_TO_END_WAR_HAS_BEEN_DENIED);
 		}
 		
@@ -67,8 +59,7 @@ public final class RequestReplyStopPledgeWar extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__06_REQUESTREPLYSTOPPLEDGEWAR;
 	}
 }

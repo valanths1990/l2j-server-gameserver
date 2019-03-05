@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionTargetActiveSkillId.
  */
-public class ConditionTargetActiveSkillId extends Condition
-{
+public class ConditionTargetActiveSkillId extends Condition {
 	private final int _skillId;
 	private final int _skillLevel;
 	
@@ -34,8 +33,7 @@ public class ConditionTargetActiveSkillId extends Condition
 	 * Instantiates a new condition target active skill id.
 	 * @param skillId the skill id
 	 */
-	public ConditionTargetActiveSkillId(int skillId)
-	{
+	public ConditionTargetActiveSkillId(int skillId) {
 		_skillId = skillId;
 		_skillLevel = -1;
 	}
@@ -45,23 +43,17 @@ public class ConditionTargetActiveSkillId extends Condition
 	 * @param skillId the skill id
 	 * @param skillLevel the skill level
 	 */
-	public ConditionTargetActiveSkillId(int skillId, int skillLevel)
-	{
+	public ConditionTargetActiveSkillId(int skillId, int skillLevel) {
 		_skillId = skillId;
 		_skillLevel = skillLevel;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		for (Skill sk : effected.getAllSkills())
-		{
-			if (sk != null)
-			{
-				if (sk.getId() == _skillId)
-				{
-					if ((_skillLevel == -1) || (_skillLevel <= sk.getLevel()))
-					{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		for (Skill sk : effected.getAllSkills()) {
+			if (sk != null) {
+				if (sk.getId() == _skillId) {
+					if ((_skillLevel == -1) || (_skillLevel <= sk.getLevel())) {
 						return true;
 					}
 				}

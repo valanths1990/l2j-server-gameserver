@@ -24,8 +24,7 @@ import java.util.List;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.serverpackets.ShowBoard;
 
-public abstract class BaseBBSManager
-{
+public abstract class BaseBBSManager {
 	public abstract void parsecmd(String command, L2PcInstance activeChar);
 	
 	public abstract void parsewrite(String ar1, String ar2, String ar3, String ar4, String ar5, L2PcInstance activeChar);
@@ -34,10 +33,8 @@ public abstract class BaseBBSManager
 	 * @param html
 	 * @param acha
 	 */
-	protected void send1001(String html, L2PcInstance acha)
-	{
-		if (html.length() < 8192)
-		{
+	protected void send1001(String html, L2PcInstance acha) {
+		if (html.length() < 8192) {
 			acha.sendPacket(new ShowBoard(html, "1001"));
 		}
 	}
@@ -45,8 +42,7 @@ public abstract class BaseBBSManager
 	/**
 	 * @param acha
 	 */
-	protected void send1002(L2PcInstance acha)
-	{
+	protected void send1002(L2PcInstance acha) {
 		send1002(acha, " ", " ", "0");
 	}
 	
@@ -56,8 +52,7 @@ public abstract class BaseBBSManager
 	 * @param string2
 	 * @param string3
 	 */
-	protected void send1002(L2PcInstance activeChar, String string, String string2, String string3)
-	{
+	protected void send1002(L2PcInstance activeChar, String string, String string2, String string3) {
 		List<String> _arg = new ArrayList<>();
 		_arg.add("0");
 		_arg.add("0");

@@ -22,8 +22,7 @@ import java.util.logging.Logger;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public interface IVoicedCommandHandler
-{
+public interface IVoicedCommandHandler {
 	public static Logger _log = Logger.getLogger(IVoicedCommandHandler.class.getName());
 	
 	/**

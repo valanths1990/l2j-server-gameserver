@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author JIV
  */
-public interface Siegable
-{
+public interface Siegable {
 	public void startSiege();
 	
 	public void endSiege();

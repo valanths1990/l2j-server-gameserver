@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
 /**
  * @author UnAfraid
  */
-public class OptionsSkillHolder extends SkillHolder
-{
+public class OptionsSkillHolder extends SkillHolder {
 	private final OptionsSkillType _type;
 	private final double _chance;
 	
@@ -34,20 +33,17 @@ public class OptionsSkillHolder extends SkillHolder
 	 * @param type
 	 * @param chance
 	 */
-	public OptionsSkillHolder(int skillId, int skillLvl, double chance, OptionsSkillType type)
-	{
+	public OptionsSkillHolder(int skillId, int skillLvl, double chance, OptionsSkillType type) {
 		super(skillId, skillLvl);
 		_chance = chance;
 		_type = type;
 	}
 	
-	public OptionsSkillType getSkillType()
-	{
+	public OptionsSkillType getSkillType() {
 		return _type;
 	}
 	
-	public double getChance()
-	{
+	public double getChance() {
 		return _chance;
 	}
 }

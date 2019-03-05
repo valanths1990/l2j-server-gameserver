@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.model.holders;
 /**
  * @author UnAfraid
  */
-public class AdditionalSkillHolder extends SkillHolder
-{
+public class AdditionalSkillHolder extends SkillHolder {
 	private final int _minLevel;
 	
-	public AdditionalSkillHolder(int skillId, int skillLevel, int minLevel)
-	{
+	public AdditionalSkillHolder(int skillId, int skillLevel, int minLevel) {
 		super(skillId, skillLevel);
 		_minLevel = minLevel;
 	}
 	
-	public int getMinLevel()
-	{
+	public int getMinLevel() {
 		return _minLevel;
 	}
 }

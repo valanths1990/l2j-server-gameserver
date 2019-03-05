@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * ExShowScreenMessage server packet implementation.
  * @author Kerberos
  */
-public class ExShowScreenMessage extends L2GameServerPacket
-{
+public class ExShowScreenMessage extends L2GameServerPacket {
 	private final int _type;
 	private final int _sysMessageId;
 	private final int _unk1;
@@ -58,8 +57,7 @@ public class ExShowScreenMessage extends L2GameServerPacket
 	 * @param text the text to display
 	 * @param time the display time
 	 */
-	public ExShowScreenMessage(String text, int time)
-	{
+	public ExShowScreenMessage(String text, int time) {
 		_type = 2;
 		_sysMessageId = -1;
 		_unk1 = 0;
@@ -81,8 +79,7 @@ public class ExShowScreenMessage extends L2GameServerPacket
 	 * @param time the display time
 	 * @param params the String parameters
 	 */
-	public ExShowScreenMessage(NpcStringId npcString, int position, int time, String... params)
-	{
+	public ExShowScreenMessage(NpcStringId npcString, int position, int time, String... params) {
 		_type = 2;
 		_sysMessageId = -1;
 		_unk1 = 0x00;
@@ -95,8 +92,7 @@ public class ExShowScreenMessage extends L2GameServerPacket
 		_size = 0x00;
 		_effect = false;
 		_npcString = npcString.getId();
-		if (params != null)
-		{
+		if (params != null) {
 			addStringParameter(params);
 		}
 	}
@@ -108,8 +104,7 @@ public class ExShowScreenMessage extends L2GameServerPacket
 	 * @param time the display time
 	 * @param params the String parameters
 	 */
-	public ExShowScreenMessage(SystemMessageId systemMsg, int position, int time, String... params)
-	{
+	public ExShowScreenMessage(SystemMessageId systemMsg, int position, int time, String... params) {
 		_type = 2;
 		_sysMessageId = systemMsg.getId();
 		_unk1 = 0x00;
@@ -122,8 +117,7 @@ public class ExShowScreenMessage extends L2GameServerPacket
 		_size = 0x00;
 		_effect = false;
 		_npcString = -1;
-		if (params != null)
-		{
+		if (params != null) {
 			addStringParameter(params);
 		}
 	}
@@ -144,8 +138,7 @@ public class ExShowScreenMessage extends L2GameServerPacket
 	 * @param npcString
 	 * @param params the String parameters
 	 */
-	public ExShowScreenMessage(int type, int messageId, int position, int unk1, int size, int unk2, int unk3, boolean showEffect, int time, boolean fade, String text, NpcStringId npcString, String params)
-	{
+	public ExShowScreenMessage(int type, int messageId, int position, int unk1, int size, int unk2, int unk3, boolean showEffect, int time, boolean fade, String text, NpcStringId npcString, String params) {
 		_type = type;
 		_sysMessageId = messageId;
 		_unk1 = unk1;
@@ -164,21 +157,17 @@ public class ExShowScreenMessage extends L2GameServerPacket
 	 * String parameter for argument S1,S2,.. in npcstring-e.dat
 	 * @param params the parameter
 	 */
-	public void addStringParameter(String... params)
-	{
-		if (_parameters == null)
-		{
+	public void addStringParameter(String... params) {
+		if (_parameters == null) {
 			_parameters = new ArrayList<>();
 		}
-		for (String param : params)
-		{
+		for (String param : params) {
 			_parameters.add(param);
 		}
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x39);
 		writeD(_type);
@@ -192,16 +181,11 @@ public class ExShowScreenMessage extends L2GameServerPacket
 		writeD(_time);
 		writeD(_fade ? 0x01 : 0x00);
 		writeD(_npcString);
-		if (_npcString == -1)
-		{
+		if (_npcString == -1) {
 			writeS(_text);
-		}
-		else
-		{
-			if (_parameters != null)
-			{
-				for (String s : _parameters)
-				{
+		} else {
+			if (_parameters != null) {
+				for (String s : _parameters) {
 					writeS(s);
 				}
 			}

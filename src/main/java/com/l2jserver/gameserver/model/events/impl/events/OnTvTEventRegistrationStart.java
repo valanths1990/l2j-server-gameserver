@@ -24,11 +24,9 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnTvTEventRegistrationStart implements IBaseEvent
-{
+public class OnTvTEventRegistrationStart implements IBaseEvent {
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_TVT_EVENT_REGISTRATION_START;
 	}
 }

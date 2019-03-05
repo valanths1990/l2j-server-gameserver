@@ -22,32 +22,27 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialClientEvent;
 
-public class RequestTutorialClientEvent extends L2GameClientPacket
-{
+public class RequestTutorialClientEvent extends L2GameClientPacket {
 	private static final String _C__88_REQUESTTUTORIALCLIENTEVENT = "[C] 88 RequestTutorialClientEvent";
 	
 	int eventId = 0;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		eventId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerTutorialClientEvent(player, eventId), player);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__88_REQUESTTUTORIALCLIENTEVENT;
 	}
 }

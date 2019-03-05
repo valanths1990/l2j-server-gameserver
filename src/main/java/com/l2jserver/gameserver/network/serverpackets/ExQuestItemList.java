@@ -27,31 +27,25 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author JIV
  */
-public class ExQuestItemList extends AbstractItemPacket
-{
+public class ExQuestItemList extends AbstractItemPacket {
 	private final L2PcInstance _activeChar;
 	private final List<L2ItemInstance> _items = new ArrayList<>();
 	
-	public ExQuestItemList(L2PcInstance activeChar)
-	{
+	public ExQuestItemList(L2PcInstance activeChar) {
 		_activeChar = activeChar;
-		for (L2ItemInstance item : activeChar.getInventory().getItems())
-		{
-			if (item.isQuestItem())
-			{
+		for (L2ItemInstance item : activeChar.getInventory().getItems()) {
+			if (item.isQuestItem()) {
 				_items.add(item);
 			}
 		}
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xC6);
 		writeH(_items.size());
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			writeItem(item);
 		}
 		writeInventoryBlock(_activeChar.getInventory());

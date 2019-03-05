@@ -36,8 +36,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Petition
  * @author xban1x
  */
-public final class Petition
-{
+public final class Petition {
 	private final long _submitTime = System.currentTimeMillis();
 	private final int _id;
 	private final PetitionType _type;
@@ -47,43 +46,34 @@ public final class Petition
 	private final L2PcInstance _petitioner;
 	private L2PcInstance _responder;
 	
-	public Petition(L2PcInstance petitioner, String petitionText, int petitionType)
-	{
+	public Petition(L2PcInstance petitioner, String petitionText, int petitionType) {
 		_id = IdFactory.getInstance().getNextId();
 		_type = PetitionType.values()[--petitionType];
 		_content = petitionText;
 		_petitioner = petitioner;
 	}
 	
-	public boolean addLogMessage(CreatureSay cs)
-	{
+	public boolean addLogMessage(CreatureSay cs) {
 		return _messageLog.add(cs);
 	}
 	
-	public List<CreatureSay> getLogMessages()
-	{
+	public List<CreatureSay> getLogMessages() {
 		return _messageLog;
 	}
 	
-	public boolean endPetitionConsultation(PetitionState endState)
-	{
+	public boolean endPetitionConsultation(PetitionState endState) {
 		setState(endState);
 		
-		if ((getResponder() != null) && getResponder().isOnline())
-		{
-			if (endState == PetitionState.RESPONDER_REJECT)
-			{
+		if ((getResponder() != null) && getResponder().isOnline()) {
+			if (endState == PetitionState.RESPONDER_REJECT) {
 				getPetitioner().sendMessage("Your petition was rejected. Please try again later.");
-			}
-			else
-			{
+			} else {
 				// Ending petition consultation with <Player>.
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PETITION_ENDED_WITH_C1);
 				sm.addString(getPetitioner().getName());
 				getResponder().sendPacket(sm);
 				
-				if (endState == PetitionState.PETITIONER_CANCEL)
-				{
+				if (endState == PetitionState.PETITIONER_CANCEL) {
 					// Receipt No. <ID> petition cancelled.
 					sm = SystemMessage.getSystemMessage(SystemMessageId.RECENT_NO_S1_CANCELED);
 					sm.addInt(getId());
@@ -93,8 +83,7 @@ public final class Petition
 		}
 		
 		// End petition consultation and inform them, if they are still online. And if petitioner is online, enable Evaluation button
-		if ((getPetitioner() != null) && getPetitioner().isOnline())
-		{
+		if ((getPetitioner() != null) && getPetitioner().isOnline()) {
 			getPetitioner().sendPacket(SystemMessageId.THIS_END_THE_PETITION_PLEASE_PROVIDE_FEEDBACK);
 			getPetitioner().sendPacket(PetitionVotePacket.STATIC_PACKET);
 		}
@@ -103,45 +92,36 @@ public final class Petition
 		return (PetitionManager.getInstance().getPendingPetitions().remove(getId()) != null);
 	}
 	
-	public String getContent()
-	{
+	public String getContent() {
 		return _content;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public L2PcInstance getPetitioner()
-	{
+	public L2PcInstance getPetitioner() {
 		return _petitioner;
 	}
 	
-	public L2PcInstance getResponder()
-	{
+	public L2PcInstance getResponder() {
 		return _responder;
 	}
 	
-	public long getSubmitTime()
-	{
+	public long getSubmitTime() {
 		return _submitTime;
 	}
 	
-	public PetitionState getState()
-	{
+	public PetitionState getState() {
 		return _state;
 	}
 	
-	public String getTypeAsString()
-	{
+	public String getTypeAsString() {
 		return _type.toString().replace("_", " ");
 	}
 	
-	public void sendPetitionerPacket(L2GameServerPacket responsePacket)
-	{
-		if ((getPetitioner() == null) || !getPetitioner().isOnline())
-		{
+	public void sendPetitionerPacket(L2GameServerPacket responsePacket) {
+		if ((getPetitioner() == null) || !getPetitioner().isOnline()) {
 			// Allows petitioners to see the results of their petition when
 			// they log back into the game.
 			
@@ -152,10 +132,8 @@ public final class Petition
 		getPetitioner().sendPacket(responsePacket);
 	}
 	
-	public void sendResponderPacket(L2GameServerPacket responsePacket)
-	{
-		if ((getResponder() == null) || !getResponder().isOnline())
-		{
+	public void sendResponderPacket(L2GameServerPacket responsePacket) {
+		if ((getResponder() == null) || !getResponder().isOnline()) {
 			endPetitionConsultation(PetitionState.RESPONDER_MISSING);
 			return;
 		}
@@ -163,15 +141,12 @@ public final class Petition
 		getResponder().sendPacket(responsePacket);
 	}
 	
-	public void setState(PetitionState state)
-	{
+	public void setState(PetitionState state) {
 		_state = state;
 	}
 	
-	public void setResponder(L2PcInstance respondingAdmin)
-	{
-		if (getResponder() != null)
-		{
+	public void setResponder(L2PcInstance respondingAdmin) {
+		if (getResponder() != null) {
 			return;
 		}
 		

@@ -21,23 +21,19 @@ package com.l2jserver.gameserver.network.clientpackets;
 /**
  * @author zabbix Lets drink to code!
  */
-public final class DummyPacket extends L2GameClientPacket
-{
+public final class DummyPacket extends L2GameClientPacket {
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return "DummyPacket";
 	}
 }

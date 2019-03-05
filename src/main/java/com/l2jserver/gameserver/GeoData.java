@@ -40,8 +40,7 @@ import com.l2jserver.geodriver.GeoDriver;
  * Geodata.
  * @author -Nemesiss-, HorridoJoho
  */
-public class GeoData
-{
+public class GeoData {
 	private static final Logger LOG = LoggerFactory.getLogger(GeoData.class);
 	private static final String FILE_NAME_FORMAT = "%d_%d.l2j";
 	private static final int ELEVATED_SEE_OVER_DISTANCE = 2;
@@ -50,44 +49,31 @@ public class GeoData
 	
 	private final GeoDriver _driver = new GeoDriver();
 	
-	protected GeoData()
-	{
+	protected GeoData() {
 		int loadedRegions = 0;
-		try
-		{
-			for (int regionX = L2World.TILE_X_MIN; regionX <= L2World.TILE_X_MAX; regionX++)
-			{
-				for (int regionY = L2World.TILE_Y_MIN; regionY <= L2World.TILE_Y_MAX; regionY++)
-				{
+		try {
+			for (int regionX = L2World.TILE_X_MIN; regionX <= L2World.TILE_X_MAX; regionX++) {
+				for (int regionY = L2World.TILE_Y_MIN; regionY <= L2World.TILE_Y_MAX; regionY++) {
 					final Path geoFilePath = Config.GEODATA_PATH.resolve(String.format(FILE_NAME_FORMAT, regionX, regionY));
 					final Boolean loadFile = Config.GEODATA_REGIONS.get(regionX + "_" + regionY);
-					if (loadFile != null)
-					{
-						if (loadFile)
-						{
+					if (loadFile != null) {
+						if (loadFile) {
 							LOG.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
-					}
-					else if (Config.TRY_LOAD_UNSPECIFIED_REGIONS && Files.exists(geoFilePath))
-					{
-						try
-						{
+					} else if (Config.TRY_LOAD_UNSPECIFIED_REGIONS && Files.exists(geoFilePath)) {
+						try {
 							LOG.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							LOG.warn("{}: Failed to load {}!", getClass().getSimpleName(), geoFilePath.getFileName(), e);
 						}
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.error("{}: Failed to load geodata!", e);
 			System.exit(1);
 		}
@@ -95,39 +81,32 @@ public class GeoData
 		LOG.info("{}: Loaded {} regions.", getClass().getSimpleName(), loadedRegions);
 	}
 	
-	public boolean hasGeoPos(int geoX, int geoY)
-	{
+	public boolean hasGeoPos(int geoX, int geoY) {
 		return _driver.hasGeoPos(geoX, geoY);
 	}
 	
-	public boolean checkNearestNswe(int geoX, int geoY, int worldZ, int nswe)
-	{
+	public boolean checkNearestNswe(int geoX, int geoY, int worldZ, int nswe) {
 		return _driver.checkNearestNswe(geoX, geoY, worldZ, nswe);
 	}
 	
-	public boolean checkNearestNsweAntiCornerCut(int geoX, int geoY, int worldZ, int nswe)
-	{
+	public boolean checkNearestNsweAntiCornerCut(int geoX, int geoY, int worldZ, int nswe) {
 		boolean can = true;
-		if ((nswe & Cell.NSWE_NORTH_EAST) == Cell.NSWE_NORTH_EAST)
-		{
+		if ((nswe & Cell.NSWE_NORTH_EAST) == Cell.NSWE_NORTH_EAST) {
 			// can = canEnterNeighbors(prevX, prevY - 1, prevGeoZ, Direction.EAST) && canEnterNeighbors(prevX + 1, prevY, prevGeoZ, Direction.NORTH);
 			can = checkNearestNswe(geoX, geoY - 1, worldZ, Cell.NSWE_EAST) && checkNearestNswe(geoX + 1, geoY, worldZ, Cell.NSWE_NORTH);
 		}
 		
-		if (can && ((nswe & Cell.NSWE_NORTH_WEST) == Cell.NSWE_NORTH_WEST))
-		{
+		if (can && ((nswe & Cell.NSWE_NORTH_WEST) == Cell.NSWE_NORTH_WEST)) {
 			// can = canEnterNeighbors(prevX, prevY - 1, prevGeoZ, Direction.WEST) && canEnterNeighbors(prevX - 1, prevY, prevGeoZ, Direction.NORTH);
 			can = checkNearestNswe(geoX, geoY - 1, worldZ, Cell.NSWE_WEST) && checkNearestNswe(geoX, geoY - 1, worldZ, Cell.NSWE_NORTH);
 		}
 		
-		if (can && ((nswe & Cell.NSWE_SOUTH_EAST) == Cell.NSWE_SOUTH_EAST))
-		{
+		if (can && ((nswe & Cell.NSWE_SOUTH_EAST) == Cell.NSWE_SOUTH_EAST)) {
 			// can = canEnterNeighbors(prevX, prevY + 1, prevGeoZ, Direction.EAST) && canEnterNeighbors(prevX + 1, prevY, prevGeoZ, Direction.SOUTH);
 			can = checkNearestNswe(geoX, geoY + 1, worldZ, Cell.NSWE_EAST) && checkNearestNswe(geoX + 1, geoY, worldZ, Cell.NSWE_SOUTH);
 		}
 		
-		if (can && ((nswe & Cell.NSWE_SOUTH_WEST) == Cell.NSWE_SOUTH_WEST))
-		{
+		if (can && ((nswe & Cell.NSWE_SOUTH_WEST) == Cell.NSWE_SOUTH_WEST)) {
 			// can = canEnterNeighbors(prevX, prevY + 1, prevGeoZ, Direction.WEST) && canEnterNeighbors(prevX - 1, prevY, prevGeoZ, Direction.SOUTH);
 			can = checkNearestNswe(geoX, geoY + 1, worldZ, Cell.NSWE_WEST) && checkNearestNswe(geoX - 1, geoY, worldZ, Cell.NSWE_SOUTH);
 		}
@@ -135,38 +114,31 @@ public class GeoData
 		return can && checkNearestNswe(geoX, geoY, worldZ, nswe);
 	}
 	
-	public int getNearestZ(int geoX, int geoY, int worldZ)
-	{
+	public int getNearestZ(int geoX, int geoY, int worldZ) {
 		return _driver.getNearestZ(geoX, geoY, worldZ);
 	}
 	
-	public int getNextLowerZ(int geoX, int geoY, int worldZ)
-	{
+	public int getNextLowerZ(int geoX, int geoY, int worldZ) {
 		return _driver.getNextLowerZ(geoX, geoY, worldZ);
 	}
 	
-	public int getNextHigherZ(int geoX, int geoY, int worldZ)
-	{
+	public int getNextHigherZ(int geoX, int geoY, int worldZ) {
 		return _driver.getNextHigherZ(geoX, geoY, worldZ);
 	}
 	
-	public int getGeoX(int worldX)
-	{
+	public int getGeoX(int worldX) {
 		return _driver.getGeoX(worldX);
 	}
 	
-	public int getGeoY(int worldY)
-	{
+	public int getGeoY(int worldY) {
 		return _driver.getGeoY(worldY);
 	}
 	
-	public int getWorldX(int geoX)
-	{
+	public int getWorldX(int geoX) {
 		return _driver.getWorldX(geoX);
 	}
 	
-	public int getWorldY(int geoY)
-	{
+	public int getWorldY(int geoY) {
 		return _driver.getWorldY(geoY);
 	}
 	
@@ -179,8 +151,7 @@ public class GeoData
 	 * @param z the z coordinate
 	 * @return the height
 	 */
-	public int getHeight(int x, int y, int z)
-	{
+	public int getHeight(int x, int y, int z) {
 		return getNearestZ(getGeoX(x), getGeoY(y), z);
 	}
 	
@@ -191,13 +162,11 @@ public class GeoData
 	 * @param z the the z coordinate
 	 * @return the spawn height
 	 */
-	public int getSpawnHeight(int x, int y, int z)
-	{
+	public int getSpawnHeight(int x, int y, int z) {
 		final int geoX = getGeoX(x);
 		final int geoY = getGeoY(y);
 		
-		if (!hasGeoPos(geoX, geoY))
-		{
+		if (!hasGeoPos(geoX, geoY)) {
 			return z;
 		}
 		
@@ -210,8 +179,7 @@ public class GeoData
 	 * @param location the location
 	 * @return the spawn height
 	 */
-	public int getSpawnHeight(Location location)
-	{
+	public int getSpawnHeight(Location location) {
 		return getSpawnHeight(location.getX(), location.getY(), location.getZ());
 	}
 	
@@ -221,14 +189,11 @@ public class GeoData
 	 * @param target the target
 	 * @return {@code true} if the character can see the target (LOS), {@code false} otherwise
 	 */
-	public boolean canSeeTarget(L2Object cha, L2Object target)
-	{
-		if (target == null)
-		{
+	public boolean canSeeTarget(L2Object cha, L2Object target) {
+		if (target == null) {
 			return false;
 		}
-		if (target.isDoor())
-		{
+		if (target.isDoor()) {
 			return true;
 		}
 		return canSeeTarget(cha.getX(), cha.getY(), cha.getZ(), cha.getInstanceId(), target.getX(), target.getY(), target.getZ(), target.getInstanceId());
@@ -240,8 +205,7 @@ public class GeoData
 	 * @param worldPosition the world position
 	 * @return {@code true} if the character can see the target at the given world position, {@code false} otherwise
 	 */
-	public boolean canSeeTarget(L2Object cha, ILocational worldPosition)
-	{
+	public boolean canSeeTarget(L2Object cha, ILocational worldPosition) {
 		return canSeeTarget(cha.getX(), cha.getY(), cha.getZ(), cha.getInstanceId(), worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
 	}
 	
@@ -257,10 +221,8 @@ public class GeoData
 	 * @param tInstanceId the target's instanceId
 	 * @return
 	 */
-	public boolean canSeeTarget(int x, int y, int z, int instanceId, int tx, int ty, int tz, int tInstanceId)
-	{
-		if ((instanceId != tInstanceId))
-		{
+	public boolean canSeeTarget(int x, int y, int z, int instanceId, int tx, int ty, int tz, int tInstanceId) {
+		if ((instanceId != tInstanceId)) {
 			return false;
 		}
 		return canSeeTarget(x, y, z, instanceId, tx, ty, tz);
@@ -277,24 +239,19 @@ public class GeoData
 	 * @param tz the target's z coordinate
 	 * @return {@code true} if there is line of sight between the given coordinate sets, {@code false} otherwise
 	 */
-	public boolean canSeeTarget(int x, int y, int z, int instanceId, int tx, int ty, int tz)
-	{
-		if (DoorData.getInstance().checkIfDoorsBetween(x, y, z, tx, ty, tz, instanceId, true))
-		{
+	public boolean canSeeTarget(int x, int y, int z, int instanceId, int tx, int ty, int tz) {
+		if (DoorData.getInstance().checkIfDoorsBetween(x, y, z, tx, ty, tz, instanceId, true)) {
 			return false;
 		}
 		return canSeeTarget(x, y, z, tx, ty, tz);
 	}
 	
-	private int getLosGeoZ(int prevX, int prevY, int prevGeoZ, int curX, int curY, int nswe)
-	{
-		if ((((nswe & Cell.NSWE_NORTH) != 0) && ((nswe & Cell.NSWE_SOUTH) != 0)) || (((nswe & Cell.NSWE_WEST) != 0) && ((nswe & Cell.NSWE_EAST) != 0)))
-		{
+	private int getLosGeoZ(int prevX, int prevY, int prevGeoZ, int curX, int curY, int nswe) {
+		if ((((nswe & Cell.NSWE_NORTH) != 0) && ((nswe & Cell.NSWE_SOUTH) != 0)) || (((nswe & Cell.NSWE_WEST) != 0) && ((nswe & Cell.NSWE_EAST) != 0))) {
 			throw new RuntimeException("Multiple directions!");
 		}
 		
-		if (checkNearestNsweAntiCornerCut(prevX, prevY, prevGeoZ, nswe))
-		{
+		if (checkNearestNsweAntiCornerCut(prevX, prevY, prevGeoZ, nswe)) {
 			return getNearestZ(curX, curY, prevGeoZ);
 		}
 		return getNextHigherZ(curX, curY, prevGeoZ);
@@ -310,8 +267,7 @@ public class GeoData
 	 * @param tz the target's z coordinate
 	 * @return {@code true} if there is line of sight between the given coordinate sets, {@code false} otherwise
 	 */
-	public boolean canSeeTarget(int x, int y, int z, int tx, int ty, int tz)
-	{
+	public boolean canSeeTarget(int x, int y, int z, int tx, int ty, int tz) {
 		int geoX = getGeoX(x);
 		int geoY = getGeoY(y);
 		int tGeoX = getGeoX(tx);
@@ -321,18 +277,15 @@ public class GeoData
 		tz = getNearestZ(tGeoX, tGeoY, tz);
 		
 		// fastpath
-		if ((geoX == tGeoX) && (geoY == tGeoY))
-		{
-			if (hasGeoPos(tGeoX, tGeoY))
-			{
+		if ((geoX == tGeoX) && (geoY == tGeoY)) {
+			if (hasGeoPos(tGeoX, tGeoY)) {
 				return z == tz;
 			}
 			
 			return true;
 		}
 		
-		if (tz > z)
-		{
+		if (tz > z) {
 			int tmp = tx;
 			tx = x;
 			x = tmp;
@@ -362,13 +315,11 @@ public class GeoData
 		int prevZ = pointIter.z();
 		int prevGeoZ = prevZ;
 		int ptIndex = 0;
-		while (pointIter.next())
-		{
+		while (pointIter.next()) {
 			int curX = pointIter.x();
 			int curY = pointIter.y();
 			
-			if ((curX == prevX) && (curY == prevY))
-			{
+			if ((curX == prevX) && (curY == prevY)) {
 				continue;
 			}
 			
@@ -376,55 +327,40 @@ public class GeoData
 			int curGeoZ = prevGeoZ;
 			
 			// check if the position has geodata
-			if (hasGeoPos(curX, curY))
-			{
+			if (hasGeoPos(curX, curY)) {
 				int nswe = GeoUtils.computeNswe(prevX, prevY, curX, curY);
 				curGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, curX, curY, nswe);
 				int maxHeight;
-				if (ptIndex < ELEVATED_SEE_OVER_DISTANCE)
-				{
+				if (ptIndex < ELEVATED_SEE_OVER_DISTANCE) {
 					maxHeight = z + MAX_SEE_OVER_HEIGHT;
-				}
-				else
-				{
+				} else {
 					maxHeight = beeCurZ + MAX_SEE_OVER_HEIGHT;
 				}
 				
 				boolean canSeeThrough = false;
-				if (curGeoZ <= maxHeight)
-				{
-					if ((nswe & Cell.NSWE_NORTH_EAST) == Cell.NSWE_NORTH_EAST)
-					{
+				if (curGeoZ <= maxHeight) {
+					if ((nswe & Cell.NSWE_NORTH_EAST) == Cell.NSWE_NORTH_EAST) {
 						int northGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX, prevY - 1, Cell.NSWE_EAST);
 						int eastGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX + 1, prevY, Cell.NSWE_NORTH);
 						canSeeThrough = (northGeoZ <= maxHeight) && (eastGeoZ <= maxHeight) && (northGeoZ <= getNearestZ(prevX, prevY - 1, beeCurZ)) && (eastGeoZ <= getNearestZ(prevX + 1, prevY, beeCurZ));
-					}
-					else if ((nswe & Cell.NSWE_NORTH_WEST) == Cell.NSWE_NORTH_WEST)
-					{
+					} else if ((nswe & Cell.NSWE_NORTH_WEST) == Cell.NSWE_NORTH_WEST) {
 						int northGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX, prevY - 1, Cell.NSWE_WEST);
 						int westGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX - 1, prevY, Cell.NSWE_NORTH);
 						canSeeThrough = (northGeoZ <= maxHeight) && (westGeoZ <= maxHeight) && (northGeoZ <= getNearestZ(prevX, prevY - 1, beeCurZ)) && (westGeoZ <= getNearestZ(prevX - 1, prevY, beeCurZ));
-					}
-					else if ((nswe & Cell.NSWE_SOUTH_EAST) == Cell.NSWE_SOUTH_EAST)
-					{
+					} else if ((nswe & Cell.NSWE_SOUTH_EAST) == Cell.NSWE_SOUTH_EAST) {
 						int southGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX, prevY + 1, Cell.NSWE_EAST);
 						int eastGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX + 1, prevY, Cell.NSWE_SOUTH);
 						canSeeThrough = (southGeoZ <= maxHeight) && (eastGeoZ <= maxHeight) && (southGeoZ <= getNearestZ(prevX, prevY + 1, beeCurZ)) && (eastGeoZ <= getNearestZ(prevX + 1, prevY, beeCurZ));
-					}
-					else if ((nswe & Cell.NSWE_SOUTH_WEST) == Cell.NSWE_SOUTH_WEST)
-					{
+					} else if ((nswe & Cell.NSWE_SOUTH_WEST) == Cell.NSWE_SOUTH_WEST) {
 						int southGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX, prevY + 1, Cell.NSWE_WEST);
 						int westGeoZ = getLosGeoZ(prevX, prevY, prevGeoZ, prevX - 1, prevY, Cell.NSWE_SOUTH);
 						canSeeThrough = (southGeoZ <= maxHeight) && (westGeoZ <= maxHeight) && (southGeoZ <= getNearestZ(prevX, prevY + 1, beeCurZ)) && (westGeoZ <= getNearestZ(prevX - 1, prevY, beeCurZ));
-					}
-					else
-					{
+					} else {
 						canSeeThrough = true;
 					}
 				}
 				
-				if (!canSeeThrough)
-				{
+				if (!canSeeThrough) {
 					return false;
 				}
 			}
@@ -444,8 +380,7 @@ public class GeoData
 	 * @param destination the destination
 	 * @return the destination if there is a path or the closes location
 	 */
-	public Location moveCheck(ILocational origin, ILocational destination)
-	{
+	public Location moveCheck(ILocational origin, ILocational destination) {
 		return moveCheck(origin.getX(), origin.getY(), origin.getZ(), destination.getX(), destination.getY(), destination.getZ(), origin.getInstanceId());
 	}
 	
@@ -460,8 +395,7 @@ public class GeoData
 	 * @param instanceId the instance id
 	 * @return the last Location (x,y,z) where player can walk - just before wall
 	 */
-	public Location moveCheck(int x, int y, int z, int tx, int ty, int tz, int instanceId)
-	{
+	public Location moveCheck(int x, int y, int z, int tx, int ty, int tz, int instanceId) {
 		int geoX = getGeoX(x);
 		int geoY = getGeoY(y);
 		z = getNearestZ(geoX, geoY, z);
@@ -469,8 +403,7 @@ public class GeoData
 		int tGeoY = getGeoY(ty);
 		tz = getNearestZ(tGeoX, tGeoY, tz);
 		
-		if (DoorData.getInstance().checkIfDoorsBetween(x, y, z, tx, ty, tz, instanceId, false))
-		{
+		if (DoorData.getInstance().checkIfDoorsBetween(x, y, z, tx, ty, tz, instanceId, false)) {
 			return new Location(x, y, getHeight(x, y, z));
 		}
 		
@@ -481,17 +414,14 @@ public class GeoData
 		int prevY = pointIter.y();
 		int prevZ = z;
 		
-		while (pointIter.next())
-		{
+		while (pointIter.next()) {
 			int curX = pointIter.x();
 			int curY = pointIter.y();
 			int curZ = getNearestZ(curX, curY, prevZ);
 			
-			if (hasGeoPos(prevX, prevY))
-			{
+			if (hasGeoPos(prevX, prevY)) {
 				int nswe = GeoUtils.computeNswe(prevX, prevY, curX, curY);
-				if (!checkNearestNsweAntiCornerCut(prevX, prevY, prevZ, nswe))
-				{
+				if (!checkNearestNsweAntiCornerCut(prevX, prevY, prevZ, nswe)) {
 					// can't move, return previous location
 					return new Location(getWorldX(prevX), getWorldY(prevY), prevZ);
 				}
@@ -502,8 +432,7 @@ public class GeoData
 			prevZ = curZ;
 		}
 		
-		if (hasGeoPos(prevX, prevY) && (prevZ != tz))
-		{
+		if (hasGeoPos(prevX, prevY) && (prevZ != tz)) {
 			// different floors, return start location
 			return new Location(x, y, z);
 		}
@@ -522,8 +451,7 @@ public class GeoData
 	 * @param instanceId the instance ID
 	 * @return {@code true} if the character at start coordinates can move to end coordinates, {@code false} otherwise
 	 */
-	public boolean canMove(int fromX, int fromY, int fromZ, int toX, int toY, int toZ, int instanceId)
-	{
+	public boolean canMove(int fromX, int fromY, int fromZ, int toX, int toY, int toZ, int instanceId) {
 		int geoX = getGeoX(fromX);
 		int geoY = getGeoY(fromY);
 		fromZ = getNearestZ(geoX, geoY, fromZ);
@@ -531,8 +459,7 @@ public class GeoData
 		int tGeoY = getGeoY(toY);
 		toZ = getNearestZ(tGeoX, tGeoY, toZ);
 		
-		if (DoorData.getInstance().checkIfDoorsBetween(fromX, fromY, fromZ, toX, toY, toZ, instanceId, false))
-		{
+		if (DoorData.getInstance().checkIfDoorsBetween(fromX, fromY, fromZ, toX, toY, toZ, instanceId, false)) {
 			return false;
 		}
 		
@@ -543,17 +470,14 @@ public class GeoData
 		int prevY = pointIter.y();
 		int prevZ = fromZ;
 		
-		while (pointIter.next())
-		{
+		while (pointIter.next()) {
 			int curX = pointIter.x();
 			int curY = pointIter.y();
 			int curZ = getNearestZ(curX, curY, prevZ);
 			
-			if (hasGeoPos(prevX, prevY))
-			{
+			if (hasGeoPos(prevX, prevY)) {
 				int nswe = GeoUtils.computeNswe(prevX, prevY, curX, curY);
-				if (!checkNearestNsweAntiCornerCut(prevX, prevY, prevZ, nswe))
-				{
+				if (!checkNearestNsweAntiCornerCut(prevX, prevY, prevZ, nswe)) {
 					return false;
 				}
 			}
@@ -563,8 +487,7 @@ public class GeoData
 			prevZ = curZ;
 		}
 		
-		if (hasGeoPos(prevX, prevY) && (prevZ != toZ))
-		{
+		if (hasGeoPos(prevX, prevY) && (prevZ != toZ)) {
 			// different floors
 			return false;
 		}
@@ -572,8 +495,7 @@ public class GeoData
 		return true;
 	}
 	
-	public int traceTerrainZ(int x, int y, int z, int tx, int ty)
-	{
+	public int traceTerrainZ(int x, int y, int z, int tx, int ty) {
 		int geoX = getGeoX(x);
 		int geoY = getGeoY(y);
 		z = getNearestZ(geoX, geoY, z);
@@ -585,8 +507,7 @@ public class GeoData
 		pointIter.next();
 		int prevZ = z;
 		
-		while (pointIter.next())
-		{
+		while (pointIter.next()) {
 			int curX = pointIter.x();
 			int curY = pointIter.y();
 			int curZ = getNearestZ(curX, curY, prevZ);
@@ -605,8 +526,7 @@ public class GeoData
 	 * @param toZ the Z coordinate to end checking at
 	 * @return {@code true} if the character at start coordinates can move to end coordinates, {@code false} otherwise
 	 */
-	public boolean canMove(ILocational from, int toX, int toY, int toZ)
-	{
+	public boolean canMove(ILocational from, int toX, int toY, int toZ) {
 		return canMove(from.getX(), from.getY(), from.getZ(), toX, toY, toZ, from.getInstanceId());
 	}
 	
@@ -616,8 +536,7 @@ public class GeoData
 	 * @param to the {@code ILocational} to end checking at
 	 * @return {@code true} if the character at start coordinates can move to end coordinates, {@code false} otherwise
 	 */
-	public boolean canMove(ILocational from, ILocational to)
-	{
+	public boolean canMove(ILocational from, ILocational to) {
 		return canMove(from, to.getX(), to.getY(), to.getZ());
 	}
 	
@@ -627,18 +546,15 @@ public class GeoData
 	 * @param y the Y coordinate
 	 * @return {@code true} if there is geodata for the given coordinates, {@code false} otherwise
 	 */
-	public boolean hasGeo(int x, int y)
-	{
+	public boolean hasGeo(int x, int y) {
 		return hasGeoPos(getGeoX(x), getGeoY(y));
 	}
 	
-	public static GeoData getInstance()
-	{
+	public static GeoData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final GeoData _instance = new GeoData();
 	}
 }

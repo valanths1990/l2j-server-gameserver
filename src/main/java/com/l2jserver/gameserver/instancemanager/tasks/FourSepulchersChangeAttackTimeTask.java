@@ -29,11 +29,9 @@ import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
  * Four Sepulchers change attack time task.
  * @author xban1x
  */
-public final class FourSepulchersChangeAttackTimeTask implements Runnable
-{
+public final class FourSepulchersChangeAttackTimeTask implements Runnable {
 	@Override
-	public void run()
-	{
+	public void run() {
 		final FourSepulchersManager manager = FourSepulchersManager.getInstance();
 		manager.setIsEntryTime(false);
 		manager.setIsWarmUpTime(false);
@@ -47,17 +45,14 @@ public final class FourSepulchersChangeAttackTimeTask implements Runnable
 		manager.spawnMysteriousBox(31923);
 		manager.spawnMysteriousBox(31924);
 		
-		if (!manager.isFirstTimeRun())
-		{
+		if (!manager.isFirstTimeRun()) {
 			manager.setWarmUpTimeEnd(Calendar.getInstance().getTimeInMillis());
 		}
 		
 		long interval = 0;
 		// say task
-		if (manager.isFirstTimeRun())
-		{
-			for (double min = Calendar.getInstance().get(Calendar.MINUTE); min < manager.getCycleMin(); min++)
-			{
+		if (manager.isFirstTimeRun()) {
+			for (double min = Calendar.getInstance().get(Calendar.MINUTE); min < manager.getCycleMin(); min++) {
 				// looking for next shout time....
 				if ((min % 5) == 0)// check if min can be divided by 5
 				{
@@ -67,29 +62,23 @@ public final class FourSepulchersChangeAttackTimeTask implements Runnable
 					break;
 				}
 			}
-		}
-		else
-		{
+		} else {
 			ThreadPoolManager.getInstance().scheduleGeneral(new FourSepulchersManagerSayTask(), 5 * 60400);
 		}
 		// searching time when attack time will be ended:
 		// counting difference between time when attack time ends and
 		// current time
 		// and then launching change time task
-		if (manager.isFirstTimeRun())
-		{
+		if (manager.isFirstTimeRun()) {
 			interval = manager.getAttackTimeEnd() - Calendar.getInstance().getTimeInMillis();
-		}
-		else
-		{
+		} else {
 			interval = Config.FS_TIME_ATTACK * 60000L;
 		}
 		
 		manager.setChangeCoolDownTimeTask(ThreadPoolManager.getInstance().scheduleGeneral(new FourSepulchersChangeCoolDownTimeTask(), interval));
 		final ScheduledFuture<?> changeAttackTimeTask = manager.getChangeAttackTimeTask();
 		
-		if (changeAttackTimeTask != null)
-		{
+		if (changeAttackTimeTask != null) {
 			changeAttackTimeTask.cancel(true);
 			manager.setChangeAttackTimeTask(null);
 		}

@@ -33,42 +33,33 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * This class holds the Fishing Monsters information.
  * @author nonom
  */
-public final class FishingMonstersData implements IXmlReader
-{
+public final class FishingMonstersData implements IXmlReader {
 	private final Map<Integer, L2FishingMonster> _fishingMonstersData = new HashMap<>();
 	
 	/**
 	 * Instantiates a new fishing monsters data.
 	 */
-	protected FishingMonstersData()
-	{
+	protected FishingMonstersData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_fishingMonstersData.clear();
 		parseDatapackFile("data/stats/fishing/fishingMonsters.xml");
 		LOG.info("{}: Loaded {} Fishing Monsters.", getClass().getSimpleName(), _fishingMonstersData.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("fishingMonster".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("fishingMonster".equalsIgnoreCase(d.getNodeName())) {
 						
 						final NamedNodeMap attrs = d.getAttributes();
 						final StatsSet set = new StatsSet();
-						for (int i = 0; i < attrs.getLength(); i++)
-						{
+						for (int i = 0; i < attrs.getLength(); i++) {
 							final Node att = attrs.item(i);
 							set.set(att.getNodeName(), att.getNodeValue());
 						}
@@ -86,12 +77,9 @@ public final class FishingMonstersData implements IXmlReader
 	 * @param lvl the fisherman level
 	 * @return a fishing monster given the fisherman level
 	 */
-	public L2FishingMonster getFishingMonster(int lvl)
-	{
-		for (L2FishingMonster fishingMonster : _fishingMonstersData.values())
-		{
-			if ((lvl >= fishingMonster.getUserMinLevel()) && (lvl <= fishingMonster.getUserMaxLevel()))
-			{
+	public L2FishingMonster getFishingMonster(int lvl) {
+		for (L2FishingMonster fishingMonster : _fishingMonstersData.values()) {
+			if ((lvl >= fishingMonster.getUserMinLevel()) && (lvl <= fishingMonster.getUserMaxLevel())) {
 				return fishingMonster;
 			}
 		}
@@ -103,10 +91,8 @@ public final class FishingMonstersData implements IXmlReader
 	 * @param id the fishing monster Id
 	 * @return the fishing monster by Id
 	 */
-	public L2FishingMonster getFishingMonsterById(int id)
-	{
-		if (_fishingMonstersData.containsKey(id))
-		{
+	public L2FishingMonster getFishingMonsterById(int id) {
+		if (_fishingMonstersData.containsKey(id)) {
 			return _fishingMonstersData.get(id);
 		}
 		return null;
@@ -116,13 +102,11 @@ public final class FishingMonstersData implements IXmlReader
 	 * Gets the single instance of FishingMonsterData.
 	 * @return single instance of FishingMonsterData
 	 */
-	public static FishingMonstersData getInstance()
-	{
+	public static FishingMonstersData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final FishingMonstersData _instance = new FishingMonstersData();
 	}
 }

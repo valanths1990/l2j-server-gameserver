@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model;
  * Action Key DTO.
  * @author mrTJO, Zoey76
  */
-public class ActionKey
-{
+public class ActionKey {
 	private final int _cat;
 	private int _cmd = 0;
 	private int _key = 0;
@@ -34,8 +33,7 @@ public class ActionKey
 	/**
 	 * @param cat category Id
 	 */
-	public ActionKey(int cat)
-	{
+	public ActionKey(int cat) {
 		_cat = cat;
 	}
 	
@@ -48,8 +46,7 @@ public class ActionKey
 	 * @param tgKey2 2nd Toggled Key (eg. Alt, Ctrl or Shift)
 	 * @param show Show Action in UI
 	 */
-	public ActionKey(int cat, int cmd, int key, int tgKey1, int tgKey2, int show)
-	{
+	public ActionKey(int cat, int cmd, int key, int tgKey1, int tgKey2, int show) {
 		_cat = cat;
 		_cmd = cmd;
 		_key = key;
@@ -58,63 +55,51 @@ public class ActionKey
 		_show = show;
 	}
 	
-	public int getCategory()
-	{
+	public int getCategory() {
 		return _cat;
 	}
 	
-	public int getCommandId()
-	{
+	public int getCommandId() {
 		return _cmd;
 	}
 	
-	public void setCommandId(int cmd)
-	{
+	public void setCommandId(int cmd) {
 		_cmd = cmd;
 	}
 	
-	public int getKeyId()
-	{
+	public int getKeyId() {
 		return _key;
 	}
 	
-	public void setKeyId(int key)
-	{
+	public void setKeyId(int key) {
 		_key = key;
 	}
 	
-	public int getToogleKey1()
-	{
+	public int getToogleKey1() {
 		return _tgKey1;
 	}
 	
-	public void setToogleKey1(int tKey1)
-	{
+	public void setToogleKey1(int tKey1) {
 		_tgKey1 = tKey1;
 	}
 	
-	public int getToogleKey2()
-	{
+	public int getToogleKey2() {
 		return _tgKey2;
 	}
 	
-	public void setToogleKey2(int tKey2)
-	{
+	public void setToogleKey2(int tKey2) {
 		_tgKey2 = tKey2;
 	}
 	
-	public int getShowStatus()
-	{
+	public int getShowStatus() {
 		return _show;
 	}
 	
-	public void setShowStatus(int show)
-	{
+	public void setShowStatus(int show) {
 		_show = show;
 	}
 	
-	public String getSqlSaveString(int playerId, int order)
-	{
+	public String getSqlSaveString(int playerId, int order) {
 		return "(" + playerId + ", " + _cat + ", " + order + ", " + _cmd + "," + _key + ", " + _tgKey1 + ", " + _tgKey2 + ", " + _show + ")";
 	}
 }

@@ -30,42 +30,31 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Player Can Summon condition implementation.
  * @author Zoey76
  */
-public class ConditionPlayerCanSummon extends Condition
-{
+public class ConditionPlayerCanSummon extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanSummon(boolean val)
-	{
+	public ConditionPlayerCanSummon(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final L2PcInstance player = effector.getActingPlayer();
-		if (player == null)
-		{
+		if (player == null) {
 			return false;
 		}
 		
 		boolean canSummon = true;
-		if (Config.RESTORE_SERVITOR_ON_RECONNECT && CharSummonTable.getInstance().getServitors().containsKey(player.getObjectId()))
-		{
+		if (Config.RESTORE_SERVITOR_ON_RECONNECT && CharSummonTable.getInstance().getServitors().containsKey(player.getObjectId())) {
 			player.sendPacket(SystemMessageId.SUMMON_ONLY_ONE);
 			canSummon = false;
-		}
-		else if (Config.RESTORE_PET_ON_RECONNECT && CharSummonTable.getInstance().getPets().containsKey(player.getObjectId()))
-		{
+		} else if (Config.RESTORE_PET_ON_RECONNECT && CharSummonTable.getInstance().getPets().containsKey(player.getObjectId())) {
 			player.sendPacket(SystemMessageId.SUMMON_ONLY_ONE);
 			canSummon = false;
-		}
-		else if (player.hasSummon())
-		{
+		} else if (player.hasSummon()) {
 			player.sendPacket(SystemMessageId.SUMMON_ONLY_ONE);
 			canSummon = false;
-		}
-		else if (player.isFlyingMounted() || player.isMounted())
-		{
+		} else if (player.isFlyingMounted() || player.isMounted()) {
 			canSummon = false;
 		}
 		return (_val == canSummon);

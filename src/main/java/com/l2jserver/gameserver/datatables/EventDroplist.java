@@ -31,20 +31,17 @@ import com.l2jserver.gameserver.script.EventDrop;
  * Those extra Items are defined in the table <b>allNpcDateDrops</b>.<br>
  * Each Special Event has a start and end date to stop to drop extra Items automatically.
  */
-public class EventDroplist
-{
+public class EventDroplist {
 	/**
 	 * The table containing all DataDrop object
 	 */
 	private static final List<DateDrop> ALL_NPC_DATE_DROPS = new ArrayList<>();
 	
-	public static class DateDrop
-	{
+	public static class DateDrop {
 		protected final DateRange _dateRange;
 		private final EventDrop _eventDrop;
 		
-		public DateDrop(DateRange dateRange, EventDrop eventDrop)
-		{
+		public DateDrop(DateRange dateRange, EventDrop eventDrop) {
 			_dateRange = dateRange;
 			_eventDrop = eventDrop;
 		}
@@ -52,16 +49,14 @@ public class EventDroplist
 		/**
 		 * @return the _eventDrop
 		 */
-		public EventDrop getEventDrop()
-		{
+		public EventDrop getEventDrop() {
 			return _eventDrop;
 		}
 		
 		/**
 		 * @return the _dateRange
 		 */
-		public DateRange getDateRange()
-		{
+		public DateRange getDateRange() {
 			return _dateRange;
 		}
 	}
@@ -73,8 +68,7 @@ public class EventDroplist
 	 * @param chance The chance to obtain this drop
 	 * @param dateRange The DateRange object to add to this DateDrop
 	 */
-	public void addGlobalDrop(int[] itemIdList, int[] count, int chance, DateRange dateRange)
-	{
+	public void addGlobalDrop(int[] itemIdList, int[] count, int chance, DateRange dateRange) {
 		ALL_NPC_DATE_DROPS.add(new DateDrop(dateRange, new EventDrop(itemIdList, count[0], count[1], chance)));
 	}
 	
@@ -85,8 +79,7 @@ public class EventDroplist
 	 * @param chance the drop chance
 	 * @param dateRange the event drop rate range
 	 */
-	public void addGlobalDrop(int itemId, long min, long max, int chance, DateRange dateRange)
-	{
+	public void addGlobalDrop(int itemId, long min, long max, int chance, DateRange dateRange) {
 		ALL_NPC_DATE_DROPS.add(new DateDrop(dateRange, new EventDrop(itemId, min, max, chance)));
 	}
 	
@@ -95,35 +88,29 @@ public class EventDroplist
 	 * @param dateRange the date range.
 	 * @param eventDrop the event drop.
 	 */
-	public void addGlobalDrop(DateRange dateRange, EventDrop eventDrop)
-	{
+	public void addGlobalDrop(DateRange dateRange, EventDrop eventDrop) {
 		ALL_NPC_DATE_DROPS.add(new DateDrop(dateRange, eventDrop));
 	}
 	
 	/**
 	 * @return all DateDrop of EventDroplist allNpcDateDrops within the date range.
 	 */
-	public List<DateDrop> getAllDrops()
-	{
+	public List<DateDrop> getAllDrops() {
 		final List<DateDrop> list = new ArrayList<>();
 		final Date currentDate = new Date();
-		for (DateDrop drop : ALL_NPC_DATE_DROPS)
-		{
-			if (drop._dateRange.isWithinRange(currentDate))
-			{
+		for (DateDrop drop : ALL_NPC_DATE_DROPS) {
+			if (drop._dateRange.isWithinRange(currentDate)) {
 				list.add(drop);
 			}
 		}
 		return list;
 	}
 	
-	public static EventDroplist getInstance()
-	{
+	public static EventDroplist getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final EventDroplist _instance = new EventDroplist();
 	}
 }

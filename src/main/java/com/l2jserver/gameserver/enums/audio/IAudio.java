@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 /**
  * @author Zealar
  */
-public interface IAudio
-{
+public interface IAudio {
 	/**
 	 * @return the name of the sound of this audio object
 	 */

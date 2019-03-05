@@ -18,12 +18,10 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class StartRotation extends L2GameServerPacket
-{
+public final class StartRotation extends L2GameServerPacket {
 	private final int _charObjId, _degree, _side, _speed;
 	
-	public StartRotation(int objectId, int degree, int side, int speed)
-	{
+	public StartRotation(int objectId, int degree, int side, int speed) {
 		_charObjId = objectId;
 		_degree = degree;
 		_side = side;
@@ -31,8 +29,7 @@ public final class StartRotation extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x7a);
 		writeD(_charObjId);
 		writeD(_degree);

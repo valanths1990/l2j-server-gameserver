@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * This class ...
  * @version $Revision: 1.1.2.1.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class CannotMoveAnymore extends L2GameClientPacket
-{
+public final class CannotMoveAnymore extends L2GameClientPacket {
 	private static final String _C__47_STOPMOVE = "[C] 47 CannotMoveAnymore";
 	
 	private int _x;
@@ -37,8 +36,7 @@ public final class CannotMoveAnymore extends L2GameClientPacket
 	private int _heading;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_x = readD();
 		_y = readD();
 		_z = readD();
@@ -46,20 +44,16 @@ public final class CannotMoveAnymore extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			_log.fine("client: x:" + _x + " y:" + _y + " z:" + _z + " server x:" + player.getX() + " y:" + player.getY() + " z:" + player.getZ());
 		}
-		if (player.getAI() != null)
-		{
+		if (player.getAI() != null) {
 			player.getAI().notifyEvent(CtrlEvent.EVT_ARRIVED_BLOCKED, new Location(_x, _y, _z, _heading));
 		}
 		/*
@@ -82,8 +76,7 @@ public final class CannotMoveAnymore extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__47_STOPMOVE;
 	}
 }

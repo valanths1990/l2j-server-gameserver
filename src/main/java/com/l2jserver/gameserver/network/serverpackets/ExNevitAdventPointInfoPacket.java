@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author mochitto
  */
-public class ExNevitAdventPointInfoPacket extends L2GameServerPacket
-{
+public class ExNevitAdventPointInfoPacket extends L2GameServerPacket {
 	private final int _points;
 	
-	public ExNevitAdventPointInfoPacket(int points)
-	{
+	public ExNevitAdventPointInfoPacket(int points) {
 		_points = points;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xDF);
 		writeD(_points); // 72 = 1%, max 7200 = 100%

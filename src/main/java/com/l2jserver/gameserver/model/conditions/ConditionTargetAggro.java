@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetAggro.
  * @author mkizub
  */
-public class ConditionTargetAggro extends Condition
-{
+public class ConditionTargetAggro extends Condition {
 	
 	private final boolean _isAggro;
 	
@@ -37,20 +36,16 @@ public class ConditionTargetAggro extends Condition
 	 * Instantiates a new condition target aggro.
 	 * @param isAggro the is aggro
 	 */
-	public ConditionTargetAggro(boolean isAggro)
-	{
+	public ConditionTargetAggro(boolean isAggro) {
 		_isAggro = isAggro;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effected instanceof L2MonsterInstance)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effected instanceof L2MonsterInstance) {
 			return ((L2MonsterInstance) effected).isAggressive() == _isAggro;
 		}
-		if (effected instanceof L2PcInstance)
-		{
+		if (effected instanceof L2PcInstance) {
 			return ((L2PcInstance) effected).getKarma() > 0;
 		}
 		return false;

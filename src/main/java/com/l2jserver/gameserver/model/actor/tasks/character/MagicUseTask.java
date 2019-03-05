@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Task dedicated to magic use of character
  * @author xban1x
  */
-public final class MagicUseTask implements Runnable
-{
+public final class MagicUseTask implements Runnable {
 	private final L2Character _character;
 	private L2Object[] _targets;
 	private final Skill _skill;
@@ -36,8 +35,7 @@ public final class MagicUseTask implements Runnable
 	private int _phase;
 	private final boolean _simultaneously;
 	
-	public MagicUseTask(L2Character character, L2Object[] tgts, Skill s, int hit, boolean simultaneous)
-	{
+	public MagicUseTask(L2Character character, L2Object[] tgts, Skill s, int hit, boolean simultaneous) {
 		_character = character;
 		_targets = tgts;
 		_skill = s;
@@ -48,79 +46,63 @@ public final class MagicUseTask implements Runnable
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_character == null)
-		{
+	public void run() {
+		if (_character == null) {
 			return;
 		}
-		switch (_phase)
-		{
-			case 1:
-			{
+		switch (_phase) {
+			case 1: {
 				_character.onMagicLaunchedTimer(this);
 				break;
 			}
-			case 2:
-			{
+			case 2: {
 				_character.onMagicHitTimer(this);
 				break;
 			}
-			case 3:
-			{
+			case 3: {
 				_character.onMagicFinalizer(this);
 				break;
 			}
 		}
 	}
 	
-	public int getCount()
-	{
+	public int getCount() {
 		return _count;
 	}
 	
-	public int getPhase()
-	{
+	public int getPhase() {
 		return _phase;
 	}
 	
-	public Skill getSkill()
-	{
+	public Skill getSkill() {
 		return _skill;
 	}
 	
-	public int getSkillTime()
-	{
+	public int getSkillTime() {
 		return _skillTime;
 	}
 	
-	public L2Object[] getTargets()
-	{
+	public L2Object[] getTargets() {
 		return _targets;
 	}
 	
-	public boolean isSimultaneous()
-	{
+	public boolean isSimultaneous() {
 		return _simultaneously;
 	}
 	
-	public void setCount(int count)
-	{
+	public void setCount(int count) {
 		_count = count;
 	}
 	
-	public void setPhase(int phase)
-	{
+	public void setPhase(int phase) {
 		_phase = phase;
 	}
 	
-	public void setSkillTime(int skillTime)
-	{
+	public void setSkillTime(int skillTime) {
 		_skillTime = skillTime;
 	}
 	
-	public void setTargets(L2Object[] targets)
-	{
+	public void setTargets(L2Object[] targets) {
 		_targets = targets;
 	}
 }

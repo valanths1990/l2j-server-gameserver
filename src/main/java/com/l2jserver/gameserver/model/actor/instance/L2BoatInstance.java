@@ -30,37 +30,31 @@ import com.l2jserver.gameserver.network.serverpackets.VehicleStarted;
 /**
  * @author Maktakien, DS
  */
-public class L2BoatInstance extends L2Vehicle
-{
+public class L2BoatInstance extends L2Vehicle {
 	/**
 	 * Creates a boat.
 	 * @param template the boat template
 	 */
-	public L2BoatInstance(L2CharTemplate template)
-	{
+	public L2BoatInstance(L2CharTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2BoatInstance);
 		setAI(new L2BoatAI(this));
 	}
 	
 	@Override
-	public boolean isBoat()
-	{
+	public boolean isBoat() {
 		return true;
 	}
 	
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return 0;
 	}
 	
 	@Override
-	public boolean moveToNextRoutePoint()
-	{
+	public boolean moveToNextRoutePoint() {
 		final boolean result = super.moveToNextRoutePoint();
-		if (result)
-		{
+		if (result) {
 			broadcastPacket(new VehicleDeparture(this));
 		}
 		
@@ -68,24 +62,19 @@ public class L2BoatInstance extends L2Vehicle
 	}
 	
 	@Override
-	public void oustPlayer(L2PcInstance player)
-	{
+	public void oustPlayer(L2PcInstance player) {
 		super.oustPlayer(player);
 		
 		final Location loc = getOustLoc();
-		if (player.isOnline())
-		{
+		if (player.isOnline()) {
 			player.teleToLocation(loc.getX(), loc.getY(), loc.getZ());
-		}
-		else
-		{
+		} else {
 			player.setXYZInvisible(loc.getX(), loc.getY(), loc.getZ()); // disconnects handling
 		}
 	}
 	
 	@Override
-	public void stopMove(Location loc, boolean updateKnownObjects)
-	{
+	public void stopMove(Location loc, boolean updateKnownObjects) {
 		super.stopMove(loc, updateKnownObjects);
 		
 		broadcastPacket(new VehicleStarted(this, 0));
@@ -93,8 +82,7 @@ public class L2BoatInstance extends L2Vehicle
 	}
 	
 	@Override
-	public void sendInfo(L2PcInstance activeChar)
-	{
+	public void sendInfo(L2PcInstance activeChar) {
 		activeChar.sendPacket(new VehicleInfo(this));
 	}
 }

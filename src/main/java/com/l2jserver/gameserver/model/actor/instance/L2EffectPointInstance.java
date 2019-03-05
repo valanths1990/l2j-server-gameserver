@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
-public class L2EffectPointInstance extends L2Npc
-{
+public class L2EffectPointInstance extends L2Npc {
 	private final L2PcInstance _owner;
 	
 	/**
@@ -33,21 +32,18 @@ public class L2EffectPointInstance extends L2Npc
 	 * @param template the effect point NPC template
 	 * @param owner the owner
 	 */
-	public L2EffectPointInstance(L2NpcTemplate template, L2Character owner)
-	{
+	public L2EffectPointInstance(L2NpcTemplate template, L2Character owner) {
 		super(template);
 		setInstanceType(InstanceType.L2EffectPointInstance);
 		setIsInvul(false);
 		_owner = owner == null ? null : owner.getActingPlayer();
-		if (owner != null)
-		{
+		if (owner != null) {
 			setInstanceId(owner.getInstanceId());
 		}
 	}
 	
 	@Override
-	public L2PcInstance getActingPlayer()
-	{
+	public L2PcInstance getActingPlayer() {
 		return _owner;
 	}
 	
@@ -56,16 +52,13 @@ public class L2EffectPointInstance extends L2Npc
 	 * @param player
 	 */
 	@Override
-	public void onAction(L2PcInstance player, boolean interact)
-	{
+	public void onAction(L2PcInstance player, boolean interact) {
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
 	@Override
-	public void onActionShift(L2PcInstance player)
-	{
-		if (player == null)
-		{
+	public void onActionShift(L2PcInstance player) {
+		if (player == null) {
 			return;
 		}
 		

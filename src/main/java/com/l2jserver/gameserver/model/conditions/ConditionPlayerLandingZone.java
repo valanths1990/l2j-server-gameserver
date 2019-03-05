@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * The Class ConditionPlayerLandingZone.
  * @author kerberos
  */
-public class ConditionPlayerLandingZone extends Condition
-{
+public class ConditionPlayerLandingZone extends Condition {
 	
 	private final boolean _val;
 	
@@ -36,14 +35,12 @@ public class ConditionPlayerLandingZone extends Condition
 	 * Instantiates a new condition player landing zone.
 	 * @param val the val
 	 */
-	public ConditionPlayerLandingZone(boolean val)
-	{
+	public ConditionPlayerLandingZone(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return effector.isInsideZone(ZoneId.LANDING) == _val;
 	}
 }

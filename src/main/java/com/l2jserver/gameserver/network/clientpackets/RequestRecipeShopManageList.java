@@ -23,37 +23,30 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.RecipeShopManageList;
 
-public final class RequestRecipeShopManageList extends L2GameClientPacket
-{
+public final class RequestRecipeShopManageList extends L2GameClientPacket {
 	private static final String _C__B9_RequestRecipeShopManageList = "[C] B9 RequestRecipeShopManageList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
 		// Player shouldn't be able to set stores if he/she is alike dead (dead or fake death)
-		if (player.isAlikeDead())
-		{
+		if (player.isAlikeDead()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
-		if (player.getPrivateStoreType() != PrivateStoreType.NONE)
-		{
+		if (player.getPrivateStoreType() != PrivateStoreType.NONE) {
 			player.setPrivateStoreType(PrivateStoreType.NONE);
 			player.broadcastUserInfo();
-			if (player.isSitting())
-			{
+			if (player.isSitting()) {
 				player.standUp();
 			}
 		}
@@ -62,8 +55,7 @@ public final class RequestRecipeShopManageList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__B9_RequestRecipeShopManageList;
 	}
 }

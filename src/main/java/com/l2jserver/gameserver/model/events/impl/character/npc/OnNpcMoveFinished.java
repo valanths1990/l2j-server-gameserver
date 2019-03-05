@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnNpcMoveFinished implements IBaseEvent
-{
+public class OnNpcMoveFinished implements IBaseEvent {
 	private final L2Npc _npc;
 	
-	public OnNpcMoveFinished(L2Npc npc)
-	{
+	public OnNpcMoveFinished(L2Npc npc) {
 		_npc = npc;
 	}
 	
-	public L2Npc getNpc()
-	{
+	public L2Npc getNpc() {
 		return _npc;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_NPC_MOVE_FINISHED;
 	}
 }

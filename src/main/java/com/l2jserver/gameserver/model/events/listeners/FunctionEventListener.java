@@ -31,28 +31,22 @@ import com.l2jserver.gameserver.model.events.returns.AbstractEventReturn;
  * Function event listener provides callback operation with return object possibility.
  * @author UnAfraid
  */
-public class FunctionEventListener extends AbstractEventListener
-{
+public class FunctionEventListener extends AbstractEventListener {
 	private static final Logger _log = Logger.getLogger(FunctionEventListener.class.getName());
 	private final Function<IBaseEvent, ? extends AbstractEventReturn> _callback;
 	
 	@SuppressWarnings("unchecked")
-	public FunctionEventListener(ListenersContainer container, EventType type, Function<? extends IBaseEvent, ? extends AbstractEventReturn> callback, Object owner)
-	{
+	public FunctionEventListener(ListenersContainer container, EventType type, Function<? extends IBaseEvent, ? extends AbstractEventReturn> callback, Object owner) {
 		super(container, type, owner);
 		_callback = (Function<IBaseEvent, ? extends AbstractEventReturn>) callback;
 	}
 	
 	@Override
-	public <R extends AbstractEventReturn> R executeEvent(IBaseEvent event, Class<R> returnBackClass)
-	{
-		try
-		{
+	public <R extends AbstractEventReturn> R executeEvent(IBaseEvent event, Class<R> returnBackClass) {
+		try {
 			return returnBackClass.cast(_callback.apply(event));
 			
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while invoking " + event + " on " + getOwner(), e);
 		}
 		return null;

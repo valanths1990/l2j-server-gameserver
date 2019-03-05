@@ -26,22 +26,18 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * A scripted zone... Creation of such a zone should require somekind of jython script reference which can handle onEnter() / onExit()
  * @author durgus
  */
-public class L2ScriptZone extends L2ZoneType
-{
-	public L2ScriptZone(int id)
-	{
+public class L2ScriptZone extends L2ZoneType {
+	public L2ScriptZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
+	protected void onEnter(L2Character character) {
 		character.setInsideZone(ZoneId.SCRIPT, true);
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
+	protected void onExit(L2Character character) {
 		character.setInsideZone(ZoneId.SCRIPT, false);
 	}
 }

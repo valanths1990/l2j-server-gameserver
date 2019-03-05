@@ -30,61 +30,50 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author Zoey76
  */
-public final class RequestHennaEquip extends L2GameClientPacket
-{
+public final class RequestHennaEquip extends L2GameClientPacket {
 	private static final String _C__6F_REQUESTHENNAEQUIP = "[C] 6F RequestHennaEquip";
 	private int _symbolId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_symbolId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("HennaEquip"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("HennaEquip")) {
 			return;
 		}
 		
-		if (activeChar.getHennaEmptySlots() == 0)
-		{
+		if (activeChar.getHennaEmptySlots() == 0) {
 			activeChar.sendPacket(SystemMessageId.SYMBOLS_FULL);
 			sendActionFailed();
 			return;
 		}
 		
 		final L2Henna henna = HennaData.getInstance().getHenna(_symbolId);
-		if (henna == null)
-		{
+		if (henna == null) {
 			_log.warning(getClass().getName() + ": Invalid Henna Id: " + _symbolId + " from player " + activeChar);
 			sendActionFailed();
 			return;
 		}
 		
 		final long _count = activeChar.getInventory().getInventoryItemCount(henna.getDyeItemId(), -1);
-		if (henna.isAllowedClass(activeChar.getClassId()) && (_count >= henna.getWearCount()) && (activeChar.getAdena() >= henna.getWearFee()) && activeChar.addHenna(henna))
-		{
+		if (henna.isAllowedClass(activeChar.getClassId()) && (_count >= henna.getWearCount()) && (activeChar.getAdena() >= henna.getWearFee()) && activeChar.addHenna(henna)) {
 			activeChar.destroyItemByItemId("Henna", henna.getDyeItemId(), henna.getWearCount(), activeChar, true);
 			activeChar.getInventory().reduceAdena("Henna", henna.getWearFee(), activeChar, activeChar.getLastFolkNPC());
 			final InventoryUpdate iu = new InventoryUpdate();
 			iu.addModifiedItem(activeChar.getInventory().getAdenaInstance());
 			activeChar.sendPacket(iu);
 			activeChar.sendPacket(SystemMessageId.SYMBOL_ADDED);
-		}
-		else
-		{
+		} else {
 			activeChar.sendPacket(SystemMessageId.CANT_DRAW_SYMBOL);
-			if (!activeChar.canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !henna.isAllowedClass(activeChar.getClassId()))
-			{
+			if (!activeChar.canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !henna.isAllowedClass(activeChar.getClassId())) {
 				Util.handleIllegalPlayerAction(activeChar, "Exploit attempt: Character " + activeChar.getName() + " of account " + activeChar.getAccountName() + " tryed to add a forbidden henna.", Config.DEFAULT_PUNISH);
 			}
 			sendActionFailed();
@@ -92,8 +81,7 @@ public final class RequestHennaEquip extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__6F_REQUESTHENNAEQUIP;
 	}
 }

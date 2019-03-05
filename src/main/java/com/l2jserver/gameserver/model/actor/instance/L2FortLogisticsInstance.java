@@ -29,10 +29,8 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 /**
  * @author Vice, Zoey76
  */
-public class L2FortLogisticsInstance extends L2MerchantInstance
-{
-	private static final int[] SUPPLY_BOX_IDS =
-	{
+public class L2FortLogisticsInstance extends L2MerchantInstance {
+	private static final int[] SUPPLY_BOX_IDS = {
 		35665,
 		35697,
 		35734,
@@ -60,17 +58,14 @@ public class L2FortLogisticsInstance extends L2MerchantInstance
 	 * Creates a fort logistics.
 	 * @param template the fort logistics NPC template
 	 */
-	public L2FortLogisticsInstance(L2NpcTemplate template)
-	{
+	public L2FortLogisticsInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2FortLogisticsInstance);
 	}
 	
 	@Override
-	public void onBypassFeedback(L2PcInstance player, String command)
-	{
-		if (player.getLastFolkNPC().getObjectId() != getObjectId())
-		{
+	public void onBypassFeedback(L2PcInstance player, String command) {
+		if (player.getLastFolkNPC().getObjectId() != getObjectId()) {
 			return;
 		}
 		
@@ -78,77 +73,50 @@ public class L2FortLogisticsInstance extends L2MerchantInstance
 		String actualCommand = st.nextToken(); // Get actual command
 		
 		final NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
-		if (actualCommand.equalsIgnoreCase("rewards"))
-		{
-			if (isMyLord(player))
-			{
+		if (actualCommand.equalsIgnoreCase("rewards")) {
+			if (isMyLord(player)) {
 				html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-rewards.htm");
 				html.replace("%bloodoath%", String.valueOf(player.getClan().getBloodOathCount()));
-			}
-			else
-			{
+			} else {
 				html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-noprivs.htm");
 			}
 			html.replace("%objectId%", String.valueOf(getObjectId()));
 			player.sendPacket(html);
-		}
-		else if (actualCommand.equalsIgnoreCase("blood"))
-		{
-			if (isMyLord(player))
-			{
+		} else if (actualCommand.equalsIgnoreCase("blood")) {
+			if (isMyLord(player)) {
 				final int blood = player.getClan().getBloodOathCount();
-				if (blood > 0)
-				{
+				if (blood > 0) {
 					player.addItem("Quest", 9910, blood, this, true);
 					player.getClan().resetBloodOathCount();
 					html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-blood.htm");
-				}
-				else
-				{
+				} else {
 					html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-noblood.htm");
 				}
-			}
-			else
-			{
+			} else {
 				html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-noprivs.htm");
 			}
 			html.replace("%objectId%", String.valueOf(getObjectId()));
 			player.sendPacket(html);
-		}
-		else if (actualCommand.equalsIgnoreCase("supplylvl"))
-		{
-			if (getFort().getFortState() == 2)
-			{
-				if (player.isClanLeader())
-				{
+		} else if (actualCommand.equalsIgnoreCase("supplylvl")) {
+			if (getFort().getFortState() == 2) {
+				if (player.isClanLeader()) {
 					html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-supplylvl.htm");
 					html.replace("%supplylvl%", String.valueOf(getFort().getSupplyLvL()));
-				}
-				else
-				{
+				} else {
 					html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-noprivs.htm");
 				}
-			}
-			else
-			{
+			} else {
 				html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-1.htm"); // TODO: Missing HTML?
 			}
 			html.replace("%objectId%", String.valueOf(getObjectId()));
 			player.sendPacket(html);
-		}
-		else if (actualCommand.equalsIgnoreCase("supply"))
-		{
-			if (isMyLord(player))
-			{
-				if (getFort().getSiege().isInProgress())
-				{
+		} else if (actualCommand.equalsIgnoreCase("supply")) {
+			if (isMyLord(player)) {
+				if (getFort().getSiege().isInProgress()) {
 					html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-siege.htm");
-				}
-				else
-				{
+				} else {
 					final int level = getFort().getSupplyLvL();
-					if (level > 0)
-					{
+					if (level > 0) {
 						// spawn box
 						L2NpcTemplate boxTemplate = NpcData.getInstance().getTemplate(SUPPLY_BOX_IDS[level - 1]);
 						L2MonsterInstance box = new L2MonsterInstance(boxTemplate);
@@ -161,44 +129,33 @@ public class L2FortLogisticsInstance extends L2MerchantInstance
 						getFort().saveFortVariables();
 						
 						html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-supply.htm");
-					}
-					else
-					{
+					} else {
 						html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-nosupply.htm");
 					}
 				}
-			}
-			else
-			{
+			} else {
 				html.setFile(player.getHtmlPrefix(), "data/html/fortress/logistics-noprivs.htm");
 			}
 			html.replace("%objectId%", String.valueOf(getObjectId()));
 			player.sendPacket(html);
-		}
-		else
-		{
+		} else {
 			super.onBypassFeedback(player, command);
 		}
 	}
 	
 	@Override
-	public void showChatWindow(L2PcInstance player)
-	{
+	public void showChatWindow(L2PcInstance player) {
 		showMessageWindow(player, 0);
 	}
 	
-	private void showMessageWindow(L2PcInstance player, int val)
-	{
+	private void showMessageWindow(L2PcInstance player, int val) {
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 		
 		String filename;
 		
-		if (val == 0)
-		{
+		if (val == 0) {
 			filename = "data/html/fortress/logistics.htm";
-		}
-		else
-		{
+		} else {
 			filename = "data/html/fortress/logistics-" + val + ".htm";
 		}
 		
@@ -206,28 +163,21 @@ public class L2FortLogisticsInstance extends L2MerchantInstance
 		html.setFile(player.getHtmlPrefix(), filename);
 		html.replace("%objectId%", String.valueOf(getObjectId()));
 		html.replace("%npcId%", String.valueOf(getId()));
-		if (getFort().getOwnerClan() != null)
-		{
+		if (getFort().getOwnerClan() != null) {
 			html.replace("%clanname%", getFort().getOwnerClan().getName());
-		}
-		else
-		{
+		} else {
 			html.replace("%clanname%", "NPC");
 		}
 		player.sendPacket(html);
 	}
 	
 	@Override
-	public String getHtmlPath(int npcId, int val)
-	{
+	public String getHtmlPath(int npcId, int val) {
 		String pom = "";
 		
-		if (val == 0)
-		{
+		if (val == 0) {
 			pom = "logistics";
-		}
-		else
-		{
+		} else {
 			pom = "logistics-" + val;
 		}
 		
@@ -235,8 +185,7 @@ public class L2FortLogisticsInstance extends L2MerchantInstance
 	}
 	
 	@Override
-	public boolean hasRandomAnimation()
-	{
+	public boolean hasRandomAnimation() {
 		return false;
 	}
 }

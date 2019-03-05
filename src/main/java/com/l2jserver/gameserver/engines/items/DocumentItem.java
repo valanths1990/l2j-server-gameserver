@@ -36,58 +36,45 @@ import com.l2jserver.gameserver.model.items.L2Item;
 /**
  * @author mkizub, JIV
  */
-public final class DocumentItem extends DocumentBase
-{
+public final class DocumentItem extends DocumentBase {
 	private Item _currentItem = null;
 	private final List<L2Item> _itemsInFile = new ArrayList<>();
 	
 	/**
 	 * @param file
 	 */
-	public DocumentItem(File file)
-	{
+	public DocumentItem(File file) {
 		super(file);
 	}
 	
 	@Override
-	protected StatsSet getStatsSet()
-	{
+	protected StatsSet getStatsSet() {
 		return _currentItem.set;
 	}
 	
 	@Override
-	protected String getTableValue(String name)
-	{
+	protected String getTableValue(String name) {
 		return _tables.get(name)[_currentItem.currentLevel];
 	}
 	
 	@Override
-	protected String getTableValue(String name, int idx)
-	{
+	protected String getTableValue(String name, int idx) {
 		return _tables.get(name)[idx - 1];
 	}
 	
 	@Override
-	protected void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
+	protected void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
 				
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("item".equalsIgnoreCase(d.getNodeName()))
-					{
-						try
-						{
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("item".equalsIgnoreCase(d.getNodeName())) {
+						try {
 							_currentItem = new Item();
 							parseItem(d);
 							_itemsInFile.add(_currentItem.item);
 							resetTable();
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							_log.log(Level.WARNING, "Cannot create item " + _currentItem.id, e);
 						}
 					}
@@ -96,8 +83,7 @@ public final class DocumentItem extends DocumentBase
 		}
 	}
 	
-	protected void parseItem(Node n) throws InvocationTargetException
-	{
+	protected void parseItem(Node n) throws InvocationTargetException {
 		int itemId = Integer.parseInt(n.getAttributes().getNamedItem("id").getNodeValue());
 		String className = n.getAttributes().getNamedItem("type").getNodeValue();
 		String itemName = n.getAttributes().getNamedItem("name").getNodeValue();
@@ -110,45 +96,31 @@ public final class DocumentItem extends DocumentBase
 		_currentItem.set.set("name", itemName);
 		
 		Node first = n.getFirstChild();
-		for (n = first; n != null; n = n.getNextSibling())
-		{
-			if ("table".equalsIgnoreCase(n.getNodeName()))
-			{
-				if (_currentItem.item != null)
-				{
+		for (n = first; n != null; n = n.getNextSibling()) {
+			if ("table".equalsIgnoreCase(n.getNodeName())) {
+				if (_currentItem.item != null) {
 					throw new IllegalStateException("Item created but table node found! Item " + itemId);
 				}
 				parseTable(n);
-			}
-			else if ("set".equalsIgnoreCase(n.getNodeName()))
-			{
-				if (_currentItem.item != null)
-				{
+			} else if ("set".equalsIgnoreCase(n.getNodeName())) {
+				if (_currentItem.item != null) {
 					throw new IllegalStateException("Item created but set node found! Item " + itemId);
 				}
 				parseBeanSet(n, _currentItem.set, 1);
-			}
-			else if ("for".equalsIgnoreCase(n.getNodeName()))
-			{
+			} else if ("for".equalsIgnoreCase(n.getNodeName())) {
 				makeItem();
 				parseTemplate(n, _currentItem.item);
-			}
-			else if ("cond".equalsIgnoreCase(n.getNodeName()))
-			{
+			} else if ("cond".equalsIgnoreCase(n.getNodeName())) {
 				makeItem();
 				Condition condition = parseCondition(n.getFirstChild(), _currentItem.item);
 				Node msg = n.getAttributes().getNamedItem("msg");
 				Node msgId = n.getAttributes().getNamedItem("msgId");
-				if ((condition != null) && (msg != null))
-				{
+				if ((condition != null) && (msg != null)) {
 					condition.setMessage(msg.getNodeValue());
-				}
-				else if ((condition != null) && (msgId != null))
-				{
+				} else if ((condition != null) && (msgId != null)) {
 					condition.setMessageId(Integer.decode(getValue(msgId.getNodeValue(), null)));
 					Node addName = n.getAttributes().getNamedItem("addName");
-					if ((addName != null) && (Integer.decode(getValue(msgId.getNodeValue(), null)) > 0))
-					{
+					if ((addName != null) && (Integer.decode(getValue(msgId.getNodeValue(), null)) > 0)) {
 						condition.addName();
 					}
 				}
@@ -159,25 +131,19 @@ public final class DocumentItem extends DocumentBase
 		makeItem();
 	}
 	
-	private void makeItem() throws InvocationTargetException
-	{
-		if (_currentItem.item != null)
-		{
+	private void makeItem() throws InvocationTargetException {
+		if (_currentItem.item != null) {
 			return; // item is already created
 		}
-		try
-		{
+		try {
 			Constructor<?> c = Class.forName("com.l2jserver.gameserver.model.items.L2" + _currentItem.type).getConstructor(StatsSet.class);
 			_currentItem.item = (L2Item) c.newInstance(_currentItem.set);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			throw new InvocationTargetException(e);
 		}
 	}
 	
-	public List<L2Item> getItemList()
-	{
+	public List<L2Item> getItemList() {
 		return _itemsInFile;
 	}
 }

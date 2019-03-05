@@ -20,31 +20,26 @@ package com.l2jserver.gameserver.model;
 
 import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 
-public class L2ManufactureItem
-{
+public class L2ManufactureItem {
 	private final int _recipeId;
 	private final long _cost;
 	private final boolean _isDwarven;
 	
-	public L2ManufactureItem(int recipeId, long cost)
-	{
+	public L2ManufactureItem(int recipeId, long cost) {
 		_recipeId = recipeId;
 		_cost = cost;
 		_isDwarven = RecipeData.getInstance().getRecipeList(_recipeId).isDwarvenRecipe();
 	}
 	
-	public int getRecipeId()
-	{
+	public int getRecipeId() {
 		return _recipeId;
 	}
 	
-	public long getCost()
-	{
+	public long getCost() {
 		return _cost;
 	}
 	
-	public boolean isDwarven()
-	{
+	public boolean isDwarven() {
 		return _isDwarven;
 	}
 }

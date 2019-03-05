@@ -41,35 +41,30 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.util.StringUtil;
 
-public class L2NpcInstance extends L2Npc
-{
+public class L2NpcInstance extends L2Npc {
 	private static final Logger LOG = LoggerFactory.getLogger(L2NpcInstance.class);
 	
 	/**
 	 * Creates a NPC.
 	 * @param template the NPC template
 	 */
-	public L2NpcInstance(L2NpcTemplate template)
-	{
+	public L2NpcInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2NpcInstance);
 		setIsInvul(false);
 	}
 	
 	@Override
-	public FolkStatus getStatus()
-	{
+	public FolkStatus getStatus() {
 		return (FolkStatus) super.getStatus();
 	}
 	
 	@Override
-	public void initCharStatus()
-	{
+	public void initCharStatus() {
 		setStatus(new FolkStatus(this));
 	}
 	
-	public List<ClassId> getClassesToTeach()
-	{
+	public List<ClassId> getClassesToTeach() {
 		return getTemplate().getTeachInfo();
 	}
 	
@@ -79,10 +74,8 @@ public class L2NpcInstance extends L2Npc
 	 * @param npc the last folk.
 	 * @param classId player's active class id.
 	 */
-	public static void showSkillList(L2PcInstance player, L2Npc npc, ClassId classId)
-	{
-		if (Config.DEBUG)
-		{
+	public static void showSkillList(L2PcInstance player, L2Npc npc, ClassId classId) {
+		if (Config.DEBUG) {
 			LOG.debug("SkillList activated on: {}", npc.getObjectId());
 		}
 		
@@ -93,12 +86,10 @@ public class L2NpcInstance extends L2Npc
 			final AcquireSkillList asl = new AcquireSkillList(AcquireSkillType.COLLECT);
 			
 			int counts = 0;
-			for (L2SkillLearn s : skills)
-			{
+			for (L2SkillLearn s : skills) {
 				final Skill sk = SkillData.getInstance().getSkill(s.getSkillId(), s.getSkillLevel());
 				
-				if (sk != null)
-				{
+				if (sk != null) {
 					counts++;
 					asl.addSkill(s.getSkillId(), s.getSkillLevel(), s.getSkillLevel(), 0, 1);
 				}
@@ -107,32 +98,25 @@ public class L2NpcInstance extends L2Npc
 			if (counts == 0) // No more skills to learn, come back when you level.
 			{
 				final int minLevel = SkillTreesData.getInstance().getMinLevelForNewSkill(player, SkillTreesData.getInstance().getCollectSkillTree());
-				if (minLevel > 0)
-				{
+				if (minLevel > 0) {
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DO_NOT_HAVE_FURTHER_SKILLS_TO_LEARN_S1);
 					sm.addInt(minLevel);
 					player.sendPacket(sm);
-				}
-				else
-				{
+				} else {
 					player.sendPacket(SystemMessageId.NO_MORE_SKILLS_TO_LEARN);
 				}
-			}
-			else
-			{
+			} else {
 				player.sendPacket(asl);
 			}
 			return;
 		}
 		
-		if (!npc.getTemplate().canTeach(classId))
-		{
+		if (!npc.getTemplate().canTeach(classId)) {
 			npc.showNoTeachHtml(player);
 			return;
 		}
 		
-		if (((L2NpcInstance) npc).getClassesToTeach().isEmpty())
-		{
+		if (((L2NpcInstance) npc).getClassesToTeach().isEmpty()) {
 			final NpcHtmlMessage html = new NpcHtmlMessage(npc.getObjectId());
 			final String sb = StringUtil.concat("<html><body>I cannot teach you. My class list is empty.<br>Ask admin to fix it. Need add my npcid and classes to skill_learn.sql.<br>NpcId:", String.valueOf(npcId), ", Your classId:", String.valueOf(player.getClassId().getId()), "</body></html>");
 			html.setHtml(sb);
@@ -145,41 +129,30 @@ public class L2NpcInstance extends L2Npc
 		final AcquireSkillList asl = new AcquireSkillList(AcquireSkillType.CLASS);
 		int count = 0;
 		player.setLearningClass(classId);
-		for (L2SkillLearn s : skills)
-		{
-			if (SkillData.getInstance().getSkill(s.getSkillId(), s.getSkillLevel()) != null)
-			{
+		for (L2SkillLearn s : skills) {
+			if (SkillData.getInstance().getSkill(s.getSkillId(), s.getSkillLevel()) != null) {
 				asl.addSkill(s.getSkillId(), s.getSkillLevel(), s.getSkillLevel(), s.getCalculatedLevelUpSp(player.getClassId(), classId), 0);
 				count++;
 			}
 		}
 		
-		if (count == 0)
-		{
+		if (count == 0) {
 			final Map<Integer, L2SkillLearn> skillTree = SkillTreesData.getInstance().getCompleteClassSkillTree(classId);
 			final int minLevel = SkillTreesData.getInstance().getMinLevelForNewSkill(player, skillTree);
-			if (minLevel > 0)
-			{
+			if (minLevel > 0) {
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DO_NOT_HAVE_FURTHER_SKILLS_TO_LEARN_S1);
 				sm.addInt(minLevel);
 				player.sendPacket(sm);
-			}
-			else
-			{
-				if (player.getClassId().level() == 1)
-				{
+			} else {
+				if (player.getClassId().level() == 1) {
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.NO_SKILLS_TO_LEARN_RETURN_AFTER_S1_CLASS_CHANGE);
 					sm.addInt(2);
 					player.sendPacket(sm);
-				}
-				else
-				{
+				} else {
 					player.sendPacket(SystemMessageId.NO_MORE_SKILLS_TO_LEARN);
 				}
 			}
-		}
-		else
-		{
+		} else {
 			player.sendPacket(asl);
 		}
 	}

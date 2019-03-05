@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.skills.targets;
  * Affect scope enumerated.
  * @author Zoey76
  */
-public enum AffectScope
-{
+public enum AffectScope {
 	/** Affects Valakas. */
 	BALAKAS_SCOPE,
 	/** Affects dead clan mates. */

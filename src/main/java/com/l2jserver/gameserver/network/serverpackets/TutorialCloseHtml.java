@@ -24,23 +24,19 @@ import com.l2jserver.gameserver.enums.HtmlActionScope;
  * TutorialCloseHtml server packet implementation.
  * @author HorridoJoho
  */
-public class TutorialCloseHtml extends L2GameServerPacket
-{
+public class TutorialCloseHtml extends L2GameServerPacket {
 	public static final TutorialCloseHtml STATIC_PACKET = new TutorialCloseHtml();
 	
-	private TutorialCloseHtml()
-	{
+	private TutorialCloseHtml() {
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		getClient().getActiveChar().clearHtmlActions(HtmlActionScope.TUTORIAL_HTML);
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xa9);
 	}
 }

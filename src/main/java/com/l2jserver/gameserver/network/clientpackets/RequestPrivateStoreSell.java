@@ -32,8 +32,7 @@ import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
  * This class ...
  * @version $Revision: 1.2.2.1.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestPrivateStoreSell extends L2GameClientPacket
-{
+public final class RequestPrivateStoreSell extends L2GameClientPacket {
 	private static final String _C__9F_REQUESTPRIVATESTORESELL = "[C] 9F RequestPrivateStoreSell";
 	
 	private static final int BATCH_LENGTH = 28; // length of the one item
@@ -42,18 +41,15 @@ public final class RequestPrivateStoreSell extends L2GameClientPacket
 	private ItemRequest[] _items = null;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_storePlayerId = readD();
 		int count = readD();
-		if ((count <= 0) || (count > Config.MAX_ITEM_IN_PACKET) || ((count * BATCH_LENGTH) != _buf.remaining()))
-		{
+		if ((count <= 0) || (count > Config.MAX_ITEM_IN_PACKET) || ((count * BATCH_LENGTH) != _buf.remaining())) {
 			return;
 		}
 		_items = new ItemRequest[count];
 		
-		for (int i = 0; i < count; i++)
-		{
+		for (int i = 0; i < count; i++) {
 			int objectId = readD();
 			int itemId = readD();
 			readH(); // TODO analyse this
@@ -61,8 +57,7 @@ public final class RequestPrivateStoreSell extends L2GameClientPacket
 			long cnt = readQ();
 			long price = readQ();
 			
-			if ((objectId < 1) || (itemId < 1) || (cnt < 1) || (price < 0))
-			{
+			if ((objectId < 1) || (itemId < 1) || (cnt < 1) || (price < 0)) {
 				_items = null;
 				return;
 			}
@@ -71,89 +66,74 @@ public final class RequestPrivateStoreSell extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (_items == null)
-		{
+		if (_items == null) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("privatestoresell"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("privatestoresell")) {
 			player.sendMessage("You are selling items too fast.");
 			return;
 		}
 		
 		L2PcInstance object = L2World.getInstance().getPlayer(_storePlayerId);
-		if (object == null)
-		{
+		if (object == null) {
 			return;
 		}
 		
 		L2PcInstance storePlayer = object;
-		if (!player.isInsideRadius(storePlayer, INTERACTION_DISTANCE, true, false))
-		{
+		if (!player.isInsideRadius(storePlayer, INTERACTION_DISTANCE, true, false)) {
 			return;
 		}
 		
-		if ((player.getInstanceId() != storePlayer.getInstanceId()) && (player.getInstanceId() != -1))
-		{
+		if ((player.getInstanceId() != storePlayer.getInstanceId()) && (player.getInstanceId() != -1)) {
 			return;
 		}
 		
-		if (storePlayer.getPrivateStoreType() != PrivateStoreType.BUY)
-		{
+		if (storePlayer.getPrivateStoreType() != PrivateStoreType.BUY) {
 			return;
 		}
 		
-		if (player.isCursedWeaponEquipped())
-		{
+		if (player.isCursedWeaponEquipped()) {
 			return;
 		}
 		
 		TradeList storeList = storePlayer.getBuyList();
-		if (storeList == null)
-		{
+		if (storeList == null) {
 			return;
 		}
 		
-		if (!player.getAccessLevel().allowTransaction())
-		{
+		if (!player.getAccessLevel().allowTransaction()) {
 			player.sendMessage("Transactions are disabled for your Access Level.");
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (!storeList.privateStoreSell(player, _items))
-		{
+		if (!storeList.privateStoreSell(player, _items)) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			_log.warning("PrivateStore sell has failed due to invalid list or request. Player: " + player.getName() + ", Private store of: " + storePlayer.getName());
 			return;
 		}
 		
-		if (storeList.getItemCount() == 0)
-		{
+		if (storeList.getItemCount() == 0) {
 			storePlayer.setPrivateStoreType(PrivateStoreType.NONE);
 			storePlayer.broadcastUserInfo();
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__9F_REQUESTPRIVATESTORESELL;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

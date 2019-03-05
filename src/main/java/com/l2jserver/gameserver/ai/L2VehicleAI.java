@@ -26,104 +26,84 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author DS
  */
-public abstract class L2VehicleAI extends L2CharacterAI
-{
+public abstract class L2VehicleAI extends L2CharacterAI {
 	/**
 	 * Simple AI for vehicles
 	 * @param creature
 	 */
-	public L2VehicleAI(L2Vehicle creature)
-	{
+	public L2VehicleAI(L2Vehicle creature) {
 		super(creature);
 	}
 	
 	@Override
-	protected void onIntentionAttack(L2Character target)
-	{
+	protected void onIntentionAttack(L2Character target) {
 	}
 	
 	@Override
-	protected void onIntentionCast(Skill skill, L2Object target)
-	{
+	protected void onIntentionCast(Skill skill, L2Object target) {
 	}
 	
 	@Override
-	protected void onIntentionFollow(L2Character target)
-	{
+	protected void onIntentionFollow(L2Character target) {
 	}
 	
 	@Override
-	protected void onIntentionPickUp(L2Object item)
-	{
+	protected void onIntentionPickUp(L2Object item) {
 	}
 	
 	@Override
-	protected void onIntentionInteract(L2Object object)
-	{
+	protected void onIntentionInteract(L2Object object) {
 	}
 	
 	@Override
-	protected void onEvtAttacked(L2Character attacker)
-	{
+	protected void onEvtAttacked(L2Character attacker) {
 	}
 	
 	@Override
-	protected void onEvtAggression(L2Character target, long aggro)
-	{
+	protected void onEvtAggression(L2Character target, long aggro) {
 	}
 	
 	@Override
-	protected void onEvtStunned(L2Character attacker)
-	{
+	protected void onEvtStunned(L2Character attacker) {
 	}
 	
 	@Override
-	protected void onEvtSleeping(L2Character attacker)
-	{
+	protected void onEvtSleeping(L2Character attacker) {
 	}
 	
 	@Override
-	protected void onEvtRooted(L2Character attacker)
-	{
+	protected void onEvtRooted(L2Character attacker) {
 	}
 	
 	@Override
-	protected void onEvtForgetObject(L2Object object)
-	{
+	protected void onEvtForgetObject(L2Object object) {
 	}
 	
 	@Override
-	protected void onEvtCancel()
-	{
+	protected void onEvtCancel() {
 	}
 	
 	@Override
-	protected void onEvtDead()
-	{
+	protected void onEvtDead() {
 	}
 	
 	@Override
-	protected void onEvtFakeDeath()
-	{
+	protected void onEvtFakeDeath() {
 	}
 	
 	@Override
-	protected void onEvtFinishCasting()
-	{
+	protected void onEvtFinishCasting() {
 	}
 	
 	@Override
-	protected void clientActionFailed()
-	{
+	protected void clientActionFailed() {
 	}
 	
 	@Override
-	protected void moveToPawn(L2Object pawn, int offset)
-	{
+	protected void moveToPawn(L2Object pawn, int offset) {
 	}
 	
 	@Override
-	protected void clientStoppedMoving()
-	{
+	protected void clientStoppedMoving() {
 	}
 }

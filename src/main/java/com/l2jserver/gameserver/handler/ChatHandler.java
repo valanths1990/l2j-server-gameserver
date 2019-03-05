@@ -25,15 +25,13 @@ import java.util.Map;
  * This class handles all chat handlers
  * @author durgus, UnAfraid
  */
-public class ChatHandler implements IHandler<IChatHandler, Integer>
-{
+public class ChatHandler implements IHandler<IChatHandler, Integer> {
 	private final Map<Integer, IChatHandler> _datatable;
 	
 	/**
 	 * Singleton constructor
 	 */
-	protected ChatHandler()
-	{
+	protected ChatHandler() {
 		_datatable = new HashMap<>();
 	}
 	
@@ -42,21 +40,17 @@ public class ChatHandler implements IHandler<IChatHandler, Integer>
 	 * @param handler
 	 */
 	@Override
-	public void registerHandler(IChatHandler handler)
-	{
+	public void registerHandler(IChatHandler handler) {
 		int[] ids = handler.getChatTypeList();
-		for (int id : ids)
-		{
+		for (int id : ids) {
 			_datatable.put(id, handler);
 		}
 	}
 	
 	@Override
-	public synchronized void removeHandler(IChatHandler handler)
-	{
+	public synchronized void removeHandler(IChatHandler handler) {
 		int[] ids = handler.getChatTypeList();
-		for (int id : ids)
-		{
+		for (int id : ids) {
 			_datatable.remove(id);
 		}
 	}
@@ -67,8 +61,7 @@ public class ChatHandler implements IHandler<IChatHandler, Integer>
 	 * @return
 	 */
 	@Override
-	public IChatHandler getHandler(Integer chatType)
-	{
+	public IChatHandler getHandler(Integer chatType) {
 		return _datatable.get(chatType);
 	}
 	
@@ -77,18 +70,15 @@ public class ChatHandler implements IHandler<IChatHandler, Integer>
 	 * @return
 	 */
 	@Override
-	public int size()
-	{
+	public int size() {
 		return _datatable.size();
 	}
 	
-	public static ChatHandler getInstance()
-	{
+	public static ChatHandler getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final ChatHandler _instance = new ChatHandler();
 	}
 }

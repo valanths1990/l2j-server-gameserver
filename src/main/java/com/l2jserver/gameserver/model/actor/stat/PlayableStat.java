@@ -33,24 +33,20 @@ import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.model.zone.type.L2SwampZone;
 
-public class PlayableStat extends CharStat
-{
+public class PlayableStat extends CharStat {
 	protected static final Logger _log = Logger.getLogger(PlayableStat.class.getName());
 	private final AtomicLong _exp = new AtomicLong();
 	private final AtomicInteger _sp = new AtomicInteger();
 	
-	public PlayableStat(L2Playable activeChar)
-	{
+	public PlayableStat(L2Playable activeChar) {
 		super(activeChar);
 	}
 	
-	public long getExp()
-	{
+	public long getExp() {
 		return _exp.get();
 	}
 	
-	public int getSp()
-	{
+	public int getSp() {
 		return _sp.get();
 	}
 	
@@ -58,8 +54,7 @@ public class PlayableStat extends CharStat
 	 * This method not contains checks!
 	 * @param exp
 	 */
-	public void setExp(long exp)
-	{
+	public void setExp(long exp) {
 		_exp.set(exp);
 	}
 	
@@ -67,8 +62,7 @@ public class PlayableStat extends CharStat
 	 * This method not contains checks!
 	 * @param sp
 	 */
-	public void setSp(int sp)
-	{
+	public void setSp(int sp) {
 		_sp.set(sp);
 	}
 	
@@ -77,15 +71,11 @@ public class PlayableStat extends CharStat
 	 * @param exp
 	 * @return
 	 */
-	public boolean removeExp(long exp)
-	{
+	public boolean removeExp(long exp) {
 		final long currentExp = getExp();
-		if (currentExp < exp)
-		{
+		if (currentExp < exp) {
 			_exp.addAndGet(-currentExp);
-		}
-		else
-		{
+		} else {
 			_exp.addAndGet(-exp);
 		}
 		syncExpLevel(false);
@@ -97,42 +87,33 @@ public class PlayableStat extends CharStat
 	 * @param sp
 	 * @return
 	 */
-	public boolean removeSp(int sp)
-	{
+	public boolean removeSp(int sp) {
 		final int currentSp = getSp();
-		if (currentSp < sp)
-		{
+		if (currentSp < sp) {
 			_sp.addAndGet(-currentSp);
-		}
-		else
-		{
+		} else {
 			_sp.addAndGet(-sp);
 		}
 		return true;
 	}
 	
-	public boolean addExp(long value)
-	{
+	public boolean addExp(long value) {
 		final long currentExp = getExp();
 		final long totalExp = currentExp + value;
 		final TerminateReturn term = EventDispatcher.getInstance().notifyEvent(new OnPlayableExpChanged(getActiveChar(), currentExp, totalExp), getActiveChar(), TerminateReturn.class);
-		if ((term != null) && term.terminate())
-		{
+		if ((term != null) && term.terminate()) {
 			return false;
 		}
 		
-		if ((totalExp < 0) || ((value > 0) && (currentExp == (getExpForLevel(getMaxExpLevel()) - 1))))
-		{
+		if ((totalExp < 0) || ((value > 0) && (currentExp == (getExpForLevel(getMaxExpLevel()) - 1)))) {
 			return true;
 		}
 		
-		if (totalExp >= getExpForLevel(getMaxExpLevel()))
-		{
+		if (totalExp >= getExpForLevel(getMaxExpLevel())) {
 			value = (getExpForLevel(getMaxExpLevel()) - 1 - currentExp);
 		}
 		
-		if (_exp.addAndGet(value) >= getExpForLevel(getLevel() + 1))
-		{
+		if (_exp.addAndGet(value) >= getExpForLevel(getLevel() + 1)) {
 			syncExpLevel(true);
 		}
 		
@@ -143,30 +124,23 @@ public class PlayableStat extends CharStat
 	 * Check if level need to be increased / decreased
 	 * @param isExpIncreased
 	 */
-	public void syncExpLevel(boolean isExpIncreased)
-	{
+	public void syncExpLevel(boolean isExpIncreased) {
 		int minimumLevel = getActiveChar().getMinLevel();
 		long currentExp = getExp();
 		int maxLevel = getMaxLevel();
 		int currentLevel = getLevel();
 		
-		if (isExpIncreased)
-		{
-			for (int tmp = currentLevel; tmp <= maxLevel; tmp++)
-			{
-				if (currentExp >= getExpForLevel(tmp))
-				{
-					if (currentExp >= getExpForLevel(tmp + 1))
-					{
+		if (isExpIncreased) {
+			for (int tmp = currentLevel; tmp <= maxLevel; tmp++) {
+				if (currentExp >= getExpForLevel(tmp)) {
+					if (currentExp >= getExpForLevel(tmp + 1)) {
 						continue;
 					}
-					if (tmp < minimumLevel)
-					{
+					if (tmp < minimumLevel) {
 						tmp = minimumLevel;
 					}
 					
-					if (tmp != currentLevel)
-					{
+					if (tmp != currentLevel) {
 						int newLevel = tmp - currentLevel;
 						EventDispatcher.getInstance().notifyEventAsync(new OnPlayerLevelChanged(getActiveChar().getActingPlayer(), currentLevel, newLevel), getActiveChar());
 						getActiveChar().addLevel(newLevel);
@@ -174,25 +148,18 @@ public class PlayableStat extends CharStat
 					break;
 				}
 			}
-		}
-		else
-		{
-			for (int tmp = currentLevel; tmp >= minimumLevel; tmp--)
-			{
-				if (currentExp < getExpForLevel(tmp))
-				{
-					if (currentExp < getExpForLevel(tmp - 1))
-					{
+		} else {
+			for (int tmp = currentLevel; tmp >= minimumLevel; tmp--) {
+				if (currentExp < getExpForLevel(tmp)) {
+					if (currentExp < getExpForLevel(tmp - 1)) {
 						continue;
 					}
 					--tmp;
-					if (tmp < minimumLevel)
-					{
+					if (tmp < minimumLevel) {
 						tmp = minimumLevel;
 					}
 					
-					if (tmp != currentLevel)
-					{
+					if (tmp != currentLevel) {
 						int newLevel = tmp - currentLevel;
 						EventDispatcher.getInstance().notifyEventAsync(new OnPlayerLevelChanged(getActiveChar().getActingPlayer(), currentLevel, newLevel), getActiveChar());
 						getActiveChar().addLevel(newLevel);
@@ -203,41 +170,30 @@ public class PlayableStat extends CharStat
 		}
 	}
 	
-	public boolean addSp(int sp)
-	{
-		if (sp < 0)
-		{
+	public boolean addSp(int sp) {
+		if (sp < 0) {
 			_log.warning("addSp acept only possitive numbers!");
 			return false;
 		}
 		int currentSp = getSp();
-		if (currentSp == Integer.MAX_VALUE)
-		{
+		if (currentSp == Integer.MAX_VALUE) {
 			return false;
 		}
 		
-		if (sp > (Integer.MAX_VALUE - currentSp))
-		{
+		if (sp > (Integer.MAX_VALUE - currentSp)) {
 			_sp.set(Integer.MAX_VALUE);
-		}
-		else
-		{
+		} else {
 			_sp.addAndGet(sp);
 		}
 		return true;
 	}
 	
-	public boolean addLevel(int value)
-	{
+	public boolean addLevel(int value) {
 		final int currentLevel = getLevel();
-		if ((currentLevel + value) > getMaxLevel())
-		{
-			if (currentLevel < getMaxLevel())
-			{
+		if ((currentLevel + value) > getMaxLevel()) {
+			if (currentLevel < getMaxLevel()) {
 				value = getMaxLevel() - currentLevel;
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		}
@@ -247,13 +203,11 @@ public class PlayableStat extends CharStat
 		setLevel(value);
 		
 		// Sync up exp with current level
-		if ((getExp() >= getExpForLevel(getLevel() + 1)) || (getExpForLevel(getLevel()) > getExp()))
-		{
+		if ((getExp() >= getExpForLevel(getLevel() + 1)) || (getExpForLevel(getLevel()) > getExp())) {
 			setExp(getExpForLevel(getLevel()));
 		}
 		
-		if (!levelIncreased)
-		{
+		if (!levelIncreased) {
 			return false;
 		}
 		
@@ -268,8 +222,7 @@ public class PlayableStat extends CharStat
 	 * @param level
 	 * @return
 	 */
-	public long getExpForLevel(int level)
-	{
+	public long getExpForLevel(int level) {
 		return ExperienceData.getInstance().getExpForLevel(level);
 	}
 	
@@ -279,8 +232,7 @@ public class PlayableStat extends CharStat
 	 * <li>PcStat</li>
 	 * <li>PetStat</li>
 	 */
-	public int getMaxLevel()
-	{
+	public int getMaxLevel() {
 		// Dummy method
 		return Config.MAX_PLAYER_LEVEL;
 	}
@@ -291,26 +243,21 @@ public class PlayableStat extends CharStat
 	 * <li>PcStat</li>
 	 * <li>PetStat</li>
 	 */
-	public int getMaxExpLevel()
-	{
+	public int getMaxExpLevel() {
 		// Dummy method
 		return Config.MAX_PLAYER_LEVEL + 1;
 	}
 	
 	@Override
-	public L2Playable getActiveChar()
-	{
+	public L2Playable getActiveChar() {
 		return (L2Playable) super.getActiveChar();
 	}
 	
 	@Override
-	public double getRunSpeed()
-	{
-		if (getActiveChar().isInsideZone(ZoneId.SWAMP))
-		{
+	public double getRunSpeed() {
+		if (getActiveChar().isInsideZone(ZoneId.SWAMP)) {
 			final L2SwampZone zone = ZoneManager.getInstance().getZone(getActiveChar(), L2SwampZone.class);
-			if (zone != null)
-			{
+			if (zone != null) {
 				return super.getRunSpeed() * zone.getMoveBonus();
 			}
 		}
@@ -318,13 +265,10 @@ public class PlayableStat extends CharStat
 	}
 	
 	@Override
-	public double getWalkSpeed()
-	{
-		if (getActiveChar().isInsideZone(ZoneId.SWAMP))
-		{
+	public double getWalkSpeed() {
+		if (getActiveChar().isInsideZone(ZoneId.SWAMP)) {
 			final L2SwampZone zone = ZoneManager.getInstance().getZone(getActiveChar(), L2SwampZone.class);
-			if (zone != null)
-			{
+			if (zone != null) {
 				return super.getWalkSpeed() * zone.getMoveBonus();
 			}
 		}

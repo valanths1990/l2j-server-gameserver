@@ -26,30 +26,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * An instantly executed event when L2Character is attacked by L2Character.
  * @author UnAfraid
  */
-public class OnCreatureAttacked implements IBaseEvent
-{
+public class OnCreatureAttacked implements IBaseEvent {
 	private final L2Character _attacker;
 	private final L2Character _target;
 	
-	public OnCreatureAttacked(L2Character attacker, L2Character target)
-	{
+	public OnCreatureAttacked(L2Character attacker, L2Character target) {
 		_attacker = attacker;
 		_target = target;
 	}
 	
-	public final L2Character getAttacker()
-	{
+	public final L2Character getAttacker() {
 		return _attacker;
 	}
 	
-	public final L2Character getTarget()
-	{
+	public final L2Character getTarget() {
 		return _target;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_CREATURE_ATTACKED;
 	}
 }

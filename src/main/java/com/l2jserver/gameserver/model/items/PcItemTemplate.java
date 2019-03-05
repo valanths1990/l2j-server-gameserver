@@ -24,15 +24,13 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
 /**
  * @author Zoey76
  */
-public final class PcItemTemplate extends ItemHolder
-{
+public final class PcItemTemplate extends ItemHolder {
 	private final boolean _equipped;
 	
 	/**
 	 * @param set the set containing the values for this object
 	 */
-	public PcItemTemplate(StatsSet set)
-	{
+	public PcItemTemplate(StatsSet set) {
 		super(set.getInt("id"), set.getInt("count"));
 		_equipped = set.getBoolean("equipped", false);
 	}
@@ -40,8 +38,7 @@ public final class PcItemTemplate extends ItemHolder
 	/**
 	 * @return {@code true} if the items is equipped upon character creation, {@code false} otherwise
 	 */
-	public boolean isEquipped()
-	{
+	public boolean isEquipped() {
 		return _equipped;
 	}
 }

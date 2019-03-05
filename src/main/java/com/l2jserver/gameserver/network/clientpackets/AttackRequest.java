@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
-public final class AttackRequest extends L2GameClientPacket
-{
+public final class AttackRequest extends L2GameClientPacket {
 	private static final String _C__32_ATTACKREQUEST = "[C] 32 AttackRequest";
 	
 	// cddddc
@@ -45,8 +44,7 @@ public final class AttackRequest extends L2GameClientPacket
 	private int _attackId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectId = readD();
 		_originX = readD();
 		_originY = readD();
@@ -55,21 +53,16 @@ public final class AttackRequest extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final BuffInfo info = activeChar.getEffectList().getBuffInfoByAbnormalType(AbnormalType.BOT_PENALTY);
-		if (info != null)
-		{
-			for (AbstractEffect effect : info.getEffects())
-			{
-				if (!effect.checkCondition(-1))
-				{
+		if (info != null) {
+			for (AbstractEffect effect : info.getEffects()) {
+				if (!effect.checkCondition(-1)) {
 					activeChar.sendPacket(SystemMessageId.YOU_HAVE_BEEN_REPORTED_SO_ACTIONS_NOT_ALLOWED);
 					activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 					return;
@@ -79,62 +72,48 @@ public final class AttackRequest extends L2GameClientPacket
 		
 		// avoid using expensive operations if not needed
 		final L2Object target;
-		if (activeChar.getTargetId() == _objectId)
-		{
+		if (activeChar.getTargetId() == _objectId) {
 			target = activeChar.getTarget();
-		}
-		else
-		{
+		} else {
 			target = L2World.getInstance().findObject(_objectId);
 		}
 		
-		if (target == null)
-		{
+		if (target == null) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		else if (!target.isTargetable() && !activeChar.canOverrideCond(PcCondOverride.TARGET_ALL))
-		{
+		else if (!target.isTargetable() && !activeChar.canOverrideCond(PcCondOverride.TARGET_ALL)) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Players can't attack objects in the other instances
 		// except from multiverse
-		else if ((target.getInstanceId() != activeChar.getInstanceId()) && (activeChar.getInstanceId() != -1))
-		{
+		else if ((target.getInstanceId() != activeChar.getInstanceId()) && (activeChar.getInstanceId() != -1)) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Only GMs can directly attack invisible characters
-		else if (!target.isVisibleFor(activeChar))
-		{
+		else if (!target.isVisibleFor(activeChar)) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (activeChar.getTarget() != target)
-		{
+		if (activeChar.getTarget() != target) {
 			target.onAction(activeChar);
-		}
-		else
-		{
-			if ((target.getObjectId() != activeChar.getObjectId()) && (activeChar.getPrivateStoreType() == PrivateStoreType.NONE) && (activeChar.getActiveRequester() == null))
-			{
+		} else {
+			if ((target.getObjectId() != activeChar.getObjectId()) && (activeChar.getPrivateStoreType() == PrivateStoreType.NONE) && (activeChar.getActiveRequester() == null)) {
 				target.onForcedAttack(activeChar);
-			}
-			else
-			{
+			} else {
 				activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__32_ATTACKREQUEST;
 	}
 }

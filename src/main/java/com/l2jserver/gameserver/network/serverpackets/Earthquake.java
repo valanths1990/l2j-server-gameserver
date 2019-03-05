@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class Earthquake extends L2GameServerPacket
-{
+public class Earthquake extends L2GameServerPacket {
 	private final int _x;
 	private final int _y;
 	private final int _z;
@@ -33,8 +32,7 @@ public class Earthquake extends L2GameServerPacket
 	 * @param intensity
 	 * @param duration
 	 */
-	public Earthquake(int x, int y, int z, int intensity, int duration)
-	{
+	public Earthquake(int x, int y, int z, int intensity, int duration) {
 		_x = x;
 		_y = y;
 		_z = z;
@@ -43,8 +41,7 @@ public class Earthquake extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xD3);
 		writeD(_x);
 		writeD(_y);

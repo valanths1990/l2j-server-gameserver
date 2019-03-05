@@ -23,34 +23,28 @@ import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 /**
  * @author malyelfik
  */
-public class DoorStat extends CharStat
-{
+public class DoorStat extends CharStat {
 	private int _upgradeHpRatio = 1;
 	
-	public DoorStat(L2DoorInstance activeChar)
-	{
+	public DoorStat(L2DoorInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public L2DoorInstance getActiveChar()
-	{
+	public L2DoorInstance getActiveChar() {
 		return (L2DoorInstance) super.getActiveChar();
 	}
 	
 	@Override
-	public int getMaxHp()
-	{
+	public int getMaxHp() {
 		return super.getMaxHp() * _upgradeHpRatio;
 	}
 	
-	public void setUpgradeHpRatio(int ratio)
-	{
+	public void setUpgradeHpRatio(int ratio) {
 		_upgradeHpRatio = ratio;
 	}
 	
-	public int getUpgradeHpRatio()
-	{
+	public int getUpgradeHpRatio() {
 		return _upgradeHpRatio;
 	}
 }

@@ -29,12 +29,10 @@ import com.l2jserver.gameserver.network.L2GameClient;
  * Format: c dddd
  * @author KenM
  */
-public class GameGuardReply extends L2GameClientPacket
-{
+public class GameGuardReply extends L2GameClientPacket {
 	private static final String _C__CB_GAMEGUARDREPLY = "[C] CB GameGuardReply";
 	
-	private static final byte[] VALID =
-	{
+	private static final byte[] VALID = {
 		(byte) 0x88,
 		0x40,
 		0x1c,
@@ -60,41 +58,33 @@ public class GameGuardReply extends L2GameClientPacket
 	private final byte[] _reply = new byte[8];
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		readB(_reply, 0, 4);
 		readD();
 		readB(_reply, 4, 4);
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2GameClient client = getClient();
-		try
-		{
+		try {
 			MessageDigest md = MessageDigest.getInstance("SHA");
 			byte[] result = md.digest(_reply);
-			if (Arrays.equals(result, VALID))
-			{
+			if (Arrays.equals(result, VALID)) {
 				client.setGameGuardOk(true);
 			}
-		}
-		catch (NoSuchAlgorithmException e)
-		{
+		} catch (NoSuchAlgorithmException e) {
 			_log.log(Level.WARNING, "", e);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__CB_GAMEGUARDREPLY;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

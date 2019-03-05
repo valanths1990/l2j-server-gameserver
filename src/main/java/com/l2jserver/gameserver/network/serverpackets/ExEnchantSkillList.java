@@ -21,10 +21,8 @@ package com.l2jserver.gameserver.network.serverpackets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExEnchantSkillList extends L2GameServerPacket
-{
-	public enum EnchantSkillType
-	{
+public class ExEnchantSkillList extends L2GameServerPacket {
+	public enum EnchantSkillType {
 		NORMAL,
 		SAFE,
 		UNTRAIN,
@@ -34,39 +32,33 @@ public class ExEnchantSkillList extends L2GameServerPacket
 	private final EnchantSkillType _type;
 	private final List<Skill> _skills;
 	
-	static class Skill
-	{
+	static class Skill {
 		public int id;
 		public int nextLevel;
 		
-		Skill(int pId, int pNextLevel)
-		{
+		Skill(int pId, int pNextLevel) {
 			id = pId;
 			nextLevel = pNextLevel;
 		}
 	}
 	
-	public void addSkill(int id, int level)
-	{
+	public void addSkill(int id, int level) {
 		_skills.add(new Skill(id, level));
 	}
 	
-	public ExEnchantSkillList(EnchantSkillType type)
-	{
+	public ExEnchantSkillList(EnchantSkillType type) {
 		_type = type;
 		_skills = new ArrayList<>();
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x29);
 		
 		writeD(_type.ordinal());
 		writeD(_skills.size());
-		for (Skill sk : _skills)
-		{
+		for (Skill sk : _skills) {
 			writeD(sk.id);
 			writeD(sk.nextLevel);
 		}

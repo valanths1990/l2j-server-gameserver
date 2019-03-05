@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Premium Item DAO interface.
  * @author Zoey76
  */
-public interface PremiumItemDAO
-{
+public interface PremiumItemDAO {
 	void load(L2PcInstance player);
 	
 	void update(L2PcInstance player, int itemNum, long newcount);

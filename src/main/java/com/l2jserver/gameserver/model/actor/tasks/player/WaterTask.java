@@ -26,24 +26,19 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Task dedicated to make damage to the player while drowning.
  * @author UnAfraid
  */
-public class WaterTask implements Runnable
-{
+public class WaterTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public WaterTask(L2PcInstance player)
-	{
+	public WaterTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			double reduceHp = _player.getMaxHp() / 100.0;
 			
-			if (reduceHp < 1)
-			{
+			if (reduceHp < 1) {
 				reduceHp = 1;
 			}
 			

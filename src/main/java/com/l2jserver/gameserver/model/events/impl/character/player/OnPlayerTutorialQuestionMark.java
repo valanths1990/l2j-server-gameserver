@@ -26,30 +26,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * @author Zealar
  * @since 2.6.0.0
  */
-public class OnPlayerTutorialQuestionMark implements IBaseEvent
-{
+public class OnPlayerTutorialQuestionMark implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _number;
 	
-	public OnPlayerTutorialQuestionMark(L2PcInstance activeChar, int number)
-	{
+	public OnPlayerTutorialQuestionMark(L2PcInstance activeChar, int number) {
 		_activeChar = activeChar;
 		_number = number;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getNumber()
-	{
+	public int getNumber() {
 		return _number;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_TUTORIAL_QUESTION_MARK;
 	}
 }

@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ExPutCommissionResultForVariationMake extends L2GameServerPacket
-{
+public class ExPutCommissionResultForVariationMake extends L2GameServerPacket {
 	private final int _gemstoneObjId;
 	private final int _itemId;
 	private final long _gemstoneCount;
@@ -27,8 +26,7 @@ public class ExPutCommissionResultForVariationMake extends L2GameServerPacket
 	private final int _unk2;
 	private final int _unk3;
 	
-	public ExPutCommissionResultForVariationMake(int gemstoneObjId, long count, int itemId)
-	{
+	public ExPutCommissionResultForVariationMake(int gemstoneObjId, long count, int itemId) {
 		_gemstoneObjId = gemstoneObjId;
 		_itemId = itemId;
 		_gemstoneCount = count;
@@ -39,8 +37,7 @@ public class ExPutCommissionResultForVariationMake extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x55);
 		writeD(_gemstoneObjId);

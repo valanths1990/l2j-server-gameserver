@@ -28,62 +28,51 @@ import com.l2jserver.gameserver.model.events.impl.character.player.clanwh.OnPlay
 import com.l2jserver.gameserver.model.events.impl.character.player.clanwh.OnPlayerClanWHItemTransfer;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class ClanWarehouse extends Warehouse
-{
+public final class ClanWarehouse extends Warehouse {
 	private final L2Clan _clan;
 	
-	public ClanWarehouse(L2Clan clan)
-	{
+	public ClanWarehouse(L2Clan clan) {
 		_clan = clan;
 	}
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "ClanWarehouse";
 	}
 	
 	@Override
-	public int getOwnerId()
-	{
+	public int getOwnerId() {
 		return _clan.getId();
 	}
 	
 	@Override
-	public L2PcInstance getOwner()
-	{
+	public L2PcInstance getOwner() {
 		return _clan.getLeader().getPlayerInstance();
 	}
 	
 	@Override
-	public ItemLocation getBaseLocation()
-	{
+	public ItemLocation getBaseLocation() {
 		return ItemLocation.CLANWH;
 	}
 	
-	public String getLocationId()
-	{
+	public String getLocationId() {
 		return "0";
 	}
 	
-	public int getLocationId(boolean dummy)
-	{
+	public int getLocationId(boolean dummy) {
 		return 0;
 	}
 	
-	public void setLocationId(L2PcInstance dummy)
-	{
+	public void setLocationId(L2PcInstance dummy) {
 	}
 	
 	@Override
-	public boolean validateCapacity(long slots)
-	{
+	public boolean validateCapacity(long slots) {
 		return ((_items.size() + slots) <= Config.WAREHOUSE_SLOTS_CLAN);
 	}
 	
 	@Override
-	public L2ItemInstance addItem(String process, int itemId, long count, int enchantLevel, L2PcInstance actor, Object reference)
-	{
+	public L2ItemInstance addItem(String process, int itemId, long count, int enchantLevel, L2PcInstance actor, Object reference) {
 		final L2ItemInstance item = super.addItem(process, itemId, count, enchantLevel, actor, reference);
 		
 		// Notify to scripts
@@ -92,24 +81,21 @@ public final class ClanWarehouse extends Warehouse
 	}
 	
 	@Override
-	public L2ItemInstance addItem(String process, L2ItemInstance item, L2PcInstance actor, Object reference)
-	{
+	public L2ItemInstance addItem(String process, L2ItemInstance item, L2PcInstance actor, Object reference) {
 		// Notify to scripts
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerClanWHItemAdd(process, actor, item, this), item.getItem());
 		return super.addItem(process, item, actor, reference);
 	}
 	
 	@Override
-	public L2ItemInstance destroyItem(String process, L2ItemInstance item, long count, L2PcInstance actor, Object reference)
-	{
+	public L2ItemInstance destroyItem(String process, L2ItemInstance item, long count, L2PcInstance actor, Object reference) {
 		// Notify to scripts
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerClanWHItemDestroy(process, actor, item, count, this), item.getItem());
 		return super.destroyItem(process, item, count, actor, reference);
 	}
 	
 	@Override
-	public L2ItemInstance transferItem(String process, int objectId, long count, ItemContainer target, L2PcInstance actor, Object reference)
-	{
+	public L2ItemInstance transferItem(String process, int objectId, long count, ItemContainer target, L2PcInstance actor, Object reference) {
 		final L2ItemInstance item = getItemByObjectId(objectId);
 		
 		// Notify to scripts

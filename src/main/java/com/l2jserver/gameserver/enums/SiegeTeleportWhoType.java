@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.enums;
 
-public enum SiegeTeleportWhoType
-{
+public enum SiegeTeleportWhoType {
 	Attacker,
 	Owner,
 	NotOwner,

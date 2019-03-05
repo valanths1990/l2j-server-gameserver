@@ -23,20 +23,17 @@ import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 /**
  * @author Gnacik, UnAfraid
  */
-public class OnEventTrigger extends L2GameServerPacket
-{
+public class OnEventTrigger extends L2GameServerPacket {
 	private final int _emitterId;
 	private final int _enabled;
 	
-	public OnEventTrigger(L2DoorInstance door, boolean enabled)
-	{
+	public OnEventTrigger(L2DoorInstance door, boolean enabled) {
 		_emitterId = door.getEmitter();
 		_enabled = enabled ? 1 : 0;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xCF);
 		writeD(_emitterId);
 		writeC(_enabled);

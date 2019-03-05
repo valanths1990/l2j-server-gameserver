@@ -25,70 +25,51 @@ import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.entity.clanhall.SiegableHall;
 
-public class L2CastleDoormenInstance extends L2DoormenInstance
-{
-	public L2CastleDoormenInstance(L2NpcTemplate template)
-	{
+public class L2CastleDoormenInstance extends L2DoormenInstance {
+	public L2CastleDoormenInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2CastleDoormenInstance);
 	}
 	
 	@Override
-	protected final void openDoors(L2PcInstance player, String command)
-	{
+	protected final void openDoors(L2PcInstance player, String command) {
 		StringTokenizer st = new StringTokenizer(command.substring(10), ", ");
 		st.nextToken();
 		
-		while (st.hasMoreTokens())
-		{
-			if (getConquerableHall() != null)
-			{
+		while (st.hasMoreTokens()) {
+			if (getConquerableHall() != null) {
 				getConquerableHall().openCloseDoor(Integer.parseInt(st.nextToken()), true);
-			}
-			else
-			{
+			} else {
 				getCastle().openDoor(player, Integer.parseInt(st.nextToken()));
 			}
 		}
 	}
 	
 	@Override
-	protected final void closeDoors(L2PcInstance player, String command)
-	{
+	protected final void closeDoors(L2PcInstance player, String command) {
 		StringTokenizer st = new StringTokenizer(command.substring(11), ", ");
 		st.nextToken();
 		
-		while (st.hasMoreTokens())
-		{
-			if (getConquerableHall() != null)
-			{
+		while (st.hasMoreTokens()) {
+			if (getConquerableHall() != null) {
 				getConquerableHall().openCloseDoor(Integer.parseInt(st.nextToken()), false);
-			}
-			else
-			{
+			} else {
 				getCastle().closeDoor(player, Integer.parseInt(st.nextToken()));
 			}
 		}
 	}
 	
 	@Override
-	protected final boolean isOwnerClan(L2PcInstance player)
-	{
-		if ((player.getClan() != null) && player.hasClanPrivilege(ClanPrivilege.CS_OPEN_DOOR))
-		{
+	protected final boolean isOwnerClan(L2PcInstance player) {
+		if ((player.getClan() != null) && player.hasClanPrivilege(ClanPrivilege.CS_OPEN_DOOR)) {
 			SiegableHall hall = getConquerableHall();
 			// save in variable because it's a costly call
-			if (hall != null)
-			{
-				if (player.getClanId() == hall.getOwnerId())
-				{
+			if (hall != null) {
+				if (player.getClanId() == hall.getOwnerId()) {
 					return true;
 				}
-			}
-			else if (getCastle() != null)
-			{
-				if (player.getClanId() == getCastle().getOwnerId())
-				{
+			} else if (getCastle() != null) {
+				if (player.getClanId() == getCastle().getOwnerId()) {
 					return true;
 				}
 			}
@@ -97,11 +78,9 @@ public class L2CastleDoormenInstance extends L2DoormenInstance
 	}
 	
 	@Override
-	protected final boolean isUnderSiege()
-	{
+	protected final boolean isUnderSiege() {
 		SiegableHall hall = getConquerableHall();
-		if (hall != null)
-		{
+		if (hall != null) {
 			return hall.isInSiege();
 		}
 		return getCastle().getZone().isActive();

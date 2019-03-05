@@ -21,30 +21,25 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class SpawnItem extends L2GameServerPacket
-{
+public final class SpawnItem extends L2GameServerPacket {
 	private final int _objectId;
 	private int _itemId;
 	private final int _x, _y, _z;
 	private int _stackable;
 	private long _count;
 	
-	public SpawnItem(L2Object obj)
-	{
+	public SpawnItem(L2Object obj) {
 		_objectId = obj.getObjectId();
 		_x = obj.getX();
 		_y = obj.getY();
 		_z = obj.getZ();
 		
-		if (obj instanceof L2ItemInstance)
-		{
+		if (obj instanceof L2ItemInstance) {
 			L2ItemInstance item = (L2ItemInstance) obj;
 			_itemId = item.getDisplayId();
 			_stackable = item.isStackable() ? 0x01 : 0x00;
 			_count = item.getCount();
-		}
-		else
-		{
+		} else {
 			_itemId = obj.getPoly().getPolyId();
 			_stackable = 0;
 			_count = 1;
@@ -52,8 +47,7 @@ public final class SpawnItem extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x05);
 		writeD(_objectId);
 		writeD(_itemId);

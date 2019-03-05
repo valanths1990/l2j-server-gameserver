@@ -32,8 +32,7 @@ import com.l2jserver.util.StringUtil;
 /**
  * This class is dedicated to the management of EtcItem.
  */
-public final class L2EtcItem extends L2Item
-{
+public final class L2EtcItem extends L2Item {
 	private String _handler;
 	private EtcItemType _type;
 	private final boolean _isBlessed;
@@ -43,19 +42,16 @@ public final class L2EtcItem extends L2Item
 	 * Constructor for EtcItem.
 	 * @param set StatsSet designating the set of couples (key,value) for description of the Etc
 	 */
-	public L2EtcItem(StatsSet set)
-	{
+	public L2EtcItem(StatsSet set) {
 		super(set);
 		_type = set.getEnum("etcitem_type", EtcItemType.class, EtcItemType.NONE);
 		
 		// l2j custom - L2EtcItemType.SHOT
-		switch (getDefaultAction())
-		{
+		switch (getDefaultAction()) {
 			case SOULSHOT:
 			case SUMMON_SOULSHOT:
 			case SUMMON_SPIRITSHOT:
-			case SPIRITSHOT:
-			{
+			case SPIRITSHOT: {
 				_type = EtcItemType.SHOT;
 				break;
 			}
@@ -64,12 +60,9 @@ public final class L2EtcItem extends L2Item
 		_type1 = ItemType1.ITEM_QUESTITEM_ADENA;
 		_type2 = ItemType2.OTHER; // default is other
 		
-		if (isQuestItem())
-		{
+		if (isQuestItem()) {
 			_type2 = ItemType2.QUEST;
-		}
-		else if ((getId() == Inventory.ADENA_ID) || (getId() == Inventory.ANCIENT_ADENA_ID))
-		{
+		} else if ((getId() == Inventory.ADENA_ID) || (getId() == Inventory.ANCIENT_ADENA_ID)) {
 			_type2 = ItemType2.MONEY;
 		}
 		
@@ -78,19 +71,15 @@ public final class L2EtcItem extends L2Item
 		
 		// Extractable
 		String capsuled_items = set.getString("capsuled_items", null);
-		if (capsuled_items != null)
-		{
+		if (capsuled_items != null) {
 			String[] split = capsuled_items.split(";");
 			_extractableItems = new ArrayList<>(split.length);
-			for (String part : split)
-			{
-				if (part.trim().isEmpty())
-				{
+			for (String part : split) {
+				if (part.trim().isEmpty()) {
 					continue;
 				}
 				String[] data = part.split(",");
-				if (data.length != 4)
-				{
+				if (data.length != 4) {
 					_log.info(StringUtil.concat("> Couldnt parse ", part, " in capsuled_items! item ", toString()));
 					continue;
 				}
@@ -98,8 +87,7 @@ public final class L2EtcItem extends L2Item
 				int min = Integer.parseInt(data[1]);
 				int max = Integer.parseInt(data[2]);
 				double chance = Double.parseDouble(data[3]);
-				if (max < min)
-				{
+				if (max < min) {
 					_log.info(StringUtil.concat("> Max amount < Min amount in ", part, ", item ", toString()));
 					continue;
 				}
@@ -109,14 +97,11 @@ public final class L2EtcItem extends L2Item
 			((ArrayList<?>) _extractableItems).trimToSize();
 			
 			// check for handler
-			if (_handler == null)
-			{
+			if (_handler == null) {
 				_log.warning("Item " + this + " define capsuled_items but missing handler.");
 				_handler = "ExtractableItems";
 			}
-		}
-		else
-		{
+		} else {
 			_extractableItems = null;
 		}
 	}
@@ -125,8 +110,7 @@ public final class L2EtcItem extends L2Item
 	 * @return the type of Etc Item.
 	 */
 	@Override
-	public EtcItemType getItemType()
-	{
+	public EtcItemType getItemType() {
 		return _type;
 	}
 	
@@ -134,32 +118,28 @@ public final class L2EtcItem extends L2Item
 	 * @return the ID of the Etc item after applying the mask.
 	 */
 	@Override
-	public int getItemMask()
-	{
+	public int getItemMask() {
 		return getItemType().mask();
 	}
 	
 	/**
 	 * @return the handler name, null if no handler for item.
 	 */
-	public String getHandlerName()
-	{
+	public String getHandlerName() {
 		return _handler;
 	}
 	
 	/**
 	 * @return {@code true} if the item is blessed, {@code false} otherwise.
 	 */
-	public final boolean isBlessed()
-	{
+	public final boolean isBlessed() {
 		return _isBlessed;
 	}
 	
 	/**
 	 * @return the extractable items list.
 	 */
-	public List<L2ExtractableProduct> getExtractableItems()
-	{
+	public List<L2ExtractableProduct> getExtractableItems() {
 		return _extractableItems;
 	}
 }

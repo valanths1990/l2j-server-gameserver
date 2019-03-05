@@ -22,21 +22,18 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Duel Start packet implementation.
  * @author KenM, Zoey76
  */
-public class ExDuelStart extends L2GameServerPacket
-{
+public class ExDuelStart extends L2GameServerPacket {
 	public static final ExDuelStart PLAYER_DUEL = new ExDuelStart(false);
 	public static final ExDuelStart PARTY_DUEL = new ExDuelStart(true);
 	
 	private final boolean _partyDuel;
 	
-	public ExDuelStart(boolean partyDuel)
-	{
+	public ExDuelStart(boolean partyDuel) {
 		_partyDuel = partyDuel;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x4e);
 		

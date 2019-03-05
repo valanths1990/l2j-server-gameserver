@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.model.interfaces;
 /**
  * @author xban1x
  */
-public interface IUniqueId
-{
+public interface IUniqueId {
 	public int getObjectId();
 }

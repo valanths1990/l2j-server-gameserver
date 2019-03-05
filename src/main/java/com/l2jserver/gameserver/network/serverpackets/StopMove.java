@@ -20,16 +20,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public final class StopMove extends L2GameServerPacket
-{
+public final class StopMove extends L2GameServerPacket {
 	private final int _objectId;
 	private final int _x;
 	private final int _y;
 	private final int _z;
 	private final int _heading;
 	
-	public StopMove(L2Character cha)
-	{
+	public StopMove(L2Character cha) {
 		this(cha.getObjectId(), cha.getX(), cha.getY(), cha.getZ(), cha.getHeading());
 	}
 	
@@ -40,8 +38,7 @@ public final class StopMove extends L2GameServerPacket
 	 * @param z
 	 * @param heading
 	 */
-	public StopMove(int objectId, int x, int y, int z, int heading)
-	{
+	public StopMove(int objectId, int x, int y, int z, int heading) {
 		_objectId = objectId;
 		_x = x;
 		_y = y;
@@ -50,8 +47,7 @@ public final class StopMove extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x47);
 		writeD(_objectId);
 		writeD(_x);

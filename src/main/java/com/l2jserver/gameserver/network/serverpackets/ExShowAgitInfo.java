@@ -27,17 +27,14 @@ import com.l2jserver.gameserver.model.entity.clanhall.AuctionableHall;
 /**
  * @author KenM
  */
-public class ExShowAgitInfo extends L2GameServerPacket
-{
+public class ExShowAgitInfo extends L2GameServerPacket {
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x16);
 		Map<Integer, AuctionableHall> clannhalls = ClanHallManager.getInstance().getAllAuctionableClanHalls();
 		writeD(clannhalls.size());
-		for (AuctionableHall ch : clannhalls.values())
-		{
+		for (AuctionableHall ch : clannhalls.values()) {
 			writeD(ch.getId());
 			writeS(ch.getOwnerId() <= 0 ? "" : ClanTable.getInstance().getClan(ch.getOwnerId()).getName()); // owner clan name
 			writeS(ch.getOwnerId() <= 0 ? "" : ClanTable.getInstance().getClan(ch.getOwnerId()).getLeaderName()); // leader name

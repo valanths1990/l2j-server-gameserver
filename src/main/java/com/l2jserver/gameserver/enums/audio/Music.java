@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 /**
  * @author Zealar
  */
-public enum Music implements IAudio
-{
+public enum Music implements IAudio {
 	B03_D_10000("B03_D", 10000),
 	B03_F("B03_F"),
 	B04_S01("B04_S01"),
@@ -75,25 +74,21 @@ public enum Music implements IAudio
 	
 	private final PlaySound _playSound;
 	
-	Music(String soundName)
-	{
+	Music(String soundName) {
 		_playSound = PlaySound.createMusic(soundName, 0);
 	}
 	
-	Music(String soundName, int delay)
-	{
+	Music(String soundName, int delay) {
 		_playSound = PlaySound.createMusic(soundName, delay);
 	}
 	
 	@Override
-	public String getSoundName()
-	{
+	public String getSoundName() {
 		return _playSound.getSoundName();
 	}
 	
 	@Override
-	public PlaySound getPacket()
-	{
+	public PlaySound getPacket() {
 		return _playSound;
 	}
 }

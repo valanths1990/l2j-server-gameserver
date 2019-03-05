@@ -23,16 +23,14 @@ import java.util.List;
 /**
  * @author GKR
  */
-public class L2WalkRoute
-{
+public class L2WalkRoute {
 	private final String _name;
 	private final List<L2NpcWalkerNode> _nodeList; // List of nodes
 	private final boolean _repeatWalk; // Does repeat walk, after arriving into last point in list, or not
 	private boolean _stopAfterCycle; // Make only one cycle or endlessly
 	private final byte _repeatType; // Repeat style: 0 - go back, 1 - go to first point (circle style), 2 - teleport to first point (conveyor style), 3 - random walking between points
 	
-	public L2WalkRoute(String name, List<L2NpcWalkerNode> route, boolean repeat, boolean once, byte repeatType)
-	{
+	public L2WalkRoute(String name, List<L2NpcWalkerNode> route, boolean repeat, boolean once, byte repeatType) {
 		
 		_name = name;
 		_nodeList = route;
@@ -40,38 +38,31 @@ public class L2WalkRoute
 		_repeatWalk = ((_repeatType >= 0) && (_repeatType <= 2)) ? repeat : false;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public List<L2NpcWalkerNode> getNodeList()
-	{
+	public List<L2NpcWalkerNode> getNodeList() {
 		return _nodeList;
 	}
 	
-	public L2NpcWalkerNode getLastNode()
-	{
+	public L2NpcWalkerNode getLastNode() {
 		return _nodeList.get(_nodeList.size() - 1);
 	}
 	
-	public boolean repeatWalk()
-	{
+	public boolean repeatWalk() {
 		return _repeatWalk;
 	}
 	
-	public boolean doOnce()
-	{
+	public boolean doOnce() {
 		return _stopAfterCycle;
 	}
 	
-	public byte getRepeatType()
-	{
+	public byte getRepeatType() {
 		return _repeatType;
 	}
 	
-	public int getNodesCount()
-	{
+	public int getNodesCount() {
 		return _nodeList.size();
 	}
 }

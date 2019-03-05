@@ -25,34 +25,28 @@ import com.l2jserver.gameserver.model.olympiad.OlympiadInfo;
 /**
  * @author JIV
  */
-public class ExOlympiadMatchResult extends L2GameServerPacket
-{
+public class ExOlympiadMatchResult extends L2GameServerPacket {
 	private final boolean _tie;
 	private int _winTeam; // 1,2
 	private int _loseTeam = 2;
 	private final List<OlympiadInfo> _winnerList;
 	private final List<OlympiadInfo> _loserList;
 	
-	public ExOlympiadMatchResult(boolean tie, int winTeam, List<OlympiadInfo> winnerList, List<OlympiadInfo> loserList)
-	{
+	public ExOlympiadMatchResult(boolean tie, int winTeam, List<OlympiadInfo> winnerList, List<OlympiadInfo> loserList) {
 		_tie = tie;
 		_winTeam = winTeam;
 		_winnerList = winnerList;
 		_loserList = loserList;
 		
-		if (_winTeam == 2)
-		{
+		if (_winTeam == 2) {
 			_loseTeam = 1;
-		}
-		else if (_winTeam == 0)
-		{
+		} else if (_winTeam == 0) {
 			_winTeam = 1;
 		}
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xD4);
 		writeD(0x01); // Type 0 = Match List, 1 = Match Result
@@ -61,8 +55,7 @@ public class ExOlympiadMatchResult extends L2GameServerPacket
 		writeS(_winnerList.get(0).getName());
 		writeD(_winTeam);
 		writeD(_winnerList.size());
-		for (OlympiadInfo info : _winnerList)
-		{
+		for (OlympiadInfo info : _winnerList) {
 			writeS(info.getName());
 			writeS(info.getClanName());
 			writeD(info.getClanId());
@@ -74,8 +67,7 @@ public class ExOlympiadMatchResult extends L2GameServerPacket
 		
 		writeD(_loseTeam);
 		writeD(_loserList.size());
-		for (OlympiadInfo info : _loserList)
-		{
+		for (OlympiadInfo info : _loserList) {
 			writeS(info.getName());
 			writeS(info.getClanName());
 			writeD(info.getClanId());

@@ -30,43 +30,35 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author l3x
  */
-public final class ExShowSellCropList extends L2GameServerPacket
-{
+public final class ExShowSellCropList extends L2GameServerPacket {
 	private final int _manorId;
 	private final Map<Integer, L2ItemInstance> _cropsItems = new HashMap<>();
 	private final Map<Integer, CropProcure> _castleCrops = new HashMap<>();
 	
-	public ExShowSellCropList(PcInventory inventory, int manorId)
-	{
+	public ExShowSellCropList(PcInventory inventory, int manorId) {
 		_manorId = manorId;
-		for (int cropId : CastleManorManager.getInstance().getCropIds())
-		{
+		for (int cropId : CastleManorManager.getInstance().getCropIds()) {
 			final L2ItemInstance item = inventory.getItemByItemId(cropId);
-			if (item != null)
-			{
+			if (item != null) {
 				_cropsItems.put(cropId, item);
 			}
 		}
 		
-		for (CropProcure crop : CastleManorManager.getInstance().getCropProcure(_manorId, false))
-		{
-			if (_cropsItems.containsKey(crop.getId()) && (crop.getAmount() > 0))
-			{
+		for (CropProcure crop : CastleManorManager.getInstance().getCropProcure(_manorId, false)) {
+			if (_cropsItems.containsKey(crop.getId()) && (crop.getAmount() > 0)) {
 				_castleCrops.put(crop.getId(), crop);
 			}
 		}
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xFE);
 		writeH(0x2C);
 		
 		writeD(_manorId); // manor id
 		writeD(_cropsItems.size()); // size
-		for (L2ItemInstance item : _cropsItems.values())
-		{
+		for (L2ItemInstance item : _cropsItems.values()) {
 			final L2Seed seed = CastleManorManager.getInstance().getSeedByCrop(item.getId());
 			writeD(item.getObjectId()); // Object id
 			writeD(item.getId()); // crop id
@@ -75,16 +67,13 @@ public final class ExShowSellCropList extends L2GameServerPacket
 			writeD(seed.getReward(1)); // reward 1 id
 			writeC(0x01);
 			writeD(seed.getReward(2)); // reward 2 id
-			if (_castleCrops.containsKey(item.getId()))
-			{
+			if (_castleCrops.containsKey(item.getId())) {
 				final CropProcure crop = _castleCrops.get(item.getId());
 				writeD(_manorId); // manor
 				writeQ(crop.getAmount()); // buy residual
 				writeQ(crop.getPrice()); // buy price
 				writeC(crop.getReward()); // reward
-			}
-			else
-			{
+			} else {
 				writeD(0xFFFFFFFF); // manor
 				writeQ(0x00); // buy residual
 				writeQ(0x00); // buy price

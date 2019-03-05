@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.zone;
  * Abstract class for Zone settings.
  * @author UnAfraid
  */
-public abstract class AbstractZoneSettings
-{
+public abstract class AbstractZoneSettings {
 	/**
 	 * Clear the Zone settings.
 	 */

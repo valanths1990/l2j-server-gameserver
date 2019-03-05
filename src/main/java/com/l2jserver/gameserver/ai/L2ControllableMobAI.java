@@ -44,8 +44,7 @@ import com.l2jserver.util.Rnd;
  * AI for controllable mobs
  * @author littlecrow
  */
-public final class L2ControllableMobAI extends L2AttackableAI
-{
+public final class L2ControllableMobAI extends L2AttackableAI {
 	public static final int AI_IDLE = 1;
 	public static final int AI_NORMAL = 2;
 	public static final int AI_FORCEATTACK = 3;
@@ -61,18 +60,15 @@ public final class L2ControllableMobAI extends L2AttackableAI
 	private L2Character _forcedTarget;
 	private MobGroup _targetGroup;
 	
-	public L2ControllableMobAI(L2ControllableMobInstance creature)
-	{
+	public L2ControllableMobAI(L2ControllableMobInstance creature) {
 		super(creature);
 		setAlternateAI(AI_IDLE);
 	}
 	
-	protected void thinkFollow()
-	{
+	protected void thinkFollow() {
 		L2Attackable me = (L2Attackable) _actor;
 		
-		if (!Util.checkIfInRange(MobGroupTable.FOLLOW_RANGE, me, getForcedTarget(), true))
-		{
+		if (!Util.checkIfInRange(MobGroupTable.FOLLOW_RANGE, me, getForcedTarget(), true)) {
 			int signX = (Rnd.nextInt(2) == 0) ? -1 : 1;
 			int signY = (Rnd.nextInt(2) == 0) ? -1 : 1;
 			int randX = Rnd.nextInt(MobGroupTable.FOLLOW_RANGE);
@@ -83,22 +79,17 @@ public final class L2ControllableMobAI extends L2AttackableAI
 	}
 	
 	@Override
-	protected void onEvtThink()
-	{
-		if (isThinking())
-		{
+	protected void onEvtThink() {
+		if (isThinking()) {
 			return;
 		}
 		
 		setThinking(true);
 		
-		try
-		{
-			switch (getAlternateAI())
-			{
+		try {
+			switch (getAlternateAI()) {
 				case AI_IDLE:
-					if (getIntention() != CtrlIntention.AI_INTENTION_ACTIVE)
-					{
+					if (getIntention() != CtrlIntention.AI_INTENTION_ACTIVE) {
 						setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
 					}
 					break;
@@ -115,49 +106,38 @@ public final class L2ControllableMobAI extends L2AttackableAI
 					thinkAttackGroup();
 					break;
 				default:
-					if (getIntention() == AI_INTENTION_ACTIVE)
-					{
+					if (getIntention() == AI_INTENTION_ACTIVE) {
 						thinkActive();
-					}
-					else if (getIntention() == AI_INTENTION_ATTACK)
-					{
+					} else if (getIntention() == AI_INTENTION_ATTACK) {
 						thinkAttack();
 					}
 					break;
 			}
-		}
-		finally
-		{
+		} finally {
 			setThinking(false);
 		}
 	}
 	
 	@Override
-	protected void thinkCast()
-	{
+	protected void thinkCast() {
 		L2Attackable npc = (L2Attackable) _actor;
-		if ((getAttackTarget() == null) || getAttackTarget().isAlikeDead())
-		{
+		if ((getAttackTarget() == null) || getAttackTarget().isAlikeDead()) {
 			setAttackTarget(findNextRndTarget());
 			clientStopMoving(null);
 		}
 		
-		if (getAttackTarget() == null)
-		{
+		if (getAttackTarget() == null) {
 			return;
 		}
 		
 		npc.setTarget(getAttackTarget());
 		
-		if (!_actor.isMuted())
-		{
+		if (!_actor.isMuted()) {
 			int max_range = 0;
 			// check distant skills
 			
-			for (Skill sk : _actor.getAllSkills())
-			{
-				if (Util.checkIfInRange(sk.getCastRange(), _actor, getAttackTarget(), true) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
-				{
+			for (Skill sk : _actor.getAllSkills()) {
+				if (Util.checkIfInRange(sk.getCastRange(), _actor, getAttackTarget(), true) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk))) {
 					_actor.doCast(sk);
 					return;
 				}
@@ -165,8 +145,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 				max_range = Math.max(max_range, sk.getCastRange());
 			}
 			
-			if (!isNotMoving())
-			{
+			if (!isNotMoving()) {
 				moveToPawn(getAttackTarget(), max_range);
 			}
 			
@@ -174,18 +153,15 @@ public final class L2ControllableMobAI extends L2AttackableAI
 		}
 	}
 	
-	protected void thinkAttackGroup()
-	{
+	protected void thinkAttackGroup() {
 		L2Character target = getForcedTarget();
-		if ((target == null) || target.isAlikeDead())
-		{
+		if ((target == null) || target.isAlikeDead()) {
 			// try to get next group target
 			setForcedTarget(findNextGroupTarget());
 			clientStopMoving(null);
 		}
 		
-		if (target == null)
-		{
+		if (target == null) {
 			return;
 		}
 		
@@ -199,15 +175,12 @@ public final class L2ControllableMobAI extends L2AttackableAI
 		int range = _actor.getPhysicalAttackRange() + _actor.getTemplate().getCollisionRadius() + target.getTemplate().getCollisionRadius();
 		int max_range = range;
 		
-		if (!_actor.isMuted() && (dist2 > ((range + 20) * (range + 20))))
-		{
+		if (!_actor.isMuted() && (dist2 > ((range + 20) * (range + 20)))) {
 			// check distant skills
-			for (Skill sk : _actor.getAllSkills())
-			{
+			for (Skill sk : _actor.getAllSkills()) {
 				int castRange = sk.getCastRange();
 				
-				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
-				{
+				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk))) {
 					_actor.doCast(sk);
 					return;
 				}
@@ -215,8 +188,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 				max_range = Math.max(max_range, castRange);
 			}
 			
-			if (!isNotMoving())
-			{
+			if (!isNotMoving()) {
 				moveToPawn(target, range);
 			}
 			
@@ -225,10 +197,8 @@ public final class L2ControllableMobAI extends L2AttackableAI
 		_actor.doAttack(target);
 	}
 	
-	protected void thinkForceAttack()
-	{
-		if ((getForcedTarget() == null) || getForcedTarget().isAlikeDead())
-		{
+	protected void thinkForceAttack() {
+		if ((getForcedTarget() == null) || getForcedTarget().isAlikeDead()) {
 			clientStopMoving(null);
 			setIntention(AI_INTENTION_ACTIVE);
 			setAlternateAI(AI_IDLE);
@@ -239,15 +209,12 @@ public final class L2ControllableMobAI extends L2AttackableAI
 		int range = _actor.getPhysicalAttackRange() + _actor.getTemplate().getCollisionRadius() + getForcedTarget().getTemplate().getCollisionRadius();
 		int max_range = range;
 		
-		if (!_actor.isMuted() && (dist2 > ((range + 20) * (range + 20))))
-		{
+		if (!_actor.isMuted() && (dist2 > ((range + 20) * (range + 20)))) {
 			// check distant skills
-			for (Skill sk : _actor.getAllSkills())
-			{
+			for (Skill sk : _actor.getAllSkills()) {
 				int castRange = sk.getCastRange();
 				
-				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
-				{
+				if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk))) {
 					_actor.doCast(sk);
 					return;
 				}
@@ -255,8 +222,7 @@ public final class L2ControllableMobAI extends L2AttackableAI
 				max_range = Math.max(max_range, castRange);
 			}
 			
-			if (!isNotMoving())
-			{
+			if (!isNotMoving()) {
 				moveToPawn(getForcedTarget(), _actor.getPhysicalAttackRange()/* range */);
 			}
 			
@@ -267,41 +233,31 @@ public final class L2ControllableMobAI extends L2AttackableAI
 	}
 	
 	@Override
-	protected void thinkAttack()
-	{
-		if ((getAttackTarget() == null) || getAttackTarget().isAlikeDead())
-		{
-			if (getAttackTarget() != null)
-			{
+	protected void thinkAttack() {
+		if ((getAttackTarget() == null) || getAttackTarget().isAlikeDead()) {
+			if (getAttackTarget() != null) {
 				// stop hating
 				L2Attackable npc = (L2Attackable) _actor;
 				npc.stopHating(getAttackTarget());
 			}
 			
 			setIntention(AI_INTENTION_ACTIVE);
-		}
-		else
-		{
+		} else {
 			// notify aggression
-			if (((L2Npc) _actor).getTemplate().getClans() != null)
-			{
+			if (((L2Npc) _actor).getTemplate().getClans() != null) {
 				Collection<L2Object> objs = _actor.getKnownList().getKnownObjects().values();
-				for (L2Object obj : objs)
-				{
-					if (!(obj instanceof L2Npc))
-					{
+				for (L2Object obj : objs) {
+					if (!(obj instanceof L2Npc)) {
 						continue;
 					}
 					
 					L2Npc npc = (L2Npc) obj;
 					
-					if (!npc.isInMyClan((L2Npc) _actor))
-					{
+					if (!npc.isInMyClan((L2Npc) _actor)) {
 						continue;
 					}
 					
-					if (_actor.isInsideRadius(npc, npc.getTemplate().getClanHelpRange(), false, true) && (Math.abs(getAttackTarget().getZ() - npc.getZ()) < 200))
-					{
+					if (_actor.isInsideRadius(npc, npc.getTemplate().getClanHelpRange(), false, true) && (Math.abs(getAttackTarget().getZ() - npc.getZ()) < 200)) {
 						npc.getAI().notifyEvent(CtrlEvent.EVT_AGGRESSION, getAttackTarget(), 1);
 					}
 				}
@@ -312,15 +268,12 @@ public final class L2ControllableMobAI extends L2AttackableAI
 			int range = _actor.getPhysicalAttackRange() + _actor.getTemplate().getCollisionRadius() + getAttackTarget().getTemplate().getCollisionRadius();
 			int max_range = range;
 			
-			if (!_actor.isMuted() && (dist2 > ((range + 20) * (range + 20))))
-			{
+			if (!_actor.isMuted() && (dist2 > ((range + 20) * (range + 20)))) {
 				// check distant skills
-				for (Skill sk : _actor.getAllSkills())
-				{
+				for (Skill sk : _actor.getAllSkills()) {
 					int castRange = sk.getCastRange();
 					
-					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk)))
-					{
+					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() > _actor.getStat().getMpConsume2(sk))) {
 						_actor.doCast(sk);
 						return;
 					}
@@ -335,34 +288,26 @@ public final class L2ControllableMobAI extends L2AttackableAI
 			// Force mobs to attack anybody if confused.
 			L2Character hated;
 			
-			if (_actor.isConfused())
-			{
+			if (_actor.isConfused()) {
 				hated = findNextRndTarget();
-			}
-			else
-			{
+			} else {
 				hated = getAttackTarget();
 			}
 			
-			if (hated == null)
-			{
+			if (hated == null) {
 				setIntention(AI_INTENTION_ACTIVE);
 				return;
 			}
 			
-			if (hated != getAttackTarget())
-			{
+			if (hated != getAttackTarget()) {
 				setAttackTarget(hated);
 			}
 			
-			if (!_actor.isMuted() && (Rnd.nextInt(5) == 3))
-			{
-				for (Skill sk : _actor.getAllSkills())
-				{
+			if (!_actor.isMuted() && (Rnd.nextInt(5) == 3)) {
+				for (Skill sk : _actor.getAllSkills()) {
 					int castRange = sk.getCastRange();
 					
-					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() < _actor.getStat().getMpConsume2(sk)))
-					{
+					if (((castRange * castRange) >= dist2) && !_actor.isSkillDisabled(sk) && (_actor.getCurrentMp() < _actor.getStat().getMpConsume2(sk))) {
 						_actor.doCast(sk);
 						return;
 					}
@@ -374,162 +319,131 @@ public final class L2ControllableMobAI extends L2AttackableAI
 	}
 	
 	@Override
-	protected void thinkActive()
-	{
+	protected void thinkActive() {
 		setAttackTarget(findNextRndTarget());
 		L2Character hated;
 		
-		if (_actor.isConfused())
-		{
+		if (_actor.isConfused()) {
 			hated = findNextRndTarget();
-		}
-		else
-		{
+		} else {
 			hated = getAttackTarget();
 		}
 		
-		if (hated != null)
-		{
+		if (hated != null) {
 			_actor.setRunning();
 			setIntention(CtrlIntention.AI_INTENTION_ATTACK, hated);
 		}
 	}
 	
-	private boolean checkAutoAttackCondition(L2Character target)
-	{
-		if ((target == null) || (target instanceof L2NpcInstance) || (target instanceof L2DoorInstance))
-		{
+	private boolean checkAutoAttackCondition(L2Character target) {
+		if ((target == null) || (target instanceof L2NpcInstance) || (target instanceof L2DoorInstance)) {
 			return false;
 		}
 		
 		// TODO(Zoey76)[#112]: This check must change if summon fall in L2Npc hierarchy.
-		if (target.isNpc())
-		{
+		if (target.isNpc()) {
 			return false;
 		}
 		
 		// Check if the target isn't invulnerable
-		if (target.isInvul() || target.isAlikeDead())
-		{
+		if (target.isInvul() || target.isAlikeDead()) {
 			return false;
 		}
 		
 		// Spawn protection (only against mobs)
-		if (target.isPlayer() && ((L2PcInstance) target).isSpawnProtected())
-		{
+		if (target.isPlayer() && ((L2PcInstance) target).isSpawnProtected()) {
 			return false;
 		}
 		
 		final L2Attackable me = getActiveChar();
-		if (!me.isInsideRadius(target, me.getAggroRange(), false, false) || (Math.abs(_actor.getZ() - target.getZ()) > 100))
-		{
+		if (!me.isInsideRadius(target, me.getAggroRange(), false, false) || (Math.abs(_actor.getZ() - target.getZ()) > 100)) {
 			return false;
 		}
 		
 		// Check if the target is a L2Playable
-		if (target.isPlayable())
-		{
+		if (target.isPlayable()) {
 			// Check if the target isn't in silent move mode
-			if (((L2Playable) target).isSilentMovingAffected())
-			{
+			if (((L2Playable) target).isSilentMovingAffected()) {
 				return false;
 			}
 		}
 		return me.isAggressive();
 	}
 	
-	private L2Character findNextRndTarget()
-	{
+	private L2Character findNextRndTarget() {
 		final List<L2Character> potentialTarget = _actor.getKnownList().getKnownCharactersInRadius(getActiveChar().getAggroRange()).stream().filter(this::checkAutoAttackCondition).collect(Collectors.toList());
-		if (potentialTarget.isEmpty())
-		{
+		if (potentialTarget.isEmpty()) {
 			return null;
 		}
 		return potentialTarget.get(Rnd.nextInt(potentialTarget.size()));
 	}
 	
-	private L2ControllableMobInstance findNextGroupTarget()
-	{
+	private L2ControllableMobInstance findNextGroupTarget() {
 		return getGroupTarget().getRandomMob();
 	}
 	
-	public int getAlternateAI()
-	{
+	public int getAlternateAI() {
 		return _alternateAI;
 	}
 	
-	public void setAlternateAI(int _alternateai)
-	{
+	public void setAlternateAI(int _alternateai) {
 		_alternateAI = _alternateai;
 	}
 	
-	public void forceAttack(L2Character target)
-	{
+	public void forceAttack(L2Character target) {
 		setAlternateAI(AI_FORCEATTACK);
 		setForcedTarget(target);
 	}
 	
-	public void forceAttackGroup(MobGroup group)
-	{
+	public void forceAttackGroup(MobGroup group) {
 		setForcedTarget(null);
 		setGroupTarget(group);
 		setAlternateAI(AI_ATTACK_GROUP);
 	}
 	
-	public void stop()
-	{
+	public void stop() {
 		setAlternateAI(AI_IDLE);
 		clientStopMoving(null);
 	}
 	
-	public void move(int x, int y, int z)
-	{
+	public void move(int x, int y, int z) {
 		moveTo(x, y, z);
 	}
 	
-	public void follow(L2Character target)
-	{
+	public void follow(L2Character target) {
 		setAlternateAI(AI_FOLLOW);
 		setForcedTarget(target);
 	}
 	
-	public boolean isThinking()
-	{
+	public boolean isThinking() {
 		return _isThinking;
 	}
 	
-	public boolean isNotMoving()
-	{
+	public boolean isNotMoving() {
 		return _isNotMoving;
 	}
 	
-	public void setNotMoving(boolean isNotMoving)
-	{
+	public void setNotMoving(boolean isNotMoving) {
 		_isNotMoving = isNotMoving;
 	}
 	
-	public void setThinking(boolean isThinking)
-	{
+	public void setThinking(boolean isThinking) {
 		_isThinking = isThinking;
 	}
 	
-	private L2Character getForcedTarget()
-	{
+	private L2Character getForcedTarget() {
 		return _forcedTarget;
 	}
 	
-	private MobGroup getGroupTarget()
-	{
+	private MobGroup getGroupTarget() {
 		return _targetGroup;
 	}
 	
-	private void setForcedTarget(L2Character forcedTarget)
-	{
+	private void setForcedTarget(L2Character forcedTarget) {
 		_forcedTarget = forcedTarget;
 	}
 	
-	private void setGroupTarget(MobGroup targetGroup)
-	{
+	private void setGroupTarget(MobGroup targetGroup) {
 		_targetGroup = targetGroup;
 	}
 }

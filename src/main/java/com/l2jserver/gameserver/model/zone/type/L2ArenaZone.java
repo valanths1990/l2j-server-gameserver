@@ -28,20 +28,15 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * A PVP Zone
  * @author durgus
  */
-public class L2ArenaZone extends L2ZoneType
-{
-	public L2ArenaZone(int id)
-	{
+public class L2ArenaZone extends L2ZoneType {
+	public L2ArenaZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character instanceof L2PcInstance)
-		{
-			if (!character.isInsideZone(ZoneId.PVP))
-			{
+	protected void onEnter(L2Character character) {
+		if (character instanceof L2PcInstance) {
+			if (!character.isInsideZone(ZoneId.PVP)) {
 				character.sendPacket(SystemMessageId.ENTERED_COMBAT_ZONE);
 			}
 		}
@@ -50,12 +45,9 @@ public class L2ArenaZone extends L2ZoneType
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character instanceof L2PcInstance)
-		{
-			if (!character.isInsideZone(ZoneId.PVP))
-			{
+	protected void onExit(L2Character character) {
+		if (character instanceof L2PcInstance) {
+			if (!character.isInsideZone(ZoneId.PVP)) {
 				character.sendPacket(SystemMessageId.LEFT_COMBAT_ZONE);
 			}
 		}

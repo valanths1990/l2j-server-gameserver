@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 /**
  * Class for Control Tower instance.
  */
-public class L2ControlTowerInstance extends L2Tower
-{
+public class L2ControlTowerInstance extends L2Tower {
 	private static final Logger LOG = LoggerFactory.getLogger(L2ControlTowerInstance.class);
 	
 	private volatile List<L2Spawn> _guards;
@@ -43,30 +42,22 @@ public class L2ControlTowerInstance extends L2Tower
 	 * Creates a control tower.
 	 * @param template the control tower NPC template
 	 */
-	public L2ControlTowerInstance(L2NpcTemplate template)
-	{
+	public L2ControlTowerInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2ControlTowerInstance);
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
-		if (getCastle().getSiege().isInProgress())
-		{
+	public boolean doDie(L2Character killer) {
+		if (getCastle().getSiege().isInProgress()) {
 			getCastle().getSiege().killedCT(this);
 			
-			if ((_guards != null) && !_guards.isEmpty())
-			{
-				for (L2Spawn spawn : _guards)
-				{
-					try
-					{
+			if ((_guards != null) && !_guards.isEmpty()) {
+				for (L2Spawn spawn : _guards) {
+					try {
 						spawn.stopRespawn();
 						// spawn.getLastSpawn().doDie(spawn.getLastSpawn());
-					}
-					catch (Exception e)
-					{
+					} catch (Exception e) {
 						LOG.warn("Error at L2ControlTowerInstance {}", e);
 					}
 				}
@@ -76,19 +67,14 @@ public class L2ControlTowerInstance extends L2Tower
 		return super.doDie(killer);
 	}
 	
-	public void registerGuard(L2Spawn guard)
-	{
+	public void registerGuard(L2Spawn guard) {
 		getGuards().add(guard);
 	}
 	
-	private final List<L2Spawn> getGuards()
-	{
-		if (_guards == null)
-		{
-			synchronized (this)
-			{
-				if (_guards == null)
-				{
+	private final List<L2Spawn> getGuards() {
+		if (_guards == null) {
+			synchronized (this) {
+				if (_guards == null) {
 					_guards = new CopyOnWriteArrayList<>();
 				}
 			}

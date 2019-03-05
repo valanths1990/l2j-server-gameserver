@@ -36,70 +36,54 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Player Can Create Base condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanCreateBase extends Condition
-{
+public class ConditionPlayerCanCreateBase extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanCreateBase(boolean val)
-	{
+	public ConditionPlayerCanCreateBase(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return !_val;
 		}
 		
 		final L2PcInstance player = effector.getActingPlayer();
 		boolean canCreateBase = true;
-		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || (player.getClan() == null))
-		{
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || (player.getClan() == null)) {
 			canCreateBase = false;
 		}
 		
 		final Castle castle = CastleManager.getInstance().getCastle(player);
 		final Fort fort = FortManager.getInstance().getFort(player);
 		final SystemMessage sm;
-		if ((castle == null) && (fort == null))
-		{
+		if ((castle == null) && (fort == null)) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			canCreateBase = false;
-		}
-		else if (((castle != null) && !castle.getSiege().isInProgress()) || ((fort != null) && !fort.getSiege().isInProgress()))
-		{
+		} else if (((castle != null) && !castle.getSiege().isInProgress()) || ((fort != null) && !fort.getSiege().isInProgress())) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			canCreateBase = false;
-		}
-		else if (((castle != null) && (castle.getSiege().getAttackerClan(player.getClan()) == null)) || ((fort != null) && (fort.getSiege().getAttackerClan(player.getClan()) == null)))
-		{
+		} else if (((castle != null) && (castle.getSiege().getAttackerClan(player.getClan()) == null)) || ((fort != null) && (fort.getSiege().getAttackerClan(player.getClan()) == null))) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			canCreateBase = false;
-		}
-		else if (!player.isClanLeader())
-		{
+		} else if (!player.isClanLeader()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			canCreateBase = false;
-		}
-		else if (((castle != null) && (castle.getSiege().getAttackerClan(player.getClan()).getNumFlags() >= SiegeManager.getInstance().getFlagMaxCount())) || ((fort != null) && (fort.getSiege().getAttackerClan(player.getClan()).getNumFlags() >= FortSiegeManager.getInstance().getFlagMaxCount())))
-		{
+		} else if (((castle != null) && (castle.getSiege().getAttackerClan(player.getClan()).getNumFlags() >= SiegeManager.getInstance().getFlagMaxCount())) || ((fort != null) && (fort.getSiege().getAttackerClan(player.getClan()).getNumFlags() >= FortSiegeManager.getInstance().getFlagMaxCount()))) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			canCreateBase = false;
-		}
-		else if (!player.isInsideZone(ZoneId.HQ))
-		{
+		} else if (!player.isInsideZone(ZoneId.HQ)) {
 			player.sendPacket(SystemMessageId.NOT_SET_UP_BASE_HERE);
 			canCreateBase = false;
 		}

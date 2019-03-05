@@ -24,27 +24,22 @@ import com.l2jserver.gameserver.model.items.L2Henna;
 /**
  * @author Zoey76
  */
-public class HennaRemoveList extends L2GameServerPacket
-{
+public class HennaRemoveList extends L2GameServerPacket {
 	private final L2PcInstance _player;
 	
-	public HennaRemoveList(L2PcInstance player)
-	{
+	public HennaRemoveList(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xE6);
 		writeQ(_player.getAdena());
 		writeD(0x00);
 		writeD(3 - _player.getHennaEmptySlots());
 		
-		for (L2Henna henna : _player.getHennaList())
-		{
-			if (henna != null)
-			{
+		for (L2Henna henna : _player.getHennaList()) {
+			if (henna != null) {
 				writeD(henna.getDyeId());
 				writeD(henna.getDyeItemId());
 				writeD(henna.getCancelCount());

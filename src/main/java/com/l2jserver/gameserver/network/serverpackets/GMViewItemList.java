@@ -25,42 +25,35 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class GMViewItemList extends AbstractItemPacket
-{
+public class GMViewItemList extends AbstractItemPacket {
 	private final List<L2ItemInstance> _items = new ArrayList<>();
 	private final int _limit;
 	private final String _playerName;
 	
-	public GMViewItemList(L2PcInstance cha)
-	{
+	public GMViewItemList(L2PcInstance cha) {
 		_playerName = cha.getName();
 		_limit = cha.getInventoryLimit();
-		for (L2ItemInstance item : cha.getInventory().getItems())
-		{
+		for (L2ItemInstance item : cha.getInventory().getItems()) {
 			_items.add(item);
 		}
 	}
 	
-	public GMViewItemList(L2PetInstance cha)
-	{
+	public GMViewItemList(L2PetInstance cha) {
 		_playerName = cha.getName();
 		_limit = cha.getInventoryLimit();
-		for (L2ItemInstance item : cha.getInventory().getItems())
-		{
+		for (L2ItemInstance item : cha.getInventory().getItems()) {
 			_items.add(item);
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x9a);
 		writeS(_playerName);
 		writeD(_limit); // inventory limit
 		writeH(0x01); // show window ??
 		writeH(_items.size());
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			writeItem(item);
 		}
 	}

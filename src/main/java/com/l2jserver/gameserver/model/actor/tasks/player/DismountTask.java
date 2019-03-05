@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Task dedicated to dismount player from pet.
  * @author UnAfraid
  */
-public class DismountTask implements Runnable
-{
+public class DismountTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public DismountTask(L2PcInstance player)
-	{
+	public DismountTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			_player.dismount();
 		}
 	}

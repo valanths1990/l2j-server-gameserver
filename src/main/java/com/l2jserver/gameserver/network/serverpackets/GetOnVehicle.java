@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.model.Location;
 /**
  * @author Maktakien
  */
-public class GetOnVehicle extends L2GameServerPacket
-{
+public class GetOnVehicle extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _boatObjId;
 	private final Location _pos;
@@ -34,16 +33,14 @@ public class GetOnVehicle extends L2GameServerPacket
 	 * @param boatObjId
 	 * @param pos
 	 */
-	public GetOnVehicle(int charObjId, int boatObjId, Location pos)
-	{
+	public GetOnVehicle(int charObjId, int boatObjId, Location pos) {
 		_charObjId = charObjId;
 		_boatObjId = boatObjId;
 		_pos = pos;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0x6e);
 		writeD(_charObjId);
 		writeD(_boatObjId);

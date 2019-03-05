@@ -25,12 +25,10 @@ import com.l2jserver.util.network.BaseSendablePacket;
 /**
  * @author -Wooden-
  */
-public class ServerStatus extends BaseSendablePacket
-{
+public class ServerStatus extends BaseSendablePacket {
 	private final ArrayList<Attribute> _attributes;
 	
-	public static final String[] STATUS_STRING =
-	{
+	public static final String[] STATUS_STRING = {
 		"Auto",
 		"Good",
 		"Normal",
@@ -70,35 +68,29 @@ public class ServerStatus extends BaseSendablePacket
 	public static final int ON = 0x01;
 	public static final int OFF = 0x00;
 	
-	static class Attribute
-	{
+	static class Attribute {
 		public int id;
 		public int value;
 		
-		Attribute(int pId, int pValue)
-		{
+		Attribute(int pId, int pValue) {
 			id = pId;
 			value = pValue;
 		}
 	}
 	
-	public ServerStatus()
-	{
+	public ServerStatus() {
 		_attributes = new ArrayList<>();
 	}
 	
-	public void addAttribute(int id, int value)
-	{
+	public void addAttribute(int id, int value) {
 		_attributes.add(new Attribute(id, value));
 	}
 	
 	@Override
-	public byte[] getContent()
-	{
+	public byte[] getContent() {
 		writeC(0x06);
 		writeD(_attributes.size());
-		for (Attribute temp : _attributes)
-		{
+		for (Attribute temp : _attributes) {
 			writeD(temp.id);
 			writeD(temp.value);
 		}

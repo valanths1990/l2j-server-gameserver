@@ -27,15 +27,13 @@ import com.l2jserver.gameserver.network.serverpackets.StopMoveInVehicle;
 /**
  * @author Maktakien
  */
-public final class RequestGetOffVehicle extends L2GameClientPacket
-{
+public final class RequestGetOffVehicle extends L2GameClientPacket {
 	private static final String _C__54_GETOFFVEHICLE = "[S] 54 GetOffVehicle";
 	
 	private int _boatId, _x, _y, _z;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_boatId = readD();
 		_x = readD();
 		_y = readD();
@@ -43,15 +41,12 @@ public final class RequestGetOffVehicle extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
-		if (!activeChar.isInBoat() || (activeChar.getBoat().getObjectId() != _boatId) || activeChar.getBoat().isMoving() || !activeChar.isInsideRadius(_x, _y, _z, 1000, true, false))
-		{
+		if (!activeChar.isInBoat() || (activeChar.getBoat().getObjectId() != _boatId) || activeChar.getBoat().isMoving() || !activeChar.isInsideRadius(_x, _y, _z, 1000, true, false)) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
@@ -67,8 +62,7 @@ public final class RequestGetOffVehicle extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__54_GETOFFVEHICLE;
 	}
 }

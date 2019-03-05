@@ -21,21 +21,18 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author nBd
  */
-public class RequestEnchant extends L2GameServerPacket
-{
+public class RequestEnchant extends L2GameServerPacket {
 	private final int _unk;
 	
 	/**
 	 * @param value
 	 */
-	public RequestEnchant(int value)
-	{
+	public RequestEnchant(int value) {
 		_unk = value;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x81);
 		writeD(_unk);

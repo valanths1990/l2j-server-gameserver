@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author malyelfik
  */
-public enum ManorMode
-{
+public enum ManorMode {
 	DISABLED,
 	MODIFIABLE,
 	MAINTENANCE,

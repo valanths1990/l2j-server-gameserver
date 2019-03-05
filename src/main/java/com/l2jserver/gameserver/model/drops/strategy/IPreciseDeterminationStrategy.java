@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.drops.IDropItem;
 /**
  * @author Battlecruiser
  */
-public interface IPreciseDeterminationStrategy
-{
+public interface IPreciseDeterminationStrategy {
 	public static final IPreciseDeterminationStrategy ALWAYS = dropItem -> true;
 	
 	public static final IPreciseDeterminationStrategy DEFAULT = dropItem -> Config.PRECISE_DROP_CALCULATION;

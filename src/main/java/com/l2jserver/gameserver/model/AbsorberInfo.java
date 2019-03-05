@@ -23,48 +23,39 @@ import com.l2jserver.gameserver.model.interfaces.IUniqueId;
 /**
  * @author xban1x
  */
-public final class AbsorberInfo implements IUniqueId
-{
+public final class AbsorberInfo implements IUniqueId {
 	private int _objectId;
 	private double _absorbedHp;
 	
-	public AbsorberInfo(int objectId, double pAbsorbedHp)
-	{
+	public AbsorberInfo(int objectId, double pAbsorbedHp) {
 		_objectId = objectId;
 		_absorbedHp = pAbsorbedHp;
 	}
 	
-	public double getAbsorbedHp()
-	{
+	public double getAbsorbedHp() {
 		return _absorbedHp;
 	}
 	
-	public void setAbsorbedHp(double absorbedHp)
-	{
+	public void setAbsorbedHp(double absorbedHp) {
 		_absorbedHp = absorbedHp;
 	}
 	
 	@Override
-	public int getObjectId()
-	{
+	public int getObjectId() {
 		return _objectId;
 	}
 	
-	public void setObjectId(int objectId)
-	{
+	public void setObjectId(int objectId) {
 		_objectId = objectId;
 	}
 	
 	@Override
-	public final boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
+	public final boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
 		
-		if (obj instanceof AbsorberInfo)
-		{
+		if (obj instanceof AbsorberInfo) {
 			return (((AbsorberInfo) obj).getObjectId() == _objectId);
 		}
 		
@@ -72,8 +63,7 @@ public final class AbsorberInfo implements IUniqueId
 	}
 	
 	@Override
-	public final int hashCode()
-	{
+	public final int hashCode() {
 		return _objectId;
 	}
 }

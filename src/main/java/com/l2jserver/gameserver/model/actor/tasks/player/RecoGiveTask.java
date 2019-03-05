@@ -27,25 +27,20 @@ import com.l2jserver.gameserver.network.serverpackets.UserInfo;
  * Task dedicated to increase player's recommendation bonus.
  * @author UnAfraid
  */
-public class RecoGiveTask implements Runnable
-{
+public class RecoGiveTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public RecoGiveTask(L2PcInstance player)
-	{
+	public RecoGiveTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			// 10 recommendations to give out after 2 hours of being logged in
 			// 1 more recommendation to give out every hour after that.
 			int recoToGive = 1;
-			if (!_player.isRecoTwoHoursGiven())
-			{
+			if (!_player.isRecoTwoHoursGiven()) {
 				recoToGive = 10;
 				_player.setRecoTwoHoursGiven(true);
 			}

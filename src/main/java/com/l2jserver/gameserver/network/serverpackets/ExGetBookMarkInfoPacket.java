@@ -24,26 +24,22 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author ShanSoft
  */
-public class ExGetBookMarkInfoPacket extends L2GameServerPacket
-{
+public class ExGetBookMarkInfoPacket extends L2GameServerPacket {
 	private final L2PcInstance player;
 	
-	public ExGetBookMarkInfoPacket(L2PcInstance cha)
-	{
+	public ExGetBookMarkInfoPacket(L2PcInstance cha) {
 		player = cha;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0x84);
 		writeD(0x00); // Dummy
 		writeD(player.getBookmarkslot());
 		writeD(player.getTeleportBookmarks().size());
 		
-		for (TeleportBookmark tpbm : player.getTeleportBookmarks())
-		{
+		for (TeleportBookmark tpbm : player.getTeleportBookmarks()) {
 			writeD(tpbm.getId());
 			writeD(tpbm.getX());
 			writeD(tpbm.getY());

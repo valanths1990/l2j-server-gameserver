@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 /**
  * @author KenM
  */
-public class ExEnchantSkillInfoDetail extends L2GameServerPacket
-{
+public class ExEnchantSkillInfoDetail extends L2GameServerPacket {
 	private static final int TYPE_NORMAL_ENCHANT = 0;
 	private static final int TYPE_SAFE_ENCHANT = 1;
 	private static final int TYPE_UNTRAIN_ENCHANT = 2;
@@ -45,41 +44,31 @@ public class ExEnchantSkillInfoDetail extends L2GameServerPacket
 	private int _sp;
 	private final int _adenacount;
 	
-	public ExEnchantSkillInfoDetail(int type, int skillid, int skilllvl, L2PcInstance ply)
-	{
+	public ExEnchantSkillInfoDetail(int type, int skillid, int skilllvl, L2PcInstance ply) {
 		
 		L2EnchantSkillLearn enchantLearn = EnchantSkillGroupsData.getInstance().getSkillEnchantmentBySkillId(skillid);
 		EnchantSkillHolder esd = null;
 		// do we have this skill?
-		if (enchantLearn != null)
-		{
-			if (skilllvl > 100)
-			{
+		if (enchantLearn != null) {
+			if (skilllvl > 100) {
 				esd = enchantLearn.getEnchantSkillHolder(skilllvl);
-			}
-			else
-			{
+			} else {
 				esd = enchantLearn.getFirstRouteGroup().getEnchantGroupDetails().get(0);
 			}
 		}
 		
-		if (esd == null)
-		{
+		if (esd == null) {
 			throw new IllegalArgumentException("Skill " + skillid + " dont have enchant data for level " + skilllvl);
 		}
 		
-		if (type == 0)
-		{
+		if (type == 0) {
 			multi = EnchantSkillGroupsData.NORMAL_ENCHANT_COST_MULTIPLIER;
-		}
-		else if (type == 1)
-		{
+		} else if (type == 1) {
 			multi = EnchantSkillGroupsData.SAFE_ENCHANT_COST_MULTIPLIER;
 		}
 		_chance = esd.getRate(ply);
 		_sp = esd.getSpCost();
-		if (type == TYPE_UNTRAIN_ENCHANT)
-		{
+		if (type == TYPE_UNTRAIN_ENCHANT) {
 			_sp = (int) (0.8 * _sp);
 		}
 		_adenacount = esd.getAdenaCost() * multi;
@@ -87,8 +76,7 @@ public class ExEnchantSkillInfoDetail extends L2GameServerPacket
 		_skillid = skillid;
 		_skilllvl = skilllvl;
 		
-		switch (type)
-		{
+		switch (type) {
 			case TYPE_NORMAL_ENCHANT:
 				bookId = EnchantSkillGroupsData.NORMAL_ENCHANT_BOOK;
 				reqCount = (((_skilllvl % 100) > 1) ? 0 : 1);
@@ -109,15 +97,13 @@ public class ExEnchantSkillInfoDetail extends L2GameServerPacket
 				return;
 		}
 		
-		if ((type != TYPE_SAFE_ENCHANT) && !Config.ES_SP_BOOK_NEEDED)
-		{
+		if ((type != TYPE_SAFE_ENCHANT) && !Config.ES_SP_BOOK_NEEDED) {
 			reqCount = 0;
 		}
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x5E);
 		

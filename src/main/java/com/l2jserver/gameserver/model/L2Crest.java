@@ -28,32 +28,25 @@ import com.l2jserver.gameserver.network.serverpackets.PledgeCrest;
 /**
  * @author NosBit
  */
-public final class L2Crest implements IIdentifiable
-{
-	public enum CrestType
-	{
+public final class L2Crest implements IIdentifiable {
+	public enum CrestType {
 		PLEDGE(1),
 		PLEDGE_LARGE(2),
 		ALLY(3);
 		
 		private final int _id;
 		
-		private CrestType(int id)
-		{
+		private CrestType(int id) {
 			_id = id;
 		}
 		
-		public int getId()
-		{
+		public int getId() {
 			return _id;
 		}
 		
-		public static CrestType getById(int id)
-		{
-			for (CrestType crestType : values())
-			{
-				if (crestType.getId() == id)
-				{
+		public static CrestType getById(int id) {
+			for (CrestType crestType : values()) {
+				if (crestType.getId() == id) {
 					return crestType;
 				}
 			}
@@ -65,26 +58,22 @@ public final class L2Crest implements IIdentifiable
 	private final byte[] _data;
 	private final CrestType _type;
 	
-	public L2Crest(int id, byte[] data, CrestType type)
-	{
+	public L2Crest(int id, byte[] data, CrestType type) {
 		_id = id;
 		_data = data;
 		_type = type;
 	}
 	
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public byte[] getData()
-	{
+	public byte[] getData() {
 		return _data;
 	}
 	
-	public CrestType getType()
-	{
+	public CrestType getType() {
 		return _type;
 	}
 	
@@ -93,25 +82,20 @@ public final class L2Crest implements IIdentifiable
 	 * @param activeChar the @{code L2PcInstance} where html is send to.
 	 * @return the client path to crest
 	 */
-	public String getClientPath(L2PcInstance activeChar)
-	{
+	public String getClientPath(L2PcInstance activeChar) {
 		String path = null;
-		switch (getType())
-		{
-			case PLEDGE:
-			{
+		switch (getType()) {
+			case PLEDGE: {
 				activeChar.sendPacket(new PledgeCrest(getId(), getData()));
 				path = "Crest.crest_" + Config.SERVER_ID + "_" + getId();
 				break;
 			}
-			case PLEDGE_LARGE:
-			{
+			case PLEDGE_LARGE: {
 				activeChar.sendPacket(new ExPledgeCrestLarge(getId(), getData()));
 				path = "Crest.crest_" + Config.SERVER_ID + "_" + getId() + "_l";
 				break;
 			}
-			case ALLY:
-			{
+			case ALLY: {
 				activeChar.sendPacket(new AllyCrest(getId(), getData()));
 				path = "Crest.crest_" + Config.SERVER_ID + "_" + getId();
 				break;

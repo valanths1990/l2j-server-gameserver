@@ -21,19 +21,16 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author JIV
  */
-public class ExRotation extends L2GameServerPacket
-{
+public class ExRotation extends L2GameServerPacket {
 	private final int _charId, _heading;
 	
-	public ExRotation(int charId, int heading)
-	{
+	public ExRotation(int charId, int heading) {
 		_charId = charId;
 		_heading = heading;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xC1);
 		writeD(_charId);

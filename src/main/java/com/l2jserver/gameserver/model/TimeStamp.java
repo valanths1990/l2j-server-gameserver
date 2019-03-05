@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * <b>Filter this carefully as it becomes redundant to store reuse for small delays.</b>
  * @author Yesod, Zoey76
  */
-public class TimeStamp
-{
+public class TimeStamp {
 	/** Item or skill ID. */
 	private final int _id1;
 	/** Item object ID or skill level. */
@@ -46,8 +45,7 @@ public class TimeStamp
 	 * @param reuse the reuse time for this skill.
 	 * @param systime overrides the system time with a customized one.
 	 */
-	public TimeStamp(Skill skill, long reuse, long systime)
-	{
+	public TimeStamp(Skill skill, long reuse, long systime) {
 		_id1 = skill.getId();
 		_id2 = skill.getLevel();
 		_reuse = reuse;
@@ -61,8 +59,7 @@ public class TimeStamp
 	 * @param reuse the reuse time for this item.
 	 * @param systime overrides the system time with a customized one.
 	 */
-	public TimeStamp(L2ItemInstance item, long reuse, long systime)
-	{
+	public TimeStamp(L2ItemInstance item, long reuse, long systime) {
 		_id1 = item.getId();
 		_id2 = item.getObjectId();
 		_reuse = reuse;
@@ -74,8 +71,7 @@ public class TimeStamp
 	 * Gets the time stamp.
 	 * @return the time stamp, either the system time where this time stamp was created or the custom time assigned
 	 */
-	public long getStamp()
-	{
+	public long getStamp() {
 		return _stamp;
 	}
 	
@@ -83,8 +79,7 @@ public class TimeStamp
 	 * Gets the item ID.
 	 * @return the item ID
 	 */
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _id1;
 	}
 	
@@ -92,8 +87,7 @@ public class TimeStamp
 	 * Gets the item object ID.
 	 * @return the item object ID
 	 */
-	public int getItemObjectId()
-	{
+	public int getItemObjectId() {
 		return _id2;
 	}
 	
@@ -101,8 +95,7 @@ public class TimeStamp
 	 * Gets the skill ID.
 	 * @return the skill ID
 	 */
-	public int getSkillId()
-	{
+	public int getSkillId() {
 		return _id1;
 	}
 	
@@ -110,8 +103,7 @@ public class TimeStamp
 	 * Gets the skill level.
 	 * @return the skill level
 	 */
-	public int getSkillLvl()
-	{
+	public int getSkillLvl() {
 		return _id2;
 	}
 	
@@ -119,8 +111,7 @@ public class TimeStamp
 	 * Gets the reuse.
 	 * @return the reuse
 	 */
-	public long getReuse()
-	{
+	public long getReuse() {
 		return _reuse;
 	}
 	
@@ -129,8 +120,7 @@ public class TimeStamp
 	 * Only used on items.
 	 * @return the shared reuse group
 	 */
-	public int getSharedReuseGroup()
-	{
+	public int getSharedReuseGroup() {
 		return _group;
 	}
 	
@@ -138,8 +128,7 @@ public class TimeStamp
 	 * Gets the remaining time.
 	 * @return the remaining time for this time stamp to expire
 	 */
-	public long getRemaining()
-	{
+	public long getRemaining() {
 		return Math.max(_stamp - System.currentTimeMillis(), 0);
 	}
 	
@@ -147,8 +136,7 @@ public class TimeStamp
 	 * Verifies if the reuse delay has passed.
 	 * @return {@code true} if this time stamp has expired, {@code false} otherwise
 	 */
-	public boolean hasNotPassed()
-	{
+	public boolean hasNotPassed() {
 		return System.currentTimeMillis() < _stamp;
 	}
 }

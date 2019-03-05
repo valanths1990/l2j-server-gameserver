@@ -24,35 +24,27 @@ import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.L2RecipeList;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class RecipeShopManageList extends L2GameServerPacket
-{
+public class RecipeShopManageList extends L2GameServerPacket {
 	private final L2PcInstance _seller;
 	private final boolean _isDwarven;
 	private L2RecipeList[] _recipes;
 	
-	public RecipeShopManageList(L2PcInstance seller, boolean isDwarven)
-	{
+	public RecipeShopManageList(L2PcInstance seller, boolean isDwarven) {
 		_seller = seller;
 		_isDwarven = isDwarven;
 		
-		if (_isDwarven && _seller.hasDwarvenCraft())
-		{
+		if (_isDwarven && _seller.hasDwarvenCraft()) {
 			_recipes = _seller.getDwarvenRecipeBook();
-		}
-		else
-		{
+		} else {
 			_recipes = _seller.getCommonRecipeBook();
 		}
 		
-		if (_seller.hasManufactureShop())
-		{
+		if (_seller.hasManufactureShop()) {
 			final Iterator<L2ManufactureItem> it = _seller.getManufactureItems().values().iterator();
 			L2ManufactureItem item;
-			while (it.hasNext())
-			{
+			while (it.hasNext()) {
 				item = it.next();
-				if ((item.isDwarven() != _isDwarven) || !seller.hasRecipeList(item.getRecipeId()))
-				{
+				if ((item.isDwarven() != _isDwarven) || !seller.hasRecipeList(item.getRecipeId())) {
 					it.remove();
 				}
 			}
@@ -60,38 +52,29 @@ public class RecipeShopManageList extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xDE);
 		writeD(_seller.getObjectId());
 		writeD((int) _seller.getAdena());
 		writeD(_isDwarven ? 0x00 : 0x01);
 		
-		if (_recipes == null)
-		{
+		if (_recipes == null) {
 			writeD(0);
-		}
-		else
-		{
+		} else {
 			writeD(_recipes.length);// number of items in recipe book
 			
-			for (int i = 0; i < _recipes.length; i++)
-			{
+			for (int i = 0; i < _recipes.length; i++) {
 				L2RecipeList temp = _recipes[i];
 				writeD(temp.getId());
 				writeD(i + 1);
 			}
 		}
 		
-		if (!_seller.hasManufactureShop())
-		{
+		if (!_seller.hasManufactureShop()) {
 			writeD(0x00);
-		}
-		else
-		{
+		} else {
 			writeD(_seller.getManufactureItems().size());
-			for (L2ManufactureItem item : _seller.getManufactureItems().values())
-			{
+			for (L2ManufactureItem item : _seller.getManufactureItems().values()) {
 				writeD(item.getRecipeId());
 				writeD(0x00);
 				writeQ(item.getCost());

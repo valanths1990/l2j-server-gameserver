@@ -23,38 +23,31 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author UnAfraid
  */
-public class TvTEventPlayer
-{
+public class TvTEventPlayer {
 	private final L2PcInstance _player;
 	
-	protected TvTEventPlayer(L2PcInstance player)
-	{
+	protected TvTEventPlayer(L2PcInstance player) {
 		_player = player;
 		
 	}
 	
-	public boolean isOnEvent()
-	{
+	public boolean isOnEvent() {
 		return TvTEvent.isStarted() && TvTEvent.isPlayerParticipant(getPlayer().getObjectId());
 	}
 	
-	public boolean isBlockingExit()
-	{
+	public boolean isBlockingExit() {
 		return true;
 	}
 	
-	public boolean isBlockingDeathPenalty()
-	{
+	public boolean isBlockingDeathPenalty() {
 		return true;
 	}
 	
-	public boolean canRevive()
-	{
+	public boolean canRevive() {
 		return false;
 	}
 	
-	public L2PcInstance getPlayer()
-	{
+	public L2PcInstance getPlayer() {
 		return _player;
 	}
 }

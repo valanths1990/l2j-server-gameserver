@@ -23,21 +23,18 @@ package com.l2jserver.gameserver.model.items.type;
  * @author Adry_85
  * @since 2.6.0.0
  */
-public enum ItemType1
-{
+public enum ItemType1 {
 	WEAPON_RING_EARRING_NECKLACE(0),
 	SHIELD_ARMOR(1),
 	ITEM_QUESTITEM_ADENA(4);
 	
 	private final int _id;
 	
-	private ItemType1(int id)
-	{
+	private ItemType1(int id) {
 		_id = id;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 }

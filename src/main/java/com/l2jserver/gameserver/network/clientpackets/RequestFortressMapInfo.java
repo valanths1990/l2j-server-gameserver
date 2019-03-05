@@ -26,28 +26,23 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowFortressMapInfo;
 /**
  * @author KenM
  */
-public class RequestFortressMapInfo extends L2GameClientPacket
-{
+public class RequestFortressMapInfo extends L2GameClientPacket {
 	private static final String _C_D0_48_REQUESTFORTRESSMAPINFO = "[C] D0:48 RequestFortressMapInfo";
 	private int _fortressId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_fortressId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		Fort fort = FortManager.getInstance().getFortById(_fortressId);
 		
-		if (fort == null)
-		{
+		if (fort == null) {
 			_log.warning("Fort is not found with id (" + _fortressId + ") in all forts with size of (" + FortManager.getInstance().getForts().size() + ") called by player (" + getActiveChar() + ")");
 			
-			if (getActiveChar() == null)
-			{
+			if (getActiveChar() == null) {
 				return;
 			}
 			
@@ -58,8 +53,7 @@ public class RequestFortressMapInfo extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C_D0_48_REQUESTFORTRESSMAPINFO;
 	}
 }

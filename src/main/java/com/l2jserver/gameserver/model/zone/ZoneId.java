@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.zone;
  * Zone Ids.
  * @author Zoey76
  */
-public enum ZoneId
-{
+public enum ZoneId {
 	PVP,
 	PEACE,
 	SIEGE,
@@ -48,8 +47,7 @@ public enum ZoneId
 	NO_ITEM_DROP,
 	NO_RESTART;
 	
-	public static int getZoneCount()
-	{
+	public static int getZoneCount() {
 		return values().length;
 	}
 }

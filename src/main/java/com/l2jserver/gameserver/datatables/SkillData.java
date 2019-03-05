@@ -33,28 +33,24 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * Skill data.
  */
-public final class SkillData
-{
+public final class SkillData {
 	private static Logger LOGGER = Logger.getLogger(SkillData.class.getName());
 	
 	private final Map<Integer, Skill> _skills = new HashMap<>();
 	private final Map<Integer, Integer> _skillMaxLevel = new HashMap<>();
 	private final Set<Integer> _enchantable = new HashSet<>();
 	
-	protected SkillData()
-	{
+	protected SkillData() {
 		load();
 	}
 	
-	public void reload()
-	{
+	public void reload() {
 		load();
 		// Reload Skill Tree as well.
 		SkillTreesData.getInstance().load();
 	}
 	
-	private void load()
-	{
+	private void load() {
 		final Map<Integer, Skill> _temp = new HashMap<>();
 		DocumentEngine.getInstance().loadAllSkills(_temp);
 		
@@ -63,14 +59,11 @@ public final class SkillData
 		
 		_skillMaxLevel.clear();
 		_enchantable.clear();
-		for (Skill skill : _skills.values())
-		{
+		for (Skill skill : _skills.values()) {
 			final int skillId = skill.getId();
 			final int skillLvl = skill.getLevel();
-			if (skillLvl > 99)
-			{
-				if (!_enchantable.contains(skillId))
-				{
+			if (skillLvl > 99) {
+				if (!_enchantable.contains(skillId)) {
 					_enchantable.add(skillId);
 				}
 				continue;
@@ -78,8 +71,7 @@ public final class SkillData
 			
 			// only non-enchanted skills
 			final int maxLvl = getMaxLevel(skillId);
-			if (skillLvl > maxLvl)
-			{
+			if (skillLvl > maxLvl) {
 				_skillMaxLevel.put(skillId, skillLvl);
 			}
 		}
@@ -90,8 +82,7 @@ public final class SkillData
 	 * @param skill The L2Skill to be hashed
 	 * @return getSkillHashCode(skill.getId(), skill.getLevel())
 	 */
-	public static int getSkillHashCode(Skill skill)
-	{
+	public static int getSkillHashCode(Skill skill) {
 		return getSkillHashCode(skill.getId(), skill.getLevel());
 	}
 	
@@ -101,26 +92,21 @@ public final class SkillData
 	 * @param skillLevel The Skill Level
 	 * @return The Skill hash number
 	 */
-	public static int getSkillHashCode(int skillId, int skillLevel)
-	{
+	public static int getSkillHashCode(int skillId, int skillLevel) {
 		return (skillId * 1021) + skillLevel;
 	}
 	
-	public Skill getSkill(int skillId, int level)
-	{
+	public Skill getSkill(int skillId, int level) {
 		final Skill result = _skills.get(getSkillHashCode(skillId, level));
-		if (result != null)
-		{
+		if (result != null) {
 			return result;
 		}
 		
 		// skill/level not found, fix for transformation scripts
 		final int maxLvl = getMaxLevel(skillId);
 		// requested level too high
-		if ((maxLvl > 0) && (level > maxLvl))
-		{
-			if (Config.DEBUG)
-			{
+		if ((maxLvl > 0) && (level > maxLvl)) {
+			if (Config.DEBUG) {
 				LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": call to unexisting skill level id: " + skillId + " requested level: " + level + " max level: " + maxLvl, new Throwable());
 			}
 			return _skills.get(getSkillHashCode(skillId, maxLvl));
@@ -130,8 +116,7 @@ public final class SkillData
 		return null;
 	}
 	
-	public int getMaxLevel(int skillId)
-	{
+	public int getMaxLevel(int skillId) {
 		final Integer maxLevel = _skillMaxLevel.get(skillId);
 		return maxLevel != null ? maxLevel : 0;
 	}
@@ -141,8 +126,7 @@ public final class SkillData
 	 * @param skillId the skill ID
 	 * @return {@code true} if the skill is enchantable, {@code false} otherwise
 	 */
-	public boolean isEnchantable(int skillId)
-	{
+	public boolean isEnchantable(int skillId) {
 		return _enchantable.contains(skillId);
 	}
 	
@@ -151,32 +135,27 @@ public final class SkillData
 	 * @param hasCastle
 	 * @return an array with siege skills. If addNoble == true, will add also Advanced headquarters.
 	 */
-	public Skill[] getSiegeSkills(boolean addNoble, boolean hasCastle)
-	{
+	public Skill[] getSiegeSkills(boolean addNoble, boolean hasCastle) {
 		Skill[] temp = new Skill[2 + (addNoble ? 1 : 0) + (hasCastle ? 2 : 0)];
 		int i = 0;
 		temp[i++] = _skills.get(SkillData.getSkillHashCode(246, 1));
 		temp[i++] = _skills.get(SkillData.getSkillHashCode(247, 1));
 		
-		if (addNoble)
-		{
+		if (addNoble) {
 			temp[i++] = _skills.get(SkillData.getSkillHashCode(326, 1));
 		}
-		if (hasCastle)
-		{
+		if (hasCastle) {
 			temp[i++] = _skills.get(SkillData.getSkillHashCode(844, 1));
 			temp[i++] = _skills.get(SkillData.getSkillHashCode(845, 1));
 		}
 		return temp;
 	}
 	
-	public static SkillData getInstance()
-	{
+	public static SkillData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final SkillData _instance = new SkillData();
 	}
 }

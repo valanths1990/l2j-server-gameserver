@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author St3eT
  */
-public class OnPlayerSummonTalk implements IBaseEvent
-{
+public class OnPlayerSummonTalk implements IBaseEvent {
 	private final L2Summon _summon;
 	
-	public OnPlayerSummonTalk(L2Summon summon)
-	{
+	public OnPlayerSummonTalk(L2Summon summon) {
 		_summon = summon;
 	}
 	
-	public L2Summon getSummon()
-	{
+	public L2Summon getSummon() {
 		return _summon;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_SUMMON_TALK;
 	}
 }

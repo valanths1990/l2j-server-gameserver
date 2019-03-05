@@ -30,86 +30,62 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Player Can Resurrect condition implementation.
  * @author UnAfraid
  */
-public class ConditionPlayerCanResurrect extends Condition
-{
+public class ConditionPlayerCanResurrect extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanResurrect(boolean val)
-	{
+	public ConditionPlayerCanResurrect(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		// Need skill rework for fix that properly
-		if (skill.getAffectRange() > 0)
-		{
+		if (skill.getAffectRange() > 0) {
 			return true;
 		}
-		if (effected == null)
-		{
+		if (effected == null) {
 			return false;
 		}
 		boolean canResurrect = true;
 		
-		if (effected.isPlayer())
-		{
+		if (effected.isPlayer()) {
 			final L2PcInstance player = effected.getActingPlayer();
-			if (!player.isDead())
-			{
+			if (!player.isDead()) {
 				canResurrect = false;
-				if (effector.isPlayer())
-				{
+				if (effector.isPlayer()) {
 					final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 					msg.addSkillName(skill);
 					effector.sendPacket(msg);
 				}
-			}
-			else if (player.isResurrectionBlocked())
-			{
+			} else if (player.isResurrectionBlocked()) {
 				canResurrect = false;
-				if (effector.isPlayer())
-				{
+				if (effector.isPlayer()) {
 					effector.sendPacket(SystemMessageId.REJECT_RESURRECTION);
 				}
-			}
-			else if (player.isReviveRequested())
-			{
+			} else if (player.isReviveRequested()) {
 				canResurrect = false;
-				if (effector.isPlayer())
-				{
+				if (effector.isPlayer()) {
 					effector.sendPacket(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED);
 				}
 			}
-		}
-		else if (effected.isSummon())
-		{
+		} else if (effected.isSummon()) {
 			final L2Summon summon = (L2Summon) effected;
 			final L2PcInstance player = summon.getOwner();
-			if (!summon.isDead())
-			{
+			if (!summon.isDead()) {
 				canResurrect = false;
-				if (effector.isPlayer())
-				{
+				if (effector.isPlayer()) {
 					final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 					msg.addSkillName(skill);
 					effector.sendPacket(msg);
 				}
-			}
-			else if (summon.isResurrectionBlocked())
-			{
+			} else if (summon.isResurrectionBlocked()) {
 				canResurrect = false;
-				if (effector.isPlayer())
-				{
+				if (effector.isPlayer()) {
 					effector.sendPacket(SystemMessageId.REJECT_RESURRECTION);
 				}
-			}
-			else if ((player != null) && player.isRevivingPet())
-			{
+			} else if ((player != null) && player.isRevivingPet()) {
 				canResurrect = false;
-				if (effector.isPlayer())
-				{
+				if (effector.isPlayer()) {
 					effector.sendPacket(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED); // Resurrection is already been proposed.
 				}
 			}

@@ -25,13 +25,11 @@ import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
  * Extended by {@link ItemChanceHolder}, {@link QuestItemHolder}, {@link UniqueItemHolder}.
  * @author UnAfraid
  */
-public class ItemHolder implements IIdentifiable
-{
+public class ItemHolder implements IIdentifiable {
 	private final int _id;
 	private final long _count;
 	
-	public ItemHolder(int id, long count)
-	{
+	public ItemHolder(int id, long count) {
 		_id = id;
 		_count = count;
 	}
@@ -40,22 +38,19 @@ public class ItemHolder implements IIdentifiable
 	 * @return the ID of the item contained in this object
 	 */
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
 	/**
 	 * @return the count of items contained in this object
 	 */
-	public long getCount()
-	{
+	public long getCount() {
 		return _count;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "[" + getClass().getSimpleName() + "] ID: " + _id + ", count: " + _count;
 	}
 }

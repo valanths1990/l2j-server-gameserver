@@ -24,37 +24,31 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * This packet is received from client when a party leader requests to change the leadership to another player in his party.
  */
-public final class RequestChangePartyLeader extends L2GameClientPacket
-{
+public final class RequestChangePartyLeader extends L2GameClientPacket {
 	private static final String _C__D0_0C_REQUESTCHANGEPARTYLEADER = "[C] D0:0C RequestChangePartyLeader";
 	
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		L2Party party = activeChar.getParty();
-		if ((party != null) && party.isLeader(activeChar))
-		{
+		if ((party != null) && party.isLeader(activeChar)) {
 			party.changePartyLeader(_name);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_0C_REQUESTCHANGEPARTYLEADER;
 	}
 }

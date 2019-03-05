@@ -23,67 +23,54 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 /**
  * @author xban1x
  */
-public final class AggroInfo
-{
+public final class AggroInfo {
 	private final L2Character _attacker;
 	private long _hate = 0;
 	private int _damage = 0;
 	
-	public AggroInfo(L2Character pAttacker)
-	{
+	public AggroInfo(L2Character pAttacker) {
 		_attacker = pAttacker;
 	}
 	
-	public L2Character getAttacker()
-	{
+	public L2Character getAttacker() {
 		return _attacker;
 	}
 	
-	public long getHate()
-	{
+	public long getHate() {
 		return _hate;
 	}
 	
-	public long checkHate(L2Character owner)
-	{
-		if (_attacker.isAlikeDead() || !_attacker.isVisible() || !owner.getKnownList().knowsObject(_attacker))
-		{
+	public long checkHate(L2Character owner) {
+		if (_attacker.isAlikeDead() || !_attacker.isVisible() || !owner.getKnownList().knowsObject(_attacker)) {
 			_hate = 0;
 		}
 		
 		return _hate;
 	}
 	
-	public void addHate(long value)
-	{
+	public void addHate(long value) {
 		_hate = Math.min(_hate + value, 999999999);
 	}
 	
-	public void stopHate()
-	{
+	public void stopHate() {
 		_hate = 0;
 	}
 	
-	public int getDamage()
-	{
+	public int getDamage() {
 		return _damage;
 	}
 	
-	public void addDamage(int value)
-	{
+	public void addDamage(int value) {
 		_damage = (int) Math.min(_damage + (long) value, 999999999);
 	}
 	
 	@Override
-	public final boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
+	public final boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
 		
-		if (obj instanceof AggroInfo)
-		{
+		if (obj instanceof AggroInfo) {
 			return (((AggroInfo) obj).getAttacker() == _attacker);
 		}
 		
@@ -91,14 +78,12 @@ public final class AggroInfo
 	}
 	
 	@Override
-	public final int hashCode()
-	{
+	public final int hashCode() {
 		return _attacker.getObjectId();
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "AggroInfo [attacker=" + _attacker + ", hate=" + _hate + ", damage=" + _damage + "]";
 	}
 }

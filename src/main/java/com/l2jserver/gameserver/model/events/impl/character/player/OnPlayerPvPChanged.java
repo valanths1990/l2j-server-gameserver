@@ -25,37 +25,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerPvPChanged implements IBaseEvent
-{
+public class OnPlayerPvPChanged implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _oldPoints;
 	private final int _newPoints;
 	
-	public OnPlayerPvPChanged(L2PcInstance activeChar, int oldPoints, int newPoints)
-	{
+	public OnPlayerPvPChanged(L2PcInstance activeChar, int oldPoints, int newPoints) {
 		_activeChar = activeChar;
 		_oldPoints = oldPoints;
 		_newPoints = newPoints;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getOldPoints()
-	{
+	public int getOldPoints() {
 		return _oldPoints;
 	}
 	
-	public int getNewPoints()
-	{
+	public int getNewPoints() {
 		return _newPoints;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_PVP_CHANGED;
 	}
 }

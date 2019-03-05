@@ -37,8 +37,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author luisantonioa
  */
-public enum PlayerClass
-{
+public enum PlayerClass {
 	HumanFighter(Race.HUMAN, Fighter, First),
 	Warrior(Race.HUMAN, Fighter, Second),
 	Gladiator(Race.HUMAN, Fighter, Third),
@@ -206,8 +205,7 @@ public enum PlayerClass
 	
 	private static final EnumMap<PlayerClass, Set<PlayerClass>> subclassSetMap = new EnumMap<>(PlayerClass.class);
 	
-	static
-	{
+	static {
 		Set<PlayerClass> subclasses = getSet(null, Third);
 		subclasses.removeAll(neverSubclassed);
 		
@@ -235,27 +233,22 @@ public enum PlayerClass
 		subclassSetMap.put(Spellhowler, subclasseSet5);
 	}
 	
-	PlayerClass(Race race, ClassType pType, ClassLevel pLevel)
-	{
+	PlayerClass(Race race, ClassType pType, ClassLevel pLevel) {
 		_race = race;
 		_level = pLevel;
 		_type = pType;
 	}
 	
-	public final Set<PlayerClass> getAvailableSubclasses(L2PcInstance player)
-	{
+	public final Set<PlayerClass> getAvailableSubclasses(L2PcInstance player) {
 		Set<PlayerClass> subclasses = null;
 		
-		if (_level == Third)
-		{
-			if (player.getRace() != Race.KAMAEL)
-			{
+		if (_level == Third) {
+			if (player.getRace() != Race.KAMAEL) {
 				subclasses = EnumSet.copyOf(mainSubclassSet);
 				
 				subclasses.remove(this);
 				
-				switch (player.getRace())
-				{
+				switch (player.getRace()) {
 					case ELF:
 						subclasses.removeAll(getSet(Race.DARK_ELF, Third));
 						break;
@@ -268,32 +261,24 @@ public enum PlayerClass
 				
 				Set<PlayerClass> unavailableClasses = subclassSetMap.get(this);
 				
-				if (unavailableClasses != null)
-				{
+				if (unavailableClasses != null) {
 					subclasses.removeAll(unavailableClasses);
 				}
 				
-			}
-			else
-			{
+			} else {
 				subclasses = getSet(Race.KAMAEL, Third);
 				subclasses.remove(this);
 				// Check sex, male subclasses female and vice versa
 				// If server owner set MaxSubclass > 3 some kamael's cannot take 4 sub
 				// So, in that situation we must skip sex check
-				if (Config.MAX_SUBCLASS <= 3)
-				{
-					if (player.getAppearance().getSex())
-					{
+				if (Config.MAX_SUBCLASS <= 3) {
+					if (player.getAppearance().getSex()) {
 						subclasses.removeAll(EnumSet.of(femaleSoulbreaker));
-					}
-					else
-					{
+					} else {
 						subclasses.removeAll(EnumSet.of(maleSoulbreaker));
 					}
 				}
-				if (!player.getSubClasses().containsKey(2) || (player.getSubClasses().get(2).getLevel() < 75))
-				{
+				if (!player.getSubClasses().containsKey(2) || (player.getSubClasses().get(2).getLevel() < 75)) {
 					subclasses.removeAll(EnumSet.of(inspector));
 				}
 			}
@@ -301,16 +286,12 @@ public enum PlayerClass
 		return subclasses;
 	}
 	
-	public static final EnumSet<PlayerClass> getSet(Race race, ClassLevel level)
-	{
+	public static final EnumSet<PlayerClass> getSet(Race race, ClassLevel level) {
 		EnumSet<PlayerClass> allOf = EnumSet.noneOf(PlayerClass.class);
 		
-		for (PlayerClass playerClass : EnumSet.allOf(PlayerClass.class))
-		{
-			if ((race == null) || playerClass.isOfRace(race))
-			{
-				if ((level == null) || playerClass.isOfLevel(level))
-				{
+		for (PlayerClass playerClass : EnumSet.allOf(PlayerClass.class)) {
+			if ((race == null) || playerClass.isOfRace(race)) {
+				if ((level == null) || playerClass.isOfLevel(level)) {
 					allOf.add(playerClass);
 				}
 			}
@@ -318,23 +299,19 @@ public enum PlayerClass
 		return allOf;
 	}
 	
-	public final boolean isOfRace(Race pRace)
-	{
+	public final boolean isOfRace(Race pRace) {
 		return _race == pRace;
 	}
 	
-	public final boolean isOfType(ClassType pType)
-	{
+	public final boolean isOfType(ClassType pType) {
 		return _type == pType;
 	}
 	
-	public final boolean isOfLevel(ClassLevel pLevel)
-	{
+	public final boolean isOfLevel(ClassLevel pLevel) {
 		return _level == pLevel;
 	}
 	
-	public final ClassLevel getLevel()
-	{
+	public final ClassLevel getLevel() {
 		return _level;
 	}
 }

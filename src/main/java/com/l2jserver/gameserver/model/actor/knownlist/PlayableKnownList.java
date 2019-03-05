@@ -20,16 +20,13 @@ package com.l2jserver.gameserver.model.actor.knownlist;
 
 import com.l2jserver.gameserver.model.actor.L2Playable;
 
-public class PlayableKnownList extends CharKnownList
-{
-	public PlayableKnownList(L2Playable activeChar)
-	{
+public class PlayableKnownList extends CharKnownList {
+	public PlayableKnownList(L2Playable activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public L2Playable getActiveChar()
-	{
+	public L2Playable getActiveChar() {
 		return (L2Playable) super.getActiveChar();
 	}
 }

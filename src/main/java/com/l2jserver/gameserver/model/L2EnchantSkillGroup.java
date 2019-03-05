@@ -23,48 +23,40 @@ import java.util.List;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public final class L2EnchantSkillGroup
-{
+public final class L2EnchantSkillGroup {
 	private final int _id;
 	private final List<EnchantSkillHolder> _enchantDetails = new ArrayList<>();
 	
-	public L2EnchantSkillGroup(int id)
-	{
+	public L2EnchantSkillGroup(int id) {
 		_id = id;
 	}
 	
-	public void addEnchantDetail(EnchantSkillHolder detail)
-	{
+	public void addEnchantDetail(EnchantSkillHolder detail) {
 		_enchantDetails.add(detail);
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public List<EnchantSkillHolder> getEnchantGroupDetails()
-	{
+	public List<EnchantSkillHolder> getEnchantGroupDetails() {
 		return _enchantDetails;
 	}
 	
-	public static class EnchantSkillHolder
-	{
+	public static class EnchantSkillHolder {
 		private final int _level;
 		private final int _adenaCost;
 		private final int _expCost;
 		private final int _spCost;
 		private final byte[] _rate;
 		
-		public EnchantSkillHolder(StatsSet set)
-		{
+		public EnchantSkillHolder(StatsSet set) {
 			_level = set.getInt("level");
 			_adenaCost = set.getInt("adena");
 			_expCost = set.getInt("exp");
 			_spCost = set.getInt("sp");
 			_rate = new byte[24];
-			for (int i = 0; i < 24; i++)
-			{
+			for (int i = 0; i < 24; i++) {
 				_rate[i] = set.getByte("chance" + (76 + i), (byte) 0);
 			}
 		}
@@ -72,33 +64,27 @@ public final class L2EnchantSkillGroup
 		/**
 		 * @return Returns the level.
 		 */
-		public int getLevel()
-		{
+		public int getLevel() {
 			return _level;
 		}
 		
 		/**
 		 * @return Returns the spCost.
 		 */
-		public int getSpCost()
-		{
+		public int getSpCost() {
 			return _spCost;
 		}
 		
-		public int getExpCost()
-		{
+		public int getExpCost() {
 			return _expCost;
 		}
 		
-		public int getAdenaCost()
-		{
+		public int getAdenaCost() {
 			return _adenaCost;
 		}
 		
-		public byte getRate(L2PcInstance ply)
-		{
-			if (ply.getLevel() < 76)
-			{
+		public byte getRate(L2PcInstance ply) {
+			if (ply.getLevel() < 76) {
 				return 0;
 			}
 			return _rate[ply.getLevel() - 76];

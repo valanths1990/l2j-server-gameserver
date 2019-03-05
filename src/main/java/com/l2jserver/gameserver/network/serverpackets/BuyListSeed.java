@@ -27,39 +27,32 @@ import com.l2jserver.gameserver.model.SeedProduction;
 /**
  * @author l3x
  */
-public final class BuyListSeed extends L2GameServerPacket
-{
+public final class BuyListSeed extends L2GameServerPacket {
 	private final int _manorId;
 	private final long _money;
 	private final List<SeedProduction> _list = new ArrayList<>();
 	
-	public BuyListSeed(long currentMoney, int castleId)
-	{
+	public BuyListSeed(long currentMoney, int castleId) {
 		_money = currentMoney;
 		_manorId = castleId;
 		
-		for (SeedProduction s : CastleManorManager.getInstance().getSeedProduction(castleId, false))
-		{
-			if ((s.getAmount() > 0) && (s.getPrice() > 0))
-			{
+		for (SeedProduction s : CastleManorManager.getInstance().getSeedProduction(castleId, false)) {
+			if ((s.getAmount() > 0) && (s.getPrice() > 0)) {
 				_list.add(s);
 			}
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xe9);
 		
 		writeQ(_money); // current money
 		writeD(_manorId); // manor id
 		
-		if (!_list.isEmpty())
-		{
+		if (!_list.isEmpty()) {
 			writeH(_list.size()); // list length
-			for (SeedProduction s : _list)
-			{
+			for (SeedProduction s : _list) {
 				writeD(s.getId());
 				writeD(s.getId());
 				writeD(0x00);
@@ -75,8 +68,7 @@ public final class BuyListSeed extends L2GameServerPacket
 				writeD(-9999); // Time
 				writeH(0x00); // Element Type
 				writeH(0x00); // Element Power
-				for (byte i = 0; i < 6; i++)
-				{
+				for (byte i = 0; i < 6; i++) {
 					writeH(0x00);
 				}
 				// Enchant Effects
@@ -86,9 +78,7 @@ public final class BuyListSeed extends L2GameServerPacket
 				writeQ(s.getPrice()); // price
 			}
 			_list.clear();
-		}
-		else
-		{
+		} else {
 			writeH(0x00);
 		}
 	}

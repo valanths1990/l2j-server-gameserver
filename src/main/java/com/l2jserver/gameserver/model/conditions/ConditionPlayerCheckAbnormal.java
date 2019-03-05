@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Condition implementation to verify player's abnormal type and level.
  * @author Zoey76
  */
-public class ConditionPlayerCheckAbnormal extends Condition
-{
+public class ConditionPlayerCheckAbnormal extends Condition {
 	private final AbnormalType _type;
 	private final int _level;
 	
@@ -37,8 +36,7 @@ public class ConditionPlayerCheckAbnormal extends Condition
 	 * Instantiates a new condition player check abnormal.
 	 * @param type the abnormal type
 	 */
-	public ConditionPlayerCheckAbnormal(AbnormalType type)
-	{
+	public ConditionPlayerCheckAbnormal(AbnormalType type) {
 		_type = type;
 		_level = -1;
 	}
@@ -48,15 +46,13 @@ public class ConditionPlayerCheckAbnormal extends Condition
 	 * @param type the abnormal type
 	 * @param level the abnormal level
 	 */
-	public ConditionPlayerCheckAbnormal(AbnormalType type, int level)
-	{
+	public ConditionPlayerCheckAbnormal(AbnormalType type, int level) {
 		_type = type;
 		_level = level;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final BuffInfo info = effector.getEffectList().getBuffInfoByAbnormalType(_type);
 		return ((info != null) && ((_level == -1) || (_level >= info.getSkill().getAbnormalLvl())));
 	}

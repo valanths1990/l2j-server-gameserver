@@ -144,8 +144,7 @@ public class CharacterSelect extends L2GameClientPacket {
 					CharSelected cs = new CharSelected(cha, client.getSessionId().playOkID1);
 					sendPacket(cs);
 				}
-			}
-			finally {
+			} finally {
 				client.getActiveCharLock().unlock();
 			}
 			

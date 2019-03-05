@@ -28,16 +28,14 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * An instantly executed event when L2Character is attacked by L2Character.
  * @author UnAfraid
  */
-public class OnCreatureSkillUse implements IBaseEvent
-{
+public class OnCreatureSkillUse implements IBaseEvent {
 	private final L2Character _caster;
 	private final Skill _skill;
 	private final boolean _simultaneously;
 	private final L2Character _target;
 	private final L2Object[] _targets;
 	
-	public OnCreatureSkillUse(L2Character caster, Skill skill, boolean simultaneously, L2Character target, L2Object[] targets)
-	{
+	public OnCreatureSkillUse(L2Character caster, Skill skill, boolean simultaneously, L2Character target, L2Object[] targets) {
 		_caster = caster;
 		_skill = skill;
 		_simultaneously = simultaneously;
@@ -45,34 +43,28 @@ public class OnCreatureSkillUse implements IBaseEvent
 		_targets = targets;
 	}
 	
-	public final L2Character getCaster()
-	{
+	public final L2Character getCaster() {
 		return _caster;
 	}
 	
-	public Skill getSkill()
-	{
+	public Skill getSkill() {
 		return _skill;
 	}
 	
-	public boolean isSimultaneously()
-	{
+	public boolean isSimultaneously() {
 		return _simultaneously;
 	}
 	
-	public final L2Character getTarget()
-	{
+	public final L2Character getTarget() {
 		return _target;
 	}
 	
-	public L2Object[] getTargets()
-	{
+	public L2Object[] getTargets() {
 		return _targets;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_CREATURE_SKILL_USE;
 	}
 }

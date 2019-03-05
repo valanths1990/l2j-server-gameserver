@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Player DAO interface.
  * @author Zoey76
  */
-public interface PlayerDAO
-{
+public interface PlayerDAO {
 	void storeCharBase(L2PcInstance player);
 	
 	/**

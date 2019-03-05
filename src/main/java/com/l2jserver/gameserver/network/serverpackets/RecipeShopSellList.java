@@ -21,33 +21,26 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.L2ManufactureItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class RecipeShopSellList extends L2GameServerPacket
-{
+public class RecipeShopSellList extends L2GameServerPacket {
 	private final L2PcInstance _buyer, _manufacturer;
 	
-	public RecipeShopSellList(L2PcInstance buyer, L2PcInstance manufacturer)
-	{
+	public RecipeShopSellList(L2PcInstance buyer, L2PcInstance manufacturer) {
 		_buyer = buyer;
 		_manufacturer = manufacturer;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xDF);
 		writeD(_manufacturer.getObjectId());
 		writeD((int) _manufacturer.getCurrentMp());// Creator's MP
 		writeD(_manufacturer.getMaxMp());// Creator's MP
 		writeQ(_buyer.getAdena());// Buyer Adena
-		if (!_manufacturer.hasManufactureShop())
-		{
+		if (!_manufacturer.hasManufactureShop()) {
 			writeD(0x00);
-		}
-		else
-		{
+		} else {
 			writeD(_manufacturer.getManufactureItems().size());
-			for (L2ManufactureItem temp : _manufacturer.getManufactureItems().values())
-			{
+			for (L2ManufactureItem temp : _manufacturer.getManufactureItems().values()) {
 				writeD(temp.getRecipeId());
 				writeD(0x00); // unknown
 				writeQ(temp.getCost());

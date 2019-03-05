@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author -Wooden-
  */
-public class ShowPCCafeCouponShowUI extends L2GameServerPacket
-{
+public class ShowPCCafeCouponShowUI extends L2GameServerPacket {
 	public static final ShowPCCafeCouponShowUI STATIC_PACKET = new ShowPCCafeCouponShowUI();
 	
-	private ShowPCCafeCouponShowUI()
-	{
+	private ShowPCCafeCouponShowUI() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x44);
 	}

@@ -38,31 +38,24 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Dawn/Dusk Seven Signs Priest Instance
  * @author Tempy
  */
-public class L2SignsPriestInstance extends L2Npc
-{
+public class L2SignsPriestInstance extends L2Npc {
 	private static final Logger LOG = LoggerFactory.getLogger(L2SignsPriestInstance.class);
 	
-	public L2SignsPriestInstance(L2NpcTemplate template)
-	{
+	public L2SignsPriestInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2SignsPriestInstance);
 	}
 	
 	@Override
-	public void onBypassFeedback(L2PcInstance player, String command)
-	{
-		if ((player.getLastFolkNPC() == null) || (player.getLastFolkNPC().getObjectId() != getObjectId()))
-		{
+	public void onBypassFeedback(L2PcInstance player, String command) {
+		if ((player.getLastFolkNPC() == null) || (player.getLastFolkNPC().getObjectId() != getObjectId())) {
 			return;
 		}
 		
-		if (command.startsWith("SevenSignsDesc"))
-		{
+		if (command.startsWith("SevenSignsDesc")) {
 			int val = Integer.parseInt(command.substring(15));
 			showChatWindow(player, val, null, true);
-		}
-		else if (command.startsWith("SevenSigns"))
-		{
+		} else if (command.startsWith("SevenSigns")) {
 			SystemMessage sm;
 			
 			String path;
@@ -74,50 +67,36 @@ public class L2SignsPriestInstance extends L2Npc
 			
 			int val = Integer.parseInt(command.substring(11, 12).trim());
 			
-			if (command.length() > 12)
-			{
+			if (command.length() > 12) {
 				val = Integer.parseInt(command.substring(11, 13).trim());
 			}
 			
-			if (command.length() > 13)
-			{
-				try
-				{
+			if (command.length() > 13) {
+				try {
 					cabal = Integer.parseInt(command.substring(14, 15).trim());
-				}
-				catch (Exception e)
-				{
-					try
-					{
+				} catch (Exception e) {
+					try {
 						cabal = Integer.parseInt(command.substring(13, 14).trim());
-					}
-					catch (Exception e2)
-					{
-						try
-						{
+					} catch (Exception e2) {
+						try {
 							StringTokenizer st = new StringTokenizer(command.trim());
 							st.nextToken();
 							cabal = Integer.parseInt(st.nextToken());
-						}
-						catch (Exception e3)
-						{
+						} catch (Exception e3) {
 							LOG.warn("Failed to retrieve cabal from bypass command. NpcId: {},  Command: {}", getId(), command);
 						}
 					}
 				}
 			}
 			
-			switch (val)
-			{
+			switch (val) {
 				case 2: // Purchase Record of the Seven Signs
-					if (!player.getInventory().validateCapacity(1))
-					{
+					if (!player.getInventory().validateCapacity(1)) {
 						player.sendPacket(SystemMessageId.SLOTS_FULL);
 						break;
 					}
 					
-					if (!player.reduceAdena("SevenSigns", SevenSigns.RECORD_SEVEN_SIGNS_COST, this, true))
-					{
+					if (!player.reduceAdena("SevenSigns", SevenSigns.RECORD_SEVEN_SIGNS_COST, this, true)) {
 						player.sendPacket(SystemMessageId.YOU_NOT_ENOUGH_ADENA);
 						break;
 					}
@@ -127,77 +106,55 @@ public class L2SignsPriestInstance extends L2Npc
 					sm.addItemName(SevenSigns.RECORD_SEVEN_SIGNS_ID);
 					player.sendPacket(sm);
 					
-					if (this instanceof L2DawnPriestInstance)
-					{
+					if (this instanceof L2DawnPriestInstance) {
 						showChatWindow(player, val, "dawn", false);
-					}
-					else
-					{
+					} else {
 						showChatWindow(player, val, "dusk", false);
 					}
 					break;
 				case 33: // "I want to participate" request
 					int oldCabal = SevenSigns.getInstance().getPlayerCabal(player.getObjectId());
 					
-					if (oldCabal != SevenSigns.CABAL_NULL)
-					{
-						if (this instanceof L2DawnPriestInstance)
-						{
+					if (oldCabal != SevenSigns.CABAL_NULL) {
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, val, "dawn_member", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, val, "dusk_member", false);
 						}
 						return;
-					}
-					else if (player.getClassId().level() == 0)
-					{
-						if (this instanceof L2DawnPriestInstance)
-						{
+					} else if (player.getClassId().level() == 0) {
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, val, "dawn_firstclass", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, val, "dusk_firstclass", false);
 						}
 						return;
-					}
-					else if ((cabal == SevenSigns.CABAL_DUSK) && Config.ALT_GAME_CASTLE_DUSK) // dusk
+					} else if ((cabal == SevenSigns.CABAL_DUSK) && Config.ALT_GAME_CASTLE_DUSK) // dusk
 					{
 						// castle owners cannot participate with dusk side
-						if ((player.getClan() != null) && (player.getClan().getCastleId() > 0))
-						{
+						if ((player.getClan() != null) && (player.getClan().getCastleId() > 0)) {
 							showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_33_dusk_no.htm");
 							break;
 						}
-					}
-					else if ((cabal == SevenSigns.CABAL_DAWN) && Config.ALT_GAME_CASTLE_DAWN) // dawn
+					} else if ((cabal == SevenSigns.CABAL_DAWN) && Config.ALT_GAME_CASTLE_DAWN) // dawn
 					{
 						// clans without castle need to pay participation fee
-						if ((player.getClan() == null) || (player.getClan().getCastleId() == 0))
-						{
+						if ((player.getClan() == null) || (player.getClan().getCastleId() == 0)) {
 							showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_33_dawn_fee.htm");
 							break;
 						}
 					}
 					
-					if (this instanceof L2DawnPriestInstance)
-					{
+					if (this instanceof L2DawnPriestInstance) {
 						showChatWindow(player, val, "dawn", false);
-					}
-					else
-					{
+					} else {
 						showChatWindow(player, val, "dusk", false);
 					}
 					break;
 				case 34: // Pay the participation fee request
-					if ((player.getClassId().level() > 0) && ((player.getAdena() >= Config.SSQ_JOIN_DAWN_ADENA_FEE) || (player.getInventory().getInventoryItemCount(Config.SSQ_MANORS_AGREEMENT_ID, -1) > 0)))
-					{
+					if ((player.getClassId().level() > 0) && ((player.getAdena() >= Config.SSQ_JOIN_DAWN_ADENA_FEE) || (player.getInventory().getInventoryItemCount(Config.SSQ_MANORS_AGREEMENT_ID, -1) > 0))) {
 						showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_33_dawn.htm");
-					}
-					else
-					{
+					} else {
 						showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_33_dawn_no.htm");
 					}
 					break;
@@ -208,10 +165,8 @@ public class L2SignsPriestInstance extends L2Npc
 				case 4: // Join a Cabal - SevenSigns 4 [0]1 x
 					int newSeal = Integer.parseInt(command.substring(15));
 					
-					if (player.getClassId().level() >= 1)
-					{
-						if ((cabal == SevenSigns.CABAL_DUSK) && Config.ALT_GAME_CASTLE_DUSK)
-						{
+					if (player.getClassId().level() >= 1) {
+						if ((cabal == SevenSigns.CABAL_DUSK) && Config.ALT_GAME_CASTLE_DUSK) {
 							if ((player.getClan() != null) && (player.getClan().getCastleId() > 0)) // even if in htmls is said that ally can have castle too, but its not
 							{
 								showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_33_dusk_no.htm");
@@ -219,25 +174,18 @@ public class L2SignsPriestInstance extends L2Npc
 							}
 						}
 						// If the player is trying to join the Lords of Dawn, check if they are carrying a Lord's certificate. If not then try to take the required amount of adena instead.
-						if (Config.ALT_GAME_CASTLE_DAWN && (cabal == SevenSigns.CABAL_DAWN))
-						{
+						if (Config.ALT_GAME_CASTLE_DAWN && (cabal == SevenSigns.CABAL_DAWN)) {
 							boolean allowJoinDawn = false;
 							
-							if ((player.getClan() != null) && (player.getClan().getCastleId() > 0))
-							{
+							if ((player.getClan() != null) && (player.getClan().getCastleId() > 0)) {
 								allowJoinDawn = true;
-							}
-							else if (player.destroyItemByItemId("SevenSigns", Config.SSQ_MANORS_AGREEMENT_ID, 1, this, true))
-							{
+							} else if (player.destroyItemByItemId("SevenSigns", Config.SSQ_MANORS_AGREEMENT_ID, 1, this, true)) {
 								allowJoinDawn = true;
-							}
-							else if (player.reduceAdena("SevenSigns", Config.SSQ_JOIN_DAWN_ADENA_FEE, this, true))
-							{
+							} else if (player.reduceAdena("SevenSigns", Config.SSQ_JOIN_DAWN_ADENA_FEE, this, true)) {
 								allowJoinDawn = true;
 							}
 							
-							if (!allowJoinDawn)
-							{
+							if (!allowJoinDawn) {
 								showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_33_dawn_fee.htm");
 								return;
 							}
@@ -245,18 +193,14 @@ public class L2SignsPriestInstance extends L2Npc
 					}
 					SevenSigns.getInstance().setPlayerInfo(player.getObjectId(), cabal, newSeal);
 					
-					if (cabal == SevenSigns.CABAL_DAWN)
-					{
+					if (cabal == SevenSigns.CABAL_DAWN) {
 						player.sendPacket(SystemMessageId.SEVENSIGNS_PARTECIPATION_DAWN); // Joined Dawn
-					}
-					else
-					{
+					} else {
 						player.sendPacket(SystemMessageId.SEVENSIGNS_PARTECIPATION_DUSK); // Joined Dusk
 					}
 					
 					// Show a confirmation message to the user, indicating which seal they chose.
-					switch (newSeal)
-					{
+					switch (newSeal) {
 						case SevenSigns.SEAL_AVARICE:
 							player.sendPacket(SystemMessageId.FIGHT_FOR_AVARICE);
 							break;
@@ -271,25 +215,16 @@ public class L2SignsPriestInstance extends L2Npc
 					showChatWindow(player, 4, SevenSigns.getCabalShortName(cabal), false);
 					break;
 				case 5:
-					if (this instanceof L2DawnPriestInstance)
-					{
-						if (SevenSigns.getInstance().getPlayerCabal(player.getObjectId()) == SevenSigns.CABAL_NULL)
-						{
+					if (this instanceof L2DawnPriestInstance) {
+						if (SevenSigns.getInstance().getPlayerCabal(player.getObjectId()) == SevenSigns.CABAL_NULL) {
 							showChatWindow(player, val, "dawn_no", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, val, "dawn", false);
 						}
-					}
-					else
-					{
-						if (SevenSigns.getInstance().getPlayerCabal(player.getObjectId()) == SevenSigns.CABAL_NULL)
-						{
+					} else {
+						if (SevenSigns.getInstance().getPlayerCabal(player.getObjectId()) == SevenSigns.CABAL_NULL) {
 							showChatWindow(player, val, "dusk_no", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, val, "dusk", false);
 						}
 					}
@@ -314,52 +249,40 @@ public class L2SignsPriestInstance extends L2Npc
 					long greenContrib = 0;
 					long blueContrib = 0;
 					
-					try
-					{
+					try {
 						contributionCount = Long.parseLong(command.substring(19).trim());
-					}
-					catch (Exception NumberFormatException)
-					{
-						if (this instanceof L2DawnPriestInstance)
-						{
+					} catch (Exception NumberFormatException) {
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, 6, "dawn_failure", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, 6, "dusk_failure", false);
 						}
 						break;
 					}
 					
-					switch (contribStoneId)
-					{
+					switch (contribStoneId) {
 						case SevenSigns.SEAL_STONE_BLUE_ID:
 							blueContrib = (Config.ALT_MAXIMUM_PLAYER_CONTRIB - score) / SevenSigns.BLUE_CONTRIB_POINTS;
-							if (blueContrib > contribBlueStoneCount)
-							{
+							if (blueContrib > contribBlueStoneCount) {
 								blueContrib = contributionCount;
 							}
 							break;
 						case SevenSigns.SEAL_STONE_GREEN_ID:
 							greenContrib = (Config.ALT_MAXIMUM_PLAYER_CONTRIB - score) / SevenSigns.GREEN_CONTRIB_POINTS;
-							if (greenContrib > contribGreenStoneCount)
-							{
+							if (greenContrib > contribGreenStoneCount) {
 								greenContrib = contributionCount;
 							}
 							break;
 						case SevenSigns.SEAL_STONE_RED_ID:
 							redContrib = (Config.ALT_MAXIMUM_PLAYER_CONTRIB - score) / SevenSigns.RED_CONTRIB_POINTS;
-							if (redContrib > contribRedStoneCount)
-							{
+							if (redContrib > contribRedStoneCount) {
 								redContrib = contributionCount;
 							}
 							break;
 					}
 					
-					if (redContrib > 0)
-					{
-						if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_RED_ID, redContrib, this, false))
-						{
+					if (redContrib > 0) {
+						if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_RED_ID, redContrib, this, false)) {
 							contribStonesFound = true;
 							SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 							msg.addItemName(SevenSigns.SEAL_STONE_RED_ID);
@@ -367,10 +290,8 @@ public class L2SignsPriestInstance extends L2Npc
 							player.sendPacket(msg);
 						}
 					}
-					if (greenContrib > 0)
-					{
-						if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_GREEN_ID, greenContrib, this, false))
-						{
+					if (greenContrib > 0) {
+						if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_GREEN_ID, greenContrib, this, false)) {
 							contribStonesFound = true;
 							SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 							msg.addItemName(SevenSigns.SEAL_STONE_GREEN_ID);
@@ -378,10 +299,8 @@ public class L2SignsPriestInstance extends L2Npc
 							player.sendPacket(msg);
 						}
 					}
-					if (blueContrib > 0)
-					{
-						if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_BLUE_ID, blueContrib, this, false))
-						{
+					if (blueContrib > 0) {
+						if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_BLUE_ID, blueContrib, this, false)) {
 							contribStonesFound = true;
 							SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 							msg.addItemName(SevenSigns.SEAL_STONE_BLUE_ID);
@@ -390,30 +309,21 @@ public class L2SignsPriestInstance extends L2Npc
 						}
 					}
 					
-					if (!contribStonesFound)
-					{
-						if (this instanceof L2DawnPriestInstance)
-						{
+					if (!contribStonesFound) {
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, 6, "dawn_low_stones", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, 6, "dusk_low_stones", false);
 						}
-					}
-					else
-					{
+					} else {
 						score = SevenSigns.getInstance().addPlayerStoneContrib(player.getObjectId(), blueContrib, greenContrib, redContrib);
 						sm = SystemMessage.getSystemMessage(SystemMessageId.CONTRIB_SCORE_INCREASED_S1);
 						sm.addLong(score);
 						player.sendPacket(sm);
 						
-						if (this instanceof L2DawnPriestInstance)
-						{
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, 6, "dawn", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, 6, "dusk", false);
 						}
 					}
@@ -432,12 +342,9 @@ public class L2SignsPriestInstance extends L2Npc
 					long contribScore = SevenSigns.getInstance().getPlayerContribScore(player.getObjectId());
 					boolean stonesFound = false;
 					
-					if (contribScore == Config.ALT_MAXIMUM_PLAYER_CONTRIB)
-					{
+					if (contribScore == Config.ALT_MAXIMUM_PLAYER_CONTRIB) {
 						player.sendPacket(SystemMessageId.CONTRIB_SCORE_EXCEEDED);
-					}
-					else
-					{
+					} else {
 						long redContribCount = 0;
 						long greenContribCount = 0;
 						long blueContribCount = 0;
@@ -448,8 +355,7 @@ public class L2SignsPriestInstance extends L2Npc
 						long stoneCountContr = 0;
 						int stoneIdContr = 0;
 						
-						switch (stoneType)
-						{
+						switch (stoneType) {
 							case 1:
 								contribStoneColor = "Blue";
 								stoneColorContr = "blue";
@@ -471,29 +377,24 @@ public class L2SignsPriestInstance extends L2Npc
 							case 4:
 								long tempContribScore = contribScore;
 								redContribCount = (Config.ALT_MAXIMUM_PLAYER_CONTRIB - tempContribScore) / SevenSigns.RED_CONTRIB_POINTS;
-								if (redContribCount > redStoneCount)
-								{
+								if (redContribCount > redStoneCount) {
 									redContribCount = redStoneCount;
 								}
 								
 								tempContribScore += redContribCount * SevenSigns.RED_CONTRIB_POINTS;
 								greenContribCount = (Config.ALT_MAXIMUM_PLAYER_CONTRIB - tempContribScore) / SevenSigns.GREEN_CONTRIB_POINTS;
-								if (greenContribCount > greenStoneCount)
-								{
+								if (greenContribCount > greenStoneCount) {
 									greenContribCount = greenStoneCount;
 								}
 								
 								tempContribScore += greenContribCount * SevenSigns.GREEN_CONTRIB_POINTS;
 								blueContribCount = (Config.ALT_MAXIMUM_PLAYER_CONTRIB - tempContribScore) / SevenSigns.BLUE_CONTRIB_POINTS;
-								if (blueContribCount > blueStoneCount)
-								{
+								if (blueContribCount > blueStoneCount) {
 									blueContribCount = blueStoneCount;
 								}
 								
-								if (redContribCount > 0)
-								{
-									if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_RED_ID, redContribCount, this, false))
-									{
+								if (redContribCount > 0) {
+									if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_RED_ID, redContribCount, this, false)) {
 										stonesFound = true;
 										SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 										msg.addItemName(SevenSigns.SEAL_STONE_RED_ID);
@@ -501,10 +402,8 @@ public class L2SignsPriestInstance extends L2Npc
 										player.sendPacket(msg);
 									}
 								}
-								if (greenContribCount > 0)
-								{
-									if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_GREEN_ID, greenContribCount, this, false))
-									{
+								if (greenContribCount > 0) {
+									if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_GREEN_ID, greenContribCount, this, false)) {
 										stonesFound = true;
 										SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 										msg.addItemName(SevenSigns.SEAL_STONE_GREEN_ID);
@@ -512,10 +411,8 @@ public class L2SignsPriestInstance extends L2Npc
 										player.sendPacket(msg);
 									}
 								}
-								if (blueContribCount > 0)
-								{
-									if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_BLUE_ID, blueContribCount, this, false))
-									{
+								if (blueContribCount > 0) {
+									if (player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_BLUE_ID, blueContribCount, this, false)) {
 										stonesFound = true;
 										SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.S2_S1_DISAPPEARED);
 										msg.addItemName(SevenSigns.SEAL_STONE_BLUE_ID);
@@ -524,49 +421,36 @@ public class L2SignsPriestInstance extends L2Npc
 									}
 								}
 								
-								if (!stonesFound)
-								{
-									if (this instanceof L2DawnPriestInstance)
-									{
+								if (!stonesFound) {
+									if (this instanceof L2DawnPriestInstance) {
 										showChatWindow(player, val, "dawn_no_stones", false);
-									}
-									else
-									{
+									} else {
 										showChatWindow(player, val, "dusk_no_stones", false);
 									}
-								}
-								else
-								{
+								} else {
 									contribScore = SevenSigns.getInstance().addPlayerStoneContrib(player.getObjectId(), blueContribCount, greenContribCount, redContribCount);
 									sm = SystemMessage.getSystemMessage(SystemMessageId.CONTRIB_SCORE_INCREASED_S1);
 									sm.addLong(contribScore);
 									player.sendPacket(sm);
 									
-									if (this instanceof L2DawnPriestInstance)
-									{
+									if (this instanceof L2DawnPriestInstance) {
 										showChatWindow(player, 6, "dawn", false);
-									}
-									else
-									{
+									} else {
 										showChatWindow(player, 6, "dusk", false);
 									}
 								}
 								return;
 						}
 						
-						if (this instanceof L2DawnPriestInstance)
-						{
+						if (this instanceof L2DawnPriestInstance) {
 							path = SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_6_dawn_contribute.htm";
-						}
-						else
-						{
+						} else {
 							path = SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_6_dusk_contribute.htm";
 						}
 						
 						String contentContr = HtmCache.getInstance().getHtm(player.getHtmlPrefix(), path);
 						
-						if (contentContr != null)
-						{
+						if (contentContr != null) {
 							contentContr = contentContr.replaceAll("%contribStoneColor%", contribStoneColor);
 							contentContr = contentContr.replaceAll("%stoneColor%", stoneColorContr);
 							contentContr = contentContr.replaceAll("%stoneCount%", String.valueOf(stoneCountContr));
@@ -576,9 +460,7 @@ public class L2SignsPriestInstance extends L2Npc
 							final NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
 							html.setHtml(contentContr);
 							player.sendPacket(html);
-						}
-						else
-						{
+						} else {
 							LOG.warn("Problem with HTML text {}", path);
 						}
 					}
@@ -586,28 +468,21 @@ public class L2SignsPriestInstance extends L2Npc
 				case 7: // Exchange Ancient Adena for Adena - SevenSigns 7 xxxxxxx
 					long ancientAdenaConvert = 0;
 					
-					try
-					{
+					try {
 						ancientAdenaConvert = Long.parseLong(command.substring(13).trim());
-					}
-					catch (NumberFormatException e)
-					{
+					} catch (NumberFormatException e) {
 						showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "blkmrkt_3.htm");
 						break;
-					}
-					catch (StringIndexOutOfBoundsException e)
-					{
+					} catch (StringIndexOutOfBoundsException e) {
 						showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "blkmrkt_3.htm");
 						break;
 					}
 					
-					if (ancientAdenaConvert < 1)
-					{
+					if (ancientAdenaConvert < 1) {
 						showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "blkmrkt_3.htm");
 						break;
 					}
-					if (ancientAdenaAmount < ancientAdenaConvert)
-					{
+					if (ancientAdenaAmount < ancientAdenaConvert) {
 						showChatWindow(player, SevenSigns.SEVEN_SIGNS_HTML_PATH + "blkmrkt_4.htm");
 						break;
 					}
@@ -621,18 +496,13 @@ public class L2SignsPriestInstance extends L2Npc
 					int playerCabal = SevenSigns.getInstance().getPlayerCabal(player.getObjectId());
 					int winningCabal = SevenSigns.getInstance().getCabalHighestScore();
 					
-					if (SevenSigns.getInstance().isSealValidationPeriod() && (playerCabal == winningCabal))
-					{
+					if (SevenSigns.getInstance().isSealValidationPeriod() && (playerCabal == winningCabal)) {
 						int ancientAdenaReward = SevenSigns.getInstance().getAncientAdenaReward(player.getObjectId(), true);
 						
-						if (ancientAdenaReward < 3)
-						{
-							if (this instanceof L2DawnPriestInstance)
-							{
+						if (ancientAdenaReward < 3) {
+							if (this instanceof L2DawnPriestInstance) {
 								showChatWindow(player, 9, "dawn_b", false);
-							}
-							else
-							{
+							} else {
 								showChatWindow(player, 9, "dusk_b", false);
 							}
 							break;
@@ -640,19 +510,15 @@ public class L2SignsPriestInstance extends L2Npc
 						
 						player.addAncientAdena("SevenSigns", ancientAdenaReward, this, true);
 						
-						if (this instanceof L2DawnPriestInstance)
-						{
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, 9, "dawn_a", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, 9, "dusk_a", false);
 						}
 					}
 					break;
 				case 11: // Teleport to Hunting Grounds
-					try
-					{
+					try {
 						String portInfo = command.substring(14).trim();
 						StringTokenizer st = new StringTokenizer(portInfo);
 						
@@ -662,28 +528,21 @@ public class L2SignsPriestInstance extends L2Npc
 						
 						long ancientAdenaCost = Long.parseLong(st.nextToken());
 						
-						if (ancientAdenaCost > 0)
-						{
-							if (!player.reduceAncientAdena("SevenSigns", ancientAdenaCost, this, true))
-							{
+						if (ancientAdenaCost > 0) {
+							if (!player.reduceAncientAdena("SevenSigns", ancientAdenaCost, this, true)) {
 								break;
 							}
 						}
 						
 						player.teleToLocation(x, y, z);
-					}
-					catch (Exception e)
-					{
+					} catch (Exception e) {
 						LOG.warn("SevenSigns: Error occurred while teleporting player: {}", e);
 					}
 					break;
 				case 16:
-					if (this instanceof L2DawnPriestInstance)
-					{
+					if (this instanceof L2DawnPriestInstance) {
 						showChatWindow(player, val, "dawn", false);
-					}
-					else
-					{
+					} else {
 						showChatWindow(player, val, "dusk", false);
 					}
 					break;
@@ -696,8 +555,7 @@ public class L2SignsPriestInstance extends L2Npc
 					
 					String stoneColor = null;
 					
-					switch (stoneType)
-					{
+					switch (stoneType) {
 						case 1:
 							stoneColor = "blue";
 							stoneId = SevenSigns.SEAL_STONE_BLUE_ID;
@@ -725,40 +583,30 @@ public class L2SignsPriestInstance extends L2Npc
 							
 							ancientAdenaRewardAll = SevenSigns.calcAncientAdenaReward(blueStoneCountAll, greenStoneCountAll, redStoneCountAll);
 							
-							if (ancientAdenaRewardAll == 0)
-							{
-								if (this instanceof L2DawnPriestInstance)
-								{
+							if (ancientAdenaRewardAll == 0) {
+								if (this instanceof L2DawnPriestInstance) {
 									showChatWindow(player, 18, "dawn_no_stones", false);
-								}
-								else
-								{
+								} else {
 									showChatWindow(player, 18, "dusk_no_stones", false);
 								}
 								return;
 							}
 							
-							if (blueStoneCountAll > 0)
-							{
+							if (blueStoneCountAll > 0) {
 								player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_BLUE_ID, blueStoneCountAll, this, true);
 							}
-							if (greenStoneCountAll > 0)
-							{
+							if (greenStoneCountAll > 0) {
 								player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_GREEN_ID, greenStoneCountAll, this, true);
 							}
-							if (redStoneCountAll > 0)
-							{
+							if (redStoneCountAll > 0) {
 								player.destroyItemByItemId("SevenSigns", SevenSigns.SEAL_STONE_RED_ID, redStoneCountAll, this, true);
 							}
 							
 							player.addAncientAdena("SevenSigns", ancientAdenaRewardAll, this, true);
 							
-							if (this instanceof L2DawnPriestInstance)
-							{
+							if (this instanceof L2DawnPriestInstance) {
 								showChatWindow(player, 18, "dawn", false);
-							}
-							else
-							{
+							} else {
 								showChatWindow(player, 18, "dusk", false);
 							}
 							return;
@@ -766,24 +614,19 @@ public class L2SignsPriestInstance extends L2Npc
 					
 					L2ItemInstance stoneInstance = player.getInventory().getItemByItemId(stoneId);
 					
-					if (stoneInstance != null)
-					{
+					if (stoneInstance != null) {
 						stoneCount = stoneInstance.getCount();
 					}
 					
-					if (this instanceof L2DawnPriestInstance)
-					{
+					if (this instanceof L2DawnPriestInstance) {
 						path = SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_17_dawn.htm";
-					}
-					else
-					{
+					} else {
 						path = SevenSigns.SEVEN_SIGNS_HTML_PATH + "signs_17_dusk.htm";
 					}
 					
 					String content = HtmCache.getInstance().getHtm(player.getHtmlPrefix(), path);
 					
-					if (content != null)
-					{
+					if (content != null) {
 						content = content.replaceAll("%stoneColor%", stoneColor);
 						content = content.replaceAll("%stoneValue%", String.valueOf(stoneValue));
 						content = content.replaceAll("%stoneCount%", String.valueOf(stoneCount));
@@ -793,9 +636,7 @@ public class L2SignsPriestInstance extends L2Npc
 						final NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
 						html.setHtml(content);
 						player.sendPacket(html);
-					}
-					else
-					{
+					} else {
 						LOG.warn("Problem with HTML text {} signs_17.htm: {}", SevenSigns.SEVEN_SIGNS_HTML_PATH, path);
 					}
 					break;
@@ -803,18 +644,12 @@ public class L2SignsPriestInstance extends L2Npc
 					int convertStoneId = Integer.parseInt(command.substring(14, 18));
 					long convertCount = 0;
 					
-					try
-					{
+					try {
 						convertCount = Long.parseLong(command.substring(19).trim());
-					}
-					catch (Exception NumberFormatException)
-					{
-						if (this instanceof L2DawnPriestInstance)
-						{
+					} catch (Exception NumberFormatException) {
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, 18, "dawn_failed", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, 18, "dusk_failed", false);
 						}
 						break;
@@ -822,15 +657,12 @@ public class L2SignsPriestInstance extends L2Npc
 					
 					L2ItemInstance convertItem = player.getInventory().getItemByItemId(convertStoneId);
 					
-					if (convertItem != null)
-					{
+					if (convertItem != null) {
 						long ancientAdenaReward = 0;
 						long totalCount = convertItem.getCount();
 						
-						if ((convertCount <= totalCount) && (convertCount > 0))
-						{
-							switch (convertStoneId)
-							{
+						if ((convertCount <= totalCount) && (convertCount > 0)) {
+							switch (convertStoneId) {
 								case SevenSigns.SEAL_STONE_BLUE_ID:
 									ancientAdenaReward = SevenSigns.calcAncientAdenaReward(convertCount, 0, 0);
 									break;
@@ -842,41 +674,27 @@ public class L2SignsPriestInstance extends L2Npc
 									break;
 							}
 							
-							if (player.destroyItemByItemId("SevenSigns", convertStoneId, convertCount, this, true))
-							{
+							if (player.destroyItemByItemId("SevenSigns", convertStoneId, convertCount, this, true)) {
 								player.addAncientAdena("SevenSigns", ancientAdenaReward, this, true);
 								
-								if (this instanceof L2DawnPriestInstance)
-								{
+								if (this instanceof L2DawnPriestInstance) {
 									showChatWindow(player, 18, "dawn", false);
-								}
-								else
-								{
+								} else {
 									showChatWindow(player, 18, "dusk", false);
 								}
 							}
-						}
-						else
-						{
-							if (this instanceof L2DawnPriestInstance)
-							{
+						} else {
+							if (this instanceof L2DawnPriestInstance) {
 								showChatWindow(player, 18, "dawn_low_stones", false);
-							}
-							else
-							{
+							} else {
 								showChatWindow(player, 18, "dusk_low_stones", false);
 							}
 							break;
 						}
-					}
-					else
-					{
-						if (this instanceof L2DawnPriestInstance)
-						{
+					} else {
+						if (this instanceof L2DawnPriestInstance) {
 							showChatWindow(player, 18, "dawn_no_stones", false);
-						}
-						else
-						{
+						} else {
 							showChatWindow(player, 18, "dusk_no_stones", false);
 						}
 						break;
@@ -891,25 +709,18 @@ public class L2SignsPriestInstance extends L2Npc
 					break;
 				case 20: // Seal Status (for when joining a cabal)
 					StringBuilder contentBuffer = new StringBuilder();
-					if (this instanceof L2DawnPriestInstance)
-					{
+					if (this instanceof L2DawnPriestInstance) {
 						contentBuffer.append("<html><body>Priest of Dawn:<br><font color=\"LEVEL\">[ Seal Status ]</font><br>");
-					}
-					else
-					{
+					} else {
 						contentBuffer.append("<html><body>Dusk Priestess:<br><font color=\"LEVEL\">[ Status of the Seals ]</font><br>");
 					}
 					
-					for (int i = 1; i < 4; i++)
-					{
+					for (int i = 1; i < 4; i++) {
 						int sealOwner = SevenSigns.getInstance().getSealOwner(i);
 						
-						if (sealOwner != SevenSigns.CABAL_NULL)
-						{
+						if (sealOwner != SevenSigns.CABAL_NULL) {
 							contentBuffer.append("[" + SevenSigns.getSealName(i, false) + ": " + SevenSigns.getCabalName(sealOwner) + "]<br>");
-						}
-						else
-						{
+						} else {
 							contentBuffer.append("[" + SevenSigns.getSealName(i, false) + ": Nothingness]<br>");
 						}
 					}
@@ -924,15 +735,12 @@ public class L2SignsPriestInstance extends L2Npc
 					showChatWindow(player, val, null, false);
 					break;
 			}
-		}
-		else
-		{
+		} else {
 			super.onBypassFeedback(player, command);
 		}
 	}
 	
-	private void showChatWindow(L2PcInstance player, int val, String suffix, boolean isDescription)
-	{
+	private void showChatWindow(L2PcInstance player, int val, String suffix, boolean isDescription) {
 		String filename = SevenSigns.SEVEN_SIGNS_HTML_PATH;
 		
 		filename += (isDescription) ? "desc_" + val : "signs_" + val;

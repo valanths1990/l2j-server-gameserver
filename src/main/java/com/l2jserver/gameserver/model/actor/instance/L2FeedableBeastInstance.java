@@ -27,10 +27,8 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 // This class is only truly used by the handlers in order to check the correctness
 // of the target.  However, no additional tasks are needed, since they are all
 // handled by scripted AI.
-public class L2FeedableBeastInstance extends L2MonsterInstance
-{
-	public L2FeedableBeastInstance(L2NpcTemplate template)
-	{
+public class L2FeedableBeastInstance extends L2MonsterInstance {
+	public L2FeedableBeastInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2FeedableBeastInstance);
 	}

@@ -23,25 +23,18 @@ import com.l2jserver.gameserver.data.xml.impl.CategoryData;
 /**
  * @author UnAfraid
  */
-public enum MountType
-{
+public enum MountType {
 	NONE,
 	STRIDER,
 	WYVERN,
 	WOLF;
 	
-	public static MountType findByNpcId(int npcId)
-	{
-		if (CategoryData.getInstance().isInCategory(CategoryType.STRIDER, npcId))
-		{
+	public static MountType findByNpcId(int npcId) {
+		if (CategoryData.getInstance().isInCategory(CategoryType.STRIDER, npcId)) {
 			return STRIDER;
-		}
-		else if (CategoryData.getInstance().isInCategory(CategoryType.WYVERN_GROUP, npcId))
-		{
+		} else if (CategoryData.getInstance().isInCategory(CategoryType.WYVERN_GROUP, npcId)) {
 			return WYVERN;
-		}
-		else if (CategoryData.getInstance().isInCategory(CategoryType.WOLF_GROUP, npcId))
-		{
+		} else if (CategoryData.getInstance().isInCategory(CategoryType.WOLF_GROUP, npcId)) {
 			return WOLF;
 		}
 		return NONE;

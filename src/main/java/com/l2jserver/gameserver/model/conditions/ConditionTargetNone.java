@@ -26,19 +26,16 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetNone.
  * @author mkizub
  */
-public class ConditionTargetNone extends Condition
-{
+public class ConditionTargetNone extends Condition {
 	/**
 	 * Instantiates a new condition target none.
 	 */
-	public ConditionTargetNone()
-	{
+	public ConditionTargetNone() {
 		//
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effected == null);
 	}
 }

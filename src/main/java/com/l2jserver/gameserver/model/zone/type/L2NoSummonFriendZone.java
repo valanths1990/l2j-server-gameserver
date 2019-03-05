@@ -26,23 +26,19 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * A simple no summon zone
  * @author JIV
  */
-public class L2NoSummonFriendZone extends L2ZoneType
-{
+public class L2NoSummonFriendZone extends L2ZoneType {
 	
-	public L2NoSummonFriendZone(int id)
-	{
+	public L2NoSummonFriendZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
+	protected void onEnter(L2Character character) {
 		character.setInsideZone(ZoneId.NO_SUMMON_FRIEND, true);
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
+	protected void onExit(L2Character character) {
 		character.setInsideZone(ZoneId.NO_SUMMON_FRIEND, false);
 	}
 }

@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.enums.ShortcutType;
  * Shortcut DTO.
  * @author Zoey76
  */
-public class Shortcut
-{
+public class Shortcut {
 	/** Slot from 0 to 11. */
 	private final int _slot;
 	/** Page from 0 to 9. */
@@ -41,8 +40,7 @@ public class Shortcut
 	/** Shared reuse group. */
 	private int _sharedReuseGroup = -1;
 	
-	public Shortcut(int slot, int page, ShortcutType type, int id, int level, int characterType)
-	{
+	public Shortcut(int slot, int page, ShortcutType type, int id, int level, int characterType) {
 		_slot = slot;
 		_page = page;
 		_type = type;
@@ -55,8 +53,7 @@ public class Shortcut
 	 * Gets the shortcut ID.
 	 * @return the ID
 	 */
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
@@ -64,8 +61,7 @@ public class Shortcut
 	 * Gets the shortcut level.
 	 * @return the level
 	 */
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _level;
 	}
 	
@@ -73,8 +69,7 @@ public class Shortcut
 	 * Gets the shortcut page.
 	 * @return the page
 	 */
-	public int getPage()
-	{
+	public int getPage() {
 		return _page;
 	}
 	
@@ -82,8 +77,7 @@ public class Shortcut
 	 * Gets the shortcut slot.
 	 * @return the slot
 	 */
-	public int getSlot()
-	{
+	public int getSlot() {
 		return _slot;
 	}
 	
@@ -91,8 +85,7 @@ public class Shortcut
 	 * Gets the shortcut type.
 	 * @return the type
 	 */
-	public ShortcutType getType()
-	{
+	public ShortcutType getType() {
 		return _type;
 	}
 	
@@ -100,8 +93,7 @@ public class Shortcut
 	 * Gets the shortcut character type.
 	 * @return the character type
 	 */
-	public int getCharacterType()
-	{
+	public int getCharacterType() {
 		return _characterType;
 	}
 	
@@ -109,8 +101,7 @@ public class Shortcut
 	 * Gets the shared reuse group.
 	 * @return the shared reuse group
 	 */
-	public int getSharedReuseGroup()
-	{
+	public int getSharedReuseGroup() {
 		return _sharedReuseGroup;
 	}
 	
@@ -118,8 +109,7 @@ public class Shortcut
 	 * Sets the shared reuse group.
 	 * @param sharedReuseGroup the shared reuse group to set
 	 */
-	public void setSharedReuseGroup(int sharedReuseGroup)
-	{
+	public void setSharedReuseGroup(int sharedReuseGroup) {
 		_sharedReuseGroup = sharedReuseGroup;
 	}
 }

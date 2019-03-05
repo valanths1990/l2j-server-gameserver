@@ -24,15 +24,13 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author DS
  */
-public class ItemInfo
-{
+public class ItemInfo {
 	private final int _enchantLevel, _augmentId;
 	private final byte _elementId;
 	private final int _elementPower;
 	private final int[] _elementals = new int[6];
 	
-	public ItemInfo(L2ItemInstance item)
-	{
+	public ItemInfo(L2ItemInstance item) {
 		_enchantLevel = item.getEnchantLevel();
 		_augmentId = item.getAugmentation() != null ? item.getAugmentation().getAugmentationId() : 0;
 		_elementId = item.getAttackElementType();
@@ -45,8 +43,7 @@ public class ItemInfo
 		_elementals[5] = item.getElementDefAttr(Elementals.DARK);
 	}
 	
-	public ItemInfo(int enchantLevel)
-	{
+	public ItemInfo(int enchantLevel) {
 		_enchantLevel = enchantLevel;
 		_augmentId = 0;
 		_elementId = Elementals.NONE;
@@ -59,28 +56,23 @@ public class ItemInfo
 		_elementals[5] = 0;
 	}
 	
-	public final int getEnchantLevel()
-	{
+	public final int getEnchantLevel() {
 		return _enchantLevel;
 	}
 	
-	public final int getAugmentId()
-	{
+	public final int getAugmentId() {
 		return _augmentId;
 	}
 	
-	public final byte getElementId()
-	{
+	public final byte getElementId() {
 		return _elementId;
 	}
 	
-	public final int getElementPower()
-	{
+	public final int getElementPower() {
 		return _elementPower;
 	}
 	
-	public final int[] getElementals()
-	{
+	public final int[] getElementals() {
 		return _elementals;
 	}
 }

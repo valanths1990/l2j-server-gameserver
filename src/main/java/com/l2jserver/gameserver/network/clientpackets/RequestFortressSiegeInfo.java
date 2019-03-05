@@ -26,26 +26,20 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowFortressSiegeInfo;
 /**
  * @author KenM
  */
-public class RequestFortressSiegeInfo extends L2GameClientPacket
-{
+public class RequestFortressSiegeInfo extends L2GameClientPacket {
 	private static final String _C__D0_3F_REQUESTFORTRESSSIEGEINFO = "[C] D0:3F RequestFortressSiegeInfo";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2GameClient client = getClient();
-		if (client != null)
-		{
-			for (Fort fort : FortManager.getInstance().getForts())
-			{
-				if ((fort != null) && fort.getSiege().isInProgress())
-				{
+		if (client != null) {
+			for (Fort fort : FortManager.getInstance().getForts()) {
+				if ((fort != null) && fort.getSiege().isInProgress()) {
 					client.sendPacket(new ExShowFortressSiegeInfo(fort));
 				}
 			}
@@ -53,14 +47,12 @@ public class RequestFortressSiegeInfo extends L2GameClientPacket
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_3F_REQUESTFORTRESSSIEGEINFO;
 	}
 }

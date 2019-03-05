@@ -21,16 +21,13 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author Kerberos
  */
-public class AcquireSkillDone extends L2GameServerPacket
-{
-	public AcquireSkillDone()
-	{
+public class AcquireSkillDone extends L2GameServerPacket {
+	public AcquireSkillDone() {
 		//
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x94);
 	}
 }

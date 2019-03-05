@@ -32,39 +32,30 @@ import com.l2jserver.gameserver.util.Util;
  * Player Can Take Castle condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanTakeCastle extends Condition
-{
+public class ConditionPlayerCanTakeCastle extends Condition {
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return false;
 		}
 		
 		final L2PcInstance player = effector.getActingPlayer();
 		
-		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || !player.isClanLeader())
-		{
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || !player.isClanLeader()) {
 			return false;
 		}
 		
 		Castle castle = CastleManager.getInstance().getCastle(player);
 		SystemMessage sm;
-		if ((castle == null) || (castle.getResidenceId() <= 0) || !castle.getSiege().isInProgress() || (castle.getSiege().getAttackerClan(player.getClan()) == null))
-		{
+		if ((castle == null) || (castle.getResidenceId() <= 0) || !castle.getSiege().isInProgress() || (castle.getSiege().getAttackerClan(player.getClan()) == null)) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);
 			return false;
-		}
-		else if (!castle.getArtefacts().contains(effected))
-		{
+		} else if (!castle.getArtefacts().contains(effected)) {
 			player.sendPacket(SystemMessageId.INCORRECT_TARGET);
 			return false;
-		}
-		else if (!Util.checkIfInRange(skill.getCastRange(), player, effected, true))
-		{
+		} else if (!Util.checkIfInRange(skill.getCastRange(), player, effected, true)) {
 			player.sendPacket(SystemMessageId.DIST_TOO_FAR_CASTING_STOPPED);
 			return false;
 		}

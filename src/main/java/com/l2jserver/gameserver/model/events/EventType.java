@@ -114,8 +114,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author UnAfraid
  */
-public enum EventType
-{
+public enum EventType {
 	// Attackable events
 	ON_ATTACKABLE_AGGRO_RANGE_ENTER(OnAttackableAggroRangeEnter.class, void.class),
 	ON_ATTACKABLE_ATTACK(OnAttackableAttack.class, void.class),
@@ -242,29 +241,24 @@ public enum EventType
 	private final Class<? extends IBaseEvent> _eventClass;
 	private final Class<?>[] _returnClass;
 	
-	private EventType(Class<? extends IBaseEvent> eventClass, Class<?>... returnClasss)
-	{
+	private EventType(Class<? extends IBaseEvent> eventClass, Class<?>... returnClasss) {
 		_eventClass = eventClass;
 		_returnClass = returnClasss;
 	}
 	
-	public Class<? extends IBaseEvent> getEventClass()
-	{
+	public Class<? extends IBaseEvent> getEventClass() {
 		return _eventClass;
 	}
 	
-	public Class<?>[] getReturnClasses()
-	{
+	public Class<?>[] getReturnClasses() {
 		return _returnClass;
 	}
 	
-	public boolean isEventClass(Class<?> clazz)
-	{
+	public boolean isEventClass(Class<?> clazz) {
 		return _eventClass == clazz;
 	}
 	
-	public boolean isReturnClass(Class<?> clazz)
-	{
+	public boolean isReturnClass(Class<?> clazz) {
 		return Util.contains(_returnClass, clazz);
 	}
 }

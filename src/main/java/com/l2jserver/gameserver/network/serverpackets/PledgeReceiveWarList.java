@@ -24,31 +24,26 @@ import com.l2jserver.gameserver.model.L2Clan;
 /**
  * @author -Wooden-
  */
-public class PledgeReceiveWarList extends L2GameServerPacket
-{
+public class PledgeReceiveWarList extends L2GameServerPacket {
 	private final L2Clan _clan;
 	private final int _tab;
 	
-	public PledgeReceiveWarList(L2Clan clan, int tab)
-	{
+	public PledgeReceiveWarList(L2Clan clan, int tab) {
 		_clan = clan;
 		_tab = tab;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x3f);
 		
 		writeD(_tab); // type : 0 = Declared, 1 = Under Attack
 		writeD(0x00); // page
 		writeD(_tab == 0 ? _clan.getWarList().size() : _clan.getAttackerList().size());
-		for (Integer i : _tab == 0 ? _clan.getWarList() : _clan.getAttackerList())
-		{
+		for (Integer i : _tab == 0 ? _clan.getWarList() : _clan.getAttackerList()) {
 			L2Clan clan = ClanTable.getInstance().getClan(i);
-			if (clan == null)
-			{
+			if (clan == null) {
 				continue;
 			}
 			

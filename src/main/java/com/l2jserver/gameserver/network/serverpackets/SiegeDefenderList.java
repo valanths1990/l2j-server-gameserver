@@ -46,36 +46,30 @@ import com.l2jserver.gameserver.model.entity.Castle;
  * d = AllyCrestID<BR>
  * @author KenM
  */
-public final class SiegeDefenderList extends L2GameServerPacket
-{
+public final class SiegeDefenderList extends L2GameServerPacket {
 	private final Castle _castle;
 	
-	public SiegeDefenderList(Castle castle)
-	{
+	public SiegeDefenderList(Castle castle) {
 		_castle = castle;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xcb);
 		writeD(_castle.getResidenceId());
 		writeD(0x00); // 0
 		writeD(0x01); // 1
 		writeD(0x00); // 0
 		int size = _castle.getSiege().getDefenderClans().size() + _castle.getSiege().getDefenderWaitingClans().size();
-		if (size > 0)
-		{
+		if (size > 0) {
 			L2Clan clan;
 			
 			writeD(size);
 			writeD(size);
 			// Listing the Lord and the approved clans
-			for (L2SiegeClan siegeclan : _castle.getSiege().getDefenderClans())
-			{
+			for (L2SiegeClan siegeclan : _castle.getSiege().getDefenderClans()) {
 				clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
-				if (clan == null)
-				{
+				if (clan == null) {
 					continue;
 				}
 				
@@ -84,8 +78,7 @@ public final class SiegeDefenderList extends L2GameServerPacket
 				writeS(clan.getLeaderName());
 				writeD(clan.getCrestId());
 				writeD(0x00); // signed time (seconds) (not storated by L2J)
-				switch (siegeclan.getType())
-				{
+				switch (siegeclan.getType()) {
 					case OWNER:
 						writeD(0x01); // owner
 						break;
@@ -104,8 +97,7 @@ public final class SiegeDefenderList extends L2GameServerPacket
 				writeS(""); // AllyLeaderName
 				writeD(clan.getAllyCrestId());
 			}
-			for (L2SiegeClan siegeclan : _castle.getSiege().getDefenderWaitingClans())
-			{
+			for (L2SiegeClan siegeclan : _castle.getSiege().getDefenderWaitingClans()) {
 				clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
 				writeD(clan.getId());
 				writeS(clan.getName());
@@ -118,9 +110,7 @@ public final class SiegeDefenderList extends L2GameServerPacket
 				writeS(""); // AllyLeaderName
 				writeD(clan.getAllyCrestId());
 			}
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 			writeD(0x00);
 		}

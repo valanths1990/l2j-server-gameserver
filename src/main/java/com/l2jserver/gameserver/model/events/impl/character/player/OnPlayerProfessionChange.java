@@ -26,37 +26,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerProfessionChange implements IBaseEvent
-{
+public class OnPlayerProfessionChange implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final L2PcTemplate _template;
 	private final boolean _isSubClass;
 	
-	public OnPlayerProfessionChange(L2PcInstance activeChar, L2PcTemplate template, boolean isSubClass)
-	{
+	public OnPlayerProfessionChange(L2PcInstance activeChar, L2PcTemplate template, boolean isSubClass) {
 		_activeChar = activeChar;
 		_template = template;
 		_isSubClass = isSubClass;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public L2PcTemplate getTemplate()
-	{
+	public L2PcTemplate getTemplate() {
 		return _template;
 	}
 	
-	public boolean isSubClass()
-	{
+	public boolean isSubClass() {
 		return _isSubClass;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_PROFESSION_CHANGE;
 	}
 }

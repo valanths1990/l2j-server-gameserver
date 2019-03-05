@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnCastleSiegeStart implements IBaseEvent
-{
+public class OnCastleSiegeStart implements IBaseEvent {
 	private final Siege _siege;
 	
-	public OnCastleSiegeStart(Siege siege)
-	{
+	public OnCastleSiegeStart(Siege siege) {
 		_siege = siege;
 	}
 	
-	public Siege getSiege()
-	{
+	public Siege getSiege() {
 		return _siege;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_CASTLE_SIEGE_START;
 	}
 }

@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.util.Util;
  * This class ...
  * @version $Revision: 1.11.2.4.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public class MoveBackwardToLocation extends L2GameClientPacket
-{
+public class MoveBackwardToLocation extends L2GameClientPacket {
 	private static final String _C__0F_MOVEBACKWARDTOLOC = "[C] 0F MoveBackwardToLoc";
 	
 	// cdddddd
@@ -49,22 +48,17 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 	private int _moveMovement;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_targetX = readD();
 		_targetY = readD();
 		_targetZ = readD();
 		_originX = readD();
 		_originY = readD();
 		_originZ = readD();
-		try
-		{
+		try {
 			_moveMovement = readD(); // is 0 if cursor keys are used 1 if mouse is used
-		}
-		catch (BufferUnderflowException e)
-		{
-			if (Config.L2WALKER_PROTECTION)
-			{
+		} catch (BufferUnderflowException e) {
+			if (Config.L2WALKER_PROTECTION) {
 				L2PcInstance activeChar = getClient().getActiveChar();
 				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " is trying to use L2Walker and got kicked.", Config.DEFAULT_PUNISH);
 			}
@@ -72,23 +66,19 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if ((Config.PLAYER_MOVEMENT_BLOCK_TIME > 0) && !activeChar.isGM() && (activeChar.getNotMoveUntil() > System.currentTimeMillis()))
-		{
+		if ((Config.PLAYER_MOVEMENT_BLOCK_TIME > 0) && !activeChar.isGM() && (activeChar.getNotMoveUntil() > System.currentTimeMillis())) {
 			activeChar.sendPacket(SystemMessageId.CANNOT_MOVE_WHILE_SPEAKING_TO_AN_NPC);
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if ((_targetX == _originX) && (_targetY == _originY) && (_targetZ == _originZ))
-		{
+		if ((_targetX == _originX) && (_targetY == _originY) && (_targetZ == _originZ)) {
 			activeChar.sendPacket(new StopMove(activeChar));
 			return;
 		}
@@ -101,10 +91,8 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 		// Validate position packets sends head level.
 		_targetZ += activeChar.getTemplate().getCollisionHeight();
 		
-		if (activeChar.getTeleMode() > 0)
-		{
-			if (activeChar.getTeleMode() == 1)
-			{
+		if (activeChar.getTeleMode() > 0) {
+			if (activeChar.getTeleMode() == 1) {
 				activeChar.setTeleMode(0);
 			}
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
@@ -124,8 +112,7 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__0F_MOVEBACKWARDTOLOC;
 	}
 }

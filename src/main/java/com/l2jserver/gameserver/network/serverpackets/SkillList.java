@@ -21,20 +21,17 @@ package com.l2jserver.gameserver.network.serverpackets;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class SkillList extends L2GameServerPacket
-{
+public final class SkillList extends L2GameServerPacket {
 	private final List<Skill> _skills = new ArrayList<>();
 	
-	static class Skill
-	{
+	static class Skill {
 		public int id;
 		public int level;
 		public boolean passive;
 		public boolean disabled;
 		public boolean enchanted;
 		
-		Skill(int pId, int pLevel, boolean pPassive, boolean pDisabled, boolean pEnchanted)
-		{
+		Skill(int pId, int pLevel, boolean pPassive, boolean pDisabled, boolean pEnchanted) {
 			id = pId;
 			level = pLevel;
 			passive = pPassive;
@@ -43,19 +40,16 @@ public final class SkillList extends L2GameServerPacket
 		}
 	}
 	
-	public void addSkill(int id, int level, boolean passive, boolean disabled, boolean enchanted)
-	{
+	public void addSkill(int id, int level, boolean passive, boolean disabled, boolean enchanted) {
 		_skills.add(new Skill(id, level, passive, disabled, enchanted));
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x5F);
 		writeD(_skills.size());
 		
-		for (Skill temp : _skills)
-		{
+		for (Skill temp : _skills) {
 			writeD(temp.passive ? 1 : 0);
 			writeD(temp.level);
 			writeD(temp.id);

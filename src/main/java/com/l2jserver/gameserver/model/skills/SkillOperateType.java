@@ -34,8 +34,7 @@ package com.l2jserver.gameserver.model.skills;
  * </ul>
  * @author Zoey76
  */
-public enum SkillOperateType
-{
+public enum SkillOperateType {
 	/**
 	 * Active Skill with "Instant Effect" (for example damage skills heal/pdam/mdam/cpdam skills).
 	 */
@@ -90,10 +89,8 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to an active skill.
 	 * @return {@code true} if the operative skill type is active, {@code false} otherwise
 	 */
-	public boolean isActive()
-	{
-		switch (this)
-		{
+	public boolean isActive() {
+		switch (this) {
 			case A1:
 			case A2:
 			case A3:
@@ -112,10 +109,8 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to a continuous skill.
 	 * @return {@code true} if the operative skill type is continuous, {@code false} otherwise
 	 */
-	public boolean isContinuous()
-	{
-		switch (this)
-		{
+	public boolean isContinuous() {
+		switch (this) {
 			case A2:
 			case A4:
 			case DA2:
@@ -129,8 +124,7 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to a continuous skill.
 	 * @return {@code true} if the operative skill type is continuous, {@code false} otherwise
 	 */
-	public boolean isSelfContinuous()
-	{
+	public boolean isSelfContinuous() {
 		return (this == A3);
 	}
 	
@@ -138,8 +132,7 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to a passive skill.
 	 * @return {@code true} if the operative skill type is passive, {@code false} otherwise
 	 */
-	public boolean isPassive()
-	{
+	public boolean isPassive() {
 		return (this == P);
 	}
 	
@@ -147,8 +140,7 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to a toggle skill.
 	 * @return {@code true} if the operative skill type is toggle, {@code false} otherwise
 	 */
-	public boolean isToggle()
-	{
+	public boolean isToggle() {
 		return (this == T);
 	}
 	
@@ -156,10 +148,8 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to a channeling skill.
 	 * @return {@code true} if the operative skill type is channeling, {@code false} otherwise
 	 */
-	public boolean isChanneling()
-	{
-		switch (this)
-		{
+	public boolean isChanneling() {
+		switch (this) {
 			case CA1:
 			case CA5:
 				return true;
@@ -172,10 +162,8 @@ public enum SkillOperateType
 	 * Verifies if the operative type correspond to a fly skill.
 	 * @return {@code true} if the operative skill type is fly, {@code false} otherwise
 	 */
-	public boolean isFlyType()
-	{
-		switch (this)
-		{
+	public boolean isFlyType() {
+		switch (this) {
 			case DA1:
 			case DA2:
 				return true;

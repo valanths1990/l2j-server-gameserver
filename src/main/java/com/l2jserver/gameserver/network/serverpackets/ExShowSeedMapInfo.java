@@ -20,17 +20,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.instancemanager.GraciaSeedsManager;
 
-public class ExShowSeedMapInfo extends L2GameServerPacket
-{
+public class ExShowSeedMapInfo extends L2GameServerPacket {
 	public static final ExShowSeedMapInfo STATIC_PACKET = new ExShowSeedMapInfo();
 	
-	private ExShowSeedMapInfo()
-	{
+	private ExShowSeedMapInfo() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE); // Id
 		writeH(0xA1); // SubId
 		

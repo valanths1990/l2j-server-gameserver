@@ -20,15 +20,13 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.L2Npc;
 
-public class MonRaceInfo extends L2GameServerPacket
-{
+public class MonRaceInfo extends L2GameServerPacket {
 	private final int _unknown1;
 	private final int _unknown2;
 	private final L2Npc[] _monsters;
 	private final int[][] _speeds;
 	
-	public MonRaceInfo(int unknown1, int unknown2, L2Npc[] monsters, int[][] speeds)
-	{
+	public MonRaceInfo(int unknown1, int unknown2, L2Npc[] monsters, int[][] speeds) {
 		/*
 		 * -1 0 to initial the race 0 15322 to start race 13765 -1 in middle of race -1 0 to end the race
 		 */
@@ -39,16 +37,14 @@ public class MonRaceInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xe3);
 		
 		writeD(_unknown1);
 		writeD(_unknown2);
 		writeD(0x08);
 		
-		for (int i = 0; i < 8; i++)
-		{
+		for (int i = 0; i < 8; i++) {
 			writeD(_monsters[i].getObjectId()); // npcObjectID
 			writeD(_monsters[i].getTemplate().getId() + 1000000); // npcID
 			writeD(14107); // origin X
@@ -60,14 +56,10 @@ public class MonRaceInfo extends L2GameServerPacket
 			writeF(_monsters[i].getTemplate().getfCollisionHeight()); // coll. height
 			writeF(_monsters[i].getTemplate().getfCollisionRadius()); // coll. radius
 			writeD(120); // ?? unknown
-			for (int j = 0; j < 20; j++)
-			{
-				if (_unknown1 == 0)
-				{
+			for (int j = 0; j < 20; j++) {
+				if (_unknown1 == 0) {
 					writeC(_speeds[i][j]);
-				}
-				else
-				{
+				} else {
 					writeC(0x00);
 				}
 			}

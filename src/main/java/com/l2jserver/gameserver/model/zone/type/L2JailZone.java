@@ -32,70 +32,57 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * A jail zone
  * @author durgus
  */
-public class L2JailZone extends L2ZoneType
-{
+public class L2JailZone extends L2ZoneType {
 	private static final Location JAIL_IN_LOC = new Location(-114356, -249645, -2984);
 	private static final Location JAIL_OUT_LOC = new Location(17836, 170178, -3507);
 	
-	public L2JailZone(int id)
-	{
+	public L2JailZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.JAIL, true);
 			character.setInsideZone(ZoneId.NO_SUMMON_FRIEND, true);
-			if (Config.JAIL_IS_PVP)
-			{
+			if (Config.JAIL_IS_PVP) {
 				character.setInsideZone(ZoneId.PVP, true);
 				character.sendPacket(SystemMessageId.ENTERED_COMBAT_ZONE);
 			}
-			if (Config.JAIL_DISABLE_TRANSACTION)
-			{
+			if (Config.JAIL_DISABLE_TRANSACTION) {
 				character.setInsideZone(ZoneId.NO_STORE, true);
 			}
 		}
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(L2Character character) {
+		if (character.isPlayer()) {
 			final L2PcInstance player = character.getActingPlayer();
 			player.setInsideZone(ZoneId.JAIL, false);
 			player.setInsideZone(ZoneId.NO_SUMMON_FRIEND, false);
 			
-			if (Config.JAIL_IS_PVP)
-			{
+			if (Config.JAIL_IS_PVP) {
 				character.setInsideZone(ZoneId.PVP, false);
 				character.sendPacket(SystemMessageId.LEFT_COMBAT_ZONE);
 			}
 			
-			if (player.isJailed())
-			{
+			if (player.isJailed()) {
 				// when a player wants to exit jail even if he is still jailed, teleport him back to jail
 				ThreadPoolManager.getInstance().scheduleGeneral(new TeleportTask(player, JAIL_IN_LOC), 2000);
 				character.sendMessage("You cannot cheat your way out of here. You must wait until your jail time is over.");
 			}
-			if (Config.JAIL_DISABLE_TRANSACTION)
-			{
+			if (Config.JAIL_DISABLE_TRANSACTION) {
 				character.setInsideZone(ZoneId.NO_STORE, false);
 			}
 		}
 	}
 	
-	public static Location getLocationIn()
-	{
+	public static Location getLocationIn() {
 		return JAIL_IN_LOC;
 	}
 	
-	public static Location getLocationOut()
-	{
+	public static Location getLocationOut() {
 		return JAIL_OUT_LOC;
 	}
 }

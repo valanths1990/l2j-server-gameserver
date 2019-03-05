@@ -28,10 +28,8 @@ import com.l2jserver.geodriver.Cell;
 /**
  * @author HorridoJoho
  */
-public final class GeoUtils
-{
-	public static void debug2DLine(L2PcInstance player, int x, int y, int tx, int ty, int z)
-	{
+public final class GeoUtils {
+	public static void debug2DLine(L2PcInstance player, int x, int y, int tx, int ty, int z) {
 		int gx = GeoData.getInstance().getGeoX(x);
 		int gy = GeoData.getInstance().getGeoY(y);
 		
@@ -43,8 +41,7 @@ public final class GeoUtils
 		
 		LinePointIterator iter = new LinePointIterator(gx, gy, tgx, tgy);
 		
-		while (iter.next())
-		{
+		while (iter.next()) {
 			int wx = GeoData.getInstance().getWorldX(iter.x());
 			int wy = GeoData.getInstance().getWorldY(iter.y());
 			
@@ -53,8 +50,7 @@ public final class GeoUtils
 		player.sendPacket(prim);
 	}
 	
-	public static void debug3DLine(L2PcInstance player, int x, int y, int z, int tx, int ty, int tz)
-	{
+	public static void debug3DLine(L2PcInstance player, int x, int y, int z, int tx, int ty, int tz) {
 		int gx = GeoData.getInstance().getGeoX(x);
 		int gy = GeoData.getInstance().getGeoY(y);
 		
@@ -73,13 +69,11 @@ public final class GeoUtils
 		int wz = iter.z();
 		prim.addPoint(Color.RED, wx, wy, wz);
 		
-		while (iter.next())
-		{
+		while (iter.next()) {
 			int curX = iter.x();
 			int curY = iter.y();
 			
-			if ((curX != prevX) || (curY != prevY))
-			{
+			if ((curX != prevX) || (curY != prevY)) {
 				wx = GeoData.getInstance().getWorldX(curX);
 				wy = GeoData.getInstance().getWorldY(curY);
 				wz = iter.z();
@@ -93,21 +87,17 @@ public final class GeoUtils
 		player.sendPacket(prim);
 	}
 	
-	private static Color getDirectionColor(int x, int y, int z, int nswe)
-	{
-		if (GeoData.getInstance().checkNearestNswe(x, y, z, nswe))
-		{
+	private static Color getDirectionColor(int x, int y, int z, int nswe) {
+		if (GeoData.getInstance().checkNearestNswe(x, y, z, nswe)) {
 			return Color.GREEN;
 		}
 		return Color.RED;
 	}
 	
-	public static void debugGrid(L2PcInstance player)
-	{
+	public static void debugGrid(L2PcInstance player) {
 		int geoRadius = 10;
 		int blocksPerPacket = 49;
-		if (geoRadius < 0)
-		{
+		if (geoRadius < 0) {
 			throw new IllegalArgumentException("geoRadius < 0");
 		}
 		
@@ -118,23 +108,18 @@ public final class GeoUtils
 		GeoData gd = GeoData.getInstance();
 		int playerGx = gd.getGeoX(player.getX());
 		int playerGy = gd.getGeoY(player.getY());
-		for (int dx = -geoRadius; dx <= geoRadius; ++dx)
-		{
-			for (int dy = -geoRadius; dy <= geoRadius; ++dy)
-			{
-				if (iBlock >= blocksPerPacket)
-				{
+		for (int dx = -geoRadius; dx <= geoRadius; ++dx) {
+			for (int dy = -geoRadius; dy <= geoRadius; ++dy) {
+				if (iBlock >= blocksPerPacket) {
 					iBlock = 0;
-					if (exsp != null)
-					{
+					if (exsp != null) {
 						++iPacket;
 						player.sendPacket(exsp);
 					}
 					exsp = new ExServerPrimitive("DebugGrid_" + iPacket, player.getX(), player.getY(), -16000);
 				}
 				
-				if (exsp == null)
-				{
+				if (exsp == null) {
 					throw new IllegalStateException();
 				}
 				
@@ -188,51 +173,33 @@ public final class GeoUtils
 	 * @param y
 	 * @return
 	 */
-	public static int computeNswe(int lastX, int lastY, int x, int y)
-	{
+	public static int computeNswe(int lastX, int lastY, int x, int y) {
 		if (x > lastX) // east
 		{
-			if (y > lastY)
-			{
+			if (y > lastY) {
 				return Cell.NSWE_SOUTH_EAST;// Direction.SOUTH_EAST;
-			}
-			else if (y < lastY)
-			{
+			} else if (y < lastY) {
 				return Cell.NSWE_NORTH_EAST;// Direction.NORTH_EAST;
-			}
-			else
-			{
+			} else {
 				return Cell.NSWE_EAST;// Direction.EAST;
 			}
-		}
-		else if (x < lastX) // west
+		} else if (x < lastX) // west
 		{
-			if (y > lastY)
-			{
+			if (y > lastY) {
 				return Cell.NSWE_SOUTH_WEST;// Direction.SOUTH_WEST;
-			}
-			else if (y < lastY)
-			{
+			} else if (y < lastY) {
 				return Cell.NSWE_NORTH_WEST;// Direction.NORTH_WEST;
-			}
-			else
-			{
+			} else {
 				return Cell.NSWE_WEST;// Direction.WEST;
 			}
-		}
-		else
+		} else
 		// unchanged x
 		{
-			if (y > lastY)
-			{
+			if (y > lastY) {
 				return Cell.NSWE_SOUTH;// Direction.SOUTH;
-			}
-			else if (y < lastY)
-			{
+			} else if (y < lastY) {
 				return Cell.NSWE_NORTH;// Direction.NORTH;
-			}
-			else
-			{
+			} else {
 				throw new RuntimeException();
 			}
 		}

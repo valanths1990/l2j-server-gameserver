@@ -31,12 +31,10 @@ import com.l2jserver.gameserver.config.Config;
 /**
  * Audits Game Master's actions.
  */
-public class GMAudit
-{
+public class GMAudit {
 	private static final Logger _log = Logger.getLogger(GMAudit.class.getName());
 	
-	static
-	{
+	static {
 		new File("log/GMAudit").mkdirs();
 	}
 	
@@ -47,23 +45,18 @@ public class GMAudit
 	 * @param target the target's name
 	 * @param params the parameters
 	 */
-	public static void auditGMAction(String gmName, String action, String target, String params)
-	{
+	public static void auditGMAction(String gmName, String action, String target, String params) {
 		final SimpleDateFormat _formatter = new SimpleDateFormat("dd/MM/yyyy H:mm:ss");
 		final String date = _formatter.format(new Date());
 		String name = com.l2jserver.util.Util.replaceIllegalCharacters(gmName);
-		if (!com.l2jserver.util.Util.isValidFileName(name))
-		{
+		if (!com.l2jserver.util.Util.isValidFileName(name)) {
 			name = "INVALID_GM_NAME_" + date;
 		}
 		
 		final File file = new File("log/GMAudit/" + name + ".txt");
-		try (FileWriter save = new FileWriter(file, true))
-		{
+		try (FileWriter save = new FileWriter(file, true)) {
 			save.write(date + ">" + gmName + ">" + action + ">" + target + ">" + params + Config.EOL);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			_log.log(Level.SEVERE, "GMAudit for GM " + gmName + " could not be saved: ", e);
 		}
 	}
@@ -74,8 +67,7 @@ public class GMAudit
 	 * @param action the performed action
 	 * @param target the target's name
 	 */
-	public static void auditGMAction(String gmName, String action, String target)
-	{
+	public static void auditGMAction(String gmName, String action, String target) {
 		auditGMAction(gmName, action, target, "");
 	}
 }

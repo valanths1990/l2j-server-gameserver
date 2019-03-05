@@ -25,52 +25,43 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Simple class for storing skill id/level.
  * @author BiggBoss
  */
-public class SkillHolder
-{
+public class SkillHolder {
 	private final int _skillId;
 	private final int _skillLvl;
 	
-	public SkillHolder(int skillId)
-	{
+	public SkillHolder(int skillId) {
 		_skillId = skillId;
 		_skillLvl = 1;
 	}
 	
-	public SkillHolder(int skillId, int skillLvl)
-	{
+	public SkillHolder(int skillId, int skillLvl) {
 		_skillId = skillId;
 		_skillLvl = skillLvl;
 	}
 	
-	public SkillHolder(Skill skill)
-	{
+	public SkillHolder(Skill skill) {
 		_skillId = skill.getId();
 		_skillLvl = skill.getLevel();
 	}
 	
-	public final int getSkillId()
-	{
+	public final int getSkillId() {
 		return _skillId;
 	}
 	
-	public final int getSkillLvl()
-	{
+	public final int getSkillLvl() {
 		return _skillLvl;
 	}
 	
-	public final Skill getSkill()
-	{
+	public final Skill getSkill() {
 		return SkillData.getInstance().getSkill(_skillId, Math.max(_skillLvl, 1));
 	}
 	
-	public final Skill getSkill(int levelOverride)
-	{
+	public final Skill getSkill(int levelOverride) {
 		return SkillData.getInstance().getSkill(_skillId, Math.max(levelOverride, 1));
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "[SkillId: " + _skillId + " Level: " + _skillLvl + "]";
 	}
 }

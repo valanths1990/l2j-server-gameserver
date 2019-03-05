@@ -23,31 +23,26 @@ import java.util.Calendar;
 /**
  * @author UnAfraid
  */
-public class SiegeScheduleDate
-{
+public class SiegeScheduleDate {
 	private final int _day;
 	private final int _hour;
 	private final int _maxConcurrent;
 	
-	public SiegeScheduleDate(StatsSet set)
-	{
+	public SiegeScheduleDate(StatsSet set) {
 		_day = set.getInt("day", Calendar.SUNDAY);
 		_hour = set.getInt("hour", 16);
 		_maxConcurrent = set.getInt("maxConcurrent", 5);
 	}
 	
-	public int getDay()
-	{
+	public int getDay() {
 		return _day;
 	}
 	
-	public int getHour()
-	{
+	public int getHour() {
 		return _hour;
 	}
 	
-	public int getMaxConcurrent()
-	{
+	public int getMaxConcurrent() {
 		return _maxConcurrent;
 	}
 }

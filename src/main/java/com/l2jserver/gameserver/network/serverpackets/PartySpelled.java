@@ -24,32 +24,26 @@ import java.util.List;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 
-public class PartySpelled extends L2GameServerPacket
-{
+public class PartySpelled extends L2GameServerPacket {
 	private final List<BuffInfo> _effects = new ArrayList<>();
 	private final L2Character _activeChar;
 	
-	public PartySpelled(L2Character cha)
-	{
+	public PartySpelled(L2Character cha) {
 		_activeChar = cha;
 	}
 	
-	public void addSkill(BuffInfo info)
-	{
+	public void addSkill(BuffInfo info) {
 		_effects.add(info);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xF4);
 		writeD(_activeChar.isServitor() ? 2 : _activeChar.isPet() ? 1 : 0);
 		writeD(_activeChar.getObjectId());
 		writeD(_effects.size());
-		for (BuffInfo info : _effects)
-		{
-			if ((info != null) && info.isInUse())
-			{
+		for (BuffInfo info : _effects) {
+			if ((info != null) && info.isInUse()) {
 				writeD(info.getSkill().getDisplayId());
 				writeH(info.getSkill().getDisplayLevel());
 				writeD(info.getTime());

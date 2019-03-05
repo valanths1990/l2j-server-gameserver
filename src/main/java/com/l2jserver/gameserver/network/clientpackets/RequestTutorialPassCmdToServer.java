@@ -22,32 +22,27 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialCmd;
 
-public class RequestTutorialPassCmdToServer extends L2GameClientPacket
-{
+public class RequestTutorialPassCmdToServer extends L2GameClientPacket {
 	private static final String _C__86_REQUESTTUTORIALPASSCMDTOSERVER = "[C] 86 RequestTutorialPassCmdToServer";
 	
 	private String _bypass = null;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_bypass = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerTutorialCmd(player, _bypass), player);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__86_REQUESTTUTORIALPASSCMDTOSERVER;
 	}
 }

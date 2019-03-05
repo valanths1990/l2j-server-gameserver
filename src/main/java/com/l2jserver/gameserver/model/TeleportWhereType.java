@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model;
  * All teleport types.
  * @author xban1x
  */
-public enum TeleportWhereType
-{
+public enum TeleportWhereType {
 	CASTLE,
 	CLANHALL,
 	SIEGEFLAG,

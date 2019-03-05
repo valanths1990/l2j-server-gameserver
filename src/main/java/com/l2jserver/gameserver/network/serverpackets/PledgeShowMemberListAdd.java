@@ -21,16 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.L2ClanMember;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public final class PledgeShowMemberListAdd extends L2GameServerPacket
-{
+public final class PledgeShowMemberListAdd extends L2GameServerPacket {
 	private final String _name;
 	private final int _lvl;
 	private final int _classId;
 	private final int _isOnline;
 	private final int _pledgeType;
 	
-	public PledgeShowMemberListAdd(L2PcInstance player)
-	{
+	public PledgeShowMemberListAdd(L2PcInstance player) {
 		_name = player.getName();
 		_lvl = player.getLevel();
 		_classId = player.getClassId().getId();
@@ -38,8 +36,7 @@ public final class PledgeShowMemberListAdd extends L2GameServerPacket
 		_pledgeType = player.getPledgeType();
 	}
 	
-	public PledgeShowMemberListAdd(L2ClanMember cm)
-	{
+	public PledgeShowMemberListAdd(L2ClanMember cm) {
 		_name = cm.getName();
 		_lvl = cm.getLevel();
 		_classId = cm.getClassId();
@@ -48,8 +45,7 @@ public final class PledgeShowMemberListAdd extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x5c);
 		writeS(_name);
 		writeD(_lvl);

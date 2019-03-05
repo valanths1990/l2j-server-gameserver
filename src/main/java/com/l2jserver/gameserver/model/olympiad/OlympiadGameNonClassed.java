@@ -25,42 +25,34 @@ import com.l2jserver.gameserver.config.Config;
 /**
  * @author DS
  */
-public class OlympiadGameNonClassed extends OlympiadGameNormal
-{
-	private OlympiadGameNonClassed(int id, Participant[] opponents)
-	{
+public class OlympiadGameNonClassed extends OlympiadGameNormal {
+	private OlympiadGameNonClassed(int id, Participant[] opponents) {
 		super(id, opponents);
 	}
 	
 	@Override
-	public final CompetitionType getType()
-	{
+	public final CompetitionType getType() {
 		return CompetitionType.NON_CLASSED;
 	}
 	
 	@Override
-	protected final int getDivider()
-	{
+	protected final int getDivider() {
 		return Config.ALT_OLY_DIVIDER_NON_CLASSED;
 	}
 	
 	@Override
-	protected final int[][] getReward()
-	{
+	protected final int[][] getReward() {
 		return Config.ALT_OLY_NONCLASSED_REWARD;
 	}
 	
 	@Override
-	protected final String getWeeklyMatchType()
-	{
+	protected final String getWeeklyMatchType() {
 		return COMP_DONE_WEEK_NON_CLASSED;
 	}
 	
-	protected static final OlympiadGameNonClassed createGame(int id, List<Integer> list)
-	{
+	protected static final OlympiadGameNonClassed createGame(int id, List<Integer> list) {
 		final Participant[] opponents = OlympiadGameNormal.createListOfParticipants(list);
-		if (opponents == null)
-		{
+		if (opponents == null) {
 			return null;
 		}
 		

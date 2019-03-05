@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Community Board interface.
  * @author Zoey76
  */
-public interface IParseBoardHandler
-{
+public interface IParseBoardHandler {
 	public static final Logger LOG = Logger.getLogger(IParseBoardHandler.class.getName());
 	
 	/**

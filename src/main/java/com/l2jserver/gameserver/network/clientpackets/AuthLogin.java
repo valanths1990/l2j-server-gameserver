@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
  * This class ...
  * @version $Revision: 1.9.2.3.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class AuthLogin extends L2GameClientPacket
-{
+public final class AuthLogin extends L2GameClientPacket {
 	private static final String _C__2B_AUTHLOGIN = "[C] 2B AuthLogin";
 	
 	// loginName + keys must match what the loginserver used.
@@ -43,8 +42,7 @@ public final class AuthLogin extends L2GameClientPacket
 	private int _loginKey2;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_loginName = readS().toLowerCase();
 		_playKey2 = readD();
 		_playKey1 = readD();
@@ -53,40 +51,32 @@ public final class AuthLogin extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2GameClient client = getClient();
-		if (_loginName.isEmpty() || !client.isProtocolOk())
-		{
+		if (_loginName.isEmpty() || !client.isProtocolOk()) {
 			client.close((L2GameServerPacket) null);
 			return;
 		}
 		SessionKey key = new SessionKey(_loginKey1, _loginKey2, _playKey1, _playKey2);
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			_log.info("user:" + _loginName);
 			_log.info("key:" + key);
 		}
 		
 		// avoid potential exploits
-		if (client.getAccountName() == null)
-		{
+		if (client.getAccountName() == null) {
 			// Preventing duplicate login in case client login server socket was disconnected or this packet was not sent yet
-			if (LoginServerThread.getInstance().addGameServerLogin(_loginName, client))
-			{
+			if (LoginServerThread.getInstance().addGameServerLogin(_loginName, client)) {
 				client.setAccountName(_loginName);
 				LoginServerThread.getInstance().addWaitingClientAndSendRequest(_loginName, client, key);
-			}
-			else
-			{
+			} else {
 				client.close((L2GameServerPacket) null);
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__2B_AUTHLOGIN;
 	}
 }

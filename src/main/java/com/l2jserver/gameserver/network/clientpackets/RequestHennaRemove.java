@@ -25,45 +25,35 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 /**
  * @author Zoey76
  */
-public final class RequestHennaRemove extends L2GameClientPacket
-{
+public final class RequestHennaRemove extends L2GameClientPacket {
 	private static final String _C__72_REQUESTHENNAREMOVE = "[C] 72 RequestHennaRemove";
 	private int _symbolId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_symbolId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("HennaRemove"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("HennaRemove")) {
 			sendActionFailed();
 			return;
 		}
 		
 		L2Henna henna;
 		boolean found = false;
-		for (int i = 1; i <= 3; i++)
-		{
+		for (int i = 1; i <= 3; i++) {
 			henna = activeChar.getHenna(i);
-			if ((henna != null) && (henna.getDyeId() == _symbolId))
-			{
-				if (activeChar.getAdena() >= henna.getCancelFee())
-				{
+			if ((henna != null) && (henna.getDyeId() == _symbolId)) {
+				if (activeChar.getAdena() >= henna.getCancelFee()) {
 					activeChar.removeHenna(i);
-				}
-				else
-				{
+				} else {
 					activeChar.sendPacket(SystemMessageId.YOU_NOT_ENOUGH_ADENA);
 					sendActionFailed();
 				}
@@ -72,16 +62,14 @@ public final class RequestHennaRemove extends L2GameClientPacket
 			}
 		}
 		// TODO: Test.
-		if (!found)
-		{
+		if (!found) {
 			_log.warning(getClass().getSimpleName() + ": Player " + activeChar + " requested Henna Draw remove without any henna.");
 			sendActionFailed();
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__72_REQUESTHENNAREMOVE;
 	}
 }

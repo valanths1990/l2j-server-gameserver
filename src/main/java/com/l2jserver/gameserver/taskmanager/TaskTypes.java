@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.taskmanager;
 /**
  * @author Layane
  */
-public enum TaskTypes
-{
+public enum TaskTypes {
 	TYPE_NONE,
 	TYPE_TIME,
 	TYPE_SHEDULED,

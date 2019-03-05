@@ -32,8 +32,7 @@ import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
  * </ul>
  * @version $Revision: 1.4.4.4 $ $Date: 2005/03/27 15:29:33 $
  */
-public enum ClassId implements IIdentifiable
-{
+public enum ClassId implements IIdentifiable {
 	fighter(0x00, false, Race.HUMAN, null),
 	
 	warrior(0x01, false, Race.HUMAN, fighter),
@@ -220,8 +219,7 @@ public enum ClassId implements IIdentifiable
 	 * @param race the race related to the class.
 	 * @param pParent the parent class Id.
 	 */
-	private ClassId(int pId, boolean pIsMage, Race race, ClassId pParent)
-	{
+	private ClassId(int pId, boolean pIsMage, Race race, ClassId pParent) {
 		_id = pId;
 		_isMage = pIsMage;
 		_isSummoner = false;
@@ -237,8 +235,7 @@ public enum ClassId implements IIdentifiable
 	 * @param race the race related to the class.
 	 * @param pParent the parent class Id.
 	 */
-	private ClassId(int pId, boolean pIsMage, boolean pIsSummoner, Race race, ClassId pParent)
-	{
+	private ClassId(int pId, boolean pIsMage, boolean pIsSummoner, Race race, ClassId pParent) {
 		_id = pId;
 		_isMage = pIsMage;
 		_isSummoner = pIsSummoner;
@@ -251,32 +248,28 @@ public enum ClassId implements IIdentifiable
 	 * @return the ID of the class
 	 */
 	@Override
-	public final int getId()
-	{
+	public final int getId() {
 		return _id;
 	}
 	
 	/**
 	 * @return {code true} if the class is a mage class.
 	 */
-	public final boolean isMage()
-	{
+	public final boolean isMage() {
 		return _isMage;
 	}
 	
 	/**
 	 * @return {code true} if the class is a summoner class.
 	 */
-	public final boolean isSummoner()
-	{
+	public final boolean isSummoner() {
 		return _isSummoner;
 	}
 	
 	/**
 	 * @return the Race object of the class.
 	 */
-	public final Race getRace()
-	{
+	public final Race getRace() {
 		return _race;
 	}
 	
@@ -284,15 +277,12 @@ public enum ClassId implements IIdentifiable
 	 * @param cid the parent ClassId to check.
 	 * @return {code true} if this Class is a child of the selected ClassId.
 	 */
-	public final boolean childOf(ClassId cid)
-	{
-		if (_parent == null)
-		{
+	public final boolean childOf(ClassId cid) {
+		if (_parent == null) {
 			return false;
 		}
 		
-		if (_parent == cid)
-		{
+		if (_parent == cid) {
 			return true;
 		}
 		
@@ -304,18 +294,15 @@ public enum ClassId implements IIdentifiable
 	 * @param cid the parent ClassId to check.
 	 * @return {code true} if this Class is equal to the selected ClassId or a child of the selected ClassId.
 	 */
-	public final boolean equalsOrChildOf(ClassId cid)
-	{
+	public final boolean equalsOrChildOf(ClassId cid) {
 		return (this == cid) || childOf(cid);
 	}
 	
 	/**
 	 * @return the child level of this Class (0=root, 1=child leve 1...)
 	 */
-	public final int level()
-	{
-		if (_parent == null)
-		{
+	public final int level() {
+		if (_parent == null) {
 			return 0;
 		}
 		
@@ -325,19 +312,14 @@ public enum ClassId implements IIdentifiable
 	/**
 	 * @return its parent Class Id
 	 */
-	public final ClassId getParent()
-	{
+	public final ClassId getParent() {
 		return _parent;
 	}
 	
-	public static ClassId getClassId(int cId)
-	{
-		try
-		{
+	public static ClassId getClassId(int cId) {
+		try {
 			return ClassId.values()[cId];
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			return null;
 		}
 	}

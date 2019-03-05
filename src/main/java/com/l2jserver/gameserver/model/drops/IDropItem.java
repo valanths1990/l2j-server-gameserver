@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
 /**
  * @author NosBit
  */
-public interface IDropItem
-{
+public interface IDropItem {
 	
 	/**
 	 * Calculates drops of this drop item.

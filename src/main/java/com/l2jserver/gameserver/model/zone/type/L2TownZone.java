@@ -26,44 +26,34 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * A Town zone
  * @author durgus
  */
-public class L2TownZone extends L2ZoneType
-{
+public class L2TownZone extends L2ZoneType {
 	private int _townId;
 	private int _taxById;
 	
-	public L2TownZone(int id)
-	{
+	public L2TownZone(int id) {
 		super(id);
 		
 		_taxById = 0;
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("townId"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("townId")) {
 			_townId = Integer.parseInt(value);
-		}
-		else if (name.equals("taxById"))
-		{
+		} else if (name.equals("taxById")) {
 			_taxById = Integer.parseInt(value);
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
+	protected void onEnter(L2Character character) {
 		character.setInsideZone(ZoneId.TOWN, true);
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
+	protected void onExit(L2Character character) {
 		character.setInsideZone(ZoneId.TOWN, false);
 	}
 	
@@ -71,8 +61,7 @@ public class L2TownZone extends L2ZoneType
 	 * Returns this zones town id (if any)
 	 * @return
 	 */
-	public int getTownId()
-	{
+	public int getTownId() {
 		return _townId;
 	}
 	
@@ -80,8 +69,7 @@ public class L2TownZone extends L2ZoneType
 	 * Returns this town zones castle id
 	 * @return
 	 */
-	public final int getTaxById()
-	{
+	public final int getTaxById() {
 		return _taxById;
 	}
 }

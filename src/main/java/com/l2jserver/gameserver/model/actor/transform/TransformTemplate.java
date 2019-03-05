@@ -38,8 +38,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExBasicActionList;
 /**
  * @author UnAfraid
  */
-public final class TransformTemplate
-{
+public final class TransformTemplate {
 	private final double _collisionRadius;
 	private final double _collisionHeight;
 	private final WeaponType _baseAttackType;
@@ -55,8 +54,7 @@ public final class TransformTemplate
 	private ExBasicActionList _list;
 	private final Map<Integer, TransformLevelData> _data = new LinkedHashMap<>(100);
 	
-	public TransformTemplate(StatsSet set)
-	{
+	public TransformTemplate(StatsSet set) {
 		_collisionRadius = set.getDouble("radius", 0);
 		_collisionHeight = set.getDouble("height", 0);
 		_baseAttackType = set.getEnum("attackType", WeaponType.class, WeaponType.FIST);
@@ -96,149 +94,118 @@ public final class TransformTemplate
 		addDefense(Inventory.PAPERDOLL_NECK, set.getInt("neck", 0));
 	}
 	
-	private void addSpeed(MoveType type, double val)
-	{
-		if (_baseSpeed == null)
-		{
+	private void addSpeed(MoveType type, double val) {
+		if (_baseSpeed == null) {
 			_baseSpeed = new HashMap<>();
 		}
 		_baseSpeed.put(type.ordinal(), val);
 	}
 	
-	public double getBaseMoveSpeed(MoveType type)
-	{
-		if ((_baseSpeed == null) || !_baseSpeed.containsKey(type.ordinal()))
-		{
+	public double getBaseMoveSpeed(MoveType type) {
+		if ((_baseSpeed == null) || !_baseSpeed.containsKey(type.ordinal())) {
 			return 0;
 		}
 		return _baseSpeed.get(type.ordinal());
 	}
 	
-	private void addDefense(int type, int val)
-	{
-		if (_baseDefense == null)
-		{
+	private void addDefense(int type, int val) {
+		if (_baseDefense == null) {
 			_baseDefense = new HashMap<>();
 		}
 		_baseDefense.put(type, val);
 	}
 	
-	public int getDefense(int type)
-	{
-		if ((_baseDefense == null) || !_baseDefense.containsKey(type))
-		{
+	public int getDefense(int type) {
+		if ((_baseDefense == null) || !_baseDefense.containsKey(type)) {
 			return 0;
 		}
 		return _baseDefense.get(type);
 	}
 	
-	private void addStats(Stats stats, double val)
-	{
-		if (_baseStats == null)
-		{
+	private void addStats(Stats stats, double val) {
+		if (_baseStats == null) {
 			_baseStats = new HashMap<>();
 		}
 		_baseStats.put(stats.ordinal(), val);
 	}
 	
-	public double getStats(Stats stats)
-	{
-		if ((_baseStats == null) || !_baseStats.containsKey(stats.ordinal()))
-		{
+	public double getStats(Stats stats) {
+		if ((_baseStats == null) || !_baseStats.containsKey(stats.ordinal())) {
 			return 0;
 		}
 		return _baseStats.get(stats.ordinal());
 	}
 	
-	public double getCollisionRadius()
-	{
+	public double getCollisionRadius() {
 		return _collisionRadius;
 	}
 	
-	public double getCollisionHeight()
-	{
+	public double getCollisionHeight() {
 		return _collisionHeight;
 	}
 	
-	public WeaponType getBaseAttackType()
-	{
+	public WeaponType getBaseAttackType() {
 		return _baseAttackType;
 	}
 	
-	public int getBaseAttackRange()
-	{
+	public int getBaseAttackRange() {
 		return _baseAttackRange;
 	}
 	
-	public double getBaseRandomDamage()
-	{
+	public double getBaseRandomDamage() {
 		return _baseRandomDamage;
 	}
 	
-	public void addSkill(SkillHolder holder)
-	{
-		if (_skills == null)
-		{
+	public void addSkill(SkillHolder holder) {
+		if (_skills == null) {
 			_skills = new ArrayList<>();
 		}
 		_skills.add(holder);
 	}
 	
-	public List<SkillHolder> getSkills()
-	{
+	public List<SkillHolder> getSkills() {
 		return _skills != null ? _skills : Collections.<SkillHolder> emptyList();
 	}
 	
-	public void addAdditionalSkill(AdditionalSkillHolder holder)
-	{
-		if (_additionalSkills == null)
-		{
+	public void addAdditionalSkill(AdditionalSkillHolder holder) {
+		if (_additionalSkills == null) {
 			_additionalSkills = new ArrayList<>();
 		}
 		_additionalSkills.add(holder);
 	}
 	
-	public List<AdditionalSkillHolder> getAdditionalSkills()
-	{
+	public List<AdditionalSkillHolder> getAdditionalSkills() {
 		return _additionalSkills != null ? _additionalSkills : Collections.<AdditionalSkillHolder> emptyList();
 	}
 	
-	public void addAdditionalItem(AdditionalItemHolder holder)
-	{
-		if (_additionalItems == null)
-		{
+	public void addAdditionalItem(AdditionalItemHolder holder) {
+		if (_additionalItems == null) {
 			_additionalItems = new ArrayList<>();
 		}
 		_additionalItems.add(holder);
 	}
 	
-	public List<AdditionalItemHolder> getAdditionalItems()
-	{
+	public List<AdditionalItemHolder> getAdditionalItems() {
 		return _additionalItems != null ? _additionalItems : Collections.<AdditionalItemHolder> emptyList();
 	}
 	
-	public void setBasicActionList(ExBasicActionList list)
-	{
+	public void setBasicActionList(ExBasicActionList list) {
 		_list = list;
 	}
 	
-	public ExBasicActionList getBasicActionList()
-	{
+	public ExBasicActionList getBasicActionList() {
 		return _list;
 	}
 	
-	public boolean hasBasicActionList()
-	{
+	public boolean hasBasicActionList() {
 		return _list != null;
 	}
 	
-	public void addLevelData(TransformLevelData data)
-	{
+	public void addLevelData(TransformLevelData data) {
 		_data.put(data.getLevel(), data);
 	}
 	
-	public TransformLevelData getData(int level)
-	{
+	public TransformLevelData getData(int level) {
 		return _data.get(level);
 	}
 }

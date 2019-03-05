@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author KenM
  */
-public class ExShowAdventurerGuideBook extends L2GameServerPacket
-{
+public class ExShowAdventurerGuideBook extends L2GameServerPacket {
 	public static final ExShowAdventurerGuideBook STATIC_PACKET = new ExShowAdventurerGuideBook();
 	
-	private ExShowAdventurerGuideBook()
-	{
+	private ExShowAdventurerGuideBook() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x38);
 	}

@@ -30,8 +30,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * This class ...
  * @version $Revision: 1.0.0.0 $ $Date: 2005/07/11 15:29:30 $
  */
-public final class RequestAutoSoulShot extends L2GameClientPacket
-{
+public final class RequestAutoSoulShot extends L2GameClientPacket {
 	private static final String _C__D0_0D_REQUESTAUTOSOULSHOT = "[C] D0:0D RequestAutoSoulShot";
 	
 	// format cd
@@ -39,62 +38,46 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 	private int _type; // 1 = on : 0 = off;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_itemId = readD();
 		_type = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if ((activeChar.getPrivateStoreType() == PrivateStoreType.NONE) && (activeChar.getActiveRequester() == null) && !activeChar.isDead())
-		{
-			if (Config.DEBUG)
-			{
+		if ((activeChar.getPrivateStoreType() == PrivateStoreType.NONE) && (activeChar.getActiveRequester() == null) && !activeChar.isDead()) {
+			if (Config.DEBUG) {
 				_log.fine("AutoSoulShot:" + _itemId);
 			}
 			
 			final L2ItemInstance item = activeChar.getInventory().getItemByItemId(_itemId);
-			if (item == null)
-			{
+			if (item == null) {
 				return;
 			}
 			
-			if (_type == 1)
-			{
-				if (!activeChar.getInventory().canManipulateWithItemId(item.getId()))
-				{
+			if (_type == 1) {
+				if (!activeChar.getInventory().canManipulateWithItemId(item.getId())) {
 					activeChar.sendMessage("Cannot use this item.");
 					return;
 				}
 				
 				// Fishingshots are not automatic on retail
-				if ((_itemId < 6535) || (_itemId > 6540))
-				{
+				if ((_itemId < 6535) || (_itemId > 6540)) {
 					// Attempt to charge first shot on activation
-					if ((_itemId == 6645) || (_itemId == 6646) || (_itemId == 6647) || (_itemId == 20332) || (_itemId == 20333) || (_itemId == 20334))
-					{
-						if (activeChar.hasSummon())
-						{
-							if (item.getEtcItem().getHandlerName().equals("BeastSoulShot"))
-							{
-								if (activeChar.getSummon().getSoulShotsPerHit() > item.getCount())
-								{
+					if ((_itemId == 6645) || (_itemId == 6646) || (_itemId == 6647) || (_itemId == 20332) || (_itemId == 20333) || (_itemId == 20334)) {
+						if (activeChar.hasSummon()) {
+							if (item.getEtcItem().getHandlerName().equals("BeastSoulShot")) {
+								if (activeChar.getSummon().getSoulShotsPerHit() > item.getCount()) {
 									activeChar.sendPacket(SystemMessageId.NOT_ENOUGH_SOULSHOTS_FOR_PET);
 									return;
 								}
-							}
-							else
-							{
-								if (activeChar.getSummon().getSpiritShotsPerHit() > item.getCount())
-								{
+							} else {
+								if (activeChar.getSummon().getSpiritShotsPerHit() > item.getCount()) {
 									activeChar.sendPacket(SystemMessageId.NOT_ENOUGH_SOULSHOTS_FOR_PET);
 									return;
 								}
@@ -110,27 +93,17 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 							activeChar.rechargeShots(true, true);
 							activeChar.getSummon().rechargeShots(true, true);
 							
-						}
-						else
-						{
+						} else {
 							activeChar.sendPacket(SystemMessageId.NO_SERVITOR_CANNOT_AUTOMATE_USE);
 						}
-					}
-					else
-					{
-						if ((activeChar.getActiveWeaponItem() != activeChar.getFistsWeaponItem()) && (item.getItem().getCrystalType() == activeChar.getActiveWeaponItem().getItemGradeSPlus()))
-						{
+					} else {
+						if ((activeChar.getActiveWeaponItem() != activeChar.getFistsWeaponItem()) && (item.getItem().getCrystalType() == activeChar.getActiveWeaponItem().getItemGradeSPlus())) {
 							activeChar.addAutoSoulShot(_itemId);
 							activeChar.sendPacket(new ExAutoSoulShot(_itemId, _type));
-						}
-						else
-						{
-							if (((_itemId >= 2509) && (_itemId <= 2514)) || ((_itemId >= 3947) && (_itemId <= 3952)) || (_itemId == 5790) || ((_itemId >= 22072) && (_itemId <= 22081)))
-							{
+						} else {
+							if (((_itemId >= 2509) && (_itemId <= 2514)) || ((_itemId >= 3947) && (_itemId <= 3952)) || (_itemId == 5790) || ((_itemId >= 22072) && (_itemId <= 22081))) {
 								activeChar.sendPacket(SystemMessageId.SPIRITSHOTS_GRADE_MISMATCH);
-							}
-							else
-							{
+							} else {
 								activeChar.sendPacket(SystemMessageId.SOULSHOTS_GRADE_MISMATCH);
 							}
 							
@@ -146,9 +119,7 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 						activeChar.rechargeShots(true, true);
 					}
 				}
-			}
-			else if (_type == 0)
-			{
+			} else if (_type == 0) {
 				activeChar.removeAutoSoulShot(_itemId);
 				activeChar.sendPacket(new ExAutoSoulShot(_itemId, _type));
 				
@@ -161,14 +132,12 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_0D_REQUESTAUTOSOULSHOT;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

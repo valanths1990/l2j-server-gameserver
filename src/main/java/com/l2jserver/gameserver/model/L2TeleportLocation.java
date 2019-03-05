@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model;
  * This class ...
  * @version $Revision: 1.2.4.1 $ $Date: 2005/03/27 15:29:32 $
  */
-public class L2TeleportLocation
-{
+public class L2TeleportLocation {
 	private int _teleId;
 	private int _locX;
 	private int _locY;
@@ -35,112 +34,98 @@ public class L2TeleportLocation
 	/**
 	 * @param id
 	 */
-	public void setTeleId(int id)
-	{
+	public void setTeleId(int id) {
 		_teleId = id;
 	}
 	
 	/**
 	 * @param locX
 	 */
-	public void setLocX(int locX)
-	{
+	public void setLocX(int locX) {
 		_locX = locX;
 	}
 	
 	/**
 	 * @param locY
 	 */
-	public void setLocY(int locY)
-	{
+	public void setLocY(int locY) {
 		_locY = locY;
 	}
 	
 	/**
 	 * @param locZ
 	 */
-	public void setLocZ(int locZ)
-	{
+	public void setLocZ(int locZ) {
 		_locZ = locZ;
 	}
 	
 	/**
 	 * @param price
 	 */
-	public void setPrice(int price)
-	{
+	public void setPrice(int price) {
 		_price = price;
 	}
 	
 	/**
 	 * @param val
 	 */
-	public void setIsForNoble(boolean val)
-	{
+	public void setIsForNoble(boolean val) {
 		_forNoble = val;
 	}
 	
 	/**
 	 * @param val
 	 */
-	public void setItemId(int val)
-	{
+	public void setItemId(int val) {
 		_itemId = val;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getTeleId()
-	{
+	public int getTeleId() {
 		return _teleId;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getLocX()
-	{
+	public int getLocX() {
 		return _locX;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getLocY()
-	{
+	public int getLocY() {
 		return _locY;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getLocZ()
-	{
+	public int getLocZ() {
 		return _locZ;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getPrice()
-	{
+	public int getPrice() {
 		return _price;
 	}
 	
 	/**
 	 * @return
 	 */
-	public boolean getIsForNoble()
-	{
+	public boolean getIsForNoble() {
 		return _forNoble;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 }

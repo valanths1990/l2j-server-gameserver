@@ -22,7 +22,6 @@ package com.l2jserver.gameserver.model.interfaces;
  * Interface for objects with name.
  * @author xban1x
  */
-public interface INamable
-{
+public interface INamable {
 	public String getName();
 }

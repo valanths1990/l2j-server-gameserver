@@ -31,8 +31,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 /**
  * @author Gnacik
  */
-public final class RequestPartyMatchDetail extends L2GameClientPacket
-{
+public final class RequestPartyMatchDetail extends L2GameClientPacket {
 	private static final String _C__81_REQUESTPARTYMATCHDETAIL = "[C] 81 RequestPartyMatchDetail";
 	
 	private int _roomid;
@@ -44,8 +43,7 @@ public final class RequestPartyMatchDetail extends L2GameClientPacket
 	private int _unk3;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_roomid = readD();
 		// If player click on Room all unk are 0
 		// If player click AutoJoin values are -1 1 1
@@ -55,22 +53,18 @@ public final class RequestPartyMatchDetail extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance _activeChar = getClient().getActiveChar();
-		if (_activeChar == null)
-		{
+		if (_activeChar == null) {
 			return;
 		}
 		
 		PartyMatchRoom _room = PartyMatchRoomList.getInstance().getRoom(_roomid);
-		if (_room == null)
-		{
+		if (_room == null) {
 			return;
 		}
 		
-		if ((_activeChar.getLevel() >= _room.getMinLvl()) && (_activeChar.getLevel() <= _room.getMaxLvl()))
-		{
+		if ((_activeChar.getLevel() >= _room.getMinLvl()) && (_activeChar.getLevel() <= _room.getMaxLvl())) {
 			// Remove from waiting list
 			PartyMatchWaitingList.getInstance().removePlayer(_activeChar);
 			
@@ -79,10 +73,8 @@ public final class RequestPartyMatchDetail extends L2GameClientPacket
 			_activeChar.sendPacket(new PartyMatchDetail(_activeChar, _room));
 			_activeChar.sendPacket(new ExPartyRoomMember(_activeChar, _room, 0));
 			
-			for (L2PcInstance _member : _room.getPartyMembers())
-			{
-				if (_member == null)
-				{
+			for (L2PcInstance _member : _room.getPartyMembers()) {
+				if (_member == null) {
 					continue;
 				}
 				
@@ -96,16 +88,13 @@ public final class RequestPartyMatchDetail extends L2GameClientPacket
 			
 			// Info Broadcast
 			_activeChar.broadcastUserInfo();
-		}
-		else
-		{
+		} else {
 			_activeChar.sendPacket(SystemMessageId.CANT_ENTER_PARTY_ROOM);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__81_REQUESTPARTYMATCHDETAIL;
 	}
 }

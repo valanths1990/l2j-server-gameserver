@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.model.stats.Stats;
  * Indeed, functions with lowest priority order is executed first and functions with the same order are executed in unspecified order.<br>
  * @author Zoey76
  */
-public abstract class AbstractFunction
-{
+public abstract class AbstractFunction {
 	/** Logger. */
 	protected static final Logger LOG = Logger.getLogger(AbstractFunction.class.getName());
 	/** Statistics, that is affected by this function (See L2Character.CALCULATOR_XXX constants) */
@@ -66,8 +65,7 @@ public abstract class AbstractFunction
 	 * @param value the value
 	 * @param applayCond the apply condition
 	 */
-	public AbstractFunction(Stats stat, int order, Object owner, double value, Condition applayCond)
-	{
+	public AbstractFunction(Stats stat, int order, Object owner, double value, Condition applayCond) {
 		_stat = stat;
 		_order = order;
 		_funcOwner = owner;
@@ -79,8 +77,7 @@ public abstract class AbstractFunction
 	 * Gets the apply condition
 	 * @return the apply condition
 	 */
-	public Condition getApplayCond()
-	{
+	public Condition getApplayCond() {
 		return _applayCond;
 	}
 	
@@ -88,8 +85,7 @@ public abstract class AbstractFunction
 	 * Gets the fuction owner.
 	 * @return the function owner
 	 */
-	public final Object getFuncOwner()
-	{
+	public final Object getFuncOwner() {
 		return _funcOwner;
 	}
 	
@@ -97,8 +93,7 @@ public abstract class AbstractFunction
 	 * Gets the function order.
 	 * @return the order
 	 */
-	public final int getOrder()
-	{
+	public final int getOrder() {
 		return _order;
 	}
 	
@@ -106,8 +101,7 @@ public abstract class AbstractFunction
 	 * Gets the stat.
 	 * @return the stat
 	 */
-	public final Stats getStat()
-	{
+	public final Stats getStat() {
 		return _stat;
 	}
 	
@@ -115,8 +109,7 @@ public abstract class AbstractFunction
 	 * Gets the value.
 	 * @return the value
 	 */
-	public final double getValue()
-	{
+	public final double getValue() {
 		return _value;
 	}
 	

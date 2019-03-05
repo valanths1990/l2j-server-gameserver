@@ -29,34 +29,28 @@ import com.l2jserver.util.network.BaseSendablePacket;
 /**
  * @author -Wooden-
  */
-public class BlowFishKey extends BaseSendablePacket
-{
+public class BlowFishKey extends BaseSendablePacket {
 	private static Logger _log = Logger.getLogger(BlowFishKey.class.getName());
 	
 	/**
 	 * @param blowfishKey
 	 * @param publicKey
 	 */
-	public BlowFishKey(byte[] blowfishKey, RSAPublicKey publicKey)
-	{
+	public BlowFishKey(byte[] blowfishKey, RSAPublicKey publicKey) {
 		writeC(0x00);
-		try
-		{
+		try {
 			final Cipher rsaCipher = Cipher.getInstance("RSA/ECB/nopadding");
 			rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 			byte[] encrypted = rsaCipher.doFinal(blowfishKey);
 			writeD(encrypted.length);
 			writeB(encrypted);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error While encrypting blowfish key for transmision (Crypt error): " + e.getMessage(), e);
 		}
 	}
 	
 	@Override
-	public byte[] getContent()
-	{
+	public byte[] getContent() {
 		return getBytes();
 	}
 }

@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class PartySmallWindowDeleteAll extends L2GameServerPacket
-{
+public final class PartySmallWindowDeleteAll extends L2GameServerPacket {
 	public static final PartySmallWindowDeleteAll STATIC_PACKET = new PartySmallWindowDeleteAll();
 	
-	private PartySmallWindowDeleteAll()
-	{
+	private PartySmallWindowDeleteAll() {
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x50);
 	}
 }

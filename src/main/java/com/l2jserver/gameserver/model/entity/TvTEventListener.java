@@ -24,42 +24,35 @@ import com.l2jserver.gameserver.model.interfaces.IEventListener;
 /**
  * @author UnAfraid
  */
-public final class TvTEventListener implements IEventListener
-{
+public final class TvTEventListener implements IEventListener {
 	private final L2PcInstance _player;
 	
-	protected TvTEventListener(L2PcInstance player)
-	{
+	protected TvTEventListener(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public boolean isOnEvent()
-	{
+	public boolean isOnEvent() {
 		return TvTEvent.isStarted() && TvTEvent.isPlayerParticipant(getPlayer().getObjectId());
 	}
 	
 	@Override
-	public boolean isBlockingExit()
-	{
+	public boolean isBlockingExit() {
 		return true;
 	}
 	
 	@Override
-	public boolean isBlockingDeathPenalty()
-	{
+	public boolean isBlockingDeathPenalty() {
 		return true;
 	}
 	
 	@Override
-	public boolean canRevive()
-	{
+	public boolean canRevive() {
 		return false;
 	}
 	
 	@Override
-	public L2PcInstance getPlayer()
-	{
+	public L2PcInstance getPlayer() {
 		return _player;
 	}
 }

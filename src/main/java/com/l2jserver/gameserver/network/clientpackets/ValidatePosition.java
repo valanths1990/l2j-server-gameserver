@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.network.serverpackets.ValidateLocation;
  * This class ...
  * @version $Revision: 1.13.4.7 $ $Date: 2005/03/27 15:29:30 $
  */
-public class ValidatePosition extends L2GameClientPacket
-{
+public class ValidatePosition extends L2GameClientPacket {
 	private static final String _C__59_VALIDATEPOSITION = "[C] 59 ValidatePosition";
 	
 	private int _x;
@@ -40,8 +39,7 @@ public class ValidatePosition extends L2GameClientPacket
 	private int _data; // vehicle id
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_x = readD();
 		_y = readD();
 		_z = readD();
@@ -50,11 +48,9 @@ public class ValidatePosition extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if ((activeChar == null) || activeChar.isTeleporting() || activeChar.inObserverMode())
-		{
+		if ((activeChar == null) || activeChar.isTeleporting() || activeChar.inObserverMode()) {
 			return;
 		}
 		
@@ -62,16 +58,13 @@ public class ValidatePosition extends L2GameClientPacket
 		final int realY = activeChar.getY();
 		int realZ = activeChar.getZ();
 		
-		if (Config.DEVELOPER)
-		{
+		if (Config.DEVELOPER) {
 			_log.fine("client pos: " + _x + " " + _y + " " + _z + " head " + _heading);
 			_log.fine("server pos: " + realX + " " + realY + " " + realZ + " head " + activeChar.getHeading());
 		}
 		
-		if ((_x == 0) && (_y == 0))
-		{
-			if (realX != 0)
-			{
+		if ((_x == 0) && (_y == 0)) {
+			if (realX != 0) {
 				return;
 			}
 		}
@@ -79,23 +72,19 @@ public class ValidatePosition extends L2GameClientPacket
 		int dx, dy, dz;
 		double diffSq;
 		
-		if (activeChar.isInBoat())
-		{
-			if (Config.COORD_SYNCHRONIZE == 2)
-			{
+		if (activeChar.isInBoat()) {
+			if (Config.COORD_SYNCHRONIZE == 2) {
 				dx = _x - activeChar.getInVehiclePosition().getX();
 				dy = _y - activeChar.getInVehiclePosition().getY();
 				// dz = _z - activeChar.getInVehiclePosition().getZ();
 				diffSq = ((dx * dx) + (dy * dy));
-				if (diffSq > 250000)
-				{
+				if (diffSq > 250000) {
 					sendPacket(new GetOnVehicle(activeChar.getObjectId(), _data, activeChar.getInVehiclePosition()));
 				}
 			}
 			return;
 		}
-		if (activeChar.isInAirShip())
-		{
+		if (activeChar.isInAirShip()) {
 			// Zoey76: TODO: Implement or cleanup.
 			// if (Config.COORD_SYNCHRONIZE == 2)
 			// {
@@ -111,8 +100,7 @@ public class ValidatePosition extends L2GameClientPacket
 			return;
 		}
 		
-		if (activeChar.isFalling(_z))
-		{
+		if (activeChar.isFalling(_z)) {
 			return; // disable validations during fall to avoid "jumping"
 		}
 		
@@ -130,20 +118,16 @@ public class ValidatePosition extends L2GameClientPacket
 		// }
 		
 		// Don't allow flying transformations outside gracia area!
-		if (activeChar.isFlyingMounted() && (_x > L2World.GRACIA_MAX_X))
-		{
+		if (activeChar.isFlyingMounted() && (_x > L2World.GRACIA_MAX_X)) {
 			activeChar.untransform();
 		}
 		
-		if (activeChar.isFlying() || activeChar.isInsideZone(ZoneId.WATER))
-		{
+		if (activeChar.isFlying() || activeChar.isInsideZone(ZoneId.WATER)) {
 			activeChar.setXYZ(realX, realY, _z);
-			if (diffSq > 90000)
-			{
+			if (diffSq > 90000) {
 				activeChar.sendPacket(new ValidateLocation(activeChar));
 			}
-		}
-		else if (diffSq < 360000) // if too large, messes observation
+		} else if (diffSq < 360000) // if too large, messes observation
 		{
 			if (Config.COORD_SYNCHRONIZE == -1) // Only Z coordinate synched to server,
 			// mainly used when no geodata but can be used also with geodata
@@ -156,17 +140,12 @@ public class ValidatePosition extends L2GameClientPacket
 				if (!activeChar.isMoving() || !activeChar.validateMovementHeading(_heading)) // Heading changed on client = possible obstacle
 				{
 					// character is not moving, take coordinates from client
-					if (diffSq < 2500)
-					{
+					if (diffSq < 2500) {
 						activeChar.setXYZ(realX, realY, _z);
-					}
-					else
-					{
+					} else {
 						activeChar.setXYZ(_x, _y, _z);
 					}
-				}
-				else
-				{
+				} else {
 					activeChar.setXYZ(realX, realY, _z);
 				}
 				
@@ -178,19 +157,14 @@ public class ValidatePosition extends L2GameClientPacket
 			// when too far from server calculated true coordinate.
 			// Due to geodata/zone errors, some Z axis checks are made. (maybe a temporary solution)
 			// Important: this code part must work together with L2Character.updatePosition
-			if ((diffSq > 250000) || (Math.abs(dz) > 200))
-			{
+			if ((diffSq > 250000) || (Math.abs(dz) > 200)) {
 				// if ((_z - activeChar.getClientZ()) < 200 && Math.abs(activeChar.getLastServerPosition().getZ()-realZ) > 70)
 				
-				if ((Math.abs(dz) > 200) && (Math.abs(dz) < 1500) && (Math.abs(_z - activeChar.getClientZ()) < 800))
-				{
+				if ((Math.abs(dz) > 200) && (Math.abs(dz) < 1500) && (Math.abs(_z - activeChar.getClientZ()) < 800)) {
 					activeChar.setXYZ(realX, realY, _z);
 					realZ = _z;
-				}
-				else
-				{
-					if (Config.DEVELOPER)
-					{
+				} else {
+					if (Config.DEVELOPER) {
 						_log.info(activeChar.getName() + ": Synchronizing position Server --> Client");
 					}
 					
@@ -207,8 +181,7 @@ public class ValidatePosition extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__59_VALIDATEPOSITION;
 	}
 }

@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.skills.targets;
 /**
  * @author Zoey76
  */
-public enum L2TargetType
-{
+public enum L2TargetType {
 	AREA,
 	AREA_CORPSE_MOB,
 	AREA_FRIENDLY,

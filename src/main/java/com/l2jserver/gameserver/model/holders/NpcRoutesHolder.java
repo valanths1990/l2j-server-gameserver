@@ -29,12 +29,10 @@ import com.l2jserver.gameserver.model.interfaces.ILocational;
  * Holds depending between NPC's spawn point and route
  * @author GKR
  */
-public final class NpcRoutesHolder
-{
+public final class NpcRoutesHolder {
 	private final Map<String, String> _correspondences;
 	
-	public NpcRoutesHolder()
-	{
+	public NpcRoutesHolder() {
 		_correspondences = new HashMap<>();
 	}
 	
@@ -43,8 +41,7 @@ public final class NpcRoutesHolder
 	 * @param routeName name of route
 	 * @param loc Location of spawn point
 	 */
-	public void addRoute(String routeName, Location loc)
-	{
+	public void addRoute(String routeName, Location loc) {
 		_correspondences.put(getUniqueKey(loc), routeName);
 	}
 	
@@ -52,10 +49,8 @@ public final class NpcRoutesHolder
 	 * @param npc
 	 * @return route name for given NPC.
 	 */
-	public String getRouteName(L2Npc npc)
-	{
-		if (npc.getSpawn() != null)
-		{
+	public String getRouteName(L2Npc npc) {
+		if (npc.getSpawn() != null) {
 			String key = getUniqueKey(npc.getSpawn().getLocation());
 			return _correspondences.containsKey(key) ? _correspondences.get(key) : "";
 		}
@@ -66,8 +61,7 @@ public final class NpcRoutesHolder
 	 * @param loc
 	 * @return unique text string for given Location.
 	 */
-	private String getUniqueKey(ILocational loc)
-	{
+	private String getUniqueKey(ILocational loc) {
 		return (loc.getX() + "-" + loc.getY() + "-" + loc.getZ());
 	}
 }

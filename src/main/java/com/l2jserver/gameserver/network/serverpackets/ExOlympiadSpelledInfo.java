@@ -27,32 +27,26 @@ import com.l2jserver.gameserver.model.skills.BuffInfo;
 /**
  * @author godson
  */
-public class ExOlympiadSpelledInfo extends L2GameServerPacket
-{
+public class ExOlympiadSpelledInfo extends L2GameServerPacket {
 	private final int _playerId;
 	private final List<BuffInfo> _effects = new ArrayList<>();
 	
-	public ExOlympiadSpelledInfo(L2PcInstance player)
-	{
+	public ExOlympiadSpelledInfo(L2PcInstance player) {
 		_playerId = player.getObjectId();
 	}
 	
-	public void addSkill(BuffInfo info)
-	{
+	public void addSkill(BuffInfo info) {
 		_effects.add(info);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0x7B);
 		writeD(_playerId);
 		writeD(_effects.size());
-		for (BuffInfo info : _effects)
-		{
-			if ((info != null) && info.isInUse())
-			{
+		for (BuffInfo info : _effects) {
+			if ((info != null) && info.isInUse()) {
 				writeD(info.getSkill().getDisplayId());
 				writeH(info.getSkill().getDisplayLevel());
 				writeD(info.getTime());

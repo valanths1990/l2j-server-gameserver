@@ -27,25 +27,21 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
 /**
  * @author Gigiikun
  */
-public class TaskGlobalVariablesSave extends Task
-{
+public class TaskGlobalVariablesSave extends Task {
 	public static final String NAME = "global_varibales_save";
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 	
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
+	public void onTimeElapsed(ExecutedTask task) {
 		GlobalVariablesManager.getInstance().storeMe();
 	}
 	
 	@Override
-	public void initializate()
-	{
+	public void initializate() {
 		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_FIXED_SHEDULED, "500000", "1800000", "");
 	}

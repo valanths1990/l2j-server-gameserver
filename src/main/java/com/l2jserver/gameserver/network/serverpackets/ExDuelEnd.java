@@ -22,21 +22,18 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Duel End packet implementation.
  * @author KenM, Zoey76
  */
-public class ExDuelEnd extends L2GameServerPacket
-{
+public class ExDuelEnd extends L2GameServerPacket {
 	public static final ExDuelEnd PLAYER_DUEL = new ExDuelEnd(false);
 	public static final ExDuelEnd PARTY_DUEL = new ExDuelEnd(true);
 	
 	private final int _partyDuel;
 	
-	private ExDuelEnd(boolean isPartyDuel)
-	{
+	private ExDuelEnd(boolean isPartyDuel) {
 		_partyDuel = isPartyDuel ? 1 : 0;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x4f);
 		writeD(_partyDuel);

@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author -Wooden-
  */
-public final class PledgeShowMemberListUpdate extends L2GameServerPacket
-{
+public final class PledgeShowMemberListUpdate extends L2GameServerPacket {
 	private final int _pledgeType;
 	private int _hasSponsor;
 	private final String _name;
@@ -37,15 +36,11 @@ public final class PledgeShowMemberListUpdate extends L2GameServerPacket
 	private final int _race;
 	private final int _sex;
 	
-	public PledgeShowMemberListUpdate(L2PcInstance player)
-	{
+	public PledgeShowMemberListUpdate(L2PcInstance player) {
 		_pledgeType = player.getPledgeType();
-		if (_pledgeType == L2Clan.SUBUNIT_ACADEMY)
-		{
+		if (_pledgeType == L2Clan.SUBUNIT_ACADEMY) {
 			_hasSponsor = player.getSponsor() != 0 ? 1 : 0;
-		}
-		else
-		{
+		} else {
 			_hasSponsor = 0;
 		}
 		_name = player.getName();
@@ -57,8 +52,7 @@ public final class PledgeShowMemberListUpdate extends L2GameServerPacket
 		_isOnline = player.isOnline();
 	}
 	
-	public PledgeShowMemberListUpdate(L2ClanMember member)
-	{
+	public PledgeShowMemberListUpdate(L2ClanMember member) {
 		_name = member.getName();
 		_level = member.getLevel();
 		_classId = member.getClassId();
@@ -67,32 +61,25 @@ public final class PledgeShowMemberListUpdate extends L2GameServerPacket
 		_pledgeType = member.getPledgeType();
 		_race = member.getRaceOrdinal();
 		_sex = member.getSex() ? 1 : 0;
-		if (_pledgeType == L2Clan.SUBUNIT_ACADEMY)
-		{
+		if (_pledgeType == L2Clan.SUBUNIT_ACADEMY) {
 			_hasSponsor = member.getSponsor() != 0 ? 1 : 0;
-		}
-		else
-		{
+		} else {
 			_hasSponsor = 0;
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x5b);
 		writeS(_name);
 		writeD(_level);
 		writeD(_classId);
 		writeD(_sex);
 		writeD(_race);
-		if (_isOnline)
-		{
+		if (_isOnline) {
 			writeD(_objectId);
 			writeD(_pledgeType);
-		}
-		else
-		{
+		} else {
 			// when going offline send as 0
 			writeD(0);
 			writeD(0);

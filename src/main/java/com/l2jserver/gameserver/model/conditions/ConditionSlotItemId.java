@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionSlotItemId.
  * @author mkizub
  */
-public final class ConditionSlotItemId extends ConditionInventory
-{
+public final class ConditionSlotItemId extends ConditionInventory {
 	private final int _itemId;
 	private final int _enchantLevel;
 	
@@ -38,24 +37,20 @@ public final class ConditionSlotItemId extends ConditionInventory
 	 * @param itemId the item id
 	 * @param enchantLevel the enchant level
 	 */
-	public ConditionSlotItemId(int slot, int itemId, int enchantLevel)
-	{
+	public ConditionSlotItemId(int slot, int itemId, int enchantLevel) {
 		super(slot);
 		_itemId = itemId;
 		_enchantLevel = enchantLevel;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return false;
 		}
 		
 		final L2ItemInstance itemSlot = effector.getInventory().getPaperdollItem(_slot);
-		if (itemSlot == null)
-		{
+		if (itemSlot == null) {
 			return _itemId == 0;
 		}
 		return (itemSlot.getId() == _itemId) && (itemSlot.getEnchantLevel() >= _enchantLevel);

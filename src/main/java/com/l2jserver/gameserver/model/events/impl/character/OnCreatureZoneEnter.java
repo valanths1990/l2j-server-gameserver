@@ -26,30 +26,25 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
 /**
  * @author UnAfraid
  */
-public class OnCreatureZoneEnter implements IBaseEvent
-{
+public class OnCreatureZoneEnter implements IBaseEvent {
 	private final L2Character _creature;
 	private final L2ZoneType _zone;
 	
-	public OnCreatureZoneEnter(L2Character creature, L2ZoneType zone)
-	{
+	public OnCreatureZoneEnter(L2Character creature, L2ZoneType zone) {
 		_creature = creature;
 		_zone = zone;
 	}
 	
-	public L2Character getCreature()
-	{
+	public L2Character getCreature() {
 		return _creature;
 	}
 	
-	public L2ZoneType getZone()
-	{
+	public L2ZoneType getZone() {
 		return _zone;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_CREATURE_ZONE_ENTER;
 	}
 	

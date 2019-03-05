@@ -26,50 +26,38 @@ import com.l2jserver.gameserver.model.TerritoryWard;
 /**
  * @author -Gigiikun-
  */
-public class ExShowOwnthingPos extends L2GameServerPacket
-{
+public class ExShowOwnthingPos extends L2GameServerPacket {
 	public static final ExShowOwnthingPos STATIC_PACKET = new ExShowOwnthingPos();
 	
-	private ExShowOwnthingPos()
-	{
+	private ExShowOwnthingPos() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x93);
 		
-		if (TerritoryWarManager.getInstance().isTWInProgress())
-		{
+		if (TerritoryWarManager.getInstance().isTWInProgress()) {
 			List<TerritoryWard> territoryWardList = TerritoryWarManager.getInstance().getAllTerritoryWards();
 			writeD(territoryWardList.size());
-			for (TerritoryWard ward : territoryWardList)
-			{
+			for (TerritoryWard ward : territoryWardList) {
 				writeD(ward.getTerritoryId());
 				
-				if (ward.getNpc() != null)
-				{
+				if (ward.getNpc() != null) {
 					writeD(ward.getNpc().getX());
 					writeD(ward.getNpc().getY());
 					writeD(ward.getNpc().getZ());
-				}
-				else if (ward.getPlayer() != null)
-				{
+				} else if (ward.getPlayer() != null) {
 					writeD(ward.getPlayer().getX());
 					writeD(ward.getPlayer().getY());
 					writeD(ward.getPlayer().getZ());
-				}
-				else
-				{
+				} else {
 					writeD(0x00);
 					writeD(0x00);
 					writeD(0x00);
 				}
 			}
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 		}
 	}

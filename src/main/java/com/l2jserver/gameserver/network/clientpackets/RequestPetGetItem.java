@@ -27,51 +27,43 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
-public final class RequestPetGetItem extends L2GameClientPacket
-{
+public final class RequestPetGetItem extends L2GameClientPacket {
 	private static final String _C__98_REQUESTPETGETITEM = "[C] 98 RequestPetGetItem";
 	
 	private int _objectId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2World world = L2World.getInstance();
 		L2ItemInstance item = (L2ItemInstance) world.findObject(_objectId);
-		if ((item == null) || (getActiveChar() == null) || !getActiveChar().hasPet())
-		{
+		if ((item == null) || (getActiveChar() == null) || !getActiveChar().hasPet()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		final int castleId = MercTicketManager.getInstance().getTicketCastleId(item.getId());
-		if (castleId > 0)
-		{
+		if (castleId > 0) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (FortSiegeManager.getInstance().isCombat(item.getId()))
-		{
+		if (FortSiegeManager.getInstance().isCombat(item.getId())) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		final L2PetInstance pet = (L2PetInstance) getClient().getActiveChar().getSummon();
-		if (pet.isDead() || pet.isOutOfControl())
-		{
+		if (pet.isDead() || pet.isOutOfControl()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (pet.isUncontrollable())
-		{
+		if (pet.isUncontrollable()) {
 			sendPacket(SystemMessageId.WHEN_YOUR_PETS_HUNGER_GAUGE_IS_AT_0_YOU_CANNOT_USE_YOUR_PET);
 			return;
 		}
@@ -80,8 +72,7 @@ public final class RequestPetGetItem extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__98_REQUESTPETGETITEM;
 	}
 }

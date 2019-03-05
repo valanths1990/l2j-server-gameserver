@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.network.clientpackets.RequestAllyInfo;
  * Sent in response to {@link RequestAllyInfo}, if applicable.<BR>
  * @author afk5min
  */
-public class AllianceInfo extends L2GameServerPacket
-{
+public class AllianceInfo extends L2GameServerPacket {
 	private final String _name;
 	private final int _total;
 	private final int _online;
@@ -38,8 +37,7 @@ public class AllianceInfo extends L2GameServerPacket
 	private final String _leaderP;
 	private final ClanInfo[] _allies;
 	
-	public AllianceInfo(int allianceId)
-	{
+	public AllianceInfo(int allianceId) {
 		final L2Clan leader = ClanTable.getInstance().getClan(allianceId);
 		_name = leader.getAllyName();
 		_leaderC = leader.getName();
@@ -48,8 +46,7 @@ public class AllianceInfo extends L2GameServerPacket
 		final Collection<L2Clan> allies = ClanTable.getInstance().getClanAllies(allianceId);
 		_allies = new ClanInfo[allies.size()];
 		int idx = 0, total = 0, online = 0;
-		for (final L2Clan clan : allies)
-		{
+		for (final L2Clan clan : allies) {
 			final ClanInfo ci = new ClanInfo(clan);
 			_allies[idx++] = ci;
 			total += ci.getTotal();
@@ -61,8 +58,7 @@ public class AllianceInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xB5);
 		
 		writeS(_name);
@@ -72,8 +68,7 @@ public class AllianceInfo extends L2GameServerPacket
 		writeS(_leaderP);
 		
 		writeD(_allies.length);
-		for (final ClanInfo aci : _allies)
-		{
+		for (final ClanInfo aci : _allies) {
 			writeS(aci.getClan().getName());
 			writeD(0x00);
 			writeD(aci.getClan().getLevel());
@@ -83,33 +78,27 @@ public class AllianceInfo extends L2GameServerPacket
 		}
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public int getTotal()
-	{
+	public int getTotal() {
 		return _total;
 	}
 	
-	public int getOnline()
-	{
+	public int getOnline() {
 		return _online;
 	}
 	
-	public String getLeaderC()
-	{
+	public String getLeaderC() {
 		return _leaderC;
 	}
 	
-	public String getLeaderP()
-	{
+	public String getLeaderP() {
 		return _leaderP;
 	}
 	
-	public ClanInfo[] getAllies()
-	{
+	public ClanInfo[] getAllies() {
 		return _allies;
 	}
 }

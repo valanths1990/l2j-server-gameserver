@@ -27,29 +27,24 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * D0 0F 00 5A 00 77 00 65 00 72 00 67 00 00 00
  * @author -Wooden-
  */
-public final class RequestExOustFromMPCC extends L2GameClientPacket
-{
+public final class RequestExOustFromMPCC extends L2GameClientPacket {
 	private static final String _C__D0_08_REQUESTEXOUSTFROMMPCC = "[C] D0:08 RequestExOustFromMPCC";
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance target = L2World.getInstance().getPlayer(_name);
 		L2PcInstance activeChar = getClient().getActiveChar();
 		
 		if ((target != null) && target.isInParty() && activeChar.isInParty() && activeChar.getParty().isInCommandChannel() && //
 			target.getParty().isInCommandChannel() && activeChar.getParty().getCommandChannel().getLeader().equals(activeChar) && //
-			activeChar.getParty().getCommandChannel().equals(target.getParty().getCommandChannel()))
-		{
-			if (activeChar.equals(target))
-			{
+			activeChar.getParty().getCommandChannel().equals(target.getParty().getCommandChannel())) {
+			if (activeChar.equals(target)) {
 				return;
 			}
 			
@@ -59,22 +54,18 @@ public final class RequestExOustFromMPCC extends L2GameClientPacket
 			target.getParty().broadcastPacket(sm);
 			
 			// check if CC has not been canceled
-			if (activeChar.getParty().isInCommandChannel())
-			{
+			if (activeChar.getParty().isInCommandChannel()) {
 				sm = SystemMessage.getSystemMessage(SystemMessageId.C1_PARTY_DISMISSED_FROM_COMMAND_CHANNEL);
 				sm.addString(target.getParty().getLeader().getName());
 				activeChar.getParty().getCommandChannel().broadcastPacket(sm);
 			}
-		}
-		else
-		{
+		} else {
 			activeChar.sendPacket(SystemMessageId.TARGET_CANT_FOUND);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_08_REQUESTEXOUSTFROMMPCC;
 	}
 }

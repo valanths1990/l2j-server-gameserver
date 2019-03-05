@@ -25,22 +25,18 @@ import com.l2jserver.gameserver.network.serverpackets.ExOlympiadMatchList;
  * Format: (ch)d d: unknown (always 0?)
  * @author mrTJO
  */
-public class RequestExOlympiadMatchListRefresh extends L2GameClientPacket
-{
+public class RequestExOlympiadMatchListRefresh extends L2GameClientPacket {
 	private static final String _C__D0_88_REQUESTEXOLYMPIADMATCHLISTREFRESH = "[C] D0:88 RequestExOlympiadMatchListRefresh";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
@@ -48,8 +44,7 @@ public class RequestExOlympiadMatchListRefresh extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_88_REQUESTEXOLYMPIADMATCHLISTREFRESH;
 	}
 }

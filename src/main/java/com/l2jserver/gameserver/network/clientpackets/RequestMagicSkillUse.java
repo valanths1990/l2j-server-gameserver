@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
-public final class RequestMagicSkillUse extends L2GameClientPacket
-{
+public final class RequestMagicSkillUse extends L2GameClientPacket {
 	private static final String _C__39_REQUESTMAGICSKILLUSE = "[C] 39 RequestMagicSkillUse";
 	
 	private int _magicId;
@@ -36,31 +35,26 @@ public final class RequestMagicSkillUse extends L2GameClientPacket
 	private boolean _shiftPressed;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_magicId = readD(); // Identifier of the used skill
 		_ctrlPressed = readD() != 0; // True if it's a ForceAttack : Ctrl pressed
 		_shiftPressed = readC() != 0; // True if Shift pressed
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// Get the current L2PcInstance of the player
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (activeChar.isDead())
-		{
+		if (activeChar.isDead()) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (activeChar.isFakeDeath())
-		{
+		if (activeChar.isFakeDeath()) {
 			activeChar.sendPacket(SystemMessageId.CANT_MOVE_SITTING);
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
@@ -68,15 +62,12 @@ public final class RequestMagicSkillUse extends L2GameClientPacket
 		
 		// Get the level of the used skill
 		Skill skill = activeChar.getKnownSkill(_magicId);
-		if (skill == null)
-		{
+		if (skill == null) {
 			// Player doesn't know this skill, maybe it's the display Id.
 			skill = activeChar.getCustomSkill(_magicId);
-			if (skill == null)
-			{
+			if (skill == null) {
 				skill = activeChar.getTransformSkill(_magicId);
-				if (skill == null)
-				{
+				if (skill == null) {
 					activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 					_log.warning("Skill Id " + _magicId + " not found in player : " + activeChar);
 					return;
@@ -85,34 +76,29 @@ public final class RequestMagicSkillUse extends L2GameClientPacket
 		}
 		
 		// Avoid Use of Skills in AirShip.
-		if (activeChar.isPlayable() && activeChar.isInAirShip())
-		{
+		if (activeChar.isPlayable() && activeChar.isInAirShip()) {
 			activeChar.sendPacket(SystemMessageId.ACTION_PROHIBITED_WHILE_MOUNTED_OR_ON_AN_AIRSHIP);
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if ((activeChar.isTransformed() || activeChar.isInStance()) && !activeChar.hasTransformSkill(skill.getId()))
-		{
+		if ((activeChar.isTransformed() || activeChar.isInStance()) && !activeChar.hasTransformSkill(skill.getId())) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// If Alternate rule Karma punishment is set to true, forbid skill Return to player with Karma
-		if (!Config.ALT_GAME_KARMA_PLAYER_CAN_TELEPORT && (activeChar.getKarma() > 0) && skill.hasEffectType(L2EffectType.TELEPORT))
-		{
+		if (!Config.ALT_GAME_KARMA_PLAYER_CAN_TELEPORT && (activeChar.getKarma() > 0) && skill.hasEffectType(L2EffectType.TELEPORT)) {
 			return;
 		}
 		
 		// players mounted on pets cannot use any toggle skills
-		if (skill.isToggle() && activeChar.isMounted())
-		{
+		if (skill.isToggle() && activeChar.isMounted()) {
 			return;
 		}
 		
 		// Stop if use self-buff (except if on AirShip or Boat).
-		if ((skill.isContinuous() && !skill.isDebuff() && (skill.getTargetType() == L2TargetType.SELF)) && (!activeChar.isInAirShip() || !activeChar.isInBoat()))
-		{
+		if ((skill.isContinuous() && !skill.isDebuff() && (skill.getTargetType() == L2TargetType.SELF)) && (!activeChar.isInAirShip() || !activeChar.isInBoat())) {
 			activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, activeChar.getLocation());
 		}
 		
@@ -120,8 +106,7 @@ public final class RequestMagicSkillUse extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__39_REQUESTMAGICSKILLUSE;
 	}
 }

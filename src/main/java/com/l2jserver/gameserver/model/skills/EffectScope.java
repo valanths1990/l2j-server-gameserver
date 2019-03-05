@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.skills;
 /**
  * @author NosBit
  */
-public enum EffectScope
-{
+public enum EffectScope {
 	GENERAL,
 	START,
 	SELF,

@@ -26,22 +26,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetAbnormal.
  * @author janiii
  */
-public class ConditionTargetAbnormal extends Condition
-{
+public class ConditionTargetAbnormal extends Condition {
 	private final int _abnormalId;
 	
 	/**
 	 * Instantiates a new condition target abnormal.
 	 * @param abnormalId the abnormal id
 	 */
-	public ConditionTargetAbnormal(int abnormalId)
-	{
+	public ConditionTargetAbnormal(int abnormalId) {
 		_abnormalId = abnormalId;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effected.getAbnormalVisualEffects() & _abnormalId) != 0;
 	}
 }

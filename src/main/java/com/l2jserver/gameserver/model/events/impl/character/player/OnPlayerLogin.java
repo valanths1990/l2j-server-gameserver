@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerLogin implements IBaseEvent
-{
+public class OnPlayerLogin implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	
-	public OnPlayerLogin(L2PcInstance activeChar)
-	{
+	public OnPlayerLogin(L2PcInstance activeChar) {
 		_activeChar = activeChar;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_LOGIN;
 	}
 }

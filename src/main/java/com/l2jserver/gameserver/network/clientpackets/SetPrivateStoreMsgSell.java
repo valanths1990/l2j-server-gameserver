@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.util.Util;
  * This class ...
  * @version $Revision: 1.2.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public class SetPrivateStoreMsgSell extends L2GameClientPacket
-{
+public class SetPrivateStoreMsgSell extends L2GameClientPacket {
 	private static final String _C__97_SETPRIVATESTOREMSGSELL = "[C] 97 SetPrivateStoreMsgSell";
 	
 	private static final int MAX_MSG_LENGTH = 29;
@@ -36,22 +35,18 @@ public class SetPrivateStoreMsgSell extends L2GameClientPacket
 	private String _storeMsg;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_storeMsg = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if ((player == null) || (player.getSellList() == null))
-		{
+		if ((player == null) || (player.getSellList() == null)) {
 			return;
 		}
 		
-		if ((_storeMsg != null) && (_storeMsg.length() > MAX_MSG_LENGTH))
-		{
+		if ((_storeMsg != null) && (_storeMsg.length() > MAX_MSG_LENGTH)) {
 			Util.handleIllegalPlayerAction(player, "Player " + player.getName() + " tried to overflow private store sell message", Config.DEFAULT_PUNISH);
 			return;
 		}
@@ -61,8 +56,7 @@ public class SetPrivateStoreMsgSell extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__97_SETPRIVATESTOREMSGSELL;
 	}
 }

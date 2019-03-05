@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2StaticObjectInstance;
 /**
  * @author KenM
  */
-public class StaticObject extends L2GameServerPacket
-{
+public class StaticObject extends L2GameServerPacket {
 	private final int _staticObjectId;
 	private final int _objectId;
 	private final int _type;
@@ -38,8 +37,7 @@ public class StaticObject extends L2GameServerPacket
 	private final boolean _showHp;
 	private final int _damageGrade;
 	
-	public StaticObject(L2StaticObjectInstance staticObject)
-	{
+	public StaticObject(L2StaticObjectInstance staticObject) {
 		_staticObjectId = staticObject.getId();
 		_objectId = staticObject.getObjectId();
 		_type = 0;
@@ -53,8 +51,7 @@ public class StaticObject extends L2GameServerPacket
 		_damageGrade = 0;
 	}
 	
-	public StaticObject(L2DoorInstance door, boolean targetable)
-	{
+	public StaticObject(L2DoorInstance door, boolean targetable) {
 		_staticObjectId = door.getId();
 		_objectId = door.getObjectId();
 		_type = 1;
@@ -69,8 +66,7 @@ public class StaticObject extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x9f);
 		writeD(_staticObjectId);
 		writeD(_objectId);

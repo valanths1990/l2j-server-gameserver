@@ -26,24 +26,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionTargetNpcType.
  */
-public class ConditionTargetNpcType extends Condition
-{
+public class ConditionTargetNpcType extends Condition {
 	private final InstanceType[] _npcType;
 	
 	/**
 	 * Instantiates a new condition target npc type.
 	 * @param type the type
 	 */
-	public ConditionTargetNpcType(InstanceType[] type)
-	{
+	public ConditionTargetNpcType(InstanceType[] type) {
 		_npcType = type;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effected == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effected == null) {
 			return false;
 		}
 		return effected.getInstanceType().isTypes(_npcType);

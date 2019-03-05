@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Player Skill Save DAO interface.
  * @author Zoey76
  */
-public interface PlayerSkillSaveDAO
-{
+public interface PlayerSkillSaveDAO {
 	/**
 	 * Deletes the player skills from the database.
 	 * @param player the player

@@ -27,18 +27,14 @@ import com.l2jserver.gameserver.network.serverpackets.ExStopMoveAirShip;
 /**
  * @author DS
  */
-public class L2AirShipAI extends L2VehicleAI
-{
-	public L2AirShipAI(L2AirShipInstance creature)
-	{
+public class L2AirShipAI extends L2VehicleAI {
+	public L2AirShipAI(L2AirShipInstance creature) {
 		super(creature);
 	}
 	
 	@Override
-	protected void moveTo(int x, int y, int z)
-	{
-		if (!_actor.isMovementDisabled())
-		{
+	protected void moveTo(int x, int y, int z) {
+		if (!_actor.isMovementDisabled()) {
 			_clientMoving = true;
 			_actor.moveToLocation(x, y, z, 0);
 			_actor.broadcastPacket(new ExMoveToLocationAirShip(getActor()));
@@ -46,32 +42,26 @@ public class L2AirShipAI extends L2VehicleAI
 	}
 	
 	@Override
-	protected void clientStopMoving(Location loc)
-	{
-		if (_actor.isMoving())
-		{
+	protected void clientStopMoving(Location loc) {
+		if (_actor.isMoving()) {
 			_actor.stopMove(loc);
 		}
 		
-		if (_clientMoving || (loc != null))
-		{
+		if (_clientMoving || (loc != null)) {
 			_clientMoving = false;
 			_actor.broadcastPacket(new ExStopMoveAirShip(getActor()));
 		}
 	}
 	
 	@Override
-	public void describeStateToPlayer(L2PcInstance player)
-	{
-		if (_clientMoving)
-		{
+	public void describeStateToPlayer(L2PcInstance player) {
+		if (_clientMoving) {
 			player.sendPacket(new ExMoveToLocationAirShip(getActor()));
 		}
 	}
 	
 	@Override
-	public L2AirShipInstance getActor()
-	{
+	public L2AirShipInstance getActor() {
 		return (L2AirShipInstance) _actor;
 	}
 }

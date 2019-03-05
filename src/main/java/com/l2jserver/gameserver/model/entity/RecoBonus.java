@@ -23,10 +23,8 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Gnacik
  */
-public final class RecoBonus
-{
-	private static final int[][] _recoBonus =
-	{
+public final class RecoBonus {
+	private static final int[][] _recoBonus = {
 		{
 			25,
 			50,
@@ -137,10 +135,8 @@ public final class RecoBonus
 		}
 	};
 	
-	public static int getRecoBonus(L2PcInstance activeChar)
-	{
-		if ((activeChar != null) && activeChar.isOnline() && (activeChar.getRecomHave() != 0) && (activeChar.getRecomBonusTime() > 0))
-		{
+	public static int getRecoBonus(L2PcInstance activeChar) {
+		if ((activeChar != null) && activeChar.isOnline() && (activeChar.getRecomHave() != 0) && (activeChar.getRecomBonusTime() > 0)) {
 			final int lvl = activeChar.getLevel() / 10;
 			final int exp = (Math.min(100, activeChar.getRecomHave()) - 1) / 10;
 			
@@ -149,12 +145,10 @@ public final class RecoBonus
 		return 0;
 	}
 	
-	public static double getRecoMultiplier(L2PcInstance activeChar)
-	{
+	public static double getRecoMultiplier(L2PcInstance activeChar) {
 		double multiplier = 1.0;
 		final double bonus = getRecoBonus(activeChar);
-		if (bonus > 0)
-		{
+		if (bonus > 0) {
 			multiplier += (bonus / 100);
 		}
 		return multiplier;

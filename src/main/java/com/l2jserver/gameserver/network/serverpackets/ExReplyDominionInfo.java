@@ -27,29 +27,24 @@ import com.l2jserver.gameserver.instancemanager.TerritoryWarManager.Territory;
 /**
  * @author JIV
  */
-public class ExReplyDominionInfo extends L2GameServerPacket
-{
+public class ExReplyDominionInfo extends L2GameServerPacket {
 	public static final ExReplyDominionInfo STATIC_PACKET = new ExReplyDominionInfo();
 	
-	private ExReplyDominionInfo()
-	{
+	private ExReplyDominionInfo() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x92);
 		List<Territory> territoryList = TerritoryWarManager.getInstance().getAllTerritories();
 		writeD(territoryList.size()); // Territory Count
-		for (Territory t : territoryList)
-		{
+		for (Territory t : territoryList) {
 			writeD(t.getTerritoryId()); // Territory Id
 			writeS(CastleManager.getInstance().getCastleById(t.getCastleId()).getName().toLowerCase() + "_dominion"); // territory name
 			writeS(t.getOwnerClan().getName());
 			writeD(t.getOwnedWardIds().size()); // Emblem Count
-			for (int i : t.getOwnedWardIds())
-			{
+			for (int i : t.getOwnedWardIds()) {
 				writeD(i); // Emblem ID - should be in for loop for emblem count
 			}
 			writeD((int) (TerritoryWarManager.getInstance().getTWStartTimeInMillis() / 1000));

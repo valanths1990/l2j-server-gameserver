@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * ExBrExtraUserInfo server packet implementation.
  * @author Kerberos, Zoey76
  */
-public class ExBrExtraUserInfo extends L2GameServerPacket
-{
+public class ExBrExtraUserInfo extends L2GameServerPacket {
 	/** Player object ID. */
 	private final int _charObjId;
 	/** Event abnormal visual effects map. */
@@ -33,8 +32,7 @@ public class ExBrExtraUserInfo extends L2GameServerPacket
 	/** Lecture mark. */
 	private final int _lectureMark;
 	
-	public ExBrExtraUserInfo(L2PcInstance player)
-	{
+	public ExBrExtraUserInfo(L2PcInstance player) {
 		_charObjId = player.getObjectId();
 		_abnormalVisualEffectsEvent = player.getAbnormalVisualEffectEvent();
 		_lectureMark = 0; // TODO: Implement.
@@ -42,8 +40,7 @@ public class ExBrExtraUserInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0xDA);
 		writeD(_charObjId);

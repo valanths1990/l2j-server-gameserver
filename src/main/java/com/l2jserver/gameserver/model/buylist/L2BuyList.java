@@ -27,50 +27,40 @@ import java.util.Set;
 /**
  * @author NosBit
  */
-public final class L2BuyList
-{
+public final class L2BuyList {
 	private final int _listId;
 	private final Map<Integer, Product> _products = new LinkedHashMap<>();
 	private Set<Integer> _allowedNpcs = null;
 	
-	public L2BuyList(int listId)
-	{
+	public L2BuyList(int listId) {
 		_listId = listId;
 	}
 	
-	public int getListId()
-	{
+	public int getListId() {
 		return _listId;
 	}
 	
-	public Collection<Product> getProducts()
-	{
+	public Collection<Product> getProducts() {
 		return _products.values();
 	}
 	
-	public Product getProductByItemId(int itemId)
-	{
+	public Product getProductByItemId(int itemId) {
 		return _products.get(itemId);
 	}
 	
-	public void addProduct(Product product)
-	{
+	public void addProduct(Product product) {
 		_products.put(product.getItemId(), product);
 	}
 	
-	public void addAllowedNpc(int npcId)
-	{
-		if (_allowedNpcs == null)
-		{
+	public void addAllowedNpc(int npcId) {
+		if (_allowedNpcs == null) {
 			_allowedNpcs = new HashSet<>();
 		}
 		_allowedNpcs.add(npcId);
 	}
 	
-	public boolean isNpcAllowed(int npcId)
-	{
-		if (_allowedNpcs == null)
-		{
+	public boolean isNpcAllowed(int npcId) {
+		if (_allowedNpcs == null) {
 			return false;
 		}
 		return _allowedNpcs.contains(npcId);

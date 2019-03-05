@@ -41,8 +41,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * RequestSellItem client packet class.
  */
-public final class RequestSellItem extends L2GameClientPacket
-{
+public final class RequestSellItem extends L2GameClientPacket {
 	private static final String _C__37_REQUESTSELLITEM = "[C] 37 RequestSellItem";
 	
 	private static final int BATCH_LENGTH = 16;
@@ -51,23 +50,19 @@ public final class RequestSellItem extends L2GameClientPacket
 	private List<UniqueItemHolder> _items = null;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_listId = readD();
 		int size = readD();
-		if ((size <= 0) || (size > Config.MAX_ITEM_IN_PACKET) || ((size * BATCH_LENGTH) != _buf.remaining()))
-		{
+		if ((size <= 0) || (size > Config.MAX_ITEM_IN_PACKET) || ((size * BATCH_LENGTH) != _buf.remaining())) {
 			return;
 		}
 		
 		_items = new ArrayList<>(size);
-		for (int i = 0; i < size; i++)
-		{
+		for (int i = 0; i < size; i++) {
 			int objectId = readD();
 			int itemId = readD();
 			long count = readQ();
-			if ((objectId < 1) || (itemId < 1) || (count < 1))
-			{
+			if ((objectId < 1) || (itemId < 1) || (count < 1)) {
 				_items = null;
 				return;
 			}
@@ -76,76 +71,61 @@ public final class RequestSellItem extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		processSell();
 	}
 	
-	protected void processSell()
-	{
+	protected void processSell() {
 		L2PcInstance player = getClient().getActiveChar();
 		
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("buy"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("buy")) {
 			player.sendMessage("You are buying too fast.");
 			return;
 		}
 		
-		if (_items == null)
-		{
+		if (_items == null) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Alt game - Karma punishment
-		if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && (player.getKarma() > 0))
-		{
+		if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && (player.getKarma() > 0)) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		L2Object target = player.getTarget();
 		L2Character merchant = null;
-		if (!player.isGM())
-		{
-			if ((target == null) || (!player.isInsideRadius(target, INTERACTION_DISTANCE, true, false)) || (player.getInstanceId() != target.getInstanceId()))
-			{
+		if (!player.isGM()) {
+			if ((target == null) || (!player.isInsideRadius(target, INTERACTION_DISTANCE, true, false)) || (player.getInstanceId() != target.getInstanceId())) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
-			if (target instanceof L2MerchantInstance)
-			{
+			if (target instanceof L2MerchantInstance) {
 				merchant = (L2Character) target;
-			}
-			else
-			{
+			} else {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 		}
 		
-		if ((merchant == null) && !player.isGM())
-		{
+		if ((merchant == null) && !player.isGM()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		final L2BuyList buyList = BuyListData.getInstance().getBuyList(_listId);
-		if (buyList == null)
-		{
+		if (buyList == null) {
 			Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " sent a false BuyList list_id " + _listId, Config.DEFAULT_PUNISH);
 			return;
 		}
 		
-		if (merchant != null)
-		{
-			if (!buyList.isNpcAllowed(merchant.getId()))
-			{
+		if (merchant != null) {
+			if (!buyList.isNpcAllowed(merchant.getId())) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
@@ -153,28 +133,22 @@ public final class RequestSellItem extends L2GameClientPacket
 		
 		long totalPrice = 0;
 		// Proceed the sell
-		for (UniqueItemHolder i : _items)
-		{
+		for (UniqueItemHolder i : _items) {
 			L2ItemInstance item = player.checkItemManipulation(i.getObjectId(), i.getCount(), "sell");
-			if ((item == null) || (!item.isSellable()))
-			{
+			if ((item == null) || (!item.isSellable())) {
 				continue;
 			}
 			
 			long price = item.getReferencePrice() / 2;
 			totalPrice += price * i.getCount();
-			if (((MAX_ADENA / i.getCount()) < price) || (totalPrice > MAX_ADENA))
-			{
+			if (((MAX_ADENA / i.getCount()) < price) || (totalPrice > MAX_ADENA)) {
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " tried to purchase over " + MAX_ADENA + " adena worth of goods.", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
-			if (Config.ALLOW_REFUND)
-			{
+			if (Config.ALLOW_REFUND) {
 				item = player.getInventory().transferItem("Sell", i.getObjectId(), i.getCount(), player.getRefund(), player, merchant);
-			}
-			else
-			{
+			} else {
 				item = player.getInventory().destroyItem("Sell", i.getObjectId(), i.getCount(), player, merchant);
 			}
 		}
@@ -188,8 +162,7 @@ public final class RequestSellItem extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__37_REQUESTSELLITEM;
 	}
 }

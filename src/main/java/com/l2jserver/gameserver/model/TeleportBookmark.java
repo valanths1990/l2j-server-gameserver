@@ -21,14 +21,12 @@ package com.l2jserver.gameserver.model;
 /**
  * @author UnAfraid
  */
-public class TeleportBookmark extends Location
-{
+public class TeleportBookmark extends Location {
 	private final int _id;
 	private int _icon;
 	private String _name, _tag;
 	
-	public TeleportBookmark(int id, int x, int y, int z, int icon, String tag, String name)
-	{
+	public TeleportBookmark(int id, int x, int y, int z, int icon, String tag, String name) {
 		super(x, y, z);
 		_id = id;
 		_icon = icon;
@@ -36,38 +34,31 @@ public class TeleportBookmark extends Location
 		_tag = tag;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public void setName(String name)
-	{
+	public void setName(String name) {
 		_name = name;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public int getIcon()
-	{
+	public int getIcon() {
 		return _icon;
 	}
 	
-	public void setIcon(int icon)
-	{
+	public void setIcon(int icon) {
 		_icon = icon;
 	}
 	
-	public String getTag()
-	{
+	public String getTag() {
 		return _tag;
 	}
 	
-	public void setTag(String tag)
-	{
+	public void setTag(String tag) {
 		_tag = tag;
 	}
 }

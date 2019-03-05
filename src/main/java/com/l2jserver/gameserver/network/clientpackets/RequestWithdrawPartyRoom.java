@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExClosePartyRoom;
 /**
  * @author Gnacik
  */
-public final class RequestWithdrawPartyRoom extends L2GameClientPacket
-{
+public final class RequestWithdrawPartyRoom extends L2GameClientPacket {
 	private static final String _C__D0_0B_REQUESTWITHDRAWPARTYROOM = "[C] D0:0B RequestWithdrawPartyRoom";
 	
 	private int _roomid;
@@ -36,38 +35,31 @@ public final class RequestWithdrawPartyRoom extends L2GameClientPacket
 	private int _unk1;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_roomid = readD();
 		_unk1 = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance _activeChar = getClient().getActiveChar();
 		
-		if (_activeChar == null)
-		{
+		if (_activeChar == null) {
 			return;
 		}
 		
 		PartyMatchRoom _room = PartyMatchRoomList.getInstance().getRoom(_roomid);
-		if (_room == null)
-		{
+		if (_room == null) {
 			return;
 		}
 		
-		if ((_activeChar.isInParty() && _room.getOwner().isInParty()) && (_activeChar.getParty().getLeaderObjectId() == _room.getOwner().getParty().getLeaderObjectId()))
-		{
+		if ((_activeChar.isInParty() && _room.getOwner().isInParty()) && (_activeChar.getParty().getLeaderObjectId() == _room.getOwner().getParty().getLeaderObjectId())) {
 			// If user is in party with Room Owner
 			// is not removed from Room
 			
 			// _activeChar.setPartyMatching(0);
 			_activeChar.broadcastUserInfo();
-		}
-		else
-		{
+		} else {
 			_room.deleteMember(_activeChar);
 			
 			_activeChar.setPartyRoom(0);
@@ -79,8 +71,7 @@ public final class RequestWithdrawPartyRoom extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_0B_REQUESTWITHDRAWPARTYROOM;
 	}
 }

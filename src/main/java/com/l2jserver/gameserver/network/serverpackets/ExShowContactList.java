@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author UnAfraid, mrTJO
  */
-public class ExShowContactList extends L2GameServerPacket
-{
+public class ExShowContactList extends L2GameServerPacket {
 	private final List<String> _contacts;
 	
-	public ExShowContactList(L2PcInstance player)
-	{
+	public ExShowContactList(L2PcInstance player) {
 		_contacts = player.getContactList().getAllContacts();
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xD3);
 		writeD(_contacts.size());
-		for (String name : _contacts)
-		{
+		for (String name : _contacts) {
 			writeS(name);
 		}
 	}

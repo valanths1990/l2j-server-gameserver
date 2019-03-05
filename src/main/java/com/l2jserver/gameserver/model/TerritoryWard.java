@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.ItemList;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-public class TerritoryWard
-{
+public class TerritoryWard {
 	// private static final Logger _log = Logger.getLogger(CombatFlag.class.getName());
 	
 	protected L2PcInstance _player = null;
@@ -46,8 +45,7 @@ public class TerritoryWard
 	
 	private final int _territoryId;
 	
-	public TerritoryWard(int territory_id, int x, int y, int z, int heading, int item_id, int castleId, L2Npc npc)
-	{
+	public TerritoryWard(int territory_id, int x, int y, int z, int heading, int item_id, int castleId, L2Npc npc) {
 		_territoryId = territory_id;
 		_location = new Location(x, y, z, heading);
 		_itemId = item_id;
@@ -55,40 +53,32 @@ public class TerritoryWard
 		_npc = npc;
 	}
 	
-	public int getTerritoryId()
-	{
+	public int getTerritoryId() {
 		return _territoryId;
 	}
 	
-	public int getOwnerCastleId()
-	{
+	public int getOwnerCastleId() {
 		return _ownerCastleId;
 	}
 	
-	public void setOwnerCastleId(int newOwner)
-	{
+	public void setOwnerCastleId(int newOwner) {
 		_ownerCastleId = newOwner;
 	}
 	
-	public L2Npc getNpc()
-	{
+	public L2Npc getNpc() {
 		return _npc;
 	}
 	
-	public void setNpc(L2Npc npc)
-	{
+	public void setNpc(L2Npc npc) {
 		_npc = npc;
 	}
 	
-	public L2PcInstance getPlayer()
-	{
+	public L2PcInstance getPlayer() {
 		return _player;
 	}
 	
-	public synchronized void spawnBack()
-	{
-		if (_player != null)
-		{
+	public synchronized void spawnBack() {
+		if (_player != null) {
 			dropIt();
 		}
 		
@@ -96,10 +86,8 @@ public class TerritoryWard
 		_npc = TerritoryWarManager.getInstance().spawnNPC(36491 + _territoryId, _oldLocation);
 	}
 	
-	public synchronized void spawnMe()
-	{
-		if (_player != null)
-		{
+	public synchronized void spawnMe() {
+		if (_player != null) {
 			dropIt();
 		}
 		
@@ -107,29 +95,22 @@ public class TerritoryWard
 		_npc = TerritoryWarManager.getInstance().spawnNPC(36491 + _territoryId, _location);
 	}
 	
-	public synchronized void unSpawnMe()
-	{
-		if (_player != null)
-		{
+	public synchronized void unSpawnMe() {
+		if (_player != null) {
 			dropIt();
 		}
-		if ((_npc != null) && !_npc.isDecayed())
-		{
+		if ((_npc != null) && !_npc.isDecayed()) {
 			_npc.deleteMe();
 		}
 	}
 	
-	public boolean activate(L2PcInstance player, L2ItemInstance item)
-	{
-		if (player.isMounted())
-		{
+	public boolean activate(L2PcInstance player, L2ItemInstance item) {
+		if (player.isMounted()) {
 			player.sendPacket(SystemMessageId.CANNOT_EQUIP_ITEM_DUE_TO_BAD_CONDITION);
 			player.destroyItem("CombatFlag", item, null, true);
 			spawnMe();
 			return false;
-		}
-		else if (TerritoryWarManager.getInstance().getRegisteredTerritoryId(player) == 0)
-		{
+		} else if (TerritoryWarManager.getInstance().getRegisteredTerritoryId(player) == 0) {
 			player.sendMessage("Non participants can't pickup Territory Wards!");
 			player.destroyItem("CombatFlag", item, null, true);
 			spawnMe();
@@ -143,12 +124,9 @@ public class TerritoryWard
 		_npc = null;
 		
 		// Equip with the weapon
-		if (item == null)
-		{
+		if (item == null) {
 			_item = ItemTable.getInstance().createItem("Combat", _itemId, 1, null, null);
-		}
-		else
-		{
+		} else {
 			_item = item;
 		}
 		_player.getInventory().equipItem(_item);
@@ -157,14 +135,11 @@ public class TerritoryWard
 		_player.sendPacket(sm);
 		
 		// Refresh inventory
-		if (!Config.FORCE_INVENTORY_UPDATE)
-		{
+		if (!Config.FORCE_INVENTORY_UPDATE) {
 			InventoryUpdate iu = new InventoryUpdate();
 			iu.addItem(_item);
 			_player.sendPacket(iu);
-		}
-		else
-		{
+		} else {
 			_player.sendPacket(new ItemList(_player, false));
 		}
 		
@@ -176,8 +151,7 @@ public class TerritoryWard
 		return true;
 	}
 	
-	public void dropIt()
-	{
+	public void dropIt() {
 		// Reset player stats
 		_player.setCombatFlagEquipped(false);
 		int slot = _player.getInventory().getSlotFromItem(_item);

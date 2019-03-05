@@ -35,8 +35,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExBuySellList;
  * This class ...
  * @version $Revision: 1.10.4.9 $ $Date: 2005/04/11 10:06:08 $
  */
-public class L2MerchantInstance extends L2NpcInstance
-{
+public class L2MerchantInstance extends L2NpcInstance {
 	private static final Logger LOG = LoggerFactory.getLogger(L2MerchantInstance.class);
 	private MerchantPriceConfig _mpc;
 	
@@ -44,30 +43,24 @@ public class L2MerchantInstance extends L2NpcInstance
 	 * Creates a merchant,
 	 * @param template the merchant NPC template
 	 */
-	public L2MerchantInstance(L2NpcTemplate template)
-	{
+	public L2MerchantInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2MerchantInstance);
 	}
 	
 	@Override
-	public void onSpawn()
-	{
+	public void onSpawn() {
 		super.onSpawn();
 		_mpc = MerchantPriceConfigTable.getInstance().getMerchantPriceConfig(this);
 	}
 	
 	@Override
-	public String getHtmlPath(int npcId, int val)
-	{
+	public String getHtmlPath(int npcId, int val) {
 		String pom = "";
 		
-		if (val == 0)
-		{
+		if (val == 0) {
 			pom = "" + npcId;
-		}
-		else
-		{
+		} else {
 			pom = npcId + "-" + val;
 		}
 		
@@ -77,28 +70,23 @@ public class L2MerchantInstance extends L2NpcInstance
 	/**
 	 * @return Returns the mpc.
 	 */
-	public MerchantPriceConfig getMpc()
-	{
+	public MerchantPriceConfig getMpc() {
 		return _mpc;
 	}
 	
-	public final void showBuyWindow(L2PcInstance player, int val)
-	{
+	public final void showBuyWindow(L2PcInstance player, int val) {
 		showBuyWindow(player, val, true);
 	}
 	
-	public final void showBuyWindow(L2PcInstance player, int val, boolean applyTax)
-	{
+	public final void showBuyWindow(L2PcInstance player, int val, boolean applyTax) {
 		final L2BuyList buyList = BuyListData.getInstance().getBuyList(val);
-		if (buyList == null)
-		{
+		if (buyList == null) {
 			LOG.warn("BuyList not found! BuyListId: {}", val);
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (!buyList.isNpcAllowed(getId()))
-		{
+		if (!buyList.isNpcAllowed(getId())) {
 			LOG.warn("Npc not allowed in BuyList! BuyListId: {} NpcId: {}", val, getId());
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
@@ -107,8 +95,7 @@ public class L2MerchantInstance extends L2NpcInstance
 		final double taxRate = (applyTax) ? getMpc().getTotalTaxRate() : 0;
 		
 		player.setInventoryBlockingStatus(true);
-		if (player.isGM())
-		{
+		if (player.isGM()) {
 			player.sendMessage("Buy List [" + buyList.getListId() + "]");
 		}
 		player.sendPacket(new BuyList(buyList, player.getAdena(), taxRate));

@@ -22,15 +22,12 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Close the CommandChannel Information window
  * @author chris_00
  */
-public class ExCloseMPCC extends L2GameServerPacket
-{
-	public ExCloseMPCC()
-	{
+public class ExCloseMPCC extends L2GameServerPacket {
+	public ExCloseMPCC() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x13);
 	}

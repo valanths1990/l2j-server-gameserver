@@ -31,72 +31,60 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author l3x
  */
-public class RequestSetSeed extends L2GameClientPacket
-{
+public class RequestSetSeed extends L2GameClientPacket {
 	private static final int BATCH_LENGTH = 20; // length of the one item
 	
 	private int _manorId;
 	private List<SeedProduction> _items;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_manorId = readD();
 		final int count = readD();
-		if ((count <= 0) || (count > Config.MAX_ITEM_IN_PACKET) || ((count * BATCH_LENGTH) != _buf.remaining()))
-		{
+		if ((count <= 0) || (count > Config.MAX_ITEM_IN_PACKET) || ((count * BATCH_LENGTH) != _buf.remaining())) {
 			return;
 		}
 		
 		_items = new ArrayList<>(count);
-		for (int i = 0; i < count; i++)
-		{
+		for (int i = 0; i < count; i++) {
 			final int itemId = readD();
 			final long sales = readQ();
 			final long price = readQ();
-			if ((itemId < 1) || (sales < 0) || (price < 0))
-			{
+			if ((itemId < 1) || (sales < 0) || (price < 0)) {
 				_items.clear();
 				return;
 			}
 			
-			if (sales > 0)
-			{
+			if (sales > 0) {
 				_items.add(new SeedProduction(itemId, sales, price, sales));
 			}
 		}
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (_items.isEmpty())
-		{
+	protected void runImpl() {
+		if (_items.isEmpty()) {
 			return;
 		}
 		
 		final CastleManorManager manor = CastleManorManager.getInstance();
-		if (!manor.isModifiablePeriod())
-		{
+		if (!manor.isModifiablePeriod()) {
 			sendActionFailed();
 			return;
 		}
 		
 		// Check player privileges
 		final L2PcInstance player = getActiveChar();
-		if ((player == null) || (player.getClan() == null) || (player.getClan().getCastleId() != _manorId) || !player.hasClanPrivilege(ClanPrivilege.CS_MANOR_ADMIN) || !player.getLastFolkNPC().canInteract(player))
-		{
+		if ((player == null) || (player.getClan() == null) || (player.getClan().getCastleId() != _manorId) || !player.hasClanPrivilege(ClanPrivilege.CS_MANOR_ADMIN) || !player.getLastFolkNPC().canInteract(player)) {
 			sendActionFailed();
 			return;
 		}
 		
 		// Filter seeds with start amount lower than 0 and incorrect price
 		final List<SeedProduction> list = new ArrayList<>(_items.size());
-		for (SeedProduction sp : _items)
-		{
+		for (SeedProduction sp : _items) {
 			final L2Seed s = manor.getSeed(sp.getId());
-			if ((s != null) && (sp.getStartAmount() <= s.getSeedLimit()) && (sp.getPrice() >= s.getSeedMinPrice()) && (sp.getPrice() <= s.getSeedMaxPrice()))
-			{
+			if ((s != null) && (sp.getStartAmount() <= s.getSeedLimit()) && (sp.getPrice() >= s.getSeedMinPrice()) && (sp.getPrice() <= s.getSeedMaxPrice())) {
 				list.add(sp);
 			}
 		}
@@ -106,8 +94,7 @@ public class RequestSetSeed extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return "[C] D0:03 RequestSetSeed";
 	}
 }

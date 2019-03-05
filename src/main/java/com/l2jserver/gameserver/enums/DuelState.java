@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author Zealar
  */
-public enum DuelState
-{
+public enum DuelState {
 	NO_DUEL,
 	DUELLING,
 	DEAD,

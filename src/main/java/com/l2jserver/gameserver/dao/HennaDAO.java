@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.items.L2Henna;
  * Henna DAO interface.
  * @author Zoey76
  */
-public interface HennaDAO
-{
+public interface HennaDAO {
 	/**
 	 * Restores all hennas for the player.
 	 * @param player the player

@@ -24,34 +24,27 @@ import com.l2jserver.gameserver.model.zone.L2ZoneRespawn;
 /**
  * @author xban1x
  */
-public abstract class L2ResidenceZone extends L2ZoneRespawn
-{
+public abstract class L2ResidenceZone extends L2ZoneRespawn {
 	private int _residenceId;
 	
-	protected L2ResidenceZone(int id)
-	{
+	protected L2ResidenceZone(int id) {
 		super(id);
 	}
 	
-	public void banishForeigners(int owningClanId)
-	{
-		for (L2PcInstance temp : getPlayersInside())
-		{
-			if ((owningClanId != 0) && (temp.getClanId() == owningClanId))
-			{
+	public void banishForeigners(int owningClanId) {
+		for (L2PcInstance temp : getPlayersInside()) {
+			if ((owningClanId != 0) && (temp.getClanId() == owningClanId)) {
 				continue;
 			}
 			temp.teleToLocation(getBanishSpawnLoc(), true);
 		}
 	}
 	
-	protected void setResidenceId(int residenceId)
-	{
+	protected void setResidenceId(int residenceId) {
 		_residenceId = residenceId;
 	}
 	
-	public int getResidenceId()
-	{
+	public int getResidenceId() {
 		return _residenceId;
 	}
 }

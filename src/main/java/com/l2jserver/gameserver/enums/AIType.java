@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author Zoey76
  */
-public enum AIType
-{
+public enum AIType {
 	FIGHTER,
 	ARCHER,
 	BALANCED,

@@ -24,59 +24,48 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public final class AllyDismiss extends L2GameClientPacket
-{
+public final class AllyDismiss extends L2GameClientPacket {
 	private static final String _C__8F_ALLYDISMISS = "[C] 8F AllyDismiss";
 	
 	private String _clanName;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_clanName = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (_clanName == null)
-		{
+	protected void runImpl() {
+		if (_clanName == null) {
 			return;
 		}
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
-		if (player.getClan() == null)
-		{
+		if (player.getClan() == null) {
 			player.sendPacket(SystemMessageId.YOU_ARE_NOT_A_CLAN_MEMBER);
 			return;
 		}
 		L2Clan leaderClan = player.getClan();
-		if (leaderClan.getAllyId() == 0)
-		{
+		if (leaderClan.getAllyId() == 0) {
 			player.sendPacket(SystemMessageId.NO_CURRENT_ALLIANCES);
 			return;
 		}
-		if (!player.isClanLeader() || (leaderClan.getId() != leaderClan.getAllyId()))
-		{
+		if (!player.isClanLeader() || (leaderClan.getId() != leaderClan.getAllyId())) {
 			player.sendPacket(SystemMessageId.FEATURE_ONLY_FOR_ALLIANCE_LEADER);
 			return;
 		}
 		L2Clan clan = ClanTable.getInstance().getClanByName(_clanName);
-		if (clan == null)
-		{
+		if (clan == null) {
 			player.sendPacket(SystemMessageId.CLAN_DOESNT_EXISTS);
 			return;
 		}
-		if (clan.getId() == leaderClan.getId())
-		{
+		if (clan.getId() == leaderClan.getId()) {
 			player.sendPacket(SystemMessageId.ALLIANCE_LEADER_CANT_WITHDRAW);
 			return;
 		}
-		if (clan.getAllyId() != leaderClan.getAllyId())
-		{
+		if (clan.getAllyId() != leaderClan.getAllyId()) {
 			player.sendPacket(SystemMessageId.DIFFERENT_ALLIANCE);
 			return;
 		}
@@ -95,8 +84,7 @@ public final class AllyDismiss extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8F_ALLYDISMISS;
 	}
 }

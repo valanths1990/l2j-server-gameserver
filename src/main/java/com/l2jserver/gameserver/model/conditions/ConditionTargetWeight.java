@@ -27,27 +27,22 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetWeight.
  * @author Zoey76
  */
-public class ConditionTargetWeight extends Condition
-{
+public class ConditionTargetWeight extends Condition {
 	private final int _weight;
 	
 	/**
 	 * Instantiates a new condition player weight.
 	 * @param weight the weight
 	 */
-	public ConditionTargetWeight(int weight)
-	{
+	public ConditionTargetWeight(int weight) {
 		_weight = weight;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effected != null) && effected.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effected != null) && effected.isPlayer()) {
 			final L2PcInstance target = effected.getActingPlayer();
-			if (!target.getDietMode() && (target.getMaxLoad() > 0))
-			{
+			if (!target.getDietMode() && (target.getMaxLoad() > 0)) {
 				int weightproc = (((target.getCurrentLoad() - target.getBonusWeightPenalty()) * 100) / target.getMaxLoad());
 				return (weightproc < _weight);
 			}

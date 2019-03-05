@@ -23,33 +23,26 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
-public final class L2TerrainObjectInstance extends L2Npc
-{
+public final class L2TerrainObjectInstance extends L2Npc {
 	/**
 	 * Creates a terrain object.
 	 * @param template the terrain object NPC template
 	 */
-	public L2TerrainObjectInstance(L2NpcTemplate template)
-	{
+	public L2TerrainObjectInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2TerrainObjectInstance);
 	}
 	
 	@Override
-	public void onAction(L2PcInstance player, boolean interact)
-	{
+	public void onAction(L2PcInstance player, boolean interact) {
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
 	@Override
-	public void onActionShift(L2PcInstance player)
-	{
-		if (player.isGM())
-		{
+	public void onActionShift(L2PcInstance player) {
+		if (player.isGM()) {
 			super.onActionShift(player);
-		}
-		else
-		{
+		} else {
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 		}
 	}

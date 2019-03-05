@@ -24,7 +24,6 @@ import com.l2jserver.gameserver.model.drops.GeneralDropItem;
 /**
  * @author Battlecruiser
  */
-public interface INonGroupedKillerChanceModifierStrategy
-{
+public interface INonGroupedKillerChanceModifierStrategy {
 	public double getKillerChanceModifier(GeneralDropItem item, L2Character victim, L2Character killer);
 }

@@ -21,48 +21,39 @@ package com.l2jserver.gameserver.network.clientpackets;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public final class RequestReplySurrenderPledgeWar extends L2GameClientPacket
-{
+public final class RequestReplySurrenderPledgeWar extends L2GameClientPacket {
 	private static final String _C__08_REQUESTREPLYSURRENDERPLEDGEWAR = "[C] 08 RequestReplySurrenderPledgeWar";
 	
 	private String _reqName;
 	private int _answer;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_reqName = readS();
 		_answer = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		final L2PcInstance requestor = activeChar.getActiveRequester();
-		if (requestor == null)
-		{
+		if (requestor == null) {
 			return;
 		}
 		
-		if (_answer == 1)
-		{
+		if (_answer == 1) {
 			ClanTable.getInstance().deleteclanswars(requestor.getClanId(), activeChar.getClanId());
-		}
-		else
-		{
+		} else {
 			_log.info(getClass().getSimpleName() + ": Missing implementation for answer: " + _answer + " and name: " + _reqName + "!");
 		}
 		activeChar.onTransactionRequest(requestor);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__08_REQUESTREPLYSURRENDERPLEDGEWAR;
 	}
 }

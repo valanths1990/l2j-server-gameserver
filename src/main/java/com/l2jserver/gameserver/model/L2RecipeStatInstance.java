@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.enums.StatType;
 /**
  * This class describes a RecipeList statUse and altStatChange component.
  */
-public class L2RecipeStatInstance
-{
+public class L2RecipeStatInstance {
 	/** The Identifier of the statType */
 	private final StatType _type;
 	
@@ -36,8 +35,7 @@ public class L2RecipeStatInstance
 	 * @param type
 	 * @param value
 	 */
-	public L2RecipeStatInstance(String type, int value)
-	{
+	public L2RecipeStatInstance(String type, int value) {
 		_type = Enum.valueOf(StatType.class, type);
 		_value = value;
 	}
@@ -45,16 +43,14 @@ public class L2RecipeStatInstance
 	/**
 	 * @return the the type of the L2RecipeStatInstance.
 	 */
-	public StatType getType()
-	{
+	public StatType getType() {
 		return _type;
 	}
 	
 	/**
 	 * @return the value of the L2RecipeStatInstance.
 	 */
-	public int getValue()
-	{
+	public int getValue() {
 		return _value;
 	}
 	

@@ -30,19 +30,16 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Format : chdb c (id) 0xD0 h (subid) 0x11 d data size b raw data (picture i think ;) )
  * @author -Wooden-
  */
-public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
-{
+public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket {
 	private static final String _C__D0_11_REQUESTEXSETPLEDGECRESTLARGE = "[C] D0:11 RequestExSetPledgeCrestLarge";
 	
 	private int _length;
 	private byte[] _data = null;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_length = readD();
-		if (_length > 2176)
-		{
+		if (_length > 2176) {
 			return;
 		}
 		
@@ -51,57 +48,45 @@ public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Clan clan = activeChar.getClan();
-		if (clan == null)
-		{
+		if (clan == null) {
 			return;
 		}
 		
-		if ((_length < 0) || (_length > 2176))
-		{
+		if ((_length < 0) || (_length > 2176)) {
 			activeChar.sendPacket(SystemMessageId.WRONG_SIZE_UPLOADED_CREST);
 			return;
 		}
 		
-		if (clan.getDissolvingExpiryTime() > System.currentTimeMillis())
-		{
+		if (clan.getDissolvingExpiryTime() > System.currentTimeMillis()) {
 			activeChar.sendPacket(SystemMessageId.CANNOT_SET_CREST_WHILE_DISSOLUTION_IN_PROGRESS);
 			return;
 		}
 		
-		if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_REGISTER_CREST))
-		{
+		if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_REGISTER_CREST)) {
 			activeChar.sendPacket(SystemMessageId.YOU_ARE_NOT_AUTHORIZED_TO_DO_THAT);
 			return;
 		}
 		
-		if (_length == 0)
-		{
-			if (clan.getCrestLargeId() != 0)
-			{
+		if (_length == 0) {
+			if (clan.getCrestLargeId() != 0) {
 				clan.changeLargeCrest(0);
 				activeChar.sendPacket(SystemMessageId.CLAN_CREST_HAS_BEEN_DELETED);
 			}
-		}
-		else
-		{
-			if (clan.getLevel() < 3)
-			{
+		} else {
+			if (clan.getLevel() < 3) {
 				activeChar.sendPacket(SystemMessageId.CLAN_LVL_3_NEEDED_TO_SET_CREST);
 				return;
 			}
 			
 			final L2Crest crest = CrestTable.getInstance().createCrest(_data, CrestType.PLEDGE_LARGE);
-			if (crest != null)
-			{
+			if (crest != null) {
 				clan.changeLargeCrest(crest.getId());
 				activeChar.sendPacket(SystemMessageId.CLAN_EMBLEM_WAS_SUCCESSFULLY_REGISTERED);
 			}
@@ -110,8 +95,7 @@ public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_11_REQUESTEXSETPLEDGECRESTLARGE;
 	}
 }

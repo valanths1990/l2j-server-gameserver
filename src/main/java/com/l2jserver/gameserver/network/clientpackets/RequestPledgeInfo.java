@@ -26,37 +26,30 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.serverpackets.PledgeInfo;
 
-public final class RequestPledgeInfo extends L2GameClientPacket
-{
+public final class RequestPledgeInfo extends L2GameClientPacket {
 	private static final String _C__65_REQUESTPLEDGEINFO = "[C] 65 RequestPledgeInfo";
 	
 	private int _clanId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_clanId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (Config.DEBUG)
-		{
+	protected void runImpl() {
+		if (Config.DEBUG) {
 			_log.log(Level.FINE, "Info for clan " + _clanId + " requested");
 		}
 		
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Clan clan = ClanTable.getInstance().getClan(_clanId);
-		if (clan == null)
-		{
-			if (Config.DEBUG)
-			{
+		if (clan == null) {
+			if (Config.DEBUG) {
 				_log.warning(getType() + ": Clan data for clanId " + _clanId + " is missing for player " + activeChar);
 			}
 			return; // we have no clan data ?!? should not happen
@@ -66,14 +59,12 @@ public final class RequestPledgeInfo extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__65_REQUESTPLEDGEINFO;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

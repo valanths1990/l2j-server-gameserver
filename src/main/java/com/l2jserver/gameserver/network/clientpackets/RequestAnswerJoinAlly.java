@@ -22,49 +22,39 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public final class RequestAnswerJoinAlly extends L2GameClientPacket
-{
+public final class RequestAnswerJoinAlly extends L2GameClientPacket {
 	private static final String _C__8D_REQUESTANSWERJOINALLY = "[C] 8D RequestAnswerJoinAlly";
 	
 	private int _response;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_response = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		L2PcInstance requestor = activeChar.getRequest().getPartner();
-		if (requestor == null)
-		{
+		if (requestor == null) {
 			return;
 		}
 		
-		if (_response == 0)
-		{
+		if (_response == 0) {
 			activeChar.sendPacket(SystemMessageId.YOU_DID_NOT_RESPOND_TO_ALLY_INVITATION);
 			requestor.sendPacket(SystemMessageId.NO_RESPONSE_TO_ALLY_INVITATION);
-		}
-		else
-		{
-			if (!(requestor.getRequest().getRequestPacket() instanceof RequestJoinAlly))
-			{
+		} else {
+			if (!(requestor.getRequest().getRequestPacket() instanceof RequestJoinAlly)) {
 				return; // hax
 			}
 			
 			L2Clan clan = requestor.getClan();
 			// we must double check this cause of hack
-			if (clan.checkAllyJoinCondition(requestor, activeChar))
-			{
+			if (clan.checkAllyJoinCondition(requestor, activeChar)) {
 				// TODO: Need correct message id
 				requestor.sendPacket(SystemMessageId.YOU_HAVE_SUCCEEDED_INVITING_FRIEND);
 				activeChar.sendPacket(SystemMessageId.YOU_ACCEPTED_ALLIANCE);
@@ -81,8 +71,7 @@ public final class RequestAnswerJoinAlly extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8D_REQUESTANSWERJOINALLY;
 	}
 }

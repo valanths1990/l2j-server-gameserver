@@ -25,26 +25,21 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * This class ...
  * @version $Revision: 1.3.2.1.2.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestDismissAlly extends L2GameClientPacket
-{
+public final class RequestDismissAlly extends L2GameClientPacket {
 	private static final String _C__90_REQUESTDISMISSALLY = "[C] 90 RequestDismissAlly";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger packet
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
-		if (!activeChar.isClanLeader())
-		{
+		if (!activeChar.isClanLeader()) {
 			activeChar.sendPacket(SystemMessageId.FEATURE_ONLY_FOR_ALLIANCE_LEADER);
 			return;
 		}
@@ -52,8 +47,7 @@ public final class RequestDismissAlly extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__90_REQUESTDISMISSALLY;
 	}
 }

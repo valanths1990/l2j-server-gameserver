@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author Administrator
  */
-public final class RequestRecipeShopMakeItem extends L2GameClientPacket
-{
+public final class RequestRecipeShopMakeItem extends L2GameClientPacket {
 	private static final String _C__BF_REQUESTRECIPESHOPMAKEITEM = "[C] BF RequestRecipeShopMakeItem";
 	
 	private int _id;
@@ -37,63 +36,52 @@ public final class RequestRecipeShopMakeItem extends L2GameClientPacket
 	private long _unknown;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_id = readD();
 		_recipeId = readD();
 		_unknown = readQ();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getManufacture().tryPerformAction("RecipeShopMake"))
-		{
+		if (!getClient().getFloodProtectors().getManufacture().tryPerformAction("RecipeShopMake")) {
 			return;
 		}
 		
 		L2PcInstance manufacturer = L2World.getInstance().getPlayer(_id);
-		if (manufacturer == null)
-		{
+		if (manufacturer == null) {
 			return;
 		}
 		
-		if ((manufacturer.getInstanceId() != activeChar.getInstanceId()) && (activeChar.getInstanceId() != -1))
-		{
+		if ((manufacturer.getInstanceId() != activeChar.getInstanceId()) && (activeChar.getInstanceId() != -1)) {
 			return;
 		}
 		
-		if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE)
-		{
+		if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE) {
 			activeChar.sendMessage("You cannot create items while trading.");
 			return;
 		}
-		if (manufacturer.getPrivateStoreType() != PrivateStoreType.MANUFACTURE)
-		{
+		if (manufacturer.getPrivateStoreType() != PrivateStoreType.MANUFACTURE) {
 			// activeChar.sendMessage("You cannot create items while trading.");
 			return;
 		}
 		
-		if (activeChar.isInCraftMode() || manufacturer.isInCraftMode())
-		{
+		if (activeChar.isInCraftMode() || manufacturer.isInCraftMode()) {
 			activeChar.sendMessage("You are currently in Craft Mode.");
 			return;
 		}
-		if (Util.checkIfInRange(150, activeChar, manufacturer, true))
-		{
+		if (Util.checkIfInRange(150, activeChar, manufacturer, true)) {
 			RecipeController.getInstance().requestManufactureItem(manufacturer, _recipeId, activeChar);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__BF_REQUESTRECIPESHOPMAKEITEM;
 	}
 }

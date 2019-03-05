@@ -38,8 +38,7 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * This class holds the Enchant Groups information.
  * @author Micr0
  */
-public class EnchantSkillGroupsData implements IXmlReader
-{
+public class EnchantSkillGroupsData implements IXmlReader {
 	public static final int NORMAL_ENCHANT_COST_MULTIPLIER = Config.NORMAL_ENCHANT_COST_MULTIPLIER;
 	public static final int SAFE_ENCHANT_COST_MULTIPLIER = Config.SAFE_ENCHANT_COST_MULTIPLIER;
 	
@@ -54,54 +53,42 @@ public class EnchantSkillGroupsData implements IXmlReader
 	/**
 	 * Instantiates a new enchant groups table.
 	 */
-	protected EnchantSkillGroupsData()
-	{
+	protected EnchantSkillGroupsData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_enchantSkillGroups.clear();
 		_enchantSkillTrees.clear();
 		parseDatapackFile("data/enchantSkillGroups.xml");
 		int routes = 0;
-		for (L2EnchantSkillGroup group : _enchantSkillGroups.values())
-		{
+		for (L2EnchantSkillGroup group : _enchantSkillGroups.values()) {
 			routes += group.getEnchantGroupDetails().size();
 		}
 		LOG.info("{}: Loaded {} groups and {} routes.", getClass().getSimpleName(), _enchantSkillGroups.size(), routes);
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("group".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("group".equalsIgnoreCase(d.getNodeName())) {
 						NamedNodeMap attrs = d.getAttributes();
 						final int id = parseInteger(attrs, "id");
 						L2EnchantSkillGroup group = _enchantSkillGroups.get(id);
-						if (group == null)
-						{
+						if (group == null) {
 							group = new L2EnchantSkillGroup(id);
 							_enchantSkillGroups.put(id, group);
 						}
 						
-						for (Node b = d.getFirstChild(); b != null; b = b.getNextSibling())
-						{
-							if ("enchant".equalsIgnoreCase(b.getNodeName()))
-							{
+						for (Node b = d.getFirstChild(); b != null; b = b.getNextSibling()) {
+							if ("enchant".equalsIgnoreCase(b.getNodeName())) {
 								attrs = b.getAttributes();
 								StatsSet set = new StatsSet();
 								
-								for (int i = 0; i < attrs.getLength(); i++)
-								{
+								for (int i = 0; i < attrs.getLength(); i++) {
 									Node att = attrs.item(i);
 									set.set(att.getNodeName(), att.getNodeValue());
 								}
@@ -122,16 +109,13 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param group the group
 	 * @return the int
 	 */
-	public int addNewRouteForSkill(int skillId, int maxLvL, int route, int group)
-	{
+	public int addNewRouteForSkill(int skillId, int maxLvL, int route, int group) {
 		L2EnchantSkillLearn enchantableSkill = _enchantSkillTrees.get(skillId);
-		if (enchantableSkill == null)
-		{
+		if (enchantableSkill == null) {
 			enchantableSkill = new L2EnchantSkillLearn(skillId, maxLvL);
 			_enchantSkillTrees.put(skillId, enchantableSkill);
 		}
-		if (_enchantSkillGroups.containsKey(group))
-		{
+		if (_enchantSkillGroups.containsKey(group)) {
 			enchantableSkill.addNewEnchantRoute(route, group);
 			
 			return _enchantSkillGroups.get(group).getEnchantGroupDetails().size();
@@ -145,12 +129,10 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param skill the skill
 	 * @return the skill enchantment for skill
 	 */
-	public L2EnchantSkillLearn getSkillEnchantmentForSkill(Skill skill)
-	{
+	public L2EnchantSkillLearn getSkillEnchantmentForSkill(Skill skill) {
 		// there is enchantment for this skill and we have the required level of it
 		final L2EnchantSkillLearn esl = getSkillEnchantmentBySkillId(skill.getId());
-		if ((esl != null) && (skill.getLevel() >= esl.getBaseLevel()))
-		{
+		if ((esl != null) && (skill.getLevel() >= esl.getBaseLevel())) {
 			return esl;
 		}
 		return null;
@@ -161,8 +143,7 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param skillId the skill id
 	 * @return the skill enchantment by skill id
 	 */
-	public L2EnchantSkillLearn getSkillEnchantmentBySkillId(int skillId)
-	{
+	public L2EnchantSkillLearn getSkillEnchantmentBySkillId(int skillId) {
 		return _enchantSkillTrees.get(skillId);
 	}
 	
@@ -171,8 +152,7 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param id the id
 	 * @return the enchant skill group by id
 	 */
-	public L2EnchantSkillGroup getEnchantSkillGroupById(int id)
-	{
+	public L2EnchantSkillGroup getEnchantSkillGroupById(int id) {
 		return _enchantSkillGroups.get(id);
 	}
 	
@@ -181,14 +161,11 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param skill the skill
 	 * @return the enchant skill sp cost
 	 */
-	public int getEnchantSkillSpCost(Skill skill)
-	{
+	public int getEnchantSkillSpCost(Skill skill) {
 		final L2EnchantSkillLearn enchantSkillLearn = _enchantSkillTrees.get(skill.getId());
-		if (enchantSkillLearn != null)
-		{
+		if (enchantSkillLearn != null) {
 			final EnchantSkillHolder esh = enchantSkillLearn.getEnchantSkillHolder(skill.getLevel());
-			if (esh != null)
-			{
+			if (esh != null) {
 				return esh.getSpCost();
 			}
 		}
@@ -200,14 +177,11 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param skill the skill
 	 * @return the enchant skill Adena cost
 	 */
-	public int getEnchantSkillAdenaCost(Skill skill)
-	{
+	public int getEnchantSkillAdenaCost(Skill skill) {
 		final L2EnchantSkillLearn enchantSkillLearn = _enchantSkillTrees.get(skill.getId());
-		if (enchantSkillLearn != null)
-		{
+		if (enchantSkillLearn != null) {
 			final EnchantSkillHolder esh = enchantSkillLearn.getEnchantSkillHolder(skill.getLevel());
-			if (esh != null)
-			{
+			if (esh != null) {
 				return esh.getAdenaCost();
 			}
 		}
@@ -220,14 +194,11 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * @param skill the skill
 	 * @return the enchant skill rate
 	 */
-	public byte getEnchantSkillRate(L2PcInstance player, Skill skill)
-	{
+	public byte getEnchantSkillRate(L2PcInstance player, Skill skill) {
 		final L2EnchantSkillLearn enchantSkillLearn = _enchantSkillTrees.get(skill.getId());
-		if (enchantSkillLearn != null)
-		{
+		if (enchantSkillLearn != null) {
 			final EnchantSkillHolder esh = enchantSkillLearn.getEnchantSkillHolder(skill.getLevel());
-			if (esh != null)
-			{
+			if (esh != null) {
 				return esh.getRate(player);
 			}
 		}
@@ -238,13 +209,11 @@ public class EnchantSkillGroupsData implements IXmlReader
 	 * Gets the single instance of EnchantGroupsData.
 	 * @return single instance of EnchantGroupsData
 	 */
-	public static EnchantSkillGroupsData getInstance()
-	{
+	public static EnchantSkillGroupsData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final EnchantSkillGroupsData _instance = new EnchantSkillGroupsData();
 	}
 }

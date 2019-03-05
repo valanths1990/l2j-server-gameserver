@@ -36,8 +36,7 @@ import com.l2jserver.gameserver.network.serverpackets.StaticObject;
  * Static Object instance.
  * @author godson
  */
-public final class L2StaticObjectInstance extends L2Character
-{
+public final class L2StaticObjectInstance extends L2Character {
 	/** The interaction distance of the L2StaticObjectInstance */
 	public static final int INTERACTION_DISTANCE = 150;
 	
@@ -51,16 +50,14 @@ public final class L2StaticObjectInstance extends L2Character
 	 * @param template the static object
 	 * @param staticId the static ID
 	 */
-	public L2StaticObjectInstance(L2CharTemplate template, int staticId)
-	{
+	public L2StaticObjectInstance(L2CharTemplate template, int staticId) {
 		super(template);
 		setInstanceType(InstanceType.L2StaticObjectInstance);
 		_staticObjectId = staticId;
 	}
 	
 	@Override
-	protected L2CharacterAI initAI()
-	{
+	protected L2CharacterAI initAI() {
 		return null;
 	}
 	
@@ -69,100 +66,83 @@ public final class L2StaticObjectInstance extends L2Character
 	 * @return the static object ID
 	 */
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _staticObjectId;
 	}
 	
 	@Override
-	public final StaticObjectKnownList getKnownList()
-	{
+	public final StaticObjectKnownList getKnownList() {
 		return (StaticObjectKnownList) super.getKnownList();
 	}
 	
 	@Override
-	public void initKnownList()
-	{
+	public void initKnownList() {
 		setKnownList(new StaticObjectKnownList(this));
 	}
 	
 	@Override
-	public final StaticObjStat getStat()
-	{
+	public final StaticObjStat getStat() {
 		return (StaticObjStat) super.getStat();
 	}
 	
 	@Override
-	public void initCharStat()
-	{
+	public void initCharStat() {
 		setStat(new StaticObjStat(this));
 	}
 	
 	@Override
-	public final StaticObjStatus getStatus()
-	{
+	public final StaticObjStatus getStatus() {
 		return (StaticObjStatus) super.getStatus();
 	}
 	
 	@Override
-	public void initCharStatus()
-	{
+	public void initCharStatus() {
 		setStatus(new StaticObjStatus(this));
 	}
 	
-	public int getType()
-	{
+	public int getType() {
 		return _type;
 	}
 	
-	public void setType(int type)
-	{
+	public void setType(int type) {
 		_type = type;
 	}
 	
-	public void setMap(String texture, int x, int y)
-	{
+	public void setMap(String texture, int x, int y) {
 		_map = new ShowTownMap("town_map." + texture, x, y);
 	}
 	
-	public ShowTownMap getMap()
-	{
+	public ShowTownMap getMap() {
 		return _map;
 	}
 	
 	@Override
-	public final int getLevel()
-	{
+	public final int getLevel() {
 		return 1;
 	}
 	
 	@Override
-	public L2ItemInstance getActiveWeaponInstance()
-	{
+	public L2ItemInstance getActiveWeaponInstance() {
 		return null;
 	}
 	
 	@Override
-	public L2Weapon getActiveWeaponItem()
-	{
+	public L2Weapon getActiveWeaponItem() {
 		return null;
 	}
 	
 	@Override
-	public L2ItemInstance getSecondaryWeaponInstance()
-	{
+	public L2ItemInstance getSecondaryWeaponInstance() {
 		return null;
 	}
 	
 	@Override
-	public L2Weapon getSecondaryWeaponItem()
-	{
+	public L2Weapon getSecondaryWeaponItem() {
 		return null;
 	}
 	
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
+	public boolean isAutoAttackable(L2Character attacker) {
 		return false;
 	}
 	
@@ -175,8 +155,7 @@ public final class L2StaticObjectInstance extends L2Character
 	 * </ul>
 	 * @param meshIndex
 	 */
-	public void setMeshIndex(int meshIndex)
-	{
+	public void setMeshIndex(int meshIndex) {
 		_meshIndex = meshIndex;
 		this.broadcastPacket(new StaticObject(this));
 	}
@@ -189,39 +168,32 @@ public final class L2StaticObjectInstance extends L2Character
 	 * </ul>
 	 * @return the meshIndex of the object
 	 */
-	public int getMeshIndex()
-	{
+	public int getMeshIndex() {
 		return _meshIndex;
 	}
 	
 	@Override
-	public void updateAbnormalEffect()
-	{
+	public void updateAbnormalEffect() {
 	}
 	
 	@Override
-	public void sendInfo(L2PcInstance activeChar)
-	{
+	public void sendInfo(L2PcInstance activeChar) {
 		activeChar.sendPacket(new StaticObject(this));
 	}
 	
 	@Override
-	public void moveToLocation(int x, int y, int z, int offset)
-	{
+	public void moveToLocation(int x, int y, int z, int offset) {
 	}
 	
 	@Override
-	public void stopMove(Location loc)
-	{
+	public void stopMove(Location loc) {
 	}
 	
 	@Override
-	public void doAttack(L2Character target)
-	{
+	public void doAttack(L2Character target) {
 	}
 	
 	@Override
-	public void doCast(Skill skill)
-	{
+	public void doCast(Skill skill) {
 	}
 }

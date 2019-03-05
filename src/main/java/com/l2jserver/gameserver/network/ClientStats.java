@@ -20,8 +20,7 @@ package com.l2jserver.gameserver.network;
 
 import com.l2jserver.gameserver.config.Config;
 
-public class ClientStats
-{
+public class ClientStats {
 	public int processedPackets = 0;
 	public int droppedPackets = 0;
 	public int unknownPackets = 0;
@@ -53,8 +52,7 @@ public class ClientStats
 	
 	private final int BUFFER_SIZE;
 	
-	public ClientStats()
-	{
+	public ClientStats() {
 		BUFFER_SIZE = Config.CLIENT_PACKET_QUEUE_MEASURE_INTERVAL;
 		_packetsInSecond = new int[BUFFER_SIZE];
 		_head = BUFFER_SIZE - 1;
@@ -63,11 +61,9 @@ public class ClientStats
 	/**
 	 * @return true if incoming packet need to be dropped
 	 */
-	protected final boolean dropPacket()
-	{
+	protected final boolean dropPacket() {
 		final boolean result = _floodDetected || _queueOverflowDetected;
-		if (result)
-		{
+		if (result) {
 			droppedPackets++;
 		}
 		return result;
@@ -78,16 +74,13 @@ public class ClientStats
 	 * @param queueSize
 	 * @return true if flood detected first and ActionFailed packet need to be sent.
 	 */
-	protected final boolean countPacket(int queueSize)
-	{
+	protected final boolean countPacket(int queueSize) {
 		processedPackets++;
 		totalQueueSize += queueSize;
-		if (maxQueueSize < queueSize)
-		{
+		if (maxQueueSize < queueSize) {
 			maxQueueSize = queueSize;
 		}
-		if (_queueOverflowDetected && (queueSize < 2))
-		{
+		if (_queueOverflowDetected && (queueSize < 2)) {
 			_queueOverflowDetected = false;
 		}
 		
@@ -97,13 +90,11 @@ public class ClientStats
 	/**
 	 * @return Counts unknown packets and return true if threshold is reached.
 	 */
-	protected final boolean countUnknownPacket()
-	{
+	protected final boolean countUnknownPacket() {
 		unknownPackets++;
 		
 		final long tick = System.currentTimeMillis();
-		if ((tick - _unknownPacketStartTick) > 60000)
-		{
+		if ((tick - _unknownPacketStartTick) > 60000) {
 			_unknownPacketStartTick = tick;
 			_unknownPacketsInMin = 1;
 			return false;
@@ -117,15 +108,12 @@ public class ClientStats
 	 * @param count - current number of processed packets in burst
 	 * @return burst length and return true if execution of the queue need to be aborted.
 	 */
-	protected final boolean countBurst(int count)
-	{
-		if (count > maxBurstSize)
-		{
+	protected final boolean countBurst(int count) {
+		if (count > maxBurstSize) {
 			maxBurstSize = count;
 		}
 		
-		if (count < Config.CLIENT_PACKET_QUEUE_MAX_BURST_SIZE)
-		{
+		if (count < Config.CLIENT_PACKET_QUEUE_MAX_BURST_SIZE) {
 			return false;
 		}
 		
@@ -136,14 +124,12 @@ public class ClientStats
 	/**
 	 * @return Counts queue overflows and return true if threshold is reached.
 	 */
-	protected final boolean countQueueOverflow()
-	{
+	protected final boolean countQueueOverflow() {
 		_queueOverflowDetected = true;
 		totalQueueOverflows++;
 		
 		final long tick = System.currentTimeMillis();
-		if ((tick - _overflowStartTick) > 60000)
-		{
+		if ((tick - _overflowStartTick) > 60000) {
 			_overflowStartTick = tick;
 			_overflowsInMin = 1;
 			return false;
@@ -156,13 +142,11 @@ public class ClientStats
 	/**
 	 * @return Counts underflow exceptions and return true if threshold is reached.
 	 */
-	protected final boolean countUnderflowException()
-	{
+	protected final boolean countUnderflowException() {
 		totalUnderflowExceptions++;
 		
 		final long tick = System.currentTimeMillis();
-		if ((tick - _underflowReadStartTick) > 60000)
-		{
+		if ((tick - _underflowReadStartTick) > 60000) {
 			_underflowReadStartTick = tick;
 			_underflowReadsInMin = 1;
 			return false;
@@ -175,13 +159,11 @@ public class ClientStats
 	/**
 	 * @return true if maximum number of floods per minute is reached.
 	 */
-	protected final boolean countFloods()
-	{
+	protected final boolean countFloods() {
 		return _floodsInMin > Config.CLIENT_PACKET_QUEUE_MAX_FLOODS_PER_MIN;
 	}
 	
-	private final boolean longFloodDetected()
-	{
+	private final boolean longFloodDetected() {
 		return (_totalCount / BUFFER_SIZE) > Config.CLIENT_PACKET_QUEUE_MAX_AVERAGE_PACKETS_PER_SECOND;
 	}
 	
@@ -189,23 +171,19 @@ public class ClientStats
 	 * Later during flood returns true (and send ActionFailed) once per second.
 	 * @return true if flood detected first and ActionFailed packet need to be sent.
 	 */
-	private final synchronized boolean countPacket()
-	{
+	private final synchronized boolean countPacket() {
 		_totalCount++;
 		final long tick = System.currentTimeMillis();
-		if ((tick - _packetCountStartTick) > 1000)
-		{
+		if ((tick - _packetCountStartTick) > 1000) {
 			_packetCountStartTick = tick;
 			
 			// clear flag if no more flooding during last seconds
-			if (_floodDetected && !longFloodDetected() && (_packetsInSecond[_head] < (Config.CLIENT_PACKET_QUEUE_MAX_PACKETS_PER_SECOND / 2)))
-			{
+			if (_floodDetected && !longFloodDetected() && (_packetsInSecond[_head] < (Config.CLIENT_PACKET_QUEUE_MAX_PACKETS_PER_SECOND / 2))) {
 				_floodDetected = false;
 			}
 			
 			// wrap head of the buffer around the tail
-			if (_head <= 0)
-			{
+			if (_head <= 0) {
 				_head = BUFFER_SIZE;
 			}
 			_head--;
@@ -216,29 +194,20 @@ public class ClientStats
 		}
 		
 		final int count = ++_packetsInSecond[_head];
-		if (!_floodDetected)
-		{
-			if (count > Config.CLIENT_PACKET_QUEUE_MAX_PACKETS_PER_SECOND)
-			{
+		if (!_floodDetected) {
+			if (count > Config.CLIENT_PACKET_QUEUE_MAX_PACKETS_PER_SECOND) {
 				shortFloods++;
-			}
-			else if (longFloodDetected())
-			{
+			} else if (longFloodDetected()) {
 				longFloods++;
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 			
 			_floodDetected = true;
-			if ((tick - _floodStartTick) > 60000)
-			{
+			if ((tick - _floodStartTick) > 60000) {
 				_floodStartTick = tick;
 				_floodsInMin = 1;
-			}
-			else
-			{
+			} else {
 				_floodsInMin++;
 			}
 			

@@ -24,20 +24,17 @@ import com.l2jserver.gameserver.model.items.L2Henna;
 /**
  * @author Zoey76
  */
-public final class HennaItemRemoveInfo extends L2GameServerPacket
-{
+public final class HennaItemRemoveInfo extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final L2Henna _henna;
 	
-	public HennaItemRemoveInfo(L2Henna henna, L2PcInstance player)
-	{
+	public HennaItemRemoveInfo(L2Henna henna, L2PcInstance player) {
 		_henna = henna;
 		_activeChar = player;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xE7);
 		writeD(_henna.getDyeId()); // symbol Id
 		writeD(_henna.getDyeItemId()); // item id of dye

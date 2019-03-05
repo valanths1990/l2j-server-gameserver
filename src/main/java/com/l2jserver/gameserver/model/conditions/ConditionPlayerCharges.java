@@ -25,22 +25,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerCharges.
  */
-public class ConditionPlayerCharges extends Condition
-{
+public class ConditionPlayerCharges extends Condition {
 	private final int _charges;
 	
 	/**
 	 * Instantiates a new condition player charges.
 	 * @param charges the charges
 	 */
-	public ConditionPlayerCharges(int charges)
-	{
+	public ConditionPlayerCharges(int charges) {
 		_charges = charges;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effector.getActingPlayer() != null) && (effector.getActingPlayer().getCharges() >= _charges);
 	}
 }

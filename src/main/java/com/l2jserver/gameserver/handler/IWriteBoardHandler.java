@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Community Board interface.
  * @author Zoey76
  */
-public interface IWriteBoardHandler extends IParseBoardHandler
-{
+public interface IWriteBoardHandler extends IParseBoardHandler {
 	/**
 	 * Writes a community board command into the client.
 	 * @param player the player

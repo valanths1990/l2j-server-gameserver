@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.skills;
  * Ride state enumerated.
  * @author Zoey76
  */
-public enum RideState
-{
+public enum RideState {
 	/** Riding nothing. */
 	NONE,
 	/** Riding a strider. */

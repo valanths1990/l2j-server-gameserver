@@ -28,50 +28,41 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
 
-public class RequestExRemoveItemAttribute extends L2GameClientPacket
-{
+public class RequestExRemoveItemAttribute extends L2GameClientPacket {
 	private static final String _C__D0_23_REQUESTEXREMOVEITEMATTRIBUTE = "[C] D0:23 RequestExRemoveItemAttribute";
 	
 	private int _objectId;
 	private long _price;
 	private byte _element;
 	
-	public RequestExRemoveItemAttribute()
-	{
+	public RequestExRemoveItemAttribute() {
 	}
 	
 	@Override
-	public void readImpl()
-	{
+	public void readImpl() {
 		_objectId = readD();
 		_element = (byte) readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		L2ItemInstance targetItem = activeChar.getInventory().getItemByObjectId(_objectId);
 		
-		if (targetItem == null)
-		{
+		if (targetItem == null) {
 			return;
 		}
 		
-		if ((targetItem.getElementals() == null) || (targetItem.getElemental(_element) == null))
-		{
+		if ((targetItem.getElementals() == null) || (targetItem.getElemental(_element) == null)) {
 			return;
 		}
 		
-		if (activeChar.reduceAdena("RemoveElement", getPrice(targetItem), activeChar, true))
-		{
-			if (targetItem.isEquipped())
-			{
+		if (activeChar.reduceAdena("RemoveElement", getPrice(targetItem), activeChar, true)) {
+			if (targetItem.isEquipped()) {
 				targetItem.getElemental(_element).removeBonus(activeChar);
 			}
 			targetItem.clearElementAttr(_element);
@@ -82,81 +73,57 @@ public class RequestExRemoveItemAttribute extends L2GameClientPacket
 			activeChar.sendPacket(iu);
 			SystemMessage sm;
 			byte realElement = targetItem.isArmor() ? Elementals.getOppositeElement(_element) : _element;
-			if (targetItem.getEnchantLevel() > 0)
-			{
-				if (targetItem.isArmor())
-				{
+			if (targetItem.getEnchantLevel() > 0) {
+				if (targetItem.isArmor()) {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.S1_S2_S3_ATTRIBUTE_REMOVED_RESISTANCE_TO_S4_DECREASED);
-				}
-				else
-				{
+				} else {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.S1_S2_ELEMENTAL_POWER_REMOVED);
 				}
 				sm.addInt(targetItem.getEnchantLevel());
 				sm.addItemName(targetItem);
-				if (targetItem.isArmor())
-				{
+				if (targetItem.isArmor()) {
 					sm.addElemental(realElement);
 					sm.addElemental(Elementals.getOppositeElement(realElement));
 				}
-			}
-			else
-			{
-				if (targetItem.isArmor())
-				{
+			} else {
+				if (targetItem.isArmor()) {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.S1_S2_ATTRIBUTE_REMOVED_RESISTANCE_S3_DECREASED);
-				}
-				else
-				{
+				} else {
 					sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ELEMENTAL_POWER_REMOVED);
 				}
 				sm.addItemName(targetItem);
-				if (targetItem.isArmor())
-				{
+				if (targetItem.isArmor()) {
 					sm.addElemental(realElement);
 					sm.addElemental(Elementals.getOppositeElement(realElement));
 				}
 			}
 			activeChar.sendPacket(sm);
 			activeChar.sendPacket(new ExBaseAttributeCancelResult(targetItem.getObjectId(), _element));
-		}
-		else
-		{
+		} else {
 			activeChar.sendPacket(SystemMessageId.YOU_DO_NOT_HAVE_ENOUGH_FUNDS_TO_CANCEL_ATTRIBUTE);
 		}
 	}
 	
-	private long getPrice(L2ItemInstance item)
-	{
-		switch (item.getItem().getCrystalType())
-		{
+	private long getPrice(L2ItemInstance item) {
+		switch (item.getItem().getCrystalType()) {
 			case S:
-				if (item.getItem() instanceof L2Weapon)
-				{
+				if (item.getItem() instanceof L2Weapon) {
 					_price = 50000;
-				}
-				else
-				{
+				} else {
 					_price = 40000;
 				}
 				break;
 			case S80:
-				if (item.getItem() instanceof L2Weapon)
-				{
+				if (item.getItem() instanceof L2Weapon) {
 					_price = 100000;
-				}
-				else
-				{
+				} else {
 					_price = 80000;
 				}
 				break;
 			case S84:
-				if (item.getItem() instanceof L2Weapon)
-				{
+				if (item.getItem() instanceof L2Weapon) {
 					_price = 200000;
-				}
-				else
-				{
+				} else {
 					_price = 160000;
 				}
 				break;
@@ -166,8 +133,7 @@ public class RequestExRemoveItemAttribute extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_23_REQUESTEXREMOVEITEMATTRIBUTE;
 	}
 }

@@ -31,8 +31,7 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
  * Class for Flame Control Tower instance.
  * @author JIV
  */
-public class L2FlameTowerInstance extends L2Tower
-{
+public class L2FlameTowerInstance extends L2Tower {
 	private int _upgradeLevel = 0;
 	private List<Integer> _zoneList;
 	
@@ -40,49 +39,40 @@ public class L2FlameTowerInstance extends L2Tower
 	 * Creates a flame tower.
 	 * @param template the flame tower NPC template
 	 */
-	public L2FlameTowerInstance(L2NpcTemplate template)
-	{
+	public L2FlameTowerInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2FlameTowerInstance);
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
+	public boolean doDie(L2Character killer) {
 		enableZones(false);
 		return super.doDie(killer);
 	}
 	
 	@Override
-	public boolean deleteMe()
-	{
+	public boolean deleteMe() {
 		enableZones(false);
 		return super.deleteMe();
 	}
 	
-	public final void enableZones(boolean state)
-	{
-		if ((_zoneList != null) && (_upgradeLevel != 0))
-		{
+	public final void enableZones(boolean state) {
+		if ((_zoneList != null) && (_upgradeLevel != 0)) {
 			final int maxIndex = _upgradeLevel * 2;
-			for (int i = 0; i < maxIndex; i++)
-			{
+			for (int i = 0; i < maxIndex; i++) {
 				final L2ZoneType zone = ZoneManager.getInstance().getZoneById(_zoneList.get(i));
-				if (zone != null)
-				{
+				if (zone != null) {
 					zone.setEnabled(state);
 				}
 			}
 		}
 	}
 	
-	public final void setUpgradeLevel(int level)
-	{
+	public final void setUpgradeLevel(int level) {
 		_upgradeLevel = level;
 	}
 	
-	public final void setZoneList(List<Integer> list)
-	{
+	public final void setZoneList(List<Integer> list) {
 		_zoneList = list;
 		enableZones(true);
 	}

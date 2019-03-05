@@ -23,21 +23,18 @@ import com.l2jserver.gameserver.data.xml.impl.AdminData;
 /**
  * @author HorridoJoho
  */
-public class L2AdminCommandAccessRight
-{
+public class L2AdminCommandAccessRight {
 	private final String _adminCommand;
 	private final int _accessLevel;
 	private final boolean _requireConfirm;
 	
-	public L2AdminCommandAccessRight(StatsSet set)
-	{
+	public L2AdminCommandAccessRight(StatsSet set) {
 		_adminCommand = set.getString("command");
 		_requireConfirm = set.getBoolean("confirmDlg", false);
 		_accessLevel = set.getInt("accessLevel", 7);
 	}
 	
-	public L2AdminCommandAccessRight(String command, boolean confirm, int level)
-	{
+	public L2AdminCommandAccessRight(String command, boolean confirm, int level) {
 		_adminCommand = command;
 		_requireConfirm = confirm;
 		_accessLevel = level;
@@ -46,8 +43,7 @@ public class L2AdminCommandAccessRight
 	/**
 	 * @return the admin command the access right belongs to
 	 */
-	public String getAdminCommand()
-	{
+	public String getAdminCommand() {
 		return _adminCommand;
 	}
 	
@@ -55,8 +51,7 @@ public class L2AdminCommandAccessRight
 	 * @param characterAccessLevel
 	 * @return {@code true} if characterAccessLevel is allowed to use the admin command which belongs to this access right, {@code false} otherwise
 	 */
-	public boolean hasAccess(L2AccessLevel characterAccessLevel)
-	{
+	public boolean hasAccess(L2AccessLevel characterAccessLevel) {
 		L2AccessLevel accessLevel = AdminData.getInstance().getAccessLevel(_accessLevel);
 		return ((accessLevel.getLevel() == characterAccessLevel.getLevel()) || characterAccessLevel.hasChildAccess(accessLevel));
 	}
@@ -64,8 +59,7 @@ public class L2AdminCommandAccessRight
 	/**
 	 * @return {@code true} if admin command requires confirmation before execution, {@code false} otherwise.
 	 */
-	public boolean getRequireConfirm()
-	{
+	public boolean getRequireConfirm() {
 		return _requireConfirm;
 	}
 }

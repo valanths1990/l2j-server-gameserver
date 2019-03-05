@@ -26,23 +26,19 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * @author Zealar
  * @since 2.6.0.0
  */
-public class OnPlayerStand implements IBaseEvent
-{
+public class OnPlayerStand implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	
-	public OnPlayerStand(L2PcInstance activeChar)
-	{
+	public OnPlayerStand(L2PcInstance activeChar) {
 		_activeChar = activeChar;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_STAND;
 	}
 }

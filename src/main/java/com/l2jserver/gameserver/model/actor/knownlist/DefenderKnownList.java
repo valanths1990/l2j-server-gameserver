@@ -27,18 +27,14 @@ import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Fort;
 import com.l2jserver.gameserver.model.entity.clanhall.SiegableHall;
 
-public class DefenderKnownList extends AttackableKnownList
-{
-	public DefenderKnownList(L2DefenderInstance activeChar)
-	{
+public class DefenderKnownList extends AttackableKnownList {
+	public DefenderKnownList(L2DefenderInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public boolean addKnownObject(L2Object object)
-	{
-		if (!super.addKnownObject(object))
-		{
+	public boolean addKnownObject(L2Object object) {
+		if (!super.addKnownObject(object)) {
 			return false;
 		}
 		
@@ -46,20 +42,16 @@ public class DefenderKnownList extends AttackableKnownList
 		Fort fortress = getActiveChar().getFort();
 		SiegableHall hall = getActiveChar().getConquerableHall();
 		// Check if siege is in progress
-		if (((fortress != null) && fortress.getZone().isActive()) || ((castle != null) && castle.getZone().isActive()) || ((hall != null) && hall.getSiegeZone().isActive()))
-		{
+		if (((fortress != null) && fortress.getZone().isActive()) || ((castle != null) && castle.getZone().isActive()) || ((hall != null) && hall.getSiegeZone().isActive())) {
 			L2PcInstance player = null;
-			if (object.isPlayable())
-			{
+			if (object.isPlayable()) {
 				player = object.getActingPlayer();
 			}
 			int activeSiegeId = (fortress != null ? fortress.getResidenceId() : (castle != null ? castle.getResidenceId() : hall != null ? hall.getId() : 0));
 			
 			// Check if player is an enemy of this defender npc
-			if ((player != null) && (((player.getSiegeState() == 2) && !player.isRegisteredOnThisSiegeField(activeSiegeId)) || ((player.getSiegeState() == 1) && !TerritoryWarManager.getInstance().isAllyField(player, activeSiegeId)) || (player.getSiegeState() == 0)))
-			{
-				if (getActiveChar().getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE)
-				{
+			if ((player != null) && (((player.getSiegeState() == 2) && !player.isRegisteredOnThisSiegeField(activeSiegeId)) || ((player.getSiegeState() == 1) && !TerritoryWarManager.getInstance().isAllyField(player, activeSiegeId)) || (player.getSiegeState() == 0))) {
+				if (getActiveChar().getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE) {
 					getActiveChar().getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE, null);
 				}
 			}
@@ -68,8 +60,7 @@ public class DefenderKnownList extends AttackableKnownList
 	}
 	
 	@Override
-	public final L2DefenderInstance getActiveChar()
-	{
+	public final L2DefenderInstance getActiveChar() {
 		return (L2DefenderInstance) super.getActiveChar();
 	}
 }

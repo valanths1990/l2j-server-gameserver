@@ -35,8 +35,7 @@ import com.l2jserver.gameserver.network.serverpackets.AutoAttackStop;
  * Attack stance task manager.
  * @author Luca Baldi, Zoey76
  */
-public class AttackStanceTaskManager
-{
+public class AttackStanceTaskManager {
 	protected static final Logger _log = Logger.getLogger(AttackStanceTaskManager.class.getName());
 	
 	protected static final Map<L2Character, Long> _attackStanceTasks = new ConcurrentHashMap<>();
@@ -44,8 +43,7 @@ public class AttackStanceTaskManager
 	/**
 	 * Instantiates a new attack stance task manager.
 	 */
-	protected AttackStanceTaskManager()
-	{
+	protected AttackStanceTaskManager() {
 		ThreadPoolManager.getInstance().scheduleAiAtFixedRate(new FightModeScheduler(), 0, 1000);
 	}
 	
@@ -53,17 +51,12 @@ public class AttackStanceTaskManager
 	 * Adds the attack stance task.
 	 * @param actor the actor
 	 */
-	public void addAttackStanceTask(L2Character actor)
-	{
-		if (actor != null)
-		{
-			if (actor.isPlayable())
-			{
+	public void addAttackStanceTask(L2Character actor) {
+		if (actor != null) {
+			if (actor.isPlayable()) {
 				final L2PcInstance player = actor.getActingPlayer();
-				for (L2CubicInstance cubic : player.getCubics().values())
-				{
-					if (cubic.getId() != L2CubicInstance.LIFE_CUBIC)
-					{
+				for (L2CubicInstance cubic : player.getCubics().values()) {
+					if (cubic.getId() != L2CubicInstance.LIFE_CUBIC) {
 						cubic.doAction();
 					}
 				}
@@ -76,12 +69,9 @@ public class AttackStanceTaskManager
 	 * Removes the attack stance task.
 	 * @param actor the actor
 	 */
-	public void removeAttackStanceTask(L2Character actor)
-	{
-		if (actor != null)
-		{
-			if (actor.isSummon())
-			{
+	public void removeAttackStanceTask(L2Character actor) {
+		if (actor != null) {
+			if (actor.isSummon()) {
 				actor = actor.getActingPlayer();
 			}
 			_attackStanceTasks.remove(actor);
@@ -93,12 +83,9 @@ public class AttackStanceTaskManager
 	 * @param actor the actor
 	 * @return {@code true} if the character has an attack stance task, {@code false} otherwise
 	 */
-	public boolean hasAttackStanceTask(L2Character actor)
-	{
-		if (actor != null)
-		{
-			if (actor.isSummon())
-			{
+	public boolean hasAttackStanceTask(L2Character actor) {
+		if (actor != null) {
+			if (actor.isSummon()) {
 				actor = actor.getActingPlayer();
 			}
 			return _attackStanceTasks.containsKey(actor);
@@ -106,38 +93,29 @@ public class AttackStanceTaskManager
 		return false;
 	}
 	
-	protected class FightModeScheduler implements Runnable
-	{
+	protected class FightModeScheduler implements Runnable {
 		@Override
-		public void run()
-		{
+		public void run() {
 			long current = System.currentTimeMillis();
-			try
-			{
+			try {
 				final Iterator<Entry<L2Character, Long>> iter = _attackStanceTasks.entrySet().iterator();
 				Entry<L2Character, Long> e;
 				L2Character actor;
-				while (iter.hasNext())
-				{
+				while (iter.hasNext()) {
 					e = iter.next();
-					if ((current - e.getValue()) > 15000)
-					{
+					if ((current - e.getValue()) > 15000) {
 						actor = e.getKey();
-						if (actor != null)
-						{
+						if (actor != null) {
 							actor.broadcastPacket(new AutoAttackStop(actor.getObjectId()));
 							actor.getAI().setAutoAttacking(false);
-							if (actor.isPlayer() && actor.hasSummon())
-							{
+							if (actor.isPlayer() && actor.hasSummon()) {
 								actor.getSummon().broadcastPacket(new AutoAttackStop(actor.getSummon().getObjectId()));
 							}
 						}
 						iter.remove();
 					}
 				}
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				// Unless caught here, players remain in attack positions.
 				_log.log(Level.WARNING, "Error in FightModeScheduler: " + e.getMessage(), e);
 			}
@@ -148,13 +126,11 @@ public class AttackStanceTaskManager
 	 * Gets the single instance of AttackStanceTaskManager.
 	 * @return single instance of AttackStanceTaskManager
 	 */
-	public static AttackStanceTaskManager getInstance()
-	{
+	public static AttackStanceTaskManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final AttackStanceTaskManager _instance = new AttackStanceTaskManager();
 	}
 }

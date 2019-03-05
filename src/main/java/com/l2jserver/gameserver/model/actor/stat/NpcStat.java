@@ -20,22 +20,18 @@ package com.l2jserver.gameserver.model.actor.stat;
 
 import com.l2jserver.gameserver.model.actor.L2Npc;
 
-public class NpcStat extends CharStat
-{
-	public NpcStat(L2Npc activeChar)
-	{
+public class NpcStat extends CharStat {
+	public NpcStat(L2Npc activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public int getLevel()
-	{
+	public int getLevel() {
 		return getActiveChar().getTemplate().getLevel();
 	}
 	
 	@Override
-	public L2Npc getActiveChar()
-	{
+	public L2Npc getActiveChar() {
 		return (L2Npc) super.getActiveChar();
 	}
 }

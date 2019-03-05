@@ -26,27 +26,21 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * The Monster Derby Track Zone
  * @author durgus
  */
-public class L2DerbyTrackZone extends L2ZoneType
-{
-	public L2DerbyTrackZone(int id)
-	{
+public class L2DerbyTrackZone extends L2ZoneType {
+	public L2DerbyTrackZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayable())
-		{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayable()) {
 			character.setInsideZone(ZoneId.MONSTER_TRACK, true);
 		}
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayable())
-		{
+	protected void onExit(L2Character character) {
+		if (character.isPlayable()) {
 			character.setInsideZone(ZoneId.MONSTER_TRACK, false);
 		}
 	}

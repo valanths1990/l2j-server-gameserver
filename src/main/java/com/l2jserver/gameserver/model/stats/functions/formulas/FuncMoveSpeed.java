@@ -27,23 +27,19 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncMoveSpeed extends AbstractFunction
-{
+public class FuncMoveSpeed extends AbstractFunction {
 	private static final FuncMoveSpeed _fms_instance = new FuncMoveSpeed();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fms_instance;
 	}
 	
-	private FuncMoveSpeed()
-	{
+	private FuncMoveSpeed() {
 		super(Stats.MOVE_SPEED, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		return initVal * BaseStats.DEX.calcBonus(effector);
 	}
 }

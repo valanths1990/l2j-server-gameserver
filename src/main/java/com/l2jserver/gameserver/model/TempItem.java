@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * class contains itemId, quantity, ownerId, referencePrice, but not objectId<br>
  * is stored, this will be only "list" of items with it's owner
  */
-public final class TempItem
-{
+public final class TempItem {
 	private final int _itemId;
 	private int _quantity;
 	private final int _referencePrice;
@@ -37,8 +36,7 @@ public final class TempItem
 	 * @param item
 	 * @param quantity of that item
 	 */
-	public TempItem(L2ItemInstance item, int quantity)
-	{
+	public TempItem(L2ItemInstance item, int quantity) {
 		super();
 		_itemId = item.getId();
 		_quantity = quantity;
@@ -49,37 +47,32 @@ public final class TempItem
 	/**
 	 * @return the quantity.
 	 */
-	public int getQuantity()
-	{
+	public int getQuantity() {
 		return _quantity;
 	}
 	
 	/**
 	 * @param quantity The quantity to set.
 	 */
-	public void setQuantity(int quantity)
-	{
+	public void setQuantity(int quantity) {
 		_quantity = quantity;
 	}
 	
-	public int getReferencePrice()
-	{
+	public int getReferencePrice() {
 		return _referencePrice;
 	}
 	
 	/**
 	 * @return the itemId.
 	 */
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 	
 	/**
 	 * @return the itemName.
 	 */
-	public String getItemName()
-	{
+	public String getItemName() {
 		return _itemName;
 	}
 }

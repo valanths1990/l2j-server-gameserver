@@ -27,37 +27,31 @@ import com.l2jserver.gameserver.network.serverpackets.ExManagePartyRoomMember;
 import com.l2jserver.gameserver.network.serverpackets.JoinParty;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-public final class RequestAnswerJoinParty extends L2GameClientPacket
-{
+public final class RequestAnswerJoinParty extends L2GameClientPacket {
 	private static final String _C__43_REQUESTANSWERPARTY = "[C] 43 RequestAnswerJoinParty";
 	
 	private int _response;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_response = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
 		final L2PcInstance requestor = player.getActiveRequester();
-		if (requestor == null)
-		{
+		if (requestor == null) {
 			return;
 		}
 		
 		requestor.sendPacket(new JoinParty(_response));
 		
-		switch (_response)
-		{
+		switch (_response) {
 			case -1: // Party disable by player client config
 			{
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_SET_TO_REFUSE_PARTY_REQUEST);
@@ -73,56 +67,41 @@ public final class RequestAnswerJoinParty extends L2GameClientPacket
 			}
 			case 1: // Party accept by player
 			{
-				if (requestor.isInParty())
-				{
-					if (requestor.getParty().getMemberCount() >= 9)
-					{
+				if (requestor.isInParty()) {
+					if (requestor.getParty().getMemberCount() >= 9) {
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PARTY_FULL);
 						player.sendPacket(sm);
 						requestor.sendPacket(sm);
 						return;
 					}
 					player.joinParty(requestor.getParty());
-				}
-				else
-				{
+				} else {
 					requestor.setParty(new L2Party(requestor, requestor.getPartyDistributionType()));
 					player.joinParty(requestor.getParty());
 				}
 				
-				if (requestor.isInPartyMatchRoom() && player.isInPartyMatchRoom())
-				{
+				if (requestor.isInPartyMatchRoom() && player.isInPartyMatchRoom()) {
 					final PartyMatchRoomList list = PartyMatchRoomList.getInstance();
-					if ((list != null) && (list.getPlayerRoomId(requestor) == list.getPlayerRoomId(player)))
-					{
+					if ((list != null) && (list.getPlayerRoomId(requestor) == list.getPlayerRoomId(player))) {
 						final PartyMatchRoom room = list.getPlayerRoom(requestor);
-						if (room != null)
-						{
+						if (room != null) {
 							final ExManagePartyRoomMember packet = new ExManagePartyRoomMember(player, room, 1);
-							for (L2PcInstance member : room.getPartyMembers())
-							{
-								if (member != null)
-								{
+							for (L2PcInstance member : room.getPartyMembers()) {
+								if (member != null) {
 									member.sendPacket(packet);
 								}
 							}
 						}
 					}
-				}
-				else if (requestor.isInPartyMatchRoom() && !player.isInPartyMatchRoom())
-				{
+				} else if (requestor.isInPartyMatchRoom() && !player.isInPartyMatchRoom()) {
 					final PartyMatchRoomList list = PartyMatchRoomList.getInstance();
-					if (list != null)
-					{
+					if (list != null) {
 						final PartyMatchRoom room = list.getPlayerRoom(requestor);
-						if (room != null)
-						{
+						if (room != null) {
 							room.addMember(player);
 							ExManagePartyRoomMember packet = new ExManagePartyRoomMember(player, room, 1);
-							for (L2PcInstance member : room.getPartyMembers())
-							{
-								if (member != null)
-								{
+							for (L2PcInstance member : room.getPartyMembers()) {
+								if (member != null) {
 									member.sendPacket(packet);
 								}
 							}
@@ -136,8 +115,7 @@ public final class RequestAnswerJoinParty extends L2GameClientPacket
 			}
 		}
 		
-		if (requestor.isInParty())
-		{
+		if (requestor.isInParty()) {
 			requestor.getParty().setPendingInvitation(false); // if party is null, there is no need of decreasing
 		}
 		
@@ -146,8 +124,7 @@ public final class RequestAnswerJoinParty extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__43_REQUESTANSWERPARTY;
 	}
 }

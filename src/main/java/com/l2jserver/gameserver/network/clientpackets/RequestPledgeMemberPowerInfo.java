@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.network.serverpackets.PledgeReceivePowerInfo;
  * Format: (ch) dS
  * @author -Wooden-
  */
-public final class RequestPledgeMemberPowerInfo extends L2GameClientPacket
-{
+public final class RequestPledgeMemberPowerInfo extends L2GameClientPacket {
 	private static final String _C__D0_14_REQUESTPLEDGEMEMBERPOWERINFO = "[C] D0:14 RequestPledgeMemberPowerInfo";
 	
 	@SuppressWarnings("unused")
@@ -36,39 +35,33 @@ public final class RequestPledgeMemberPowerInfo extends L2GameClientPacket
 	private String _player;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_unk1 = readD();
 		_player = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// _log.info("C5: RequestPledgeMemberPowerInfo d:"+_unk1);
 		// _log.info("C5: RequestPledgeMemberPowerInfo S:"+_player);
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		// do we need powers to do that??
 		L2Clan clan = activeChar.getClan();
-		if (clan == null)
-		{
+		if (clan == null) {
 			return;
 		}
 		L2ClanMember member = clan.getClanMember(_player);
-		if (member == null)
-		{
+		if (member == null) {
 			return;
 		}
 		activeChar.sendPacket(new PledgeReceivePowerInfo(member));
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_14_REQUESTPLEDGEMEMBERPOWERINFO;
 	}
 }

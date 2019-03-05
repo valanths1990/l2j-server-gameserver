@@ -42,8 +42,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 /**
  * The Class MultiSellChoose.
  */
-public class MultiSellChoose extends L2GameClientPacket
-{
+public class MultiSellChoose extends L2GameClientPacket {
 	private static final String _C__B0_MULTISELLCHOOSE = "[C] B0 MultiSellChoose";
 	
 	private int _listId;
@@ -73,8 +72,7 @@ public class MultiSellChoose extends L2GameClientPacket
 	private int _unk11;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_listId = readD();
 		_entryId = readD();
 		_amount = readQ();
@@ -92,55 +90,44 @@ public class MultiSellChoose extends L2GameClientPacket
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getMultiSell().tryPerformAction("multisell choose"))
-		{
+		if (!getClient().getFloodProtectors().getMultiSell().tryPerformAction("multisell choose")) {
 			player.setMultiSell(null);
 			return;
 		}
 		
-		if ((_amount < 1) || (_amount > 5000))
-		{
+		if ((_amount < 1) || (_amount > 5000)) {
 			player.setMultiSell(null);
 			return;
 		}
 		
 		PreparedListContainer list = player.getMultiSell();
-		if ((list == null) || (list.getListId() != _listId))
-		{
+		if ((list == null) || (list.getListId() != _listId)) {
 			player.setMultiSell(null);
 			return;
 		}
 		
 		final L2Npc npc = player.getLastFolkNPC();
-		if (((npc != null) && !list.isNpcAllowed(npc.getId())) || ((npc == null) && list.isNpcOnly()))
-		{
+		if (((npc != null) && !list.isNpcAllowed(npc.getId())) || ((npc == null) && list.isNpcOnly())) {
 			player.setMultiSell(null);
 			return;
 		}
 		
-		if (!player.isGM() && (npc != null))
-		{
-			if (!player.isInsideRadius(npc, INTERACTION_DISTANCE, true, false) || (player.getInstanceId() != npc.getInstanceId()))
-			{
+		if (!player.isGM() && (npc != null)) {
+			if (!player.isInsideRadius(npc, INTERACTION_DISTANCE, true, false) || (player.getInstanceId() != npc.getInstanceId())) {
 				player.setMultiSell(null);
 				return;
 			}
 		}
 		
-		for (Entry entry : list.getEntries())
-		{
-			if (entry.getEntryId() == _entryId)
-			{
-				if (!entry.isStackable() && (_amount > 1))
-				{
+		for (Entry entry : list.getEntries()) {
+			if (entry.getEntryId() == _entryId) {
+				if (!entry.isStackable() && (_amount > 1)) {
 					_log.severe("Character: " + player.getName() + " is trying to set amount > 1 on non-stackable multisell, id:" + _listId + ":" + _entryId);
 					player.setMultiSell(null);
 					return;
@@ -150,32 +137,25 @@ public class MultiSellChoose extends L2GameClientPacket
 				
 				int slots = 0;
 				int weight = 0;
-				for (Ingredient e : entry.getProducts())
-				{
-					if (e.getItemId() < 0)
-					{
+				for (Ingredient e : entry.getProducts()) {
+					if (e.getItemId() < 0) {
 						continue;
 					}
 					
-					if (!e.isStackable())
-					{
+					if (!e.isStackable()) {
 						slots += e.getItemCount() * _amount;
-					}
-					else if (player.getInventory().getItemByItemId(e.getItemId()) == null)
-					{
+					} else if (player.getInventory().getItemByItemId(e.getItemId()) == null) {
 						slots++;
 					}
 					weight += e.getItemCount() * _amount * e.getWeight();
 				}
 				
-				if (!inv.validateWeight(weight))
-				{
+				if (!inv.validateWeight(weight)) {
 					player.sendPacket(SystemMessageId.WEIGHT_LIMIT_EXCEEDED);
 					return;
 				}
 				
-				if (!inv.validateCapacity(slots))
-				{
+				if (!inv.validateCapacity(slots)) {
 					player.sendPacket(SystemMessageId.SLOTS_FULL);
 					return;
 				}
@@ -184,20 +164,16 @@ public class MultiSellChoose extends L2GameClientPacket
 				// Generate a list of distinct ingredients and counts in order to check if the correct item-counts
 				// are possessed by the player
 				boolean newIng;
-				for (Ingredient e : entry.getIngredients())
-				{
+				for (Ingredient e : entry.getIngredients()) {
 					newIng = true;
 					// at this point, the template has already been modified so that enchantments are properly included
 					// whenever they need to be applied. Uniqueness of items is thus judged by item id AND enchantment level
-					for (int i = ingredientsList.size(); --i >= 0;)
-					{
+					for (int i = ingredientsList.size(); --i >= 0;) {
 						Ingredient ex = ingredientsList.get(i);
 						// if the item was already added in the list, merely increment the count
 						// this happens if 1 list entry has the same ingredient twice (example 2 swords = 1 dual)
-						if ((ex.getItemId() == e.getItemId()) && (ex.getEnchantLevel() == e.getEnchantLevel()))
-						{
-							if ((ex.getItemCount() + e.getItemCount()) > Integer.MAX_VALUE)
-							{
+						if ((ex.getItemId() == e.getItemId()) && (ex.getEnchantLevel() == e.getEnchantLevel())) {
+							if ((ex.getItemCount() + e.getItemCount()) > Integer.MAX_VALUE) {
 								player.sendPacket(SystemMessageId.YOU_HAVE_EXCEEDED_QUANTITY_THAT_CAN_BE_INPUTTED);
 								return;
 							}
@@ -209,35 +185,27 @@ public class MultiSellChoose extends L2GameClientPacket
 							break;
 						}
 					}
-					if (newIng)
-					{
+					if (newIng) {
 						// if it's a new ingredient, just store its info directly (item id, count, enchantment)
 						ingredientsList.add(e);
 					}
 				}
 				
 				// now check if the player has sufficient items in the inventory to cover the ingredients' expences
-				for (Ingredient e : ingredientsList)
-				{
-					if ((e.getItemCount() * _amount) > Integer.MAX_VALUE)
-					{
+				for (Ingredient e : ingredientsList) {
+					if ((e.getItemCount() * _amount) > Integer.MAX_VALUE) {
 						player.sendPacket(SystemMessageId.YOU_HAVE_EXCEEDED_QUANTITY_THAT_CAN_BE_INPUTTED);
 						return;
 					}
-					if (e.getItemId() < 0)
-					{
-						if (!MultisellData.hasSpecialIngredient(e.getItemId(), e.getItemCount() * _amount, player))
-						{
+					if (e.getItemId() < 0) {
+						if (!MultisellData.hasSpecialIngredient(e.getItemId(), e.getItemCount() * _amount, player)) {
 							return;
 						}
-					}
-					else
-					{
+					} else {
 						// if this is not a list that maintains enchantment, check the count of all items that have the given id.
 						// otherwise, check only the count of items with exactly the needed enchantment level
 						final long required = ((Config.ALT_BLACKSMITH_USE_RECIPES || !e.getMaintainIngredient()) ? (e.getItemCount() * _amount) : e.getItemCount());
-						if (inv.getInventoryItemCount(e.getItemId(), list.getMaintainEnchantment() ? e.getEnchantLevel() : -1, false) < required)
-						{
+						if (inv.getInventoryItemCount(e.getItemId(), list.getMaintainEnchantment() ? e.getEnchantLevel() : -1, false) < required) {
 							SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S2_UNIT_OF_THE_ITEM_S1_REQUIRED);
 							sm.addItemName(e.getTemplate());
 							sm.addLong(required);
@@ -250,20 +218,14 @@ public class MultiSellChoose extends L2GameClientPacket
 				List<L2Augmentation> augmentation = new ArrayList<>();
 				Elementals[] elemental = null;
 				/** All ok, remove items and add final product */
-				for (Ingredient e : entry.getIngredients())
-				{
-					if (e.getItemId() < 0)
-					{
-						if (!MultisellData.takeSpecialIngredient(e.getItemId(), e.getItemCount() * _amount, player))
-						{
+				for (Ingredient e : entry.getIngredients()) {
+					if (e.getItemId() < 0) {
+						if (!MultisellData.takeSpecialIngredient(e.getItemId(), e.getItemCount() * _amount, player)) {
 							return;
 						}
-					}
-					else
-					{
+					} else {
 						L2ItemInstance itemToTake = inv.getItemByItemId(e.getItemId()); // initialize and initial guess for the item to take.
-						if (itemToTake == null)
-						{ // this is a cheat, transaction will be aborted and if any items already taken will not be returned back to inventory!
+						if (itemToTake == null) { // this is a cheat, transaction will be aborted and if any items already taken will not be returned back to inventory!
 							_log.severe("Character: " + player.getName() + " is trying to cheat in multisell, id:" + _listId + ":" + _entryId);
 							player.setMultiSell(null);
 							return;
@@ -277,46 +239,35 @@ public class MultiSellChoose extends L2GameClientPacket
 						// return;
 						// }
 						
-						if (Config.ALT_BLACKSMITH_USE_RECIPES || !e.getMaintainIngredient())
-						{
+						if (Config.ALT_BLACKSMITH_USE_RECIPES || !e.getMaintainIngredient()) {
 							// if it's a stackable item, just reduce the amount from the first (only) instance that is found in the inventory
-							if (itemToTake.isStackable())
-							{
-								if (!player.destroyItem("Multisell", itemToTake.getObjectId(), (e.getItemCount() * _amount), player.getTarget(), true))
-								{
+							if (itemToTake.isStackable()) {
+								if (!player.destroyItem("Multisell", itemToTake.getObjectId(), (e.getItemCount() * _amount), player.getTarget(), true)) {
 									player.setMultiSell(null);
 									return;
 								}
-							}
-							else
-							{
+							} else {
 								// for non-stackable items, one of two scenaria are possible:
 								// a) list maintains enchantment: get the instances that exactly match the requested enchantment level
 								// b) list does not maintain enchantment: get the instances with the LOWEST enchantment level
 								
 								// a) if enchantment is maintained, then get a list of items that exactly match this enchantment
-								if (list.getMaintainEnchantment())
-								{
+								if (list.getMaintainEnchantment()) {
 									// loop through this list and remove (one by one) each item until the required amount is taken.
 									L2ItemInstance[] inventoryContents = inv.getAllItemsByItemId(e.getItemId(), e.getEnchantLevel(), false);
-									for (int i = 0; i < (e.getItemCount() * _amount); i++)
-									{
-										if (inventoryContents[i].isAugmented())
-										{
+									for (int i = 0; i < (e.getItemCount() * _amount); i++) {
+										if (inventoryContents[i].isAugmented()) {
 											augmentation.add(inventoryContents[i].getAugmentation());
 										}
-										if (inventoryContents[i].getElementals() != null)
-										{
+										if (inventoryContents[i].getElementals() != null) {
 											elemental = inventoryContents[i].getElementals();
 										}
-										if (!player.destroyItem("Multisell", inventoryContents[i].getObjectId(), 1, player.getTarget(), true))
-										{
+										if (!player.destroyItem("Multisell", inventoryContents[i].getObjectId(), 1, player.getTarget(), true)) {
 											player.setMultiSell(null);
 											return;
 										}
 									}
-								}
-								else
+								} else
 								// b) enchantment is not maintained. Get the instances with the LOWEST enchantment level
 								{
 									// NOTE: There are 2 ways to achieve the above goal.
@@ -354,31 +305,25 @@ public class MultiSellChoose extends L2GameClientPacket
 									//
 									
 									// choice 1. Small number of items exchanged. No sorting.
-									for (int i = 1; i <= (e.getItemCount() * _amount); i++)
-									{
+									for (int i = 1; i <= (e.getItemCount() * _amount); i++) {
 										L2ItemInstance[] inventoryContents = inv.getAllItemsByItemId(e.getItemId(), false);
 										
 										itemToTake = inventoryContents[0];
 										// get item with the LOWEST enchantment level from the inventory...
 										// +0 is lowest by default...
-										if (itemToTake.getEnchantLevel() > 0)
-										{
-											for (L2ItemInstance item : inventoryContents)
-											{
-												if (item.getEnchantLevel() < itemToTake.getEnchantLevel())
-												{
+										if (itemToTake.getEnchantLevel() > 0) {
+											for (L2ItemInstance item : inventoryContents) {
+												if (item.getEnchantLevel() < itemToTake.getEnchantLevel()) {
 													itemToTake = item;
 													// nothing will have enchantment less than 0. If a zero-enchanted
 													// item is found, just take it
-													if (itemToTake.getEnchantLevel() == 0)
-													{
+													if (itemToTake.getEnchantLevel() == 0) {
 														break;
 													}
 												}
 											}
 										}
-										if (!player.destroyItem("Multisell", itemToTake.getObjectId(), 1, player.getTarget(), true))
-										{
+										if (!player.destroyItem("Multisell", itemToTake.getObjectId(), 1, player.getTarget(), true)) {
 											player.setMultiSell(null);
 											return;
 										}
@@ -390,34 +335,22 @@ public class MultiSellChoose extends L2GameClientPacket
 				}
 				
 				// Generate the appropriate items
-				for (Ingredient e : entry.getProducts())
-				{
-					if (e.getItemId() < 0)
-					{
+				for (Ingredient e : entry.getProducts()) {
+					if (e.getItemId() < 0) {
 						MultisellData.giveSpecialProduct(e.getItemId(), e.getItemCount() * _amount, player);
-					}
-					else
-					{
-						if (e.isStackable())
-						{
+					} else {
+						if (e.isStackable()) {
 							inv.addItem("Multisell", e.getItemId(), e.getItemCount() * _amount, player, player.getTarget());
-						}
-						else
-						{
+						} else {
 							L2ItemInstance product = null;
-							for (int i = 0; i < (e.getItemCount() * _amount); i++)
-							{
+							for (int i = 0; i < (e.getItemCount() * _amount); i++) {
 								product = inv.addItem("Multisell", e.getItemId(), 1, player, player.getTarget());
-								if ((product != null) && list.getMaintainEnchantment())
-								{
-									if (i < augmentation.size())
-									{
+								if ((product != null) && list.getMaintainEnchantment()) {
+									if (i < augmentation.size()) {
 										product.setAugmentation(new L2Augmentation(augmentation.get(i).getAugmentationId()));
 									}
-									if (elemental != null)
-									{
-										for (Elementals elm : elemental)
-										{
+									if (elemental != null) {
+										for (Elementals elm : elemental) {
 											product.setElementAttr(elm.getElement(), elm.getValue());
 										}
 									}
@@ -429,23 +362,17 @@ public class MultiSellChoose extends L2GameClientPacket
 						// msg part
 						SystemMessage sm;
 						
-						if ((e.getItemCount() * _amount) > 1)
-						{
+						if ((e.getItemCount() * _amount) > 1) {
 							sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S);
 							sm.addItemName(e.getItemId());
 							sm.addLong(e.getItemCount() * _amount);
 							player.sendPacket(sm);
-						}
-						else
-						{
-							if (list.getMaintainEnchantment() && (e.getEnchantLevel() > 0))
-							{
+						} else {
+							if (list.getMaintainEnchantment() && (e.getEnchantLevel() > 0)) {
 								sm = SystemMessage.getSystemMessage(SystemMessageId.ACQUIRED_S1_S2);
 								sm.addLong(e.getEnchantLevel());
 								sm.addItemName(e.getItemId());
-							}
-							else
-							{
+							} else {
 								sm = SystemMessage.getSystemMessage(SystemMessageId.EARNED_ITEM_S1);
 								sm.addItemName(e.getItemId());
 							}
@@ -460,8 +387,7 @@ public class MultiSellChoose extends L2GameClientPacket
 				player.sendPacket(su);
 				
 				// finally, give the tax to the castle...
-				if ((npc != null) && (entry.getTaxAmount() > 0))
-				{
+				if ((npc != null) && (entry.getTaxAmount() > 0)) {
 					npc.getCastle().addToTreasury(entry.getTaxAmount() * _amount);
 				}
 				break;
@@ -470,8 +396,7 @@ public class MultiSellChoose extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__B0_MULTISELLCHOOSE;
 	}
 }

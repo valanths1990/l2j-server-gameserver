@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.L2Clan;
 
-public class PledgeShowInfoUpdate extends L2GameServerPacket
-{
+public class PledgeShowInfoUpdate extends L2GameServerPacket {
 	private final L2Clan _clan;
 	
-	public PledgeShowInfoUpdate(L2Clan clan)
-	{
+	public PledgeShowInfoUpdate(L2Clan clan) {
 		_clan = clan;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x8E);
 		// sending empty data so client will ask all the info in response ;)
 		writeD(_clan.getId());

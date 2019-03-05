@@ -28,7 +28,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Ids
-{
+public @interface Ids {
 	public Id[] value();
 }

@@ -55,8 +55,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * Base class for all interactive objects.
  */
-public abstract class L2Object extends ListenersContainer implements IIdentifiable, INamable, ISpawnable, IUniqueId, IDecayable, IPositionable
-{
+public abstract class L2Object extends ListenersContainer implements IIdentifiable, INamable, ISpawnable, IUniqueId, IDecayable, IPositionable {
 	/** Name */
 	private String _name;
 	/** Object ID */
@@ -80,8 +79,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	private boolean _isInvisible;
 	private ObjectKnownList _knownList;
 	
-	public L2Object(int objectId)
-	{
+	public L2Object(int objectId) {
 		setInstanceType(InstanceType.L2Object);
 		_objectId = objectId;
 		initKnownList();
@@ -91,8 +89,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Gets the instance type of object.
 	 * @return the instance type
 	 */
-	public final InstanceType getInstanceType()
-	{
+	public final InstanceType getInstanceType() {
 		return _instanceType;
 	}
 	
@@ -100,8 +97,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Sets the instance type.
 	 * @param newInstanceType the instance type to set
 	 */
-	protected final void setInstanceType(InstanceType newInstanceType)
-	{
+	protected final void setInstanceType(InstanceType newInstanceType) {
 		_instanceType = newInstanceType;
 	}
 	
@@ -110,56 +106,46 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param instanceTypes the instance types to verify
 	 * @return {@code true} if object is of any given instance types, {@code false} otherwise
 	 */
-	public final boolean isInstanceTypes(InstanceType... instanceTypes)
-	{
+	public final boolean isInstanceTypes(InstanceType... instanceTypes) {
 		return _instanceType.isTypes(instanceTypes);
 	}
 	
-	public final void onAction(L2PcInstance player)
-	{
+	public final void onAction(L2PcInstance player) {
 		onAction(player, true);
 	}
 	
-	public void onAction(L2PcInstance player, boolean interact)
-	{
+	public void onAction(L2PcInstance player, boolean interact) {
 		IActionHandler handler = ActionHandler.getInstance().getHandler(getInstanceType());
-		if (handler != null)
-		{
+		if (handler != null) {
 			handler.action(player, this, interact);
 		}
 		
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
-	public void onActionShift(L2PcInstance player)
-	{
+	public void onActionShift(L2PcInstance player) {
 		IActionShiftHandler handler = ActionShiftHandler.getInstance().getHandler(getInstanceType());
-		if (handler != null)
-		{
+		if (handler != null) {
 			handler.action(player, this, true);
 		}
 		
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
-	public void onForcedAttack(L2PcInstance player)
-	{
+	public void onForcedAttack(L2PcInstance player) {
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
-	public void onSpawn()
-	{
+	public void onSpawn() {
 	}
 	
 	@Override
-	public boolean decayMe()
-	{
+	public boolean decayMe() {
 		assert getWorldRegion() != null;
 		
 		L2WorldRegion reg = getWorldRegion();
 		
-		synchronized (this)
-		{
+		synchronized (this) {
 			_isVisible = false;
 			setWorldRegion(null);
 		}
@@ -173,20 +159,17 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 		return true;
 	}
 	
-	public void refreshID()
-	{
+	public void refreshID() {
 		L2World.getInstance().removeObject(this);
 		IdFactory.getInstance().releaseId(getObjectId());
 		_objectId = IdFactory.getInstance().getNextId();
 	}
 	
 	@Override
-	public final boolean spawnMe()
-	{
+	public final boolean spawnMe() {
 		assert (getWorldRegion() == null) && (getLocation().getX() != 0) && (getLocation().getY() != 0) && (getLocation().getZ() != 0);
 		
-		synchronized (this)
-		{
+		synchronized (this) {
 			// Set the x,y,z position of the L2Object spawn and update its _worldregion
 			_isVisible = true;
 			setWorldRegion(L2World.getInstance().getRegion(getLocation()));
@@ -207,29 +190,23 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 		return true;
 	}
 	
-	public final void spawnMe(int x, int y, int z)
-	{
+	public final void spawnMe(int x, int y, int z) {
 		assert getWorldRegion() == null;
 		
-		synchronized (this)
-		{
+		synchronized (this) {
 			// Set the x,y,z position of the L2Object spawn and update its _worldregion
 			_isVisible = true;
 			
-			if (x > L2World.MAP_MAX_X)
-			{
+			if (x > L2World.MAP_MAX_X) {
 				x = L2World.MAP_MAX_X - 5000;
 			}
-			if (x < L2World.MAP_MIN_X)
-			{
+			if (x < L2World.MAP_MIN_X) {
 				x = L2World.MAP_MIN_X + 5000;
 			}
-			if (y > L2World.MAP_MAX_Y)
-			{
+			if (y > L2World.MAP_MAX_Y) {
 				y = L2World.MAP_MAX_Y - 5000;
 			}
-			if (y < L2World.MAP_MIN_Y)
-			{
+			if (y < L2World.MAP_MIN_Y) {
 				y = L2World.MAP_MIN_Y + 5000;
 			}
 			
@@ -257,89 +234,71 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object can be attacked.
 	 * @return {@code true} if object can be attacked, {@code false} otherwise
 	 */
-	public boolean canBeAttacked()
-	{
+	public boolean canBeAttacked() {
 		return false;
 	}
 	
 	public abstract boolean isAutoAttackable(L2Character attacker);
 	
-	public final boolean isVisible()
-	{
+	public final boolean isVisible() {
 		return getWorldRegion() != null;
 	}
 	
-	public final void setIsVisible(boolean value)
-	{
+	public final void setIsVisible(boolean value) {
 		_isVisible = value;
-		if (!_isVisible)
-		{
+		if (!_isVisible) {
 			setWorldRegion(null);
 		}
 	}
 	
-	public void toggleVisible()
-	{
-		if (isVisible())
-		{
+	public void toggleVisible() {
+		if (isVisible()) {
 			decayMe();
-		}
-		else
-		{
+		} else {
 			spawnMe();
 		}
 	}
 	
-	public ObjectKnownList getKnownList()
-	{
+	public ObjectKnownList getKnownList() {
 		return _knownList;
 	}
 	
-	public void initKnownList()
-	{
+	public void initKnownList() {
 		_knownList = new ObjectKnownList(this);
 	}
 	
-	public final void setKnownList(ObjectKnownList value)
-	{
+	public final void setKnownList(ObjectKnownList value) {
 		_knownList = value;
 	}
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public void setName(String value)
-	{
+	public void setName(String value) {
 		_name = value;
 	}
 	
 	@Override
-	public final int getObjectId()
-	{
+	public final int getObjectId() {
 		return _objectId;
 	}
 	
-	public final ObjectPoly getPoly()
-	{
+	public final ObjectPoly getPoly() {
 		final ObjectPoly poly = getScript(ObjectPoly.class);
 		return (poly == null) ? addScript(new ObjectPoly(this)) : poly;
 	}
 	
 	public abstract void sendInfo(L2PcInstance activeChar);
 	
-	public void sendPacket(L2GameServerPacket mov)
-	{
+	public void sendPacket(L2GameServerPacket mov) {
 	}
 	
-	public void sendPacket(SystemMessageId id)
-	{
+	public void sendPacket(SystemMessageId id) {
 	}
 	
-	public L2PcInstance getActingPlayer()
-	{
+	public L2PcInstance getActingPlayer() {
 		return null;
 	}
 	
@@ -347,8 +306,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2Attackable.
 	 * @return {@code true} if object is instance of L2Attackable, {@code false} otherwise
 	 */
-	public boolean isAttackable()
-	{
+	public boolean isAttackable() {
 		return false;
 	}
 	
@@ -356,8 +314,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2Character.
 	 * @return {@code true} if object is instance of L2Character, {@code false} otherwise
 	 */
-	public boolean isCharacter()
-	{
+	public boolean isCharacter() {
 		return false;
 	}
 	
@@ -365,8 +322,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2DoorInstance.
 	 * @return {@code true} if object is instance of L2DoorInstance, {@code false} otherwise
 	 */
-	public boolean isDoor()
-	{
+	public boolean isDoor() {
 		return false;
 	}
 	
@@ -374,8 +330,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2MonsterInstance.
 	 * @return {@code true} if object is instance of L2MonsterInstance, {@code false} otherwise
 	 */
-	public boolean isMonster()
-	{
+	public boolean isMonster() {
 		return false;
 	}
 	
@@ -383,8 +338,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2Npc.
 	 * @return {@code true} if object is instance of L2Npc, {@code false} otherwise
 	 */
-	public boolean isNpc()
-	{
+	public boolean isNpc() {
 		return false;
 	}
 	
@@ -392,8 +346,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2PetInstance.
 	 * @return {@code true} if object is instance of L2PetInstance, {@code false} otherwise
 	 */
-	public boolean isPet()
-	{
+	public boolean isPet() {
 		return false;
 	}
 	
@@ -401,8 +354,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2PcInstance.
 	 * @return {@code true} if object is instance of L2PcInstance, {@code false} otherwise
 	 */
-	public boolean isPlayer()
-	{
+	public boolean isPlayer() {
 		return false;
 	}
 	
@@ -410,8 +362,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2Playable.
 	 * @return {@code true} if object is instance of L2Playable, {@code false} otherwise
 	 */
-	public boolean isPlayable()
-	{
+	public boolean isPlayable() {
 		return false;
 	}
 	
@@ -419,8 +370,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2ServitorInstance.
 	 * @return {@code true} if object is instance of L2ServitorInstance, {@code false} otherwise
 	 */
-	public boolean isServitor()
-	{
+	public boolean isServitor() {
 		return false;
 	}
 	
@@ -428,8 +378,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2Summon.
 	 * @return {@code true} if object is instance of L2Summon, {@code false} otherwise
 	 */
-	public boolean isSummon()
-	{
+	public boolean isSummon() {
 		return false;
 	}
 	
@@ -437,8 +386,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2TrapInstance.
 	 * @return {@code true} if object is instance of L2TrapInstance, {@code false} otherwise
 	 */
-	public boolean isTrap()
-	{
+	public boolean isTrap() {
 		return false;
 	}
 	
@@ -446,8 +394,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verify if object is instance of L2ItemInstance.
 	 * @return {@code true} if object is instance of L2ItemInstance, {@code false} otherwise
 	 */
-	public boolean isItem()
-	{
+	public boolean isItem() {
 		return false;
 	}
 	
@@ -455,8 +402,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verifies if the object is a walker NPC.
 	 * @return {@code true} if object is a walker NPC, {@code false} otherwise
 	 */
-	public boolean isWalker()
-	{
+	public boolean isWalker() {
 		return false;
 	}
 	
@@ -464,16 +410,14 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Verifies if this object is a vehicle.
 	 * @return {@code true} if object is Vehicle, {@code false} otherwise
 	 */
-	public boolean isVehicle()
-	{
+	public boolean isVehicle() {
 		return false;
 	}
 	
 	/**
 	 * @return {@code true} if object Can be targeted
 	 */
-	public boolean isTargetable()
-	{
+	public boolean isTargetable() {
 		return true;
 	}
 	
@@ -482,8 +426,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param zone the zone Id to check
 	 * @return {@code true} if the object is in that zone Id
 	 */
-	public boolean isInsideZone(ZoneId zone)
-	{
+	public boolean isInsideZone(ZoneId zone) {
 		return false;
 	}
 	
@@ -492,8 +435,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param type of the shot to be checked.
 	 * @return {@code true} if the object has charged shot
 	 */
-	public boolean isChargedShot(ShotType type)
-	{
+	public boolean isChargedShot(ShotType type) {
 		return false;
 	}
 	
@@ -502,8 +444,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param type of the shot to be charged.
 	 * @param charged
 	 */
-	public void setChargedShot(ShotType type, boolean charged)
-	{
+	public void setChargedShot(ShotType type, boolean charged) {
 	}
 	
 	/**
@@ -511,8 +452,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param physical skill are using Soul shots.
 	 * @param magical skill are using Spirit shots.
 	 */
-	public void rechargeShots(boolean physical, boolean magical)
-	{
+	public void rechargeShots(boolean physical, boolean magical) {
 	}
 	
 	/**
@@ -520,14 +460,10 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param script
 	 * @return
 	 */
-	public final <T> T addScript(T script)
-	{
-		if (_scripts == null)
-		{
-			synchronized (this)
-			{
-				if (_scripts == null)
-				{
+	public final <T> T addScript(T script) {
+		if (_scripts == null) {
+			synchronized (this) {
+				if (_scripts == null) {
 					_scripts = new ConcurrentHashMap<>();
 				}
 			}
@@ -542,10 +478,8 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public final <T> T removeScript(Class<T> script)
-	{
-		if (_scripts == null)
-		{
+	public final <T> T removeScript(Class<T> script) {
+		if (_scripts == null) {
 			return null;
 		}
 		return (T) _scripts.remove(script.getName());
@@ -557,50 +491,38 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public final <T> T getScript(Class<T> script)
-	{
-		if (_scripts == null)
-		{
+	public final <T> T getScript(Class<T> script) {
+		if (_scripts == null) {
 			return null;
 		}
 		return (T) _scripts.get(script.getName());
 	}
 	
-	public void removeStatusListener(L2Character object)
-	{
+	public void removeStatusListener(L2Character object) {
 		
 	}
 	
-	protected void badCoords()
-	{
-		if (isCharacter())
-		{
+	protected void badCoords() {
+		if (isCharacter()) {
 			decayMe();
-		}
-		else if (isPlayer())
-		{
+		} else if (isPlayer()) {
 			((L2Character) this).teleToLocation(new Location(0, 0, 0), false);
 			((L2Character) this).sendMessage("Error with your coords, Please ask a GM for help!");
 		}
 	}
 	
-	public final void setXYZInvisible(int x, int y, int z)
-	{
+	public final void setXYZInvisible(int x, int y, int z) {
 		assert getWorldRegion() == null;
-		if (x > L2World.MAP_MAX_X)
-		{
+		if (x > L2World.MAP_MAX_X) {
 			x = L2World.MAP_MAX_X - 5000;
 		}
-		if (x < L2World.MAP_MIN_X)
-		{
+		if (x < L2World.MAP_MIN_X) {
 			x = L2World.MAP_MIN_X + 5000;
 		}
-		if (y > L2World.MAP_MAX_Y)
-		{
+		if (y > L2World.MAP_MAX_Y) {
 			y = L2World.MAP_MAX_Y - 5000;
 		}
-		if (y < L2World.MAP_MIN_Y)
-		{
+		if (y < L2World.MAP_MIN_Y) {
 			y = L2World.MAP_MIN_Y + 5000;
 		}
 		
@@ -608,21 +530,17 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 		setIsVisible(false);
 	}
 	
-	public final void setLocationInvisible(ILocational loc)
-	{
+	public final void setLocationInvisible(ILocational loc) {
 		setXYZInvisible(loc.getX(), loc.getY(), loc.getZ());
 	}
 	
-	public void updateWorldRegion()
-	{
-		if (!isVisible())
-		{
+	public void updateWorldRegion() {
+		if (!isVisible()) {
 			return;
 		}
 		
 		L2WorldRegion newRegion = L2World.getInstance().getRegion(getLocation());
-		if (newRegion != getWorldRegion())
-		{
+		if (newRegion != getWorldRegion()) {
 			getWorldRegion().removeVisibleObject(this);
 			
 			setWorldRegion(newRegion);
@@ -632,21 +550,16 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 		}
 	}
 	
-	public final L2WorldRegion getWorldRegion()
-	{
+	public final L2WorldRegion getWorldRegion() {
 		return _worldRegion;
 	}
 	
-	public void setWorldRegion(L2WorldRegion value)
-	{
+	public void setWorldRegion(L2WorldRegion value) {
 		if ((getWorldRegion() != null) && isCharacter()) // confirm revalidation of old region's zones
 		{
-			if (value != null)
-			{
+			if (value != null) {
 				getWorldRegion().revalidateZones((L2Character) this); // at world region change
-			}
-			else
-			{
+			} else {
 				getWorldRegion().removeFromZones((L2Character) this); // at world region change
 			}
 		}
@@ -659,8 +572,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return the X coordinate
 	 */
 	@Override
-	public int getX()
-	{
+	public int getX() {
 		return _x.get();
 	}
 	
@@ -669,8 +581,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return the Y coordinate
 	 */
 	@Override
-	public int getY()
-	{
+	public int getY() {
 		return _y.get();
 	}
 	
@@ -679,8 +590,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return the Z coordinate
 	 */
 	@Override
-	public int getZ()
-	{
+	public int getZ() {
 		return _z.get();
 	}
 	
@@ -689,8 +599,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return the heading
 	 */
 	@Override
-	public int getHeading()
-	{
+	public int getHeading() {
 		return _heading.get();
 	}
 	
@@ -699,8 +608,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return the instance ID
 	 */
 	@Override
-	public int getInstanceId()
-	{
+	public int getInstanceId() {
 		return _instanceId.get();
 	}
 	
@@ -709,8 +617,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @return the location object
 	 */
 	@Override
-	public Location getLocation()
-	{
+	public Location getLocation() {
 		return new Location(getX(), getY(), getZ(), getHeading(), getInstanceId());
 	}
 	
@@ -719,8 +626,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param newX the X coordinate
 	 */
 	@Override
-	public void setX(int newX)
-	{
+	public void setX(int newX) {
 		_x.set(newX);
 	}
 	
@@ -729,8 +635,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param newY the Y coordinate
 	 */
 	@Override
-	public void setY(int newY)
-	{
+	public void setY(int newY) {
 		_y.set(newY);
 	}
 	
@@ -739,8 +644,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param newZ the Z coordinate
 	 */
 	@Override
-	public void setZ(int newZ)
-	{
+	public void setZ(int newZ) {
 		_z.set(newZ);
 	}
 	
@@ -751,23 +655,18 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param newZ the Z coordinate
 	 */
 	@Override
-	public final void setXYZ(int newX, int newY, int newZ)
-	{
+	public final void setXYZ(int newX, int newY, int newZ) {
 		assert getWorldRegion() != null;
 		
 		setX(newX);
 		setY(newY);
 		setZ(newZ);
 		
-		try
-		{
-			if (L2World.getInstance().getRegion(getLocation()) != getWorldRegion())
-			{
+		try {
+			if (L2World.getInstance().getRegion(getLocation()) != getWorldRegion()) {
 				updateWorldRegion();
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			badCoords();
 		}
 	}
@@ -777,8 +676,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param loc the location object
 	 */
 	@Override
-	public void setXYZ(ILocational loc)
-	{
+	public void setXYZ(ILocational loc) {
 		setXYZ(loc.getX(), loc.getY(), loc.getZ());
 	}
 	
@@ -787,8 +685,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param newHeading the new heading
 	 */
 	@Override
-	public void setHeading(int newHeading)
-	{
+	public void setHeading(int newHeading) {
 		_heading.set(newHeading);
 	}
 	
@@ -799,65 +696,50 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param instanceId the ID of the instance
 	 */
 	@Override
-	public void setInstanceId(int instanceId)
-	{
-		if ((instanceId < 0) || (getInstanceId() == instanceId))
-		{
+	public void setInstanceId(int instanceId) {
+		if ((instanceId < 0) || (getInstanceId() == instanceId)) {
 			return;
 		}
 		
 		Instance oldI = InstanceManager.getInstance().getInstance(getInstanceId());
 		Instance newI = InstanceManager.getInstance().getInstance(instanceId);
-		if (newI == null)
-		{
+		if (newI == null) {
 			return;
 		}
 		
-		if (isPlayer())
-		{
+		if (isPlayer()) {
 			final L2PcInstance player = getActingPlayer();
-			if ((getInstanceId() > 0) && (oldI != null))
-			{
+			if ((getInstanceId() > 0) && (oldI != null)) {
 				oldI.removePlayer(getObjectId());
-				if (oldI.isShowTimer())
-				{
+				if (oldI.isShowTimer()) {
 					sendInstanceUpdate(oldI, true);
 				}
 			}
-			if (instanceId > 0)
-			{
+			if (instanceId > 0) {
 				newI.addPlayer(getObjectId());
-				if (newI.isShowTimer())
-				{
+				if (newI.isShowTimer()) {
 					sendInstanceUpdate(newI, false);
 				}
 			}
-			if (player.hasSummon())
-			{
+			if (player.hasSummon()) {
 				player.getSummon().setInstanceId(instanceId);
 			}
-		}
-		else if (isNpc())
-		{
+		} else if (isNpc()) {
 			final L2Npc npc = (L2Npc) this;
-			if ((getInstanceId() > 0) && (oldI != null))
-			{
+			if ((getInstanceId() > 0) && (oldI != null)) {
 				oldI.removeNpc(npc);
 			}
-			if (instanceId > 0)
-			{
+			if (instanceId > 0) {
 				newI.addNpc(npc);
 			}
 		}
 		
 		_instanceId.set(instanceId);
-		if (_isVisible && (_knownList != null))
-		{
+		if (_isVisible && (_knownList != null)) {
 			// We don't want some ugly looking disappear/appear effects, so don't update
 			// the knownlist here, but players usually enter instancezones through teleporting
 			// and the teleport will do the revalidation for us.
-			if (!isPlayer())
-			{
+			if (!isPlayer()) {
 				decayMe();
 				spawnMe();
 			}
@@ -869,8 +751,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param loc the location object
 	 */
 	@Override
-	public void setLocation(Location loc)
-	{
+	public void setLocation(Location loc) {
 		_x.set(loc.getX());
 		_y.set(loc.getY());
 		_z.set(loc.getZ());
@@ -887,8 +768,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param squared if {@code true} return will be squared
 	 * @return distance between object and given x, y, z.
 	 */
-	public final double calculateDistance(int x, int y, int z, boolean includeZAxis, boolean squared)
-	{
+	public final double calculateDistance(int x, int y, int z, boolean includeZAxis, boolean squared) {
 		final double distance = Math.pow(x - getX(), 2) + Math.pow(y - getY(), 2) + (includeZAxis ? Math.pow(z - getZ(), 2) : 0);
 		return (squared) ? distance : Math.sqrt(distance);
 	}
@@ -900,8 +780,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param squared if {@code true} return will be squared
 	 * @return distance between object and given location.
 	 */
-	public final double calculateDistance(ILocational loc, boolean includeZAxis, boolean squared)
-	{
+	public final double calculateDistance(ILocational loc, boolean includeZAxis, boolean squared) {
 		return calculateDistance(loc.getX(), loc.getY(), loc.getZ(), includeZAxis, squared);
 	}
 	
@@ -912,11 +791,9 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param target the object to which to calculate the angle
 	 * @return the angle this object has to turn to have the given object in front of it
 	 */
-	public final double calculateDirectionTo(ILocational target)
-	{
+	public final double calculateDirectionTo(ILocational target) {
 		int heading = Util.calculateHeadingFrom(this, target) - getHeading();
-		if (heading < 0)
-		{
+		if (heading < 0) {
 			heading = 65535 + heading;
 		}
 		return Util.convertHeadingToDegree(heading);
@@ -927,16 +804,12 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param instance the instance to update
 	 * @param hide if {@code true} hide the player
 	 */
-	private final void sendInstanceUpdate(Instance instance, boolean hide)
-	{
+	private final void sendInstanceUpdate(Instance instance, boolean hide) {
 		final int startTime = (int) ((System.currentTimeMillis() - instance.getInstanceStartTime()) / 1000);
 		final int endTime = (int) ((instance.getInstanceEndTime() - instance.getInstanceStartTime()) / 1000);
-		if (instance.isTimerIncrease())
-		{
+		if (instance.isTimerIncrease()) {
 			sendPacket(new ExSendUIEvent(getActingPlayer(), hide, true, startTime, endTime, instance.getTimerText()));
-		}
-		else
-		{
+		} else {
 			sendPacket(new ExSendUIEvent(getActingPlayer(), hide, false, endTime - startTime, 0, instance.getTimerText()));
 		}
 	}
@@ -944,8 +817,7 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	/**
 	 * @return {@code true} if this object is invisible, {@code false} otherwise.
 	 */
-	public boolean isInvisible()
-	{
+	public boolean isInvisible() {
 		return _isInvisible;
 	}
 	
@@ -953,19 +825,14 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * Sets this object as invisible or not
 	 * @param invis
 	 */
-	public void setInvisible(boolean invis)
-	{
+	public void setInvisible(boolean invis) {
 		_isInvisible = invis;
-		if (invis)
-		{
+		if (invis) {
 			final DeleteObject deletePacket = new DeleteObject(this);
-			for (L2Object obj : getKnownList().getKnownObjects().values())
-			{
-				if ((obj != null) && obj.isPlayer())
-				{
+			for (L2Object obj : getKnownList().getKnownObjects().values()) {
+				if ((obj != null) && obj.isPlayer()) {
 					final L2PcInstance player = obj.getActingPlayer();
-					if (!isVisibleFor(player))
-					{
+					if (!isVisibleFor(player)) {
 						obj.sendPacket(deletePacket);
 					}
 				}
@@ -980,34 +847,28 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	 * @param player
 	 * @return {@code true} if player can see an invisible object if it's invisible, {@code false} otherwise.
 	 */
-	public boolean isVisibleFor(L2PcInstance player)
-	{
+	public boolean isVisibleFor(L2PcInstance player) {
 		return !isInvisible() || player.canOverrideCond(PcCondOverride.SEE_ALL_PLAYERS);
 	}
 	
 	/**
 	 * Broadcasts describing info to known players.
 	 */
-	public void broadcastInfo()
-	{
-		for (L2Object obj : getKnownList().getKnownObjects().values())
-		{
-			if ((obj != null) && obj.isPlayer() && isVisibleFor(obj.getActingPlayer()))
-			{
+	public void broadcastInfo() {
+		for (L2Object obj : getKnownList().getKnownObjects().values()) {
+			if ((obj != null) && obj.isPlayer() && isVisibleFor(obj.getActingPlayer())) {
 				sendInfo(obj.getActingPlayer());
 			}
 		}
 	}
 	
 	@Override
-	public boolean equals(Object obj)
-	{
+	public boolean equals(Object obj) {
 		return ((obj instanceof L2Object) && (((L2Object) obj).getObjectId() == getObjectId()));
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return (getClass().getSimpleName() + ":" + getName() + "[" + getObjectId() + "]");
 	}
 }

@@ -28,16 +28,14 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * An instantly executed event when L2Attackable is attacked by L2PcInstance.
  * @author UnAfraid
  */
-public class OnAttackableAttack implements IBaseEvent
-{
+public class OnAttackableAttack implements IBaseEvent {
 	private final L2PcInstance _attacker;
 	private final L2Attackable _target;
 	private final int _damage;
 	private final Skill _skill;
 	private final boolean _isSummon;
 	
-	public OnAttackableAttack(L2PcInstance attacker, L2Attackable target, int damage, Skill skill, boolean isSummon)
-	{
+	public OnAttackableAttack(L2PcInstance attacker, L2Attackable target, int damage, Skill skill, boolean isSummon) {
 		_attacker = attacker;
 		_target = target;
 		_damage = damage;
@@ -45,34 +43,28 @@ public class OnAttackableAttack implements IBaseEvent
 		_isSummon = isSummon;
 	}
 	
-	public final L2PcInstance getAttacker()
-	{
+	public final L2PcInstance getAttacker() {
 		return _attacker;
 	}
 	
-	public final L2Attackable getTarget()
-	{
+	public final L2Attackable getTarget() {
 		return _target;
 	}
 	
-	public int getDamage()
-	{
+	public int getDamage() {
 		return _damage;
 	}
 	
-	public Skill getSkill()
-	{
+	public Skill getSkill() {
 		return _skill;
 	}
 	
-	public boolean isSummon()
-	{
+	public boolean isSummon() {
 		return _isSummon;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_ATTACKABLE_ATTACK;
 	}
 }

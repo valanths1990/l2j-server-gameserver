@@ -40,29 +40,25 @@ import com.l2jserver.util.Rnd;
 /**
  * This class manages all Guards in the world. It inherits all methods from L2Attackable and adds some more such as tracking PK and aggressive L2MonsterInstance.
  */
-public class L2GuardInstance extends L2Attackable
-{
+public class L2GuardInstance extends L2Attackable {
 	private static final Logger LOG = LoggerFactory.getLogger(L2GuardInstance.class);
 	
 	/**
 	 * Creates a guard.
 	 * @param template the guard NPC template
 	 */
-	public L2GuardInstance(L2NpcTemplate template)
-	{
+	public L2GuardInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2GuardInstance);
 	}
 	
 	@Override
-	public final GuardKnownList getKnownList()
-	{
+	public final GuardKnownList getKnownList() {
 		return (GuardKnownList) super.getKnownList();
 	}
 	
 	@Override
-	public void initKnownList()
-	{
+	public void initKnownList() {
 		setKnownList(new GuardKnownList(this));
 	}
 	
@@ -70,8 +66,7 @@ public class L2GuardInstance extends L2Attackable
 	 * Return True if hte attacker is a L2MonsterInstance.
 	 */
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
+	public boolean isAutoAttackable(L2Character attacker) {
 		return attacker instanceof L2MonsterInstance;
 	}
 	
@@ -79,15 +74,13 @@ public class L2GuardInstance extends L2Attackable
 	 * Set the home location of its L2GuardInstance.
 	 */
 	@Override
-	public void onSpawn()
-	{
+	public void onSpawn() {
 		setIsNoRndWalk(true);
 		super.onSpawn();
 		
 		// check the region where this mob is, do not activate the AI if region is inactive.
 		L2WorldRegion region = L2World.getInstance().getRegion(getX(), getY());
-		if ((region != null) && (!region.isActive()))
-		{
+		if ((region != null) && (!region.isActive())) {
 			getAI().stopAITask();
 		}
 	}
@@ -103,15 +96,11 @@ public class L2GuardInstance extends L2Attackable
 	 * @param val The number of the page to display
 	 */
 	@Override
-	public String getHtmlPath(int npcId, int val)
-	{
+	public String getHtmlPath(int npcId, int val) {
 		String pom = "";
-		if (val == 0)
-		{
+		if (val == 0) {
 			pom = "" + npcId;
-		}
-		else
-		{
+		} else {
 			pom = npcId + "-" + val;
 		}
 		return "data/html/guard/" + pom + ".htm";
@@ -138,42 +127,30 @@ public class L2GuardInstance extends L2Attackable
 	 * @param player The L2PcInstance that start an action on the L2GuardInstance
 	 */
 	@Override
-	public void onAction(L2PcInstance player, boolean interact)
-	{
-		if (!canTarget(player))
-		{
+	public void onAction(L2PcInstance player, boolean interact) {
+		if (!canTarget(player)) {
 			return;
 		}
 		
 		// Check if the L2PcInstance already target the L2GuardInstance
-		if (getObjectId() != player.getTargetId())
-		{
+		if (getObjectId() != player.getTargetId()) {
 			// Set the target of the L2PcInstance player
 			player.setTarget(this);
-		}
-		else if (interact)
-		{
+		} else if (interact) {
 			// Check if the L2PcInstance is in the _aggroList of the L2GuardInstance
-			if (isInAggroList(player))
-			{
-				if (Config.DEBUG)
-				{
+			if (isInAggroList(player)) {
+				if (Config.DEBUG) {
 					LOG.debug("{}: Attacked guard {}", player.getObjectId(), getObjectId());
 				}
 				
 				// Set the L2PcInstance Intention to AI_INTENTION_ATTACK
 				player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
-			}
-			else
-			{
+			} else {
 				// Calculate the distance between the L2PcInstance and the L2NpcInstance
-				if (!canInteract(player))
-				{
+				if (!canInteract(player)) {
 					// Set the L2PcInstance Intention to AI_INTENTION_INTERACT
 					player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
-				}
-				else
-				{
+				} else {
 					// Send a Server->Client packet SocialAction to the all L2PcInstance on the _knownPlayer of the L2NpcInstance
 					// to display a social action of the L2GuardInstance on their client
 					broadcastPacket(new SocialAction(getObjectId(), Rnd.nextInt(8)));
@@ -181,17 +158,13 @@ public class L2GuardInstance extends L2Attackable
 					player.setLastFolkNPC(this);
 					
 					// Open a chat window on client with the text of the L2GuardInstance
-					if (hasListener(EventType.ON_NPC_QUEST_START))
-					{
+					if (hasListener(EventType.ON_NPC_QUEST_START)) {
 						player.setLastQuestNpcObject(getObjectId());
 					}
 					
-					if (hasListener(EventType.ON_NPC_FIRST_TALK))
-					{
+					if (hasListener(EventType.ON_NPC_FIRST_TALK)) {
 						EventDispatcher.getInstance().notifyEventAsync(new OnNpcFirstTalk(this, player), this);
-					}
-					else
-					{
+					} else {
 						showChatWindow(player, 0);
 					}
 				}

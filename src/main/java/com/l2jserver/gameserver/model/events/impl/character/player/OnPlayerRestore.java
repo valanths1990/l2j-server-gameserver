@@ -25,37 +25,31 @@ import com.l2jserver.gameserver.network.L2GameClient;
 /**
  * @author UnAfraid
  */
-public class OnPlayerRestore implements IBaseEvent
-{
+public class OnPlayerRestore implements IBaseEvent {
 	private final int _objectId;
 	private final String _name;
 	private final L2GameClient _client;
 	
-	public OnPlayerRestore(int objectId, String name, L2GameClient client)
-	{
+	public OnPlayerRestore(int objectId, String name, L2GameClient client) {
 		_objectId = objectId;
 		_name = name;
 		_client = client;
 	}
 	
-	public int getObjectId()
-	{
+	public int getObjectId() {
 		return _objectId;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public L2GameClient getClient()
-	{
+	public L2GameClient getClient() {
 		return _client;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_RESTORE;
 	}
 }

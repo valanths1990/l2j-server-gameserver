@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums.audio;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 
-public enum Sound implements IAudio
-{
+public enum Sound implements IAudio {
 	ITEMSOUND_QUEST_ACCEPT("ItemSound.quest_accept"),
 	ITEMSOUND_QUEST_MIDDLE("ItemSound.quest_middle"),
 	ITEMSOUND_QUEST_FINISH("ItemSound.quest_finish"),
@@ -108,25 +107,21 @@ public enum Sound implements IAudio
 	
 	private final PlaySound _playSound;
 	
-	private Sound(String soundName)
-	{
+	private Sound(String soundName) {
 		_playSound = PlaySound.createSound(soundName);
 	}
 	
-	public PlaySound withObject(L2Object obj)
-	{
+	public PlaySound withObject(L2Object obj) {
 		return PlaySound.createSound(getSoundName(), obj);
 	}
 	
 	@Override
-	public String getSoundName()
-	{
+	public String getSoundName() {
 		return _playSound.getSoundName();
 	}
 	
 	@Override
-	public PlaySound getPacket()
-	{
+	public PlaySound getPacket() {
 		return _playSound;
 	}
 }

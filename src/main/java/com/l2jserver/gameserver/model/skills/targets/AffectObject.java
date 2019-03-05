@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.skills.targets;
  * Affect object enumerated.
  * @author Zoey76
  */
-public enum AffectObject
-{
+public enum AffectObject {
 	ALL,
 	CLAN,
 	FRIEND,

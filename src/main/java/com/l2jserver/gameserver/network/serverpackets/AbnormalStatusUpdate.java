@@ -23,27 +23,21 @@ import java.util.List;
 
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 
-public class AbnormalStatusUpdate extends L2GameServerPacket
-{
+public class AbnormalStatusUpdate extends L2GameServerPacket {
 	private final List<BuffInfo> _effects = new ArrayList<>();
 	
-	public void addSkill(BuffInfo info)
-	{
-		if (!info.getSkill().isHealingPotionSkill())
-		{
+	public void addSkill(BuffInfo info) {
+		if (!info.getSkill().isHealingPotionSkill()) {
 			_effects.add(info);
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x85);
 		writeH(_effects.size());
-		for (BuffInfo info : _effects)
-		{
-			if ((info != null) && info.isInUse())
-			{
+		for (BuffInfo info : _effects) {
+			if ((info != null) && info.isInUse()) {
 				writeD(info.getSkill().getDisplayId());
 				writeH(info.getSkill().getDisplayLevel());
 				writeD(info.getTime());

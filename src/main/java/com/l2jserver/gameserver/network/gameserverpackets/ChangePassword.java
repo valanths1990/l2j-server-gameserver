@@ -23,10 +23,8 @@ import com.l2jserver.util.network.BaseSendablePacket;
 /**
  * @author UnAfraid
  */
-public class ChangePassword extends BaseSendablePacket
-{
-	public ChangePassword(String accountName, String characterName, String oldPass, String newPass)
-	{
+public class ChangePassword extends BaseSendablePacket {
+	public ChangePassword(String accountName, String characterName, String oldPass, String newPass) {
 		writeC(0x0B);
 		writeS(accountName);
 		writeS(characterName);
@@ -35,8 +33,7 @@ public class ChangePassword extends BaseSendablePacket
 	}
 	
 	@Override
-	public byte[] getContent()
-	{
+	public byte[] getContent() {
 		return getBytes();
 	}
 }

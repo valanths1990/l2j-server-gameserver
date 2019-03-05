@@ -27,14 +27,12 @@ import com.l2jserver.gameserver.model.SeedProduction;
 /**
  * @author l3x
  */
-public class ExShowSeedInfo extends L2GameServerPacket
-{
+public class ExShowSeedInfo extends L2GameServerPacket {
 	private final List<SeedProduction> _seeds;
 	private final int _manorId;
 	private final boolean _hideButtons;
 	
-	public ExShowSeedInfo(int manorId, boolean nextPeriod, boolean hideButtons)
-	{
+	public ExShowSeedInfo(int manorId, boolean nextPeriod, boolean hideButtons) {
 		_manorId = manorId;
 		_hideButtons = hideButtons;
 		
@@ -43,36 +41,30 @@ public class ExShowSeedInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE); // Id
 		writeH(0x23); // SubId
 		writeC(_hideButtons ? 0x01 : 0x00); // Hide "Seed Purchase" button
 		writeD(_manorId); // Manor ID
 		writeD(0x00); // Unknown
-		if (_seeds == null)
-		{
+		if (_seeds == null) {
 			writeD(0);
 			return;
 		}
 		writeD(_seeds.size());
-		for (SeedProduction seed : _seeds)
-		{
+		for (SeedProduction seed : _seeds) {
 			writeD(seed.getId()); // Seed id
 			writeQ(seed.getAmount()); // Left to buy
 			writeQ(seed.getStartAmount()); // Started amount
 			writeQ(seed.getPrice()); // Sell Price
 			final L2Seed s = CastleManorManager.getInstance().getSeed(seed.getId());
-			if (s == null)
-			{
+			if (s == null) {
 				writeD(0); // Seed level
 				writeC(0x01); // Reward 1
 				writeD(0); // Reward 1 - item id
 				writeC(0x01); // Reward 2
 				writeD(0); // Reward 2 - item id
-			}
-			else
-			{
+			} else {
 				writeD(s.getLevel()); // Seed level
 				writeC(0x01); // Reward 1
 				writeD(s.getReward(1)); // Reward 1 - item id

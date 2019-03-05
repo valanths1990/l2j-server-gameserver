@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Task dedicated to reset player's current souls.
  * @author UnAfraid
  */
-public class ResetSoulsTask implements Runnable
-{
+public class ResetSoulsTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public ResetSoulsTask(L2PcInstance player)
-	{
+	public ResetSoulsTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			_player.clearSouls();
 		}
 	}

@@ -27,16 +27,13 @@ import com.l2jserver.gameserver.model.events.returns.AbstractEventReturn;
  * Runnable event listener provides callback operation without any parameters and return object.
  * @author UnAfraid
  */
-public class DummyEventListener extends AbstractEventListener
-{
-	public DummyEventListener(ListenersContainer container, EventType type, Object owner)
-	{
+public class DummyEventListener extends AbstractEventListener {
+	public DummyEventListener(ListenersContainer container, EventType type, Object owner) {
 		super(container, type, owner);
 	}
 	
 	@Override
-	public <R extends AbstractEventReturn> R executeEvent(IBaseEvent event, Class<R> returnBackClass)
-	{
+	public <R extends AbstractEventReturn> R executeEvent(IBaseEvent event, Class<R> returnBackClass) {
 		return null;
 	}
 }

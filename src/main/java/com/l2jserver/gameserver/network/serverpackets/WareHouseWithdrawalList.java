@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class WareHouseWithdrawalList extends AbstractItemPacket
-{
+public final class WareHouseWithdrawalList extends AbstractItemPacket {
 	public static final int PRIVATE = 1;
 	public static final int CLAN = 4;
 	public static final int CASTLE = 3; // not sure
@@ -39,10 +38,8 @@ public final class WareHouseWithdrawalList extends AbstractItemPacket
 	 */
 	private int _whType;
 	
-	public WareHouseWithdrawalList(L2PcInstance player, int type)
-	{
-		if (player.getActiveWarehouse() == null)
-		{
+	public WareHouseWithdrawalList(L2PcInstance player, int type) {
+		if (player.getActiveWarehouse() == null) {
 			_log.warning("error while sending withdraw request to: " + player.getName());
 			return;
 		}
@@ -53,15 +50,13 @@ public final class WareHouseWithdrawalList extends AbstractItemPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x42);
 		writeH(_whType);
 		writeQ(_playerAdena);
 		writeH(_items.length);
 		
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			writeItem(item);
 			writeD(item.getObjectId());
 		}

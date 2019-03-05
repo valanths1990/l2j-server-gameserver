@@ -25,37 +25,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerFameChanged implements IBaseEvent
-{
+public class OnPlayerFameChanged implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _oldFame;
 	private final int _newFame;
 	
-	public OnPlayerFameChanged(L2PcInstance activeChar, int oldFame, int newFame)
-	{
+	public OnPlayerFameChanged(L2PcInstance activeChar, int oldFame, int newFame) {
 		_activeChar = activeChar;
 		_oldFame = oldFame;
 		_newFame = newFame;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getOldFame()
-	{
+	public int getOldFame() {
 		return _oldFame;
 	}
 	
-	public int getNewFame()
-	{
+	public int getNewFame() {
 		return _newFame;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_FAME_CHANGED;
 	}
 }

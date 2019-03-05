@@ -21,36 +21,30 @@ package com.l2jserver.gameserver.model.clientstrings;
 /**
  * @author Forsaiken
  */
-final class BuilderText extends Builder
-{
+final class BuilderText extends Builder {
 	private final String _text;
 	
-	BuilderText(final String text)
-	{
+	BuilderText(final String text) {
 		_text = text;
 	}
 	
 	@Override
-	public final String toString(final Object param)
-	{
+	public final String toString(final Object param) {
 		return toString();
 	}
 	
 	@Override
-	public final String toString(final Object... params)
-	{
+	public final String toString(final Object... params) {
 		return toString();
 	}
 	
 	@Override
-	public final int getIndex()
-	{
+	public final int getIndex() {
 		return -1;
 	}
 	
 	@Override
-	public final String toString()
-	{
+	public final String toString() {
 		return _text;
 	}
 }

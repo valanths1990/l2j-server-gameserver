@@ -20,16 +20,14 @@ package com.l2jserver.gameserver.network.loginserverpackets;
 
 import com.l2jserver.util.network.BaseRecievePacket;
 
-public class KickPlayer extends BaseRecievePacket
-{
+public class KickPlayer extends BaseRecievePacket {
 	
 	private final String _account;
 	
 	/**
 	 * @param decrypt
 	 */
-	public KickPlayer(byte[] decrypt)
-	{
+	public KickPlayer(byte[] decrypt) {
 		super(decrypt);
 		_account = readS();
 	}
@@ -37,8 +35,7 @@ public class KickPlayer extends BaseRecievePacket
 	/**
 	 * @return Returns the account.
 	 */
-	public String getAccount()
-	{
+	public String getAccount() {
 		return _account;
 	}
 	

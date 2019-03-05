@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.items.enchant;
 /**
  * @author UnAfraid
  */
-public enum EnchantResultType
-{
+public enum EnchantResultType {
 	ERROR,
 	SUCCESS,
 	FAILURE

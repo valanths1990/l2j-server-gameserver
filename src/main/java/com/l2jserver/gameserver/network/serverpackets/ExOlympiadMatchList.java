@@ -31,20 +31,15 @@ import com.l2jserver.gameserver.model.olympiad.OlympiadGameTeams;
 /**
  * @author mrTJO
  */
-public class ExOlympiadMatchList extends L2GameServerPacket
-{
+public class ExOlympiadMatchList extends L2GameServerPacket {
 	private final List<OlympiadGameTask> _games = new ArrayList<>();
 	
-	public ExOlympiadMatchList()
-	{
+	public ExOlympiadMatchList() {
 		OlympiadGameTask task;
-		for (int i = 0; i < OlympiadGameManager.getInstance().getNumberOfStadiums(); i++)
-		{
+		for (int i = 0; i < OlympiadGameManager.getInstance().getNumberOfStadiums(); i++) {
 			task = OlympiadGameManager.getInstance().getOlympiadTask(i);
-			if (task != null)
-			{
-				if (!task.isGameStarted() || task.isBattleFinished())
-				{
+			if (task != null) {
+				if (!task.isGameStarted() || task.isBattleFinished()) {
 					continue; // initial or finished state not shown
 				}
 				_games.add(task);
@@ -53,8 +48,7 @@ public class ExOlympiadMatchList extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0xD4);
 		writeD(0x00); // Type 0 = Match List, 1 = Match Result
@@ -62,27 +56,18 @@ public class ExOlympiadMatchList extends L2GameServerPacket
 		writeD(_games.size());
 		writeD(0x00);
 		
-		for (OlympiadGameTask curGame : _games)
-		{
+		for (OlympiadGameTask curGame : _games) {
 			AbstractOlympiadGame game = curGame.getGame();
-			if (game != null)
-			{
+			if (game != null) {
 				writeD(game.getStadiumId()); // Stadium Id (Arena 1 = 0)
 				
-				if (game instanceof OlympiadGameNonClassed)
-				{
+				if (game instanceof OlympiadGameNonClassed) {
 					writeD(1);
-				}
-				else if (game instanceof OlympiadGameClassed)
-				{
+				} else if (game instanceof OlympiadGameClassed) {
 					writeD(2);
-				}
-				else if (game instanceof OlympiadGameTeams)
-				{
+				} else if (game instanceof OlympiadGameTeams) {
 					writeD(-1);
-				}
-				else
-				{
+				} else {
 					writeD(0);
 				}
 				

@@ -30,15 +30,13 @@ import com.l2jserver.util.Rnd;
  * It can be either general parameters overridden for certain NPC instance instead of template parameters(aggro range, for example), or some optional parameters, handled by datapack scripts.
  * @author GKR
  */
-public class NpcPersonalAIData
-{
+public class NpcPersonalAIData {
 	private final Map<String, Map<String, Integer>> _AIData = new HashMap<>();
 	
 	/**
 	 * Instantiates a new table.
 	 */
-	protected NpcPersonalAIData()
-	{
+	protected NpcPersonalAIData() {
 	}
 	
 	/**
@@ -46,13 +44,10 @@ public class NpcPersonalAIData
 	 * @param spawnDat spawn to process
 	 * @param data Map of AI values
 	 */
-	public void storeData(L2Spawn spawnDat, Map<String, Integer> data)
-	{
-		if ((data != null) && !data.isEmpty())
-		{
+	public void storeData(L2Spawn spawnDat, Map<String, Integer> data) {
+		if ((data != null) && !data.isEmpty()) {
 			// check for spawn name. Since spawn name is key for AI Data, generate random name, if spawn name isn't specified
-			if (spawnDat.getName() == null)
-			{
+			if (spawnDat.getName() == null) {
 				spawnDat.setName(Long.toString(Rnd.nextLong()));
 			}
 			
@@ -66,8 +61,7 @@ public class NpcPersonalAIData
 	 * @param paramName parameter to check
 	 * @return value of given parameter for given spawn name
 	 */
-	public int getAIValue(String spawnName, String paramName)
-	{
+	public int getAIValue(String spawnName, String paramName) {
 		return hasAIValue(spawnName, paramName) ? _AIData.get(spawnName).get(paramName) : -1;
 	}
 	
@@ -77,8 +71,7 @@ public class NpcPersonalAIData
 	 * @param paramName parameter name to check
 	 * @return {@code true} if parameter paramName is set for spawn spawnName, {@code false} otherwise
 	 */
-	public boolean hasAIValue(String spawnName, String paramName)
-	{
+	public boolean hasAIValue(String spawnName, String paramName) {
 		return (spawnName != null) && _AIData.containsKey(spawnName) && _AIData.get(spawnName).containsKey(paramName);
 	}
 	
@@ -88,18 +81,13 @@ public class NpcPersonalAIData
 	 * @param spawn link to NPC's spawn
 	 * @param spawnName name of spawn
 	 */
-	public void initializeNpcParameters(L2Npc npc, L2Spawn spawn, String spawnName)
-	{
-		if (_AIData.containsKey(spawnName))
-		{
+	public void initializeNpcParameters(L2Npc npc, L2Spawn spawn, String spawnName) {
+		if (_AIData.containsKey(spawnName)) {
 			Map<String, Integer> map = _AIData.get(spawnName);
 			
-			try
-			{
-				for (String key : map.keySet())
-				{
-					switch (key)
-					{
+			try {
+				for (String key : map.keySet()) {
+					switch (key) {
 						case "disableRandomAnimation":
 							npc.setRandomAnimationEnabled((map.get(key) == 0));
 							break;
@@ -109,9 +97,7 @@ public class NpcPersonalAIData
 							break;
 					}
 				}
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				// Do nothing
 			}
 		}
@@ -121,13 +107,11 @@ public class NpcPersonalAIData
 	 * Gets the single instance of NpcTable.
 	 * @return single instance of NpcTable
 	 */
-	public static NpcPersonalAIData getInstance()
-	{
+	public static NpcPersonalAIData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final NpcPersonalAIData _instance = new NpcPersonalAIData();
 	}
 }

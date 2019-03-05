@@ -26,10 +26,8 @@ import java.util.List;
  * Has 2 array list for "work" and "break".
  * @author Yaroslav
  */
-public class NextAction
-{
-	public interface NextActionCallback
-	{
+public class NextAction {
+	public interface NextActionCallback {
 		public void doWork();
 	}
 	
@@ -43,8 +41,7 @@ public class NextAction
 	 * @param intentions
 	 * @param callback
 	 */
-	public NextAction(List<CtrlEvent> events, List<CtrlIntention> intentions, NextActionCallback callback)
-	{
+	public NextAction(List<CtrlEvent> events, List<CtrlIntention> intentions, NextActionCallback callback) {
 		_events = events;
 		_intentions = intentions;
 		setCallback(callback);
@@ -56,25 +53,20 @@ public class NextAction
 	 * @param intention
 	 * @param callback
 	 */
-	public NextAction(CtrlEvent event, CtrlIntention intention, NextActionCallback callback)
-	{
-		if (_events == null)
-		{
+	public NextAction(CtrlEvent event, CtrlIntention intention, NextActionCallback callback) {
+		if (_events == null) {
 			_events = new ArrayList<>();
 		}
 		
-		if (_intentions == null)
-		{
+		if (_intentions == null) {
 			_intentions = new ArrayList<>();
 		}
 		
-		if (event != null)
-		{
+		if (event != null) {
 			_events.add(event);
 		}
 		
-		if (intention != null)
-		{
+		if (intention != null) {
 			_intentions.add(intention);
 		}
 		setCallback(callback);
@@ -83,10 +75,8 @@ public class NextAction
 	/**
 	 * Do action.
 	 */
-	public void doAction()
-	{
-		if (_callback != null)
-		{
+	public void doAction() {
+		if (_callback != null) {
 			_callback.doWork();
 		}
 	}
@@ -94,11 +84,9 @@ public class NextAction
 	/**
 	 * @return the _event
 	 */
-	public List<CtrlEvent> getEvents()
-	{
+	public List<CtrlEvent> getEvents() {
 		// If null return empty list.
-		if (_events == null)
-		{
+		if (_events == null) {
 			_events = new ArrayList<>();
 		}
 		return _events;
@@ -107,23 +95,19 @@ public class NextAction
 	/**
 	 * @param event the event to set.
 	 */
-	public void setEvents(ArrayList<CtrlEvent> event)
-	{
+	public void setEvents(ArrayList<CtrlEvent> event) {
 		_events = event;
 	}
 	
 	/**
 	 * @param event
 	 */
-	public void addEvent(CtrlEvent event)
-	{
-		if (_events == null)
-		{
+	public void addEvent(CtrlEvent event) {
+		if (_events == null) {
 			_events = new ArrayList<>();
 		}
 		
-		if (event != null)
-		{
+		if (event != null) {
 			_events.add(event);
 		}
 	}
@@ -131,10 +115,8 @@ public class NextAction
 	/**
 	 * @param event
 	 */
-	public void removeEvent(CtrlEvent event)
-	{
-		if (_events == null)
-		{
+	public void removeEvent(CtrlEvent event) {
+		if (_events == null) {
 			return;
 		}
 		_events.remove(event);
@@ -143,27 +125,23 @@ public class NextAction
 	/**
 	 * @return the _callback
 	 */
-	public NextActionCallback getCallback()
-	{
+	public NextActionCallback getCallback() {
 		return _callback;
 	}
 	
 	/**
 	 * @param callback the callback to set.
 	 */
-	public void setCallback(NextActionCallback callback)
-	{
+	public void setCallback(NextActionCallback callback) {
 		_callback = callback;
 	}
 	
 	/**
 	 * @return the _intentions
 	 */
-	public List<CtrlIntention> getIntentions()
-	{
+	public List<CtrlIntention> getIntentions() {
 		// If null return empty list.
-		if (_intentions == null)
-		{
+		if (_intentions == null) {
 			_intentions = new ArrayList<>();
 		}
 		return _intentions;
@@ -172,23 +150,19 @@ public class NextAction
 	/**
 	 * @param intentions the intention to set.
 	 */
-	public void setIntentions(ArrayList<CtrlIntention> intentions)
-	{
+	public void setIntentions(ArrayList<CtrlIntention> intentions) {
 		_intentions = intentions;
 	}
 	
 	/**
 	 * @param intention
 	 */
-	public void addIntention(CtrlIntention intention)
-	{
-		if (_intentions == null)
-		{
+	public void addIntention(CtrlIntention intention) {
+		if (_intentions == null) {
 			_intentions = new ArrayList<>();
 		}
 		
-		if (intention != null)
-		{
+		if (intention != null) {
 			_intentions.add(intention);
 		}
 	}
@@ -196,10 +170,8 @@ public class NextAction
 	/**
 	 * @param intention
 	 */
-	public void removeIntention(CtrlIntention intention)
-	{
-		if (_intentions == null)
-		{
+	public void removeIntention(CtrlIntention intention) {
+		if (_intentions == null) {
 			return;
 		}
 		_intentions.remove(intention);

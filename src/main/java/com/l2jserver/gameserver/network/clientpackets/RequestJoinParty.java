@@ -33,103 +33,87 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * sample 29 42 00 00 10 01 00 00 00 format cdd
  * @version $Revision: 1.7.4.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestJoinParty extends L2GameClientPacket
-{
+public final class RequestJoinParty extends L2GameClientPacket {
 	private static final String _C__42_REQUESTJOINPARTY = "[C] 42 RequestJoinParty";
 	
 	private String _name;
 	private int _partyDistributionTypeId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 		_partyDistributionTypeId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance requestor = getClient().getActiveChar();
 		L2PcInstance target = L2World.getInstance().getPlayer(_name);
 		
-		if (requestor == null)
-		{
+		if (requestor == null) {
 			return;
 		}
 		
-		if (target == null)
-		{
+		if (target == null) {
 			requestor.sendPacket(SystemMessageId.FIRST_SELECT_USER_TO_INVITE_TO_PARTY);
 			return;
 		}
 		
-		if ((target.getClient() == null) || target.getClient().isDetached())
-		{
+		if ((target.getClient() == null) || target.getClient().isDetached()) {
 			requestor.sendMessage("Player is in offline mode.");
 			return;
 		}
 		
-		if (requestor.isPartyBanned())
-		{
+		if (requestor.isPartyBanned()) {
 			requestor.sendPacket(SystemMessageId.YOU_HAVE_BEEN_REPORTED_SO_PARTY_NOT_ALLOWED);
 			requestor.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (target.isPartyBanned())
-		{
+		if (target.isPartyBanned()) {
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_REPORTED_AND_CANNOT_PARTY);
 			sm.addCharName(target);
 			requestor.sendPacket(sm);
 			return;
 		}
 		
-		if (!target.isVisibleFor(requestor))
-		{
+		if (!target.isVisibleFor(requestor)) {
 			requestor.sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
 			return;
 		}
 		
 		SystemMessage sm;
-		if (target.isInParty())
-		{
+		if (target.isInParty()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_ALREADY_IN_PARTY);
 			sm.addString(target.getName());
 			requestor.sendPacket(sm);
 			return;
 		}
 		
-		if (BlockList.isBlocked(target, requestor))
-		{
+		if (BlockList.isBlocked(target, requestor)) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_HAS_ADDED_YOU_TO_IGNORE_LIST);
 			sm.addCharName(target);
 			requestor.sendPacket(sm);
 			return;
 		}
 		
-		if (target == requestor)
-		{
+		if (target == requestor) {
 			requestor.sendPacket(SystemMessageId.YOU_HAVE_INVITED_THE_WRONG_TARGET);
 			return;
 		}
 		
-		if (target.isCursedWeaponEquipped() || requestor.isCursedWeaponEquipped())
-		{
+		if (target.isCursedWeaponEquipped() || requestor.isCursedWeaponEquipped()) {
 			requestor.sendPacket(SystemMessageId.INCORRECT_TARGET);
 			return;
 		}
 		
-		if (target.isJailed() || requestor.isJailed())
-		{
+		if (target.isJailed() || requestor.isJailed()) {
 			requestor.sendMessage("You cannot invite a player while is in Jail.");
 			return;
 		}
 		
-		if (target.isInOlympiadMode() || requestor.isInOlympiadMode())
-		{
-			if ((target.isInOlympiadMode() != requestor.isInOlympiadMode()) || (target.getOlympiadGameId() != requestor.getOlympiadGameId()) || (target.getOlympiadSide() != requestor.getOlympiadSide()))
-			{
+		if (target.isInOlympiadMode() || requestor.isInOlympiadMode()) {
+			if ((target.isInOlympiadMode() != requestor.isInOlympiadMode()) || (target.getOlympiadGameId() != requestor.getOlympiadGameId()) || (target.getOlympiadSide() != requestor.getOlympiadSide())) {
 				requestor.sendPacket(SystemMessageId.A_USER_CURRENTLY_PARTICIPATING_IN_THE_OLYMPIAD_CANNOT_SEND_PARTY_AND_FRIEND_INVITATIONS);
 				return;
 			}
@@ -139,18 +123,12 @@ public final class RequestJoinParty extends L2GameClientPacket
 		sm.addCharName(target);
 		requestor.sendPacket(sm);
 		
-		if (!requestor.isInParty())
-		{
+		if (!requestor.isInParty()) {
 			createNewParty(target, requestor);
-		}
-		else
-		{
-			if (requestor.getParty().isInDimensionalRift())
-			{
+		} else {
+			if (requestor.getParty().isInDimensionalRift()) {
 				requestor.sendMessage("You cannot invite a player when you are in the Dimensional Rift.");
-			}
-			else
-			{
+			} else {
 				addTargetToParty(target, requestor);
 			}
 		}
@@ -160,47 +138,38 @@ public final class RequestJoinParty extends L2GameClientPacket
 	 * @param target
 	 * @param requestor
 	 */
-	private void addTargetToParty(L2PcInstance target, L2PcInstance requestor)
-	{
+	private void addTargetToParty(L2PcInstance target, L2PcInstance requestor) {
 		final L2Party party = requestor.getParty();
 		// summary of ppl already in party and ppl that get invitation
-		if (!party.isLeader(requestor))
-		{
+		if (!party.isLeader(requestor)) {
 			requestor.sendPacket(SystemMessageId.ONLY_LEADER_CAN_INVITE);
 			return;
 		}
-		if (party.getMemberCount() >= 9)
-		{
+		if (party.getMemberCount() >= 9) {
 			requestor.sendPacket(SystemMessageId.PARTY_FULL);
 			return;
 		}
-		if (party.getPendingInvitation() && !party.isInvitationRequestExpired())
-		{
+		if (party.getPendingInvitation() && !party.isInvitationRequestExpired()) {
 			requestor.sendPacket(SystemMessageId.WAITING_FOR_ANOTHER_REPLY);
 			return;
 		}
 		
-		if (!target.isProcessingRequest())
-		{
+		if (!target.isProcessingRequest()) {
 			requestor.onTransactionRequest(target);
 			// in case a leader change has happened, use party's mode
 			target.sendPacket(new AskJoinParty(requestor.getName(), party.getDistributionType()));
 			party.setPendingInvitation(true);
 			
-			if (Config.DEBUG)
-			{
+			if (Config.DEBUG) {
 				_log.fine("sent out a party invitation to:" + target.getName());
 			}
 			
-		}
-		else
-		{
+		} else {
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_BUSY_TRY_LATER);
 			sm.addString(target.getName());
 			requestor.sendPacket(sm);
 			
-			if (Config.DEBUG)
-			{
+			if (Config.DEBUG) {
 				_log.warning(requestor.getName() + " already received a party invitation");
 			}
 		}
@@ -210,41 +179,33 @@ public final class RequestJoinParty extends L2GameClientPacket
 	 * @param target
 	 * @param requestor
 	 */
-	private void createNewParty(L2PcInstance target, L2PcInstance requestor)
-	{
+	private void createNewParty(L2PcInstance target, L2PcInstance requestor) {
 		PartyDistributionType partyDistributionType = PartyDistributionType.findById(_partyDistributionTypeId);
-		if (partyDistributionType == null)
-		{
+		if (partyDistributionType == null) {
 			return;
 		}
 		
-		if (!target.isProcessingRequest())
-		{
+		if (!target.isProcessingRequest()) {
 			target.sendPacket(new AskJoinParty(requestor.getName(), partyDistributionType));
 			target.setActiveRequester(requestor);
 			requestor.onTransactionRequest(target);
 			requestor.setPartyDistributionType(partyDistributionType);
 			
-			if (Config.DEBUG)
-			{
+			if (Config.DEBUG) {
 				_log.fine("sent out a party invitation to:" + target.getName());
 			}
 			
-		}
-		else
-		{
+		} else {
 			requestor.sendPacket(SystemMessageId.WAITING_FOR_ANOTHER_REPLY);
 			
-			if (Config.DEBUG)
-			{
+			if (Config.DEBUG) {
 				_log.warning(requestor.getName() + " already received a party invitation");
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__42_REQUESTJOINPARTY;
 	}
 }

@@ -23,17 +23,14 @@ package com.l2jserver.gameserver.model.holders;
  * Complemented by {@link ItemChanceHolder}.
  * @author xban1x
  */
-public class QuestItemHolder extends ItemHolder
-{
+public class QuestItemHolder extends ItemHolder {
 	private final int _chance;
 	
-	public QuestItemHolder(int id, int chance)
-	{
+	public QuestItemHolder(int id, int chance) {
 		this(id, chance, 1);
 	}
 	
-	public QuestItemHolder(int id, int chance, long count)
-	{
+	public QuestItemHolder(int id, int chance, long count) {
 		super(id, count);
 		_chance = chance;
 	}
@@ -42,14 +39,12 @@ public class QuestItemHolder extends ItemHolder
 	 * Gets the chance.
 	 * @return the drop chance of the item contained in this object
 	 */
-	public int getChance()
-	{
+	public int getChance() {
 		return _chance;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "[" + getClass().getSimpleName() + "] ID: " + getId() + ", count: " + getCount() + ", chance: " + _chance;
 	}
 }

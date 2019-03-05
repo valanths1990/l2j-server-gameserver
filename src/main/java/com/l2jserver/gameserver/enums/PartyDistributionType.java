@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author NosBit
  */
-public enum PartyDistributionType
-{
+public enum PartyDistributionType {
 	FINDERS_KEEPERS(0, 487),
 	RANDOM(1, 488),
 	RANDOM_INCLUDING_SPOIL(2, 798),
@@ -37,8 +36,7 @@ public enum PartyDistributionType
 	 * @param id the id used by packets.
 	 * @param sysStringId the sysstring id
 	 */
-	private PartyDistributionType(int id, int sysStringId)
-	{
+	private PartyDistributionType(int id, int sysStringId) {
 		_id = id;
 		_sysStringId = sysStringId;
 	}
@@ -47,8 +45,7 @@ public enum PartyDistributionType
 	 * Gets the id used by packets.
 	 * @return the id
 	 */
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
@@ -56,8 +53,7 @@ public enum PartyDistributionType
 	 * Gets the sysstring id used by system messages.
 	 * @return the sysstring-e id
 	 */
-	public int getSysStringId()
-	{
+	public int getSysStringId() {
 		return _sysStringId;
 	}
 	
@@ -66,12 +62,9 @@ public enum PartyDistributionType
 	 * @param id the id
 	 * @return the {@code PartyDistributionType} if its found, {@code null} otherwise.
 	 */
-	public static PartyDistributionType findById(int id)
-	{
-		for (PartyDistributionType partyDistributionType : values())
-		{
-			if (partyDistributionType.getId() == id)
-			{
+	public static PartyDistributionType findById(int id) {
+		for (PartyDistributionType partyDistributionType : values()) {
+			if (partyDistributionType.getId() == id) {
 				return partyDistributionType;
 			}
 		}

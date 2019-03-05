@@ -37,8 +37,7 @@ import com.l2jserver.gameserver.model.actor.L2Playable;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 
-public final class L2World
-{
+public final class L2World {
 	private static final Logger LOG = LoggerFactory.getLogger(L2World.class);
 	
 	/** Gracia border Flying objects not allowed to the east of it. */
@@ -82,8 +81,7 @@ public final class L2World
 	private L2WorldRegion[][] _worldRegions;
 	
 	/** Constructor of L2World. */
-	protected L2World()
-	{
+	protected L2World() {
 		initRegions();
 	}
 	
@@ -96,10 +94,8 @@ public final class L2World
 	 * </ul>
 	 * @param object
 	 */
-	public void storeObject(L2Object object)
-	{
-		if (_allObjects.containsKey(object.getObjectId()))
-		{
+	public void storeObject(L2Object object) {
+		if (_allObjects.containsKey(object.getObjectId())) {
 			LOG.warn("Current object: {} already exist in OID map!", object);
 			LOG.warn("---------------------- End ---------------------");
 			return;
@@ -117,8 +113,7 @@ public final class L2World
 	 * </ul>
 	 * @param object the object to remove
 	 */
-	public void removeObject(L2Object object)
-	{
+	public void removeObject(L2Object object) {
 		_allObjects.remove(object.getObjectId());
 	}
 	
@@ -130,13 +125,11 @@ public final class L2World
 	 * @param objectId Identifier of the L2Object
 	 * @return the L2Object object that belongs to an ID or null if no object found.
 	 */
-	public L2Object findObject(int objectId)
-	{
+	public L2Object findObject(int objectId) {
 		return _allObjects.get(objectId);
 	}
 	
-	public Collection<L2Object> getVisibleObjects()
-	{
+	public Collection<L2Object> getVisibleObjects() {
 		return _allObjects.values();
 	}
 	
@@ -144,18 +137,15 @@ public final class L2World
 	 * Get the count of all visible objects in world.
 	 * @return count off all L2World objects
 	 */
-	public int getVisibleObjectsCount()
-	{
+	public int getVisibleObjectsCount() {
 		return _allObjects.size();
 	}
 	
-	public List<L2PcInstance> getAllGMs()
-	{
+	public List<L2PcInstance> getAllGMs() {
 		return AdminData.getInstance().getAllGms(true);
 	}
 	
-	public Collection<L2PcInstance> getPlayers()
-	{
+	public Collection<L2PcInstance> getPlayers() {
 		return _allPlayers.values();
 	}
 	
@@ -164,8 +154,7 @@ public final class L2World
 	 * @param comparator the comparator
 	 * @return the players sorted by the comparator
 	 */
-	public L2PcInstance[] getPlayersSortedBy(Comparator<L2PcInstance> comparator)
-	{
+	public L2PcInstance[] getPlayersSortedBy(Comparator<L2PcInstance> comparator) {
 		final L2PcInstance[] players = _allPlayers.values().toArray(new L2PcInstance[_allPlayers.values().size()]);
 		Arrays.sort(players, comparator);
 		return players;
@@ -175,8 +164,7 @@ public final class L2World
 	 * Return how many players are online.
 	 * @return number of online players.
 	 */
-	public int getAllPlayersCount()
-	{
+	public int getAllPlayersCount() {
 		return _allPlayers.size();
 	}
 	
@@ -185,8 +173,7 @@ public final class L2World
 	 * @param name Name of the player to get Instance
 	 * @return the player instance corresponding to the given name.
 	 */
-	public L2PcInstance getPlayer(String name)
-	{
+	public L2PcInstance getPlayer(String name) {
 		return getPlayer(CharNameTable.getInstance().getIdByName(name));
 	}
 	
@@ -194,8 +181,7 @@ public final class L2World
 	 * @param objectId of the player to get Instance
 	 * @return the player instance corresponding to the given object ID.
 	 */
-	public L2PcInstance getPlayer(int objectId)
-	{
+	public L2PcInstance getPlayer(int objectId) {
 		return _allPlayers.get(objectId);
 	}
 	
@@ -203,8 +189,7 @@ public final class L2World
 	 * @param ownerId ID of the owner
 	 * @return the pet instance from the given ownerId.
 	 */
-	public L2PetInstance getPet(int ownerId)
-	{
+	public L2PetInstance getPet(int ownerId) {
 		return _petsInstance.get(ownerId);
 	}
 	
@@ -214,8 +199,7 @@ public final class L2World
 	 * @param pet L2PetInstance of the pet
 	 * @return
 	 */
-	public L2PetInstance addPet(int ownerId, L2PetInstance pet)
-	{
+	public L2PetInstance addPet(int ownerId, L2PetInstance pet) {
 		return _petsInstance.put(ownerId, pet);
 	}
 	
@@ -223,8 +207,7 @@ public final class L2World
 	 * Remove the given pet instance.
 	 * @param ownerId ID of the owner
 	 */
-	public void removePet(int ownerId)
-	{
+	public void removePet(int ownerId) {
 		_petsInstance.remove(ownerId);
 	}
 	
@@ -232,8 +215,7 @@ public final class L2World
 	 * Remove the given pet instance.
 	 * @param pet the pet to remove
 	 */
-	public void removePet(L2PetInstance pet)
-	{
+	public void removePet(L2PetInstance pet) {
 		_petsInstance.remove(pet.getOwner().getObjectId());
 	}
 	
@@ -253,26 +235,21 @@ public final class L2World
 	 * @param object L2object to add in the world
 	 * @param newRegion L2WorldRegion in wich the object will be add (not used)
 	 */
-	public void addVisibleObject(L2Object object, L2WorldRegion newRegion)
-	{
-		if (!newRegion.isActive())
-		{
+	public void addVisibleObject(L2Object object, L2WorldRegion newRegion) {
+		if (!newRegion.isActive()) {
 			return;
 		}
 		// Get all visible objects contained in the _visibleObjects of L2WorldRegions
 		// in a circular area of 2000 units
 		List<L2Object> visibles = getVisibleObjects(object, 2000);
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			LOG.debug("objects in range: {}", visibles.size());
 		}
 		
 		// tell the player about the surroundings
 		// Go through the visible objects contained in the circular area
-		for (L2Object visible : visibles)
-		{
-			if (visible == null)
-			{
+		for (L2Object visible : visibles) {
+			if (visible == null) {
 				continue;
 			}
 			
@@ -293,8 +270,7 @@ public final class L2World
 	 * Adds the player to the world.
 	 * @param player the player to add
 	 */
-	public void addPlayerToWorld(L2PcInstance player)
-	{
+	public void addPlayerToWorld(L2PcInstance player) {
 		_allPlayers.put(player.getObjectId(), player);
 	}
 	
@@ -302,8 +278,7 @@ public final class L2World
 	 * Remove the player from the world.
 	 * @param player the player to remove
 	 */
-	public void removeFromAllPlayers(L2PcInstance player)
-	{
+	public void removeFromAllPlayers(L2PcInstance player) {
 		_allPlayers.remove(player.getObjectId());
 	}
 	
@@ -322,15 +297,12 @@ public final class L2World
 	 * @param object L2object to remove from the world
 	 * @param oldWorldRegion L2WorldRegion in which the object was before removing
 	 */
-	public void removeVisibleObject(L2Object object, L2WorldRegion oldWorldRegion)
-	{
-		if (object == null)
-		{
+	public void removeVisibleObject(L2Object object, L2WorldRegion oldWorldRegion) {
+		if (object == null) {
 			return;
 		}
 		
-		if (oldWorldRegion == null)
-		{
+		if (oldWorldRegion == null) {
 			return;
 		}
 		
@@ -340,12 +312,9 @@ public final class L2World
 		
 		// Goes through all surrounding world region's creatures.
 		// And removes the object from their known lists.
-		for (L2WorldRegion worldRegion : oldWorldRegion.getSurroundingRegions())
-		{
-			for (L2Object obj : worldRegion.getVisibleObjects().values())
-			{
-				if (obj != null)
-				{
+		for (L2WorldRegion worldRegion : oldWorldRegion.getSurroundingRegions()) {
+			for (L2Object obj : worldRegion.getVisibleObjects().values()) {
+				if (obj != null) {
 					obj.getKnownList().removeKnownObject(object);
 				}
 			}
@@ -362,28 +331,21 @@ public final class L2World
 	 * @param object L2object that determine the current L2WorldRegion
 	 * @return
 	 */
-	public List<L2Object> getVisibleObjects(L2Object object)
-	{
+	public List<L2Object> getVisibleObjects(L2Object object) {
 		L2WorldRegion reg = object.getWorldRegion();
 		
-		if (reg == null)
-		{
+		if (reg == null) {
 			return null;
 		}
 		
 		// Create a list in order to contain all visible objects.
 		final List<L2Object> result = new LinkedList<>();
-		for (L2WorldRegion regi : reg.getSurroundingRegions())
-		{
+		for (L2WorldRegion regi : reg.getSurroundingRegions()) {
 			// Go through visible objects of the selected region
-			for (L2Object _object : regi.getVisibleObjects().values())
-			{
-				if ((_object == null) || _object.equals(object))
-				{
+			for (L2Object _object : regi.getVisibleObjects().values()) {
+				if ((_object == null) || _object.equals(object)) {
 					continue; // skip our own character
-				}
-				else if (!_object.isVisible())
-				{
+				} else if (!_object.isVisible()) {
 					continue; // skip dying objects
 				}
 				result.add(_object);
@@ -403,10 +365,8 @@ public final class L2World
 	 * @param radius Radius of the circular area
 	 * @return
 	 */
-	public List<L2Object> getVisibleObjects(L2Object object, int radius)
-	{
-		if ((object == null) || !object.isVisible())
-		{
+	public List<L2Object> getVisibleObjects(L2Object object, int radius) {
+		if ((object == null) || !object.isVisible()) {
 			return new ArrayList<>();
 		}
 		
@@ -414,18 +374,14 @@ public final class L2World
 		
 		// Create a list in order to contain all visible objects.
 		final List<L2Object> result = new LinkedList<>();
-		for (L2WorldRegion regi : object.getWorldRegion().getSurroundingRegions())
-		{
+		for (L2WorldRegion regi : object.getWorldRegion().getSurroundingRegions()) {
 			// Go through visible objects of the selected region
-			for (L2Object _object : regi.getVisibleObjects().values())
-			{
-				if ((_object == null) || _object.equals(object))
-				{
+			for (L2Object _object : regi.getVisibleObjects().values()) {
+				if ((_object == null) || _object.equals(object)) {
 					continue; // skip our own character
 				}
 				
-				if (sqRadius > object.calculateDistance(_object, false, true))
-				{
+				if (sqRadius > object.calculateDistance(_object, false, true)) {
 					result.add(_object);
 				}
 			}
@@ -443,10 +399,8 @@ public final class L2World
 	 * @param radius Radius of the spheric area
 	 * @return
 	 */
-	public List<L2Object> getVisibleObjects3D(L2Object object, int radius)
-	{
-		if ((object == null) || !object.isVisible())
-		{
+	public List<L2Object> getVisibleObjects3D(L2Object object, int radius) {
+		if ((object == null) || !object.isVisible()) {
 			return new ArrayList<>();
 		}
 		
@@ -454,17 +408,13 @@ public final class L2World
 		
 		// Create a list in order to contain all visible objects.
 		final List<L2Object> result = new LinkedList<>();
-		for (L2WorldRegion regi : object.getWorldRegion().getSurroundingRegions())
-		{
-			for (L2Object _object : regi.getVisibleObjects().values())
-			{
-				if ((_object == null) || _object.equals(object))
-				{
+		for (L2WorldRegion regi : object.getWorldRegion().getSurroundingRegions()) {
+			for (L2Object _object : regi.getVisibleObjects().values()) {
+				if ((_object == null) || _object.equals(object)) {
 					continue; // skip our own character
 				}
 				
-				if (sqRadius > object.calculateDistance(_object, true, true))
-				{
+				if (sqRadius > object.calculateDistance(_object, true, true)) {
 					result.add(_object);
 				}
 			}
@@ -480,31 +430,25 @@ public final class L2World
 	 * @param object L2object that determine the current L2WorldRegion
 	 * @return all visible players of the L2WorldRegion object's and of its surrounding L2WorldRegion.
 	 */
-	public List<L2Playable> getVisiblePlayable(L2Object object)
-	{
+	public List<L2Playable> getVisiblePlayable(L2Object object) {
 		L2WorldRegion reg = object.getWorldRegion();
-		if (reg == null)
-		{
+		if (reg == null) {
 			return null;
 		}
 		
 		// Create a list in order to contain all visible objects.
 		final List<L2Playable> result = new LinkedList<>();
-		for (L2WorldRegion regi : reg.getSurroundingRegions())
-		{
+		for (L2WorldRegion regi : reg.getSurroundingRegions()) {
 			// Create an Iterator to go through the visible L2Object of the L2WorldRegion
 			Map<Integer, L2Playable> _allpls = regi.getVisiblePlayable();
 			Collection<L2Playable> _playables = _allpls.values();
 			// Go through visible object of the selected region
-			for (L2Playable _object : _playables)
-			{
-				if ((_object == null) || _object.equals(object))
-				{
+			for (L2Playable _object : _playables) {
+				if ((_object == null) || _object.equals(object)) {
 					continue; // skip our own character
 				}
 				
-				if (!_object.isVisible())
-				{
+				if (!_object.isVisible()) {
 					continue; // skip dying objects
 				}
 				
@@ -522,13 +466,11 @@ public final class L2World
 	 * @param point position of the object
 	 * @return
 	 */
-	public L2WorldRegion getRegion(Location point)
-	{
+	public L2WorldRegion getRegion(Location point) {
 		return _worldRegions[(point.getX() >> SHIFT_BY) + OFFSET_X][(point.getY() >> SHIFT_BY) + OFFSET_Y];
 	}
 	
-	public L2WorldRegion getRegion(int x, int y)
-	{
+	public L2WorldRegion getRegion(int x, int y) {
 		return _worldRegions[(x >> SHIFT_BY) + OFFSET_X][(y >> SHIFT_BY) + OFFSET_Y];
 	}
 	
@@ -536,8 +478,7 @@ public final class L2World
 	 * Returns the whole 2d array containing the world regions used by ZoneData.java to setup zones inside the world regions
 	 * @return
 	 */
-	public L2WorldRegion[][] getWorldRegions()
-	{
+	public L2WorldRegion[][] getWorldRegions() {
 		return _worldRegions;
 	}
 	
@@ -548,36 +489,27 @@ public final class L2World
 	 * @param y Y position of the object
 	 * @return True if the L2WorldRegion is valid
 	 */
-	private boolean validRegion(int x, int y)
-	{
+	private boolean validRegion(int x, int y) {
 		return ((x >= 0) && (x <= REGIONS_X) && (y >= 0) && (y <= REGIONS_Y));
 	}
 	
 	/**
 	 * Initialize the world regions.
 	 */
-	private void initRegions()
-	{
+	private void initRegions() {
 		_worldRegions = new L2WorldRegion[REGIONS_X + 1][REGIONS_Y + 1];
 		
-		for (int i = 0; i <= REGIONS_X; i++)
-		{
-			for (int j = 0; j <= REGIONS_Y; j++)
-			{
+		for (int i = 0; i <= REGIONS_X; i++) {
+			for (int j = 0; j <= REGIONS_Y; j++) {
 				_worldRegions[i][j] = new L2WorldRegion(i, j);
 			}
 		}
 		
-		for (int x = 0; x <= REGIONS_X; x++)
-		{
-			for (int y = 0; y <= REGIONS_Y; y++)
-			{
-				for (int a = -1; a <= 1; a++)
-				{
-					for (int b = -1; b <= 1; b++)
-					{
-						if (validRegion(x + a, y + b))
-						{
+		for (int x = 0; x <= REGIONS_X; x++) {
+			for (int y = 0; y <= REGIONS_Y; y++) {
+				for (int a = -1; a <= 1; a++) {
+					for (int b = -1; b <= 1; b++) {
+						if (validRegion(x + a, y + b)) {
 							_worldRegions[x + a][y + b].addSurroundingRegion(_worldRegions[x][y]);
 						}
 					}
@@ -592,13 +524,10 @@ public final class L2World
 	/**
 	 * Deleted all spawns in the world.
 	 */
-	public void deleteVisibleNpcSpawns()
-	{
+	public void deleteVisibleNpcSpawns() {
 		LOG.info("Deleting all visible NPC's.");
-		for (int i = 0; i <= REGIONS_X; i++)
-		{
-			for (int j = 0; j <= REGIONS_Y; j++)
-			{
+		for (int i = 0; i <= REGIONS_X; i++) {
+			for (int j = 0; j <= REGIONS_Y; j++) {
 				_worldRegions[i][j].deleteVisibleNpcSpawns();
 			}
 		}
@@ -608,13 +537,11 @@ public final class L2World
 	/**
 	 * @return the current instance of L2World
 	 */
-	public static L2World getInstance()
-	{
+	public static L2World getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final L2World _instance = new L2World();
 	}
 }

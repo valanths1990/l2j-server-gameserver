@@ -23,18 +23,15 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 /**
  * @author KenM
  */
-public class ExPartyPetWindowDelete extends L2GameServerPacket
-{
+public class ExPartyPetWindowDelete extends L2GameServerPacket {
 	private final L2Summon _summon;
 	
-	public ExPartyPetWindowDelete(L2Summon summon)
-	{
+	public ExPartyPetWindowDelete(L2Summon summon) {
 		_summon = summon;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x6A);
 		writeD(_summon.getObjectId());

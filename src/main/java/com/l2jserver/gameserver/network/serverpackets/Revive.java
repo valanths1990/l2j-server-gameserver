@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.L2Object;
 
-public final class Revive extends L2GameServerPacket
-{
+public final class Revive extends L2GameServerPacket {
 	private final int _objectId;
 	
-	public Revive(L2Object obj)
-	{
+	public Revive(L2Object obj) {
 		_objectId = obj.getObjectId();
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x01);
 		writeD(_objectId);
 	}

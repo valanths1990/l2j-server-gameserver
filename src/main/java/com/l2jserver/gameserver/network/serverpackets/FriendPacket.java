@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.L2World;
  * Add new friend or delete.
  * @author JIV
  */
-public class FriendPacket extends L2GameServerPacket
-{
+public class FriendPacket extends L2GameServerPacket {
 	private final boolean _action, _online;
 	private final int _objid;
 	private final String _name;
@@ -36,8 +35,7 @@ public class FriendPacket extends L2GameServerPacket
 	 * @param action - true for adding, false for remove
 	 * @param objId
 	 */
-	public FriendPacket(boolean action, int objId)
-	{
+	public FriendPacket(boolean action, int objId) {
 		_action = action;
 		_objid = objId;
 		_name = CharNameTable.getInstance().getNameById(objId);
@@ -45,8 +43,7 @@ public class FriendPacket extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x76);
 		writeD(_action ? 1 : 3); // 1-add 3-remove
 		writeD(_objid);

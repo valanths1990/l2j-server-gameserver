@@ -20,34 +20,29 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.VehiclePathPoint;
 
-public class ExAirShipTeleportList extends L2GameServerPacket
-{
+public class ExAirShipTeleportList extends L2GameServerPacket {
 	private final int _dockId;
 	private final VehiclePathPoint[][] _teleports;
 	private final int[] _fuelConsumption;
 	
-	public ExAirShipTeleportList(int dockId, VehiclePathPoint[][] teleports, int[] fuelConsumption)
-	{
+	public ExAirShipTeleportList(int dockId, VehiclePathPoint[][] teleports, int[] fuelConsumption) {
 		_dockId = dockId;
 		_teleports = teleports;
 		_fuelConsumption = fuelConsumption;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x9a);
 		
 		writeD(_dockId);
-		if (_teleports != null)
-		{
+		if (_teleports != null) {
 			writeD(_teleports.length);
 			
 			VehiclePathPoint[] path;
 			VehiclePathPoint dst;
-			for (int i = 0; i < _teleports.length; i++)
-			{
+			for (int i = 0; i < _teleports.length; i++) {
 				writeD(i - 1);
 				writeD(_fuelConsumption[i]);
 				path = _teleports[i];
@@ -56,9 +51,7 @@ public class ExAirShipTeleportList extends L2GameServerPacket
 				writeD(dst.getY());
 				writeD(dst.getZ());
 			}
-		}
-		else
-		{
+		} else {
 			writeD(0);
 		}
 	}

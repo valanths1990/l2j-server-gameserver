@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
  * An Enum to hold some important references to commonly used skills
  * @author DrHouse
  */
-public enum CommonSkill
-{
+public enum CommonSkill {
 	RAID_CURSE(4215, 1),
 	RAID_CURSE2(4515, 1),
 	SEAL_OF_RULER(246, 1),
@@ -54,23 +53,19 @@ public enum CommonSkill
 	
 	private final SkillHolder _holder;
 	
-	private CommonSkill(int id, int level)
-	{
+	private CommonSkill(int id, int level) {
 		_holder = new SkillHolder(id, level);
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _holder.getSkillId();
 	}
 	
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _holder.getSkillLvl();
 	}
 	
-	public Skill getSkill()
-	{
+	public Skill getSkill() {
 		return _holder.getSkill();
 	}
 }

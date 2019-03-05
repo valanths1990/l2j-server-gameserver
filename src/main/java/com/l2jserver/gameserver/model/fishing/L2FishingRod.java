@@ -24,16 +24,14 @@ import com.l2jserver.gameserver.model.StatsSet;
  * Class for the Fishing Rod object.
  * @author nonom
  */
-public class L2FishingRod
-{
+public class L2FishingRod {
 	private final int _fishingRodId;
 	private final int _fishingRodItemId;
 	private final int _fishingRodLevel;
 	private final String _fishingRodName;
 	private final double _fishingRodDamage;
 	
-	public L2FishingRod(StatsSet set)
-	{
+	public L2FishingRod(StatsSet set) {
 		_fishingRodId = set.getInt("fishingRodId");
 		_fishingRodItemId = set.getInt("fishingRodItemId");
 		_fishingRodLevel = set.getInt("fishingRodLevel");
@@ -44,40 +42,35 @@ public class L2FishingRod
 	/**
 	 * @return the fishing rod Id.
 	 */
-	public int getFishingRodId()
-	{
+	public int getFishingRodId() {
 		return _fishingRodId;
 	}
 	
 	/**
 	 * @return the fishing rod Item Id.
 	 */
-	public int getFishingRodItemId()
-	{
+	public int getFishingRodItemId() {
 		return _fishingRodItemId;
 	}
 	
 	/**
 	 * @return the fishing rod Level.
 	 */
-	public int getFishingRodLevel()
-	{
+	public int getFishingRodLevel() {
 		return _fishingRodLevel;
 	}
 	
 	/**
 	 * @return the fishing rod Item Name.
 	 */
-	public String getFishingRodItemName()
-	{
+	public String getFishingRodItemName() {
 		return _fishingRodName;
 	}
 	
 	/**
 	 * @return the fishing rod Damage.
 	 */
-	public double getFishingRodDamage()
-	{
+	public double getFishingRodDamage() {
 		return _fishingRodDamage;
 	}
 }

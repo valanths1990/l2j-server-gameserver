@@ -28,29 +28,24 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * This class ...
  * @version $Revision: 1479 $ $Date: 2005-11-09 00:47:42 +0100 (mer., 09 nov. 2005) $
  */
-public final class RequestAllyInfo extends L2GameClientPacket
-{
+public final class RequestAllyInfo extends L2GameClientPacket {
 	private static final String _C__2E_REQUESTALLYINFO = "[C] 2E RequestAllyInfo";
 	
 	@Override
-	public void readImpl()
-	{
+	public void readImpl() {
 		
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		SystemMessage sm;
 		final int allianceId = activeChar.getAllyId();
-		if (allianceId > 0)
-		{
+		if (allianceId > 0) {
 			final AllianceInfo ai = new AllianceInfo(allianceId);
 			activeChar.sendPacket(ai);
 			
@@ -77,8 +72,7 @@ public final class RequestAllyInfo extends L2GameClientPacket
 			activeChar.sendPacket(sm);
 			
 			sm = SystemMessage.getSystemMessage(SystemMessageId.CLAN_INFO_HEAD);
-			for (final ClanInfo aci : ai.getAllies())
-			{
+			for (final ClanInfo aci : ai.getAllies()) {
 				activeChar.sendPacket(sm);
 				
 				sm = SystemMessage.getSystemMessage(SystemMessageId.CLAN_INFO_NAME_S1);
@@ -103,16 +97,13 @@ public final class RequestAllyInfo extends L2GameClientPacket
 			
 			sm = SystemMessage.getSystemMessage(SystemMessageId.CLAN_INFO_FOOT);
 			activeChar.sendPacket(sm);
-		}
-		else
-		{
+		} else {
 			activeChar.sendPacket(SystemMessageId.NO_CURRENT_ALLIANCES);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__2E_REQUESTALLYINFO;
 	}
 }

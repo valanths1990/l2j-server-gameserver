@@ -27,37 +27,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * An instantly executed event when L2Character is killed by L2Character.
  * @author UnAfraid
  */
-public class OnNpcCreatureSee implements IBaseEvent
-{
+public class OnNpcCreatureSee implements IBaseEvent {
 	private final L2Npc _npc;
 	private final L2Character _creature;
 	private final boolean _isSummon;
 	
-	public OnNpcCreatureSee(L2Npc npc, L2Character creature, boolean isSummon)
-	{
+	public OnNpcCreatureSee(L2Npc npc, L2Character creature, boolean isSummon) {
 		_npc = npc;
 		_creature = creature;
 		_isSummon = isSummon;
 	}
 	
-	public final L2Npc getNpc()
-	{
+	public final L2Npc getNpc() {
 		return _npc;
 	}
 	
-	public final L2Character getCreature()
-	{
+	public final L2Character getCreature() {
 		return _creature;
 	}
 	
-	public boolean isSummon()
-	{
+	public boolean isSummon() {
 		return _isSummon;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_NPC_CREATURE_SEE;
 	}
 }

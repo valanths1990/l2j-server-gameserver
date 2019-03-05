@@ -38,8 +38,7 @@ import com.l2jserver.gameserver.network.NpcStringId;
 import com.l2jserver.gameserver.network.clientpackets.Say2;
 import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 
-public class L2FortCommanderInstance extends L2DefenderInstance
-{
+public class L2FortCommanderInstance extends L2DefenderInstance {
 	private static final Logger LOG = LoggerFactory.getLogger(L2FortCommanderInstance.class);
 	private boolean _canTalk;
 	
@@ -47,8 +46,7 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 	 * Creates a fort commander.
 	 * @param template the fort commander NPC template
 	 */
-	public L2FortCommanderInstance(L2NpcTemplate template)
-	{
+	public L2FortCommanderInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2FortCommanderInstance);
 		_canTalk = true;
@@ -59,10 +57,8 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 	 * @param attacker The L2Character that the L2CommanderInstance try to attack
 	 */
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
-		if ((attacker == null) || !(attacker instanceof L2PcInstance))
-		{
+	public boolean isAutoAttackable(L2Character attacker) {
+		if ((attacker == null) || !(attacker instanceof L2PcInstance)) {
 			return false;
 		}
 		
@@ -73,29 +69,23 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 	}
 	
 	@Override
-	public void addDamageHate(L2Character attacker, int damage, long aggro)
-	{
-		if (attacker == null)
-		{
+	public void addDamageHate(L2Character attacker, int damage, long aggro) {
+		if (attacker == null) {
 			return;
 		}
 		
-		if (!(attacker instanceof L2FortCommanderInstance))
-		{
+		if (!(attacker instanceof L2FortCommanderInstance)) {
 			super.addDamageHate(attacker, damage, aggro);
 		}
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
-		if (!super.doDie(killer))
-		{
+	public boolean doDie(L2Character killer) {
+		if (!super.doDie(killer)) {
 			return false;
 		}
 		
-		if (getFort().getSiege().isInProgress())
-		{
+		if (getFort().getSiege().isInProgress()) {
 			getFort().getSiege().killedCommander(this);
 			
 		}
@@ -107,44 +97,34 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 	 * This method forces guard to return to home location previously set
 	 */
 	@Override
-	public void returnHome()
-	{
-		if (!isInsideRadius(getSpawn(), 200, false, false))
-		{
-			if (Config.DEBUG)
-			{
+	public void returnHome() {
+		if (!isInsideRadius(getSpawn(), 200, false, false)) {
+			if (Config.DEBUG) {
 				LOG.debug("{} moving home", getObjectId());
 			}
 			setisReturningToSpawnPoint(true);
 			clearAggroList();
 			
-			if (hasAI())
-			{
+			if (hasAI()) {
 				getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, getSpawn().getLocation());
 			}
 		}
 	}
 	
 	@Override
-	public final void addDamage(L2Character attacker, int damage, Skill skill)
-	{
+	public final void addDamage(L2Character attacker, int damage, Skill skill) {
 		L2Spawn spawn = getSpawn();
-		if ((spawn != null) && canTalk())
-		{
+		if ((spawn != null) && canTalk()) {
 			List<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(getFort().getResidenceId());
-			for (FortSiegeSpawn spawn2 : commanders)
-			{
-				if (spawn2.getId() == spawn.getId())
-				{
+			for (FortSiegeSpawn spawn2 : commanders) {
+				if (spawn2.getId() == spawn.getId()) {
 					NpcStringId npcString = null;
-					switch (spawn2.getMessageId())
-					{
+					switch (spawn2.getMessageId()) {
 						case 1:
 							npcString = NpcStringId.ATTACKING_THE_ENEMYS_REINFORCEMENTS_IS_NECESSARY_TIME_TO_DIE;
 							break;
 						case 2:
-							if (attacker instanceof L2Summon)
-							{
+							if (attacker instanceof L2Summon) {
 								attacker = ((L2Summon) attacker).getOwner();
 							}
 							npcString = NpcStringId.EVERYONE_CONCENTRATE_YOUR_ATTACKS_ON_S1_SHOW_THE_ENEMY_YOUR_RESOLVE;
@@ -153,11 +133,9 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 							npcString = NpcStringId.SPIRIT_OF_FIRE_UNLEASH_YOUR_POWER_BURN_THE_ENEMY;
 							break;
 					}
-					if (npcString != null)
-					{
+					if (npcString != null) {
 						NpcSay ns = new NpcSay(getObjectId(), Say2.NPC_SHOUT, getId(), npcString);
-						if (npcString.getParamCount() == 1)
-						{
+						if (npcString.getParamCount() == 1) {
 							ns.addStringParameter(attacker.getName());
 						}
 						
@@ -171,33 +149,27 @@ public class L2FortCommanderInstance extends L2DefenderInstance
 		super.addDamage(attacker, damage, skill);
 	}
 	
-	private class ScheduleTalkTask implements Runnable
-	{
+	private class ScheduleTalkTask implements Runnable {
 		
-		public ScheduleTalkTask()
-		{
+		public ScheduleTalkTask() {
 		}
 		
 		@Override
-		public void run()
-		{
+		public void run() {
 			setCanTalk(true);
 		}
 	}
 	
-	void setCanTalk(boolean val)
-	{
+	void setCanTalk(boolean val) {
 		_canTalk = val;
 	}
 	
-	private boolean canTalk()
-	{
+	private boolean canTalk() {
 		return _canTalk;
 	}
 	
 	@Override
-	public boolean hasRandomAnimation()
-	{
+	public boolean hasRandomAnimation() {
 		return false;
 	}
 }

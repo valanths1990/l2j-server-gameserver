@@ -27,37 +27,27 @@ import com.l2jserver.gameserver.model.entity.Castle;
 /**
  * @author KenM
  */
-public class ExShowCastleInfo extends L2GameServerPacket
-{
-	public ExShowCastleInfo()
-	{
+public class ExShowCastleInfo extends L2GameServerPacket {
+	public ExShowCastleInfo() {
 		
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x14);
 		List<Castle> castles = CastleManager.getInstance().getCastles();
 		writeD(castles.size());
-		for (Castle castle : castles)
-		{
+		for (Castle castle : castles) {
 			writeD(castle.getResidenceId());
-			if (castle.getOwnerId() > 0)
-			{
-				if (ClanTable.getInstance().getClan(castle.getOwnerId()) != null)
-				{
+			if (castle.getOwnerId() > 0) {
+				if (ClanTable.getInstance().getClan(castle.getOwnerId()) != null) {
 					writeS(ClanTable.getInstance().getClan(castle.getOwnerId()).getName());
-				}
-				else
-				{
+				} else {
 					_log.warning("Castle owner with no name! Castle: " + castle.getName() + " has an OwnerId = " + castle.getOwnerId() + " who does not have a  name!");
 					writeS("");
 				}
-			}
-			else
-			{
+			} else {
 				writeS("");
 			}
 			writeD(castle.getTaxPercent());

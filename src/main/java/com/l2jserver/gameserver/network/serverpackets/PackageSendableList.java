@@ -24,26 +24,22 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * @author -Wooden-
  * @author UnAfraid, mrTJO
  */
-public class PackageSendableList extends AbstractItemPacket
-{
+public class PackageSendableList extends AbstractItemPacket {
 	private final L2ItemInstance[] _items;
 	private final int _playerObjId;
 	
-	public PackageSendableList(L2ItemInstance[] items, int playerObjId)
-	{
+	public PackageSendableList(L2ItemInstance[] items, int playerObjId) {
 		_items = items;
 		_playerObjId = playerObjId;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xD2);
 		writeD(_playerObjId);
 		writeQ(getClient().getActiveChar().getAdena());
 		writeD(_items.length);
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			writeItem(item);
 			writeD(item.getObjectId());
 		}

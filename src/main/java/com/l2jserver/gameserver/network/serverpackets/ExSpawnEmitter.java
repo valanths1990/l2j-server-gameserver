@@ -24,25 +24,21 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author KenM
  */
-public class ExSpawnEmitter extends L2GameServerPacket
-{
+public class ExSpawnEmitter extends L2GameServerPacket {
 	private final int _playerObjectId;
 	private final int _npcObjectId;
 	
-	public ExSpawnEmitter(int playerObjectId, int npcObjectId)
-	{
+	public ExSpawnEmitter(int playerObjectId, int npcObjectId) {
 		_playerObjectId = playerObjectId;
 		_npcObjectId = npcObjectId;
 	}
 	
-	public ExSpawnEmitter(L2PcInstance player, L2Npc npc)
-	{
+	public ExSpawnEmitter(L2PcInstance player, L2Npc npc) {
 		this(player.getObjectId(), npc.getObjectId());
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x5D);
 		

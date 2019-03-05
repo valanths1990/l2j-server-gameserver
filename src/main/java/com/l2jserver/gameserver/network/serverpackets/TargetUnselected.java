@@ -20,8 +20,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public class TargetUnselected extends L2GameServerPacket
-{
+public class TargetUnselected extends L2GameServerPacket {
 	private final int _targetObjId;
 	private final int _x;
 	private final int _y;
@@ -30,8 +29,7 @@ public class TargetUnselected extends L2GameServerPacket
 	/**
 	 * @param character
 	 */
-	public TargetUnselected(L2Character character)
-	{
+	public TargetUnselected(L2Character character) {
 		_targetObjId = character.getObjectId();
 		_x = character.getX();
 		_y = character.getY();
@@ -39,8 +37,7 @@ public class TargetUnselected extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x24);
 		writeD(_targetObjId);
 		writeD(_x);

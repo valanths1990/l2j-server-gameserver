@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author Nyaran
  */
-public class ConditionPlayerVehicleMounted extends Condition
-{
+public class ConditionPlayerVehicleMounted extends Condition {
 	private final boolean _val;
 	
 	/**
 	 * @param val the val
 	 */
-	public ConditionPlayerVehicleMounted(boolean val)
-	{
+	public ConditionPlayerVehicleMounted(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return true;
 		}
 		return (effector.getActingPlayer().isInVehicle() == _val);

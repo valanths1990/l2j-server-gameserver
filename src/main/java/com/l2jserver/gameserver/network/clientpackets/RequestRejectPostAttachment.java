@@ -32,57 +32,47 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author Migi, DS
  */
-public final class RequestRejectPostAttachment extends L2GameClientPacket
-{
+public final class RequestRejectPostAttachment extends L2GameClientPacket {
 	private static final String _C__D0_6B_REQUESTREJECTPOSTATTACHMENT = "[C] D0:6B RequestRejectPostAttachment";
 	
 	private int _msgId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_msgId = readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
-		if (!Config.ALLOW_MAIL || !Config.ALLOW_ATTACHMENTS)
-		{
+	public void runImpl() {
+		if (!Config.ALLOW_MAIL || !Config.ALLOW_ATTACHMENTS) {
 			return;
 		}
 		
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("rejectattach"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("rejectattach")) {
 			return;
 		}
 		
-		if (!activeChar.isInsideZone(ZoneId.PEACE))
-		{
+		if (!activeChar.isInsideZone(ZoneId.PEACE)) {
 			activeChar.sendPacket(SystemMessageId.CANT_USE_MAIL_OUTSIDE_PEACE_ZONE);
 			return;
 		}
 		
 		Message msg = MailManager.getInstance().getMessage(_msgId);
-		if (msg == null)
-		{
+		if (msg == null) {
 			return;
 		}
 		
-		if (msg.getReceiverId() != activeChar.getObjectId())
-		{
+		if (msg.getReceiverId() != activeChar.getObjectId()) {
 			Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to reject not own attachment!", Config.DEFAULT_PUNISH);
 			return;
 		}
 		
-		if (!msg.hasAttachments() || (msg.getSendBySystem() != 0))
-		{
+		if (!msg.hasAttachments() || (msg.getSendBySystem() != 0)) {
 			return;
 		}
 		
@@ -92,8 +82,7 @@ public final class RequestRejectPostAttachment extends L2GameClientPacket
 		activeChar.sendPacket(new ExChangePostState(true, _msgId, Message.REJECTED));
 		
 		final L2PcInstance sender = L2World.getInstance().getPlayer(msg.getSenderId());
-		if (sender != null)
-		{
+		if (sender != null) {
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_RETURNED_MAIL);
 			sm.addCharName(activeChar);
 			sender.sendPacket(sm);
@@ -101,8 +90,7 @@ public final class RequestRejectPostAttachment extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_6B_REQUESTREJECTPOSTATTACHMENT;
 	}
 }

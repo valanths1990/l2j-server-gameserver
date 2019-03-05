@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
  * This class hold info needed for minions spawns<br>
  * @author Zealar
  */
-public class MinionHolder implements IIdentifiable
-{
+public class MinionHolder implements IIdentifiable {
 	private final int _id;
 	private final int _count;
 	private final long _respawnTime;
@@ -38,8 +37,7 @@ public class MinionHolder implements IIdentifiable
 	 * @param respawnTime the respawn time
 	 * @param weightPoint the weight point
 	 */
-	public MinionHolder(final int id, final int count, final long respawnTime, final int weightPoint)
-	{
+	public MinionHolder(final int id, final int count, final long respawnTime, final int weightPoint) {
 		_id = id;
 		_count = count;
 		_respawnTime = respawnTime;
@@ -50,32 +48,28 @@ public class MinionHolder implements IIdentifiable
 	 * @return the Identifier of the Minion to spawn.
 	 */
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
 	/**
 	 * @return the count of the Minions to spawn.
 	 */
-	public int getCount()
-	{
+	public int getCount() {
 		return _count;
 	}
 	
 	/**
 	 * @return the respawn time of the Minions.
 	 */
-	public long getRespawnTime()
-	{
+	public long getRespawnTime() {
 		return _respawnTime;
 	}
 	
 	/**
 	 * @return the weight point of the Minion.
 	 */
-	public int getWeightPoint()
-	{
+	public int getWeightPoint() {
 		return _weightPoint;
 	}
 }

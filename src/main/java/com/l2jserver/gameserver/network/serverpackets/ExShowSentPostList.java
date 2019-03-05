@@ -26,26 +26,21 @@ import com.l2jserver.gameserver.model.entity.Message;
 /**
  * @author Migi, DS
  */
-public class ExShowSentPostList extends L2GameServerPacket
-{
+public class ExShowSentPostList extends L2GameServerPacket {
 	private final List<Message> _outbox;
 	
-	public ExShowSentPostList(int objectId)
-	{
+	public ExShowSentPostList(int objectId) {
 		_outbox = MailManager.getInstance().getOutbox(objectId);
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xAC);
 		writeD((int) (System.currentTimeMillis() / 1000));
-		if ((_outbox != null) && (_outbox.size() > 0))
-		{
+		if ((_outbox != null) && (_outbox.size() > 0)) {
 			writeD(_outbox.size());
-			for (Message msg : _outbox)
-			{
+			for (Message msg : _outbox) {
 				writeD(msg.getId());
 				writeS(msg.getSubject());
 				writeS(msg.getReceiverName());
@@ -55,9 +50,7 @@ public class ExShowSentPostList extends L2GameServerPacket
 				writeD(0x01);
 				writeD(msg.hasAttachments() ? 0x01 : 0x00);
 			}
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 		}
 	}

@@ -248,8 +248,7 @@ public class L2Npc extends L2Character {
 				}
 				
 				_npc.startRandomAnimationTimer();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				LOG.error("There has been an error trying to perform a random animation for NPC {}!", _npc, e);
 			}
 		}
@@ -1118,8 +1117,7 @@ public class L2Npc extends L2Character {
 	public boolean deleteMe() {
 		try {
 			onDecay();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("Failed decayMe(). {}", e);
 		}
 		
@@ -1135,8 +1133,7 @@ public class L2Npc extends L2Character {
 		// Remove all L2Object from _knownObjects and _knownPlayer of the L2Character then cancel Attack or Cast and notify AI
 		try {
 			getKnownList().removeAllKnownObjects();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("Failed removing cleaning knownlist. {}", e);
 		}
 		

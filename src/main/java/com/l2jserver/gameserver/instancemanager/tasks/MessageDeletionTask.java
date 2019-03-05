@@ -32,38 +32,29 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Message deletion task.
  * @author xban1x
  */
-public final class MessageDeletionTask implements Runnable
-{
+public final class MessageDeletionTask implements Runnable {
 	private static final Logger _log = Logger.getLogger(MessageDeletionTask.class.getName());
 	
 	final int _msgId;
 	
-	public MessageDeletionTask(int msgId)
-	{
+	public MessageDeletionTask(int msgId) {
 		_msgId = msgId;
 	}
 	
 	@Override
-	public void run()
-	{
+	public void run() {
 		final Message msg = MailManager.getInstance().getMessage(_msgId);
-		if (msg == null)
-		{
+		if (msg == null) {
 			return;
 		}
 		
-		if (msg.hasAttachments())
-		{
-			try
-			{
+		if (msg.hasAttachments()) {
+			try {
 				final L2PcInstance sender = L2World.getInstance().getPlayer(msg.getSenderId());
-				if (sender != null)
-				{
+				if (sender != null) {
 					msg.getAttachments().returnToWh(sender.getWarehouse());
 					sender.sendPacket(SystemMessageId.MAIL_RETURNED);
-				}
-				else
-				{
+				} else {
 					msg.getAttachments().returnToWh(null);
 				}
 				
@@ -71,15 +62,12 @@ public final class MessageDeletionTask implements Runnable
 				msg.removeAttachments();
 				
 				final L2PcInstance receiver = L2World.getInstance().getPlayer(msg.getReceiverId());
-				if (receiver != null)
-				{
+				if (receiver != null) {
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.MAIL_RETURNED);
 					// sm.addString(msg.getReceiverName());
 					receiver.sendPacket(sm);
 				}
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.WARNING, getClass().getSimpleName() + ": Error returning items:" + e.getMessage(), e);
 			}
 		}

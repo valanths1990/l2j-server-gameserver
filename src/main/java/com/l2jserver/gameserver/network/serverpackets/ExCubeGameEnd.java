@@ -22,22 +22,19 @@ package com.l2jserver.gameserver.network.serverpackets;
  * *
  * @author mrTJO
  */
-public class ExCubeGameEnd extends L2GameServerPacket
-{
+public class ExCubeGameEnd extends L2GameServerPacket {
 	boolean _isRedTeamWin;
 	
 	/**
 	 * Show Minigame Results
 	 * @param isRedTeamWin Is Red Team Winner?
 	 */
-	public ExCubeGameEnd(boolean isRedTeamWin)
-	{
+	public ExCubeGameEnd(boolean isRedTeamWin) {
 		_isRedTeamWin = isRedTeamWin;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x98);
 		writeD(0x01);

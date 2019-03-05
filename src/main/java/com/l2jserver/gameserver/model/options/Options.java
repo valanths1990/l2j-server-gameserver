@@ -34,8 +34,7 @@ import com.l2jserver.gameserver.network.serverpackets.SkillCoolTime;
 /**
  * @author UnAfraid
  */
-public class Options
-{
+public class Options {
 	private final int _id;
 	private final List<FuncTemplate> _funcs = new ArrayList<>();
 	
@@ -47,34 +46,27 @@ public class Options
 	/**
 	 * @param id
 	 */
-	public Options(int id)
-	{
+	public Options(int id) {
 		_id = id;
 	}
 	
-	public final int getId()
-	{
+	public final int getId() {
 		return _id;
 	}
 	
-	public boolean hasFuncs()
-	{
+	public boolean hasFuncs() {
 		return !_funcs.isEmpty();
 	}
 	
-	public List<AbstractFunction> getStatFuncs(L2ItemInstance item, L2Character player)
-	{
-		if (_funcs.isEmpty())
-		{
+	public List<AbstractFunction> getStatFuncs(L2ItemInstance item, L2Character player) {
+		if (_funcs.isEmpty()) {
 			return Collections.<AbstractFunction> emptyList();
 		}
 		
 		final List<AbstractFunction> funcs = new ArrayList<>(_funcs.size());
-		for (FuncTemplate fuctionTemplate : _funcs)
-		{
+		for (FuncTemplate fuctionTemplate : _funcs) {
 			AbstractFunction fuction = fuctionTemplate.getFunc(player, player, item, this);
-			if (fuction != null)
-			{
+			if (fuction != null) {
 				funcs.add(fuction);
 			}
 			player.sendDebugMessage("Adding stats: " + fuctionTemplate.getStat() + " val: " + fuctionTemplate.getValue());
@@ -82,102 +74,80 @@ public class Options
 		return funcs;
 	}
 	
-	public void addFunc(FuncTemplate template)
-	{
+	public void addFunc(FuncTemplate template) {
 		_funcs.add(template);
 	}
 	
-	public boolean hasActiveSkill()
-	{
+	public boolean hasActiveSkill() {
 		return _activeSkill != null;
 	}
 	
-	public SkillHolder getActiveSkill()
-	{
+	public SkillHolder getActiveSkill() {
 		return _activeSkill;
 	}
 	
-	public void setActiveSkill(SkillHolder holder)
-	{
+	public void setActiveSkill(SkillHolder holder) {
 		_activeSkill = holder;
 	}
 	
-	public boolean hasPassiveSkill()
-	{
+	public boolean hasPassiveSkill() {
 		return _passiveSkill != null;
 	}
 	
-	public SkillHolder getPassiveSkill()
-	{
+	public SkillHolder getPassiveSkill() {
 		return _passiveSkill;
 	}
 	
-	public void setPassiveSkill(SkillHolder holder)
-	{
+	public void setPassiveSkill(SkillHolder holder) {
 		_passiveSkill = holder;
 	}
 	
-	public boolean hasActivationSkills()
-	{
+	public boolean hasActivationSkills() {
 		return !_activationSkills.isEmpty();
 	}
 	
-	public boolean hasActivationSkills(OptionsSkillType type)
-	{
-		for (OptionsSkillHolder holder : _activationSkills)
-		{
-			if (holder.getSkillType() == type)
-			{
+	public boolean hasActivationSkills(OptionsSkillType type) {
+		for (OptionsSkillHolder holder : _activationSkills) {
+			if (holder.getSkillType() == type) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public List<OptionsSkillHolder> getActivationsSkills()
-	{
+	public List<OptionsSkillHolder> getActivationsSkills() {
 		return _activationSkills;
 	}
 	
-	public List<OptionsSkillHolder> getActivationsSkills(OptionsSkillType type)
-	{
+	public List<OptionsSkillHolder> getActivationsSkills(OptionsSkillType type) {
 		List<OptionsSkillHolder> temp = new ArrayList<>();
-		for (OptionsSkillHolder holder : _activationSkills)
-		{
-			if (holder.getSkillType() == type)
-			{
+		for (OptionsSkillHolder holder : _activationSkills) {
+			if (holder.getSkillType() == type) {
 				temp.add(holder);
 			}
 		}
 		return temp;
 	}
 	
-	public void addActivationSkill(OptionsSkillHolder holder)
-	{
+	public void addActivationSkill(OptionsSkillHolder holder) {
 		_activationSkills.add(holder);
 	}
 	
-	public void apply(L2PcInstance player)
-	{
+	public void apply(L2PcInstance player) {
 		player.sendDebugMessage("Activating option id: " + _id);
-		if (hasFuncs())
-		{
+		if (hasFuncs()) {
 			player.addStatFuncs(getStatFuncs(null, player));
 		}
-		if (hasActiveSkill())
-		{
+		if (hasActiveSkill()) {
 			addSkill(player, getActiveSkill().getSkill());
 			player.sendDebugMessage("Adding active skill: " + getActiveSkill());
 		}
-		if (hasPassiveSkill())
-		{
+		if (hasPassiveSkill()) {
 			addSkill(player, getPassiveSkill().getSkill());
 			player.sendDebugMessage("Adding passive skill: " + getPassiveSkill());
 		}
-		if (hasActivationSkills())
-		{
-			for (OptionsSkillHolder holder : _activationSkills)
-			{
+		if (hasActivationSkills()) {
+			for (OptionsSkillHolder holder : _activationSkills) {
 				player.addTriggerSkill(holder);
 				player.sendDebugMessage("Adding trigger skill: " + holder);
 			}
@@ -186,27 +156,21 @@ public class Options
 		player.sendSkillList();
 	}
 	
-	public void remove(L2PcInstance player)
-	{
+	public void remove(L2PcInstance player) {
 		player.sendDebugMessage("Deactivating option id: " + _id);
-		if (hasFuncs())
-		{
+		if (hasFuncs()) {
 			player.removeStatsOwner(this);
 		}
-		if (hasActiveSkill())
-		{
+		if (hasActiveSkill()) {
 			player.removeSkill(getActiveSkill().getSkill(), false, false);
 			player.sendDebugMessage("Removing active skill: " + getActiveSkill());
 		}
-		if (hasPassiveSkill())
-		{
+		if (hasPassiveSkill()) {
 			player.removeSkill(getPassiveSkill().getSkill(), false, true);
 			player.sendDebugMessage("Removing passive skill: " + getPassiveSkill());
 		}
-		if (hasActivationSkills())
-		{
-			for (OptionsSkillHolder holder : _activationSkills)
-			{
+		if (hasActivationSkills()) {
+			for (OptionsSkillHolder holder : _activationSkills) {
 				player.removeTriggerSkill(holder);
 				player.sendDebugMessage("Removing trigger skill: " + holder);
 			}
@@ -214,24 +178,20 @@ public class Options
 		player.sendSkillList();
 	}
 	
-	private final void addSkill(L2PcInstance player, Skill skill)
-	{
+	private final void addSkill(L2PcInstance player, Skill skill) {
 		boolean updateTimeStamp = false;
 		
 		player.addSkill(skill, false);
 		
-		if (skill.isActive())
-		{
+		if (skill.isActive()) {
 			final long remainingTime = player.getSkillRemainingReuseTime(skill.getReuseHashCode());
-			if (remainingTime > 0)
-			{
+			if (remainingTime > 0) {
 				player.addTimeStamp(skill, remainingTime);
 				player.disableSkill(skill, remainingTime);
 			}
 			updateTimeStamp = true;
 		}
-		if (updateTimeStamp)
-		{
+		if (updateTimeStamp) {
 			player.sendPacket(new SkillCoolTime(player));
 		}
 	}

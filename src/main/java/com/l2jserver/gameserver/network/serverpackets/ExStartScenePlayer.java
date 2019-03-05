@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author JIV
  */
-public class ExStartScenePlayer extends L2GameServerPacket
-{
+public class ExStartScenePlayer extends L2GameServerPacket {
 	private final int _movieId;
 	
-	public ExStartScenePlayer(int id)
-	{
+	public ExStartScenePlayer(int id) {
 		_movieId = id;
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xFE);
 		writeH(0x99);
 		writeD(_movieId);

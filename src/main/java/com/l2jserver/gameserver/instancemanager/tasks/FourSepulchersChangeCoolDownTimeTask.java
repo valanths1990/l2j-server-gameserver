@@ -28,11 +28,9 @@ import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
  * Four Sepulchers change cool down time task.
  * @author xban1x
  */
-public final class FourSepulchersChangeCoolDownTimeTask implements Runnable
-{
+public final class FourSepulchersChangeCoolDownTimeTask implements Runnable {
 	@Override
-	public void run()
-	{
+	public void run() {
 		final FourSepulchersManager manager = FourSepulchersManager.getInstance();
 		manager.setIsEntryTime(false);
 		manager.setIsWarmUpTime(false);
@@ -44,13 +42,11 @@ public final class FourSepulchersChangeCoolDownTimeTask implements Runnable
 		final Calendar time = Calendar.getInstance();
 		// one hour = 55th min to 55 min of next hour, so we check for this,
 		// also check for first launch
-		if (!manager.isFirstTimeRun() && (Calendar.getInstance().get(Calendar.MINUTE) > manager.getCycleMin()))
-		{
+		if (!manager.isFirstTimeRun() && (Calendar.getInstance().get(Calendar.MINUTE) > manager.getCycleMin())) {
 			time.set(Calendar.HOUR, Calendar.getInstance().get(Calendar.HOUR) + 1);
 		}
 		time.set(Calendar.MINUTE, manager.getCycleMin());
-		if (manager.isFirstTimeRun())
-		{
+		if (manager.isFirstTimeRun()) {
 			manager.setIsFirstTimeRun(false);
 		}
 		
@@ -59,8 +55,7 @@ public final class FourSepulchersChangeCoolDownTimeTask implements Runnable
 		manager.setChangeEntryTimeTask(ThreadPoolManager.getInstance().scheduleGeneral(new FourSepulchersChangeEntryTimeTask(), interval));
 		final ScheduledFuture<?> changeCoolDownTimeTask = manager.getChangeCoolDownTimeTask();
 		
-		if (changeCoolDownTimeTask != null)
-		{
+		if (changeCoolDownTimeTask != null) {
 			changeCoolDownTimeTask.cancel(true);
 			manager.setChangeCoolDownTimeTask(null);
 		}

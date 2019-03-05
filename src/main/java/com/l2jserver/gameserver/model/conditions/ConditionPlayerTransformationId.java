@@ -28,29 +28,24 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * the parameter is -1 which returns true if player is transformed regardless the transformation Id.
  * @author Zoey76
  */
-public class ConditionPlayerTransformationId extends Condition
-{
+public class ConditionPlayerTransformationId extends Condition {
 	private final int _id;
 	
 	/**
 	 * Instantiates a new condition player is transformed.
 	 * @param id the transformation Id.
 	 */
-	public ConditionPlayerTransformationId(int id)
-	{
+	public ConditionPlayerTransformationId(int id) {
 		_id = id;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final L2PcInstance player = effector.getActingPlayer();
-		if (player == null)
-		{
+		if (player == null) {
 			return false;
 		}
-		if (_id == -1)
-		{
+		if (_id == -1) {
 			return player.isTransformed();
 		}
 		return player.getTransformationId() == _id;

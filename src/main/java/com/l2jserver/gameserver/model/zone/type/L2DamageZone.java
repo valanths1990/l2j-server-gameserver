@@ -34,8 +34,7 @@ import com.l2jserver.gameserver.model.zone.TaskZoneSettings;
  * A damage zone
  * @author durgus
  */
-public class L2DamageZone extends L2ZoneType
-{
+public class L2DamageZone extends L2ZoneType {
 	private int _damageHPPerSec;
 	private int _damageMPPerSec;
 	
@@ -45,8 +44,7 @@ public class L2DamageZone extends L2ZoneType
 	private int _startTask;
 	private int _reuseTask;
 	
-	public L2DamageZone(int id)
-	{
+	public L2DamageZone(int id) {
 		super(id);
 		
 		// Setup default damage
@@ -63,53 +61,37 @@ public class L2DamageZone extends L2ZoneType
 		
 		setTargetType(InstanceType.L2Playable); // default only playabale
 		AbstractZoneSettings settings = ZoneManager.getSettings(getName());
-		if (settings == null)
-		{
+		if (settings == null) {
 			settings = new TaskZoneSettings();
 		}
 		setSettings(settings);
 	}
 	
 	@Override
-	public TaskZoneSettings getSettings()
-	{
+	public TaskZoneSettings getSettings() {
 		return (TaskZoneSettings) super.getSettings();
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("dmgHPSec"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("dmgHPSec")) {
 			_damageHPPerSec = Integer.parseInt(value);
-		}
-		else if (name.equals("dmgMPSec"))
-		{
+		} else if (name.equals("dmgMPSec")) {
 			_damageMPPerSec = Integer.parseInt(value);
-		}
-		else if (name.equals("castleId"))
-		{
+		} else if (name.equals("castleId")) {
 			_castleId = Integer.parseInt(value);
-		}
-		else if (name.equalsIgnoreCase("initialDelay"))
-		{
+		} else if (name.equalsIgnoreCase("initialDelay")) {
 			_startTask = Integer.parseInt(value);
-		}
-		else if (name.equalsIgnoreCase("reuse"))
-		{
+		} else if (name.equalsIgnoreCase("reuse")) {
 			_reuseTask = Integer.parseInt(value);
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if ((getSettings().getTask() == null) && ((_damageHPPerSec != 0) || (_damageMPPerSec != 0)))
-		{
+	protected void onEnter(L2Character character) {
+		if ((getSettings().getTask() == null) && ((_damageHPPerSec != 0) || (_damageMPPerSec != 0))) {
 			L2PcInstance player = character.getActingPlayer();
 			if (getCastle() != null) // Castle zone
 			{
@@ -119,10 +101,8 @@ public class L2DamageZone extends L2ZoneType
 				}
 			}
 			
-			synchronized (this)
-			{
-				if (getSettings().getTask() == null)
-				{
+			synchronized (this) {
+				if (getSettings().getTask() == null) {
 					getSettings().setTask(ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new ApplyDamage(this), _startTask, _reuseTask));
 				}
 			}
@@ -130,88 +110,70 @@ public class L2DamageZone extends L2ZoneType
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (_characterList.isEmpty() && (getSettings().getTask() != null))
-		{
+	protected void onExit(L2Character character) {
+		if (_characterList.isEmpty() && (getSettings().getTask() != null)) {
 			getSettings().clear();
 		}
 	}
 	
-	protected int getHPDamagePerSecond()
-	{
+	protected int getHPDamagePerSecond() {
 		return _damageHPPerSec;
 	}
 	
-	protected int getMPDamagePerSecond()
-	{
+	protected int getMPDamagePerSecond() {
 		return _damageMPPerSec;
 	}
 	
-	protected Castle getCastle()
-	{
-		if ((_castleId > 0) && (_castle == null))
-		{
+	protected Castle getCastle() {
+		if ((_castleId > 0) && (_castle == null)) {
 			_castle = CastleManager.getInstance().getCastleById(_castleId);
 		}
 		
 		return _castle;
 	}
 	
-	private final class ApplyDamage implements Runnable
-	{
+	private final class ApplyDamage implements Runnable {
 		private final L2DamageZone _dmgZone;
 		private final Castle _castle;
 		
-		protected ApplyDamage(L2DamageZone zone)
-		{
+		protected ApplyDamage(L2DamageZone zone) {
 			_dmgZone = zone;
 			_castle = zone.getCastle();
 		}
 		
 		@Override
-		public void run()
-		{
-			if (!isEnabled())
-			{
+		public void run() {
+			if (!isEnabled()) {
 				return;
 			}
 			
 			boolean siege = false;
 			
-			if (_castle != null)
-			{
+			if (_castle != null) {
 				siege = _castle.getSiege().isInProgress();
 				// castle zones active only during siege
-				if (!siege)
-				{
+				if (!siege) {
 					_dmgZone.getSettings().clear();
 					return;
 				}
 			}
 			
-			for (L2Character temp : _dmgZone.getCharactersInside())
-			{
-				if ((temp != null) && !temp.isDead())
-				{
-					if (siege)
-					{
+			for (L2Character temp : _dmgZone.getCharactersInside()) {
+				if ((temp != null) && !temp.isDead()) {
+					if (siege) {
 						// during siege defenders not affected
 						final L2PcInstance player = temp.getActingPlayer();
-						if ((player != null) && player.isInSiege() && (player.getSiegeState() == 2))
-						{
+						if ((player != null) && player.isInSiege() && (player.getSiegeState() == 2)) {
 							continue;
 						}
 					}
 					
 					double multiplier = 1 + (temp.calcStat(Stats.DAMAGE_ZONE_VULN, 0, null, null) / 100);
 					
-					if (getHPDamagePerSecond() != 0)
-					{
+					if (getHPDamagePerSecond() != 0) {
 						temp.reduceCurrentHp(_dmgZone.getHPDamagePerSecond() * multiplier, null, null);
 					}
-					if (getMPDamagePerSecond() != 0)
-					{
+					if (getMPDamagePerSecond() != 0) {
 						temp.reduceCurrentMp(_dmgZone.getMPDamagePerSecond() * multiplier);
 					}
 				}

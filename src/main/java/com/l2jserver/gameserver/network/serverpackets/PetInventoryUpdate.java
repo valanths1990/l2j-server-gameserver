@@ -26,25 +26,20 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author Yme, Advi, UnAfraid
  */
-public class PetInventoryUpdate extends AbstractInventoryUpdate
-{
-	public PetInventoryUpdate()
-	{
+public class PetInventoryUpdate extends AbstractInventoryUpdate {
+	public PetInventoryUpdate() {
 	}
 	
-	public PetInventoryUpdate(L2ItemInstance item)
-	{
+	public PetInventoryUpdate(L2ItemInstance item) {
 		super(item);
 	}
 	
-	public PetInventoryUpdate(List<ItemInfo> items)
-	{
+	public PetInventoryUpdate(List<ItemInfo> items) {
 		super(items);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xB4);
 		writeItems();
 	}

@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.pathfinding;
 /**
  * @author -Nemesiss-
  */
-public abstract class AbstractNodeLoc
-{
+public abstract class AbstractNodeLoc {
 	public abstract int getX();
 	
 	public abstract int getY();

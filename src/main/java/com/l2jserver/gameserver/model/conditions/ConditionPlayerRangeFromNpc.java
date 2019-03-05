@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.util.Util;
  * Exist NPC condition.
  * @author UnAfraid, Zoey76
  */
-public class ConditionPlayerRangeFromNpc extends Condition
-{
+public class ConditionPlayerRangeFromNpc extends Condition {
 	/** NPC Ids. */
 	private final int[] _npcIds;
 	/** Radius to check. */
@@ -36,23 +35,18 @@ public class ConditionPlayerRangeFromNpc extends Condition
 	/** Expected value. */
 	private final boolean _val;
 	
-	public ConditionPlayerRangeFromNpc(int[] npcIds, int radius, boolean val)
-	{
+	public ConditionPlayerRangeFromNpc(int[] npcIds, int radius, boolean val) {
 		_npcIds = npcIds;
 		_radius = radius;
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean existNpc = false;
-		if ((_npcIds != null) && (_npcIds.length > 0) && (_radius > 0))
-		{
-			for (L2Character target : effector.getKnownList().getKnownCharactersInRadius(_radius))
-			{
-				if (target.isNpc() && Util.contains(_npcIds, target.getId()))
-				{
+		if ((_npcIds != null) && (_npcIds.length > 0) && (_radius > 0)) {
+			for (L2Character target : effector.getKnownList().getKnownCharactersInRadius(_radius)) {
+				if (target.isNpc() && Util.contains(_npcIds, target.getId())) {
 					existNpc = true;
 					break;
 				}

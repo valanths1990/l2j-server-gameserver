@@ -23,8 +23,7 @@ package com.l2jserver.gameserver.model.skills;
  * @author Adry_85
  * @since 2.6.0.0
  */
-public enum AttributeType
-{
+public enum AttributeType {
 	NONE(-2),
 	FIRE(0),
 	WATER(1),
@@ -35,13 +34,11 @@ public enum AttributeType
 	
 	private final byte _id;
 	
-	AttributeType(int id)
-	{
+	AttributeType(int id) {
 		_id = (byte) id;
 	}
 	
-	public byte getId()
-	{
+	public byte getId() {
 		return _id;
 	}
 }

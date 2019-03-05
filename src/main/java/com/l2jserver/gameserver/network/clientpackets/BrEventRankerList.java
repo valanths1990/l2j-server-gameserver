@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExBrLoadEventTopRankers;
 /**
  * Halloween rank list client packet. Format: (ch)ddd
  */
-public class BrEventRankerList extends L2GameClientPacket
-{
+public class BrEventRankerList extends L2GameClientPacket {
 	private static final String _C__D0_7B_BREVENTRANKERLIST = "[C] D0:7B BrEventRankerList";
 	
 	private int _eventId;
@@ -33,16 +32,14 @@ public class BrEventRankerList extends L2GameClientPacket
 	private int _ranking;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_eventId = readD();
 		_day = readD(); // 0 - current, 1 - previous
 		_ranking = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// TODO count, bestScore, myScore
 		int count = 0;
 		int bestScore = 0;
@@ -51,8 +48,7 @@ public class BrEventRankerList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_7B_BREVENTRANKERLIST;
 	}
 }

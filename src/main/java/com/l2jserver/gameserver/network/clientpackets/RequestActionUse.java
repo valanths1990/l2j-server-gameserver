@@ -61,14 +61,12 @@ import com.l2jserver.util.Rnd;
  * This class manages the action use request packet.
  * @author Zoey76
  */
-public final class RequestActionUse extends L2GameClientPacket
-{
+public final class RequestActionUse extends L2GameClientPacket {
 	private static final String _C__56_REQUESTACTIONUSE = "[C] 56 RequestActionUse";
 	
 	private static final int SIN_EATER_ID = 12564;
 	private static final int SWITCH_STANCE_ID = 6054;
-	private static final NpcStringId[] NPC_STRINGS =
-	{
+	private static final NpcStringId[] NPC_STRINGS = {
 		NpcStringId.USING_A_SPECIAL_SKILL_HERE_COULD_TRIGGER_A_BLOODBATH,
 		NpcStringId.HEY_WHAT_DO_YOU_EXPECT_OF_ME,
 		NpcStringId.UGGGGGH_PUSH_ITS_NOT_COMING_OUT,
@@ -80,41 +78,33 @@ public final class RequestActionUse extends L2GameClientPacket
 	private boolean _shiftPressed;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_actionId = readD();
 		_ctrlPressed = (readD() == 1);
 		_shiftPressed = (readC() == 1);
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			_log.info(getType() + ": " + activeChar + " requested action use ID: " + _actionId + " Ctrl pressed:" + _ctrlPressed + " Shift pressed:" + _shiftPressed);
 		}
 		
 		// Don't do anything if player is dead or confused
-		if ((activeChar.isFakeDeath() && (_actionId != 0)) || activeChar.isDead() || activeChar.isOutOfControl())
-		{
+		if ((activeChar.isFakeDeath() && (_actionId != 0)) || activeChar.isDead() || activeChar.isOutOfControl()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		final BuffInfo info = activeChar.getEffectList().getBuffInfoByAbnormalType(AbnormalType.BOT_PENALTY);
-		if (info != null)
-		{
-			for (AbstractEffect effect : info.getEffects())
-			{
-				if (!effect.checkCondition(_actionId))
-				{
+		if (info != null) {
+			for (AbstractEffect effect : info.getEffects()) {
+				if (!effect.checkCondition(_actionId)) {
 					activeChar.sendPacket(SystemMessageId.YOU_HAVE_BEEN_REPORTED_SO_ACTIONS_NOT_ALLOWED);
 					activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 					return;
@@ -123,11 +113,9 @@ public final class RequestActionUse extends L2GameClientPacket
 		}
 		
 		// Don't allow to do some action if player is transformed
-		if (activeChar.isTransformed())
-		{
+		if (activeChar.isTransformed()) {
 			int[] allowedActions = activeChar.isTransformed() ? ExBasicActionList.ACTIONS_ON_TRANSFORM : ExBasicActionList.DEFAULT_ACTION_LIST;
-			if (!(Arrays.binarySearch(allowedActions, _actionId) >= 0))
-			{
+			if (!(Arrays.binarySearch(allowedActions, _actionId) >= 0)) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				_log.warning("Player " + activeChar + " used action which he does not have! Id = " + _actionId + " transform: " + activeChar.getTransformation());
 				return;
@@ -136,15 +124,11 @@ public final class RequestActionUse extends L2GameClientPacket
 		
 		final L2Summon summon = activeChar.getSummon();
 		final L2Object target = activeChar.getTarget();
-		switch (_actionId)
-		{
+		switch (_actionId) {
 			case 0: // Sit/Stand
-				if (activeChar.isSitting() || !activeChar.isMoving() || activeChar.isFakeDeath())
-				{
+				if (activeChar.isSitting() || !activeChar.isMoving() || activeChar.isFakeDeath()) {
 					useSit(activeChar, target);
-				}
-				else
-				{
+				} else {
 					// Sit when arrive using next action.
 					// Creating next action class.
 					final NextAction nextAction = new NextAction(CtrlEvent.EVT_ARRIVED, CtrlIntention.AI_INTENTION_MOVE_TO, () -> useSit(activeChar, target));
@@ -154,12 +138,9 @@ public final class RequestActionUse extends L2GameClientPacket
 				}
 				break;
 			case 1: // Walk/Run
-				if (activeChar.isRunning())
-				{
+				if (activeChar.isRunning()) {
 					activeChar.setWalking();
-				}
-				else
-				{
+				} else {
 					activeChar.setRunning();
 				}
 				break;
@@ -167,53 +148,42 @@ public final class RequestActionUse extends L2GameClientPacket
 				activeChar.tryOpenPrivateSellStore(false);
 				break;
 			case 15: // Change Movement Mode (Pets)
-				if (validateSummon(summon, true))
-				{
+				if (validateSummon(summon, true)) {
 					((L2SummonAI) summon.getAI()).notifyFollowStatusChange();
 				}
 				break;
 			case 16: // Attack (Pets)
-				if (validateSummon(summon, true))
-				{
-					if (summon.canAttack(_ctrlPressed))
-					{
+				if (validateSummon(summon, true)) {
+					if (summon.canAttack(_ctrlPressed)) {
 						summon.doAttack();
 					}
 				}
 				break;
 			case 17: // Stop (Pets)
-				if (validateSummon(summon, true))
-				{
+				if (validateSummon(summon, true)) {
 					summon.cancelAction();
 				}
 				break;
 			case 19: // Unsummon Pet
 				
-				if (!validateSummon(summon, true))
-				{
+				if (!validateSummon(summon, true)) {
 					break;
 				}
 				
-				if (summon.isDead())
-				{
+				if (summon.isDead()) {
 					sendPacket(SystemMessageId.DEAD_PET_CANNOT_BE_RETURNED);
 					break;
 				}
 				
-				if (summon.isAttackingNow() || summon.isInCombat() || summon.isMovementDisabled())
-				{
+				if (summon.isAttackingNow() || summon.isInCombat() || summon.isMovementDisabled()) {
 					sendPacket(SystemMessageId.PET_CANNOT_SENT_BACK_DURING_BATTLE);
 					break;
 				}
 				
-				if (summon.isHungry())
-				{
-					if (summon.isPet() && !((L2PetInstance) summon).getPetData().getFood().isEmpty())
-					{
+				if (summon.isHungry()) {
+					if (summon.isPet() && !((L2PetInstance) summon).getPetData().getFood().isEmpty()) {
 						sendPacket(SystemMessageId.YOU_CANNOT_RESTORE_HUNGRY_PETS);
-					}
-					else
-					{
+					} else {
 						sendPacket(SystemMessageId.THE_HELPER_PET_CANNOT_BE_RETURNED);
 					}
 					break;
@@ -222,23 +192,19 @@ public final class RequestActionUse extends L2GameClientPacket
 				summon.unSummon(activeChar);
 				break;
 			case 21: // Change Movement Mode (Servitors)
-				if (validateSummon(summon, false))
-				{
+				if (validateSummon(summon, false)) {
 					((L2SummonAI) summon.getAI()).notifyFollowStatusChange();
 				}
 				break;
 			case 22: // Attack (Servitors)
-				if (validateSummon(summon, false))
-				{
-					if (summon.canAttack(_ctrlPressed))
-					{
+				if (validateSummon(summon, false)) {
+					if (summon.canAttack(_ctrlPressed)) {
 						summon.doAttack();
 					}
 				}
 				break;
 			case 23: // Stop (Servitors)
-				if (validateSummon(summon, false))
-				{
+				if (validateSummon(summon, false)) {
 					summon.cancelAction();
 				}
 				break;
@@ -252,18 +218,15 @@ public final class RequestActionUse extends L2GameClientPacket
 				useSkill("RangeDebuff", false);
 				break;
 			case 37: // Dwarven Manufacture
-				if (activeChar.isAlikeDead())
-				{
+				if (activeChar.isAlikeDead()) {
 					sendPacket(ActionFailed.STATIC_PACKET);
 					return;
 				}
-				if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE)
-				{
+				if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE) {
 					activeChar.setPrivateStoreType(PrivateStoreType.NONE);
 					activeChar.broadcastUserInfo();
 				}
-				if (activeChar.isSitting())
-				{
+				if (activeChar.isSitting()) {
 					activeChar.standUp();
 				}
 				
@@ -276,14 +239,10 @@ public final class RequestActionUse extends L2GameClientPacket
 				useSkill("RangeDD", false);
 				break;
 			case 41: // Wild Hog Cannon - Attack
-				if (validateSummon(summon, false))
-				{
-					if ((target != null) && (target.isDoor() || (target instanceof L2SiegeFlagInstance)))
-					{
+				if (validateSummon(summon, false)) {
+					if ((target != null) && (target.isDoor() || (target instanceof L2SiegeFlagInstance))) {
 						useSkill(4230, false);
-					}
-					else
-					{
+					} else {
 						sendPacket(SystemMessageId.INCORRECT_TARGET);
 					}
 				}
@@ -311,28 +270,23 @@ public final class RequestActionUse extends L2GameClientPacket
 				break;
 			case 51: // General Manufacture
 				// Player shouldn't be able to set stores if he/she is alike dead (dead or fake death)
-				if (activeChar.isAlikeDead())
-				{
+				if (activeChar.isAlikeDead()) {
 					sendPacket(ActionFailed.STATIC_PACKET);
 					return;
 				}
-				if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE)
-				{
+				if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE) {
 					activeChar.setPrivateStoreType(PrivateStoreType.NONE);
 					activeChar.broadcastUserInfo();
 				}
-				if (activeChar.isSitting())
-				{
+				if (activeChar.isSitting()) {
 					activeChar.standUp();
 				}
 				
 				sendPacket(new RecipeShopManageList(activeChar, false));
 				break;
 			case 52: // Unsummon Servitor
-				if (validateSummon(summon, false))
-				{
-					if (summon.isAttackingNow() || summon.isInCombat())
-					{
+				if (validateSummon(summon, false)) {
+					if (summon.isAttackingNow() || summon.isInCombat()) {
 						sendPacket(SystemMessageId.SERVITOR_NOT_RETURN_IN_BATTLE);
 						break;
 					}
@@ -340,20 +294,16 @@ public final class RequestActionUse extends L2GameClientPacket
 				}
 				break;
 			case 53: // Move to target (Servitors)
-				if (validateSummon(summon, false))
-				{
-					if ((target != null) && (summon != target) && !summon.isMovementDisabled())
-					{
+				if (validateSummon(summon, false)) {
+					if ((target != null) && (summon != target) && !summon.isMovementDisabled()) {
 						summon.setFollowStatus(false);
 						summon.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, target.getLocation());
 					}
 				}
 				break;
 			case 54: // Move to target (Pets)
-				if (validateSummon(summon, true))
-				{
-					if ((target != null) && (summon != target) && !summon.isMovementDisabled())
-					{
+				if (validateSummon(summon, true)) {
+					if ((target != null) && (summon != target) && !summon.isMovementDisabled()) {
 						summon.setFollowStatus(false);
 						summon.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, target.getLocation());
 					}
@@ -363,29 +313,22 @@ public final class RequestActionUse extends L2GameClientPacket
 				activeChar.tryOpenPrivateSellStore(true);
 				break;
 			case 65: // Bot Report Button
-				if (Config.BOTREPORT_ENABLE)
-				{
+				if (Config.BOTREPORT_ENABLE) {
 					BotReportTable.getInstance().reportBot(activeChar);
-				}
-				else
-				{
+				} else {
 					activeChar.sendMessage("This feature is disabled.");
 				}
 				break;
 			case 67: // Steer
-				if (activeChar.isInAirShip())
-				{
-					if (activeChar.getAirShip().setCaptain(activeChar))
-					{
+				if (activeChar.isInAirShip()) {
+					if (activeChar.getAirShip().setCaptain(activeChar)) {
 						activeChar.broadcastUserInfo();
 					}
 				}
 				break;
 			case 68: // Cancel Control
-				if (activeChar.isInAirShip() && activeChar.getAirShip().isCaptain(activeChar))
-				{
-					if (activeChar.getAirShip().setCaptain(null))
-					{
+				if (activeChar.isInAirShip() && activeChar.getAirShip().isCaptain(activeChar)) {
+					if (activeChar.getAirShip().setCaptain(null)) {
 						activeChar.broadcastUserInfo();
 					}
 				}
@@ -394,17 +337,12 @@ public final class RequestActionUse extends L2GameClientPacket
 				AirShipManager.getInstance().sendAirShipTeleportList(activeChar);
 				break;
 			case 70: // Exit Airship
-				if (activeChar.isInAirShip())
-				{
-					if (activeChar.getAirShip().isCaptain(activeChar))
-					{
-						if (activeChar.getAirShip().setCaptain(null))
-						{
+				if (activeChar.isInAirShip()) {
+					if (activeChar.getAirShip().isCaptain(activeChar)) {
+						if (activeChar.getAirShip().setCaptain(null)) {
 							activeChar.broadcastUserInfo();
 						}
-					}
-					else if (activeChar.getAirShip().isInDock())
-					{
+					} else if (activeChar.getAirShip().isInDock()) {
 						activeChar.getAirShip().oustPlayer(activeChar);
 					}
 				}
@@ -415,14 +353,12 @@ public final class RequestActionUse extends L2GameClientPacket
 				useCoupleSocial(_actionId - 55);
 				break;
 			case 1000: // Siege Golem - Siege Hammer
-				if ((target != null) && target.isDoor())
-				{
+				if ((target != null) && target.isDoor()) {
 					useSkill(4079, false);
 				}
 				break;
 			case 1001: // Sin Eater - Ultimate Bombastic Buster
-				if (validateSummon(summon, true) && (summon.getId() == SIN_EATER_ID))
-				{
+				if (validateSummon(summon, true) && (summon.getId() == SIN_EATER_ID)) {
 					summon.broadcastPacket(new NpcSay(summon.getObjectId(), Say2.NPC_ALL, summon.getId(), NPC_STRINGS[Rnd.get(NPC_STRINGS.length)]));
 				}
 				break;
@@ -775,15 +711,12 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * @param target the target to sit, throne, bench or chair
 	 * @return {@code true} if the player can sit, {@code false} otherwise
 	 */
-	protected boolean useSit(L2PcInstance activeChar, L2Object target)
-	{
-		if (activeChar.getMountType() != MountType.NONE)
-		{
+	protected boolean useSit(L2PcInstance activeChar, L2Object target) {
+		if (activeChar.getMountType() != MountType.NONE) {
 			return false;
 		}
 		
-		if (!activeChar.isSitting() && (target instanceof L2StaticObjectInstance) && (((L2StaticObjectInstance) target).getType() == 1) && activeChar.isInsideRadius(target, L2StaticObjectInstance.INTERACTION_DISTANCE, false, false))
-		{
+		if (!activeChar.isSitting() && (target instanceof L2StaticObjectInstance) && (((L2StaticObjectInstance) target).getType() == 1) && activeChar.isInsideRadius(target, L2StaticObjectInstance.INTERACTION_DISTANCE, false, false)) {
 			final ChairSit cs = new ChairSit(activeChar, target.getId());
 			sendPacket(cs);
 			activeChar.sitDown();
@@ -791,16 +724,11 @@ public final class RequestActionUse extends L2GameClientPacket
 			return true;
 		}
 		
-		if (activeChar.isFakeDeath())
-		{
+		if (activeChar.isFakeDeath()) {
 			activeChar.stopEffects(L2EffectType.FAKE_DEATH);
-		}
-		else if (activeChar.isSitting())
-		{
+		} else if (activeChar.isSitting()) {
 			activeChar.standUp();
-		}
-		else
-		{
+		} else {
 			activeChar.sitDown();
 		}
 		return true;
@@ -813,85 +741,68 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * @param target the target to cast the skill on, overwritten or ignored depending on skill type
 	 * @param pet if {@code true} it'll validate a pet, if {@code false} it will validate a servitor
 	 */
-	private void useSkill(int skillId, L2Object target, boolean pet)
-	{
+	private void useSkill(int skillId, L2Object target, boolean pet) {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Summon summon = activeChar.getSummon();
-		if (!validateSummon(summon, pet))
-		{
+		if (!validateSummon(summon, pet)) {
 			return;
 		}
 		
-		if (!canControl(summon))
-		{
+		if (!canControl(summon)) {
 			return;
 		}
 		
 		int lvl = 0;
-		if (summon.isPet())
-		{
+		if (summon.isPet()) {
 			lvl = PetDataTable.getInstance().getPetData(summon.getId()).getAvailableLevel(skillId, summon.getLevel());
-		}
-		else
-		{
+		} else {
 			lvl = SummonSkillsTable.getInstance().getAvailableLevel(summon, skillId);
 		}
 		
-		if (lvl > 0)
-		{
+		if (lvl > 0) {
 			summon.setTarget(target);
 			summon.useMagic(SkillData.getInstance().getSkill(skillId, lvl), _ctrlPressed, _shiftPressed);
 		}
 		
-		if (skillId == SWITCH_STANCE_ID)
-		{
+		if (skillId == SWITCH_STANCE_ID) {
 			summon.switchMode();
 		}
 	}
 	
-	private void useSkill(String skillName, L2Object target, boolean pet)
-	{
+	private void useSkill(String skillName, L2Object target, boolean pet) {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Summon summon = activeChar.getSummon();
-		if (!validateSummon(summon, pet))
-		{
+		if (!validateSummon(summon, pet)) {
 			return;
 		}
 		
-		if (!canControl(summon))
-		{
+		if (!canControl(summon)) {
 			return;
 		}
 		
-		if (summon instanceof L2PetInstance)
-		{
-			if (!((L2PetInstance) summon).isInSupportMode())
-			{
+		if (summon instanceof L2PetInstance) {
+			if (!((L2PetInstance) summon).isInSupportMode()) {
 				sendPacket(SystemMessageId.PET_AUXILIARY_MODE_CANNOT_USE_SKILLS);
 				return;
 			}
 		}
 		
 		final SkillHolder skillHolder = summon.getTemplate().getParameters().getSkillHolder(skillName);
-		if (skillHolder == null)
-		{
+		if (skillHolder == null) {
 			_log.warning(summon + " requested missing skill " + skillName + "!");
 			return;
 		}
 		
 		final Skill skill = skillHolder.getSkill();
-		if (skill == null)
-		{
+		if (skill == null) {
 			_log.warning(summon + " requested missing skill " + skillHolder + "!");
 			return;
 		}
@@ -899,27 +810,21 @@ public final class RequestActionUse extends L2GameClientPacket
 		summon.setTarget(target);
 		summon.useMagic(skill, _ctrlPressed, _shiftPressed);
 		
-		if (skill.getId() == SWITCH_STANCE_ID)
-		{
+		if (skill.getId() == SWITCH_STANCE_ID) {
 			summon.switchMode();
 		}
 	}
 	
-	private boolean canControl(L2Summon summon)
-	{
-		if (summon instanceof L2PetInstance)
-		{
-			if (!((L2PetInstance) summon).isInSupportMode())
-			{
+	private boolean canControl(L2Summon summon) {
+		if (summon instanceof L2PetInstance) {
+			if (!((L2PetInstance) summon).isInSupportMode()) {
 				sendPacket(SystemMessageId.PET_AUXILIARY_MODE_CANNOT_USE_SKILLS);
 				return false;
 			}
 		}
 		
-		if (summon.isPet())
-		{
-			if ((summon.getLevel() - getActiveChar().getLevel()) > 20)
-			{
+		if (summon.isPet()) {
+			if ((summon.getLevel() - getActiveChar().getLevel()) > 20) {
 				sendPacket(SystemMessageId.PET_TOO_HIGH_TO_CONTROL);
 				return false;
 			}
@@ -933,11 +838,9 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * @param skillId the skill Id to use
 	 * @param pet if {@code true} it'll validate a pet, if {@code false} it will validate a servitor
 	 */
-	private void useSkill(int skillId, boolean pet)
-	{
+	private void useSkill(int skillId, boolean pet) {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
@@ -950,11 +853,9 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * @param skillName the skill name to use
 	 * @param pet if {@code true} it'll validate a pet, if {@code false} it will validate a servitor
 	 */
-	private void useSkill(String skillName, boolean pet)
-	{
+	private void useSkill(String skillName, boolean pet) {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
@@ -967,29 +868,22 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * @param checkPet if {@code true} it'll validate a pet, if {@code false} it will validate a servitor
 	 * @return {@code true} if the summon is not null and whether is a pet or a servitor depending on {@code checkPet} value, {@code false} otherwise
 	 */
-	private boolean validateSummon(L2Summon summon, boolean checkPet)
-	{
-		if ((summon != null) && ((checkPet && summon.isPet()) || summon.isServitor()))
-		{
-			if (summon.isPet() && ((L2PetInstance) summon).isUncontrollable())
-			{
+	private boolean validateSummon(L2Summon summon, boolean checkPet) {
+		if ((summon != null) && ((checkPet && summon.isPet()) || summon.isServitor())) {
+			if (summon.isPet() && ((L2PetInstance) summon).isUncontrollable()) {
 				sendPacket(SystemMessageId.WHEN_YOUR_PETS_HUNGER_GAUGE_IS_AT_0_YOU_CANNOT_USE_YOUR_PET);
 				return false;
 			}
-			if (summon.isBetrayed())
-			{
+			if (summon.isBetrayed()) {
 				sendPacket(SystemMessageId.PET_REFUSING_ORDER);
 				return false;
 			}
 			return true;
 		}
 		
-		if (checkPet)
-		{
+		if (checkPet) {
 			sendPacket(SystemMessageId.DONT_HAVE_PET);
-		}
-		else
-		{
+		} else {
 			sendPacket(SystemMessageId.DONT_HAVE_SERVITOR);
 		}
 		return false;
@@ -999,21 +893,17 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * Try to broadcast SocialAction packet.
 	 * @param id the social action Id to broadcast
 	 */
-	private void tryBroadcastSocial(int id)
-	{
+	private void tryBroadcastSocial(int id) {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
-		if (activeChar.isFishing())
-		{
+		if (activeChar.isFishing()) {
 			sendPacket(SystemMessageId.CANNOT_DO_WHILE_FISHING_3);
 			return;
 		}
 		
-		if (activeChar.canMakeSocialAction())
-		{
+		if (activeChar.canMakeSocialAction()) {
 			activeChar.broadcastPacket(new SocialAction(activeChar.getObjectId(), id));
 		}
 	}
@@ -1022,100 +912,86 @@ public final class RequestActionUse extends L2GameClientPacket
 	 * Perform a couple social action.
 	 * @param id the couple social action Id
 	 */
-	private void useCoupleSocial(final int id)
-	{
+	private void useCoupleSocial(final int id) {
 		final L2PcInstance requester = getActiveChar();
-		if (requester == null)
-		{
+		if (requester == null) {
 			return;
 		}
 		
 		final L2Object target = requester.getTarget();
-		if ((target == null) || !target.isPlayer())
-		{
+		if ((target == null) || !target.isPlayer()) {
 			sendPacket(SystemMessageId.INCORRECT_TARGET);
 			return;
 		}
 		
 		final int distance = (int) requester.calculateDistance(target, false, false);
-		if ((distance > 125) || (distance < 15) || (requester.getObjectId() == target.getObjectId()))
-		{
+		if ((distance > 125) || (distance < 15) || (requester.getObjectId() == target.getObjectId())) {
 			sendPacket(SystemMessageId.TARGET_DO_NOT_MEET_LOC_REQUIREMENTS);
 			return;
 		}
 		
 		SystemMessage sm;
-		if (requester.isInStoreMode() || requester.isInCraftMode())
-		{
+		if (requester.isInStoreMode() || requester.isInCraftMode()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_PRIVATE_SHOP_MODE_OR_IN_A_BATTLE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isInCombat() || requester.isInDuel() || AttackStanceTaskManager.getInstance().hasAttackStanceTask(requester))
-		{
+		if (requester.isInCombat() || requester.isInDuel() || AttackStanceTaskManager.getInstance().hasAttackStanceTask(requester)) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_A_BATTLE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isFishing())
-		{
+		if (requester.isFishing()) {
 			sendPacket(SystemMessageId.CANNOT_DO_WHILE_FISHING_3);
 			return;
 		}
 		
-		if (requester.getKarma() > 0)
-		{
+		if (requester.getKarma() > 0) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_A_CHAOTIC_STATE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isInOlympiadMode())
-		{
+		if (requester.isInOlympiadMode()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_PARTICIPATING_IN_THE_OLYMPIAD_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isInSiege())
-		{
+		if (requester.isInSiege()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_A_CASTLE_SIEGE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isInHideoutSiege())
-		{
+		if (requester.isInHideoutSiege()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_PARTICIPATING_IN_A_HIDEOUT_SIEGE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 		}
 		
-		if (requester.isMounted() || requester.isFlyingMounted() || requester.isInBoat() || requester.isInAirShip())
-		{
+		if (requester.isMounted() || requester.isFlyingMounted() || requester.isInBoat() || requester.isInAirShip()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_RIDING_A_SHIP_STEED_OR_STRIDER_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isTransformed())
-		{
+		if (requester.isTransformed()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_CURRENTLY_TRANSFORMING_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isAlikeDead())
-		{
+		if (requester.isAlikeDead()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_CURRENTLY_DEAD_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(requester);
 			sendPacket(sm);
@@ -1124,104 +1000,91 @@ public final class RequestActionUse extends L2GameClientPacket
 		
 		// Checks for partner.
 		final L2PcInstance partner = target.getActingPlayer();
-		if (partner.isInStoreMode() || partner.isInCraftMode())
-		{
+		if (partner.isInStoreMode() || partner.isInCraftMode()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_PRIVATE_SHOP_MODE_OR_IN_A_BATTLE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isInCombat() || partner.isInDuel() || AttackStanceTaskManager.getInstance().hasAttackStanceTask(partner))
-		{
+		if (partner.isInCombat() || partner.isInDuel() || AttackStanceTaskManager.getInstance().hasAttackStanceTask(partner)) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_A_BATTLE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.getMultiSociaAction() > 0)
-		{
+		if (partner.getMultiSociaAction() > 0) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_ALREADY_PARTICIPATING_IN_A_COUPLE_ACTION_AND_CANNOT_BE_REQUESTED_FOR_ANOTHER_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isFishing())
-		{
+		if (partner.isFishing()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_FISHING_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.getKarma() > 0)
-		{
+		if (partner.getKarma() > 0) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_A_CHAOTIC_STATE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isInOlympiadMode())
-		{
+		if (partner.isInOlympiadMode()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_PARTICIPATING_IN_THE_OLYMPIAD_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isInHideoutSiege())
-		{
+		if (partner.isInHideoutSiege()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_PARTICIPATING_IN_A_HIDEOUT_SIEGE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isInSiege())
-		{
+		if (partner.isInSiege()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_IN_A_CASTLE_SIEGE_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isMounted() || partner.isFlyingMounted() || partner.isInBoat() || partner.isInAirShip())
-		{
+		if (partner.isMounted() || partner.isFlyingMounted() || partner.isInBoat() || partner.isInAirShip()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_RIDING_A_SHIP_STEED_OR_STRIDER_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isTeleporting())
-		{
+		if (partner.isTeleporting()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_CURRENTLY_TELEPORTING_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isTransformed())
-		{
+		if (partner.isTransformed()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_CURRENTLY_TRANSFORMING_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (partner.isAlikeDead())
-		{
+		if (partner.isAlikeDead()) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_CURRENTLY_DEAD_AND_CANNOT_BE_REQUESTED_FOR_A_COUPLE_ACTION);
 			sm.addPcName(partner);
 			sendPacket(sm);
 			return;
 		}
 		
-		if (requester.isAllSkillsDisabled() || partner.isAllSkillsDisabled())
-		{
+		if (requester.isAllSkillsDisabled() || partner.isAllSkillsDisabled()) {
 			sendPacket(SystemMessageId.COUPLE_ACTION_CANCELED);
 			return;
 		}
@@ -1231,15 +1094,13 @@ public final class RequestActionUse extends L2GameClientPacket
 		sm.addPcName(partner);
 		sendPacket(sm);
 		
-		if ((requester.getAI().getIntention() != CtrlIntention.AI_INTENTION_IDLE) || (partner.getAI().getIntention() != CtrlIntention.AI_INTENTION_IDLE))
-		{
+		if ((requester.getAI().getIntention() != CtrlIntention.AI_INTENTION_IDLE) || (partner.getAI().getIntention() != CtrlIntention.AI_INTENTION_IDLE)) {
 			final NextAction nextAction = new NextAction(CtrlEvent.EVT_ARRIVED, CtrlIntention.AI_INTENTION_MOVE_TO, () -> partner.sendPacket(new ExAskCoupleAction(requester.getObjectId(), id)));
 			requester.getAI().setNextAction(nextAction);
 			return;
 		}
 		
-		if (requester.isCastingNow() || requester.isCastingSimultaneouslyNow())
-		{
+		if (requester.isCastingNow() || requester.isCastingSimultaneouslyNow()) {
 			final NextAction nextAction = new NextAction(CtrlEvent.EVT_FINISH_CASTING, CtrlIntention.AI_INTENTION_CAST, () -> partner.sendPacket(new ExAskCoupleAction(requester.getObjectId(), id)));
 			requester.getAI().setNextAction(nextAction);
 			return;
@@ -1249,14 +1110,12 @@ public final class RequestActionUse extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__56_REQUESTACTIONUSE;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return (_actionId != 10) && (_actionId != 28);
 	}
 }

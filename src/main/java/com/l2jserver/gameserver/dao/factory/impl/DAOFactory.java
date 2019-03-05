@@ -28,40 +28,32 @@ import com.l2jserver.gameserver.dao.factory.IDAOFactory;
  * DAO Factory implementation.
  * @author Zoey76
  */
-public class DAOFactory
-{
-	private DAOFactory()
-	{
+public class DAOFactory {
+	private DAOFactory() {
 		// Hide constructor.
 	}
 	
-	public static IDAOFactory getInstance()
-	{
+	public static IDAOFactory getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		private static final Logger LOG = LoggerFactory.getLogger(DAOFactory.class);
 		
 		protected static final IDAOFactory INSTANCE;
 		
-		static
-		{
-			switch (Config.DATABASE_ENGINE)
-			{
+		static {
+			switch (Config.DATABASE_ENGINE) {
 				case "MSSQL":
 				case "OracleDB":
 				case "PostgreSQL":
 				case "H2":
-				case "HSQLDB":
-				{
+				case "HSQLDB": {
 					throw new UnsupportedOperationException(Config.DATABASE_ENGINE + " is not supported!");
 				}
 				default:
 				case "MariaDB":
-				case "MySQL":
-				{
+				case "MySQL": {
 					INSTANCE = MySQLDAOFactory.INSTANCE;
 					break;
 				}

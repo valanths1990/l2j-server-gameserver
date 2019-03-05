@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author St3eT
  */
-public enum InstanceRemoveBuffType
-{
+public enum InstanceRemoveBuffType {
 	NONE,
 	ALL,
 	WHITELIST,

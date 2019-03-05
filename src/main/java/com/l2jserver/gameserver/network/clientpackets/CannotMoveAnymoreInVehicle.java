@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.network.serverpackets.StopMoveInVehicle;
 /**
  * @author Maktakien
  */
-public final class CannotMoveAnymoreInVehicle extends L2GameClientPacket
-{
+public final class CannotMoveAnymoreInVehicle extends L2GameClientPacket {
 	private static final String _C__76_CANNOTMOVEANYMOREINVEHICLE = "[C] 76 CannotMoveAnymoreInVehicle";
 	
 	private int _x;
@@ -36,8 +35,7 @@ public final class CannotMoveAnymoreInVehicle extends L2GameClientPacket
 	private int _boatId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_boatId = readD();
 		_x = readD();
 		_y = readD();
@@ -46,17 +44,13 @@ public final class CannotMoveAnymoreInVehicle extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
-		if (player.isInBoat())
-		{
-			if (player.getBoat().getObjectId() == _boatId)
-			{
+		if (player.isInBoat()) {
+			if (player.getBoat().getObjectId() == _boatId) {
 				player.setInVehiclePosition(new Location(_x, _y, _z));
 				player.setHeading(_heading);
 				StopMoveInVehicle msg = new StopMoveInVehicle(player, _boatId);
@@ -66,8 +60,7 @@ public final class CannotMoveAnymoreInVehicle extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__76_CANNOTMOVEANYMOREINVEHICLE;
 	}
 }

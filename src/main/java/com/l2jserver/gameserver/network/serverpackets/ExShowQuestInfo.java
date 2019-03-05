@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author Luca Baldi
  */
-public class ExShowQuestInfo extends L2GameServerPacket
-{
+public class ExShowQuestInfo extends L2GameServerPacket {
 	public static final ExShowQuestInfo STATIC_PACKET = new ExShowQuestInfo();
 	
-	private ExShowQuestInfo()
-	{
+	private ExShowQuestInfo() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x20);
 	}

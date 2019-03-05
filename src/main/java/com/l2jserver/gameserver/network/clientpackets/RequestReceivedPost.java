@@ -31,47 +31,39 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author Migi, DS
  */
-public final class RequestReceivedPost extends L2GameClientPacket
-{
+public final class RequestReceivedPost extends L2GameClientPacket {
 	private static final String _C__D0_69_REQUESTRECEIVEDPOST = "[C] D0:69 RequestReceivedPost";
 	
 	private int _msgId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_msgId = readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if ((activeChar == null) || !Config.ALLOW_MAIL)
-		{
+		if ((activeChar == null) || !Config.ALLOW_MAIL) {
 			return;
 		}
 		
 		final Message msg = MailManager.getInstance().getMessage(_msgId);
-		if (msg == null)
-		{
+		if (msg == null) {
 			return;
 		}
 		
-		if (!activeChar.isInsideZone(ZoneId.PEACE) && msg.hasAttachments())
-		{
+		if (!activeChar.isInsideZone(ZoneId.PEACE) && msg.hasAttachments()) {
 			activeChar.sendPacket(SystemMessageId.CANT_USE_MAIL_OUTSIDE_PEACE_ZONE);
 			return;
 		}
 		
-		if (msg.getReceiverId() != activeChar.getObjectId())
-		{
+		if (msg.getReceiverId() != activeChar.getObjectId()) {
 			Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to receive not own post!", Config.DEFAULT_PUNISH);
 			return;
 		}
 		
-		if (msg.isDeletedByReceiver())
-		{
+		if (msg.isDeletedByReceiver()) {
 			return;
 		}
 		
@@ -81,14 +73,12 @@ public final class RequestReceivedPost extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_69_REQUESTRECEIVEDPOST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

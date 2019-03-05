@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.model.interfaces;
 /**
  * @author UnAfraid
  */
-public interface IDeletable
-{
+public interface IDeletable {
 	public boolean deleteMe();
 }

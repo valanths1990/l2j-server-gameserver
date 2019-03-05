@@ -33,38 +33,30 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * Loads the the list of classes and it's info.
  * @author Zoey76
  */
-public final class ClassListData implements IXmlReader
-{
+public final class ClassListData implements IXmlReader {
 	private final Map<ClassId, ClassInfo> _classData = new HashMap<>();
 	
 	/**
 	 * Instantiates a new class list data.
 	 */
-	protected ClassListData()
-	{
+	protected ClassListData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_classData.clear();
 		parseDatapackFile("data/stats/chars/classList.xml");
 		LOG.info("{}: Loaded {} Class data.", getClass().getSimpleName(), _classData.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equals(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equals(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
 					final NamedNodeMap attrs = d.getAttributes();
-					if ("class".equals(d.getNodeName()))
-					{
+					if ("class".equals(d.getNodeName())) {
 						Node attr = attrs.getNamedItem("classId");
 						final ClassId classId = ClassId.getClassId(parseInteger(attr));
 						attr = attrs.getNamedItem("name");
@@ -82,8 +74,7 @@ public final class ClassListData implements IXmlReader
 	 * Gets the class list.
 	 * @return the complete class list
 	 */
-	public Map<ClassId, ClassInfo> getClassList()
-	{
+	public Map<ClassId, ClassInfo> getClassList() {
 		return _classData;
 	}
 	
@@ -92,8 +83,7 @@ public final class ClassListData implements IXmlReader
 	 * @param classId the class ID
 	 * @return the class info related to the given {@code classId}
 	 */
-	public ClassInfo getClass(ClassId classId)
-	{
+	public ClassInfo getClass(ClassId classId) {
 		return _classData.get(classId);
 	}
 	
@@ -102,8 +92,7 @@ public final class ClassListData implements IXmlReader
 	 * @param classId the class Id as integer
 	 * @return the class info related to the given {@code classId}
 	 */
-	public ClassInfo getClass(int classId)
-	{
+	public ClassInfo getClass(int classId) {
 		final ClassId id = ClassId.getClassId(classId);
 		return (id != null) ? _classData.get(id) : null;
 	}
@@ -112,13 +101,11 @@ public final class ClassListData implements IXmlReader
 	 * Gets the single instance of ClassListData.
 	 * @return single instance of ClassListData
 	 */
-	public static ClassListData getInstance()
-	{
+	public static ClassListData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final ClassListData _instance = new ClassListData();
 	}
 }

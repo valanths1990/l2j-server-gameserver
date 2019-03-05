@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.effects;
  * Effect types.
  * @author nBd
  */
-public enum L2EffectType
-{
+public enum L2EffectType {
 	AGGRESSION,
 	BUFF,
 	CHAT_BLOCK,

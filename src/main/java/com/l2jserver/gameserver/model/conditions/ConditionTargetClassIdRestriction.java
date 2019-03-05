@@ -28,24 +28,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionTargetClassIdRestriction.
  */
-public class ConditionTargetClassIdRestriction extends Condition
-{
+public class ConditionTargetClassIdRestriction extends Condition {
 	private final List<Integer> _classIds;
 	
 	/**
 	 * Instantiates a new condition target class id restriction.
 	 * @param classId the class id
 	 */
-	public ConditionTargetClassIdRestriction(List<Integer> classId)
-	{
+	public ConditionTargetClassIdRestriction(List<Integer> classId) {
 		_classIds = classId;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (!(effected instanceof L2PcInstance))
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (!(effected instanceof L2PcInstance)) {
 			return false;
 		}
 		return (_classIds.contains((effected.getActingPlayer()).getClassId().getId()));

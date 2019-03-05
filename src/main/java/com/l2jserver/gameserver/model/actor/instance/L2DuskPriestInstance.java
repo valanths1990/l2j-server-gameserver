@@ -24,34 +24,27 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
-public class L2DuskPriestInstance extends L2SignsPriestInstance
-{
+public class L2DuskPriestInstance extends L2SignsPriestInstance {
 	/**
 	 * Creates a dusk priest.
 	 * @param template the dusk priest NPC template
 	 */
-	public L2DuskPriestInstance(L2NpcTemplate template)
-	{
+	public L2DuskPriestInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2DuskPriestInstance);
 	}
 	
 	@Override
-	public void onBypassFeedback(L2PcInstance player, String command)
-	{
-		if (command.startsWith("Chat"))
-		{
+	public void onBypassFeedback(L2PcInstance player, String command) {
+		if (command.startsWith("Chat")) {
 			showChatWindow(player);
-		}
-		else
-		{
+		} else {
 			super.onBypassFeedback(player, command);
 		}
 	}
 	
 	@Override
-	public void showChatWindow(L2PcInstance player)
-	{
+	public void showChatWindow(L2PcInstance player) {
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 		
 		String filename = SevenSigns.SEVEN_SIGNS_HTML_PATH;
@@ -62,80 +55,49 @@ public class L2DuskPriestInstance extends L2SignsPriestInstance
 		int recruitPeriod = SevenSigns.getInstance().getCurrentPeriod();
 		int compWinner = SevenSigns.getInstance().getCabalHighestScore();
 		
-		switch (playerCabal)
-		{
+		switch (playerCabal) {
 			case SevenSigns.CABAL_DUSK:
-				if (isCompResultsPeriod)
-				{
+				if (isCompResultsPeriod) {
 					filename += "dusk_priest_5.htm";
-				}
-				else if (recruitPeriod == 0)
-				{
+				} else if (recruitPeriod == 0) {
 					filename += "dusk_priest_6.htm";
-				}
-				else if (isSealValidationPeriod)
-				{
-					if (compWinner == SevenSigns.CABAL_DUSK)
-					{
-						if (compWinner != sealGnosisOwner)
-						{
+				} else if (isSealValidationPeriod) {
+					if (compWinner == SevenSigns.CABAL_DUSK) {
+						if (compWinner != sealGnosisOwner) {
 							filename += "dusk_priest_2c.htm";
-						}
-						else
-						{
+						} else {
 							filename += "dusk_priest_2a.htm";
 						}
-					}
-					else if (compWinner == SevenSigns.CABAL_NULL)
-					{
+					} else if (compWinner == SevenSigns.CABAL_NULL) {
 						filename += "dusk_priest_2d.htm";
-					}
-					else
-					{
+					} else {
 						filename += "dusk_priest_2b.htm";
 					}
-				}
-				else
-				{
+				} else {
 					filename += "dusk_priest_1b.htm";
 				}
 				break;
 			case SevenSigns.CABAL_DAWN:
-				if (isSealValidationPeriod)
-				{
+				if (isSealValidationPeriod) {
 					filename += "dusk_priest_3a.htm";
-				}
-				else
-				{
+				} else {
 					filename += "dusk_priest_3b.htm";
 				}
 				break;
 			default:
-				if (isCompResultsPeriod)
-				{
+				if (isCompResultsPeriod) {
 					filename += "dusk_priest_5.htm";
-				}
-				else if (recruitPeriod == 0)
-				{
+				} else if (recruitPeriod == 0) {
 					filename += "dusk_priest_6.htm";
-				}
-				else if (isSealValidationPeriod)
-				{
-					if (compWinner == SevenSigns.CABAL_DUSK)
-					{
+				} else if (isSealValidationPeriod) {
+					if (compWinner == SevenSigns.CABAL_DUSK) {
 						filename += "dusk_priest_4.htm";
-					}
-					else if (compWinner == SevenSigns.CABAL_NULL)
-					{
+					} else if (compWinner == SevenSigns.CABAL_NULL) {
 						filename += "dusk_priest_2d.htm";
-					}
-					else
-					{
+					} else {
 						filename += "dusk_priest_2b.htm";
 					}
-				}
-				else
-				{
+				} else {
 					filename += "dusk_priest_1a.htm";
 				}
 				break;

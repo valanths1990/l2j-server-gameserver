@@ -21,20 +21,17 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author UnAfraid
  */
-public enum PlayerAction
-{
+public enum PlayerAction {
 	ADMIN_COMMAND,
 	USER_ENGAGE;
 	
 	private final int _mask;
 	
-	private PlayerAction()
-	{
+	private PlayerAction() {
 		_mask = (1 << ordinal());
 	}
 	
-	public int getMask()
-	{
+	public int getMask() {
 		return _mask;
 	}
 }

@@ -26,40 +26,32 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionLogicNot.
  * @author mkizub
  */
-public class ConditionLogicNot extends Condition
-{
+public class ConditionLogicNot extends Condition {
 	private final Condition _condition;
 	
 	/**
 	 * Instantiates a new condition logic not.
 	 * @param condition the condition
 	 */
-	public ConditionLogicNot(Condition condition)
-	{
+	public ConditionLogicNot(Condition condition) {
 		_condition = condition;
-		if (getListener() != null)
-		{
+		if (getListener() != null) {
 			_condition.setListener(this);
 		}
 	}
 	
 	@Override
-	void setListener(ConditionListener listener)
-	{
-		if (listener != null)
-		{
+	void setListener(ConditionListener listener) {
+		if (listener != null) {
 			_condition.setListener(this);
-		}
-		else
-		{
+		} else {
 			_condition.setListener(null);
 		}
 		super.setListener(listener);
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return !_condition.test(effector, effected, skill, item);
 	}
 }

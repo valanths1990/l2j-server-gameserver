@@ -24,8 +24,7 @@ import java.util.List;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.NpcStringId;
 
-public class ExSendUIEvent extends L2GameServerPacket
-{
+public class ExSendUIEvent extends L2GameServerPacket {
 	private final int _objectId;
 	private final boolean _type;
 	private final boolean _countUp;
@@ -42,8 +41,7 @@ public class ExSendUIEvent extends L2GameServerPacket
 	 * @param endTime
 	 * @param text
 	 */
-	public ExSendUIEvent(L2PcInstance player, boolean hide, boolean countUp, int startTime, int endTime, String text)
-	{
+	public ExSendUIEvent(L2PcInstance player, boolean hide, boolean countUp, int startTime, int endTime, String text) {
 		this(player, hide, countUp, startTime, endTime, -1, text);
 	}
 	
@@ -56,8 +54,7 @@ public class ExSendUIEvent extends L2GameServerPacket
 	 * @param npcString
 	 * @param params
 	 */
-	public ExSendUIEvent(L2PcInstance player, boolean hide, boolean countUp, int startTime, int endTime, NpcStringId npcString, String... params)
-	{
+	public ExSendUIEvent(L2PcInstance player, boolean hide, boolean countUp, int startTime, int endTime, NpcStringId npcString, String... params) {
 		this(player, hide, countUp, startTime, endTime, npcString.getId(), params);
 	}
 	
@@ -70,8 +67,7 @@ public class ExSendUIEvent extends L2GameServerPacket
 	 * @param npcstringId
 	 * @param params
 	 */
-	public ExSendUIEvent(L2PcInstance player, boolean hide, boolean countUp, int startTime, int endTime, int npcstringId, String... params)
-	{
+	public ExSendUIEvent(L2PcInstance player, boolean hide, boolean countUp, int startTime, int endTime, int npcstringId, String... params) {
 		_objectId = player.getObjectId();
 		_type = hide;
 		_countUp = countUp;
@@ -82,8 +78,7 @@ public class ExSendUIEvent extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x8E);
 		writeD(_objectId);
@@ -97,10 +92,8 @@ public class ExSendUIEvent extends L2GameServerPacket
 		writeS(String.valueOf(_endTime / 60));
 		writeS(String.valueOf(_endTime % 60));
 		writeD(_npcstringId);
-		if (_params != null)
-		{
-			for (String param : _params)
-			{
+		if (_params != null) {
+			for (String param : _params) {
 				writeS(param);
 			}
 		}

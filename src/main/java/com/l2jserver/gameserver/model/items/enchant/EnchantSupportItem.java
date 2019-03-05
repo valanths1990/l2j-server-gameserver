@@ -24,19 +24,16 @@ import com.l2jserver.gameserver.model.items.type.EtcItemType;
 /**
  * @author UnAfraid
  */
-public final class EnchantSupportItem extends AbstractEnchantItem
-{
+public final class EnchantSupportItem extends AbstractEnchantItem {
 	private final boolean _isWeapon;
 	
-	public EnchantSupportItem(StatsSet set)
-	{
+	public EnchantSupportItem(StatsSet set) {
 		super(set);
 		_isWeapon = getItem().getItemType() == EtcItemType.SCRL_INC_ENCHANT_PROP_WP;
 	}
 	
 	@Override
-	public boolean isWeapon()
-	{
+	public boolean isWeapon() {
 		return _isWeapon;
 	}
 }

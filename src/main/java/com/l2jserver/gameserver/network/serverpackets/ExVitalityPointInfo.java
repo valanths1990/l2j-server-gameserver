@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author GodKratos
  */
-public class ExVitalityPointInfo extends L2GameServerPacket
-{
+public class ExVitalityPointInfo extends L2GameServerPacket {
 	private final int _vitalityPoints;
 	
-	public ExVitalityPointInfo(int vitPoints)
-	{
+	public ExVitalityPointInfo(int vitPoints) {
 		_vitalityPoints = vitPoints;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xA0);
 		writeD(_vitalityPoints);

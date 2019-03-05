@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class ValidateLocationInVehicle extends L2GameServerPacket
-{
+public class ValidateLocationInVehicle extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _boatObjId;
 	private final int _heading;
@@ -31,8 +30,7 @@ public class ValidateLocationInVehicle extends L2GameServerPacket
 	/**
 	 * @param player
 	 */
-	public ValidateLocationInVehicle(L2PcInstance player)
-	{
+	public ValidateLocationInVehicle(L2PcInstance player) {
 		_charObjId = player.getObjectId();
 		_boatObjId = player.getBoat().getObjectId();
 		_heading = player.getHeading();
@@ -40,8 +38,7 @@ public class ValidateLocationInVehicle extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x80);
 		writeD(_charObjId);
 		writeD(_boatObjId);

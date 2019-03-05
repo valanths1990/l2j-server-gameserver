@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.stats.TraitType;
  * Weapon Type enumerated.
  * @author mkizub
  */
-public enum WeaponType implements ItemType
-{
+public enum WeaponType implements ItemType {
 	SWORD(TraitType.SWORD),
 	BLUNT(TraitType.BLUNT),
 	DAGGER(TraitType.DAGGER),
@@ -51,8 +50,7 @@ public enum WeaponType implements ItemType
 	 * Constructor of the WeaponType.
 	 * @param traitType
 	 */
-	private WeaponType(TraitType traitType)
-	{
+	private WeaponType(TraitType traitType) {
 		_mask = 1 << ordinal();
 		_traitType = traitType;
 	}
@@ -61,16 +59,14 @@ public enum WeaponType implements ItemType
 	 * @return the ID of the item after applying the mask.
 	 */
 	@Override
-	public int mask()
-	{
+	public int mask() {
 		return _mask;
 	}
 	
 	/**
 	 * @return TraitType the type of the WeaponType
 	 */
-	public TraitType getTraitType()
-	{
+	public TraitType getTraitType() {
 		return _traitType;
 	}
 }

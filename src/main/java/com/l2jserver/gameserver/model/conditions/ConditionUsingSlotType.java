@@ -25,20 +25,16 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author NosBit
  */
-public class ConditionUsingSlotType extends Condition
-{
+public class ConditionUsingSlotType extends Condition {
 	private final int _mask;
 	
-	public ConditionUsingSlotType(int mask)
-	{
+	public ConditionUsingSlotType(int mask) {
 		_mask = mask;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return false;
 		}
 		

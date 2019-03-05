@@ -20,23 +20,19 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.L2Object;
 
-public final class DeleteObject extends L2GameServerPacket
-{
+public final class DeleteObject extends L2GameServerPacket {
 	private final int _objectId;
 	
-	public DeleteObject(L2Object obj)
-	{
+	public DeleteObject(L2Object obj) {
 		_objectId = obj.getObjectId();
 	}
 	
-	public DeleteObject(int objectId)
-	{
+	public DeleteObject(int objectId) {
 		_objectId = objectId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x08);
 		writeD(_objectId);
 		writeD(0x00); // c2

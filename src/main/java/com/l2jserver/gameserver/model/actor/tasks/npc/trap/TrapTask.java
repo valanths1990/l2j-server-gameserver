@@ -28,44 +28,33 @@ import com.l2jserver.gameserver.network.serverpackets.SocialAction;
  * Trap task.
  * @author Zoey76
  */
-public class TrapTask implements Runnable
-{
+public class TrapTask implements Runnable {
 	private static final Logger _log = Logger.getLogger(TrapTask.class.getName());
 	private static final int TICK = 1000; // 1s
 	private final L2TrapInstance _trap;
 	
-	public TrapTask(L2TrapInstance trap)
-	{
+	public TrapTask(L2TrapInstance trap) {
 		_trap = trap;
 	}
 	
 	@Override
-	public void run()
-	{
-		try
-		{
-			if (!_trap.isTriggered())
-			{
-				if (_trap.hasLifeTime())
-				{
+	public void run() {
+		try {
+			if (!_trap.isTriggered()) {
+				if (_trap.hasLifeTime()) {
 					_trap.setRemainingTime(_trap.getRemainingTime() - TICK);
-					if (_trap.getRemainingTime() < (_trap.getLifeTime() - 15000))
-					{
+					if (_trap.getRemainingTime() < (_trap.getLifeTime() - 15000)) {
 						_trap.broadcastPacket(new SocialAction(_trap.getObjectId(), 2));
 					}
-					if (_trap.getRemainingTime() <= 0)
-					{
-						switch (_trap.getSkill().getTargetType())
-						{
+					if (_trap.getRemainingTime() <= 0) {
+						switch (_trap.getSkill().getTargetType()) {
 							case AURA:
 							case FRONT_AURA:
-							case BEHIND_AURA:
-							{
+							case BEHIND_AURA: {
 								_trap.triggerTrap(_trap);
 								break;
 							}
-							default:
-							{
+							default: {
 								_trap.unSummon();
 							}
 						}
@@ -73,18 +62,14 @@ public class TrapTask implements Runnable
 					}
 				}
 				
-				for (L2Character target : _trap.getKnownList().getKnownCharacters())
-				{
-					if (_trap.checkTarget(target))
-					{
+				for (L2Character target : _trap.getKnownList().getKnownCharacters()) {
+					if (_trap.checkTarget(target)) {
 						_trap.triggerTrap(target);
 						break;
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.severe(TrapTask.class.getSimpleName() + ": " + e.getMessage());
 			_trap.unSummon();
 		}

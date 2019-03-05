@@ -29,66 +29,51 @@ import com.l2jserver.util.Rnd;
  * Teleport residence zone for clan hall sieges
  * @author BiggBoss
  */
-public class L2ResidenceHallTeleportZone extends L2ResidenceTeleportZone
-{
+public class L2ResidenceHallTeleportZone extends L2ResidenceTeleportZone {
 	private int _id;
 	private ScheduledFuture<?> _teleTask;
 	
 	/**
 	 * @param id
 	 */
-	public L2ResidenceHallTeleportZone(int id)
-	{
+	public L2ResidenceHallTeleportZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("residenceZoneId"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("residenceZoneId")) {
 			_id = Integer.parseInt(value);
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
-	public int getResidenceZoneId()
-	{
+	public int getResidenceZoneId() {
 		return _id;
 	}
 	
-	public synchronized void checkTeleporTask()
-	{
-		if ((_teleTask == null) || _teleTask.isDone())
-		{
+	public synchronized void checkTeleporTask() {
+		if ((_teleTask == null) || _teleTask.isDone()) {
 			_teleTask = ThreadPoolManager.getInstance().scheduleGeneral(new TeleportTask(), 30000);
 		}
 	}
 	
-	protected class TeleportTask implements Runnable
-	{
+	protected class TeleportTask implements Runnable {
 		@Override
-		public void run()
-		{
+		public void run() {
 			int index = 0;
-			if (getSpawns().size() > 1)
-			{
+			if (getSpawns().size() > 1) {
 				index = Rnd.get(getSpawns().size());
 			}
 			
 			final Location loc = getSpawns().get(index);
-			if (loc == null)
-			{
+			if (loc == null) {
 				throw new NullPointerException();
 			}
 			
-			for (L2PcInstance pc : getPlayersInside())
-			{
-				if (pc != null)
-				{
+			for (L2PcInstance pc : getPlayersInside()) {
+				if (pc != null) {
 					pc.teleToLocation(loc, false);
 				}
 			}

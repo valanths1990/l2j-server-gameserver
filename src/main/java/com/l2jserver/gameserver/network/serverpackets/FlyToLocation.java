@@ -24,22 +24,19 @@ import com.l2jserver.gameserver.model.interfaces.ILocational;
 /**
  * @author KenM
  */
-public final class FlyToLocation extends L2GameServerPacket
-{
+public final class FlyToLocation extends L2GameServerPacket {
 	private final int _destX, _destY, _destZ;
 	private final int _chaObjId, _chaX, _chaY, _chaZ;
 	private final FlyType _type;
 	
-	public enum FlyType
-	{
+	public enum FlyType {
 		THROW_UP,
 		THROW_HORIZONTAL,
 		DUMMY, // no effect
 		CHARGE;
 	}
 	
-	public FlyToLocation(L2Character cha, int destX, int destY, int destZ, FlyType type)
-	{
+	public FlyToLocation(L2Character cha, int destX, int destY, int destZ, FlyType type) {
 		_chaObjId = cha.getObjectId();
 		_chaX = cha.getX();
 		_chaY = cha.getY();
@@ -50,14 +47,12 @@ public final class FlyToLocation extends L2GameServerPacket
 		_type = type;
 	}
 	
-	public FlyToLocation(L2Character cha, ILocational dest, FlyType type)
-	{
+	public FlyToLocation(L2Character cha, ILocational dest, FlyType type) {
 		this(cha, dest.getX(), dest.getY(), dest.getZ(), type);
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xD4);
 		writeD(_chaObjId);
 		writeD(_destX);

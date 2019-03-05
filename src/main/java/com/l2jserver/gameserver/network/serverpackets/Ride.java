@@ -21,16 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public final class Ride extends L2GameServerPacket
-{
+public final class Ride extends L2GameServerPacket {
 	private final int _objectId;
 	private final int _mounted;
 	private final int _rideType;
 	private final int _rideNpcId;
 	private final Location _loc;
 	
-	public Ride(L2PcInstance player)
-	{
+	public Ride(L2PcInstance player) {
 		_objectId = player.getObjectId();
 		_mounted = player.isMounted() ? 1 : 0;
 		_rideType = player.getMountType().ordinal();
@@ -39,8 +37,7 @@ public final class Ride extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x8C);
 		writeD(_objectId);
 		writeD(_mounted);

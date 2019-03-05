@@ -31,70 +31,56 @@ import com.l2jserver.gameserver.model.options.Options;
  * Used to store an augmentation and its bonuses.
  * @author durgus, UnAfraid
  */
-public final class L2Augmentation
-{
+public final class L2Augmentation {
 	private int _effectsId = 0;
 	private AugmentationStatBoni _boni = null;
 	
-	public L2Augmentation(int effects)
-	{
+	public L2Augmentation(int effects) {
 		_effectsId = effects;
 		_boni = new AugmentationStatBoni(_effectsId);
 	}
 	
-	public static class AugmentationStatBoni
-	{
+	public static class AugmentationStatBoni {
 		private static final Logger _log = Logger.getLogger(AugmentationStatBoni.class.getName());
 		private final List<Options> _options = new ArrayList<>();
 		private boolean _active;
 		
-		public AugmentationStatBoni(int augmentationId)
-		{
+		public AugmentationStatBoni(int augmentationId) {
 			_active = false;
 			int[] stats = new int[2];
 			stats[0] = 0x0000FFFF & augmentationId;
 			stats[1] = (augmentationId >> 16);
 			
-			for (int stat : stats)
-			{
+			for (int stat : stats) {
 				Options op = OptionData.getInstance().getOptions(stat);
-				if (op != null)
-				{
+				if (op != null) {
 					_options.add(op);
-				}
-				else
-				{
+				} else {
 					_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't find option: " + stat);
 				}
 			}
 		}
 		
-		public void applyBonus(L2PcInstance player)
-		{
+		public void applyBonus(L2PcInstance player) {
 			// make sure the bonuses are not applied twice..
-			if (_active)
-			{
+			if (_active) {
 				return;
 			}
 			
-			for (Options op : _options)
-			{
+			for (Options op : _options) {
 				op.apply(player);
 			}
 			
 			_active = true;
 		}
 		
-		public void removeBonus(L2PcInstance player)
-		{
+		public void removeBonus(L2PcInstance player) {
 			// make sure the bonuses are not removed twice
-			if (!_active)
-			{
+			if (!_active) {
 				return;
 			}
 			
-			for (Options op : _options)
-			{
+			for (Options op : _options) {
 				op.remove(player);
 			}
 			
@@ -102,8 +88,7 @@ public final class L2Augmentation
 		}
 	}
 	
-	public int getAttributes()
-	{
+	public int getAttributes() {
 		return _effectsId;
 	}
 	
@@ -111,8 +96,7 @@ public final class L2Augmentation
 	 * Get the augmentation "id" used in serverpackets.
 	 * @return augmentationId
 	 */
-	public int getAugmentationId()
-	{
+	public int getAugmentationId() {
 		return _effectsId;
 	}
 	
@@ -120,8 +104,7 @@ public final class L2Augmentation
 	 * Applies the bonuses to the player.
 	 * @param player
 	 */
-	public void applyBonus(L2PcInstance player)
-	{
+	public void applyBonus(L2PcInstance player) {
 		_boni.applyBonus(player);
 	}
 	
@@ -129,8 +112,7 @@ public final class L2Augmentation
 	 * Removes the augmentation bonuses from the player.
 	 * @param player
 	 */
-	public void removeBonus(L2PcInstance player)
-	{
+	public void removeBonus(L2PcInstance player) {
 		_boni.removeBonus(player);
 	}
 }

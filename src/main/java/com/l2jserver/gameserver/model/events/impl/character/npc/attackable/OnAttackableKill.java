@@ -27,37 +27,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * An instantly executed event when L2Attackable is killed by L2PcInstance.
  * @author UnAfraid
  */
-public class OnAttackableKill implements IBaseEvent
-{
+public class OnAttackableKill implements IBaseEvent {
 	private final L2PcInstance _attacker;
 	private final L2Attackable _target;
 	private final boolean _isSummon;
 	
-	public OnAttackableKill(L2PcInstance attacker, L2Attackable target, boolean isSummon)
-	{
+	public OnAttackableKill(L2PcInstance attacker, L2Attackable target, boolean isSummon) {
 		_attacker = attacker;
 		_target = target;
 		_isSummon = isSummon;
 	}
 	
-	public final L2PcInstance getAttacker()
-	{
+	public final L2PcInstance getAttacker() {
 		return _attacker;
 	}
 	
-	public final L2Attackable getTarget()
-	{
+	public final L2Attackable getTarget() {
 		return _target;
 	}
 	
-	public final boolean isSummon()
-	{
+	public final boolean isSummon() {
 		return _isSummon;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_ATTACKABLE_KILL;
 	}
 }

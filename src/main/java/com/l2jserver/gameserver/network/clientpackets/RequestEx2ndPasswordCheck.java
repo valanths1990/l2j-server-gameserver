@@ -25,21 +25,17 @@ import com.l2jserver.gameserver.network.serverpackets.Ex2ndPasswordCheck;
  * Format: (ch)
  * @author mrTJO
  */
-public class RequestEx2ndPasswordCheck extends L2GameClientPacket
-{
+public class RequestEx2ndPasswordCheck extends L2GameClientPacket {
 	private static final String _C__D0_AD_REQUESTEX2NDPASSWORDCHECK = "[C] D0:AD RequestEx2ndPasswordCheck";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (!SecondaryAuthData.getInstance().isEnabled() || getClient().getSecondaryAuth().isAuthed())
-		{
+	protected void runImpl() {
+		if (!SecondaryAuthData.getInstance().isEnabled() || getClient().getSecondaryAuth().isAuthed()) {
 			sendPacket(new Ex2ndPasswordCheck(Ex2ndPasswordCheck.PASSWORD_OK));
 			return;
 		}
@@ -48,8 +44,7 @@ public class RequestEx2ndPasswordCheck extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_AD_REQUESTEX2NDPASSWORDCHECK;
 	}
 }

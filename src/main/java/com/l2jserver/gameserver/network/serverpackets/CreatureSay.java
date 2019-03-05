@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.NpcStringId;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public final class CreatureSay extends L2GameServerPacket
-{
+public final class CreatureSay extends L2GameServerPacket {
 	private final int _objectId;
 	private final int _textType;
 	private String _charName = null;
@@ -41,32 +40,28 @@ public final class CreatureSay extends L2GameServerPacket
 	 * @param charName
 	 * @param text
 	 */
-	public CreatureSay(int objectId, int messageType, String charName, String text)
-	{
+	public CreatureSay(int objectId, int messageType, String charName, String text) {
 		_objectId = objectId;
 		_textType = messageType;
 		_charName = charName;
 		_text = text;
 	}
 	
-	public CreatureSay(int objectId, int messageType, int charId, NpcStringId npcString)
-	{
+	public CreatureSay(int objectId, int messageType, int charId, NpcStringId npcString) {
 		_objectId = objectId;
 		_textType = messageType;
 		_charId = charId;
 		_npcString = npcString.getId();
 	}
 	
-	public CreatureSay(int objectId, int messageType, String charName, NpcStringId npcString)
-	{
+	public CreatureSay(int objectId, int messageType, String charName, NpcStringId npcString) {
 		_objectId = objectId;
 		_textType = messageType;
 		_charName = charName;
 		_npcString = npcString.getId();
 	}
 	
-	public CreatureSay(int objectId, int messageType, int charId, SystemMessageId sysString)
-	{
+	public CreatureSay(int objectId, int messageType, int charId, SystemMessageId sysString) {
 		_objectId = objectId;
 		_textType = messageType;
 		_charId = charId;
@@ -77,49 +72,37 @@ public final class CreatureSay extends L2GameServerPacket
 	 * String parameter for argument S1,S2,.. in npcstring-e.dat
 	 * @param text
 	 */
-	public void addStringParameter(String text)
-	{
-		if (_parameters == null)
-		{
+	public void addStringParameter(String text) {
+		if (_parameters == null) {
 			_parameters = new ArrayList<>();
 		}
 		_parameters.add(text);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x4a);
 		writeD(_objectId);
 		writeD(_textType);
-		if (_charName != null)
-		{
+		if (_charName != null) {
 			writeS(_charName);
-		}
-		else
-		{
+		} else {
 			writeD(_charId);
 		}
 		writeD(_npcString); // High Five NPCString ID
-		if (_text != null)
-		{
+		if (_text != null) {
 			writeS(_text);
-		}
-		else if (_parameters != null)
-		{
-			for (String s : _parameters)
-			{
+		} else if (_parameters != null) {
+			for (String s : _parameters) {
 				writeS(s);
 			}
 		}
 	}
 	
 	@Override
-	public final void runImpl()
-	{
+	public final void runImpl() {
 		L2PcInstance _pci = getClient().getActiveChar();
-		if (_pci != null)
-		{
+		if (_pci != null) {
 			_pci.broadcastSnoop(_textType, _charName, _text);
 		}
 	}

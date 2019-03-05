@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Gnacik
  */
-public class RequestDismissPartyRoom extends L2GameClientPacket
-{
+public class RequestDismissPartyRoom extends L2GameClientPacket {
 	private static final String _C__D0_0A_REQUESTDISMISSPARTYROOM = "[C] D0:0A RequestDismissPartyRoom";
 	
 	private int _roomid;
@@ -34,26 +33,22 @@ public class RequestDismissPartyRoom extends L2GameClientPacket
 	private int _data2;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_roomid = readD();
 		_data2 = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance _activeChar = getClient().getActiveChar();
 		
-		if (_activeChar == null)
-		{
+		if (_activeChar == null) {
 			return;
 		}
 		
 		PartyMatchRoom _room = PartyMatchRoomList.getInstance().getRoom(_roomid);
 		
-		if (_room == null)
-		{
+		if (_room == null) {
 			return;
 		}
 		
@@ -61,8 +56,7 @@ public class RequestDismissPartyRoom extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_0A_REQUESTDISMISSPARTYROOM;
 	}
 	

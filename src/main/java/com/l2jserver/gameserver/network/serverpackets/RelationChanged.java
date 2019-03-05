@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.actor.L2Playable;
 /**
  * @author Luca Baldi
  */
-public final class RelationChanged extends L2GameServerPacket
-{
+public final class RelationChanged extends L2GameServerPacket {
 	public static final int RELATION_PARTY1 = 0x00001; // party member
 	public static final int RELATION_PARTY2 = 0x00002; // party member
 	public static final int RELATION_PARTY3 = 0x00004; // party member
@@ -46,16 +45,14 @@ public final class RelationChanged extends L2GameServerPacket
 	public static final int RELATION_ALLY_MEMBER = 0x10000; // clan is in alliance
 	public static final int RELATION_TERRITORY_WAR = 0x80000; // show Territory War icon
 	
-	protected static class Relation
-	{
+	protected static class Relation {
 		int _objId, _relation, _autoAttackable, _karma, _pvpFlag;
 	}
 	
 	private Relation _singled;
 	private List<Relation> _multi;
 	
-	public RelationChanged(L2Playable activeChar, int relation, boolean autoattackable)
-	{
+	public RelationChanged(L2Playable activeChar, int relation, boolean autoattackable) {
 		_singled = new Relation();
 		_singled._objId = activeChar.getObjectId();
 		_singled._relation = relation;
@@ -65,15 +62,12 @@ public final class RelationChanged extends L2GameServerPacket
 		setInvisible(activeChar.isInvisible());
 	}
 	
-	public RelationChanged()
-	{
+	public RelationChanged() {
 		_multi = new ArrayList<>();
 	}
 	
-	public void addRelation(L2Playable activeChar, int relation, boolean autoattackable)
-	{
-		if (activeChar.isInvisible())
-		{
+	public void addRelation(L2Playable activeChar, int relation, boolean autoattackable) {
+		if (activeChar.isInvisible()) {
 			throw new IllegalArgumentException("Cannot add insivisble character to multi relation packet");
 		}
 		Relation r = new Relation();
@@ -86,26 +80,20 @@ public final class RelationChanged extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xce);
-		if (_multi == null)
-		{
+		if (_multi == null) {
 			writeD(1);
 			writeRelation(_singled);
-		}
-		else
-		{
+		} else {
 			writeD(_multi.size());
-			for (Relation r : _multi)
-			{
+			for (Relation r : _multi) {
 				writeRelation(r);
 			}
 		}
 	}
 	
-	private void writeRelation(Relation relation)
-	{
+	private void writeRelation(Relation relation) {
 		writeD(relation._objId);
 		writeD(relation._relation);
 		writeD(relation._autoAttackable);

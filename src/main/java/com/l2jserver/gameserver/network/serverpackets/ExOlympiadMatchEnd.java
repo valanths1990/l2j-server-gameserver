@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author GodKratos
  */
-public class ExOlympiadMatchEnd extends L2GameServerPacket
-{
+public class ExOlympiadMatchEnd extends L2GameServerPacket {
 	public static final ExOlympiadMatchEnd STATIC_PACKET = new ExOlympiadMatchEnd();
 	
-	private ExOlympiadMatchEnd()
-	{
+	private ExOlympiadMatchEnd() {
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0x2D);
 	}

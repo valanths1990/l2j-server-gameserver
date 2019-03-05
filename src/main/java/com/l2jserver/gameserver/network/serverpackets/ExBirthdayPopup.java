@@ -22,15 +22,12 @@ package com.l2jserver.gameserver.network.serverpackets;
  * @author Gnat
  **/
 
-public class ExBirthdayPopup extends L2GameServerPacket
-{
-	public ExBirthdayPopup()
-	{
+public class ExBirthdayPopup extends L2GameServerPacket {
+	public ExBirthdayPopup() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x8f);
 	}

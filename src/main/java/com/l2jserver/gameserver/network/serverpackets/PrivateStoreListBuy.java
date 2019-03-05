@@ -23,14 +23,12 @@ import java.util.List;
 import com.l2jserver.gameserver.model.TradeItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class PrivateStoreListBuy extends AbstractItemPacket
-{
+public class PrivateStoreListBuy extends AbstractItemPacket {
 	private final int _objId;
 	private final long _playerAdena;
 	private final List<TradeItem> _items;
 	
-	public PrivateStoreListBuy(L2PcInstance player, L2PcInstance storePlayer)
-	{
+	public PrivateStoreListBuy(L2PcInstance player, L2PcInstance storePlayer) {
 		_objId = storePlayer.getObjectId();
 		_playerAdena = player.getAdena();
 		storePlayer.getSellList().updateItems(); // Update SellList for case inventory content has changed
@@ -38,16 +36,14 @@ public class PrivateStoreListBuy extends AbstractItemPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xbe);
 		writeD(_objId);
 		writeQ(_playerAdena);
 		
 		writeD(_items.size());
 		
-		for (TradeItem item : _items)
-		{
+		for (TradeItem item : _items) {
 			writeItem(item);
 			writeD(item.getObjectId());
 			writeQ(item.getPrice());

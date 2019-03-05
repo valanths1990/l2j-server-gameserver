@@ -29,30 +29,22 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Player Can Untransform condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanUntransform extends Condition
-{
+public class ConditionPlayerCanUntransform extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanUntransform(boolean val)
-	{
+	public ConditionPlayerCanUntransform(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean canUntransform = true;
 		final L2PcInstance player = effector.getActingPlayer();
-		if (player == null)
-		{
+		if (player == null) {
 			canUntransform = false;
-		}
-		else if (player.isAlikeDead() || player.isCursedWeaponEquipped())
-		{
+		} else if (player.isAlikeDead() || player.isCursedWeaponEquipped()) {
 			canUntransform = false;
-		}
-		else if ((player.isTransformed() || player.isInStance()) && player.isFlyingMounted() && !player.isInsideZone(ZoneId.LANDING))
-		{
+		} else if ((player.isTransformed() || player.isInStance()) && player.isFlyingMounted() && !player.isInsideZone(ZoneId.LANDING)) {
 			player.sendPacket(SystemMessageId.TOO_HIGH_TO_PERFORM_THIS_ACTION); // TODO: check if message is retail like.
 			canUntransform = false;
 		}

@@ -27,23 +27,19 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncMAtkSpeed extends AbstractFunction
-{
+public class FuncMAtkSpeed extends AbstractFunction {
 	private static final FuncMAtkSpeed _fas_instance = new FuncMAtkSpeed();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fas_instance;
 	}
 	
-	private FuncMAtkSpeed()
-	{
+	private FuncMAtkSpeed() {
 		super(Stats.MAGIC_ATTACK_SPEED, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		return initVal * BaseStats.WIT.calcBonus(effector);
 	}
 }

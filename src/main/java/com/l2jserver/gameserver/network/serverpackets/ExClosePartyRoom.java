@@ -21,15 +21,12 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author Gnacik
  */
-public class ExClosePartyRoom extends L2GameServerPacket
-{
-	public ExClosePartyRoom()
-	{
+public class ExClosePartyRoom extends L2GameServerPacket {
+	public ExClosePartyRoom() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x09);
 	}

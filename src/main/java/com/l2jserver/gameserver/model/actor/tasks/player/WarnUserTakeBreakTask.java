@@ -25,26 +25,19 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Task dedicated to warn user to take a break.
  * @author UnAfraid
  */
-public class WarnUserTakeBreakTask implements Runnable
-{
+public class WarnUserTakeBreakTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public WarnUserTakeBreakTask(L2PcInstance player)
-	{
+	public WarnUserTakeBreakTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
-			if (_player.isOnline())
-			{
+	public void run() {
+		if (_player != null) {
+			if (_player.isOnline()) {
 				_player.sendPacket(SystemMessageId.PLAYING_FOR_LONG_TIME);
-			}
-			else
-			{
+			} else {
 				_player.stopWarnUserTakeBreak();
 			}
 		}

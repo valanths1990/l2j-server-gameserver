@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.network.serverpackets;
  * @author KenM
  * @author UnAfraid
  */
-public class ExPCCafePointInfo extends L2GameServerPacket
-{
+public class ExPCCafePointInfo extends L2GameServerPacket {
 	private final int _points;
 	private final int _mAddPoint;
 	private final int _mPeriodType;
@@ -31,8 +30,7 @@ public class ExPCCafePointInfo extends L2GameServerPacket
 	private final int _pointType;
 	private final int _time;
 	
-	public ExPCCafePointInfo()
-	{
+	public ExPCCafePointInfo() {
 		_points = 0;
 		_mAddPoint = 0;
 		_remainTime = 0;
@@ -41,8 +39,7 @@ public class ExPCCafePointInfo extends L2GameServerPacket
 		_time = 0;
 	}
 	
-	public ExPCCafePointInfo(int points, int pointsToAdd, int time)
-	{
+	public ExPCCafePointInfo(int points, int pointsToAdd, int time) {
 		_points = points;
 		_mAddPoint = pointsToAdd;
 		_mPeriodType = 1;
@@ -53,8 +50,7 @@ public class ExPCCafePointInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x32);
 		writeD(_points); // num points

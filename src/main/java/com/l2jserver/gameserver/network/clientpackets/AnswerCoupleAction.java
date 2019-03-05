@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author JIV
  */
-public class AnswerCoupleAction extends L2GameClientPacket
-{
+public class AnswerCoupleAction extends L2GameClientPacket {
 	private static final String _C__D0_7A_ANSWERCOUPLEACTION = "[C] D0:7A AnswerCoupleAction";
 	
 	private int _charObjId;
@@ -38,35 +37,29 @@ public class AnswerCoupleAction extends L2GameClientPacket
 	private int _answer;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_actionId = readD();
 		_answer = readD();
 		_charObjId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getActiveChar();
 		L2PcInstance target = L2World.getInstance().getPlayer(_charObjId);
-		if ((activeChar == null) || (target == null))
-		{
+		if ((activeChar == null) || (target == null)) {
 			return;
 		}
-		if ((target.getMultiSocialTarget() != activeChar.getObjectId()) || (target.getMultiSociaAction() != _actionId))
-		{
+		if ((target.getMultiSocialTarget() != activeChar.getObjectId()) || (target.getMultiSociaAction() != _actionId)) {
 			return;
 		}
 		if (_answer == 0) // cancel
 		{
 			target.sendPacket(SystemMessageId.COUPLE_ACTION_DENIED);
-		}
-		else if (_answer == 1) // approve
+		} else if (_answer == 1) // approve
 		{
 			final int distance = (int) activeChar.calculateDistance(target, false, false);
-			if ((distance > 125) || (distance < 15) || (activeChar.getObjectId() == target.getObjectId()))
-			{
+			if ((distance > 125) || (distance < 15) || (activeChar.getObjectId() == target.getObjectId())) {
 				sendPacket(SystemMessageId.TARGET_DO_NOT_MEET_LOC_REQUIREMENTS);
 				target.sendPacket(SystemMessageId.TARGET_DO_NOT_MEET_LOC_REQUIREMENTS);
 				return;
@@ -79,8 +72,7 @@ public class AnswerCoupleAction extends L2GameClientPacket
 			target.broadcastPacket(new ExRotation(target.getObjectId(), heading));
 			activeChar.broadcastPacket(new SocialAction(activeChar.getObjectId(), _actionId));
 			target.broadcastPacket(new SocialAction(_charObjId, _actionId));
-		}
-		else if (_answer == -1) // refused
+		} else if (_answer == -1) // refused
 		{
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_SET_TO_REFUSE_COUPLE_ACTIONS);
 			sm.addPcName(activeChar);
@@ -90,8 +82,7 @@ public class AnswerCoupleAction extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_7A_ANSWERCOUPLEACTION;
 	}
 }

@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.L2Party;
 /**
  * @author chris_00
  */
-public class ExMultiPartyCommandChannelInfo extends L2GameServerPacket
-{
+public class ExMultiPartyCommandChannelInfo extends L2GameServerPacket {
 	private final L2CommandChannel _channel;
 	
-	public ExMultiPartyCommandChannelInfo(L2CommandChannel channel)
-	{
+	public ExMultiPartyCommandChannelInfo(L2CommandChannel channel) {
 		_channel = channel;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
-		if (_channel == null)
-		{
+	protected void writeImpl() {
+		if (_channel == null) {
 			return;
 		}
 		
@@ -49,8 +45,7 @@ public class ExMultiPartyCommandChannelInfo extends L2GameServerPacket
 		writeD(_channel.getMemberCount());
 		
 		writeD(_channel.getPartys().size());
-		for (L2Party p : _channel.getPartys())
-		{
+		for (L2Party p : _channel.getPartys()) {
 			writeS(p.getLeader().getName());
 			writeD(p.getLeaderObjectId());
 			writeD(p.getMemberCount());

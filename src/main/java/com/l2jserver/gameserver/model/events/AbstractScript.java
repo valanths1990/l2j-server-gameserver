@@ -152,44 +152,34 @@ import com.l2jserver.util.Util;
  * Abstract script.
  * @author KenM, UnAfraid, Zoey76
  */
-public abstract class AbstractScript implements INamable
-{
+public abstract class AbstractScript implements INamable {
 	public static final Logger _log = Logger.getLogger(AbstractScript.class.getName());
 	private final Map<ListenerRegisterType, Set<Integer>> _registeredIds = new ConcurrentHashMap<>();
 	private final List<AbstractEventListener> _listeners = new CopyOnWriteArrayList<>();
 	private final File _scriptFile;
 	private boolean _isActive;
 	
-	public AbstractScript()
-	{
+	public AbstractScript() {
 		_scriptFile = ScriptEngineManager.getInstance().getCurrentLoadingScript();
 		initializeAnnotationListeners();
 	}
 	
-	private void initializeAnnotationListeners()
-	{
+	private void initializeAnnotationListeners() {
 		final List<Integer> ids = new ArrayList<>();
-		for (Method method : getClass().getMethods())
-		{
-			if (method.isAnnotationPresent(RegisterEvent.class) && method.isAnnotationPresent(RegisterType.class))
-			{
+		for (Method method : getClass().getMethods()) {
+			if (method.isAnnotationPresent(RegisterEvent.class) && method.isAnnotationPresent(RegisterType.class)) {
 				final RegisterEvent listener = method.getAnnotation(RegisterEvent.class);
 				final RegisterType regType = method.getAnnotation(RegisterType.class);
 				
 				final ListenerRegisterType type = regType.value();
 				final EventType eventType = listener.value();
-				if (method.getParameterCount() != 1)
-				{
+				if (method.getParameterCount() != 1) {
 					_log.log(Level.WARNING, getClass().getSimpleName() + ": Non properly defined annotation listener on method: " + method.getName() + " expected parameter count is 1 but found: " + method.getParameterCount());
 					continue;
-				}
-				else if (!eventType.isEventClass(method.getParameterTypes()[0]))
-				{
+				} else if (!eventType.isEventClass(method.getParameterTypes()[0])) {
 					_log.log(Level.WARNING, getClass().getSimpleName() + ": Non properly defined annotation listener on method: " + method.getName() + " expected parameter to be type of: " + eventType.getEventClass().getSimpleName() + " but found: " + method.getParameterTypes()[0].getSimpleName());
 					continue;
-				}
-				else if (!eventType.isReturnClass(method.getReturnType()))
-				{
+				} else if (!eventType.isReturnClass(method.getReturnType())) {
 					_log.log(Level.WARNING, getClass().getSimpleName() + ": Non properly defined annotation listener on method: " + method.getName() + " expected return type to be one of: " + Arrays.toString(eventType.getReturnClasses()) + " but found: " + method.getReturnType().getSimpleName());
 					continue;
 				}
@@ -200,111 +190,79 @@ public abstract class AbstractScript implements INamable
 				ids.clear();
 				
 				// Scan for possible Id filters
-				for (Annotation annotation : method.getAnnotations())
-				{
-					if (annotation instanceof Id)
-					{
+				for (Annotation annotation : method.getAnnotations()) {
+					if (annotation instanceof Id) {
 						final Id npc = (Id) annotation;
-						for (int id : npc.value())
-						{
+						for (int id : npc.value()) {
 							ids.add(id);
 						}
-					}
-					else if (annotation instanceof Ids)
-					{
+					} else if (annotation instanceof Ids) {
 						final Ids npcs = (Ids) annotation;
-						for (Id npc : npcs.value())
-						{
-							for (int id : npc.value())
-							{
+						for (Id npc : npcs.value()) {
+							for (int id : npc.value()) {
 								ids.add(id);
 							}
 						}
-					}
-					else if (annotation instanceof Range)
-					{
+					} else if (annotation instanceof Range) {
 						final Range range = (Range) annotation;
-						if (range.from() > range.to())
-						{
+						if (range.from() > range.to()) {
 							_log.log(Level.WARNING, getClass().getSimpleName() + ": Wrong " + annotation.getClass().getSimpleName() + " from is higher then to!");
 							continue;
 						}
 						
-						for (int id = range.from(); id <= range.to(); id++)
-						{
+						for (int id = range.from(); id <= range.to(); id++) {
 							ids.add(id);
 						}
-					}
-					else if (annotation instanceof Ranges)
-					{
+					} else if (annotation instanceof Ranges) {
 						final Ranges ranges = (Ranges) annotation;
-						for (Range range : ranges.value())
-						{
-							if (range.from() > range.to())
-							{
+						for (Range range : ranges.value()) {
+							if (range.from() > range.to()) {
 								_log.log(Level.WARNING, getClass().getSimpleName() + ": Wrong " + annotation.getClass().getSimpleName() + " from is higher then to!");
 								continue;
 							}
 							
-							for (int id = range.from(); id <= range.to(); id++)
-							{
+							for (int id = range.from(); id <= range.to(); id++) {
 								ids.add(id);
 							}
 						}
-					}
-					else if (annotation instanceof NpcLevelRange)
-					{
+					} else if (annotation instanceof NpcLevelRange) {
 						final NpcLevelRange range = (NpcLevelRange) annotation;
-						if (range.from() > range.to())
-						{
+						if (range.from() > range.to()) {
 							_log.log(Level.WARNING, getClass().getSimpleName() + ": Wrong " + annotation.getClass().getSimpleName() + " from is higher then to!");
 							continue;
-						}
-						else if (type != ListenerRegisterType.NPC)
-						{
+						} else if (type != ListenerRegisterType.NPC) {
 							_log.log(Level.WARNING, getClass().getSimpleName() + ": ListenerRegisterType " + type + " for " + annotation.getClass().getSimpleName() + " NPC is expected!");
 							continue;
 						}
 						
-						for (int level = range.from(); level <= range.to(); level++)
-						{
+						for (int level = range.from(); level <= range.to(); level++) {
 							final List<L2NpcTemplate> templates = NpcData.getInstance().getAllOfLevel(level);
 							templates.forEach(template -> ids.add(template.getId()));
 						}
 						
-					}
-					else if (annotation instanceof NpcLevelRanges)
-					{
+					} else if (annotation instanceof NpcLevelRanges) {
 						final NpcLevelRanges ranges = (NpcLevelRanges) annotation;
-						for (NpcLevelRange range : ranges.value())
-						{
-							if (range.from() > range.to())
-							{
+						for (NpcLevelRange range : ranges.value()) {
+							if (range.from() > range.to()) {
 								_log.log(Level.WARNING, getClass().getSimpleName() + ": Wrong " + annotation.getClass().getSimpleName() + " from is higher then to!");
 								continue;
-							}
-							else if (type != ListenerRegisterType.NPC)
-							{
+							} else if (type != ListenerRegisterType.NPC) {
 								_log.log(Level.WARNING, getClass().getSimpleName() + ": ListenerRegisterType " + type + " for " + annotation.getClass().getSimpleName() + " NPC is expected!");
 								continue;
 							}
 							
-							for (int level = range.from(); level <= range.to(); level++)
-							{
+							for (int level = range.from(); level <= range.to(); level++) {
 								final List<L2NpcTemplate> templates = NpcData.getInstance().getAllOfLevel(level);
 								templates.forEach(template -> ids.add(template.getId()));
 							}
 						}
-					}
-					else if (annotation instanceof Priority)
-					{
+					} else if (annotation instanceof Priority) {
 						final Priority p = (Priority) annotation;
 						priority = p.value();
 					}
 				}
 				
-				if (!ids.isEmpty())
-				{
+				if (!ids.isEmpty()) {
 					_registeredIds.putIfAbsent(type, ConcurrentHashMap.newKeySet(ids.size()));
 					
 					_registeredIds.get(type).addAll(ids);
@@ -315,30 +273,23 @@ public abstract class AbstractScript implements INamable
 		}
 	}
 	
-	public void setActive(boolean status)
-	{
+	public void setActive(boolean status) {
 		_isActive = status;
 	}
 	
-	public boolean isActive()
-	{
+	public boolean isActive() {
 		return _isActive;
 	}
 	
-	public File getScriptFile()
-	{
+	public File getScriptFile() {
 		return _scriptFile;
 	}
 	
-	public boolean reload()
-	{
-		try
-		{
+	public boolean reload() {
+		try {
 			ScriptEngineManager.getInstance().executeScript(getScriptFile());
 			return true;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			return false;
 		}
 	}
@@ -347,8 +298,7 @@ public abstract class AbstractScript implements INamable
 	 * Unloads all listeners registered by this class.
 	 * @return {@code true}
 	 */
-	public boolean unload()
-	{
+	public boolean unload() {
 		_listeners.forEach(AbstractEventListener::unregisterMe);
 		_listeners.clear();
 		return true;
@@ -364,8 +314,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableKillId(Consumer<OnAttackableKill> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableKillId(Consumer<OnAttackableKill> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_KILL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -375,8 +324,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableKillId(Consumer<OnAttackableKill> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableKillId(Consumer<OnAttackableKill> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_KILL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -388,8 +336,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> addCreatureKillId(Function<OnCreatureKill, ? extends AbstractEventReturn> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> addCreatureKillId(Function<OnCreatureKill, ? extends AbstractEventReturn> callback, int... npcIds) {
 		return registerFunction(callback, EventType.ON_CREATURE_KILL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -399,8 +346,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCreatureKillId(Consumer<OnCreatureKill> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setCreatureKillId(Consumer<OnCreatureKill> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_CREATURE_KILL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -410,8 +356,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCreatureKillId(Consumer<OnCreatureKill> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setCreatureKillId(Consumer<OnCreatureKill> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_CREATURE_KILL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -423,8 +368,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcFirstTalkId(Consumer<OnNpcFirstTalk> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcFirstTalkId(Consumer<OnNpcFirstTalk> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_FIRST_TALK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -434,30 +378,25 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcFirstTalkId(Consumer<OnNpcFirstTalk> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcFirstTalkId(Consumer<OnNpcFirstTalk> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_FIRST_TALK, ListenerRegisterType.NPC, npcIds);
 	}
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
-	protected final List<AbstractEventListener> setPlayerTutorialEvent(Consumer<OnPlayerTutorialEvent> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerTutorialEvent(Consumer<OnPlayerTutorialEvent> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_EVENT, ListenerRegisterType.GLOBAL);
 	}
 	
-	protected final List<AbstractEventListener> setPlayerTutorialClientEvent(Consumer<OnPlayerTutorialClientEvent> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerTutorialClientEvent(Consumer<OnPlayerTutorialClientEvent> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_CLIENT_EVENT, ListenerRegisterType.GLOBAL);
 	}
 	
-	protected final List<AbstractEventListener> setPlayerTutorialQuestionMark(Consumer<OnPlayerTutorialQuestionMark> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerTutorialQuestionMark(Consumer<OnPlayerTutorialQuestionMark> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_QUESTION_MARK, ListenerRegisterType.GLOBAL);
 	}
 	
-	protected final List<AbstractEventListener> setPlayerTutorialCmd(Consumer<OnPlayerTutorialCmd> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerTutorialCmd(Consumer<OnPlayerTutorialCmd> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_TUTORIAL_CMD, ListenerRegisterType.GLOBAL);
 	}
 	
@@ -468,8 +407,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcTalkId(Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcTalkId(Collection<Integer> npcIds) {
 		return registerDummy(EventType.ON_NPC_TALK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -478,8 +416,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcTalkId(int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcTalkId(int... npcIds) {
 		return registerDummy(EventType.ON_NPC_TALK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -491,8 +428,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcTeleportId(Consumer<OnNpcTeleport> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcTeleportId(Consumer<OnNpcTeleport> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_TELEPORT, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -502,8 +438,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcTeleportId(Consumer<OnNpcTeleport> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcTeleportId(Consumer<OnNpcTeleport> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_TELEPORT, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -514,8 +449,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcQuestStartId(int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcQuestStartId(int... npcIds) {
 		return registerDummy(EventType.ON_NPC_QUEST_START, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -524,8 +458,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcQuestStartId(Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcQuestStartId(Collection<Integer> npcIds) {
 		return registerDummy(EventType.ON_NPC_QUEST_START, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -537,8 +470,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcSkillSeeId(Consumer<OnNpcSkillSee> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcSkillSeeId(Consumer<OnNpcSkillSee> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_SKILL_SEE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -548,8 +480,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcSkillSeeId(Consumer<OnNpcSkillSee> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcSkillSeeId(Consumer<OnNpcSkillSee> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_SKILL_SEE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -561,8 +492,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcSkillFinishedId(Consumer<OnNpcSkillFinished> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcSkillFinishedId(Consumer<OnNpcSkillFinished> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_SKILL_FINISHED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -572,8 +502,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcSkillFinishedId(Consumer<OnNpcSkillFinished> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcSkillFinishedId(Consumer<OnNpcSkillFinished> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_SKILL_FINISHED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -585,8 +514,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcSpawnId(Consumer<OnNpcSpawn> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcSpawnId(Consumer<OnNpcSpawn> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_SPAWN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -596,8 +524,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcSpawnId(Consumer<OnNpcSpawn> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcSpawnId(Consumer<OnNpcSpawn> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_SPAWN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -609,8 +536,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcEventReceivedId(Consumer<OnNpcEventReceived> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcEventReceivedId(Consumer<OnNpcEventReceived> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_EVENT_RECEIVED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -620,8 +546,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcEventReceivedId(Consumer<OnNpcEventReceived> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcEventReceivedId(Consumer<OnNpcEventReceived> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_EVENT_RECEIVED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -633,8 +558,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcMoveFinishedId(Consumer<OnNpcMoveFinished> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcMoveFinishedId(Consumer<OnNpcMoveFinished> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_MOVE_FINISHED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -644,8 +568,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcMoveFinishedId(Consumer<OnNpcMoveFinished> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcMoveFinishedId(Consumer<OnNpcMoveFinished> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_MOVE_FINISHED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -657,8 +580,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcMoveNodeArrivedId(Consumer<OnNpcMoveNodeArrived> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcMoveNodeArrivedId(Consumer<OnNpcMoveNodeArrived> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_MOVE_NODE_ARRIVED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -668,8 +590,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcMoveNodeArrivedId(Consumer<OnNpcMoveNodeArrived> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcMoveNodeArrivedId(Consumer<OnNpcMoveNodeArrived> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_MOVE_NODE_ARRIVED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -681,8 +602,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcMoveRouteFinishedId(Consumer<OnNpcMoveRouteFinished> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcMoveRouteFinishedId(Consumer<OnNpcMoveRouteFinished> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_MOVE_ROUTE_FINISHED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -692,8 +612,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcMoveRouteFinishedId(Consumer<OnNpcMoveRouteFinished> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcMoveRouteFinishedId(Consumer<OnNpcMoveRouteFinished> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_MOVE_ROUTE_FINISHED, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -705,8 +624,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcHateId(Consumer<OnAttackableHate> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcHateId(Consumer<OnAttackableHate> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_HATE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -716,8 +634,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcHateId(Consumer<OnAttackableHate> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcHateId(Consumer<OnAttackableHate> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_HATE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -727,8 +644,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> addNpcHateId(Function<OnAttackableHate, TerminateReturn> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> addNpcHateId(Function<OnAttackableHate, TerminateReturn> callback, int... npcIds) {
 		return registerFunction(callback, EventType.ON_NPC_HATE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -738,8 +654,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> addNpcHateId(Function<OnAttackableHate, TerminateReturn> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> addNpcHateId(Function<OnAttackableHate, TerminateReturn> callback, Collection<Integer> npcIds) {
 		return registerFunction(callback, EventType.ON_NPC_HATE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -751,8 +666,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcCanBeSeenId(Consumer<OnNpcCanBeSeen> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcCanBeSeenId(Consumer<OnNpcCanBeSeen> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_CAN_BE_SEEN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -762,8 +676,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcCanBeSeenId(Consumer<OnNpcCanBeSeen> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcCanBeSeenId(Consumer<OnNpcCanBeSeen> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_CAN_BE_SEEN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -773,8 +686,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcCanBeSeenId(Function<OnNpcCanBeSeen, TerminateReturn> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcCanBeSeenId(Function<OnNpcCanBeSeen, TerminateReturn> callback, int... npcIds) {
 		return registerFunction(callback, EventType.ON_NPC_CAN_BE_SEEN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -784,8 +696,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcCanBeSeenId(Function<OnNpcCanBeSeen, TerminateReturn> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcCanBeSeenId(Function<OnNpcCanBeSeen, TerminateReturn> callback, Collection<Integer> npcIds) {
 		return registerFunction(callback, EventType.ON_NPC_CAN_BE_SEEN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -797,8 +708,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcCreatureSeeId(Consumer<OnNpcCreatureSee> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcCreatureSeeId(Consumer<OnNpcCreatureSee> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_CREATURE_SEE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -808,8 +718,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setNpcCreatureSeeId(Consumer<OnNpcCreatureSee> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setNpcCreatureSeeId(Consumer<OnNpcCreatureSee> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_NPC_CREATURE_SEE, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -821,8 +730,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableFactionIdId(Consumer<OnAttackableFactionCall> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableFactionIdId(Consumer<OnAttackableFactionCall> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_FACTION_CALL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -832,8 +740,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableFactionIdId(Consumer<OnAttackableFactionCall> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableFactionIdId(Consumer<OnAttackableFactionCall> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_FACTION_CALL, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -845,8 +752,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableAttackId(Consumer<OnAttackableAttack> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableAttackId(Consumer<OnAttackableAttack> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_ATTACK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -856,8 +762,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableAttackId(Consumer<OnAttackableAttack> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableAttackId(Consumer<OnAttackableAttack> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_ATTACK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -869,8 +774,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableAggroRangeEnterId(Consumer<OnAttackableAggroRangeEnter> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableAggroRangeEnterId(Consumer<OnAttackableAggroRangeEnter> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_AGGRO_RANGE_ENTER, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -880,8 +784,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setAttackableAggroRangeEnterId(Consumer<OnAttackableAggroRangeEnter> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setAttackableAggroRangeEnterId(Consumer<OnAttackableAggroRangeEnter> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_ATTACKABLE_AGGRO_RANGE_ENTER, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -893,8 +796,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerSkillLearnId(Consumer<OnPlayerSkillLearn> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setPlayerSkillLearnId(Consumer<OnPlayerSkillLearn> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_PLAYER_SKILL_LEARN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -904,8 +806,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerSkillLearnId(Consumer<OnPlayerSkillLearn> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setPlayerSkillLearnId(Consumer<OnPlayerSkillLearn> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_PLAYER_SKILL_LEARN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -917,8 +818,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerSummonSpawnId(Consumer<OnPlayerSummonSpawn> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setPlayerSummonSpawnId(Consumer<OnPlayerSummonSpawn> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_PLAYER_SUMMON_SPAWN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -928,8 +828,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerSummonSpawnId(Consumer<OnPlayerSummonSpawn> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setPlayerSummonSpawnId(Consumer<OnPlayerSummonSpawn> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_PLAYER_SUMMON_SPAWN, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -941,8 +840,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerSummonTalkId(Consumer<OnPlayerSummonTalk> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setPlayerSummonTalkId(Consumer<OnPlayerSummonTalk> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_PLAYER_SUMMON_TALK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -952,8 +850,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerSummonTalkId(Consumer<OnPlayerSummonSpawn> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setPlayerSummonTalkId(Consumer<OnPlayerSummonSpawn> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_PLAYER_SUMMON_TALK, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -964,8 +861,7 @@ public abstract class AbstractScript implements INamable
 	 * @param callback
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerLoginId(Consumer<OnPlayerLogin> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerLoginId(Consumer<OnPlayerLogin> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_LOGIN, ListenerRegisterType.GLOBAL);
 	}
 	
@@ -976,8 +872,7 @@ public abstract class AbstractScript implements INamable
 	 * @param callback
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerLogoutId(Consumer<OnPlayerLogout> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerLogoutId(Consumer<OnPlayerLogout> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_LOGOUT, ListenerRegisterType.GLOBAL);
 	}
 	
@@ -989,8 +884,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCreatureZoneEnterId(Consumer<OnCreatureZoneEnter> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setCreatureZoneEnterId(Consumer<OnCreatureZoneEnter> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_CREATURE_ZONE_ENTER, ListenerRegisterType.ZONE, npcIds);
 	}
 	
@@ -1000,8 +894,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCreatureZoneEnterId(Consumer<OnCreatureZoneEnter> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setCreatureZoneEnterId(Consumer<OnCreatureZoneEnter> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_CREATURE_ZONE_ENTER, ListenerRegisterType.ZONE, npcIds);
 	}
 	
@@ -1013,8 +906,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCreatureZoneExitId(Consumer<OnCreatureZoneExit> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setCreatureZoneExitId(Consumer<OnCreatureZoneExit> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_CREATURE_ZONE_EXIT, ListenerRegisterType.ZONE, npcIds);
 	}
 	
@@ -1024,8 +916,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCreatureZoneExitId(Consumer<OnCreatureZoneExit> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setCreatureZoneExitId(Consumer<OnCreatureZoneExit> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_CREATURE_ZONE_EXIT, ListenerRegisterType.ZONE, npcIds);
 	}
 	
@@ -1037,8 +928,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setTrapActionId(Consumer<OnTrapAction> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setTrapActionId(Consumer<OnTrapAction> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_TRAP_ACTION, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -1048,8 +938,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setTrapActionId(Consumer<OnTrapAction> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setTrapActionId(Consumer<OnTrapAction> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_TRAP_ACTION, ListenerRegisterType.NPC, npcIds);
 	}
 	
@@ -1061,8 +950,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setItemBypassEvenId(Consumer<OnItemBypassEvent> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setItemBypassEvenId(Consumer<OnItemBypassEvent> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_ITEM_BYPASS_EVENT, ListenerRegisterType.ITEM, npcIds);
 	}
 	
@@ -1072,8 +960,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setItemBypassEvenId(Consumer<OnItemBypassEvent> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setItemBypassEvenId(Consumer<OnItemBypassEvent> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_ITEM_BYPASS_EVENT, ListenerRegisterType.ITEM, npcIds);
 	}
 	
@@ -1085,8 +972,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setItemTalkId(Consumer<OnItemTalk> callback, int... npcIds)
-	{
+	protected final List<AbstractEventListener> setItemTalkId(Consumer<OnItemTalk> callback, int... npcIds) {
 		return registerConsumer(callback, EventType.ON_ITEM_TALK, ListenerRegisterType.ITEM, npcIds);
 	}
 	
@@ -1096,8 +982,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setItemTalkId(Consumer<OnItemTalk> callback, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> setItemTalkId(Consumer<OnItemTalk> callback, Collection<Integer> npcIds) {
 		return registerConsumer(callback, EventType.ON_ITEM_TALK, ListenerRegisterType.ITEM, npcIds);
 	}
 	
@@ -1108,8 +993,7 @@ public abstract class AbstractScript implements INamable
 	 * @param callback
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setOlympiadMatchResult(Consumer<OnOlympiadMatchResult> callback)
-	{
+	protected final List<AbstractEventListener> setOlympiadMatchResult(Consumer<OnOlympiadMatchResult> callback) {
 		return registerConsumer(callback, EventType.ON_OLYMPIAD_MATCH_RESULT, ListenerRegisterType.OLYMPIAD);
 	}
 	
@@ -1121,8 +1005,7 @@ public abstract class AbstractScript implements INamable
 	 * @param castleIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCastleSiegeStartId(Consumer<OnCastleSiegeStart> callback, int... castleIds)
-	{
+	protected final List<AbstractEventListener> setCastleSiegeStartId(Consumer<OnCastleSiegeStart> callback, int... castleIds) {
 		return registerConsumer(callback, EventType.ON_CASTLE_SIEGE_START, ListenerRegisterType.CASTLE, castleIds);
 	}
 	
@@ -1132,8 +1015,7 @@ public abstract class AbstractScript implements INamable
 	 * @param castleIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCastleSiegeStartId(Consumer<OnCastleSiegeStart> callback, Collection<Integer> castleIds)
-	{
+	protected final List<AbstractEventListener> setCastleSiegeStartId(Consumer<OnCastleSiegeStart> callback, Collection<Integer> castleIds) {
 		return registerConsumer(callback, EventType.ON_CASTLE_SIEGE_START, ListenerRegisterType.CASTLE, castleIds);
 	}
 	
@@ -1145,8 +1027,7 @@ public abstract class AbstractScript implements INamable
 	 * @param castleIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCastleSiegeOwnerChangeId(Consumer<OnCastleSiegeOwnerChange> callback, int... castleIds)
-	{
+	protected final List<AbstractEventListener> setCastleSiegeOwnerChangeId(Consumer<OnCastleSiegeOwnerChange> callback, int... castleIds) {
 		return registerConsumer(callback, EventType.ON_CASTLE_SIEGE_OWNER_CHANGE, ListenerRegisterType.CASTLE, castleIds);
 	}
 	
@@ -1156,8 +1037,7 @@ public abstract class AbstractScript implements INamable
 	 * @param castleIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCastleSiegeOwnerChangeId(Consumer<OnCastleSiegeOwnerChange> callback, Collection<Integer> castleIds)
-	{
+	protected final List<AbstractEventListener> setCastleSiegeOwnerChangeId(Consumer<OnCastleSiegeOwnerChange> callback, Collection<Integer> castleIds) {
 		return registerConsumer(callback, EventType.ON_CASTLE_SIEGE_OWNER_CHANGE, ListenerRegisterType.CASTLE, castleIds);
 	}
 	
@@ -1169,8 +1049,7 @@ public abstract class AbstractScript implements INamable
 	 * @param castleIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCastleSiegeFinishId(Consumer<OnCastleSiegeFinish> callback, int... castleIds)
-	{
+	protected final List<AbstractEventListener> setCastleSiegeFinishId(Consumer<OnCastleSiegeFinish> callback, int... castleIds) {
 		return registerConsumer(callback, EventType.ON_CASTLE_SIEGE_FINISH, ListenerRegisterType.CASTLE, castleIds);
 	}
 	
@@ -1180,8 +1059,7 @@ public abstract class AbstractScript implements INamable
 	 * @param castleIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setCastleSiegeFinishId(Consumer<OnCastleSiegeFinish> callback, Collection<Integer> castleIds)
-	{
+	protected final List<AbstractEventListener> setCastleSiegeFinishId(Consumer<OnCastleSiegeFinish> callback, Collection<Integer> castleIds) {
 		return registerConsumer(callback, EventType.ON_CASTLE_SIEGE_FINISH, ListenerRegisterType.CASTLE, castleIds);
 	}
 	
@@ -1192,8 +1070,7 @@ public abstract class AbstractScript implements INamable
 	 * @param callback
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerProfessionChangeId(Consumer<OnPlayerProfessionChange> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerProfessionChangeId(Consumer<OnPlayerProfessionChange> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_PROFESSION_CHANGE, ListenerRegisterType.GLOBAL);
 	}
 	
@@ -1202,8 +1079,7 @@ public abstract class AbstractScript implements INamable
 	 * @param callback
 	 * @return
 	 */
-	protected final List<AbstractEventListener> setPlayerProfessionCancelId(Consumer<OnPlayerProfessionCancel> callback)
-	{
+	protected final List<AbstractEventListener> setPlayerProfessionCancelId(Consumer<OnPlayerProfessionCancel> callback) {
 		return registerConsumer(callback, EventType.ON_PLAYER_PROFESSION_CANCEL, ListenerRegisterType.GLOBAL);
 	}
 	
@@ -1219,8 +1095,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerConsumer(Consumer<? extends IBaseEvent> callback, EventType type, ListenerRegisterType registerType, int... npcIds)
-	{
+	protected final List<AbstractEventListener> registerConsumer(Consumer<? extends IBaseEvent> callback, EventType type, ListenerRegisterType registerType, int... npcIds) {
 		return registerListener((container) -> new ConsumerEventListener(container, type, callback, this), registerType, npcIds);
 	}
 	
@@ -1232,8 +1107,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerConsumer(Consumer<? extends IBaseEvent> callback, EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> registerConsumer(Consumer<? extends IBaseEvent> callback, EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds) {
 		return registerListener((container) -> new ConsumerEventListener(container, type, callback, this), registerType, npcIds);
 	}
 	
@@ -1245,8 +1119,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerFunction(Function<? extends IBaseEvent, ? extends AbstractEventReturn> callback, EventType type, ListenerRegisterType registerType, int... npcIds)
-	{
+	protected final List<AbstractEventListener> registerFunction(Function<? extends IBaseEvent, ? extends AbstractEventReturn> callback, EventType type, ListenerRegisterType registerType, int... npcIds) {
 		return registerListener((container) -> new FunctionEventListener(container, type, callback, this), registerType, npcIds);
 	}
 	
@@ -1258,8 +1131,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerFunction(Function<? extends IBaseEvent, ? extends AbstractEventReturn> callback, EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> registerFunction(Function<? extends IBaseEvent, ? extends AbstractEventReturn> callback, EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds) {
 		return registerListener((container) -> new FunctionEventListener(container, type, callback, this), registerType, npcIds);
 	}
 	
@@ -1271,8 +1143,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerRunnable(Runnable callback, EventType type, ListenerRegisterType registerType, int... npcIds)
-	{
+	protected final List<AbstractEventListener> registerRunnable(Runnable callback, EventType type, ListenerRegisterType registerType, int... npcIds) {
 		return registerListener((container) -> new RunnableEventListener(container, type, callback, this), registerType, npcIds);
 	}
 	
@@ -1284,8 +1155,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerRunnable(Runnable callback, EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> registerRunnable(Runnable callback, EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds) {
 		return registerListener((container) -> new RunnableEventListener(container, type, callback, this), registerType, npcIds);
 	}
 	
@@ -1298,8 +1168,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerAnnotation(Method callback, EventType type, ListenerRegisterType registerType, int priority, int... npcIds)
-	{
+	protected final List<AbstractEventListener> registerAnnotation(Method callback, EventType type, ListenerRegisterType registerType, int priority, int... npcIds) {
 		return registerListener((container) -> new AnnotationEventListener(container, type, callback, this, priority), registerType, npcIds);
 	}
 	
@@ -1312,8 +1181,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerAnnotation(Method callback, EventType type, ListenerRegisterType registerType, int priority, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> registerAnnotation(Method callback, EventType type, ListenerRegisterType registerType, int priority, Collection<Integer> npcIds) {
 		return registerListener((container) -> new AnnotationEventListener(container, type, callback, this, priority), registerType, npcIds);
 	}
 	
@@ -1324,8 +1192,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerDummy(EventType type, ListenerRegisterType registerType, int... npcIds)
-	{
+	protected final List<AbstractEventListener> registerDummy(EventType type, ListenerRegisterType registerType, int... npcIds) {
 		return registerListener((container) -> new DummyEventListener(container, type, this), registerType, npcIds);
 	}
 	
@@ -1336,8 +1203,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npcIds
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerDummy(EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds)
-	{
+	protected final List<AbstractEventListener> registerDummy(EventType type, ListenerRegisterType registerType, Collection<Integer> npcIds) {
 		return registerListener((container) -> new DummyEventListener(container, type, this), registerType, npcIds);
 	}
 	
@@ -1352,62 +1218,47 @@ public abstract class AbstractScript implements INamable
 	 * @param ids
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerListener(Function<ListenersContainer, AbstractEventListener> action, ListenerRegisterType registerType, int... ids)
-	{
+	protected final List<AbstractEventListener> registerListener(Function<ListenersContainer, AbstractEventListener> action, ListenerRegisterType registerType, int... ids) {
 		final List<AbstractEventListener> listeners = new ArrayList<>(ids.length > 0 ? ids.length : 1);
-		if (ids.length > 0)
-		{
-			for (int id : ids)
-			{
-				switch (registerType)
-				{
-					case NPC:
-					{
+		if (ids.length > 0) {
+			for (int id : ids) {
+				switch (registerType) {
+					case NPC: {
 						final L2NpcTemplate template = NpcData.getInstance().getTemplate(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case ZONE:
-					{
+					case ZONE: {
 						final L2ZoneType template = ZoneManager.getInstance().getZoneById(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case ITEM:
-					{
+					case ITEM: {
 						final L2Item template = ItemTable.getInstance().getTemplate(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case CASTLE:
-					{
+					case CASTLE: {
 						final Castle template = CastleManager.getInstance().getCastleById(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case FORTRESS:
-					{
+					case FORTRESS: {
 						final Fort template = FortManager.getInstance().getFortById(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					default:
-					{
+					default: {
 						_log.log(Level.WARNING, getClass().getSimpleName() + ": Unhandled register type: " + registerType);
 					}
 				}
@@ -1415,13 +1266,9 @@ public abstract class AbstractScript implements INamable
 				_registeredIds.putIfAbsent(registerType, ConcurrentHashMap.newKeySet(1));
 				_registeredIds.get(registerType).add(id);
 			}
-		}
-		else
-		{
-			switch (registerType)
-			{
-				case OLYMPIAD:
-				{
+		} else {
+			switch (registerType) {
+				case OLYMPIAD: {
 					final Olympiad template = Olympiad.getInstance();
 					listeners.add(template.addListener(action.apply(template)));
 					break;
@@ -1464,62 +1311,47 @@ public abstract class AbstractScript implements INamable
 	 * @param ids
 	 * @return
 	 */
-	protected final List<AbstractEventListener> registerListener(Function<ListenersContainer, AbstractEventListener> action, ListenerRegisterType registerType, Collection<Integer> ids)
-	{
+	protected final List<AbstractEventListener> registerListener(Function<ListenersContainer, AbstractEventListener> action, ListenerRegisterType registerType, Collection<Integer> ids) {
 		final List<AbstractEventListener> listeners = new ArrayList<>(!ids.isEmpty() ? ids.size() : 1);
-		if (!ids.isEmpty())
-		{
-			for (int id : ids)
-			{
-				switch (registerType)
-				{
-					case NPC:
-					{
+		if (!ids.isEmpty()) {
+			for (int id : ids) {
+				switch (registerType) {
+					case NPC: {
 						final L2NpcTemplate template = NpcData.getInstance().getTemplate(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case ZONE:
-					{
+					case ZONE: {
 						final L2ZoneType template = ZoneManager.getInstance().getZoneById(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case ITEM:
-					{
+					case ITEM: {
 						final L2Item template = ItemTable.getInstance().getTemplate(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case CASTLE:
-					{
+					case CASTLE: {
 						final Castle template = CastleManager.getInstance().getCastleById(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					case FORTRESS:
-					{
+					case FORTRESS: {
 						final Fort template = FortManager.getInstance().getFortById(id);
-						if (template != null)
-						{
+						if (template != null) {
 							listeners.add(template.addListener(action.apply(template)));
 						}
 						break;
 					}
-					default:
-					{
+					default: {
 						_log.log(Level.WARNING, getClass().getSimpleName() + ": Unhandled register type: " + registerType);
 					}
 				}
@@ -1527,13 +1359,9 @@ public abstract class AbstractScript implements INamable
 			
 			_registeredIds.putIfAbsent(registerType, ConcurrentHashMap.newKeySet(ids.size()));
 			_registeredIds.get(registerType).addAll(ids);
-		}
-		else
-		{
-			switch (registerType)
-			{
-				case OLYMPIAD:
-				{
+		} else {
+			switch (registerType) {
+				case OLYMPIAD: {
 					final Olympiad template = Olympiad.getInstance();
 					listeners.add(template.addListener(action.apply(template)));
 					break;
@@ -1568,13 +1396,11 @@ public abstract class AbstractScript implements INamable
 		return listeners;
 	}
 	
-	public Set<Integer> getRegisteredIds(ListenerRegisterType type)
-	{
+	public Set<Integer> getRegisteredIds(ListenerRegisterType type) {
 		return _registeredIds.containsKey(type) ? _registeredIds.get(type) : Collections.emptySet();
 	}
 	
-	public List<AbstractEventListener> getListeners()
-	{
+	public List<AbstractEventListener> getListeners() {
 		return _listeners;
 	}
 	
@@ -1588,8 +1414,7 @@ public abstract class AbstractScript implements INamable
 	 * @param text the message to display
 	 * @param time the duration of the message in milliseconds
 	 */
-	public static void showOnScreenMsg(L2PcInstance player, String text, int time)
-	{
+	public static void showOnScreenMsg(L2PcInstance player, String text, int time) {
 		player.sendPacket(new ExShowScreenMessage(text, time));
 	}
 	
@@ -1601,8 +1426,7 @@ public abstract class AbstractScript implements INamable
 	 * @param time the duration of the message in milliseconds
 	 * @param params values of parameters to replace in the NPC String (like S1, C1 etc.)
 	 */
-	public static void showOnScreenMsg(L2PcInstance player, NpcStringId npcString, int position, int time, String... params)
-	{
+	public static void showOnScreenMsg(L2PcInstance player, NpcStringId npcString, int position, int time, String... params) {
 		player.sendPacket(new ExShowScreenMessage(npcString, position, time, params));
 	}
 	
@@ -1614,8 +1438,7 @@ public abstract class AbstractScript implements INamable
 	 * @param time the duration of the message in milliseconds
 	 * @param params values of parameters to replace in the system message (like S1, C1 etc.)
 	 */
-	public static void showOnScreenMsg(L2PcInstance player, SystemMessageId systemMsg, int position, int time, String... params)
-	{
+	public static void showOnScreenMsg(L2PcInstance player, SystemMessageId systemMsg, int position, int time, String... params) {
 		player.sendPacket(new ExShowScreenMessage(systemMsg, position, time, params));
 	}
 	
@@ -1627,8 +1450,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, IPositionable pos)
-	{
+	public static L2Npc addSpawn(int npcId, IPositionable pos) {
 		return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), false, 0, false, 0);
 	}
 	
@@ -1641,8 +1463,7 @@ public abstract class AbstractScript implements INamable
 	 * @param despawnDelay time in milliseconds till the NPC is despawned (0 - only despawned on server shutdown)
 	 * @return the {@link L2Npc} object of the newly spawned NPC, {@code null} if the NPC doesn't exist
 	 */
-	public static L2Npc addSpawn(L2Npc summoner, int npcId, IPositionable pos, boolean randomOffset, long despawnDelay)
-	{
+	public static L2Npc addSpawn(L2Npc summoner, int npcId, IPositionable pos, boolean randomOffset, long despawnDelay) {
 		return addSpawn(summoner, npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
 	}
 	
@@ -1655,8 +1476,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean isSummonSpawn)
-	{
+	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean isSummonSpawn) {
 		return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), false, 0, isSummonSpawn, 0);
 	}
 	
@@ -1670,8 +1490,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean randomOffset, long despawnDelay)
-	{
+	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean randomOffset, long despawnDelay) {
 		return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
 	}
 	
@@ -1686,8 +1505,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean randomOffset, long despawnDelay, boolean isSummonSpawn)
-	{
+	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean randomOffset, long despawnDelay, boolean isSummonSpawn) {
 		return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, isSummonSpawn, 0);
 	}
 	
@@ -1706,8 +1524,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId)
-	{
+	public static L2Npc addSpawn(int npcId, IPositionable pos, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId) {
 		return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, isSummonSpawn, instanceId);
 	}
 	
@@ -1724,8 +1541,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay)
-	{
+	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay) {
 		return addSpawn(npcId, x, y, z, heading, randomOffset, despawnDelay, false, 0);
 	}
 	
@@ -1743,8 +1559,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, IPositionable, boolean, long, boolean, int)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean, int)
 	 */
-	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn)
-	{
+	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn) {
 		return addSpawn(npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, 0);
 	}
 	
@@ -1764,8 +1579,7 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, int, int, int, int, boolean, long)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean)
 	 */
-	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId)
-	{
+	public static L2Npc addSpawn(int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId) {
 		return addSpawn(null, npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, instanceId);
 	}
 	
@@ -1786,28 +1600,22 @@ public abstract class AbstractScript implements INamable
 	 * @see #addSpawn(int, int, int, int, int, boolean, long)
 	 * @see #addSpawn(int, int, int, int, int, boolean, long, boolean)
 	 */
-	public static L2Npc addSpawn(L2Npc summoner, int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId)
-	{
-		try
-		{
-			if ((x == 0) && (y == 0))
-			{
+	public static L2Npc addSpawn(L2Npc summoner, int npcId, int x, int y, int z, int heading, boolean randomOffset, long despawnDelay, boolean isSummonSpawn, int instanceId) {
+		try {
+			if ((x == 0) && (y == 0)) {
 				_log.log(Level.SEVERE, "addSpawn(): invalid spawn coordinates for NPC #" + npcId + "!");
 				return null;
 			}
 			
-			if (randomOffset)
-			{
+			if (randomOffset) {
 				int offset = Rnd.get(50, 100);
-				if (Rnd.nextBoolean())
-				{
+				if (Rnd.nextBoolean()) {
 					offset *= -1;
 				}
 				x += offset;
 				
 				offset = Rnd.get(50, 100);
-				if (Rnd.nextBoolean())
-				{
+				if (Rnd.nextBoolean()) {
 					offset *= -1;
 				}
 				y += offset;
@@ -1822,19 +1630,15 @@ public abstract class AbstractScript implements INamable
 			spawn.stopRespawn();
 			
 			final L2Npc npc = spawn.spawnOne(isSummonSpawn);
-			if (despawnDelay > 0)
-			{
+			if (despawnDelay > 0) {
 				npc.scheduleDespawn(despawnDelay);
 			}
 			
-			if (summoner != null)
-			{
+			if (summoner != null) {
 				summoner.addSummonedNpc(npc);
 			}
 			return npc;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.warning("Could not spawn NPC #" + npcId + "; error: " + e.getMessage());
 		}
 		
@@ -1851,8 +1655,7 @@ public abstract class AbstractScript implements INamable
 	 * @param instanceId
 	 * @return
 	 */
-	public L2TrapInstance addTrap(int trapId, int x, int y, int z, int heading, Skill skill, int instanceId)
-	{
+	public L2TrapInstance addTrap(int trapId, int x, int y, int z, int heading, Skill skill, int instanceId) {
 		final L2NpcTemplate npcTemplate = NpcData.getInstance().getTemplate(trapId);
 		L2TrapInstance trap = new L2TrapInstance(npcTemplate, instanceId, -1);
 		trap.setCurrentHp(trap.getMaxHp());
@@ -1868,8 +1671,7 @@ public abstract class AbstractScript implements INamable
 	 * @param minionId
 	 * @return
 	 */
-	public L2Npc addMinion(L2MonsterInstance master, int minionId)
-	{
+	public L2Npc addMinion(L2MonsterInstance master, int minionId) {
 		return MinionList.spawnMinion(master, minionId);
 	}
 	
@@ -1879,8 +1681,7 @@ public abstract class AbstractScript implements INamable
 	 * @param itemId the ID of the item whose amount to get
 	 * @return the amount of the specified item in player's inventory
 	 */
-	public static long getQuestItemsCount(L2PcInstance player, int itemId)
-	{
+	public static long getQuestItemsCount(L2PcInstance player, int itemId) {
 		return player.getInventory().getInventoryItemCount(itemId, -1);
 	}
 	
@@ -1890,22 +1691,16 @@ public abstract class AbstractScript implements INamable
 	 * @param itemIds a list of IDs of items whose amount to get
 	 * @return the summary amount of all listed items in player's inventory
 	 */
-	public long getQuestItemsCount(L2PcInstance player, int... itemIds)
-	{
+	public long getQuestItemsCount(L2PcInstance player, int... itemIds) {
 		long count = 0;
-		for (L2ItemInstance item : player.getInventory().getItems())
-		{
-			if (item == null)
-			{
+		for (L2ItemInstance item : player.getInventory().getItems()) {
+			if (item == null) {
 				continue;
 			}
 			
-			for (int itemId : itemIds)
-			{
-				if (item.getId() == itemId)
-				{
-					if ((count + item.getCount()) > Long.MAX_VALUE)
-					{
+			for (int itemId : itemIds) {
+				if (item.getId() == itemId) {
+					if ((count + item.getCount()) > Long.MAX_VALUE) {
 						return Long.MAX_VALUE;
 					}
 					count += item.getCount();
@@ -1921,8 +1716,7 @@ public abstract class AbstractScript implements INamable
 	 * @param item the {@link ItemHolder} object containing the ID and count of the item to check
 	 * @return {@code true} if the player has the required count of the item
 	 */
-	protected static boolean hasItem(L2PcInstance player, ItemHolder item)
-	{
+	protected static boolean hasItem(L2PcInstance player, ItemHolder item) {
 		return hasItem(player, item, true);
 	}
 	
@@ -1934,14 +1728,11 @@ public abstract class AbstractScript implements INamable
 	 *            otherwise check only if the player has the item at all
 	 * @return {@code true} if the player has the item
 	 */
-	protected static boolean hasItem(L2PcInstance player, ItemHolder item, boolean checkCount)
-	{
-		if (item == null)
-		{
+	protected static boolean hasItem(L2PcInstance player, ItemHolder item, boolean checkCount) {
+		if (item == null) {
 			return false;
 		}
-		if (checkCount)
-		{
+		if (checkCount) {
 			return (getQuestItemsCount(player, item.getId()) >= item.getCount());
 		}
 		return hasQuestItems(player, item.getId());
@@ -1955,16 +1746,12 @@ public abstract class AbstractScript implements INamable
 	 * @param itemList a list of {@link ItemHolder} objects containing the IDs of the items to check
 	 * @return {@code true} if the player has all the items from the list
 	 */
-	protected static boolean hasAllItems(L2PcInstance player, boolean checkCount, ItemHolder... itemList)
-	{
-		if ((itemList == null) || (itemList.length == 0))
-		{
+	protected static boolean hasAllItems(L2PcInstance player, boolean checkCount, ItemHolder... itemList) {
+		if ((itemList == null) || (itemList.length == 0)) {
 			return false;
 		}
-		for (ItemHolder item : itemList)
-		{
-			if (!hasItem(player, item, checkCount))
-			{
+		for (ItemHolder item : itemList) {
+			if (!hasItem(player, item, checkCount)) {
 				return false;
 			}
 		}
@@ -1977,8 +1764,7 @@ public abstract class AbstractScript implements INamable
 	 * @param itemId the ID of the item to check for
 	 * @return {@code true} if the item exists in player's inventory, {@code false} otherwise
 	 */
-	public static boolean hasQuestItems(L2PcInstance player, int itemId)
-	{
+	public static boolean hasQuestItems(L2PcInstance player, int itemId) {
 		return (player.getInventory().getItemByItemId(itemId) != null);
 	}
 	
@@ -1988,17 +1774,13 @@ public abstract class AbstractScript implements INamable
 	 * @param itemIds a list of item IDs to check for
 	 * @return {@code true} if all items exist in player's inventory, {@code false} otherwise
 	 */
-	public static boolean hasQuestItems(L2PcInstance player, int... itemIds)
-	{
-		if ((itemIds == null) || (itemIds.length == 0))
-		{
+	public static boolean hasQuestItems(L2PcInstance player, int... itemIds) {
+		if ((itemIds == null) || (itemIds.length == 0)) {
 			return false;
 		}
 		final PcInventory inv = player.getInventory();
-		for (int itemId : itemIds)
-		{
-			if (inv.getItemByItemId(itemId) == null)
-			{
+		for (int itemId : itemIds) {
+			if (inv.getItemByItemId(itemId) == null) {
 				return false;
 			}
 		}
@@ -2011,13 +1793,10 @@ public abstract class AbstractScript implements INamable
 	 * @param itemIds a list of item IDs to check for
 	 * @return {@code true} if at least one items exist in player's inventory, {@code false} otherwise
 	 */
-	public boolean hasAtLeastOneQuestItem(L2PcInstance player, int... itemIds)
-	{
+	public boolean hasAtLeastOneQuestItem(L2PcInstance player, int... itemIds) {
 		final PcInventory inv = player.getInventory();
-		for (int itemId : itemIds)
-		{
-			if (inv.getItemByItemId(itemId) != null)
-			{
+		for (int itemId : itemIds) {
+			if (inv.getItemByItemId(itemId) != null) {
 				return true;
 			}
 		}
@@ -2030,11 +1809,9 @@ public abstract class AbstractScript implements INamable
 	 * @param itemId the ID of the item whose enchantment level to get
 	 * @return the enchantment level of the item or 0 if the item was not found
 	 */
-	public static int getEnchantLevel(L2PcInstance player, int itemId)
-	{
+	public static int getEnchantLevel(L2PcInstance player, int itemId) {
 		final L2ItemInstance enchantedItem = player.getInventory().getItemByItemId(itemId);
-		if (enchantedItem == null)
-		{
+		if (enchantedItem == null) {
 			return 0;
 		}
 		return enchantedItem.getEnchantLevel();
@@ -2046,14 +1823,10 @@ public abstract class AbstractScript implements INamable
 	 * @param count the amount of Adena to give
 	 * @param applyRates if {@code true} quest rates will be applied to the amount
 	 */
-	public void giveAdena(L2PcInstance player, long count, boolean applyRates)
-	{
-		if (applyRates)
-		{
+	public void giveAdena(L2PcInstance player, long count, boolean applyRates) {
+		if (applyRates) {
 			rewardItems(player, Inventory.ADENA_ID, count);
-		}
-		else
-		{
+		} else {
 			giveItems(player, Inventory.ADENA_ID, count);
 		}
 	}
@@ -2063,8 +1836,7 @@ public abstract class AbstractScript implements INamable
 	 * @param player the player to whom to give the item
 	 * @param holder
 	 */
-	public static void rewardItems(L2PcInstance player, ItemHolder holder)
-	{
+	public static void rewardItems(L2PcInstance player, ItemHolder holder) {
 		rewardItems(player, holder.getId(), holder.getCount());
 	}
 	
@@ -2074,31 +1846,22 @@ public abstract class AbstractScript implements INamable
 	 * @param itemId the ID of the item to give
 	 * @param count the amount of items to give
 	 */
-	public static void rewardItems(L2PcInstance player, int itemId, long count)
-	{
-		if (count <= 0)
-		{
+	public static void rewardItems(L2PcInstance player, int itemId, long count) {
+		if (count <= 0) {
 			return;
 		}
 		
 		final L2Item item = ItemTable.getInstance().getTemplate(itemId);
-		if (item == null)
-		{
+		if (item == null) {
 			return;
 		}
 		
-		try
-		{
-			if (itemId == Inventory.ADENA_ID)
-			{
+		try {
+			if (itemId == Inventory.ADENA_ID) {
 				count *= Config.RATE_QUEST_REWARD_ADENA;
-			}
-			else if (Config.RATE_QUEST_REWARD_USE_MULTIPLIERS)
-			{
-				if (item instanceof L2EtcItem)
-				{
-					switch (((L2EtcItem) item).getItemType())
-					{
+			} else if (Config.RATE_QUEST_REWARD_USE_MULTIPLIERS) {
+				if (item instanceof L2EtcItem) {
+					switch (((L2EtcItem) item).getItemType()) {
 						case POTION:
 							count *= Config.RATE_QUEST_REWARD_POTION;
 							break;
@@ -2117,21 +1880,16 @@ public abstract class AbstractScript implements INamable
 							count *= Config.RATE_QUEST_REWARD;
 					}
 				}
-			}
-			else
-			{
+			} else {
 				count *= Config.RATE_QUEST_REWARD;
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			count = Long.MAX_VALUE;
 		}
 		
 		// Add items to player's inventory
 		final L2ItemInstance itemInstance = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-		if (itemInstance == null)
-		{
+		if (itemInstance == null) {
 			return;
 		}
 		
@@ -2144,27 +1902,21 @@ public abstract class AbstractScript implements INamable
 	 * @param item the item obtain by the player
 	 * @param count the item count
 	 */
-	private static void sendItemGetMessage(L2PcInstance player, L2ItemInstance item, long count)
-	{
+	private static void sendItemGetMessage(L2PcInstance player, L2ItemInstance item, long count) {
 		// If item for reward is gold, send message of gold reward to client
-		if (item.getId() == Inventory.ADENA_ID)
-		{
+		if (item.getId() == Inventory.ADENA_ID) {
 			SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S1_ADENA);
 			smsg.addLong(count);
 			player.sendPacket(smsg);
 		}
 		// Otherwise, send message of object reward to client
-		else
-		{
-			if (count > 1)
-			{
+		else {
+			if (count > 1) {
 				SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S);
 				smsg.addItemName(item);
 				smsg.addLong(count);
 				player.sendPacket(smsg);
-			}
-			else
-			{
+			} else {
 				SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.EARNED_ITEM_S1);
 				smsg.addItemName(item);
 				player.sendPacket(smsg);
@@ -2182,8 +1934,7 @@ public abstract class AbstractScript implements INamable
 	 * @param itemId
 	 * @param count
 	 */
-	public static void giveItems(L2PcInstance player, int itemId, long count)
-	{
+	public static void giveItems(L2PcInstance player, int itemId, long count) {
 		giveItems(player, itemId, count, 0);
 	}
 	
@@ -2192,8 +1943,7 @@ public abstract class AbstractScript implements INamable
 	 * @param player
 	 * @param holder
 	 */
-	protected static void giveItems(L2PcInstance player, ItemHolder holder)
-	{
+	protected static void giveItems(L2PcInstance player, ItemHolder holder) {
 		giveItems(player, holder.getId(), holder.getCount());
 	}
 	
@@ -2203,23 +1953,19 @@ public abstract class AbstractScript implements INamable
 	 * @param count
 	 * @param enchantlevel
 	 */
-	public static void giveItems(L2PcInstance player, int itemId, long count, int enchantlevel)
-	{
-		if (count <= 0)
-		{
+	public static void giveItems(L2PcInstance player, int itemId, long count, int enchantlevel) {
+		if (count <= 0) {
 			return;
 		}
 		
 		// Add items to player's inventory
 		final L2ItemInstance item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-		if (item == null)
-		{
+		if (item == null) {
 			return;
 		}
 		
 		// set enchant level for item if that item is not adena
-		if ((enchantlevel > 0) && (itemId != Inventory.ADENA_ID))
-		{
+		if ((enchantlevel > 0) && (itemId != Inventory.ADENA_ID)) {
 			item.setEnchantLevel(enchantlevel);
 		}
 		
@@ -2233,26 +1979,21 @@ public abstract class AbstractScript implements INamable
 	 * @param attributeId
 	 * @param attributeLevel
 	 */
-	public static void giveItems(L2PcInstance player, int itemId, long count, byte attributeId, int attributeLevel)
-	{
-		if (count <= 0)
-		{
+	public static void giveItems(L2PcInstance player, int itemId, long count, byte attributeId, int attributeLevel) {
+		if (count <= 0) {
 			return;
 		}
 		
 		// Add items to player's inventory
 		final L2ItemInstance item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-		if (item == null)
-		{
+		if (item == null) {
 			return;
 		}
 		
 		// set enchant level for item if that item is not adena
-		if ((attributeId >= 0) && (attributeLevel > 0))
-		{
+		if ((attributeId >= 0) && (attributeLevel > 0)) {
 			item.setElementAttr(attributeId, attributeLevel);
-			if (item.isEquipped())
-			{
+			if (item.isEquipped()) {
 				item.updateElementAttrBonus(player);
 			}
 			
@@ -2275,8 +2016,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if true, plays ItemSound.quest_itemget when items are given and ItemSound.quest_middle when the limit is reached
 	 * @return {@code true} if limit > 0 and the limit was reached or if limit <= 0 and items were given; {@code false} in all other cases
 	 */
-	public static boolean giveItemRandomly(L2PcInstance player, int itemId, long amountToGive, long limit, double dropChance, boolean playSound)
-	{
+	public static boolean giveItemRandomly(L2PcInstance player, int itemId, long amountToGive, long limit, double dropChance, boolean playSound) {
 		return giveItemRandomly(player, null, itemId, amountToGive, amountToGive, limit, dropChance, playSound);
 	}
 	
@@ -2292,8 +2032,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if true, plays ItemSound.quest_itemget when items are given and ItemSound.quest_middle when the limit is reached
 	 * @return {@code true} if limit > 0 and the limit was reached or if limit <= 0 and items were given; {@code false} in all other cases
 	 */
-	public static boolean giveItemRandomly(L2PcInstance player, L2Npc npc, int itemId, long amountToGive, long limit, double dropChance, boolean playSound)
-	{
+	public static boolean giveItemRandomly(L2PcInstance player, L2Npc npc, int itemId, long amountToGive, long limit, double dropChance, boolean playSound) {
 		return giveItemRandomly(player, npc, itemId, amountToGive, amountToGive, limit, dropChance, playSound);
 	}
 	
@@ -2310,28 +2049,22 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if true, plays ItemSound.quest_itemget when items are given and ItemSound.quest_middle when the limit is reached
 	 * @return {@code true} if limit > 0 and the limit was reached or if limit <= 0 and items were given; {@code false} in all other cases
 	 */
-	public static boolean giveItemRandomly(L2PcInstance player, L2Npc npc, int itemId, long minAmount, long maxAmount, long limit, double dropChance, boolean playSound)
-	{
+	public static boolean giveItemRandomly(L2PcInstance player, L2Npc npc, int itemId, long minAmount, long maxAmount, long limit, double dropChance, boolean playSound) {
 		final long currentCount = getQuestItemsCount(player, itemId);
 		
-		if ((limit > 0) && (currentCount >= limit))
-		{
+		if ((limit > 0) && (currentCount >= limit)) {
 			return true;
 		}
 		
 		minAmount *= Config.RATE_QUEST_DROP;
 		maxAmount *= Config.RATE_QUEST_DROP;
 		dropChance *= Config.RATE_QUEST_DROP; // TODO separate configs for rate and amount
-		if ((npc != null) && Config.L2JMOD_CHAMPION_ENABLE && npc.isChampion())
-		{
-			if ((itemId == Inventory.ADENA_ID) || (itemId == Inventory.ANCIENT_ADENA_ID))
-			{
+		if ((npc != null) && Config.L2JMOD_CHAMPION_ENABLE && npc.isChampion()) {
+			if ((itemId == Inventory.ADENA_ID) || (itemId == Inventory.ANCIENT_ADENA_ID)) {
 				dropChance *= Config.L2JMOD_CHAMPION_ADENAS_REWARDS_CHANCE;
 				minAmount *= Config.L2JMOD_CHAMPION_ADENAS_REWARDS_AMOUNT;
 				maxAmount *= Config.L2JMOD_CHAMPION_ADENAS_REWARDS_AMOUNT;
-			}
-			else
-			{
+			} else {
 				dropChance *= Config.L2JMOD_CHAMPION_REWARDS_CHANCE;
 				minAmount *= Config.L2JMOD_CHAMPION_REWARDS_AMOUNT;
 				maxAmount *= Config.L2JMOD_CHAMPION_REWARDS_AMOUNT;
@@ -2341,34 +2074,27 @@ public abstract class AbstractScript implements INamable
 		long amountToGive = ((minAmount == maxAmount) ? minAmount : Rnd.get(minAmount, maxAmount));
 		final double random = Rnd.nextDouble();
 		// Inventory slot check (almost useless for non-stacking items)
-		if ((dropChance >= random) && (amountToGive > 0) && player.getInventory().validateCapacityByItemId(itemId))
-		{
-			if ((limit > 0) && ((currentCount + amountToGive) > limit))
-			{
+		if ((dropChance >= random) && (amountToGive > 0) && player.getInventory().validateCapacityByItemId(itemId)) {
+			if ((limit > 0) && ((currentCount + amountToGive) > limit)) {
 				amountToGive = limit - currentCount;
 			}
 			
 			// Give the item to player
 			L2ItemInstance item = player.addItem("Quest", itemId, amountToGive, npc, true);
-			if (item != null)
-			{
+			if (item != null) {
 				// limit reached (if there is no limit, this block doesn't execute)
-				if ((currentCount + amountToGive) == limit)
-				{
-					if (playSound)
-					{
+				if ((currentCount + amountToGive) == limit) {
+					if (playSound) {
 						playSound(player, Sound.ITEMSOUND_QUEST_MIDDLE);
 					}
 					return true;
 				}
 				
-				if (playSound)
-				{
+				if (playSound) {
 					playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 				}
 				// if there is no limit, return true every time an item is given
-				if (limit <= 0)
-				{
+				if (limit <= 0) {
 					return true;
 				}
 			}
@@ -2383,11 +2109,9 @@ public abstract class AbstractScript implements INamable
 	 * @param victim the character that "dropped" the item
 	 * @return <code>true</code> if at least one item was given, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim) {
 		List<ItemHolder> items = item.calculateDrops(victim, player);
-		if ((items == null) || items.isEmpty())
-		{
+		if ((items == null) || items.isEmpty()) {
 			return false;
 		}
 		giveItems(player, items);
@@ -2399,10 +2123,8 @@ public abstract class AbstractScript implements INamable
 	 * @param player
 	 * @param items
 	 */
-	protected static void giveItems(L2PcInstance player, List<ItemHolder> items)
-	{
-		for (ItemHolder item : items)
-		{
+	protected static void giveItems(L2PcInstance player, List<ItemHolder> items) {
+		for (ItemHolder item : items) {
 			giveItems(player, item);
 		}
 		
@@ -2415,22 +2137,18 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached.
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit) {
 		long maxToGive = limit - player.getInventory().getInventoryItemCount(item.getId(), -1);
-		if (maxToGive <= 0)
-		{
+		if (maxToGive <= 0) {
 			return false;
 		}
 		giveItems(player, item.getId(), Math.min(maxToGive, item.getCount()));
 		return true;
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, ItemHolder item, long limit, boolean playSound) {
 		boolean drop = giveItems(player, item, limit);
-		if (drop && playSound)
-		{
+		if (drop && playSound) {
 			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
@@ -2442,21 +2160,17 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached.
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit) {
 		boolean b = false;
-		for (ItemHolder item : items)
-		{
+		for (ItemHolder item : items) {
 			b |= giveItems(player, item, limit);
 		}
 		return b;
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, long limit, boolean playSound) {
 		boolean drop = giveItems(player, items, limit);
-		if (drop && playSound)
-		{
+		if (drop && playSound) {
 			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
@@ -2468,8 +2182,7 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit) {
 		return giveItems(player, items, Util.mapToFunction(limit));
 	}
 	
@@ -2479,17 +2192,13 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Function<Integer, Long> limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Function<Integer, Long> limit) {
 		boolean b = false;
-		for (ItemHolder item : items)
-		{
-			if (limit != null)
-			{
+		for (ItemHolder item : items) {
+			if (limit != null) {
 				Long longLimit = limit.apply(item.getId());
 				// null -> no limit specified for that item id. This trick is to avoid limit.apply() be called twice (once for the null check)
-				if (longLimit != null)
-				{
+				if (longLimit != null) {
 					b |= giveItems(player, item, longLimit);
 					continue; // the item is given, continue with next
 				}
@@ -2503,18 +2212,15 @@ public abstract class AbstractScript implements INamable
 		return b;
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Function<Integer, Long> limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Function<Integer, Long> limit, boolean playSound) {
 		boolean drop = giveItems(player, items, limit);
-		if (drop && playSound)
-		{
+		if (drop && playSound) {
 			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, List<ItemHolder> items, Map<Integer, Long> limit, boolean playSound) {
 		return giveItems(player, items, Util.mapToFunction(limit), playSound);
 	}
 	
@@ -2525,16 +2231,13 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached.
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit) {
 		return giveItems(player, item.calculateDrops(victim, player), limit);
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, int limit, boolean playSound) {
 		boolean drop = giveItems(player, item, victim, limit);
-		if (drop && playSound)
-		{
+		if (drop && playSound) {
 			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
@@ -2547,8 +2250,7 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit) {
 		return giveItems(player, item.calculateDrops(victim, player), limit);
 	}
 	
@@ -2559,21 +2261,17 @@ public abstract class AbstractScript implements INamable
 	 * @param limit the maximum amount of items the player can have. Won't give more if this limit is reached. If a no limit for an itemId is specified, item will always be given
 	 * @return <code>true</code> if at least one item was given to the player, <code>false</code> otherwise
 	 */
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Function<Integer, Long> limit)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Function<Integer, Long> limit) {
 		return giveItems(player, item.calculateDrops(victim, player), limit);
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Map<Integer, Long> limit, boolean playSound) {
 		return giveItems(player, item, victim, Util.mapToFunction(limit), playSound);
 	}
 	
-	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Function<Integer, Long> limit, boolean playSound)
-	{
+	protected static boolean giveItems(L2PcInstance player, IDropItem item, L2Character victim, Function<Integer, Long> limit, boolean playSound) {
 		boolean drop = giveItems(player, item, victim, limit);
-		if (drop && playSound)
-		{
+		if (drop && playSound) {
 			playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 		}
 		return drop;
@@ -2587,8 +2285,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Function<Integer, Long> limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Function<Integer, Long> limit, boolean playSound) {
 		Map<L2PcInstance, Map<Integer, Long>> rewardedCounts = calculateDistribution(players, items, limit);
 		// now give the calculated items to the players
 		giveItems(rewardedCounts, playSound);
@@ -2603,8 +2300,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, Map<Integer, Long> limit, boolean playSound) {
 		return distributeItems(players, items, Util.mapToFunction(limit), playSound);
 	}
 	
@@ -2616,8 +2312,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, long limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, Collection<ItemHolder> items, long limit, boolean playSound) {
 		return distributeItems(players, items, t -> limit, playSound);
 	}
 	
@@ -2629,14 +2324,11 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Long> distributeItems(Collection<L2PcInstance> players, ItemHolder item, long limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Long> distributeItems(Collection<L2PcInstance> players, ItemHolder item, long limit, boolean playSound) {
 		Map<L2PcInstance, Map<Integer, Long>> distribution = distributeItems(players, Collections.singletonList(item), limit, playSound);
 		Map<L2PcInstance, Long> returnMap = new HashMap<>();
-		for (Entry<L2PcInstance, Map<Integer, Long>> entry : distribution.entrySet())
-		{
-			for (Entry<Integer, Long> entry2 : entry.getValue().entrySet())
-			{
+		for (Entry<L2PcInstance, Map<Integer, Long>> entry : distribution.entrySet()) {
+			for (Entry<Integer, Long> entry2 : entry.getValue().entrySet()) {
 				returnMap.put(entry.getKey(), entry2.getValue());
 			}
 		}
@@ -2653,8 +2345,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, Function<Integer, Long> limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, Function<Integer, Long> limit, boolean playSound) {
 		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
 	}
 	
@@ -2668,8 +2359,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound) {
 		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
 	}
 	
@@ -2683,8 +2373,7 @@ public abstract class AbstractScript implements INamable
 	 * @param playSound if to play sound if a player gets at least one item
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, IDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound) {
 		return distributeItems(players, items.calculateDrops(victim, killer), limit, playSound);
 	}
 	
@@ -2699,22 +2388,17 @@ public abstract class AbstractScript implements INamable
 	 * @param smartDrop true if to not calculate a drop, which can't be given to any player 'cause of limits
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Function<Integer, Long> limit, boolean playSound, boolean smartDrop)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Function<Integer, Long> limit, boolean playSound, boolean smartDrop) {
 		GroupedGeneralDropItem toDrop;
-		if (smartDrop)
-		{
+		if (smartDrop) {
 			toDrop = new GroupedGeneralDropItem(items.getChance(), items.getDropCalculationStrategy(), items.getKillerChanceModifierStrategy(), items.getPreciseStrategy());
 			List<GeneralDropItem> dropItems = new LinkedList<>(items.getItems());
 			ITEM_LOOP:
-			for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();)
-			{
+			for (Iterator<GeneralDropItem> it = dropItems.iterator(); it.hasNext();) {
 				GeneralDropItem item = it.next();
-				for (L2PcInstance player : players)
-				{
+				for (L2PcInstance player : players) {
 					int itemId = item.getItemId();
-					if (player.getInventory().getInventoryItemCount(itemId, -1, true) < avoidNull(limit, itemId))
-					{
+					if (player.getInventory().getInventoryItemCount(itemId, -1, true) < avoidNull(limit, itemId)) {
 						// we can give this item to this player
 						continue ITEM_LOOP;
 					}
@@ -2724,9 +2408,7 @@ public abstract class AbstractScript implements INamable
 			}
 			toDrop.setItems(dropItems);
 			toDrop = toDrop.normalizeMe(victim, killer);
-		}
-		else
-		{
+		} else {
 			toDrop = items;
 		}
 		return distributeItems(players, toDrop, killer, victim, limit, playSound);
@@ -2743,8 +2425,7 @@ public abstract class AbstractScript implements INamable
 	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound, boolean smartDrop)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, Map<Integer, Long> limit, boolean playSound, boolean smartDrop) {
 		return distributeItems(players, items, killer, victim, Util.mapToFunction(limit), playSound, smartDrop);
 	}
 	
@@ -2759,8 +2440,7 @@ public abstract class AbstractScript implements INamable
 	 * @param smartDrop true if to not calculate a drop, which can't be given to any player
 	 * @return the counts of each items given to each player
 	 */
-	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound, boolean smartDrop)
-	{
+	protected static Map<L2PcInstance, Map<Integer, Long>> distributeItems(Collection<L2PcInstance> players, final GroupedGeneralDropItem items, L2Character killer, L2Character victim, long limit, boolean playSound, boolean smartDrop) {
 		return distributeItems(players, items, killer, victim, t -> limit, playSound, smartDrop);
 	}
 	
@@ -2770,40 +2450,33 @@ public abstract class AbstractScript implements INamable
 	 * @param limit
 	 * @return
 	 */
-	private static Map<L2PcInstance, Map<Integer, Long>> calculateDistribution(Collection<L2PcInstance> players, Collection<ItemHolder> items, Function<Integer, Long> limit)
-	{
+	private static Map<L2PcInstance, Map<Integer, Long>> calculateDistribution(Collection<L2PcInstance> players, Collection<ItemHolder> items, Function<Integer, Long> limit) {
 		Map<L2PcInstance, Map<Integer, Long>> rewardedCounts = new HashMap<>();
-		for (L2PcInstance player : players)
-		{
+		for (L2PcInstance player : players) {
 			rewardedCounts.put(player, new HashMap<Integer, Long>());
 		}
 		NEXT_ITEM:
-		for (ItemHolder item : items)
-		{
+		for (ItemHolder item : items) {
 			long equaldist = item.getCount() / players.size();
 			long randomdist = item.getCount() % players.size();
 			List<L2PcInstance> toDist = new ArrayList<>(players);
 			do // this must happen at least once in order to get away already full players (and then equaldist can become nonzero)
 			{
-				for (Iterator<L2PcInstance> it = toDist.iterator(); it.hasNext();)
-				{
+				for (Iterator<L2PcInstance> it = toDist.iterator(); it.hasNext();) {
 					L2PcInstance player = it.next();
-					if (!rewardedCounts.get(player).containsKey(item.getId()))
-					{
+					if (!rewardedCounts.get(player).containsKey(item.getId())) {
 						rewardedCounts.get(player).put(item.getId(), 0L);
 					}
 					long maxGive = avoidNull(limit, item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
 					long toGive = equaldist;
-					if (equaldist >= maxGive)
-					{
+					if (equaldist >= maxGive) {
 						toGive = maxGive;
 						randomdist += (equaldist - maxGive); // overflown items are available to next players
 						it.remove(); // this player is already full
 					}
 					rewardedCounts.get(player).put(item.getId(), rewardedCounts.get(player).get(item.getId()) + toGive);
 				}
-				if (toDist.isEmpty())
-				{
+				if (toDist.isEmpty()) {
 					// there's no one to give items anymore, all players will be full when we give the items
 					continue NEXT_ITEM;
 				}
@@ -2811,18 +2484,15 @@ public abstract class AbstractScript implements INamable
 				randomdist %= toDist.size();
 			}
 			while (equaldist > 0);
-			while (randomdist > 0)
-			{
-				if (toDist.isEmpty())
-				{
+			while (randomdist > 0) {
+				if (toDist.isEmpty()) {
 					// we don't have any player left
 					continue NEXT_ITEM;
 				}
 				L2PcInstance player = toDist.get(getRandom(toDist.size()));
 				// avoid null return
 				long maxGive = avoidNull(limit, item.getId()) - limit.apply(item.getId()) - player.getInventory().getInventoryItemCount(item.getId(), -1, true) - rewardedCounts.get(player).get(item.getId());
-				if (maxGive > 0)
-				{
+				if (maxGive > 0) {
 					// we can add an item to player
 					// so we add one item to player
 					rewardedCounts.get(player).put(item.getId(), rewardedCounts.get(player).get(item.getId()) + 1);
@@ -2841,8 +2511,7 @@ public abstract class AbstractScript implements INamable
 	 * @param arg the argument
 	 * @return {@link Long#MAX_VALUE} if function.apply(arg) is null, function.apply(arg) otherwise
 	 */
-	private static <T> long avoidNull(Function<T, Long> function, T arg)
-	{
+	private static <T> long avoidNull(Function<T, Long> function, T arg) {
 		Long longLimit = function.apply(arg);
 		return longLimit == null ? Long.MAX_VALUE : longLimit;
 	}
@@ -2852,22 +2521,17 @@ public abstract class AbstractScript implements INamable
 	 * @param rewardedCounts A scheme of distribution items (the structure is: Map<player Map<itemId, count>>)
 	 * @param playSound if to play sound if a player gets at least one item
 	 */
-	private static void giveItems(Map<L2PcInstance, Map<Integer, Long>> rewardedCounts, boolean playSound)
-	{
-		for (Entry<L2PcInstance, Map<Integer, Long>> entry : rewardedCounts.entrySet())
-		{
+	private static void giveItems(Map<L2PcInstance, Map<Integer, Long>> rewardedCounts, boolean playSound) {
+		for (Entry<L2PcInstance, Map<Integer, Long>> entry : rewardedCounts.entrySet()) {
 			L2PcInstance player = entry.getKey();
 			boolean playPlayerSound = false;
-			for (Entry<Integer, Long> item : entry.getValue().entrySet())
-			{
-				if (item.getValue() >= 0)
-				{
+			for (Entry<Integer, Long> item : entry.getValue().entrySet()) {
+				if (item.getValue() >= 0) {
 					playPlayerSound = true;
 					giveItems(player, item.getKey(), item.getValue());
 				}
 			}
-			if (playSound && playPlayerSound)
-			{
+			if (playSound && playPlayerSound) {
 				playSound(player, Sound.ITEMSOUND_QUEST_ITEMGET);
 			}
 		}
@@ -2880,21 +2544,15 @@ public abstract class AbstractScript implements INamable
 	 * @param amount the amount to take
 	 * @return {@code true} if any items were taken, {@code false} otherwise
 	 */
-	public static boolean takeItems(L2PcInstance player, int itemId, long amount)
-	{
+	public static boolean takeItems(L2PcInstance player, int itemId, long amount) {
 		final List<L2ItemInstance> items = player.getInventory().getItemsByItemId(itemId);
-		if (amount < 0)
-		{
+		if (amount < 0) {
 			items.forEach(i -> takeItem(player, i, i.getCount()));
-		}
-		else
-		{
+		} else {
 			long currentCount = 0;
-			for (L2ItemInstance i : items)
-			{
+			for (L2ItemInstance i : items) {
 				long toDelete = i.getCount();
-				if ((currentCount + toDelete) > amount)
-				{
+				if ((currentCount + toDelete) > amount) {
 					toDelete = amount - currentCount;
 				}
 				takeItem(player, i, toDelete);
@@ -2904,14 +2562,11 @@ public abstract class AbstractScript implements INamable
 		return true;
 	}
 	
-	private static boolean takeItem(L2PcInstance player, L2ItemInstance item, long toDelete)
-	{
-		if (item.isEquipped())
-		{
+	private static boolean takeItem(L2PcInstance player, L2ItemInstance item, long toDelete) {
+		if (item.isEquipped()) {
 			final L2ItemInstance[] unequiped = player.getInventory().unEquipItemInBodySlotAndRecord(item.getItem().getBodyPart());
 			final InventoryUpdate iu = new InventoryUpdate();
-			for (L2ItemInstance itm : unequiped)
-			{
+			for (L2ItemInstance itm : unequiped) {
 				iu.addModifiedItem(itm);
 			}
 			player.sendPacket(iu);
@@ -2926,10 +2581,8 @@ public abstract class AbstractScript implements INamable
 	 * @param holder the {@link ItemHolder} object containing the ID and count of the item to take
 	 * @return {@code true} if the item was taken, {@code false} otherwise
 	 */
-	protected static boolean takeItem(L2PcInstance player, ItemHolder holder)
-	{
-		if (holder == null)
-		{
+	protected static boolean takeItem(L2PcInstance player, ItemHolder holder) {
+		if (holder == null) {
 			return false;
 		}
 		return takeItems(player, holder.getId(), holder.getCount());
@@ -2941,22 +2594,17 @@ public abstract class AbstractScript implements INamable
 	 * @param itemList the list of {@link ItemHolder} objects containing the IDs and counts of the items to take
 	 * @return {@code true} if all items were taken, {@code false} otherwise
 	 */
-	protected static boolean takeAllItems(L2PcInstance player, ItemHolder... itemList)
-	{
-		if ((itemList == null) || (itemList.length == 0))
-		{
+	protected static boolean takeAllItems(L2PcInstance player, ItemHolder... itemList) {
+		if ((itemList == null) || (itemList.length == 0)) {
 			return false;
 		}
 		// first check if the player has all items to avoid taking half the items from the list
-		if (!hasAllItems(player, true, itemList))
-		{
+		if (!hasAllItems(player, true, itemList)) {
 			return false;
 		}
-		for (ItemHolder item : itemList)
-		{
+		for (ItemHolder item : itemList) {
 			// this should never be false, but just in case
-			if (!takeItem(player, item))
-			{
+			if (!takeItem(player, item)) {
 				return false;
 			}
 		}
@@ -2970,13 +2618,10 @@ public abstract class AbstractScript implements INamable
 	 * @param itemIds a list or an array of IDs of the items to take
 	 * @return {@code true} if all items were taken, {@code false} otherwise
 	 */
-	public static boolean takeItems(L2PcInstance player, int amount, int... itemIds)
-	{
+	public static boolean takeItems(L2PcInstance player, int amount, int... itemIds) {
 		boolean check = true;
-		if (itemIds != null)
-		{
-			for (int item : itemIds)
-			{
+		if (itemIds != null) {
+			for (int item : itemIds) {
 				check &= takeItems(player, item, amount);
 			}
 		}
@@ -2988,8 +2633,7 @@ public abstract class AbstractScript implements INamable
 	 * @param player the player whom to send the packet
 	 * @param sound the {@link IAudio} object of the sound to play
 	 */
-	public static void playSound(L2PcInstance player, IAudio sound)
-	{
+	public static void playSound(L2PcInstance player, IAudio sound) {
 		player.sendPacket(sound.getPacket());
 	}
 	
@@ -2999,8 +2643,7 @@ public abstract class AbstractScript implements INamable
 	 * @param exp the amount of EXP to give to the player
 	 * @param sp the amount of SP to give to the player
 	 */
-	public static void addExpAndSp(L2PcInstance player, long exp, int sp)
-	{
+	public static void addExpAndSp(L2PcInstance player, long exp, int sp) {
 		player.addExpAndSpQuest((long) (exp * Config.RATE_QUEST_REWARD_XP), (int) (sp * Config.RATE_QUEST_REWARD_SP));
 	}
 	
@@ -3010,8 +2653,7 @@ public abstract class AbstractScript implements INamable
 	 * @param max the maximum value for randomization
 	 * @return a random integer number from 0 to {@code max - 1}
 	 */
-	public static int getRandom(int max)
-	{
+	public static int getRandom(int max) {
 		return Rnd.get(max);
 	}
 	
@@ -3022,8 +2664,7 @@ public abstract class AbstractScript implements INamable
 	 * @param max the maximum value for randomization
 	 * @return a random integer number from {@code min} to {@code max}
 	 */
-	public static int getRandom(int min, int max)
-	{
+	public static int getRandom(int min, int max) {
 		return Rnd.get(min, max);
 	}
 	
@@ -3032,8 +2673,7 @@ public abstract class AbstractScript implements INamable
 	 * Use this method instead of importing {@link com.l2jserver.util.Rnd} utility.
 	 * @return {@code true} or {@code false} randomly
 	 */
-	public static boolean getRandomBoolean()
-	{
+	public static boolean getRandomBoolean() {
 		return Rnd.nextBoolean();
 	}
 	
@@ -3043,16 +2683,14 @@ public abstract class AbstractScript implements INamable
 	 * @param slot the location in the player's inventory to check
 	 * @return the ID of the item equipped in the specified inventory slot or 0 if the slot is empty or item is {@code null}.
 	 */
-	public static int getItemEquipped(L2PcInstance player, int slot)
-	{
+	public static int getItemEquipped(L2PcInstance player, int slot) {
 		return player.getInventory().getPaperdollItemId(slot);
 	}
 	
 	/**
 	 * @return the number of ticks from the {@link com.l2jserver.gameserver.GameTimeController}.
 	 */
-	public static int getGameTicks()
-	{
+	public static int getGameTicks() {
 		return GameTimeController.getInstance().getGameTicks();
 	}
 	
@@ -3065,29 +2703,20 @@ public abstract class AbstractScript implements INamable
 	 * @param includeCommandChannel if {@code true}, {@link #actionForEachPlayer(L2PcInstance, L2Npc, boolean)} will be called with the player's command channel members
 	 * @see #actionForEachPlayer(L2PcInstance, L2Npc, boolean)
 	 */
-	public final void executeForEachPlayer(L2PcInstance player, final L2Npc npc, final boolean isSummon, boolean includeParty, boolean includeCommandChannel)
-	{
-		if ((includeParty || includeCommandChannel) && player.isInParty())
-		{
-			if (includeCommandChannel && player.getParty().isInCommandChannel())
-			{
-				player.getParty().getCommandChannel().forEachMember(member ->
-				{
+	public final void executeForEachPlayer(L2PcInstance player, final L2Npc npc, final boolean isSummon, boolean includeParty, boolean includeCommandChannel) {
+		if ((includeParty || includeCommandChannel) && player.isInParty()) {
+			if (includeCommandChannel && player.getParty().isInCommandChannel()) {
+				player.getParty().getCommandChannel().forEachMember(member -> {
+					actionForEachPlayer(member, npc, isSummon);
+					return true;
+				});
+			} else if (includeParty) {
+				player.getParty().forEachMember(member -> {
 					actionForEachPlayer(member, npc, isSummon);
 					return true;
 				});
 			}
-			else if (includeParty)
-			{
-				player.getParty().forEachMember(member ->
-				{
-					actionForEachPlayer(member, npc, isSummon);
-					return true;
-				});
-			}
-		}
-		else
-		{
+		} else {
 			actionForEachPlayer(player, npc, isSummon);
 		}
 	}
@@ -3098,8 +2727,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npc the NPC related to this action
 	 * @param isSummon {@code true} if the event that called this method was originated by the player's summon
 	 */
-	public void actionForEachPlayer(L2PcInstance player, L2Npc npc, boolean isSummon)
-	{
+	public void actionForEachPlayer(L2PcInstance player, L2Npc npc, boolean isSummon) {
 		// To be overridden in quest scripts.
 	}
 	
@@ -3108,15 +2736,11 @@ public abstract class AbstractScript implements INamable
 	 * @param doorId the ID of the door to open
 	 * @param instanceId the ID of the instance the door is in (0 if the door is not not inside an instance)
 	 */
-	public void openDoor(int doorId, int instanceId)
-	{
+	public void openDoor(int doorId, int instanceId) {
 		final L2DoorInstance door = getDoor(doorId, instanceId);
-		if (door == null)
-		{
+		if (door == null) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": called openDoor(" + doorId + ", " + instanceId + "); but door wasnt found!", new NullPointerException());
-		}
-		else if (!door.getOpen())
-		{
+		} else if (!door.getOpen()) {
 			door.openMe();
 		}
 	}
@@ -3126,15 +2750,11 @@ public abstract class AbstractScript implements INamable
 	 * @param doorId the ID of the door to close
 	 * @param instanceId the ID of the instance the door is in (0 if the door is not not inside an instance)
 	 */
-	public void closeDoor(int doorId, int instanceId)
-	{
+	public void closeDoor(int doorId, int instanceId) {
 		final L2DoorInstance door = getDoor(doorId, instanceId);
-		if (door == null)
-		{
+		if (door == null) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": called closeDoor(" + doorId + ", " + instanceId + "); but door wasnt found!", new NullPointerException());
-		}
-		else if (door.getOpen())
-		{
+		} else if (door.getOpen()) {
 			door.closeMe();
 		}
 	}
@@ -3145,18 +2765,13 @@ public abstract class AbstractScript implements INamable
 	 * @param instanceId the ID of the instance the door is in (0 if the door is not not inside an instance)
 	 * @return the found door or {@code null} if no door with that ID and instance ID was found
 	 */
-	public L2DoorInstance getDoor(int doorId, int instanceId)
-	{
+	public L2DoorInstance getDoor(int doorId, int instanceId) {
 		L2DoorInstance door = null;
-		if (instanceId <= 0)
-		{
+		if (instanceId <= 0) {
 			door = DoorData.getInstance().getDoor(doorId);
-		}
-		else
-		{
+		} else {
 			final Instance inst = InstanceManager.getInstance().getInstance(instanceId);
-			if (inst != null)
-			{
+			if (inst != null) {
 				door = inst.getDoor(doorId);
 			}
 		}
@@ -3169,8 +2784,7 @@ public abstract class AbstractScript implements INamable
 	 * @param loc the {@link Location} object containing the destination coordinates
 	 * @param instanceId the ID of the instance to teleport the player to (0 to teleport out of an instance)
 	 */
-	public void teleportPlayer(L2PcInstance player, Location loc, int instanceId)
-	{
+	public void teleportPlayer(L2PcInstance player, Location loc, int instanceId) {
 		teleportPlayer(player, loc, instanceId, true);
 	}
 	
@@ -3181,8 +2795,7 @@ public abstract class AbstractScript implements INamable
 	 * @param instanceId the ID of the instance to teleport the player to (0 to teleport out of an instance)
 	 * @param allowRandomOffset if {@code true}, will randomize the teleport coordinates by +/-Config.MAX_OFFSET_ON_TELEPORT
 	 */
-	public void teleportPlayer(L2PcInstance player, Location loc, int instanceId, boolean allowRandomOffset)
-	{
+	public void teleportPlayer(L2PcInstance player, Location loc, int instanceId, boolean allowRandomOffset) {
 		player.teleToLocation(loc, instanceId, allowRandomOffset ? Config.MAX_OFFSET_ON_TELEPORT : 0);
 	}
 	
@@ -3191,8 +2804,7 @@ public abstract class AbstractScript implements INamable
 	 * @param npc the NPC that performs the attack
 	 * @param creature the target of the attack
 	 */
-	protected void addAttackDesire(L2Npc npc, L2Character creature)
-	{
+	protected void addAttackDesire(L2Npc npc, L2Character creature) {
 		addAttackDesire(npc, creature, 999);
 	}
 	
@@ -3202,10 +2814,8 @@ public abstract class AbstractScript implements INamable
 	 * @param creature the target of the attack
 	 * @param desire the desire to perform the attack
 	 */
-	protected void addAttackDesire(L2Npc npc, L2Character creature, long desire)
-	{
-		if (npc instanceof L2Attackable)
-		{
+	protected void addAttackDesire(L2Npc npc, L2Character creature, long desire) {
+		if (npc instanceof L2Attackable) {
 			((L2Attackable) npc).addDamageHate(creature, 0, desire);
 		}
 		npc.setIsRunning(true);
@@ -3218,8 +2828,7 @@ public abstract class AbstractScript implements INamable
 	 * @param loc the location
 	 * @param desire the desire
 	 */
-	protected void addMoveToDesire(L2Npc npc, Location loc, int desire)
-	{
+	protected void addMoveToDesire(L2Npc npc, Location loc, int desire) {
 		npc.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, loc);
 	}
 	
@@ -3229,8 +2838,7 @@ public abstract class AbstractScript implements INamable
 	 * @param target the target of the cast
 	 * @param skill the skill to cast
 	 */
-	protected void castSkill(L2Npc npc, L2Playable target, SkillHolder skill)
-	{
+	protected void castSkill(L2Npc npc, L2Playable target, SkillHolder skill) {
 		npc.setTarget(target);
 		npc.doCast(skill.getSkill());
 	}
@@ -3241,8 +2849,7 @@ public abstract class AbstractScript implements INamable
 	 * @param target the target of the cast
 	 * @param skill the skill to cast
 	 */
-	protected void castSkill(L2Npc npc, L2Playable target, Skill skill)
-	{
+	protected void castSkill(L2Npc npc, L2Playable target, Skill skill) {
 		npc.setTarget(target);
 		npc.doCast(skill);
 	}
@@ -3254,8 +2861,7 @@ public abstract class AbstractScript implements INamable
 	 * @param skill the skill to cast
 	 * @param desire the desire to cast the skill
 	 */
-	protected void addSkillCastDesire(L2Npc npc, L2Character target, SkillHolder skill, long desire)
-	{
+	protected void addSkillCastDesire(L2Npc npc, L2Character target, SkillHolder skill, long desire) {
 		addSkillCastDesire(npc, target, skill.getSkill(), desire);
 	}
 	
@@ -3266,10 +2872,8 @@ public abstract class AbstractScript implements INamable
 	 * @param skill the skill to cast
 	 * @param desire the desire to cast the skill
 	 */
-	protected void addSkillCastDesire(L2Npc npc, L2Character target, Skill skill, long desire)
-	{
-		if (npc instanceof L2Attackable)
-		{
+	protected void addSkillCastDesire(L2Npc npc, L2Character target, Skill skill, long desire) {
+		if (npc instanceof L2Attackable) {
 			((L2Attackable) npc).addDamageHate(target, 0, desire);
 		}
 		npc.setTarget(target);
@@ -3291,8 +2895,7 @@ public abstract class AbstractScript implements INamable
 	 * @param isWide
 	 * @param relAngle
 	 */
-	public static final void specialCamera(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle)
-	{
+	public static final void specialCamera(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle) {
 		player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle));
 	}
 	
@@ -3310,8 +2913,7 @@ public abstract class AbstractScript implements INamable
 	 * @param isWide
 	 * @param relAngle
 	 */
-	public static final void specialCameraEx(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int duration, int relYaw, int relPitch, int isWide, int relAngle)
-	{
+	public static final void specialCameraEx(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int duration, int relYaw, int relPitch, int isWide, int relAngle) {
 		player.sendPacket(new SpecialCamera(creature, player, force, angle1, angle2, time, duration, relYaw, relPitch, isWide, relAngle));
 	}
 	
@@ -3331,8 +2933,7 @@ public abstract class AbstractScript implements INamable
 	 * @param relAngle
 	 * @param unk
 	 */
-	public static final void specialCamera3(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle, int unk)
-	{
+	public static final void specialCamera3(L2PcInstance player, L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle, int unk) {
 		player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle, unk));
 	}
 	
@@ -3342,8 +2943,7 @@ public abstract class AbstractScript implements INamable
 	 * @param y
 	 * @param z
 	 */
-	public static void addRadar(L2PcInstance player, int x, int y, int z)
-	{
+	public static void addRadar(L2PcInstance player, int x, int y, int z) {
 		player.getRadar().addMarker(x, y, z);
 	}
 	
@@ -3353,16 +2953,14 @@ public abstract class AbstractScript implements INamable
 	 * @param y
 	 * @param z
 	 */
-	public void removeRadar(L2PcInstance player, int x, int y, int z)
-	{
+	public void removeRadar(L2PcInstance player, int x, int y, int z) {
 		player.getRadar().removeMarker(x, y, z);
 	}
 	
 	/**
 	 * @param player
 	 */
-	public void clearRadar(L2PcInstance player)
-	{
+	public void clearRadar(L2PcInstance player) {
 		player.getRadar().removeAllMarkers();
 	}
 }

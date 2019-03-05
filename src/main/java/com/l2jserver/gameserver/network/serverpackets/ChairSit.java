@@ -20,8 +20,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class ChairSit extends L2GameServerPacket
-{
+public class ChairSit extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final int _staticObjectId;
 	
@@ -29,15 +28,13 @@ public class ChairSit extends L2GameServerPacket
 	 * @param player
 	 * @param staticObjectId
 	 */
-	public ChairSit(L2PcInstance player, int staticObjectId)
-	{
+	public ChairSit(L2PcInstance player, int staticObjectId) {
 		_activeChar = player;
 		_staticObjectId = staticObjectId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xed);
 		writeD(_activeChar.getObjectId());
 		writeD(_staticObjectId);

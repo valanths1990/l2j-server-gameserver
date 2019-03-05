@@ -22,24 +22,20 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialEvent;
 
-public class RequestTutorialLinkHtml extends L2GameClientPacket
-{
+public class RequestTutorialLinkHtml extends L2GameClientPacket {
 	private static final String _C__85_REQUESTTUTORIALLINKHTML = "[C] 85 RequestTutorialLinkHtml";
 	
 	private String _bypass;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_bypass = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
@@ -47,8 +43,7 @@ public class RequestTutorialLinkHtml extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__85_REQUESTTUTORIALLINKHTML;
 	}
 }

@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.model.entity.Fort;
 import com.l2jserver.gameserver.model.entity.clanhall.SiegableHall;
 import com.l2jserver.gameserver.model.olympiad.OlympiadManager;
 
-public class Die extends L2GameServerPacket
-{
+public class Die extends L2GameServerPacket {
 	private final int _charObjId;
 	private final boolean _canTeleport;
 	private final boolean _sweepable;
@@ -44,12 +43,10 @@ public class Die extends L2GameServerPacket
 	private boolean _isJailed;
 	private boolean _staticRes = false;
 	
-	public Die(L2Character cha)
-	{
+	public Die(L2Character cha) {
 		_charObjId = cha.getObjectId();
 		_activeChar = cha;
-		if (cha.isPlayer())
-		{
+		if (cha.isPlayer()) {
 			final L2PcInstance player = cha.getActingPlayer();
 			_access = player.getAccessLevel();
 			_clan = player.getClan();
@@ -60,28 +57,23 @@ public class Die extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x00);
 		writeD(_charObjId);
 		writeD(_canTeleport ? 0x01 : 0x00);
 		
-		if (_activeChar.isPlayer())
-		{
-			if (!OlympiadManager.getInstance().isRegistered(_activeChar.getActingPlayer()) && !_activeChar.isOnEvent())
-			{
+		if (_activeChar.isPlayer()) {
+			if (!OlympiadManager.getInstance().isRegistered(_activeChar.getActingPlayer()) && !_activeChar.isOnEvent()) {
 				_staticRes = _activeChar.getInventory().haveItemForSelfResurrection();
 			}
 			
 			// Verify if player can use fixed resurrection without Feather
-			if (_access.allowFixedRes())
-			{
+			if (_access.allowFixedRes()) {
 				_staticRes = true;
 			}
 		}
 		
-		if (_canTeleport && (_clan != null) && !_isJailed)
-		{
+		if (_canTeleport && (_clan != null) && !_isJailed) {
 			boolean isInCastleDefense = false;
 			boolean isInFortDefense = false;
 			
@@ -89,21 +81,16 @@ public class Die extends L2GameServerPacket
 			Castle castle = CastleManager.getInstance().getCastle(_activeChar);
 			Fort fort = FortManager.getInstance().getFort(_activeChar);
 			SiegableHall hall = CHSiegeManager.getInstance().getNearbyClanHall(_activeChar);
-			if ((castle != null) && castle.getSiege().isInProgress())
-			{
+			if ((castle != null) && castle.getSiege().isInProgress()) {
 				// siege in progress
 				siegeClan = castle.getSiege().getAttackerClan(_clan);
-				if ((siegeClan == null) && castle.getSiege().checkIsDefender(_clan))
-				{
+				if ((siegeClan == null) && castle.getSiege().checkIsDefender(_clan)) {
 					isInCastleDefense = true;
 				}
-			}
-			else if ((fort != null) && fort.getSiege().isInProgress())
-			{
+			} else if ((fort != null) && fort.getSiege().isInProgress()) {
 				// siege in progress
 				siegeClan = fort.getSiege().getAttackerClan(_clan);
-				if ((siegeClan == null) && fort.getSiege().checkIsDefender(_clan))
-				{
+				if ((siegeClan == null) && fort.getSiege().checkIsDefender(_clan)) {
 					isInFortDefense = true;
 				}
 			}
@@ -114,9 +101,7 @@ public class Die extends L2GameServerPacket
 			writeD(_sweepable ? 0x01 : 0x00); // sweepable (blue glow)
 			writeD(_staticRes ? 0x01 : 0x00); // 6d 04 00 00 00 - to FIXED
 			writeD((_clan.getFortId() > 0) || isInFortDefense ? 0x01 : 0x00); // 6d 05 00 00 00 - to fortress
-		}
-		else
-		{
+		} else {
 			writeD(0x00); // 6d 01 00 00 00 - to hide away
 			writeD(0x00); // 6d 02 00 00 00 - to castle
 			writeD(0x00); // 6d 03 00 00 00 - to siege HQ

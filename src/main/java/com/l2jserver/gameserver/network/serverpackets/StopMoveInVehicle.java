@@ -24,15 +24,13 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Maktakien
  */
-public class StopMoveInVehicle extends L2GameServerPacket
-{
+public class StopMoveInVehicle extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _boatId;
 	private final Location _pos;
 	private final int _heading;
 	
-	public StopMoveInVehicle(L2PcInstance player, int boatId)
-	{
+	public StopMoveInVehicle(L2PcInstance player, int boatId) {
 		_charObjId = player.getObjectId();
 		_boatId = boatId;
 		_pos = player.getInVehiclePosition();
@@ -40,8 +38,7 @@ public class StopMoveInVehicle extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0x7f);
 		writeD(_charObjId);
 		writeD(_boatId);

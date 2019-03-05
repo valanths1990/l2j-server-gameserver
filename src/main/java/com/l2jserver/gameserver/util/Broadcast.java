@@ -36,8 +36,7 @@ import com.l2jserver.gameserver.network.serverpackets.RelationChanged;
  * This class ...
  * @version $Revision: 1.2 $ $Date: 2004/06/27 08:12:59 $
  */
-public final class Broadcast
-{
+public final class Broadcast {
 	private static Logger _log = Logger.getLogger(Broadcast.class.getName());
 	
 	/**
@@ -49,13 +48,10 @@ public final class Broadcast
 	 * @param character
 	 * @param mov
 	 */
-	public static void toPlayersTargettingMyself(L2Character character, L2GameServerPacket mov)
-	{
+	public static void toPlayersTargettingMyself(L2Character character, L2GameServerPacket mov) {
 		Collection<L2PcInstance> plrs = character.getKnownList().getKnownPlayers().values();
-		for (L2PcInstance player : plrs)
-		{
-			if (player.getTarget() != character)
-			{
+		for (L2PcInstance player : plrs) {
+			if (player.getTarget() != character) {
 				continue;
 			}
 			
@@ -73,34 +69,25 @@ public final class Broadcast
 	 * @param character
 	 * @param mov
 	 */
-	public static void toKnownPlayers(L2Character character, L2GameServerPacket mov)
-	{
+	public static void toKnownPlayers(L2Character character, L2GameServerPacket mov) {
 		Collection<L2PcInstance> plrs = character.getKnownList().getKnownPlayers().values();
-		for (L2PcInstance player : plrs)
-		{
-			if (player == null)
-			{
+		for (L2PcInstance player : plrs) {
+			if (player == null) {
 				continue;
 			}
-			try
-			{
+			try {
 				player.sendPacket(mov);
-				if ((mov instanceof CharInfo) && (character instanceof L2PcInstance))
-				{
+				if ((mov instanceof CharInfo) && (character instanceof L2PcInstance)) {
 					int relation = ((L2PcInstance) character).getRelation(player);
 					Integer oldrelation = character.getKnownList().getKnownRelations().get(player.getObjectId());
-					if ((oldrelation != null) && (oldrelation != relation))
-					{
+					if ((oldrelation != null) && (oldrelation != relation)) {
 						player.sendPacket(new RelationChanged((L2PcInstance) character, relation, character.isAutoAttackable(player)));
-						if (character.hasSummon())
-						{
+						if (character.hasSummon()) {
 							player.sendPacket(new RelationChanged(character.getSummon(), relation, character.isAutoAttackable(player)));
 						}
 					}
 				}
-			}
-			catch (NullPointerException e)
-			{
+			} catch (NullPointerException e) {
 				_log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
@@ -117,18 +104,14 @@ public final class Broadcast
 	 * @param mov
 	 * @param radius
 	 */
-	public static void toKnownPlayersInRadius(L2Character character, L2GameServerPacket mov, int radius)
-	{
-		if (radius < 0)
-		{
+	public static void toKnownPlayersInRadius(L2Character character, L2GameServerPacket mov, int radius) {
+		if (radius < 0) {
 			radius = 1500;
 		}
 		
 		Collection<L2PcInstance> plrs = character.getKnownList().getKnownPlayers().values();
-		for (L2PcInstance player : plrs)
-		{
-			if (character.isInsideRadius(player, radius, false, false))
-			{
+		for (L2PcInstance player : plrs) {
+			if (character.isInsideRadius(player, radius, false, false)) {
 				player.sendPacket(mov);
 			}
 		}
@@ -142,10 +125,8 @@ public final class Broadcast
 	 * @param character
 	 * @param mov
 	 */
-	public static void toSelfAndKnownPlayers(L2Character character, L2GameServerPacket mov)
-	{
-		if (character instanceof L2PcInstance)
-		{
+	public static void toSelfAndKnownPlayers(L2Character character, L2GameServerPacket mov) {
+		if (character instanceof L2PcInstance) {
 			character.sendPacket(mov);
 		}
 		
@@ -153,23 +134,18 @@ public final class Broadcast
 	}
 	
 	// To improve performance we are comparing values of radius^2 instead of calculating sqrt all the time
-	public static void toSelfAndKnownPlayersInRadius(L2Character character, L2GameServerPacket mov, int radius)
-	{
-		if (radius < 0)
-		{
+	public static void toSelfAndKnownPlayersInRadius(L2Character character, L2GameServerPacket mov, int radius) {
+		if (radius < 0) {
 			radius = 600;
 		}
 		
-		if (character instanceof L2PcInstance)
-		{
+		if (character instanceof L2PcInstance) {
 			character.sendPacket(mov);
 		}
 		
 		Collection<L2PcInstance> plrs = character.getKnownList().getKnownPlayers().values();
-		for (L2PcInstance player : plrs)
-		{
-			if ((player != null) && Util.checkIfInRange(radius, character, player, false))
-			{
+		for (L2PcInstance player : plrs) {
+			if ((player != null) && Util.checkIfInRange(radius, character, player, false)) {
 				player.sendPacket(mov);
 			}
 		}
@@ -182,40 +158,31 @@ public final class Broadcast
 	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : This method DOESN'T SEND Server->Client packet to this L2Character (to do this use method toSelfAndKnownPlayers)</B></FONT><BR>
 	 * @param packet
 	 */
-	public static void toAllOnlinePlayers(L2GameServerPacket packet)
-	{
-		for (L2PcInstance player : L2World.getInstance().getPlayers())
-		{
-			if (player.isOnline())
-			{
+	public static void toAllOnlinePlayers(L2GameServerPacket packet) {
+		for (L2PcInstance player : L2World.getInstance().getPlayers()) {
+			if (player.isOnline()) {
 				player.sendPacket(packet);
 			}
 		}
 	}
 	
-	public static void toAllOnlinePlayers(String text)
-	{
+	public static void toAllOnlinePlayers(String text) {
 		toAllOnlinePlayers(text, false);
 	}
 	
-	public static void toAllOnlinePlayers(String text, boolean isCritical)
-	{
+	public static void toAllOnlinePlayers(String text, boolean isCritical) {
 		toAllOnlinePlayers(new CreatureSay(0, isCritical ? Say2.CRITICAL_ANNOUNCE : Say2.ANNOUNCEMENT, "", text));
 	}
 	
-	public static void toPlayersInInstance(L2GameServerPacket packet, int instanceId)
-	{
-		for (L2PcInstance player : L2World.getInstance().getPlayers())
-		{
-			if (player.isOnline() && (player.getInstanceId() == instanceId))
-			{
+	public static void toPlayersInInstance(L2GameServerPacket packet, int instanceId) {
+		for (L2PcInstance player : L2World.getInstance().getPlayers()) {
+			if (player.isOnline() && (player.getInstanceId() == instanceId)) {
 				player.sendPacket(packet);
 			}
 		}
 	}
 	
-	public static void toAllOnlinePlayersOnScreen(String text)
-	{
+	public static void toAllOnlinePlayersOnScreen(String text) {
 		toAllOnlinePlayers(new ExShowScreenMessage(text, 10000));
 	}
 }

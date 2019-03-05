@@ -24,15 +24,13 @@ import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.buylist.L2BuyList;
 import com.l2jserver.gameserver.model.buylist.Product;
 
-public final class BuyList extends L2GameServerPacket
-{
+public final class BuyList extends L2GameServerPacket {
 	private final int _listId;
 	private final Collection<Product> _list;
 	private final long _money;
 	private double _taxRate = 0;
 	
-	public BuyList(L2BuyList list, long currentMoney, double taxRate)
-	{
+	public BuyList(L2BuyList list, long currentMoney, double taxRate) {
 		_listId = list.getListId();
 		_list = list.getProducts();
 		_money = currentMoney;
@@ -40,8 +38,7 @@ public final class BuyList extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0xB7);
 		writeD(0x00);
@@ -50,10 +47,8 @@ public final class BuyList extends L2GameServerPacket
 		
 		writeH(_list.size());
 		
-		for (Product product : _list)
-		{
-			if ((product.getCount() > 0) || !product.hasLimitedStock())
-			{
+		for (Product product : _list) {
+			if ((product.getCount() > 0) || !product.hasLimitedStock()) {
 				writeD(product.getItemId());
 				writeD(product.getItemId());
 				writeD(0);
@@ -69,8 +64,7 @@ public final class BuyList extends L2GameServerPacket
 				writeD(-9999); // Time
 				writeH(0x00); // Element Type
 				writeH(0x00); // Element Power
-				for (byte i = 0; i < 6; i++)
-				{
+				for (byte i = 0; i < 6; i++) {
 					writeH(0x00);
 				}
 				// Enchant Effects
@@ -78,12 +72,9 @@ public final class BuyList extends L2GameServerPacket
 				writeH(0x00);
 				writeH(0x00);
 				
-				if ((product.getItemId() >= 3960) && (product.getItemId() <= 4026))
-				{
+				if ((product.getItemId() >= 3960) && (product.getItemId() <= 4026)) {
 					writeQ((long) (product.getPrice() * Config.RATE_SIEGE_GUARDS_PRICE * (1 + _taxRate)));
-				}
-				else
-				{
+				} else {
 					writeQ((long) (product.getPrice() * (1 + _taxRate)));
 				}
 			}

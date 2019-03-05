@@ -27,16 +27,14 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionChangeWeapon.
  * @author nBd
  */
-public class ConditionChangeWeapon extends Condition
-{
+public class ConditionChangeWeapon extends Condition {
 	private final boolean _required;
 	
 	/**
 	 * Instantiates a new condition change weapon.
 	 * @param required the required
 	 */
-	public ConditionChangeWeapon(boolean required)
-	{
+	public ConditionChangeWeapon(boolean required) {
 		_required = required;
 	}
 	
@@ -45,28 +43,22 @@ public class ConditionChangeWeapon extends Condition
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		
-		if (_required)
-		{
+		if (_required) {
 			final L2Weapon weaponItem = effector.getActiveWeaponItem();
-			if (weaponItem == null)
-			{
+			if (weaponItem == null) {
 				return false;
 			}
 			
-			if (weaponItem.getChangeWeaponId() == 0)
-			{
+			if (weaponItem.getChangeWeaponId() == 0) {
 				return false;
 			}
 			
-			if (effector.getActingPlayer().isEnchanting())
-			{
+			if (effector.getActingPlayer().isEnchanting()) {
 				return false;
 			}
 		}

@@ -29,49 +29,41 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * This class ...
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestJoinAlly extends L2GameClientPacket
-{
+public final class RequestJoinAlly extends L2GameClientPacket {
 	private static final String _C__8C_REQUESTJOINALLY = "[C] 8C RequestJoinAlly";
 	
 	private int _id;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_id = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		L2PcInstance ob = L2World.getInstance().getPlayer(_id);
 		
-		if (ob == null)
-		{
+		if (ob == null) {
 			activeChar.sendPacket(SystemMessageId.YOU_HAVE_INVITED_THE_WRONG_TARGET);
 			return;
 		}
 		
-		if (activeChar.getClan() == null)
-		{
+		if (activeChar.getClan() == null) {
 			activeChar.sendPacket(SystemMessageId.YOU_ARE_NOT_A_CLAN_MEMBER);
 			return;
 		}
 		
 		L2PcInstance target = ob;
 		L2Clan clan = activeChar.getClan();
-		if (!clan.checkAllyJoinCondition(activeChar, target))
-		{
+		if (!clan.checkAllyJoinCondition(activeChar, target)) {
 			return;
 		}
-		if (!activeChar.getRequest().setRequest(target, this))
-		{
+		if (!activeChar.getRequest().setRequest(target, this)) {
 			return;
 		}
 		
@@ -83,8 +75,7 @@ public final class RequestJoinAlly extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8C_REQUESTJOINALLY;
 	}
 }

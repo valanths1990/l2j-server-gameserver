@@ -18,18 +18,15 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class JoinPledge extends L2GameServerPacket
-{
+public final class JoinPledge extends L2GameServerPacket {
 	private final int _pledgeId;
 	
-	public JoinPledge(int pledgeId)
-	{
+	public JoinPledge(int pledgeId) {
 		_pledgeId = pledgeId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x2D);
 		writeD(_pledgeId);
 	}

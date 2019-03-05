@@ -24,42 +24,35 @@ import java.util.List;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class ItemList extends AbstractItemPacket
-{
+public final class ItemList extends AbstractItemPacket {
 	private final L2PcInstance _activeChar;
 	private final List<L2ItemInstance> _items = new ArrayList<>();
 	private final boolean _showWindow;
 	
-	public ItemList(L2PcInstance activeChar, boolean showWindow)
-	{
+	public ItemList(L2PcInstance activeChar, boolean showWindow) {
 		_activeChar = activeChar;
 		_showWindow = showWindow;
 		
-		for (L2ItemInstance item : activeChar.getInventory().getItems())
-		{
-			if (!item.isQuestItem())
-			{
+		for (L2ItemInstance item : activeChar.getInventory().getItems()) {
+			if (!item.isQuestItem()) {
 				_items.add(item);
 			}
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x11);
 		writeH(_showWindow ? 0x01 : 0x00);
 		writeH(_items.size());
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			writeItem(item);
 		}
 		writeInventoryBlock(_activeChar.getInventory());
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		getClient().sendPacket(new ExQuestItemList(_activeChar));
 	}
 }

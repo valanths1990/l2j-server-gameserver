@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class Dice extends L2GameServerPacket
-{
+public class Dice extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _itemId;
 	private final int _number;
@@ -35,8 +34,7 @@ public class Dice extends L2GameServerPacket
 	 * @param y
 	 * @param z
 	 */
-	public Dice(int charObjId, int itemId, int number, int x, int y, int z)
-	{
+	public Dice(int charObjId, int itemId, int number, int x, int y, int z) {
 		_charObjId = charObjId;
 		_itemId = itemId;
 		_number = number;
@@ -46,8 +44,7 @@ public class Dice extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xda);
 		writeD(_charObjId); // object id of player
 		writeD(_itemId); // item id of dice (spade) 4625,4626,4627,4628

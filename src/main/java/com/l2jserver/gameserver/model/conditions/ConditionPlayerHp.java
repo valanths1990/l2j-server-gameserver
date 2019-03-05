@@ -26,22 +26,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerHp.
  * @author mr
  */
-public class ConditionPlayerHp extends Condition
-{
+public class ConditionPlayerHp extends Condition {
 	private final int _hp;
 	
 	/**
 	 * Instantiates a new condition player hp.
 	 * @param hp the hp
 	 */
-	public ConditionPlayerHp(int hp)
-	{
+	public ConditionPlayerHp(int hp) {
 		_hp = hp;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effector != null) && (((effector.getCurrentHp() * 100) / effector.getMaxHp()) <= _hp);
 	}
 }

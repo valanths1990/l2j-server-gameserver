@@ -24,22 +24,18 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author UnAfraid
  */
-public class TeleportTask implements Runnable
-{
+public class TeleportTask implements Runnable {
 	private final L2PcInstance _activeChar;
 	private final Location _loc;
 	
-	public TeleportTask(L2PcInstance player, Location loc)
-	{
+	public TeleportTask(L2PcInstance player, Location loc) {
 		_activeChar = player;
 		_loc = loc;
 	}
 	
 	@Override
-	public void run()
-	{
-		if ((_activeChar != null) && _activeChar.isOnline())
-		{
+	public void run() {
+		if ((_activeChar != null) && _activeChar.isOnline()) {
 			_activeChar.teleToLocation(_loc, true);
 		}
 	}

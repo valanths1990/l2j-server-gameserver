@@ -18,22 +18,19 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ExRegenMax extends L2GameServerPacket
-{
+public class ExRegenMax extends L2GameServerPacket {
 	private final int _time;
 	private final int _tickInterval;
 	private final double _amountPerTick;
 	
-	public ExRegenMax(int time, int tickInterval, double amountPerTick)
-	{
+	public ExRegenMax(int time, int tickInterval, double amountPerTick) {
 		_time = time;
 		_tickInterval = tickInterval;
 		_amountPerTick = amountPerTick;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x01);
 		writeD(1);

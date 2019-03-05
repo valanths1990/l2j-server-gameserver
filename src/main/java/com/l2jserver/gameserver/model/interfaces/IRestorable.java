@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.model.interfaces;
 /**
  * @author UnAfraid
  */
-public interface IRestorable
-{
+public interface IRestorable {
 	public boolean restoreMe();
 }

@@ -30,37 +30,29 @@ import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
  * This class ...
  * @version $Revision: 1.5.2.8.2.8 $ $Date: 2005/04/02 10:43:04 $
  */
-public final class ProtocolVersion extends L2GameClientPacket
-{
+public final class ProtocolVersion extends L2GameClientPacket {
 	private static final String _C__0E_PROTOCOLVERSION = "[C] 0E ProtocolVersion";
 	private static final Logger _logAccounting = Logger.getLogger("accounting");
 	
 	private int _version;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_version = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// this packet is never encrypted
-		if (_version == -2)
-		{
-			if (Config.DEBUG)
-			{
+		if (_version == -2) {
+			if (Config.DEBUG) {
 				_log.info("Ping received");
 			}
 			// this is just a ping attempt from the new C2 client
 			getClient().close((L2GameServerPacket) null);
-		}
-		else if (!Config.PROTOCOL_LIST.contains(_version))
-		{
+		} else if (!Config.PROTOCOL_LIST.contains(_version)) {
 			LogRecord record = new LogRecord(Level.WARNING, "Wrong protocol");
-			record.setParameters(new Object[]
-			{
+			record.setParameters(new Object[] {
 				_version,
 				getClient()
 			});
@@ -68,11 +60,8 @@ public final class ProtocolVersion extends L2GameClientPacket
 			KeyPacket pk = new KeyPacket(getClient().enableCrypt(), 0);
 			getClient().setProtocolOk(false);
 			getClient().close(pk);
-		}
-		else
-		{
-			if (Config.DEBUG)
-			{
+		} else {
+			if (Config.DEBUG) {
 				_log.fine("Client Protocol Revision is ok: " + _version);
 			}
 			
@@ -83,8 +72,7 @@ public final class ProtocolVersion extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__0E_PROTOCOLVERSION;
 	}
 }

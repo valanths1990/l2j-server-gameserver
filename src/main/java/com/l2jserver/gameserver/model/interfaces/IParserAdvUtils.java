@@ -23,8 +23,7 @@ package com.l2jserver.gameserver.model.interfaces;
  * Allows usage of get methods without fall back value.<br>
  * @author xban1x
  */
-public interface IParserAdvUtils extends IParserUtils
-{
+public interface IParserAdvUtils extends IParserUtils {
 	
 	public boolean getBoolean(String key);
 	

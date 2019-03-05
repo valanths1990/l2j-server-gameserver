@@ -23,66 +23,55 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.l2jserver.gameserver.model.actor.L2Npc;
 
-public class L2SiegeClan
-{
+public class L2SiegeClan {
 	private int _clanId = 0;
 	private final List<L2Npc> _flag = new CopyOnWriteArrayList<>();
 	private SiegeClanType _type;
 	
-	public enum SiegeClanType
-	{
+	public enum SiegeClanType {
 		OWNER,
 		DEFENDER,
 		ATTACKER,
 		DEFENDER_PENDING
 	}
 	
-	public L2SiegeClan(int clanId, SiegeClanType type)
-	{
+	public L2SiegeClan(int clanId, SiegeClanType type) {
 		_clanId = clanId;
 		_type = type;
 	}
 	
-	public int getNumFlags()
-	{
+	public int getNumFlags() {
 		return _flag.size();
 	}
 	
-	public void addFlag(L2Npc flag)
-	{
+	public void addFlag(L2Npc flag) {
 		_flag.add(flag);
 	}
 	
-	public boolean removeFlag(L2Npc flag)
-	{
+	public boolean removeFlag(L2Npc flag) {
 		boolean ret = _flag.remove(flag);
 		flag.deleteMe();
 		return ret;
 	}
 	
-	public void removeFlags()
-	{
+	public void removeFlags() {
 		_flag.forEach(f -> f.decayMe());
 		_flag.clear();
 	}
 	
-	public final int getClanId()
-	{
+	public final int getClanId() {
 		return _clanId;
 	}
 	
-	public final List<L2Npc> getFlag()
-	{
+	public final List<L2Npc> getFlag() {
 		return _flag;
 	}
 	
-	public SiegeClanType getType()
-	{
+	public SiegeClanType getType() {
 		return _type;
 	}
 	
-	public void setType(SiegeClanType setType)
-	{
+	public void setType(SiegeClanType setType) {
 		_type = setType;
 	}
 }

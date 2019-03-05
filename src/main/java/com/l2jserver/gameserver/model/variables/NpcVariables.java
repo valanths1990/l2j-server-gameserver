@@ -25,23 +25,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * NPC Variables implementation.
  * @author GKR
  */
-public class NpcVariables extends AbstractVariables
-{
+public class NpcVariables extends AbstractVariables {
 	@Override
-	public int getInt(String key)
-	{
+	public int getInt(String key) {
 		return super.getInt(key, 0);
 	}
 	
 	@Override
-	public boolean restoreMe()
-	{
+	public boolean restoreMe() {
 		return true;
 	}
 	
 	@Override
-	public boolean storeMe()
-	{
+	public boolean storeMe() {
 		return true;
 	}
 	
@@ -50,8 +46,7 @@ public class NpcVariables extends AbstractVariables
 	 * @param name the name of the variable
 	 * @return the stored player or {@code null}
 	 */
-	public L2PcInstance getPlayer(String name)
-	{
+	public L2PcInstance getPlayer(String name) {
 		return getObject(name, L2PcInstance.class);
 	}
 	
@@ -60,8 +55,7 @@ public class NpcVariables extends AbstractVariables
 	 * @param name the name of the variable
 	 * @return the stored summon or {@code null}
 	 */
-	public L2Summon getSummon(String name)
-	{
+	public L2Summon getSummon(String name) {
 		return getObject(name, L2Summon.class);
 	}
 }

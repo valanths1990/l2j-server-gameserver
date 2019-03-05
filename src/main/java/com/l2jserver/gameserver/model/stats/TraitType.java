@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.stats;
 /**
  * @author UnAfraid, NosBit
  */
-public enum TraitType
-{
+public enum TraitType {
 	NONE(0, 0),
 	SWORD(1, 1),
 	BLUNT(2, 1),
@@ -76,19 +75,16 @@ public enum TraitType
 	private final int _id;
 	private final int _type; // 1 = weapon, 2 = weakness, 3 = resistance
 	
-	TraitType(int id, int type)
-	{
+	TraitType(int id, int type) {
 		_id = id;
 		_type = type;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public int getType()
-	{
+	public int getType() {
 		return _type;
 	}
 }

@@ -29,47 +29,35 @@ import com.l2jserver.gameserver.network.serverpackets.AgitDecoInfo;
  * A clan hall zone
  * @author durgus
  */
-public class L2ClanHallZone extends L2ResidenceZone
-{
-	public L2ClanHallZone(int id)
-	{
+public class L2ClanHallZone extends L2ResidenceZone {
+	public L2ClanHallZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("clanHallId"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("clanHallId")) {
 			setResidenceId(Integer.parseInt(value));
 			// Register self to the correct clan hall
 			ClanHall hall = ClanHallManager.getInstance().getClanHallById(getResidenceId());
-			if (hall == null)
-			{
+			if (hall == null) {
 				_log.warning("L2ClanHallZone: Clan hall with id " + getResidenceId() + " does not exist!");
-			}
-			else
-			{
+			} else {
 				hall.setZone(this);
 			}
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayer()) {
 			// Set as in clan hall
 			character.setInsideZone(ZoneId.CLAN_HALL, true);
 			
 			AuctionableHall clanHall = ClanHallManager.getInstance().getAuctionableHallById(getResidenceId());
-			if (clanHall == null)
-			{
+			if (clanHall == null) {
 				return;
 			}
 			
@@ -81,10 +69,8 @@ public class L2ClanHallZone extends L2ResidenceZone
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.CLAN_HALL, false);
 		}
 	}

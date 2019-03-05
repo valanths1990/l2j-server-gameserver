@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.skills.AbnormalVisualEffect;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 
-public class CharInfo extends L2GameServerPacket
-{
+public class CharInfo extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private int _objId;
 	private int _x, _y, _z, _heading;
@@ -46,8 +45,7 @@ public class CharInfo extends L2GameServerPacket
 	
 	private int _vehicleId = 0;
 	
-	private static final int[] PAPERDOLL_ORDER = new int[]
-	{
+	private static final int[] PAPERDOLL_ORDER = new int[] {
 		Inventory.PAPERDOLL_UNDER,
 		Inventory.PAPERDOLL_HEAD,
 		Inventory.PAPERDOLL_RHAND,
@@ -71,19 +69,15 @@ public class CharInfo extends L2GameServerPacket
 		Inventory.PAPERDOLL_BELT
 	};
 	
-	public CharInfo(L2PcInstance cha)
-	{
+	public CharInfo(L2PcInstance cha) {
 		_activeChar = cha;
 		_objId = cha.getObjectId();
-		if ((_activeChar.getVehicle() != null) && (_activeChar.getInVehiclePosition() != null))
-		{
+		if ((_activeChar.getVehicle() != null) && (_activeChar.getInVehiclePosition() != null)) {
 			_x = _activeChar.getInVehiclePosition().getX();
 			_y = _activeChar.getInVehiclePosition().getY();
 			_z = _activeChar.getInVehiclePosition().getZ();
 			_vehicleId = _activeChar.getVehicle().getObjectId();
-		}
-		else
-		{
+		} else {
 			_x = _activeChar.getX();
 			_y = _activeChar.getY();
 			_z = _activeChar.getZ();
@@ -103,8 +97,7 @@ public class CharInfo extends L2GameServerPacket
 		_flyWalkSpd = cha.isFlying() ? _walkSpd : 0;
 	}
 	
-	public CharInfo(L2Decoy decoy)
-	{
+	public CharInfo(L2Decoy decoy) {
 		this(decoy.getActingPlayer()); // init
 		_objId = decoy.getObjectId();
 		_x = decoy.getX();
@@ -114,22 +107,18 @@ public class CharInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		boolean gmSeeInvis = false;
 		
-		if (isInvisible())
-		{
+		if (isInvisible()) {
 			final L2PcInstance activeChar = getClient().getActiveChar();
-			if ((activeChar != null) && activeChar.canOverrideCond(PcCondOverride.SEE_ALL_PLAYERS))
-			{
+			if ((activeChar != null) && activeChar.canOverrideCond(PcCondOverride.SEE_ALL_PLAYERS)) {
 				gmSeeInvis = true;
 			}
 		}
 		
 		final L2NpcTemplate template = _activeChar.getPoly().isMorphed() ? NpcData.getInstance().getTemplate(_activeChar.getPoly().getPolyId()) : null;
-		if (template != null)
-		{
+		if (template != null) {
 			writeC(0x0C);
 			writeD(_objId);
 			writeD(template.getId() + 1000000); // npctype id
@@ -194,9 +183,7 @@ public class CharInfo extends L2GameServerPacket
 			writeC(template.isShowName() ? 1 : 0); // show name
 			writeC(_activeChar.getAbnormalVisualEffectSpecial());
 			writeD(0x00);
-		}
-		else
-		{
+		} else {
 			writeC(0x31);
 			writeD(_x);
 			writeD(_y);
@@ -208,13 +195,11 @@ public class CharInfo extends L2GameServerPacket
 			writeD(_activeChar.getAppearance().getSex() ? 1 : 0);
 			writeD(_activeChar.getBaseClass());
 			
-			for (int slot : getPaperdollOrder())
-			{
+			for (int slot : getPaperdollOrder()) {
 				writeD(_activeChar.getInventory().getPaperdollItemDisplayId(slot));
 			}
 			
-			for (int slot : getPaperdollOrder())
-			{
+			for (int slot : getPaperdollOrder()) {
 				writeD(_activeChar.getInventory().getPaperdollAugmentationId(slot));
 			}
 			
@@ -249,15 +234,12 @@ public class CharInfo extends L2GameServerPacket
 			
 			writeS(gmSeeInvis ? "Invisible" : _activeChar.getAppearance().getVisibleTitle());
 			
-			if (!_activeChar.isCursedWeaponEquipped())
-			{
+			if (!_activeChar.isCursedWeaponEquipped()) {
 				writeD(_activeChar.getClanId());
 				writeD(_activeChar.getClanCrestId());
 				writeD(_activeChar.getAllyId());
 				writeD(_activeChar.getAllyCrestId());
-			}
-			else
-			{
+			} else {
 				writeD(0x00);
 				writeD(0x00);
 				writeD(0x00);
@@ -276,8 +258,7 @@ public class CharInfo extends L2GameServerPacket
 			writeC(_activeChar.getPrivateStoreType().getId());
 			
 			writeH(_activeChar.getCubics().size());
-			for (int cubicId : _activeChar.getCubics().keySet())
-			{
+			for (int cubicId : _activeChar.getCubics().keySet()) {
 				writeH(cubicId);
 			}
 			
@@ -330,8 +311,7 @@ public class CharInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected int[] getPaperdollOrder()
-	{
+	protected int[] getPaperdollOrder() {
 		return PAPERDOLL_ORDER;
 	}
 }

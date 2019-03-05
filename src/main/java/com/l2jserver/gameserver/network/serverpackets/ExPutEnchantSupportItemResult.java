@@ -21,21 +21,18 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author nBd
  */
-public class ExPutEnchantSupportItemResult extends L2GameServerPacket
-{
+public class ExPutEnchantSupportItemResult extends L2GameServerPacket {
 	private final int _result;
 	
 	/**
 	 * @param result
 	 */
-	public ExPutEnchantSupportItemResult(int result)
-	{
+	public ExPutEnchantSupportItemResult(int result) {
 		_result = result;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x82);
 		writeD(_result);

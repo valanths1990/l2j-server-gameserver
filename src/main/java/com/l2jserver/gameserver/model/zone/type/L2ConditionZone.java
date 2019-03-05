@@ -25,60 +25,44 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
 /**
  * @author UnAfraid
  */
-public class L2ConditionZone extends L2ZoneType
-{
+public class L2ConditionZone extends L2ZoneType {
 	private boolean NO_ITEM_DROP = false;
 	private boolean NO_BOOKMARK = false;
 	
-	public L2ConditionZone(int id)
-	{
+	public L2ConditionZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equalsIgnoreCase("NoBookmark"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equalsIgnoreCase("NoBookmark")) {
 			NO_BOOKMARK = Boolean.parseBoolean(value);
-		}
-		else if (name.equalsIgnoreCase("NoItemDrop"))
-		{
+		} else if (name.equalsIgnoreCase("NoItemDrop")) {
 			NO_ITEM_DROP = Boolean.parseBoolean(value);
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayer())
-		{
-			if (NO_BOOKMARK)
-			{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayer()) {
+			if (NO_BOOKMARK) {
 				character.setInsideZone(ZoneId.NO_BOOKMARK, true);
 			}
-			if (NO_ITEM_DROP)
-			{
+			if (NO_ITEM_DROP) {
 				character.setInsideZone(ZoneId.NO_ITEM_DROP, true);
 			}
 		}
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayer())
-		{
-			if (NO_BOOKMARK)
-			{
+	protected void onExit(L2Character character) {
+		if (character.isPlayer()) {
+			if (NO_BOOKMARK) {
 				character.setInsideZone(ZoneId.NO_BOOKMARK, false);
 			}
-			if (NO_ITEM_DROP)
-			{
+			if (NO_ITEM_DROP) {
 				character.setInsideZone(ZoneId.NO_ITEM_DROP, false);
 			}
 		}

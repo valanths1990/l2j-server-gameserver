@@ -27,37 +27,31 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author UnAfraid
  */
-public class OnNpcSkillFinished implements IBaseEvent
-{
+public class OnNpcSkillFinished implements IBaseEvent {
 	private final L2Npc _caster;
 	private final L2PcInstance _target;
 	private final Skill _skill;
 	
-	public OnNpcSkillFinished(L2Npc caster, L2PcInstance target, Skill skill)
-	{
+	public OnNpcSkillFinished(L2Npc caster, L2PcInstance target, Skill skill) {
 		_caster = caster;
 		_target = target;
 		_skill = skill;
 	}
 	
-	public L2PcInstance getTarget()
-	{
+	public L2PcInstance getTarget() {
 		return _target;
 	}
 	
-	public L2Npc getCaster()
-	{
+	public L2Npc getCaster() {
 		return _caster;
 	}
 	
-	public Skill getSkill()
-	{
+	public Skill getSkill() {
 		return _skill;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_NPC_SKILL_FINISHED;
 	}
 }

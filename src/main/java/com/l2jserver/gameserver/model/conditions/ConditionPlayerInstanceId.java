@@ -29,36 +29,30 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerInstanceId.
  */
-public class ConditionPlayerInstanceId extends Condition
-{
+public class ConditionPlayerInstanceId extends Condition {
 	private final ArrayList<Integer> _instanceIds;
 	
 	/**
 	 * Instantiates a new condition player instance id.
 	 * @param instanceIds the instance ids
 	 */
-	public ConditionPlayerInstanceId(ArrayList<Integer> instanceIds)
-	{
+	public ConditionPlayerInstanceId(ArrayList<Integer> instanceIds) {
 		_instanceIds = instanceIds;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		
 		final int instanceId = effector.getInstanceId();
-		if (instanceId <= 0)
-		{
+		if (instanceId <= 0) {
 			return false; // player not in instance
 		}
 		
 		final InstanceWorld world = InstanceManager.getInstance().getPlayerWorld(effector.getActingPlayer());
-		if ((world == null) || (world.getInstanceId() != instanceId))
-		{
+		if ((world == null) || (world.getInstanceId() != instanceId)) {
 			return false; // player in the different instance
 		}
 		return _instanceIds.contains(world.getTemplateId());

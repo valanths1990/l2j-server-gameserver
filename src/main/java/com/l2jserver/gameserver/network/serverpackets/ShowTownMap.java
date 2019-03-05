@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ShowTownMap extends L2GameServerPacket
-{
+public class ShowTownMap extends L2GameServerPacket {
 	private final String _texture;
 	private final int _x;
 	private final int _y;
@@ -29,16 +28,14 @@ public class ShowTownMap extends L2GameServerPacket
 	 * @param x
 	 * @param y
 	 */
-	public ShowTownMap(String texture, int x, int y)
-	{
+	public ShowTownMap(String texture, int x, int y) {
 		_texture = texture;
 		_x = x;
 		_y = y;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xea);
 		writeS(_texture);
 		writeD(_x);

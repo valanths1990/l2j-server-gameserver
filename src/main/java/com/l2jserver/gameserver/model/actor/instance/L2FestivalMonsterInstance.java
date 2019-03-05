@@ -30,22 +30,19 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
  * This class manages all attackable festival NPCs, spawned during the Festival of Darkness.
  * @author Tempy
  */
-public class L2FestivalMonsterInstance extends L2MonsterInstance
-{
+public class L2FestivalMonsterInstance extends L2MonsterInstance {
 	protected int _bonusMultiplier = 1;
 	
 	/**
 	 * Creates a festival monster.
 	 * @param template the festival monster NPC template
 	 */
-	public L2FestivalMonsterInstance(L2NpcTemplate template)
-	{
+	public L2FestivalMonsterInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2FestivalMonsterInstance);
 	}
 	
-	public void setOfferingBonus(int bonusMultiplier)
-	{
+	public void setOfferingBonus(int bonusMultiplier) {
 		_bonusMultiplier = bonusMultiplier;
 	}
 	
@@ -53,10 +50,8 @@ public class L2FestivalMonsterInstance extends L2MonsterInstance
 	 * Return True if the attacker is not another L2FestivalMonsterInstance.
 	 */
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
-		if (attacker instanceof L2FestivalMonsterInstance)
-		{
+	public boolean isAutoAttackable(L2Character attacker) {
+		if (attacker instanceof L2FestivalMonsterInstance) {
 			return false;
 		}
 		
@@ -67,8 +62,7 @@ public class L2FestivalMonsterInstance extends L2MonsterInstance
 	 * All mobs in the festival are aggressive, and have high aggro range.
 	 */
 	@Override
-	public boolean isAggressive()
-	{
+	public boolean isAggressive() {
 		return true;
 	}
 	
@@ -76,8 +70,7 @@ public class L2FestivalMonsterInstance extends L2MonsterInstance
 	 * All mobs in the festival really don't need random animation.
 	 */
 	@Override
-	public boolean hasRandomAnimation()
-	{
+	public boolean hasRandomAnimation() {
 		return false;
 	}
 	
@@ -90,20 +83,17 @@ public class L2FestivalMonsterInstance extends L2MonsterInstance
 	 * </ul>
 	 */
 	@Override
-	public void doItemDrop(L2Character lastAttacker)
-	{
+	public void doItemDrop(L2Character lastAttacker) {
 		L2PcInstance killingChar = null;
 		
-		if (!(lastAttacker instanceof L2PcInstance))
-		{
+		if (!(lastAttacker instanceof L2PcInstance)) {
 			return;
 		}
 		
 		killingChar = (L2PcInstance) lastAttacker;
 		L2Party associatedParty = killingChar.getParty();
 		
-		if (associatedParty == null)
-		{
+		if (associatedParty == null) {
 			return;
 		}
 		
@@ -112,12 +102,9 @@ public class L2FestivalMonsterInstance extends L2MonsterInstance
 		
 		InventoryUpdate iu = new InventoryUpdate();
 		
-		if (addedOfferings.getCount() != _bonusMultiplier)
-		{
+		if (addedOfferings.getCount() != _bonusMultiplier) {
 			iu.addModifiedItem(addedOfferings);
-		}
-		else
-		{
+		} else {
 			iu.addNewItem(addedOfferings);
 		}
 		

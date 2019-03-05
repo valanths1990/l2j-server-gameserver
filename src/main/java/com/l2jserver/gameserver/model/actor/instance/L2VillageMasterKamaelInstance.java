@@ -23,22 +23,18 @@ import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.base.PlayerClass;
 
-public final class L2VillageMasterKamaelInstance extends L2VillageMasterInstance
-{
+public final class L2VillageMasterKamaelInstance extends L2VillageMasterInstance {
 	/**
 	 * Creates a village master.
 	 * @param template the village master NPC template
 	 */
-	public L2VillageMasterKamaelInstance(L2NpcTemplate template)
-	{
+	public L2VillageMasterKamaelInstance(L2NpcTemplate template) {
 		super(template);
 	}
 	
 	@Override
-	protected final String getSubClassMenu(Race race)
-	{
-		if (Config.ALT_GAME_SUBCLASS_EVERYWHERE || (race == Race.KAMAEL))
-		{
+	protected final String getSubClassMenu(Race race) {
+		if (Config.ALT_GAME_SUBCLASS_EVERYWHERE || (race == Race.KAMAEL)) {
 			return "data/html/villagemaster/SubClass.htm";
 		}
 		
@@ -46,22 +42,18 @@ public final class L2VillageMasterKamaelInstance extends L2VillageMasterInstance
 	}
 	
 	@Override
-	protected final String getSubClassFail()
-	{
+	protected final String getSubClassFail() {
 		return "data/html/villagemaster/SubClass_Fail_Kamael.htm";
 	}
 	
 	@Override
-	protected final boolean checkQuests(L2PcInstance player)
-	{
+	protected final boolean checkQuests(L2PcInstance player) {
 		return player.isNoble() || player.hasQuestCompleted("Q00234_FatesWhisper") || player.hasQuestCompleted("Q00236_SeedsOfChaos");
 	}
 	
 	@Override
-	protected final boolean checkVillageMasterRace(PlayerClass pclass)
-	{
-		if (pclass == null)
-		{
+	protected final boolean checkVillageMasterRace(PlayerClass pclass) {
+		if (pclass == null) {
 			return false;
 		}
 		

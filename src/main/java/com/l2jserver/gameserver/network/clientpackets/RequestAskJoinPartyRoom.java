@@ -28,48 +28,37 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Format: (ch) S
  * @author -Wooden-, Tryskell
  */
-public class RequestAskJoinPartyRoom extends L2GameClientPacket
-{
+public class RequestAskJoinPartyRoom extends L2GameClientPacket {
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
 		// Send PartyRoom invite request (with activeChar) name to the target
 		final L2PcInstance target = L2World.getInstance().getPlayer(_name);
-		if (target != null)
-		{
-			if (!target.isProcessingRequest())
-			{
+		if (target != null) {
+			if (!target.isProcessingRequest()) {
 				player.onTransactionRequest(target);
 				target.sendPacket(new ExAskJoinPartyRoom(player.getName()));
-			}
-			else
-			{
+			} else {
 				player.sendPacket(SystemMessage.getSystemMessage(SystemMessageId.C1_IS_BUSY_TRY_LATER).addPcName(target));
 			}
-		}
-		else
-		{
+		} else {
 			player.sendPacket(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return "[C] D0:14 RequestAskJoinPartyRoom";
 	}
 }

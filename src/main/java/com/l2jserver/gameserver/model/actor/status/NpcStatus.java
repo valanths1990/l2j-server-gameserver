@@ -23,32 +23,25 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class NpcStatus extends CharStatus
-{
-	public NpcStatus(L2Npc activeChar)
-	{
+public class NpcStatus extends CharStatus {
+	public NpcStatus(L2Npc activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public void reduceHp(double value, L2Character attacker)
-	{
+	public void reduceHp(double value, L2Character attacker) {
 		reduceHp(value, attacker, true, false, false);
 	}
 	
 	@Override
-	public void reduceHp(double value, L2Character attacker, boolean awake, boolean isDOT, boolean isHpConsumption)
-	{
-		if (getActiveChar().isDead())
-		{
+	public void reduceHp(double value, L2Character attacker, boolean awake, boolean isDOT, boolean isHpConsumption) {
+		if (getActiveChar().isDead()) {
 			return;
 		}
 		
-		if (attacker != null)
-		{
+		if (attacker != null) {
 			final L2PcInstance attackerPlayer = attacker.getActingPlayer();
-			if ((attackerPlayer != null) && attackerPlayer.isInDuel())
-			{
+			if ((attackerPlayer != null) && attackerPlayer.isInDuel()) {
 				attackerPlayer.setDuelState(DuelState.INTERRUPTED);
 			}
 			
@@ -60,8 +53,7 @@ public class NpcStatus extends CharStatus
 	}
 	
 	@Override
-	public L2Npc getActiveChar()
-	{
+	public L2Npc getActiveChar() {
 		return (L2Npc) super.getActiveChar();
 	}
 }

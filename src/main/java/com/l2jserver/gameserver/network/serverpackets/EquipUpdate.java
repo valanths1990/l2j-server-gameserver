@@ -21,26 +21,22 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class EquipUpdate extends L2GameServerPacket
-{
+public final class EquipUpdate extends L2GameServerPacket {
 	private final L2ItemInstance _item;
 	private final int _change;
 	
-	public EquipUpdate(L2ItemInstance item, int change)
-	{
+	public EquipUpdate(L2ItemInstance item, int change) {
 		_item = item;
 		_change = change;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		int bodypart = 0;
 		writeC(0x4b);
 		writeD(_change);
 		writeD(_item.getObjectId());
-		switch (_item.getItem().getBodyPart())
-		{
+		switch (_item.getItem().getBodyPart()) {
 			case L2Item.SLOT_L_EAR:
 				bodypart = 0x01;
 				break;

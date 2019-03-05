@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.Location;
  * Object world location storage and update interface.
  * @author Zoey76
  */
-public interface IPositionable extends ILocational
-{
+public interface IPositionable extends ILocational {
 	/**
 	 * Sets the X coordinate of this object.
 	 * @param x the new X coordinate

@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.CrystalType;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public abstract class AbstractRefinePacket extends L2GameClientPacket
-{
+public abstract class AbstractRefinePacket extends L2GameClientPacket {
 	public static final int GRADE_NONE = 0;
 	public static final int GRADE_MID = 1;
 	public static final int GRADE_HIGH = 2;
@@ -47,11 +46,9 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	
 	private static final Map<Integer, LifeStone> _lifeStones = new HashMap<>();
 	
-	protected static final class LifeStone
-	{
+	protected static final class LifeStone {
 		// lifestone level to player level table
-		private static final int[] LEVELS =
-		{
+		private static final int[] LEVELS = {
 			46,
 			49,
 			52,
@@ -70,30 +67,25 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 		private final int _grade;
 		private final int _level;
 		
-		public LifeStone(int grade, int level)
-		{
+		public LifeStone(int grade, int level) {
 			_grade = grade;
 			_level = level;
 		}
 		
-		public final int getLevel()
-		{
+		public final int getLevel() {
 			return _level;
 		}
 		
-		public final int getGrade()
-		{
+		public final int getGrade() {
 			return _grade;
 		}
 		
-		public final int getPlayerLevel()
-		{
+		public final int getPlayerLevel() {
 			return LEVELS[_level];
 		}
 	}
 	
-	static
-	{
+	static {
 		// itemId, (LS grade, LS level)
 		_lifeStones.put(8723, new LifeStone(GRADE_NONE, 0));
 		_lifeStones.put(8724, new LifeStone(GRADE_NONE, 1));
@@ -196,8 +188,7 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 		_lifeStones.put(16178, new LifeStone(GRADE_ACC, 13));
 	}
 	
-	protected static final LifeStone getLifeStone(int itemId)
-	{
+	protected static final LifeStone getLifeStone(int itemId) {
 		return _lifeStones.get(itemId);
 	}
 	
@@ -209,21 +200,17 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	 * @param gemStones
 	 * @return
 	 */
-	protected static final boolean isValid(L2PcInstance player, L2ItemInstance item, L2ItemInstance refinerItem, L2ItemInstance gemStones)
-	{
-		if (!isValid(player, item, refinerItem))
-		{
+	protected static final boolean isValid(L2PcInstance player, L2ItemInstance item, L2ItemInstance refinerItem, L2ItemInstance gemStones) {
+		if (!isValid(player, item, refinerItem)) {
 			return false;
 		}
 		
 		// GemStones must belong to owner
-		if (gemStones.getOwnerId() != player.getObjectId())
-		{
+		if (gemStones.getOwnerId() != player.getObjectId()) {
 			return false;
 		}
 		// .. and located in inventory
-		if (gemStones.getItemLocation() != ItemLocation.INVENTORY)
-		{
+		if (gemStones.getItemLocation() != ItemLocation.INVENTORY) {
 			return false;
 		}
 		
@@ -231,13 +218,11 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 		final LifeStone ls = _lifeStones.get(refinerItem.getId());
 		
 		// Check for item id
-		if (getGemStoneId(grade) != gemStones.getId())
-		{
+		if (getGemStoneId(grade) != gemStones.getId()) {
 			return false;
 		}
 		// Count must be greater or equal of required number
-		if (getGemStoneCount(grade, ls.getGrade()) > gemStones.getCount())
-		{
+		if (getGemStoneCount(grade, ls.getGrade()) > gemStones.getCount()) {
 			return false;
 		}
 		
@@ -251,42 +236,34 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	 * @param refinerItem
 	 * @return
 	 */
-	protected static final boolean isValid(L2PcInstance player, L2ItemInstance item, L2ItemInstance refinerItem)
-	{
-		if (!isValid(player, item))
-		{
+	protected static final boolean isValid(L2PcInstance player, L2ItemInstance item, L2ItemInstance refinerItem) {
+		if (!isValid(player, item)) {
 			return false;
 		}
 		
 		// Item must belong to owner
-		if (refinerItem.getOwnerId() != player.getObjectId())
-		{
+		if (refinerItem.getOwnerId() != player.getObjectId()) {
 			return false;
 		}
 		// Lifestone must be located in inventory
-		if (refinerItem.getItemLocation() != ItemLocation.INVENTORY)
-		{
+		if (refinerItem.getItemLocation() != ItemLocation.INVENTORY) {
 			return false;
 		}
 		
 		final LifeStone ls = _lifeStones.get(refinerItem.getId());
-		if (ls == null)
-		{
+		if (ls == null) {
 			return false;
 		}
 		// weapons can't be augmented with accessory ls
-		if ((item.getItem() instanceof L2Weapon) && (ls.getGrade() == GRADE_ACC))
-		{
+		if ((item.getItem() instanceof L2Weapon) && (ls.getGrade() == GRADE_ACC)) {
 			return false;
 		}
 		// and accessory can't be augmented with weapon ls
-		if ((item.getItem() instanceof L2Armor) && (ls.getGrade() != GRADE_ACC))
-		{
+		if ((item.getItem() instanceof L2Armor) && (ls.getGrade() != GRADE_ACC)) {
 			return false;
 		}
 		// check for level of the lifestone
-		if (player.getLevel() < ls.getPlayerLevel())
-		{
+		if (player.getLevel() < ls.getPlayerLevel()) {
 			return false;
 		}
 		
@@ -299,54 +276,42 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	 * @param item
 	 * @return
 	 */
-	protected static final boolean isValid(L2PcInstance player, L2ItemInstance item)
-	{
-		if (!isValid(player))
-		{
+	protected static final boolean isValid(L2PcInstance player, L2ItemInstance item) {
+		if (!isValid(player)) {
 			return false;
 		}
 		
 		// Item must belong to owner
-		if (item.getOwnerId() != player.getObjectId())
-		{
+		if (item.getOwnerId() != player.getObjectId()) {
 			return false;
 		}
-		if (item.isAugmented())
-		{
+		if (item.isAugmented()) {
 			return false;
 		}
-		if (item.isHeroItem())
-		{
+		if (item.isHeroItem()) {
 			return false;
 		}
-		if (item.isShadowItem())
-		{
+		if (item.isShadowItem()) {
 			return false;
 		}
-		if (item.isCommonItem())
-		{
+		if (item.isCommonItem()) {
 			return false;
 		}
-		if (item.isEtcItem())
-		{
+		if (item.isEtcItem()) {
 			return false;
 		}
-		if (item.isTimeLimitedItem())
-		{
+		if (item.isTimeLimitedItem()) {
 			return false;
 		}
-		if (item.isPvp() && !Config.ALT_ALLOW_AUGMENT_PVP_ITEMS)
-		{
+		if (item.isPvp() && !Config.ALT_ALLOW_AUGMENT_PVP_ITEMS) {
 			return false;
 		}
-		if (item.getItem().getCrystalType().isLesser(CrystalType.C))
-		{
+		if (item.getItem().getCrystalType().isLesser(CrystalType.C)) {
 			return false;
 		}
 		
 		// Source item can be equipped or in inventory
-		switch (item.getItemLocation())
-		{
+		switch (item.getItemLocation()) {
 			case INVENTORY:
 			case PAPERDOLL:
 				break;
@@ -354,22 +319,17 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 				return false;
 		}
 		
-		if (item.getItem() instanceof L2Weapon)
-		{
-			switch (((L2Weapon) item.getItem()).getItemType())
-			{
+		if (item.getItem() instanceof L2Weapon) {
+			switch (((L2Weapon) item.getItem()).getItemType()) {
 				case NONE:
 				case FISHINGROD:
 					return false;
 				default:
 					break;
 			}
-		}
-		else if (item.getItem() instanceof L2Armor)
-		{
+		} else if (item.getItem() instanceof L2Armor) {
 			// only accessories can be augmented
-			switch (item.getItem().getBodyPart())
-			{
+			switch (item.getItem().getBodyPart()) {
 				case L2Item.SLOT_LR_FINGER:
 				case L2Item.SLOT_LR_EAR:
 				case L2Item.SLOT_NECK:
@@ -377,15 +337,12 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 				default:
 					return false;
 			}
-		}
-		else
-		{
+		} else {
 			return false; // neither weapon nor armor ?
 		}
 		
 		// blacklist check
-		if (Arrays.binarySearch(Config.AUGMENTATION_BLACKLIST, item.getId()) >= 0)
-		{
+		if (Arrays.binarySearch(Config.AUGMENTATION_BLACKLIST, item.getId()) >= 0) {
 			return false;
 		}
 		
@@ -397,44 +354,35 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	 * @param player
 	 * @return
 	 */
-	protected static final boolean isValid(L2PcInstance player)
-	{
-		if (player.getPrivateStoreType() != PrivateStoreType.NONE)
-		{
+	protected static final boolean isValid(L2PcInstance player) {
+		if (player.getPrivateStoreType() != PrivateStoreType.NONE) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_AUGMENT_ITEMS_WHILE_A_PRIVATE_STORE_OR_PRIVATE_WORKSHOP_IS_IN_OPERATION);
 			return false;
 		}
-		if (player.getActiveTradeList() != null)
-		{
+		if (player.getActiveTradeList() != null) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_AUGMENT_ITEMS_WHILE_TRADING);
 			return false;
 		}
-		if (player.isDead())
-		{
+		if (player.isDead()) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_AUGMENT_ITEMS_WHILE_DEAD);
 			return false;
 		}
-		if (player.isParalyzed())
-		{
+		if (player.isParalyzed()) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_AUGMENT_ITEMS_WHILE_PARALYZED);
 			return false;
 		}
-		if (player.isFishing())
-		{
+		if (player.isFishing()) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_AUGMENT_ITEMS_WHILE_FISHING);
 			return false;
 		}
-		if (player.isSitting())
-		{
+		if (player.isSitting()) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_AUGMENT_ITEMS_WHILE_SITTING_DOWN);
 			return false;
 		}
-		if (player.isCursedWeaponEquipped())
-		{
+		if (player.isCursedWeaponEquipped()) {
 			return false;
 		}
-		if (player.isEnchanting() || player.isProcessingTransaction())
-		{
+		if (player.isEnchanting() || player.isProcessingTransaction()) {
 			return false;
 		}
 		
@@ -445,10 +393,8 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	 * @param itemGrade
 	 * @return GemStone itemId based on item grade
 	 */
-	protected static final int getGemStoneId(CrystalType itemGrade)
-	{
-		switch (itemGrade)
-		{
+	protected static final int getGemStoneId(CrystalType itemGrade) {
+		switch (itemGrade) {
 			case C:
 			case B:
 				return GEMSTONE_D;
@@ -469,13 +415,10 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 	 * @param lifeStoneGrade
 	 * @return GemStone count based on item grade and life stone grade
 	 */
-	protected static final int getGemStoneCount(CrystalType itemGrade, int lifeStoneGrade)
-	{
-		switch (lifeStoneGrade)
-		{
+	protected static final int getGemStoneCount(CrystalType itemGrade, int lifeStoneGrade) {
+		switch (lifeStoneGrade) {
 			case GRADE_ACC:
-				switch (itemGrade)
-				{
+				switch (itemGrade) {
 					case C:
 						return 200;
 					case B:
@@ -492,8 +435,7 @@ public abstract class AbstractRefinePacket extends L2GameClientPacket
 						return 0;
 				}
 			default:
-				switch (itemGrade)
-				{
+				switch (itemGrade) {
 					case C:
 						return 20;
 					case B:

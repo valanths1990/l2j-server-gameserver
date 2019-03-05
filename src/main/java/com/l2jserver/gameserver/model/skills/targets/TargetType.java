@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.skills.targets;
  * Target type enumerated.
  * @author Zoey76
  */
-public enum TargetType
-{
+public enum TargetType {
 	/** Advance Head Quarters (Outposts). */
 	ADVANCE_BASE,
 	/** Enemies in high terrain or protected by castle walls and doors. */

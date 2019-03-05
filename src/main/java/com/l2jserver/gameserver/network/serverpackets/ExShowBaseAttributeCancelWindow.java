@@ -22,24 +22,20 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class ExShowBaseAttributeCancelWindow extends L2GameServerPacket
-{
+public class ExShowBaseAttributeCancelWindow extends L2GameServerPacket {
 	private final L2ItemInstance[] _items;
 	private long _price;
 	
-	public ExShowBaseAttributeCancelWindow(L2PcInstance player)
-	{
+	public ExShowBaseAttributeCancelWindow(L2PcInstance player) {
 		_items = player.getInventory().getElementItems();
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x74);
 		writeD(_items.length);
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			writeD(item.getObjectId());
 			writeQ(getPrice(item));
 		}
@@ -50,37 +46,26 @@ public class ExShowBaseAttributeCancelWindow extends L2GameServerPacket
 	 * @param item
 	 * @return
 	 */
-	private long getPrice(L2ItemInstance item)
-	{
-		switch (item.getItem().getCrystalType())
-		{
+	private long getPrice(L2ItemInstance item) {
+		switch (item.getItem().getCrystalType()) {
 			case S:
-				if (item.getItem() instanceof L2Weapon)
-				{
+				if (item.getItem() instanceof L2Weapon) {
 					_price = 50000;
-				}
-				else
-				{
+				} else {
 					_price = 40000;
 				}
 				break;
 			case S80:
-				if (item.getItem() instanceof L2Weapon)
-				{
+				if (item.getItem() instanceof L2Weapon) {
 					_price = 100000;
-				}
-				else
-				{
+				} else {
 					_price = 80000;
 				}
 				break;
 			case S84:
-				if (item.getItem() instanceof L2Weapon)
-				{
+				if (item.getItem() instanceof L2Weapon) {
 					_price = 200000;
-				}
-				else
-				{
+				} else {
 					_price = 160000;
 				}
 				break;

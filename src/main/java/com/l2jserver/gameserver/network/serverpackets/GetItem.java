@@ -20,20 +20,17 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class GetItem extends L2GameServerPacket
-{
+public final class GetItem extends L2GameServerPacket {
 	private final L2ItemInstance _item;
 	private final int _playerId;
 	
-	public GetItem(L2ItemInstance item, int playerId)
-	{
+	public GetItem(L2ItemInstance item, int playerId) {
 		_item = item;
 		_playerId = playerId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x17);
 		writeD(_playerId);
 		writeD(_item.getObjectId());

@@ -25,35 +25,27 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 
-public class L2FortDoormenInstance extends L2DoormenInstance
-{
+public class L2FortDoormenInstance extends L2DoormenInstance {
 	/**
 	 * Creates a fort doorman.
 	 * @param template the fort doorman NPC template
 	 */
-	public L2FortDoormenInstance(L2NpcTemplate template)
-	{
+	public L2FortDoormenInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2FortDoormenInstance);
 	}
 	
 	@Override
-	public void showChatWindow(L2PcInstance player)
-	{
+	public void showChatWindow(L2PcInstance player) {
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 		
 		final NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
 		
-		if (!isOwnerClan(player))
-		{
+		if (!isOwnerClan(player)) {
 			html.setFile(player.getHtmlPrefix(), "data/html/doormen/" + getTemplate().getId() + "-no.htm");
-		}
-		else if (isUnderSiege())
-		{
+		} else if (isUnderSiege()) {
 			html.setFile(player.getHtmlPrefix(), "data/html/doormen/" + getTemplate().getId() + "-busy.htm");
-		}
-		else
-		{
+		} else {
 			html.setFile(player.getHtmlPrefix(), "data/html/doormen/" + getTemplate().getId() + ".htm");
 		}
 		
@@ -62,36 +54,29 @@ public class L2FortDoormenInstance extends L2DoormenInstance
 	}
 	
 	@Override
-	protected final void openDoors(L2PcInstance player, String command)
-	{
+	protected final void openDoors(L2PcInstance player, String command) {
 		StringTokenizer st = new StringTokenizer(command.substring(10), ", ");
 		st.nextToken();
 		
-		while (st.hasMoreTokens())
-		{
+		while (st.hasMoreTokens()) {
 			getFort().openDoor(player, Integer.parseInt(st.nextToken()));
 		}
 	}
 	
 	@Override
-	protected final void closeDoors(L2PcInstance player, String command)
-	{
+	protected final void closeDoors(L2PcInstance player, String command) {
 		StringTokenizer st = new StringTokenizer(command.substring(11), ", ");
 		st.nextToken();
 		
-		while (st.hasMoreTokens())
-		{
+		while (st.hasMoreTokens()) {
 			getFort().closeDoor(player, Integer.parseInt(st.nextToken()));
 		}
 	}
 	
 	@Override
-	protected final boolean isOwnerClan(L2PcInstance player)
-	{
-		if ((player.getClan() != null) && (getFort() != null) && (getFort().getOwnerClan() != null))
-		{
-			if (player.getClanId() == getFort().getOwnerClan().getId())
-			{
+	protected final boolean isOwnerClan(L2PcInstance player) {
+		if ((player.getClan() != null) && (getFort() != null) && (getFort().getOwnerClan() != null)) {
+			if (player.getClanId() == getFort().getOwnerClan().getId()) {
 				return true;
 			}
 		}
@@ -99,8 +84,7 @@ public class L2FortDoormenInstance extends L2DoormenInstance
 	}
 	
 	@Override
-	protected final boolean isUnderSiege()
-	{
+	protected final boolean isUnderSiege() {
 		return getFort().getZone().isActive();
 	}
 }

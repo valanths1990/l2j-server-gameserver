@@ -30,33 +30,26 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncHenna extends AbstractFunction
-{
+public class FuncHenna extends AbstractFunction {
 	private static final Map<Stats, FuncHenna> _fh_instance = new HashMap<>();
 	
-	public static AbstractFunction getInstance(Stats st)
-	{
-		if (!_fh_instance.containsKey(st))
-		{
+	public static AbstractFunction getInstance(Stats st) {
+		if (!_fh_instance.containsKey(st)) {
 			_fh_instance.put(st, new FuncHenna(st));
 		}
 		return _fh_instance.get(st);
 	}
 	
-	private FuncHenna(Stats stat)
-	{
+	private FuncHenna(Stats stat) {
 		super(stat, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		L2PcInstance pc = effector.getActingPlayer();
 		double value = initVal;
-		if (pc != null)
-		{
-			switch (getStat())
-			{
+		if (pc != null) {
+			switch (getStat()) {
 				case STAT_STR:
 					value += pc.getHennaStatSTR();
 					break;

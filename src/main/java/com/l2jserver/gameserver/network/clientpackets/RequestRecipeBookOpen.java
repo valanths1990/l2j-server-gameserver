@@ -23,39 +23,32 @@ import com.l2jserver.gameserver.RecipeController;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public final class RequestRecipeBookOpen extends L2GameClientPacket
-{
+public final class RequestRecipeBookOpen extends L2GameClientPacket {
 	private static final String _C__B5_REQUESTRECIPEBOOKOPEN = "[C] B5 RequestRecipeBookOpen";
 	
 	private boolean _isDwarvenCraft;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_isDwarvenCraft = (readD() == 0);
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			_log.info("RequestRecipeBookOpen : " + (_isDwarvenCraft ? "dwarvenCraft" : "commonCraft"));
 		}
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (activeChar.isCastingNow() || activeChar.isCastingSimultaneouslyNow())
-		{
+		if (activeChar.isCastingNow() || activeChar.isCastingSimultaneouslyNow()) {
 			activeChar.sendPacket(SystemMessageId.NO_RECIPE_BOOK_WHILE_CASTING);
 			return;
 		}
 		
-		if (activeChar.getActiveRequester() != null)
-		{
+		if (activeChar.getActiveRequester() != null) {
 			activeChar.sendMessage("You may not alter your recipe book while trading.");
 			return;
 		}
@@ -64,8 +57,7 @@ public final class RequestRecipeBookOpen extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__B5_REQUESTRECIPEBOOKOPEN;
 	}
 }

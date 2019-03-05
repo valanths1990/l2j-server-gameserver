@@ -23,7 +23,6 @@ import com.l2jserver.gameserver.model.events.EventType;
 /**
  * @author UnAfraid
  */
-public interface IBaseEvent
-{
+public interface IBaseEvent {
 	public EventType getType();
 }

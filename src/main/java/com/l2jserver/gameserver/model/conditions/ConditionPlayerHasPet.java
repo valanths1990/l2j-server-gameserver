@@ -29,36 +29,28 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerHasPet.
  */
-public class ConditionPlayerHasPet extends Condition
-{
+public class ConditionPlayerHasPet extends Condition {
 	private final ArrayList<Integer> _controlItemIds;
 	
 	/**
 	 * Instantiates a new condition player has pet.
 	 * @param itemIds the item ids
 	 */
-	public ConditionPlayerHasPet(ArrayList<Integer> itemIds)
-	{
-		if ((itemIds.size() == 1) && (itemIds.get(0) == 0))
-		{
+	public ConditionPlayerHasPet(ArrayList<Integer> itemIds) {
+		if ((itemIds.size() == 1) && (itemIds.get(0) == 0)) {
 			_controlItemIds = null;
-		}
-		else
-		{
+		} else {
 			_controlItemIds = itemIds;
 		}
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector.getActingPlayer() == null) || (!(effector.getActingPlayer().getSummon() instanceof L2PetInstance)))
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector.getActingPlayer() == null) || (!(effector.getActingPlayer().getSummon() instanceof L2PetInstance))) {
 			return false;
 		}
 		
-		if (_controlItemIds == null)
-		{
+		if (_controlItemIds == null) {
 			return true;
 		}
 		

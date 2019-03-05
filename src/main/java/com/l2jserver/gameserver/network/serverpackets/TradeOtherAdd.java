@@ -24,18 +24,15 @@ import com.l2jserver.gameserver.model.TradeItem;
 /**
  * @author Yme
  */
-public final class TradeOtherAdd extends AbstractItemPacket
-{
+public final class TradeOtherAdd extends AbstractItemPacket {
 	private final TradeItem _item;
 	
-	public TradeOtherAdd(TradeItem item)
-	{
+	public TradeOtherAdd(TradeItem item) {
 		_item = item;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x1B);
 		
 		writeH(1); // item count

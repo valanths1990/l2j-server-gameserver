@@ -22,8 +22,7 @@ import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.serverpackets.ManagePledgePower;
 
-public final class RequestPledgePower extends L2GameClientPacket
-{
+public final class RequestPledgePower extends L2GameClientPacket {
 	private static final String _C__CC_REQUESTPLEDGEPOWER = "[C] CC RequestPledgePower";
 	
 	private int _rank;
@@ -31,35 +30,26 @@ public final class RequestPledgePower extends L2GameClientPacket
 	private int _privs;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_rank = readD();
 		_action = readD();
-		if (_action == 2)
-		{
+		if (_action == 2) {
 			_privs = readD();
-		}
-		else
-		{
+		} else {
 			_privs = 0;
 		}
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (_action == 2)
-		{
-			if (player.isClanLeader())
-			{
-				if (_rank == 9)
-				{
+		if (_action == 2) {
+			if (player.isClanLeader()) {
+				if (_rank == 9) {
 					// The rights below cannot be bestowed upon Academy members:
 					// Join a clan or be dismissed
 					// Title management, crest management, master management, level management,
@@ -71,16 +61,13 @@ public final class RequestPledgePower extends L2GameClientPacket
 				}
 				player.getClan().setRankPrivs(_rank, _privs);
 			}
-		}
-		else
-		{
+		} else {
 			player.sendPacket(new ManagePledgePower(getClient().getActiveChar().getClan(), _action, _rank));
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__CC_REQUESTPLEDGEPOWER;
 	}
 }

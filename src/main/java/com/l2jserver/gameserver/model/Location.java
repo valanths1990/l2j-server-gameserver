@@ -26,31 +26,26 @@ import com.l2jserver.gameserver.model.interfaces.IPositionable;
  * Contains coordinates data, heading and instance Id.
  * @author Zoey76
  */
-public class Location implements IPositionable
-{
+public class Location implements IPositionable {
 	private int _x;
 	private int _y;
 	private int _z;
 	private int _heading;
 	private int _instanceId;
 	
-	public Location(int x, int y, int z)
-	{
+	public Location(int x, int y, int z) {
 		this(x, y, z, 0, -1);
 	}
 	
-	public Location(int x, int y, int z, int heading)
-	{
+	public Location(int x, int y, int z, int heading) {
 		this(x, y, z, heading, -1);
 	}
 	
-	public Location(L2Object obj)
-	{
+	public Location(L2Object obj) {
 		this(obj.getX(), obj.getY(), obj.getZ(), obj.getHeading(), obj.getInstanceId());
 	}
 	
-	public Location(int x, int y, int z, int heading, int instanceId)
-	{
+	public Location(int x, int y, int z, int heading, int instanceId) {
 		_x = x;
 		_y = y;
 		_z = z;
@@ -63,8 +58,7 @@ public class Location implements IPositionable
 	 * @return the x coordinate
 	 */
 	@Override
-	public int getX()
-	{
+	public int getX() {
 		return _x;
 	}
 	
@@ -73,8 +67,7 @@ public class Location implements IPositionable
 	 * @param x the x coordinate
 	 */
 	@Override
-	public void setX(int x)
-	{
+	public void setX(int x) {
 		_x = x;
 	}
 	
@@ -83,8 +76,7 @@ public class Location implements IPositionable
 	 * @return the y coordinate
 	 */
 	@Override
-	public int getY()
-	{
+	public int getY() {
 		return _y;
 	}
 	
@@ -93,8 +85,7 @@ public class Location implements IPositionable
 	 * @param y the x coordinate
 	 */
 	@Override
-	public void setY(int y)
-	{
+	public void setY(int y) {
 		_y = y;
 	}
 	
@@ -103,8 +94,7 @@ public class Location implements IPositionable
 	 * @return the z coordinate
 	 */
 	@Override
-	public int getZ()
-	{
+	public int getZ() {
 		return _z;
 	}
 	
@@ -113,8 +103,7 @@ public class Location implements IPositionable
 	 * @param z the z coordinate
 	 */
 	@Override
-	public void setZ(int z)
-	{
+	public void setZ(int z) {
 		_z = z;
 	}
 	
@@ -125,8 +114,7 @@ public class Location implements IPositionable
 	 * @param z the z coordinate
 	 */
 	@Override
-	public void setXYZ(int x, int y, int z)
-	{
+	public void setXYZ(int x, int y, int z) {
 		setX(x);
 		setY(y);
 		setZ(z);
@@ -137,8 +125,7 @@ public class Location implements IPositionable
 	 * @param loc The location.
 	 */
 	@Override
-	public void setXYZ(ILocational loc)
-	{
+	public void setXYZ(ILocational loc) {
 		setXYZ(loc.getX(), loc.getY(), loc.getZ());
 	}
 	
@@ -147,8 +134,7 @@ public class Location implements IPositionable
 	 * @return the heading
 	 */
 	@Override
-	public int getHeading()
-	{
+	public int getHeading() {
 		return _heading;
 	}
 	
@@ -157,8 +143,7 @@ public class Location implements IPositionable
 	 * @param heading the heading
 	 */
 	@Override
-	public void setHeading(int heading)
-	{
+	public void setHeading(int heading) {
 		_heading = heading;
 	}
 	
@@ -167,8 +152,7 @@ public class Location implements IPositionable
 	 * @return the instance Id
 	 */
 	@Override
-	public int getInstanceId()
-	{
+	public int getInstanceId() {
 		return _instanceId;
 	}
 	
@@ -177,20 +161,17 @@ public class Location implements IPositionable
 	 * @param instanceId the instance Id to set
 	 */
 	@Override
-	public void setInstanceId(int instanceId)
-	{
+	public void setInstanceId(int instanceId) {
 		_instanceId = instanceId;
 	}
 	
 	@Override
-	public IPositionable getLocation()
-	{
+	public IPositionable getLocation() {
 		return this;
 	}
 	
 	@Override
-	public void setLocation(Location loc)
-	{
+	public void setLocation(Location loc) {
 		_x = loc.getX();
 		_y = loc.getY();
 		_z = loc.getZ();
@@ -199,10 +180,8 @@ public class Location implements IPositionable
 	}
 	
 	@Override
-	public boolean equals(Object obj)
-	{
-		if ((obj != null) && (obj instanceof Location))
-		{
+	public boolean equals(Object obj) {
+		if ((obj != null) && (obj instanceof Location)) {
 			final Location loc = (Location) obj;
 			return (getX() == loc.getX()) && (getY() == loc.getY()) && (getZ() == loc.getZ()) && (getHeading() == loc.getHeading()) && (getInstanceId() == loc.getInstanceId());
 		}
@@ -210,8 +189,7 @@ public class Location implements IPositionable
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "[" + getClass().getSimpleName() + "] X: " + getX() + " Y: " + getY() + " Z: " + getZ() + " Heading: " + _heading + " InstanceId: " + _instanceId;
 	}
 }

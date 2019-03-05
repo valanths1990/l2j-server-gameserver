@@ -32,40 +32,34 @@ import com.l2jserver.gameserver.network.L2GameClient.GameClientState;
  * Request Save Key Mapping client packet.
  * @author mrTJO, Zoey76
  */
-public class RequestSaveKeyMapping extends L2GameClientPacket
-{
+public class RequestSaveKeyMapping extends L2GameClientPacket {
 	private static final String _C__D0_22_REQUESTSAVEKEYMAPPING = "[C] D0:22 RequestSaveKeyMapping";
 	
 	private final Map<Integer, List<ActionKey>> _keyMap = new HashMap<>();
 	private final Map<Integer, List<Integer>> _catMap = new HashMap<>();
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		int category = 0;
 		
 		readD(); // Unknown
 		readD(); // Unknown
 		final int _tabNum = readD();
-		for (int i = 0; i < _tabNum; i++)
-		{
+		for (int i = 0; i < _tabNum; i++) {
 			int cmd1Size = readC();
-			for (int j = 0; j < cmd1Size; j++)
-			{
+			for (int j = 0; j < cmd1Size; j++) {
 				UIData.addCategory(_catMap, category, readC());
 			}
 			category++;
 			
 			int cmd2Size = readC();
-			for (int j = 0; j < cmd2Size; j++)
-			{
+			for (int j = 0; j < cmd2Size; j++) {
 				UIData.addCategory(_catMap, category, readC());
 			}
 			category++;
 			
 			int cmdSize = readD();
-			for (int j = 0; j < cmdSize; j++)
-			{
+			for (int j = 0; j < cmdSize; j++) {
 				int cmd = readD();
 				int key = readD();
 				int tgKey1 = readD();
@@ -79,19 +73,16 @@ public class RequestSaveKeyMapping extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (!Config.STORE_UI_SETTINGS || (player == null) || (getClient().getState() != GameClientState.IN_GAME))
-		{
+		if (!Config.STORE_UI_SETTINGS || (player == null) || (getClient().getState() != GameClientState.IN_GAME)) {
 			return;
 		}
 		player.getUISettings().storeAll(_catMap, _keyMap);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_22_REQUESTSAVEKEYMAPPING;
 	}
 }

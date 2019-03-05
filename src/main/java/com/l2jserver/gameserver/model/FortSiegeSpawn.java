@@ -24,22 +24,19 @@ import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
  * Fort Siege Spawn.
  * @author xban1x
  */
-public final class FortSiegeSpawn extends Location implements IIdentifiable
-{
+public final class FortSiegeSpawn extends Location implements IIdentifiable {
 	private final int _npcId;
 	private final int _fortId;
 	private final int _id;
 	
-	public FortSiegeSpawn(int fort_id, int x, int y, int z, int heading, int npc_id, int id)
-	{
+	public FortSiegeSpawn(int fort_id, int x, int y, int z, int heading, int npc_id, int id) {
 		super(x, y, z, heading);
 		_fortId = fort_id;
 		_npcId = npc_id;
 		_id = id;
 	}
 	
-	public int getFortId()
-	{
+	public int getFortId() {
 		return _fortId;
 	}
 	
@@ -48,13 +45,11 @@ public final class FortSiegeSpawn extends Location implements IIdentifiable
 	 * @return the NPC ID
 	 */
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _npcId;
 	}
 	
-	public int getMessageId()
-	{
+	public int getMessageId() {
 		return _id;
 	}
 }

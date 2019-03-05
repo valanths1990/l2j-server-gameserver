@@ -30,8 +30,7 @@ import com.l2jserver.gameserver.network.serverpackets.StopMoveInVehicle;
  * format: ddddddd X:%d Y:%d Z:%d OriginX:%d OriginY:%d OriginZ:%d
  * @author GodKratos
  */
-public class MoveToLocationInAirShip extends L2GameClientPacket
-{
+public class MoveToLocationInAirShip extends L2GameClientPacket {
 	private static final String _C__D0_20_MOVETOLOCATIONINAIRSHIP = "[C] D0:20 MoveToLocationInAirShip";
 	
 	private int _shipId;
@@ -43,8 +42,7 @@ public class MoveToLocationInAirShip extends L2GameClientPacket
 	private int _originZ;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_shipId = readD();
 		_targetX = readD();
 		_targetY = readD();
@@ -55,41 +53,34 @@ public class MoveToLocationInAirShip extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if ((_targetX == _originX) && (_targetY == _originY) && (_targetZ == _originZ))
-		{
+		if ((_targetX == _originX) && (_targetY == _originY) && (_targetZ == _originZ)) {
 			activeChar.sendPacket(new StopMoveInVehicle(activeChar, _shipId));
 			return;
 		}
 		
-		if (activeChar.isAttackingNow() && (activeChar.getActiveWeaponItem() != null) && (activeChar.getActiveWeaponItem().getItemType() == WeaponType.BOW))
-		{
+		if (activeChar.isAttackingNow() && (activeChar.getActiveWeaponItem() != null) && (activeChar.getActiveWeaponItem().getItemType() == WeaponType.BOW)) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (activeChar.isSitting() || activeChar.isMovementDisabled())
-		{
+		if (activeChar.isSitting() || activeChar.isMovementDisabled()) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (!activeChar.isInAirShip())
-		{
+		if (!activeChar.isInAirShip()) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		final L2AirShipInstance airShip = activeChar.getAirShip();
-		if (airShip.getObjectId() != _shipId)
-		{
+		if (airShip.getObjectId() != _shipId) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
@@ -99,8 +90,7 @@ public class MoveToLocationInAirShip extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_20_MOVETOLOCATIONINAIRSHIP;
 	}
 }

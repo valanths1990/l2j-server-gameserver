@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.options;
 /**
  * @author UnAfraid
  */
-public enum OptionsSkillType
-{
+public enum OptionsSkillType {
 	ATTACK,
 	MAGIC,
 	CRITICAL

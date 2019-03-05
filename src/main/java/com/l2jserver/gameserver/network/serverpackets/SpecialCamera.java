@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  * Special Camera server packet implementation.
  * @author Zoey76
  */
-public class SpecialCamera extends L2GameServerPacket
-{
+public class SpecialCamera extends L2GameServerPacket {
 	private final int _id;
 	private final int _force;
 	private final int _angle1;
@@ -52,8 +51,7 @@ public class SpecialCamera extends L2GameServerPacket
 	 * @param isWide
 	 * @param relAngle
 	 */
-	public SpecialCamera(L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle)
-	{
+	public SpecialCamera(L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle) {
 		this(creature, force, angle1, angle2, time, duration, range, relYaw, relPitch, isWide, relAngle, 0);
 	}
 	
@@ -71,8 +69,7 @@ public class SpecialCamera extends L2GameServerPacket
 	 * @param isWide
 	 * @param relAngle
 	 */
-	public SpecialCamera(L2Character creature, L2Character talker, int force, int angle1, int angle2, int time, int duration, int relYaw, int relPitch, int isWide, int relAngle)
-	{
+	public SpecialCamera(L2Character creature, L2Character talker, int force, int angle1, int angle2, int time, int duration, int relYaw, int relPitch, int isWide, int relAngle) {
 		this(creature, force, angle1, angle2, time, duration, 0, relYaw, relPitch, isWide, relAngle, 0);
 	}
 	
@@ -91,8 +88,7 @@ public class SpecialCamera extends L2GameServerPacket
 	 * @param relAngle
 	 * @param unk unknown post-C4 parameter
 	 */
-	public SpecialCamera(L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle, int unk)
-	{
+	public SpecialCamera(L2Character creature, int force, int angle1, int angle2, int time, int range, int duration, int relYaw, int relPitch, int isWide, int relAngle, int unk) {
 		_id = creature.getObjectId();
 		_force = force;
 		_angle1 = angle1;
@@ -107,8 +103,7 @@ public class SpecialCamera extends L2GameServerPacket
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xD6);
 		writeD(_id);
 		writeD(_force);

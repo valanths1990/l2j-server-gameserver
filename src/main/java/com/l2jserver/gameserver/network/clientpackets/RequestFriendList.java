@@ -27,34 +27,27 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 /**
  * @since 2005/03/27
  */
-public final class RequestFriendList extends L2GameClientPacket
-{
+public final class RequestFriendList extends L2GameClientPacket {
 	private static final String _C__79_REQUESTFRIENDLIST = "[C] 79 RequestFriendList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		// ======<Friend List>======
 		activeChar.sendPacket(SystemMessageId.FRIEND_LIST_HEADER);
-		if (activeChar.hasFriends())
-		{
-			for (int id : activeChar.getFriends())
-			{
+		if (activeChar.hasFriends()) {
+			for (int id : activeChar.getFriends()) {
 				final String friendName = CharNameTable.getInstance().getNameById(id);
-				if (friendName == null)
-				{
+				if (friendName == null) {
 					continue;
 				}
 				
@@ -69,8 +62,7 @@ public final class RequestFriendList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__79_REQUESTFRIENDLIST;
 	}
 }

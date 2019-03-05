@@ -21,47 +21,41 @@ package com.l2jserver.gameserver.model.events;
 /**
  * @author UnAfraid
  */
-public class Containers
-{
+public class Containers {
 	private static final ListenersContainer _globalContainer = new ListenersContainer();
 	private static final ListenersContainer _globalNpcsContainer = new ListenersContainer();
 	private static final ListenersContainer _globalMonstersContainer = new ListenersContainer();
 	private static final ListenersContainer _globalPlayersContainer = new ListenersContainer();
 	
-	protected Containers()
-	{
+	protected Containers() {
 		
 	}
 	
 	/**
 	 * @return global listeners container
 	 */
-	public static ListenersContainer Global()
-	{
+	public static ListenersContainer Global() {
 		return _globalContainer;
 	}
 	
 	/**
 	 * @return global npc listeners container
 	 */
-	public static ListenersContainer Npcs()
-	{
+	public static ListenersContainer Npcs() {
 		return _globalNpcsContainer;
 	}
 	
 	/**
 	 * @return global monster listeners container
 	 */
-	public static ListenersContainer Monsters()
-	{
+	public static ListenersContainer Monsters() {
 		return _globalMonstersContainer;
 	}
 	
 	/**
 	 * @return global player listeners container
 	 */
-	public static ListenersContainer Players()
-	{
+	public static ListenersContainer Players() {
 		return _globalPlayersContainer;
 	}
 }

@@ -23,8 +23,7 @@ import java.util.List;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
 import com.l2jserver.gameserver.model.interfaces.INamable;
 
-public class Macro implements IIdentifiable, INamable
-{
+public class Macro implements IIdentifiable, INamable {
 	private int _id;
 	private final int _icon;
 	private final String _name;
@@ -41,8 +40,7 @@ public class Macro implements IIdentifiable, INamable
 	 * @param acronym the macro acronym
 	 * @param list the macro command list
 	 */
-	public Macro(int id, int icon, String name, String descr, String acronym, List<MacroCmd> list)
-	{
+	public Macro(int id, int icon, String name, String descr, String acronym, List<MacroCmd> list) {
 		_id = id;
 		_icon = icon;
 		_name = name;
@@ -56,8 +54,7 @@ public class Macro implements IIdentifiable, INamable
 	 * @returns the marco ID
 	 */
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
@@ -65,8 +62,7 @@ public class Macro implements IIdentifiable, INamable
 	 * Sets the marco ID.
 	 * @param id the marco ID
 	 */
-	public void setId(int id)
-	{
+	public void setId(int id) {
 		_id = id;
 	}
 	
@@ -74,8 +70,7 @@ public class Macro implements IIdentifiable, INamable
 	 * Gets the macro icon ID.
 	 * @return the icon
 	 */
-	public int getIcon()
-	{
+	public int getIcon() {
 		return _icon;
 	}
 	
@@ -84,8 +79,7 @@ public class Macro implements IIdentifiable, INamable
 	 * @return the name
 	 */
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
@@ -93,8 +87,7 @@ public class Macro implements IIdentifiable, INamable
 	 * Gets the macro description.
 	 * @return the description
 	 */
-	public String getDescr()
-	{
+	public String getDescr() {
 		return _descr;
 	}
 	
@@ -102,8 +95,7 @@ public class Macro implements IIdentifiable, INamable
 	 * Gets the macro acronym.
 	 * @return the acronym
 	 */
-	public String getAcronym()
-	{
+	public String getAcronym() {
 		return _acronym;
 	}
 	
@@ -111,8 +103,7 @@ public class Macro implements IIdentifiable, INamable
 	 * Gets the macro command list.
 	 * @return the macro command list
 	 */
-	public List<MacroCmd> getCommands()
-	{
+	public List<MacroCmd> getCommands() {
 		return _commands;
 	}
 }

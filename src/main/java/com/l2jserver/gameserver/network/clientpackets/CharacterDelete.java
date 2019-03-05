@@ -33,39 +33,32 @@ import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
  * This class ...
  * @version $Revision: 1.8.2.1.2.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class CharacterDelete extends L2GameClientPacket
-{
+public final class CharacterDelete extends L2GameClientPacket {
 	private static final String _C__0C_CHARACTERDELETE = "[C] 0D CharacterDelete";
 	
 	// cd
 	private int _charSlot;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_charSlot = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (!getClient().getFloodProtectors().getCharacterSelect().tryPerformAction("CharacterDelete"))
-		{
+	protected void runImpl() {
+		if (!getClient().getFloodProtectors().getCharacterSelect().tryPerformAction("CharacterDelete")) {
 			sendPacket(new CharDeleteFail(CharDeleteFail.REASON_DELETION_FAILED));
 			return;
 		}
 		
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			_log.fine("deleting slot:" + _charSlot);
 		}
 		
-		try
-		{
+		try {
 			byte answer = getClient().markToDeleteChar(_charSlot);
 			
-			switch (answer)
-			{
+			switch (answer) {
 				default:
 				case -1: // Error
 					break;
@@ -81,9 +74,7 @@ public final class CharacterDelete extends L2GameClientPacket
 					sendPacket(new CharDeleteFail(CharDeleteFail.REASON_CLAN_LEADERS_MAY_NOT_BE_DELETED));
 					break;
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.SEVERE, "Error:", e);
 		}
 		
@@ -93,8 +84,7 @@ public final class CharacterDelete extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__0C_CHARACTERDELETE;
 	}
 }

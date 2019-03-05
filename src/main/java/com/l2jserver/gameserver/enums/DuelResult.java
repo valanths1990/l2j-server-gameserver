@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author Zealar
  */
-public enum DuelResult
-{
+public enum DuelResult {
 	CONTINUE,
 	TEAM_1_WIN,
 	TEAM_2_WIN,

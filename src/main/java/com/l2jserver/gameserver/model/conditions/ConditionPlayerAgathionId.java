@@ -25,22 +25,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerAgathionId.
  */
-public class ConditionPlayerAgathionId extends Condition
-{
+public class ConditionPlayerAgathionId extends Condition {
 	private final int _agathionId;
 	
 	/**
 	 * Instantiates a new condition player agathion id.
 	 * @param agathionId the agathion id
 	 */
-	public ConditionPlayerAgathionId(int agathionId)
-	{
+	public ConditionPlayerAgathionId(int agathionId) {
 		_agathionId = agathionId;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effector.getActingPlayer() != null) && (effector.getActingPlayer().getAgathionId() == _agathionId);
 	}
 }

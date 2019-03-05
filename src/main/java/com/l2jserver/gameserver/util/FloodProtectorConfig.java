@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.util;
  * Flood protector configuration
  * @author fordfrog
  */
-public final class FloodProtectorConfig
-{
+public final class FloodProtectorConfig {
 	/**
 	 * Type used for identification of logging output.
 	 */
@@ -53,8 +52,7 @@ public final class FloodProtectorConfig
 	 * Creates new instance of FloodProtectorConfig.
 	 * @param floodProtectorType {@link #FLOOD_PROTECTOR_TYPE}
 	 */
-	public FloodProtectorConfig(final String floodProtectorType)
-	{
+	public FloodProtectorConfig(final String floodProtectorType) {
 		super();
 		FLOOD_PROTECTOR_TYPE = floodProtectorType;
 	}

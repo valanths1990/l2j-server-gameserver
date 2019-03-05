@@ -21,20 +21,17 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author GodKratos
  */
-public class ExBrPremiumState extends L2GameServerPacket
-{
+public class ExBrPremiumState extends L2GameServerPacket {
 	private final int _objId;
 	private final int _state;
 	
-	public ExBrPremiumState(int id, int state)
-	{
+	public ExBrPremiumState(int id, int state) {
 		_objId = id;
 		_state = state;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xD9);
 		writeD(_objId);

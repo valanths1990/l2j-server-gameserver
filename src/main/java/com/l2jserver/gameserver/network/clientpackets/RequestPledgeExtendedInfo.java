@@ -22,28 +22,24 @@ package com.l2jserver.gameserver.network.clientpackets;
  * Format: (c) S S: pledge name?
  * @author -Wooden-
  */
-public class RequestPledgeExtendedInfo extends L2GameClientPacket
-{
+public class RequestPledgeExtendedInfo extends L2GameClientPacket {
 	private static final String _C__67_REQUESTPLEDGECREST = "[C] 67 RequestPledgeExtendedInfo";
 	
 	@SuppressWarnings("unused")
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// TODO: Implement
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__67_REQUESTPLEDGECREST;
 	}
 }

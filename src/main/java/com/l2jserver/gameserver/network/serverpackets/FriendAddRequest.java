@@ -18,21 +18,18 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class FriendAddRequest extends L2GameServerPacket
-{
+public class FriendAddRequest extends L2GameServerPacket {
 	private final String _requestorName;
 	
 	/**
 	 * @param requestorName
 	 */
-	public FriendAddRequest(String requestorName)
-	{
+	public FriendAddRequest(String requestorName) {
 		_requestorName = requestorName;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x83);
 		writeS(_requestorName);
 		writeD(0x00);

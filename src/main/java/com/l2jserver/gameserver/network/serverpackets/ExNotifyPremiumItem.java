@@ -21,13 +21,11 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author Gnacik
  */
-public class ExNotifyPremiumItem extends L2GameServerPacket
-{
+public class ExNotifyPremiumItem extends L2GameServerPacket {
 	public static final ExNotifyPremiumItem STATIC_PACKET = new ExNotifyPremiumItem();
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x85);
 	}

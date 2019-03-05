@@ -32,49 +32,41 @@ import com.l2jserver.gameserver.network.serverpackets.PartyMatchDetail;
  * This class ...
  * @version $Revision: 1.1.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestPartyMatchConfig extends L2GameClientPacket
-{
+public final class RequestPartyMatchConfig extends L2GameClientPacket {
 	private static final String _C__7F_REQUESTPARTYMATCHCONFIG = "[C] 7F RequestPartyMatchConfig";
 	
 	private int _auto, _loc, _lvl;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_auto = readD(); //
 		_loc = readD(); // Location
 		_lvl = readD(); // my level
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance _activeChar = getClient().getActiveChar();
 		
-		if (_activeChar == null)
-		{
+		if (_activeChar == null) {
 			return;
 		}
 		
-		if (!_activeChar.isInPartyMatchRoom() && (_activeChar.getParty() != null) && (_activeChar.getParty().getLeader() != _activeChar))
-		{
+		if (!_activeChar.isInPartyMatchRoom() && (_activeChar.getParty() != null) && (_activeChar.getParty().getLeader() != _activeChar)) {
 			_activeChar.sendPacket(SystemMessageId.CANT_VIEW_PARTY_ROOMS);
 			_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (_activeChar.isInPartyMatchRoom())
-		{
+		if (_activeChar.isInPartyMatchRoom()) {
 			// If Player is in Room show him room, not list
 			PartyMatchRoomList _list = PartyMatchRoomList.getInstance();
-			if (_list == null)
-			{
+			if (_list == null) {
 				return;
 			}
 			
 			PartyMatchRoom _room = _list.getPlayerRoom(_activeChar);
-			if (_room == null)
-			{
+			if (_room == null) {
 				return;
 			}
 			
@@ -84,9 +76,7 @@ public final class RequestPartyMatchConfig extends L2GameClientPacket
 			_activeChar.setPartyRoom(_room.getId());
 			// _activeChar.setPartyMatching(1);
 			_activeChar.broadcastUserInfo();
-		}
-		else
-		{
+		} else {
 			// Add to waiting list
 			PartyMatchWaitingList.getInstance().addPlayer(_activeChar);
 			
@@ -98,8 +88,7 @@ public final class RequestPartyMatchConfig extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__7F_REQUESTPARTYMATCHCONFIG;
 	}
 }

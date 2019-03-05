@@ -28,36 +28,27 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * A no landing zone
  * @author durgus
  */
-public class L2NoLandingZone extends L2ZoneType
-{
+public class L2NoLandingZone extends L2ZoneType {
 	private int dismountDelay = 5;
 	
-	public L2NoLandingZone(int id)
-	{
+	public L2NoLandingZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("dismountDelay"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("dismountDelay")) {
 			dismountDelay = Integer.parseInt(value);
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.NO_LANDING, true);
-			if (character.getActingPlayer().getMountType() == MountType.WYVERN)
-			{
+			if (character.getActingPlayer().getMountType() == MountType.WYVERN) {
 				character.sendPacket(SystemMessageId.AREA_CANNOT_BE_ENTERED_WHILE_MOUNTED_WYVERN);
 				character.getActingPlayer().enteredNoLanding(dismountDelay);
 			}
@@ -65,13 +56,10 @@ public class L2NoLandingZone extends L2ZoneType
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.NO_LANDING, false);
-			if (character.getActingPlayer().getMountType() == MountType.WYVERN)
-			{
+			if (character.getActingPlayer().getMountType() == MountType.WYVERN) {
 				character.getActingPlayer().exitedNoLanding();
 			}
 		}

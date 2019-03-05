@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class SunRise extends L2GameServerPacket
-{
+public class SunRise extends L2GameServerPacket {
 	public static final SunRise STATIC_PACKET = new SunRise();
 	
-	private SunRise()
-	{
+	private SunRise() {
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x12);
 	}
 }

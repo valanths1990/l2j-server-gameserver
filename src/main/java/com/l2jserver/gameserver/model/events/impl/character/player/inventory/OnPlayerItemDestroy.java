@@ -26,30 +26,25 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author UnAfraid
  */
-public class OnPlayerItemDestroy implements IBaseEvent
-{
+public class OnPlayerItemDestroy implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final L2ItemInstance _item;
 	
-	public OnPlayerItemDestroy(L2PcInstance activeChar, L2ItemInstance item)
-	{
+	public OnPlayerItemDestroy(L2PcInstance activeChar, L2ItemInstance item) {
 		_activeChar = activeChar;
 		_item = item;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public L2ItemInstance getItem()
-	{
+	public L2ItemInstance getItem() {
 		return _item;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_ITEM_DESTROY;
 	}
 }

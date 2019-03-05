@@ -26,31 +26,24 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * ExReplySentPost packet implementation.
  * @author Migi, DS
  */
-public class ExReplySentPost extends AbstractItemPacket
-{
+public class ExReplySentPost extends AbstractItemPacket {
 	private final Message _msg;
 	private L2ItemInstance[] _items = null;
 	
-	public ExReplySentPost(Message msg)
-	{
+	public ExReplySentPost(Message msg) {
 		_msg = msg;
-		if (msg.hasAttachments())
-		{
+		if (msg.hasAttachments()) {
 			final ItemContainer attachments = msg.getAttachments();
-			if ((attachments != null) && (attachments.getSize() > 0))
-			{
+			if ((attachments != null) && (attachments.getSize() > 0)) {
 				_items = attachments.getItems();
-			}
-			else
-			{
+			} else {
 				_log.warning("Message " + msg.getId() + " has attachments but itemcontainer is empty.");
 			}
 		}
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xAD);
 		writeD(_msg.getId());
@@ -59,19 +52,15 @@ public class ExReplySentPost extends AbstractItemPacket
 		writeS(_msg.getSubject());
 		writeS(_msg.getContent());
 		
-		if ((_items != null) && (_items.length > 0))
-		{
+		if ((_items != null) && (_items.length > 0)) {
 			writeD(_items.length);
-			for (L2ItemInstance item : _items)
-			{
+			for (L2ItemInstance item : _items) {
 				writeItem(item);
 				writeD(item.getObjectId());
 			}
 			writeQ(_msg.getReqAdena());
 			writeD(_msg.getSendBySystem());
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 			writeQ(_msg.getReqAdena());
 		}

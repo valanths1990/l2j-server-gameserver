@@ -35,8 +35,7 @@ import com.l2jserver.util.Rnd;
  * This class manages all RaidBoss.<br>
  * In a group mob, there are one master called RaidBoss and several slaves called Minions.
  */
-public class L2RaidBossInstance extends L2MonsterInstance
-{
+public class L2RaidBossInstance extends L2MonsterInstance {
 	private static final int RAIDBOSS_MAINTENANCE_INTERVAL = 30000; // 30 sec
 	
 	private RaidBossSpawnManager.StatusEnum _raidStatus;
@@ -46,8 +45,7 @@ public class L2RaidBossInstance extends L2MonsterInstance
 	 * Creates a raid boss.
 	 * @param template the raid boss template
 	 */
-	public L2RaidBossInstance(L2NpcTemplate template)
-	{
+	public L2RaidBossInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2RaidBossInstance);
 		setIsRaid(true);
@@ -55,46 +53,35 @@ public class L2RaidBossInstance extends L2MonsterInstance
 	}
 	
 	@Override
-	public void onSpawn()
-	{
+	public void onSpawn() {
 		setIsNoRndWalk(true);
 		super.onSpawn();
 	}
 	
 	@Override
-	protected int getMaintenanceInterval()
-	{
+	protected int getMaintenanceInterval() {
 		return RAIDBOSS_MAINTENANCE_INTERVAL;
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
-		if (!super.doDie(killer))
-		{
+	public boolean doDie(L2Character killer) {
+		if (!super.doDie(killer)) {
 			return false;
 		}
 		
 		final L2PcInstance player = killer.getActingPlayer();
-		if (player != null)
-		{
+		if (player != null) {
 			broadcastPacket(SystemMessage.getSystemMessage(SystemMessageId.RAID_WAS_SUCCESSFUL));
-			if (player.getParty() != null)
-			{
-				for (L2PcInstance member : player.getParty().getMembers())
-				{
+			if (player.getParty() != null) {
+				for (L2PcInstance member : player.getParty().getMembers()) {
 					RaidBossPointsManager.getInstance().addPoints(member, getId(), (getLevel() / 2) + Rnd.get(-5, 5));
-					if (member.isNoble())
-					{
+					if (member.isNoble()) {
 						Hero.getInstance().setRBkilled(member.getObjectId(), getId());
 					}
 				}
-			}
-			else
-			{
+			} else {
 				RaidBossPointsManager.getInstance().addPoints(player, getId(), (getLevel() / 2) + Rnd.get(-5, 5));
-				if (player.isNoble())
-				{
+				if (player.isNoble()) {
 					Hero.getInstance().setRBkilled(player.getObjectId(), getId());
 				}
 			}
@@ -108,21 +95,17 @@ public class L2RaidBossInstance extends L2MonsterInstance
 	 * Spawn all minions at a regular interval Also if boss is too far from home location at the time of this check, teleport it home.
 	 */
 	@Override
-	protected void startMaintenanceTask()
-	{
+	protected void startMaintenanceTask() {
 		_maintenanceTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(() -> checkAndReturnToSpawn(), 60000, getMaintenanceInterval() + Rnd.get(5000));
 	}
 	
-	protected void checkAndReturnToSpawn()
-	{
-		if (isDead() || isMovementDisabled() || !canReturnToSpawnPoint())
-		{
+	protected void checkAndReturnToSpawn() {
+		if (isDead() || isMovementDisabled() || !canReturnToSpawnPoint()) {
 			return;
 		}
 		
 		final L2Spawn spawn = getSpawn();
-		if (spawn == null)
-		{
+		if (spawn == null) {
 			return;
 		}
 		
@@ -130,45 +113,37 @@ public class L2RaidBossInstance extends L2MonsterInstance
 		final int spawnY = spawn.getY();
 		final int spawnZ = spawn.getZ();
 		
-		if (!isInCombat() && !isMovementDisabled())
-		{
-			if (!isInsideRadius(spawnX, spawnY, spawnZ, Math.max(Config.MAX_DRIFT_RANGE, 200), true, false))
-			{
+		if (!isInCombat() && !isMovementDisabled()) {
+			if (!isInsideRadius(spawnX, spawnY, spawnZ, Math.max(Config.MAX_DRIFT_RANGE, 200), true, false)) {
 				teleToLocation(spawnX, spawnY, spawnZ, false);
 			}
 		}
 	}
 	
-	public void setRaidStatus(RaidBossSpawnManager.StatusEnum status)
-	{
+	public void setRaidStatus(RaidBossSpawnManager.StatusEnum status) {
 		_raidStatus = status;
 	}
 	
-	public RaidBossSpawnManager.StatusEnum getRaidStatus()
-	{
+	public RaidBossSpawnManager.StatusEnum getRaidStatus() {
 		return _raidStatus;
 	}
 	
 	@Override
-	public float getVitalityPoints(int damage)
-	{
+	public float getVitalityPoints(int damage) {
 		return -super.getVitalityPoints(damage) / 100;
 	}
 	
 	@Override
-	public boolean useVitalityRate()
-	{
+	public boolean useVitalityRate() {
 		return false;
 	}
 	
-	public void setUseRaidCurse(boolean val)
-	{
+	public void setUseRaidCurse(boolean val) {
 		_useRaidCurse = val;
 	}
 	
 	@Override
-	public boolean giveRaidCurse()
-	{
+	public boolean giveRaidCurse() {
 		return _useRaidCurse;
 	}
 }

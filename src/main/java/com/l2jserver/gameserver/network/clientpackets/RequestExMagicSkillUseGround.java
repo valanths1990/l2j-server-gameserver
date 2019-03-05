@@ -31,8 +31,7 @@ import com.l2jserver.gameserver.util.Util;
  * Fromat:(ch) dddddc
  * @author -Wooden-
  */
-public final class RequestExMagicSkillUseGround extends L2GameClientPacket
-{
+public final class RequestExMagicSkillUseGround extends L2GameClientPacket {
 	private static final String _C__D0_44_REQUESTEXMAGICSKILLUSEGROUND = "[C] D0:44 RequestExMagicSkillUseGround";
 	
 	private int _x;
@@ -43,8 +42,7 @@ public final class RequestExMagicSkillUseGround extends L2GameClientPacket
 	private boolean _shiftPressed;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_x = readD();
 		_y = readD();
 		_z = readD();
@@ -54,19 +52,16 @@ public final class RequestExMagicSkillUseGround extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// Get the current L2PcInstance of the player
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		// Get the level of the used skill
 		int level = activeChar.getSkillLevel(_skillId);
-		if (level <= 0)
-		{
+		if (level <= 0) {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
@@ -75,8 +70,7 @@ public final class RequestExMagicSkillUseGround extends L2GameClientPacket
 		Skill skill = SkillData.getInstance().getSkill(_skillId, level);
 		
 		// Check the validity of the skill
-		if (skill != null)
-		{
+		if (skill != null) {
 			activeChar.setCurrentSkillWorldPosition(new Location(_x, _y, _z));
 			
 			// normally magicskilluse packet turns char client side but for these skills, it doesn't (even with correct target)
@@ -84,17 +78,14 @@ public final class RequestExMagicSkillUseGround extends L2GameClientPacket
 			Broadcast.toKnownPlayers(activeChar, new ValidateLocation(activeChar));
 			
 			activeChar.useMagic(skill, _ctrlPressed, _shiftPressed);
-		}
-		else
-		{
+		} else {
 			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			_log.warning("No skill found with id " + _skillId + " and level " + level + " !!");
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_44_REQUESTEXMAGICSKILLUSEGROUND;
 	}
 }

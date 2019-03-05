@@ -35,16 +35,14 @@ import com.l2jserver.util.Rnd;
 /**
  * @author UnAfraid
  */
-public final class EnchantScroll extends AbstractEnchantItem
-{
+public final class EnchantScroll extends AbstractEnchantItem {
 	private final boolean _isWeapon;
 	private final boolean _isBlessed;
 	private final boolean _isSafe;
 	private final int _scrollGroupId;
 	private Set<Integer> _items;
 	
-	public EnchantScroll(StatsSet set)
-	{
+	public EnchantScroll(StatsSet set) {
 		super(set);
 		_scrollGroupId = set.getInt("scrollGroupId", 0);
 		
@@ -55,32 +53,28 @@ public final class EnchantScroll extends AbstractEnchantItem
 	}
 	
 	@Override
-	public boolean isWeapon()
-	{
+	public boolean isWeapon() {
 		return _isWeapon;
 	}
 	
 	/**
 	 * @return {@code true} for blessed scrolls (enchanted item will remain on failure), {@code false} otherwise
 	 */
-	public boolean isBlessed()
-	{
+	public boolean isBlessed() {
 		return _isBlessed;
 	}
 	
 	/**
 	 * @return {@code true} for safe-enchant scrolls (enchant level will remain on failure), {@code false} otherwise
 	 */
-	public boolean isSafe()
-	{
+	public boolean isSafe() {
 		return _isSafe;
 	}
 	
 	/**
 	 * @return id of scroll group that should be used
 	 */
-	public int getScrollGroupId()
-	{
+	public int getScrollGroupId() {
 		return _scrollGroupId;
 	}
 	
@@ -88,10 +82,8 @@ public final class EnchantScroll extends AbstractEnchantItem
 	 * Enforces current scroll to use only those items as possible items to enchant
 	 * @param itemId
 	 */
-	public void addItem(int itemId)
-	{
-		if (_items == null)
-		{
+	public void addItem(int itemId) {
+		if (_items == null) {
 			_items = new HashSet<>();
 		}
 		_items.add(itemId);
@@ -103,24 +95,15 @@ public final class EnchantScroll extends AbstractEnchantItem
 	 * @return {@code true} if this scroll can be used with the specified support item and the item to be enchanted, {@code false} otherwise
 	 */
 	@Override
-	public boolean isValid(L2ItemInstance itemToEnchant, EnchantSupportItem supportItem)
-	{
-		if ((_items != null) && !_items.contains(itemToEnchant.getId()))
-		{
+	public boolean isValid(L2ItemInstance itemToEnchant, EnchantSupportItem supportItem) {
+		if ((_items != null) && !_items.contains(itemToEnchant.getId())) {
 			return false;
-		}
-		else if ((supportItem != null))
-		{
-			if (isBlessed())
-			{
+		} else if ((supportItem != null)) {
+			if (isBlessed()) {
 				return false;
-			}
-			else if (!supportItem.isValid(itemToEnchant, supportItem))
-			{
+			} else if (!supportItem.isValid(itemToEnchant, supportItem)) {
 				return false;
-			}
-			else if (supportItem.isWeapon() != isWeapon())
-			{
+			} else if (supportItem.isWeapon() != isWeapon()) {
 				return false;
 			}
 		}
@@ -132,17 +115,14 @@ public final class EnchantScroll extends AbstractEnchantItem
 	 * @param enchantItem
 	 * @return the chance of current scroll's group.
 	 */
-	public double getChance(L2PcInstance player, L2ItemInstance enchantItem)
-	{
-		if (EnchantItemGroupsData.getInstance().getScrollGroup(_scrollGroupId) == null)
-		{
+	public double getChance(L2PcInstance player, L2ItemInstance enchantItem) {
+		if (EnchantItemGroupsData.getInstance().getScrollGroup(_scrollGroupId) == null) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Unexistent enchant scroll group specified for enchant scroll: " + getId());
 			return -1;
 		}
 		
 		final EnchantItemGroup group = EnchantItemGroupsData.getInstance().getItemGroup(enchantItem.getItem(), _scrollGroupId);
-		if (group == null)
-		{
+		if (group == null) {
 			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't find enchant item group for scroll: " + getId() + " requested by: " + player);
 			return -1;
 		}
@@ -155,16 +135,13 @@ public final class EnchantScroll extends AbstractEnchantItem
 	 * @param supportItem
 	 * @return the total chance for success rate of this scroll
 	 */
-	public EnchantResultType calculateSuccess(L2PcInstance player, L2ItemInstance enchantItem, EnchantSupportItem supportItem)
-	{
-		if (!isValid(enchantItem, supportItem))
-		{
+	public EnchantResultType calculateSuccess(L2PcInstance player, L2ItemInstance enchantItem, EnchantSupportItem supportItem) {
+		if (!isValid(enchantItem, supportItem)) {
 			return EnchantResultType.ERROR;
 		}
 		
 		final double chance = getChance(player, enchantItem);
-		if (chance == -1)
-		{
+		if (chance == -1) {
 			return EnchantResultType.ERROR;
 		}
 		
@@ -175,25 +152,20 @@ public final class EnchantScroll extends AbstractEnchantItem
 		final double random = 100 * Rnd.nextDouble();
 		final boolean success = (random < finalChance);
 		
-		if (player.isDebug())
-		{
+		if (player.isDebug()) {
 			final EnchantItemGroup group = EnchantItemGroupsData.getInstance().getItemGroup(enchantItem.getItem(), _scrollGroupId);
 			final StatsSet set = new StatsSet();
-			if (isBlessed())
-			{
+			if (isBlessed()) {
 				set.set("isBlessed", isBlessed());
 			}
-			if (isSafe())
-			{
+			if (isSafe()) {
 				set.set("isSafe", isSafe());
 			}
 			set.set("chance", Util.formatDouble(chance, "#.##"));
-			if (bonusRate > 0)
-			{
+			if (bonusRate > 0) {
 				set.set("bonusRate", Util.formatDouble(bonusRate, "#.##"));
 			}
-			if (supportBonusRate > 0)
-			{
+			if (supportBonusRate > 0) {
 				set.set("supportBonusRate", Util.formatDouble(supportBonusRate, "#.##"));
 			}
 			set.set("finalChance", Util.formatDouble(finalChance, "#.##"));

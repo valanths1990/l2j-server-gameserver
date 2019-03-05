@@ -27,24 +27,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionTargetNpcId.
  */
-public class ConditionTargetNpcId extends Condition
-{
+public class ConditionTargetNpcId extends Condition {
 	private final List<Integer> _npcIds;
 	
 	/**
 	 * Instantiates a new condition target npc id.
 	 * @param npcIds the npc ids
 	 */
-	public ConditionTargetNpcId(List<Integer> npcIds)
-	{
+	public ConditionTargetNpcId(List<Integer> npcIds) {
 		_npcIds = npcIds;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effected != null) && (effected.isNpc() || effected.isDoor()))
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effected != null) && (effected.isNpc() || effected.isDoor())) {
 			return _npcIds.contains(effected.getId());
 		}
 		return false;

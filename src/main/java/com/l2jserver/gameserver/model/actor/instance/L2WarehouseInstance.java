@@ -21,35 +21,28 @@ package com.l2jserver.gameserver.model.actor.instance;
 import com.l2jserver.gameserver.enums.InstanceType;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 
-public class L2WarehouseInstance extends L2NpcInstance
-{
+public class L2WarehouseInstance extends L2NpcInstance {
 	/**
 	 * Creates a warehouse NPC.
 	 * @param template the warehouse NPC template
 	 */
-	public L2WarehouseInstance(L2NpcTemplate template)
-	{
+	public L2WarehouseInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2WarehouseInstance);
 	}
 	
 	@Override
-	public boolean isWarehouse()
-	{
+	public boolean isWarehouse() {
 		return true;
 	}
 	
 	@Override
-	public String getHtmlPath(int npcId, int val)
-	{
+	public String getHtmlPath(int npcId, int val) {
 		String pom = "";
 		
-		if (val == 0)
-		{
+		if (val == 0) {
 			pom = "" + npcId;
-		}
-		else
-		{
+		} else {
 			pom = npcId + "-" + val;
 		}
 		

@@ -22,8 +22,7 @@ package com.l2jserver.gameserver;
  * Interface for managers of list of instances.
  * @author fordfrog
  */
-public interface InstanceListManager
-{
+public interface InstanceListManager {
 	/**
 	 * Loads instances with their data from persistent format.<br>
 	 * This method has no side effect as calling methods of another instance manager.

@@ -30,16 +30,14 @@ import com.l2jserver.gameserver.network.serverpackets.GetOnVehicle;
  * This class ...
  * @version $Revision: 1.1.4.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestGetOnVehicle extends L2GameClientPacket
-{
+public final class RequestGetOnVehicle extends L2GameClientPacket {
 	private static final String _C__53_GETONVEHICLE = "[C] 53 GetOnVehicle";
 	
 	private int _boatId;
 	private Location _pos;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		int x, y, z;
 		_boatId = readD();
 		x = readD();
@@ -49,29 +47,22 @@ public final class RequestGetOnVehicle extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		L2BoatInstance boat;
-		if (activeChar.isInBoat())
-		{
+		if (activeChar.isInBoat()) {
 			boat = activeChar.getBoat();
-			if (boat.getObjectId() != _boatId)
-			{
+			if (boat.getObjectId() != _boatId) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
-		}
-		else
-		{
+		} else {
 			boat = BoatManager.getInstance().getBoat(_boatId);
-			if ((boat == null) || boat.isMoving() || !activeChar.isInsideRadius(boat, 1000, true, false))
-			{
+			if ((boat == null) || boat.isMoving() || !activeChar.isInsideRadius(boat, 1000, true, false)) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
@@ -87,8 +78,7 @@ public final class RequestGetOnVehicle extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__53_GETONVEHICLE;
 	}
 }

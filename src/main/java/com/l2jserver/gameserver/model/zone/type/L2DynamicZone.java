@@ -31,21 +31,18 @@ import com.l2jserver.gameserver.model.zone.TaskZoneSettings;
  * A dynamic zone? Maybe use this for interlude skills like protection field :>
  * @author durgus
  */
-public class L2DynamicZone extends L2ZoneType
-{
+public class L2DynamicZone extends L2ZoneType {
 	private final L2WorldRegion _region;
 	private final L2Character _owner;
 	private final Skill _skill;
 	
-	public L2DynamicZone(L2WorldRegion region, L2Character owner, Skill skill)
-	{
+	public L2DynamicZone(L2WorldRegion region, L2Character owner, Skill skill) {
 		super(-1);
 		_region = region;
 		_owner = owner;
 		_skill = skill;
 		AbstractZoneSettings settings = ZoneManager.getSettings(getName());
-		if (settings == null)
-		{
+		if (settings == null) {
 			settings = new TaskZoneSettings();
 		}
 		setSettings(settings);
@@ -54,34 +51,27 @@ public class L2DynamicZone extends L2ZoneType
 	}
 	
 	@Override
-	public TaskZoneSettings getSettings()
-	{
+	public TaskZoneSettings getSettings() {
 		return (TaskZoneSettings) super.getSettings();
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayer()) {
 			character.sendMessage("You have entered a temporary zone!");
 		}
-		if (_owner != null)
-		{
+		if (_owner != null) {
 			_skill.applyEffects(_owner, character);
 		}
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(L2Character character) {
+		if (character.isPlayer()) {
 			character.sendMessage("You have left a temporary zone!"); // TODO: Custom message?
 		}
 		
-		if (character == _owner)
-		{
+		if (character == _owner) {
 			remove();
 			return;
 		}
@@ -89,18 +79,15 @@ public class L2DynamicZone extends L2ZoneType
 		character.stopSkillEffects(true, _skill.getId());
 	}
 	
-	protected void remove()
-	{
-		if ((getSettings().getTask() == null) || (_skill == null))
-		{
+	protected void remove() {
+		if ((getSettings().getTask() == null) || (_skill == null)) {
 			return;
 		}
 		
 		getSettings().getTask().cancel(false);
 		
 		_region.removeZone(this);
-		for (L2Character member : getCharactersInside())
-		{
+		for (L2Character member : getCharactersInside()) {
 			member.stopSkillEffects(true, _skill.getId());
 		}
 		_owner.stopSkillEffects(true, _skill.getId());
@@ -108,21 +95,16 @@ public class L2DynamicZone extends L2ZoneType
 	}
 	
 	@Override
-	public void onDieInside(L2Character character)
-	{
-		if (character == _owner)
-		{
+	public void onDieInside(L2Character character) {
+		if (character == _owner) {
 			remove();
-		}
-		else
-		{
+		} else {
 			character.stopSkillEffects(true, _skill.getId());
 		}
 	}
 	
 	@Override
-	public void onReviveInside(L2Character character)
-	{
+	public void onReviveInside(L2Character character) {
 		_skill.applyEffects(_owner, character);
 	}
 }

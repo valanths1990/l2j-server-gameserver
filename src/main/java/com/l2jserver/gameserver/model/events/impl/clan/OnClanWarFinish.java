@@ -25,30 +25,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnClanWarFinish implements IBaseEvent
-{
+public class OnClanWarFinish implements IBaseEvent {
 	private final L2Clan _clan1;
 	private final L2Clan _clan2;
 	
-	public OnClanWarFinish(L2Clan clan1, L2Clan clan2)
-	{
+	public OnClanWarFinish(L2Clan clan1, L2Clan clan2) {
 		_clan1 = clan1;
 		_clan2 = clan2;
 	}
 	
-	public L2Clan getClan1()
-	{
+	public L2Clan getClan1() {
 		return _clan1;
 	}
 	
-	public L2Clan getClan2()
-	{
+	public L2Clan getClan2() {
 		return _clan2;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_CLAN_WAR_FINISH;
 	}
 }

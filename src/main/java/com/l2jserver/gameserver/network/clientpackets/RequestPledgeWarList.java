@@ -25,32 +25,27 @@ import com.l2jserver.gameserver.network.serverpackets.PledgeReceiveWarList;
  * Format: (ch) dd
  * @author -Wooden-
  */
-public final class RequestPledgeWarList extends L2GameClientPacket
-{
+public final class RequestPledgeWarList extends L2GameClientPacket {
 	private static final String _C__D0_17_REQUESTPLEDGEWARLIST = "[C] D0:17 RequestPledgeWarList";
 	@SuppressWarnings("unused")
 	private int _unk1;
 	private int _tab;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_unk1 = readD();
 		_tab = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// _log.info("C5: RequestPledgeWarList d:"+_unk1);
 		// _log.info("C5: RequestPledgeWarList d:"+_tab);
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
-		if (activeChar.getClan() == null)
-		{
+		if (activeChar.getClan() == null) {
 			return;
 		}
 		
@@ -59,8 +54,7 @@ public final class RequestPledgeWarList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_17_REQUESTPLEDGEWARLIST;
 	}
 }

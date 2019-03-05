@@ -28,41 +28,29 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Player Can Transform condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanTransform extends Condition
-{
+public class ConditionPlayerCanTransform extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanTransform(boolean val)
-	{
+	public ConditionPlayerCanTransform(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean canTransform = true;
 		final L2PcInstance player = effector.getActingPlayer();
-		if ((player == null) || player.isAlikeDead() || player.isCursedWeaponEquipped())
-		{
+		if ((player == null) || player.isAlikeDead() || player.isCursedWeaponEquipped()) {
 			canTransform = false;
-		}
-		else if (player.isSitting())
-		{
+		} else if (player.isSitting()) {
 			player.sendPacket(SystemMessageId.CANNOT_TRANSFORM_WHILE_SITTING);
 			canTransform = false;
-		}
-		else if (player.isTransformed() || player.isInStance())
-		{
+		} else if (player.isTransformed() || player.isInStance()) {
 			player.sendPacket(SystemMessageId.YOU_ALREADY_POLYMORPHED_AND_CANNOT_POLYMORPH_AGAIN);
 			canTransform = false;
-		}
-		else if (player.isInWater())
-		{
+		} else if (player.isInWater()) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_POLYMORPH_INTO_THE_DESIRED_FORM_IN_WATER);
 			canTransform = false;
-		}
-		else if (player.isFlyingMounted() || player.isMounted())
-		{
+		} else if (player.isFlyingMounted() || player.isMounted()) {
 			player.sendPacket(SystemMessageId.YOU_CANNOT_POLYMORPH_WHILE_RIDING_A_PET);
 			canTransform = false;
 		}

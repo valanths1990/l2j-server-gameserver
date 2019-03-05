@@ -21,15 +21,13 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author KenM
  */
-public class ExUseSharedGroupItem extends L2GameServerPacket
-{
+public class ExUseSharedGroupItem extends L2GameServerPacket {
 	private final int _itemId;
 	private final int _grpId;
 	private final int _remainingTime;
 	private final int _totalTime;
 	
-	public ExUseSharedGroupItem(int itemId, int grpId, long remainingTime, int totalTime)
-	{
+	public ExUseSharedGroupItem(int itemId, int grpId, long remainingTime, int totalTime) {
 		_itemId = itemId;
 		_grpId = grpId;
 		_remainingTime = (int) (remainingTime / 1000);
@@ -37,8 +35,7 @@ public class ExUseSharedGroupItem extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x4A);
 		

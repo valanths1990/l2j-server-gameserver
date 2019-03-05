@@ -20,29 +20,24 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.Shortcut;
 
-public final class ShortCutRegister extends L2GameServerPacket
-{
+public final class ShortCutRegister extends L2GameServerPacket {
 	private final Shortcut _shortcut;
 	
 	/**
 	 * Register new skill shortcut
 	 * @param shortcut
 	 */
-	public ShortCutRegister(Shortcut shortcut)
-	{
+	public ShortCutRegister(Shortcut shortcut) {
 		_shortcut = shortcut;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x44);
 		writeD(_shortcut.getType().ordinal());
 		writeD(_shortcut.getSlot() + (_shortcut.getPage() * 12)); // C4 Client
-		switch (_shortcut.getType())
-		{
-			case ITEM:
-			{
+		switch (_shortcut.getType()) {
+			case ITEM: {
 				writeD(_shortcut.getId());
 				writeD(_shortcut.getCharacterType());
 				writeD(_shortcut.getSharedReuseGroup());
@@ -51,8 +46,7 @@ public final class ShortCutRegister extends L2GameServerPacket
 				writeD(0x00); // item augment id
 				break;
 			}
-			case SKILL:
-			{
+			case SKILL: {
 				writeD(_shortcut.getId());
 				writeD(_shortcut.getLevel());
 				writeC(0x00); // C5
@@ -62,8 +56,7 @@ public final class ShortCutRegister extends L2GameServerPacket
 			case ACTION:
 			case MACRO:
 			case RECIPE:
-			case BOOKMARK:
-			{
+			case BOOKMARK: {
 				writeD(_shortcut.getId());
 				writeD(_shortcut.getCharacterType());
 			}

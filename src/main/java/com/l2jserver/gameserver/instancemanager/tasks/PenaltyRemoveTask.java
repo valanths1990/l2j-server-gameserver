@@ -24,18 +24,15 @@ import com.l2jserver.gameserver.instancemanager.HandysBlockCheckerManager;
  * Handys Block Checker penalty remove.
  * @author xban1x
  */
-public final class PenaltyRemoveTask implements Runnable
-{
+public final class PenaltyRemoveTask implements Runnable {
 	private final int _objectId;
 	
-	public PenaltyRemoveTask(int id)
-	{
+	public PenaltyRemoveTask(int id) {
 		_objectId = id;
 	}
 	
 	@Override
-	public void run()
-	{
+	public void run() {
 		HandysBlockCheckerManager.getInstance().removePenalty(_objectId);
 	}
 }

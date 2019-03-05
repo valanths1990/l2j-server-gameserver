@@ -18,24 +18,21 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ShortBuffStatusUpdate extends L2GameServerPacket
-{
+public class ShortBuffStatusUpdate extends L2GameServerPacket {
 	public static final ShortBuffStatusUpdate RESET_SHORT_BUFF = new ShortBuffStatusUpdate(0, 0, 0);
 	
 	private final int _skillId;
 	private final int _skillLvl;
 	private final int _duration;
 	
-	public ShortBuffStatusUpdate(int skillId, int skillLvl, int duration)
-	{
+	public ShortBuffStatusUpdate(int skillId, int skillLvl, int duration) {
 		_skillId = skillId;
 		_skillLvl = skillLvl;
 		_duration = duration;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xfa);
 		writeD(_skillId);
 		writeD(_skillLvl);

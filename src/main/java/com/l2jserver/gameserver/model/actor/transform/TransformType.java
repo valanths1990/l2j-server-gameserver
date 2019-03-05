@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.actor.transform;
 /**
  * @author UnAfraid
  */
-public enum TransformType
-{
+public enum TransformType {
 	MODE_CHANGE,
 	NON_COMBAT,
 	CURSED,

@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * Mother class of all Item Handlers.
  */
-public interface IItemHandler
-{
+public interface IItemHandler {
 	public static final Logger _log = Logger.getLogger(IItemHandler.class.getName());
 	
 	/**

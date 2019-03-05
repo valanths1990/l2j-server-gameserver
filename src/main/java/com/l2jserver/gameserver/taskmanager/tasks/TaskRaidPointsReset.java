@@ -31,33 +31,25 @@ import com.l2jserver.gameserver.taskmanager.TaskManager;
 import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
 import com.l2jserver.gameserver.taskmanager.TaskTypes;
 
-public class TaskRaidPointsReset extends Task
-{
+public class TaskRaidPointsReset extends Task {
 	public static final String NAME = "raid_points_reset";
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 	
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
+	public void onTimeElapsed(ExecutedTask task) {
 		Calendar cal = Calendar.getInstance();
-		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
-		{
+		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
 			// reward clan reputation points
 			Map<Integer, Integer> rankList = RaidBossPointsManager.getInstance().getRankList();
-			for (L2Clan c : ClanTable.getInstance().getClans())
-			{
-				for (Entry<Integer, Integer> entry : rankList.entrySet())
-				{
-					if ((entry.getValue() <= 100) && c.isMember(entry.getKey()))
-					{
+			for (L2Clan c : ClanTable.getInstance().getClans()) {
+				for (Entry<Integer, Integer> entry : rankList.entrySet()) {
+					if ((entry.getValue() <= 100) && c.isMember(entry.getKey())) {
 						int reputation = 0;
-						switch (entry.getValue())
-						{
+						switch (entry.getValue()) {
 							case 1:
 								reputation = Config.RAID_RANKING_1ST;
 								break;
@@ -89,12 +81,9 @@ public class TaskRaidPointsReset extends Task
 								reputation = Config.RAID_RANKING_10TH;
 								break;
 							default:
-								if (entry.getValue() <= 50)
-								{
+								if (entry.getValue() <= 50) {
 									reputation = Config.RAID_RANKING_UP_TO_50TH;
-								}
-								else
-								{
+								} else {
 									reputation = Config.RAID_RANKING_UP_TO_100TH;
 								}
 								break;
@@ -110,8 +99,7 @@ public class TaskRaidPointsReset extends Task
 	}
 	
 	@Override
-	public void initializate()
-	{
+	public void initializate() {
 		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", "00:10:00", "");
 	}

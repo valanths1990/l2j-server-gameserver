@@ -27,61 +27,49 @@ import java.util.logging.Logger;
 /**
  * @author Luis Arias
  */
-public class DateRange
-{
+public class DateRange {
 	protected static final Logger _log = Logger.getLogger(DateRange.class.getName());
 	private final Date _startDate, _endDate;
 	
-	public DateRange(Date from, Date to)
-	{
+	public DateRange(Date from, Date to) {
 		_startDate = from;
 		_endDate = to;
 	}
 	
-	public static DateRange parse(String dateRange, DateFormat format)
-	{
+	public static DateRange parse(String dateRange, DateFormat format) {
 		String[] date = dateRange.split("-");
-		if (date.length == 2)
-		{
-			try
-			{
+		if (date.length == 2) {
+			try {
 				Date start = format.parse(date[0]);
 				Date end = format.parse(date[1]);
 				
 				return new DateRange(start, end);
-			}
-			catch (ParseException e)
-			{
+			} catch (ParseException e) {
 				_log.log(Level.WARNING, "Invalid Date Format.", e);
 			}
 		}
 		return new DateRange(null, null);
 	}
 	
-	public boolean isValid()
-	{
+	public boolean isValid() {
 		return (_startDate != null) && (_endDate != null) && _startDate.before(_endDate);
 	}
 	
-	public boolean isWithinRange(Date date)
-	{
+	public boolean isWithinRange(Date date) {
 		return (date.equals(_startDate) || date.after(_startDate)) //
 			&& (date.equals(_endDate) || date.before(_endDate));
 	}
 	
-	public Date getEndDate()
-	{
+	public Date getEndDate() {
 		return _endDate;
 	}
 	
-	public Date getStartDate()
-	{
+	public Date getStartDate() {
 		return _startDate;
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "DateRange: From: " + getStartDate() + " To: " + getEndDate();
 	}
 }

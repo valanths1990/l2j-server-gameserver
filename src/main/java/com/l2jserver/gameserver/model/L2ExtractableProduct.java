@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model;
 /**
  * @author JIV
  */
-public class L2ExtractableProduct
-{
+public class L2ExtractableProduct {
 	private final int _id;
 	private final int _min;
 	private final int _max;
@@ -35,31 +34,26 @@ public class L2ExtractableProduct
 	 * @param max item count min
 	 * @param chance chance for creating
 	 */
-	public L2ExtractableProduct(int id, int min, int max, double chance)
-	{
+	public L2ExtractableProduct(int id, int min, int max, double chance) {
 		_id = id;
 		_min = min;
 		_max = max;
 		_chance = (int) (chance * 1000);
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
-	public int getMin()
-	{
+	public int getMin() {
 		return _min;
 	}
 	
-	public int getMax()
-	{
+	public int getMax() {
 		return _max;
 	}
 	
-	public int getChance()
-	{
+	public int getChance() {
 		return _chance;
 	}
 }

@@ -40,19 +40,16 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
 /**
  * @author DaRkRaGe
  */
-public class L2BossZone extends L2ZoneType
-{
+public class L2BossZone extends L2ZoneType {
 	private int _timeInvade;
 	
-	private int[] _oustLoc =
-	{
+	private int[] _oustLoc = {
 		0,
 		0,
 		0
 	};
 	
-	public final class Settings extends AbstractZoneSettings
-	{
+	public final class Settings extends AbstractZoneSettings {
 		// track the times that players got disconnected. Players are allowed
 		// to log back into the zone as long as their log-out was within _timeInvade time...
 		// <player objectId, expiration time in milliseconds>
@@ -64,41 +61,34 @@ public class L2BossZone extends L2ZoneType
 		
 		private final List<L2Character> _raidList = new CopyOnWriteArrayList<>();
 		
-		protected Settings()
-		{
+		protected Settings() {
 		}
 		
-		public Map<Integer, Long> getPlayerAllowedReEntryTimes()
-		{
+		public Map<Integer, Long> getPlayerAllowedReEntryTimes() {
 			return _playerAllowedReEntryTimes;
 		}
 		
-		public List<Integer> getPlayersAllowed()
-		{
+		public List<Integer> getPlayersAllowed() {
 			return _playersAllowed;
 		}
 		
-		public List<L2Character> getRaidList()
-		{
+		public List<L2Character> getRaidList() {
 			return _raidList;
 		}
 		
 		@Override
-		public void clear()
-		{
+		public void clear() {
 			_playerAllowedReEntryTimes.clear();
 			_playersAllowed.clear();
 			_raidList.clear();
 		}
 	}
 	
-	public L2BossZone(int id)
-	{
+	public L2BossZone(int id) {
 		super(id);
 		_oustLoc = new int[3];
 		AbstractZoneSettings settings = ZoneManager.getSettings(getName());
-		if (settings == null)
-		{
+		if (settings == null) {
 			settings = new Settings();
 		}
 		setSettings(settings);
@@ -106,32 +96,21 @@ public class L2BossZone extends L2ZoneType
 	}
 	
 	@Override
-	public Settings getSettings()
-	{
+	public Settings getSettings() {
 		return (Settings) super.getSettings();
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("InvadeTime"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("InvadeTime")) {
 			_timeInvade = Integer.parseInt(value);
-		}
-		else if (name.equals("oustX"))
-		{
+		} else if (name.equals("oustX")) {
 			_oustLoc[0] = Integer.parseInt(value);
-		}
-		else if (name.equals("oustY"))
-		{
+		} else if (name.equals("oustY")) {
 			_oustLoc[1] = Integer.parseInt(value);
-		}
-		else if (name.equals("oustZ"))
-		{
+		} else if (name.equals("oustZ")) {
 			_oustLoc[2] = Integer.parseInt(value);
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
@@ -146,21 +125,16 @@ public class L2BossZone extends L2ZoneType
 	 * That is if the server recently rebooted (boot-up time more recent than currentTime - _timeInvade) AND the player was in the zone prior to reboot.
 	 */
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (isEnabled())
-		{
-			if (character.isPlayer())
-			{
+	protected void onEnter(L2Character character) {
+		if (isEnabled()) {
+			if (character.isPlayer()) {
 				final L2PcInstance player = character.getActingPlayer();
-				if (player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS))
-				{
+				if (player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS)) {
 					return;
 				}
 				// if player has been (previously) cleared by npc/ai for entry and the zone is
 				// set to receive players (aka not waiting for boss to respawn)
-				if (getSettings().getPlayersAllowed().contains(player.getObjectId()))
-				{
+				if (getSettings().getPlayersAllowed().contains(player.getObjectId())) {
 					// Get the information about this player's last logout-exit from
 					// this zone.
 					final Long expirationTime = getSettings().getPlayerAllowedReEntryTimes().get(player.getObjectId());
@@ -169,50 +143,36 @@ public class L2BossZone extends L2ZoneType
 					if (expirationTime == null) // legal null expirationTime entries
 					{
 						long serverStartTime = GameServer.dateTimeServerStarted.getTimeInMillis();
-						if ((serverStartTime > (System.currentTimeMillis() - _timeInvade)))
-						{
+						if ((serverStartTime > (System.currentTimeMillis() - _timeInvade))) {
 							return;
 						}
-					}
-					else
-					{
+					} else {
 						// legal non-null logoutTime entries
 						getSettings().getPlayerAllowedReEntryTimes().remove(player.getObjectId());
-						if (expirationTime.longValue() > System.currentTimeMillis())
-						{
+						if (expirationTime.longValue() > System.currentTimeMillis()) {
 							return;
 						}
 					}
 					getSettings().getPlayersAllowed().remove(getSettings().getPlayersAllowed().indexOf(player.getObjectId()));
 				}
 				// teleport out all players who attempt "illegal" (re-)entry
-				if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0))
-				{
+				if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0)) {
 					player.teleToLocation(_oustLoc[0], _oustLoc[1], _oustLoc[2]);
-				}
-				else
-				{
+				} else {
 					player.teleToLocation(TeleportWhereType.TOWN);
 				}
-			}
-			else if (character.isSummon())
-			{
+			} else if (character.isSummon()) {
 				final L2PcInstance player = character.getActingPlayer();
-				if (player != null)
-				{
-					if (getSettings().getPlayersAllowed().contains(player.getObjectId()) || player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS))
-					{
+				if (player != null) {
+					if (getSettings().getPlayersAllowed().contains(player.getObjectId()) || player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS)) {
 						return;
 					}
 					
 					// remove summon and teleport out owner
 					// who attempt "illegal" (re-)entry
-					if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0))
-					{
+					if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0)) {
 						player.teleToLocation(_oustLoc[0], _oustLoc[1], _oustLoc[2]);
-					}
-					else
-					{
+					} else {
 						player.teleToLocation(TeleportWhereType.TOWN);
 					}
 				}
@@ -222,15 +182,11 @@ public class L2BossZone extends L2ZoneType
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (isEnabled())
-		{
-			if (character.isPlayer())
-			{
+	protected void onExit(L2Character character) {
+		if (isEnabled()) {
+			if (character.isPlayer()) {
 				final L2PcInstance player = character.getActingPlayer();
-				if (player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS))
-				{
+				if (player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS)) {
 					return;
 				}
 				
@@ -238,53 +194,38 @@ public class L2BossZone extends L2ZoneType
 				// time so that
 				// decisions can be made later about allowing or not the player
 				// to log into the zone
-				if (!player.isOnline() && getSettings().getPlayersAllowed().contains(player.getObjectId()))
-				{
+				if (!player.isOnline() && getSettings().getPlayersAllowed().contains(player.getObjectId())) {
 					// mark the time that the player left the zone
 					getSettings().getPlayerAllowedReEntryTimes().put(player.getObjectId(), System.currentTimeMillis() + _timeInvade);
-				}
-				else
-				{
-					if (getSettings().getPlayersAllowed().contains(player.getObjectId()))
-					{
+				} else {
+					if (getSettings().getPlayersAllowed().contains(player.getObjectId())) {
 						getSettings().getPlayersAllowed().remove(getSettings().getPlayersAllowed().indexOf(player.getObjectId()));
 					}
 					getSettings().getPlayerAllowedReEntryTimes().remove(player.getObjectId());
 				}
 			}
-			if (character.isPlayable())
-			{
-				if ((getCharactersInside() != null) && !getCharactersInside().isEmpty())
-				{
+			if (character.isPlayable()) {
+				if ((getCharactersInside() != null) && !getCharactersInside().isEmpty()) {
 					getSettings().getRaidList().clear();
 					int count = 0;
-					for (L2Character obj : getCharactersInside())
-					{
-						if (obj == null)
-						{
+					for (L2Character obj : getCharactersInside()) {
+						if (obj == null) {
 							continue;
 						}
-						if (obj.isPlayable())
-						{
+						if (obj.isPlayable()) {
 							count++;
-						}
-						else if (obj.isAttackable() && obj.isRaid())
-						{
+						} else if (obj.isAttackable() && obj.isRaid()) {
 							getSettings().getRaidList().add(obj);
 						}
 					}
 					// if inside zone isnt any player, force all boss instance return to its spawn points
-					if ((count == 0) && !getSettings().getRaidList().isEmpty())
-					{
-						for (int i = 0; i < getSettings().getRaidList().size(); i++)
-						{
+					if ((count == 0) && !getSettings().getRaidList().isEmpty()) {
+						for (int i = 0; i < getSettings().getRaidList().size(); i++) {
 							L2Attackable raid = (L2Attackable) getSettings().getRaidList().get(i);
-							if ((raid == null) || (raid.getSpawn() == null) || raid.isDead())
-							{
+							if ((raid == null) || (raid.getSpawn() == null) || raid.isDead()) {
 								continue;
 							}
-							if (!raid.isInsideRadius(raid.getSpawn(), 150, false, false))
-							{
+							if (!raid.isInsideRadius(raid.getSpawn(), 150, false, false)) {
 								raid.returnHome();
 							}
 						}
@@ -292,59 +233,43 @@ public class L2BossZone extends L2ZoneType
 				}
 			}
 		}
-		if (character.isAttackable() && character.isRaid() && !character.isDead())
-		{
+		if (character.isAttackable() && character.isRaid() && !character.isDead()) {
 			((L2Attackable) character).returnHome();
 		}
 	}
 	
 	@Override
-	public void setEnabled(boolean flag)
-	{
-		if (isEnabled() != flag)
-		{
+	public void setEnabled(boolean flag) {
+		if (isEnabled() != flag) {
 			oustAllPlayers();
 		}
 		super.setEnabled(flag);
 	}
 	
-	public int getTimeInvade()
-	{
+	public int getTimeInvade() {
 		return _timeInvade;
 	}
 	
-	public void setAllowedPlayers(List<Integer> players)
-	{
-		if (players != null)
-		{
+	public void setAllowedPlayers(List<Integer> players) {
+		if (players != null) {
 			getSettings().getPlayersAllowed().clear();
 			getSettings().getPlayersAllowed().addAll(players);
 		}
 	}
 	
-	public List<Integer> getAllowedPlayers()
-	{
+	public List<Integer> getAllowedPlayers() {
 		return getSettings().getPlayersAllowed();
 	}
 	
-	public boolean isPlayerAllowed(L2PcInstance player)
-	{
-		if (player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS))
-		{
+	public boolean isPlayerAllowed(L2PcInstance player) {
+		if (player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS)) {
 			return true;
-		}
-		else if (getSettings().getPlayersAllowed().contains(player.getObjectId()))
-		{
+		} else if (getSettings().getPlayersAllowed().contains(player.getObjectId())) {
 			return true;
-		}
-		else
-		{
-			if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0))
-			{
+		} else {
+			if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0)) {
 				player.teleToLocation(_oustLoc[0], _oustLoc[1], _oustLoc[2]);
-			}
-			else
-			{
+			} else {
 				player.teleToLocation(TeleportWhereType.TOWN);
 			}
 			return false;
@@ -355,20 +280,15 @@ public class L2BossZone extends L2ZoneType
 	 * Some GrandBosses send all players in zone to a specific part of the zone, rather than just removing them all. If this is the case, this command should be used. If this is no the case, then use oustAllPlayers().
 	 * @param loc
 	 */
-	public void movePlayersTo(Location loc)
-	{
-		if (_characterList.isEmpty())
-		{
+	public void movePlayersTo(Location loc) {
+		if (_characterList.isEmpty()) {
 			return;
 		}
 		
-		for (L2Character character : getCharactersInside())
-		{
-			if ((character != null) && character.isPlayer())
-			{
+		for (L2Character character : getCharactersInside()) {
+			if ((character != null) && character.isPlayer()) {
 				L2PcInstance player = character.getActingPlayer();
-				if (player.isOnline())
-				{
+				if (player.isOnline()) {
 					player.teleToLocation(loc);
 				}
 			}
@@ -379,26 +299,18 @@ public class L2BossZone extends L2ZoneType
 	 * Occasionally, all players need to be sent out of the zone (for example, if the players are just running around without fighting for too long, or if all players die, etc). This call sends all online players to town and marks offline players to be teleported (by clearing their relog expiration
 	 * times) when they log back in (no real need for off-line teleport).
 	 */
-	public void oustAllPlayers()
-	{
-		if (_characterList.isEmpty())
-		{
+	public void oustAllPlayers() {
+		if (_characterList.isEmpty()) {
 			return;
 		}
 		
-		for (L2Character character : getCharactersInside())
-		{
-			if ((character != null) && character.isPlayer())
-			{
+		for (L2Character character : getCharactersInside()) {
+			if ((character != null) && character.isPlayer()) {
 				L2PcInstance player = character.getActingPlayer();
-				if (player.isOnline())
-				{
-					if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0))
-					{
+				if (player.isOnline()) {
+					if ((_oustLoc[0] != 0) && (_oustLoc[1] != 0) && (_oustLoc[2] != 0)) {
 						player.teleToLocation(_oustLoc[0], _oustLoc[1], _oustLoc[2]);
-					}
-					else
-					{
+					} else {
 						player.teleToLocation(TeleportWhereType.TOWN);
 					}
 				}
@@ -413,42 +325,32 @@ public class L2BossZone extends L2ZoneType
 	 * @param player reference to the player we wish to allow
 	 * @param durationInSec amount of time in seconds during which entry is valid.
 	 */
-	public void allowPlayerEntry(L2PcInstance player, int durationInSec)
-	{
-		if (!player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS))
-		{
-			if (!getSettings().getPlayersAllowed().contains(player.getObjectId()))
-			{
+	public void allowPlayerEntry(L2PcInstance player, int durationInSec) {
+		if (!player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS)) {
+			if (!getSettings().getPlayersAllowed().contains(player.getObjectId())) {
 				getSettings().getPlayersAllowed().add(player.getObjectId());
 			}
 			getSettings().getPlayerAllowedReEntryTimes().put(player.getObjectId(), System.currentTimeMillis() + (durationInSec * 1000));
 		}
 	}
 	
-	public void removePlayer(L2PcInstance player)
-	{
-		if (!player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS))
-		{
+	public void removePlayer(L2PcInstance player) {
+		if (!player.canOverrideCond(PcCondOverride.ZONE_CONDITIONS)) {
 			getSettings().getPlayersAllowed().remove(Integer.valueOf(player.getObjectId()));
 			getSettings().getPlayerAllowedReEntryTimes().remove(player.getObjectId());
 		}
 	}
 	
-	public void updateKnownList(L2Npc npc)
-	{
-		if ((_characterList == null) || _characterList.isEmpty())
-		{
+	public void updateKnownList(L2Npc npc) {
+		if ((_characterList == null) || _characterList.isEmpty()) {
 			return;
 		}
 		
 		Map<Integer, L2PcInstance> npcKnownPlayers = npc.getKnownList().getKnownPlayers();
-		for (L2Character character : getCharactersInside())
-		{
-			if ((character != null) && character.isPlayer())
-			{
+		for (L2Character character : getCharactersInside()) {
+			if ((character != null) && character.isPlayer()) {
 				L2PcInstance player = character.getActingPlayer();
-				if (player.isOnline())
-				{
+				if (player.isOnline()) {
 					npcKnownPlayers.put(player.getObjectId(), player);
 				}
 			}

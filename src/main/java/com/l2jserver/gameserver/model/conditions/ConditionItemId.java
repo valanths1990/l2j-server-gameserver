@@ -26,16 +26,14 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionItemId.
  * @author mkizub
  */
-public final class ConditionItemId extends Condition
-{
+public final class ConditionItemId extends Condition {
 	private final int _itemId;
 	
 	/**
 	 * Instantiates a new condition item id.
 	 * @param itemId the item id
 	 */
-	public ConditionItemId(int itemId)
-	{
+	public ConditionItemId(int itemId) {
 		_itemId = itemId;
 	}
 	
@@ -44,8 +42,7 @@ public final class ConditionItemId extends Condition
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (item != null) && (item.getId() == _itemId);
 	}
 }

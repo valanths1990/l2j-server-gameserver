@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.entity.Fort;
 /**
  * @author KenM
  */
-public class ExShowFortressSiegeInfo extends L2GameServerPacket
-{
+public class ExShowFortressSiegeInfo extends L2GameServerPacket {
 	private final int _fortId;
 	private final int _size;
 	private final int _csize;
@@ -37,8 +36,7 @@ public class ExShowFortressSiegeInfo extends L2GameServerPacket
 	/**
 	 * @param fort
 	 */
-	public ExShowFortressSiegeInfo(Fort fort)
-	{
+	public ExShowFortressSiegeInfo(Fort fort) {
 		_fortId = fort.getResidenceId();
 		_size = fort.getFortSize();
 		List<FortSiegeSpawn> commanders = FortSiegeManager.getInstance().getCommanderSpawnList(_fortId);
@@ -47,20 +45,16 @@ public class ExShowFortressSiegeInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x17);
 		
 		writeD(_fortId); // Fortress Id
 		writeD(_size); // Total Barracks Count
-		if (_csize > 0)
-		{
-			switch (_csize)
-			{
+		if (_csize > 0) {
+			switch (_csize) {
 				case 3:
-					switch (_csize2)
-					{
+					switch (_csize2) {
 						case 0:
 							writeD(0x03);
 							break;
@@ -97,11 +91,8 @@ public class ExShowFortressSiegeInfo extends L2GameServerPacket
 					}
 					break;
 			}
-		}
-		else
-		{
-			for (int i = 0; i < _size; i++)
-			{
+		} else {
+			for (int i = 0; i < _size; i++) {
 				writeD(0x00);
 			}
 		}

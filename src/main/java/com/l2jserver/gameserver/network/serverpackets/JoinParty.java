@@ -18,21 +18,18 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class JoinParty extends L2GameServerPacket
-{
+public final class JoinParty extends L2GameServerPacket {
 	private final int _response;
 	
 	/**
 	 * @param response
 	 */
-	public JoinParty(int response)
-	{
+	public JoinParty(int response) {
 		_response = response;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x3a);
 		writeD(_response);
 	}

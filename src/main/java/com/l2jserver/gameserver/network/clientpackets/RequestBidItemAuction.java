@@ -27,55 +27,46 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 /**
  * @author Forsaiken
  */
-public final class RequestBidItemAuction extends L2GameClientPacket
-{
+public final class RequestBidItemAuction extends L2GameClientPacket {
 	private static final String _C__D0_39_REQUESTBIDITEMAUCTION = "[C] D0:39 RequestBidItemAuction";
 	
 	private int _instanceId;
 	private long _bid;
 	
 	@Override
-	protected final void readImpl()
-	{
+	protected final void readImpl() {
 		_instanceId = super.readD();
 		_bid = super.readQ();
 	}
 	
 	@Override
-	protected final void runImpl()
-	{
+	protected final void runImpl() {
 		final L2PcInstance activeChar = super.getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		// can't use auction fp here
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("auction"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("auction")) {
 			activeChar.sendMessage("You are bidding too fast.");
 			return;
 		}
 		
-		if ((_bid < 0) || (_bid > Inventory.MAX_ADENA))
-		{
+		if ((_bid < 0) || (_bid > Inventory.MAX_ADENA)) {
 			return;
 		}
 		
 		final ItemAuctionInstance instance = ItemAuctionManager.getInstance().getManagerInstance(_instanceId);
-		if (instance != null)
-		{
+		if (instance != null) {
 			final ItemAuction auction = instance.getCurrentAuction();
-			if (auction != null)
-			{
+			if (auction != null) {
 				auction.registerBid(activeChar, _bid);
 			}
 		}
 	}
 	
 	@Override
-	public final String getType()
-	{
+	public final String getType() {
 		return _C__D0_39_REQUESTBIDITEMAUCTION;
 	}
 }

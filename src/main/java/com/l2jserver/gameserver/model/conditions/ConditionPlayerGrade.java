@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerGrade.
  * @author Gigiikun
  */
-public final class ConditionPlayerGrade extends Condition
-{
+public final class ConditionPlayerGrade extends Condition {
 	protected static final Logger _log = Logger.getLogger(ConditionPlayerGrade.class.getName());
 	// conditional values
 	public static final int COND_NO_GRADE = 0x0001;
@@ -47,8 +46,7 @@ public final class ConditionPlayerGrade extends Condition
 	 * Instantiates a new condition player grade.
 	 * @param value the value
 	 */
-	public ConditionPlayerGrade(int value)
-	{
+	public ConditionPlayerGrade(int value) {
 		_value = value;
 	}
 	
@@ -56,8 +54,7 @@ public final class ConditionPlayerGrade extends Condition
 	 * 
 	 */
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effector.getActingPlayer() != null) && (_value == (byte) effector.getActingPlayer().getExpertiseLevel());
 	}
 }

@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2ServitorInstance;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 
-public class PetInfo extends L2GameServerPacket
-{
+public class PetInfo extends L2GameServerPacket {
 	private final L2Summon _summon;
 	private final int _x, _y, _z, _heading;
 	private final boolean _isSummoned;
@@ -37,8 +36,7 @@ public class PetInfo extends L2GameServerPacket
 	private final int _maxHp, _maxMp;
 	private int _maxFed, _curFed;
 	
-	public PetInfo(L2Summon summon, int val)
-	{
+	public PetInfo(L2Summon summon, int val) {
 		_summon = summon;
 		_isSummoned = summon.isShowSummonAnimation();
 		_x = summon.getX();
@@ -57,14 +55,11 @@ public class PetInfo extends L2GameServerPacket
 		_maxHp = summon.getMaxHp();
 		_maxMp = summon.getMaxMp();
 		_val = val;
-		if (summon.isPet())
-		{
+		if (summon.isPet()) {
 			final L2PetInstance pet = (L2PetInstance) _summon;
 			_curFed = pet.getCurrentFed(); // how fed it is
 			_maxFed = pet.getMaxFed(); // max fed it can be
-		}
-		else if (summon.isServitor())
-		{
+		} else if (summon.isServitor()) {
 			final L2ServitorInstance sum = (L2ServitorInstance) _summon;
 			_curFed = sum.getLifeTimeRemaining();
 			_maxFed = sum.getLifeTime();
@@ -72,8 +67,7 @@ public class PetInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xb2);
 		writeD(_summon.getSummonType());
 		writeD(_summon.getObjectId());
@@ -108,12 +102,9 @@ public class PetInfo extends L2GameServerPacket
 		writeC(_summon.isAlikeDead() ? 1 : 0); // dead 1=true
 		writeC(_isSummoned ? 2 : _val); // 0=teleported 1=default 2=summoned
 		writeD(-1); // High Five NPCString ID
-		if (_summon.isPet())
-		{
+		if (_summon.isPet()) {
 			writeS(_summon.getName()); // Pet name.
-		}
-		else
-		{
+		} else {
 			writeS(_summon.getTemplate().isUsingServerSideName() ? _summon.getName() : ""); // Summon name.
 		}
 		writeD(-1); // High Five NPCString ID
@@ -131,12 +122,9 @@ public class PetInfo extends L2GameServerPacket
 		writeD(_summon.getLevel());// lvl
 		writeQ(_summon.getExp());
 		
-		if (_summon.getExpForThisLevel() > _summon.getExp())
-		{
+		if (_summon.getExpForThisLevel() > _summon.getExp()) {
 			writeQ(_summon.getExp());// 0% absolute value
-		}
-		else
-		{
+		} else {
 			writeQ(_summon.getExpForThisLevel());// 0% absolute value
 		}
 		

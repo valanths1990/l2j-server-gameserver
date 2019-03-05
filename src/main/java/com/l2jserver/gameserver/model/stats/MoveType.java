@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.stats;
  * Enum of move types.
  * @author GKR
  */
-public enum MoveType
-{
+public enum MoveType {
 	WALK,
 	RUN,
 	FAST_SWIM,

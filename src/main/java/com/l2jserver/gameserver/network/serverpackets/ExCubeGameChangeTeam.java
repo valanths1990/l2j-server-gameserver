@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author mrTJO
  */
-public class ExCubeGameChangeTeam extends L2GameServerPacket
-{
+public class ExCubeGameChangeTeam extends L2GameServerPacket {
 	L2PcInstance _player;
 	boolean _fromRedTeam;
 	
@@ -33,15 +32,13 @@ public class ExCubeGameChangeTeam extends L2GameServerPacket
 	 * @param player Player Instance
 	 * @param fromRedTeam Is Player from Red Team?
 	 */
-	public ExCubeGameChangeTeam(L2PcInstance player, boolean fromRedTeam)
-	{
+	public ExCubeGameChangeTeam(L2PcInstance player, boolean fromRedTeam) {
 		_player = player;
 		_fromRedTeam = fromRedTeam;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x97);
 		writeD(0x05);

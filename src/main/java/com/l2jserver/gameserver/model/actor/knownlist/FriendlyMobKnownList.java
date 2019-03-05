@@ -24,23 +24,18 @@ import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2FriendlyMobInstance;
 
-public class FriendlyMobKnownList extends AttackableKnownList
-{
-	public FriendlyMobKnownList(L2FriendlyMobInstance activeChar)
-	{
+public class FriendlyMobKnownList extends AttackableKnownList {
+	public FriendlyMobKnownList(L2FriendlyMobInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public boolean addKnownObject(L2Object object)
-	{
-		if (!super.addKnownObject(object))
-		{
+	public boolean addKnownObject(L2Object object) {
+		if (!super.addKnownObject(object)) {
 			return false;
 		}
 		
-		if (object.isPlayer() && (getActiveChar().getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE))
-		{
+		if (object.isPlayer() && (getActiveChar().getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE)) {
 			getActiveChar().getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE, null);
 		}
 		
@@ -48,32 +43,25 @@ public class FriendlyMobKnownList extends AttackableKnownList
 	}
 	
 	@Override
-	protected boolean removeKnownObject(L2Object object, boolean forget)
-	{
-		if (!super.removeKnownObject(object, forget))
-		{
+	protected boolean removeKnownObject(L2Object object, boolean forget) {
+		if (!super.removeKnownObject(object, forget)) {
 			return false;
 		}
 		
-		if (!(object instanceof L2Character))
-		{
+		if (!(object instanceof L2Character)) {
 			return true;
 		}
 		
-		if (getActiveChar().hasAI())
-		{
+		if (getActiveChar().hasAI()) {
 			getActiveChar().getAI().notifyEvent(CtrlEvent.EVT_FORGET_OBJECT, object);
-			if (getActiveChar().getTarget() == object)
-			{
+			if (getActiveChar().getTarget() == object) {
 				getActiveChar().setTarget(null);
 			}
 		}
 		
-		if (getActiveChar().isVisible() && getKnownPlayers().isEmpty() && getKnownSummons().isEmpty())
-		{
+		if (getActiveChar().isVisible() && getKnownPlayers().isEmpty() && getKnownSummons().isEmpty()) {
 			getActiveChar().clearAggroList();
-			if (getActiveChar().hasAI())
-			{
+			if (getActiveChar().hasAI()) {
 				getActiveChar().getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE, null);
 			}
 		}
@@ -82,8 +70,7 @@ public class FriendlyMobKnownList extends AttackableKnownList
 	}
 	
 	@Override
-	public final L2FriendlyMobInstance getActiveChar()
-	{
+	public final L2FriendlyMobInstance getActiveChar() {
 		return (L2FriendlyMobInstance) super.getActiveChar();
 	}
 }

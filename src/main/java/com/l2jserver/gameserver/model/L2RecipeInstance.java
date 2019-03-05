@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model;
 /**
  * This class describes a RecipeList component (1 line of the recipe : Item-Quantity needed).
  */
-public class L2RecipeInstance
-{
+public class L2RecipeInstance {
 	/** The Identifier of the item needed in the L2RecipeInstance */
 	private final int _itemId;
 	
@@ -34,8 +33,7 @@ public class L2RecipeInstance
 	 * @param itemId
 	 * @param quantity
 	 */
-	public L2RecipeInstance(int itemId, int quantity)
-	{
+	public L2RecipeInstance(int itemId, int quantity) {
 		_itemId = itemId;
 		_quantity = quantity;
 	}
@@ -43,16 +41,14 @@ public class L2RecipeInstance
 	/**
 	 * @return the Identifier of the L2RecipeInstance Item needed.
 	 */
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 	
 	/**
 	 * @return the Item quantity needed of the L2RecipeInstance.
 	 */
-	public int getQuantity()
-	{
+	public int getQuantity() {
 		return _quantity;
 	}
 	

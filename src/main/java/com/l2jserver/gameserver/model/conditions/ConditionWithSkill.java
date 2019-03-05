@@ -26,22 +26,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionWithSkill.
  * @author Steuf
  */
-public class ConditionWithSkill extends Condition
-{
+public class ConditionWithSkill extends Condition {
 	private final boolean _skill;
 	
 	/**
 	 * Instantiates a new condition with skill.
 	 * @param skill the skill
 	 */
-	public ConditionWithSkill(boolean skill)
-	{
+	public ConditionWithSkill(boolean skill) {
 		_skill = skill;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (skill != null) == _skill;
 	}
 }

@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.util.GMAudit;
  * This class handles all GM commands triggered by //command
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:29 $
  */
-public final class SendBypassBuildCmd extends L2GameClientPacket
-{
+public final class SendBypassBuildCmd extends L2GameClientPacket {
 	private static final String _C__74_SENDBYPASSBUILDCMD = "[C] 74 SendBypassBuildCmd";
 	
 	public static final int GM_MESSAGE = 9;
@@ -39,21 +38,17 @@ public final class SendBypassBuildCmd extends L2GameClientPacket
 	private String _command;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_command = readS();
-		if (_command != null)
-		{
+		if (_command != null) {
 			_command = _command.trim();
 		}
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
@@ -61,10 +56,8 @@ public final class SendBypassBuildCmd extends L2GameClientPacket
 		
 		IAdminCommandHandler ach = AdminCommandHandler.getInstance().getHandler(command);
 		
-		if (ach == null)
-		{
-			if (activeChar.isGM())
-			{
+		if (ach == null) {
+			if (activeChar.isGM()) {
 				activeChar.sendMessage("The command " + command.substring(6) + " does not exists!");
 			}
 			
@@ -72,15 +65,13 @@ public final class SendBypassBuildCmd extends L2GameClientPacket
 			return;
 		}
 		
-		if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel()))
-		{
+		if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel())) {
 			activeChar.sendMessage("You don't have the access right to use this command!");
 			_log.warning("Character " + activeChar.getName() + " tryed to use admin command " + command + ", but have no access to it!");
 			return;
 		}
 		
-		if (Config.GMAUDIT)
-		{
+		if (Config.GMAUDIT) {
 			GMAudit.auditGMAction(activeChar.getName() + " [" + activeChar.getObjectId() + "]", _command, (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"));
 		}
 		
@@ -88,8 +79,7 @@ public final class SendBypassBuildCmd extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__74_SENDBYPASSBUILDCMD;
 	}
 }

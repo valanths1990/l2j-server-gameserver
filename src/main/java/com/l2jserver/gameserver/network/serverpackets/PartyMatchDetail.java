@@ -24,22 +24,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Gnacik
  */
-public class PartyMatchDetail extends L2GameServerPacket
-{
+public class PartyMatchDetail extends L2GameServerPacket {
 	private final PartyMatchRoom _room;
 	
 	/**
 	 * @param player
 	 * @param room
 	 */
-	public PartyMatchDetail(L2PcInstance player, PartyMatchRoom room)
-	{
+	public PartyMatchDetail(L2PcInstance player, PartyMatchRoom room) {
 		_room = room;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x9d);
 		writeD(_room.getId());
 		writeD(_room.getMaxMembers());

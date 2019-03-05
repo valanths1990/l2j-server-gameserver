@@ -28,16 +28,13 @@ import com.l2jserver.util.Rnd;
  * @version 0.1, 2005-03-12
  * @author Balancer
  */
-public class L2Territory
-{
+public class L2Territory {
 	private static Logger _log = Logger.getLogger(L2Territory.class.getName());
 	
-	protected static class Point
-	{
+	protected static class Point {
 		protected int _x, _y, _zmin, _zmax, _proc;
 		
-		Point(int x, int y, int zmin, int zmax, int proc)
-		{
+		Point(int x, int y, int zmin, int zmax, int proc) {
 			_x = x;
 			_y = y;
 			_zmin = zmin;
@@ -56,8 +53,7 @@ public class L2Territory
 	private int _zMax;
 	private int _procMax;
 	
-	public L2Territory(int terr)
-	{
+	public L2Territory(int terr) {
 		_terr = terr;
 		_xMin = 999999;
 		_xMax = -999999;
@@ -68,56 +64,45 @@ public class L2Territory
 		_procMax = 0;
 	}
 	
-	public void add(int x, int y, int zmin, int zmax, int proc)
-	{
+	public void add(int x, int y, int zmin, int zmax, int proc) {
 		_points.add(new Point(x, y, zmin, zmax, proc));
-		if (x < _xMin)
-		{
+		if (x < _xMin) {
 			_xMin = x;
 		}
-		if (y < _yMin)
-		{
+		if (y < _yMin) {
 			_yMin = y;
 		}
-		if (x > _xMax)
-		{
+		if (x > _xMax) {
 			_xMax = x;
 		}
-		if (y > _yMax)
-		{
+		if (y > _yMax) {
 			_yMax = y;
 		}
-		if (zmin < _zMin)
-		{
+		if (zmin < _zMin) {
 			_zMin = zmin;
 		}
-		if (zmax > _zMax)
-		{
+		if (zmax > _zMax) {
 			_zMax = zmax;
 		}
 		_procMax += proc;
 	}
 	
-	public boolean isIntersect(int x, int y, Point p1, Point p2)
-	{
+	public boolean isIntersect(int x, int y, Point p1, Point p2) {
 		double dy1 = p1._y - y;
 		double dy2 = p2._y - y;
 		
-		if (Math.abs(Math.signum(dy1) - Math.signum(dy2)) <= 1e-6)
-		{
+		if (Math.abs(Math.signum(dy1) - Math.signum(dy2)) <= 1e-6) {
 			return false;
 		}
 		
 		double dx1 = p1._x - x;
 		double dx2 = p2._x - x;
 		
-		if ((dx1 >= 0) && (dx2 >= 0))
-		{
+		if ((dx1 >= 0) && (dx2 >= 0)) {
 			return true;
 		}
 		
-		if ((dx1 < 0) && (dx2 < 0))
-		{
+		if ((dx1 < 0) && (dx2 < 0)) {
 			return false;
 		}
 		
@@ -126,16 +111,13 @@ public class L2Territory
 		return dx0 <= dx1;
 	}
 	
-	public boolean isInside(int x, int y)
-	{
+	public boolean isInside(int x, int y) {
 		int intersect_count = 0;
-		for (int i = 0; i < _points.size(); i++)
-		{
+		for (int i = 0; i < _points.size(); i++) {
 			Point p1 = _points.get(i > 0 ? i - 1 : _points.size() - 1);
 			Point p2 = _points.get(i);
 			
-			if (isIntersect(x, y, p1, p2))
-			{
+			if (isIntersect(x, y, p1, p2)) {
 				intersect_count++;
 			}
 		}
@@ -143,35 +125,27 @@ public class L2Territory
 		return (intersect_count % 2) == 1;
 	}
 	
-	public Location getRandomPoint()
-	{
-		if (_procMax > 0)
-		{
+	public Location getRandomPoint() {
+		if (_procMax > 0) {
 			int pos = 0;
 			int rnd = Rnd.nextInt(_procMax);
-			for (Point p1 : _points)
-			{
+			for (Point p1 : _points) {
 				pos += p1._proc;
-				if (rnd <= pos)
-				{
+				if (rnd <= pos) {
 					return new Location(p1._x, p1._y, Rnd.get(p1._zmin, p1._zmax));
 				}
 			}
 			
 		}
-		for (int i = 0; i < 100; i++)
-		{
+		for (int i = 0; i < 100; i++) {
 			int x = Rnd.get(_xMin, _xMax);
 			int y = Rnd.get(_yMin, _yMax);
-			if (isInside(x, y))
-			{
+			if (isInside(x, y)) {
 				double curdistance = 0;
 				int zmin = _zMin;
-				for (Point p1 : _points)
-				{
+				for (Point p1 : _points) {
 					double distance = Math.hypot(p1._x - x, p1._y - y);
-					if ((curdistance == 0) || (distance < curdistance))
-					{
+					if ((curdistance == 0) || (distance < curdistance)) {
 						curdistance = distance;
 						zmin = p1._zmin;
 					}
@@ -183,8 +157,7 @@ public class L2Territory
 		return null;
 	}
 	
-	public int getProcMax()
-	{
+	public int getProcMax() {
 		return _procMax;
 	}
 }

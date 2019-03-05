@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Formulas test.
  * @author Zoey76
  */
-public class FormulasTest
-{
+public class FormulasTest {
 	private static final String PROVIDE_SPEED_SKILL_TIME = "PROVIDE_SPEED_SKILL_TIME";
 	
 	private static final String PROVIDE_CHARACTERS = "PROVIDE_CHARACTERS";
@@ -38,21 +37,18 @@ public class FormulasTest
 	private static final Integer HP_REGENERATE_PERIOD_DOOR = 300000;
 	
 	@BeforeClass
-	private void init()
-	{
+	private void init() {
 		Config.DATAPACK_ROOT = new File("src/test/resources");
 	}
 	
 	@Test(dataProvider = PROVIDE_CHARACTERS)
-	public void testGetRegeneratePeriod(L2Character character, Integer expected)
-	{
+	public void testGetRegeneratePeriod(L2Character character, Integer expected) {
 		assertEquals(Formulas.getRegeneratePeriod(character), expected.intValue());
 	}
 	
 	@Test(dataProvider = PROVIDE_SPEED_SKILL_TIME)
 	public void testCalcAtkSpd(int hitTime, boolean isChanneling, int channelingSkillId, boolean isStatic, boolean isMagic, //
-		int mAtkSpeed, double pAtkSpeed, boolean isChargedSpiritshots, boolean isChargedBlessedSpiritShots, double expected)
-	{
+		int mAtkSpeed, double pAtkSpeed, boolean isChargedSpiritshots, boolean isChargedBlessedSpiritShots, double expected) {
 		final L2Character character = mock(L2Character.class);
 		when(character.getMAtkSpd()).thenReturn(mAtkSpeed);
 		when(character.getPAtkSpd()).thenReturn(pAtkSpeed);
@@ -73,8 +69,7 @@ public class FormulasTest
 	}
 	
 	@DataProvider(name = PROVIDE_CHARACTERS)
-	private Iterator<Object[]> provideCharacters()
-	{
+	private Iterator<Object[]> provideCharacters() {
 		final List<Object[]> result = new LinkedList<>();
 		final L2Character c1 = mock(L2Character.class);
 		when(c1.isDoor()).thenReturn(true);
@@ -91,8 +86,7 @@ public class FormulasTest
 	}
 	
 	@DataProvider(name = PROVIDE_SPEED_SKILL_TIME)
-	private Iterator<Object[]> provide()
-	{
+	private Iterator<Object[]> provide() {
 		final Set<Object[]> result = new HashSet<>();
 		// @formatter:off
 		// TODO(Zoey76): Take care of the "bad" values.

@@ -32,8 +32,7 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
 /**
  * @author NosBit
  */
-public final class GeneralDropItem implements IDropItem
-{
+public final class GeneralDropItem implements IDropItem {
 	private final int _itemId;
 	private final long _min;
 	private final long _max;
@@ -51,28 +50,23 @@ public final class GeneralDropItem implements IDropItem
 	 * @param max the max count
 	 * @param chance the chance of this drop item
 	 */
-	public GeneralDropItem(int itemId, long min, long max, double chance)
-	{
+	public GeneralDropItem(int itemId, long min, long max, double chance) {
 		this(itemId, min, max, chance, 1, 1);
 	}
 	
-	public GeneralDropItem(int itemId, long min, long max, double chance, double defaultAmountMultiplier, double defaultChanceMultiplier)
-	{
+	public GeneralDropItem(int itemId, long min, long max, double chance, double defaultAmountMultiplier, double defaultChanceMultiplier) {
 		this(itemId, min, max, defaultChanceMultiplier, IAmountMultiplierStrategy.DEFAULT_STRATEGY(defaultAmountMultiplier), IChanceMultiplierStrategy.DEFAULT_STRATEGY(defaultChanceMultiplier));
 	}
 	
-	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy)
-	{
+	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy) {
 		this(itemId, min, max, chance, amountMultiplierStrategy, chanceMultiplierStrategy, IPreciseDeterminationStrategy.DEFAULT, IKillerChanceModifierStrategy.DEFAULT_NONGROUP_STRATEGY);
 	}
 	
-	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy, IPreciseDeterminationStrategy preciseStrategy, INonGroupedKillerChanceModifierStrategy killerStrategy)
-	{
+	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy, IPreciseDeterminationStrategy preciseStrategy, INonGroupedKillerChanceModifierStrategy killerStrategy) {
 		this(itemId, min, max, chance, amountMultiplierStrategy, chanceMultiplierStrategy, preciseStrategy, killerStrategy, IDropCalculationStrategy.DEFAULT_STRATEGY);
 	}
 	
-	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy, IPreciseDeterminationStrategy preciseStrategy, INonGroupedKillerChanceModifierStrategy killerStrategy, IDropCalculationStrategy dropCalculationStrategy)
-	{
+	public GeneralDropItem(int itemId, long min, long max, double chance, IAmountMultiplierStrategy amountMultiplierStrategy, IChanceMultiplierStrategy chanceMultiplierStrategy, IPreciseDeterminationStrategy preciseStrategy, INonGroupedKillerChanceModifierStrategy killerStrategy, IDropCalculationStrategy dropCalculationStrategy) {
 		_itemId = itemId;
 		_min = min;
 		_max = max;
@@ -88,40 +82,35 @@ public final class GeneralDropItem implements IDropItem
 	/**
 	 * @return the _amountStrategy
 	 */
-	public final IAmountMultiplierStrategy getAmountStrategy()
-	{
+	public final IAmountMultiplierStrategy getAmountStrategy() {
 		return _amountStrategy;
 	}
 	
 	/**
 	 * @return the _chanceStrategy
 	 */
-	public final IChanceMultiplierStrategy getChanceStrategy()
-	{
+	public final IChanceMultiplierStrategy getChanceStrategy() {
 		return _chanceStrategy;
 	}
 	
 	/**
 	 * @return the _preciseStrategy
 	 */
-	public final IPreciseDeterminationStrategy getPreciseStrategy()
-	{
+	public final IPreciseDeterminationStrategy getPreciseStrategy() {
 		return _preciseStrategy;
 	}
 	
 	/**
 	 * @return the _killerStrategy
 	 */
-	public final INonGroupedKillerChanceModifierStrategy getKillerChanceModifierStrategy()
-	{
+	public final INonGroupedKillerChanceModifierStrategy getKillerChanceModifierStrategy() {
 		return _killerStrategy;
 	}
 	
 	/**
 	 * @return the _dropCalculationStrategy
 	 */
-	public final IDropCalculationStrategy getDropCalculationStrategy()
-	{
+	public final IDropCalculationStrategy getDropCalculationStrategy() {
 		return _dropCalculationStrategy;
 	}
 	
@@ -129,8 +118,7 @@ public final class GeneralDropItem implements IDropItem
 	 * Gets the item id
 	 * @return the item id
 	 */
-	public final int getItemId()
-	{
+	public final int getItemId() {
 		return _itemId;
 	}
 	
@@ -138,8 +126,7 @@ public final class GeneralDropItem implements IDropItem
 	 * Gets the base min drop count
 	 * @return the min
 	 */
-	public final long getMin()
-	{
+	public final long getMin() {
 		return _min;
 	}
 	
@@ -148,8 +135,7 @@ public final class GeneralDropItem implements IDropItem
 	 * @param victim the victim who drops the item
 	 * @return the min modified by any rates.
 	 */
-	public final long getMin(L2Character victim)
-	{
+	public final long getMin(L2Character victim) {
 		return (long) (getMin() * getAmountMultiplier(victim));
 	}
 	
@@ -157,8 +143,7 @@ public final class GeneralDropItem implements IDropItem
 	 * Gets the base max drop count
 	 * @return the max
 	 */
-	public final long getMax()
-	{
+	public final long getMax() {
 		return _max;
 	}
 	
@@ -167,8 +152,7 @@ public final class GeneralDropItem implements IDropItem
 	 * @param victim the victim who drops the item
 	 * @return the max modified by any rates.
 	 */
-	public final long getMax(L2Character victim)
-	{
+	public final long getMax(L2Character victim) {
 		return (long) (getMax() * getAmountMultiplier(victim));
 	}
 	
@@ -176,8 +160,7 @@ public final class GeneralDropItem implements IDropItem
 	 * Gets the chance of this drop item.
 	 * @return the chance
 	 */
-	public final double getChance()
-	{
+	public final double getChance() {
 		return _chance;
 	}
 	
@@ -187,8 +170,7 @@ public final class GeneralDropItem implements IDropItem
 	 * @param victim the victim who drops the item
 	 * @return the chance modified by any rates.
 	 */
-	public final double getChance(L2Character victim)
-	{
+	public final double getChance(L2Character victim) {
 		return getChance() * getChanceMultiplier(victim);
 	}
 	
@@ -199,22 +181,19 @@ public final class GeneralDropItem implements IDropItem
 	 * @param killer who kills the victim
 	 * @return a chance to drop modified by deep blue drop rules
 	 */
-	public final double getChance(L2Character victim, L2Character killer)
-	{
+	public final double getChance(L2Character victim, L2Character killer) {
 		return (getKillerChanceModifier(victim, killer) * getChance(victim));
 	}
 	
 	@Override
-	public final List<ItemHolder> calculateDrops(L2Character victim, L2Character killer)
-	{
+	public final List<ItemHolder> calculateDrops(L2Character victim, L2Character killer) {
 		return _dropCalculationStrategy.calculateDrops(this, victim, killer);
 	}
 	
 	/**
 	 * @return <code>true</code> if chance over 100% should be handled
 	 */
-	public final boolean isPreciseCalculated()
-	{
+	public final boolean isPreciseCalculated() {
 		return _preciseStrategy.isPreciseCalculated(this);
 	}
 	
@@ -224,8 +203,7 @@ public final class GeneralDropItem implements IDropItem
 	 * @param killer who kills the victim
 	 * @return a number between 0 and 1 (usually)
 	 */
-	protected final double getKillerChanceModifier(L2Character victim, L2Character killer)
-	{
+	protected final double getKillerChanceModifier(L2Character victim, L2Character killer) {
 		return _killerStrategy.getKillerChanceModifier(this, victim, killer);
 	}
 	
@@ -234,8 +212,7 @@ public final class GeneralDropItem implements IDropItem
 	 * @param victim who drops the item
 	 * @return
 	 */
-	protected final double getAmountMultiplier(L2Character victim)
-	{
+	protected final double getAmountMultiplier(L2Character victim) {
 		return _amountStrategy.getAmountMultiplier(this, victim);
 	}
 	
@@ -244,8 +221,7 @@ public final class GeneralDropItem implements IDropItem
 	 * @param victim who drops the item
 	 * @return
 	 */
-	protected final double getChanceMultiplier(L2Character victim)
-	{
+	protected final double getChanceMultiplier(L2Character victim) {
 		return _chanceStrategy.getChanceMultiplier(this, victim);
 	}
 }

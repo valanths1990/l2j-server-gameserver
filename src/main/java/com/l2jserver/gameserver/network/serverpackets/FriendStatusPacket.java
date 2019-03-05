@@ -26,22 +26,19 @@ import com.l2jserver.gameserver.model.L2World;
  * Inform player about friend online status change
  * @author JIV
  */
-public class FriendStatusPacket extends L2GameServerPacket
-{
+public class FriendStatusPacket extends L2GameServerPacket {
 	private final boolean _online;
 	private final int _objid;
 	private final String _name;
 	
-	public FriendStatusPacket(int objId)
-	{
+	public FriendStatusPacket(int objId) {
 		_objid = objId;
 		_name = CharNameTable.getInstance().getNameById(objId);
 		_online = L2World.getInstance().getPlayer(objId) != null;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x77);
 		writeD(_online ? 1 : 0);
 		writeS(_name);

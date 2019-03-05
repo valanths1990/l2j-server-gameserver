@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.events;
 /**
  * @author UnAfraid
  */
-public enum ListenerRegisterType
-{
+public enum ListenerRegisterType {
 	NPC,
 	ZONE,
 	ITEM,

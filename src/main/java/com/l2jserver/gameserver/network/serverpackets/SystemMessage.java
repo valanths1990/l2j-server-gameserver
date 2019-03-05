@@ -23,17 +23,13 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 /**
  * @author Forsaiken, UnAfraid
  */
-public final class SystemMessage extends AbstractMessagePacket<SystemMessage>
-{
-	private SystemMessage(final SystemMessageId smId)
-	{
+public final class SystemMessage extends AbstractMessagePacket<SystemMessage> {
+	private SystemMessage(final SystemMessageId smId) {
 		super(smId);
 	}
 	
-	public static final SystemMessage sendString(final String text)
-	{
-		if (text == null)
-		{
+	public static final SystemMessage sendString(final String text) {
+		if (text == null) {
 			throw new NullPointerException();
 		}
 		
@@ -42,17 +38,14 @@ public final class SystemMessage extends AbstractMessagePacket<SystemMessage>
 		return sm;
 	}
 	
-	public static final SystemMessage getSystemMessage(final SystemMessageId smId)
-	{
+	public static final SystemMessage getSystemMessage(final SystemMessageId smId) {
 		SystemMessage sm = smId.getStaticSystemMessage();
-		if (sm != null)
-		{
+		if (sm != null) {
 			return sm;
 		}
 		
 		sm = new SystemMessage(smId);
-		if (smId.getParamCount() == 0)
-		{
+		if (smId.getParamCount() == 0) {
 			smId.setStaticSystemMessage(sm);
 		}
 		
@@ -64,8 +57,7 @@ public final class SystemMessage extends AbstractMessagePacket<SystemMessage>
 	 * @param id
 	 * @return the system message associated to the given Id.
 	 */
-	public static SystemMessage getSystemMessage(int id)
-	{
+	public static SystemMessage getSystemMessage(int id) {
 		return getSystemMessage(SystemMessageId.getSystemMessageId(id));
 	}
 	
@@ -75,14 +67,12 @@ public final class SystemMessage extends AbstractMessagePacket<SystemMessage>
 	 * @deprecated
 	 */
 	@Deprecated
-	private SystemMessage(final int id)
-	{
+	private SystemMessage(final int id) {
 		this(SystemMessageId.getSystemMessageId(id));
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x62);
 		writeMe();
 	}

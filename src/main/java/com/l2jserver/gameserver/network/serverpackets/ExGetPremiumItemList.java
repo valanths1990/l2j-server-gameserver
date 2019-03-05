@@ -26,23 +26,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Gnacik
  */
-public class ExGetPremiumItemList extends L2GameServerPacket
-{
+public class ExGetPremiumItemList extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	
-	public ExGetPremiumItemList(L2PcInstance activeChar)
-	{
+	public ExGetPremiumItemList(L2PcInstance activeChar) {
 		_activeChar = activeChar;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x86);
 		writeD(_activeChar.getPremiumItemList().size());
-		for (Entry<Integer, L2PremiumItem> entry : _activeChar.getPremiumItemList().entrySet())
-		{
+		for (Entry<Integer, L2PremiumItem> entry : _activeChar.getPremiumItemList().entrySet()) {
 			L2PremiumItem item = entry.getValue();
 			writeD(entry.getKey());
 			writeD(_activeChar.getObjectId());

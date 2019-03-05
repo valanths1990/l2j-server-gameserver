@@ -21,7 +21,6 @@ package com.l2jserver.gameserver.model.drops;
 /**
  * @author Battlecruiser
  */
-public interface IGroupedDropItemFactory
-{
+public interface IGroupedDropItemFactory {
 	public GroupedGeneralDropItem newGroupedDropItem(double chance);
 }

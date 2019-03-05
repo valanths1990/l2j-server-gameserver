@@ -23,8 +23,7 @@ package com.l2jserver.gameserver.model.items.type;
  * @author Adry_85
  * @since 2.6.0.0
  */
-public enum ItemType2
-{
+public enum ItemType2 {
 	WEAPON(0),
 	SHIELD_ARMOR(1),
 	ACCESSORY(2),
@@ -34,13 +33,11 @@ public enum ItemType2
 	
 	private final int _id;
 	
-	private ItemType2(int id)
-	{
+	private ItemType2(int id) {
 		_id = id;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 }

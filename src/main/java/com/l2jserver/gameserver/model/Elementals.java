@@ -25,14 +25,11 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.functions.FuncAdd;
 
-public final class Elementals
-{
+public final class Elementals {
 	private static final Map<Integer, ElementalItems> TABLE = new HashMap<>();
 	
-	static
-	{
-		for (ElementalItems item : ElementalItems.values())
-		{
+	static {
+		for (ElementalItems item : ElementalItems.values()) {
 			TABLE.put(item._itemId, item);
 		}
 	}
@@ -49,8 +46,7 @@ public final class Elementals
 	public static final int NEXT_WEAPON_BONUS = 5;
 	public static final int ARMOR_BONUS = 6;
 	
-	public static final int[] WEAPON_VALUES =
-	{
+	public static final int[] WEAPON_VALUES = {
 		0, // Level 1
 		25, // Level 2
 		75, // Level 3
@@ -65,11 +61,10 @@ public final class Elementals
 		525, // Level 12
 		600, // Level 13
 		Integer.MAX_VALUE
-	// TODO: Higher stones
+		// TODO: Higher stones
 	};
 	
-	public static final int[] ARMOR_VALUES =
-	{
+	public static final int[] ARMOR_VALUES = {
 		0, // Level 1
 		12, // Level 2
 		30, // Level 3
@@ -84,11 +79,10 @@ public final class Elementals
 		210, // Level 12
 		240, // Level 13
 		Integer.MAX_VALUE
-	// TODO: Higher stones
+		// TODO: Higher stones
 	};
 	
-	public static enum ElementalItemType
-	{
+	public static enum ElementalItemType {
 		Stone(3),
 		Roughore(3),
 		Crystal(6),
@@ -97,14 +91,12 @@ public final class Elementals
 		
 		public int _maxLevel;
 		
-		private ElementalItemType(int maxLvl)
-		{
+		private ElementalItemType(int maxLvl) {
 			_maxLevel = maxLvl;
 		}
 	}
 	
-	public static enum ElementalItems
-	{
+	public static enum ElementalItems {
 		fireStone(FIRE, 9546, ElementalItemType.Stone),
 		waterStone(WATER, 9547, ElementalItemType.Stone),
 		windStone(WIND, 9549, ElementalItemType.Stone),
@@ -145,43 +137,35 @@ public final class Elementals
 		public int _itemId;
 		public ElementalItemType _type;
 		
-		private ElementalItems(byte element, int itemId, ElementalItemType type)
-		{
+		private ElementalItems(byte element, int itemId, ElementalItemType type) {
 			_element = element;
 			_itemId = itemId;
 			_type = type;
 		}
 	}
 	
-	public static byte getItemElement(int itemId)
-	{
+	public static byte getItemElement(int itemId) {
 		ElementalItems item = TABLE.get(itemId);
-		if (item != null)
-		{
+		if (item != null) {
 			return item._element;
 		}
 		return NONE;
 	}
 	
-	public static ElementalItems getItemElemental(int itemId)
-	{
+	public static ElementalItems getItemElemental(int itemId) {
 		return TABLE.get(itemId);
 	}
 	
-	public static int getMaxElementLevel(int itemId)
-	{
+	public static int getMaxElementLevel(int itemId) {
 		ElementalItems item = TABLE.get(itemId);
-		if (item != null)
-		{
+		if (item != null) {
 			return item._type._maxLevel;
 		}
 		return -1;
 	}
 	
-	public static String getElementName(byte element)
-	{
-		switch (element)
-		{
+	public static String getElementName(byte element) {
+		switch (element) {
 			case FIRE:
 				return "Fire";
 			case WATER:
@@ -198,64 +182,51 @@ public final class Elementals
 		return "None";
 	}
 	
-	public static byte getElementId(String name)
-	{
+	public static byte getElementId(String name) {
 		String tmp = name.toLowerCase();
-		if (tmp.equals("fire"))
-		{
+		if (tmp.equals("fire")) {
 			return FIRE;
 		}
-		if (tmp.equals("water"))
-		{
+		if (tmp.equals("water")) {
 			return WATER;
 		}
-		if (tmp.equals("wind"))
-		{
+		if (tmp.equals("wind")) {
 			return WIND;
 		}
-		if (tmp.equals("earth"))
-		{
+		if (tmp.equals("earth")) {
 			return EARTH;
 		}
-		if (tmp.equals("dark"))
-		{
+		if (tmp.equals("dark")) {
 			return DARK;
 		}
-		if (tmp.equals("holy"))
-		{
+		if (tmp.equals("holy")) {
 			return HOLY;
 		}
 		return NONE;
 	}
 	
-	public static byte getOppositeElement(byte element)
-	{
+	public static byte getOppositeElement(byte element) {
 		return (byte) (((element % 2) == 0) ? (element + 1) : (element - 1));
 	}
 	
-	public static class ElementalStatBoni
-	{
+	public static class ElementalStatBoni {
 		private byte _elementalType;
 		private int _elementalValue;
 		private boolean _active;
 		
-		public ElementalStatBoni(byte type, int value)
-		{
+		public ElementalStatBoni(byte type, int value) {
 			_elementalType = type;
 			_elementalValue = value;
 			_active = false;
 		}
 		
-		public void applyBonus(L2PcInstance player, boolean isArmor)
-		{
+		public void applyBonus(L2PcInstance player, boolean isArmor) {
 			// make sure the bonuses are not applied twice..
-			if (_active)
-			{
+			if (_active) {
 				return;
 			}
 			
-			switch (_elementalType)
-			{
+			switch (_elementalType) {
 				case FIRE:
 					player.addStatFunc(new FuncAdd(isArmor ? Stats.FIRE_RES : Stats.FIRE_POWER, 0x40, this, _elementalValue, null));
 					break;
@@ -279,11 +250,9 @@ public final class Elementals
 			_active = true;
 		}
 		
-		public void removeBonus(L2PcInstance player)
-		{
+		public void removeBonus(L2PcInstance player) {
 			// make sure the bonuses are not removed twice
-			if (!_active)
-			{
+			if (!_active) {
 				return;
 			}
 			
@@ -292,13 +261,11 @@ public final class Elementals
 			_active = false;
 		}
 		
-		public void setValue(int val)
-		{
+		public void setValue(int val) {
 			_elementalValue = val;
 		}
 		
-		public void setElement(byte type)
-		{
+		public void setElement(byte type) {
 			_elementalType = type;
 		}
 	}
@@ -308,53 +275,44 @@ public final class Elementals
 	private byte _element = NONE;
 	private int _value = 0;
 	
-	public byte getElement()
-	{
+	public byte getElement() {
 		return _element;
 	}
 	
-	public void setElement(byte type)
-	{
+	public void setElement(byte type) {
 		_element = type;
 		_boni.setElement(type);
 	}
 	
-	public int getValue()
-	{
+	public int getValue() {
 		return _value;
 	}
 	
-	public void setValue(int val)
-	{
+	public void setValue(int val) {
 		_value = val;
 		_boni.setValue(val);
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return getElementName(_element) + " +" + _value;
 	}
 	
-	public Elementals(byte type, int value)
-	{
+	public Elementals(byte type, int value) {
 		_element = type;
 		_value = value;
 		_boni = new ElementalStatBoni(_element, _value);
 	}
 	
-	public void applyBonus(L2PcInstance player, boolean isArmor)
-	{
+	public void applyBonus(L2PcInstance player, boolean isArmor) {
 		_boni.applyBonus(player, isArmor);
 	}
 	
-	public void removeBonus(L2PcInstance player)
-	{
+	public void removeBonus(L2PcInstance player) {
 		_boni.removeBonus(player);
 	}
 	
-	public void updateBonus(L2PcInstance player, boolean isArmor)
-	{
+	public void updateBonus(L2PcInstance player, boolean isArmor) {
 		_boni.removeBonus(player);
 		_boni.applyBonus(player, isArmor);
 	}

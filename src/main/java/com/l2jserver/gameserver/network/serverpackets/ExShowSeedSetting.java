@@ -29,38 +29,32 @@ import com.l2jserver.gameserver.model.SeedProduction;
 /**
  * @author l3x
  */
-public class ExShowSeedSetting extends L2GameServerPacket
-{
+public class ExShowSeedSetting extends L2GameServerPacket {
 	private final int _manorId;
 	private final Set<L2Seed> _seeds;
 	private final Map<Integer, SeedProduction> _current = new HashMap<>();
 	private final Map<Integer, SeedProduction> _next = new HashMap<>();
 	
-	public ExShowSeedSetting(int manorId)
-	{
+	public ExShowSeedSetting(int manorId) {
 		final CastleManorManager manor = CastleManorManager.getInstance();
 		_manorId = manorId;
 		_seeds = manor.getSeedsForCastle(_manorId);
-		for (L2Seed s : _seeds)
-		{
+		for (L2Seed s : _seeds) {
 			// Current period
 			SeedProduction sp = manor.getSeedProduct(manorId, s.getSeedId(), false);
-			if (sp != null)
-			{
+			if (sp != null) {
 				_current.put(s.getSeedId(), sp);
 			}
 			// Next period
 			sp = manor.getSeedProduct(manorId, s.getSeedId(), true);
-			if (sp != null)
-			{
+			if (sp != null) {
 				_next.put(s.getSeedId(), sp);
 			}
 		}
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xFE); // Id
 		writeH(0x26); // SubId
 		
@@ -68,8 +62,7 @@ public class ExShowSeedSetting extends L2GameServerPacket
 		writeD(_seeds.size()); // size
 		
 		SeedProduction sp;
-		for (L2Seed s : _seeds)
-		{
+		for (L2Seed s : _seeds) {
 			writeD(s.getSeedId()); // seed id
 			writeD(s.getLevel()); // level
 			writeC(1);
@@ -81,26 +74,20 @@ public class ExShowSeedSetting extends L2GameServerPacket
 			writeD(s.getSeedMinPrice()); // min seed price
 			writeD(s.getSeedMaxPrice()); // max seed price
 			// Current period
-			if (_current.containsKey(s.getSeedId()))
-			{
+			if (_current.containsKey(s.getSeedId())) {
 				sp = _current.get(s.getSeedId());
 				writeQ(sp.getStartAmount()); // sales
 				writeQ(sp.getPrice()); // price
-			}
-			else
-			{
+			} else {
 				writeQ(0);
 				writeQ(0);
 			}
 			// Next period
-			if (_next.containsKey(s.getSeedId()))
-			{
+			if (_next.containsKey(s.getSeedId())) {
 				sp = _next.get(s.getSeedId());
 				writeQ(sp.getStartAmount()); // sales
 				writeQ(sp.getPrice()); // price
-			}
-			else
-			{
+			} else {
 				writeQ(0);
 				writeQ(0);
 			}

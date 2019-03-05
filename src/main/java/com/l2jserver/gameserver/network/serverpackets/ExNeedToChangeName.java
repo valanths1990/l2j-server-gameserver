@@ -24,13 +24,11 @@ package com.l2jserver.gameserver.network.serverpackets;
  * type 1 = clan name
  * @author JIV
  */
-public class ExNeedToChangeName extends L2GameServerPacket
-{
+public class ExNeedToChangeName extends L2GameServerPacket {
 	private final int _type, _subType;
 	private final String _name;
 	
-	public ExNeedToChangeName(int type, int subType, String name)
-	{
+	public ExNeedToChangeName(int type, int subType, String name) {
 		super();
 		_type = type;
 		_subType = subType;
@@ -38,8 +36,7 @@ public class ExNeedToChangeName extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x69);
 		writeD(_type);

@@ -31,8 +31,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * This class extends Guard class for quests, that require tracking of onAttack and onKill events from monsters' attacks.
  * @author GKR
  */
-public final class L2QuestGuardInstance extends L2GuardInstance
-{
+public final class L2QuestGuardInstance extends L2GuardInstance {
 	private boolean _isAutoAttackable = true;
 	private boolean _isPassive = false;
 	
@@ -40,34 +39,28 @@ public final class L2QuestGuardInstance extends L2GuardInstance
 	 * Creates a quest guard.
 	 * @param template the quest guard NPC template
 	 */
-	public L2QuestGuardInstance(L2NpcTemplate template)
-	{
+	public L2QuestGuardInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2QuestGuardInstance);
 	}
 	
 	@Override
-	public void addDamage(L2Character attacker, int damage, Skill skill)
-	{
+	public void addDamage(L2Character attacker, int damage, Skill skill) {
 		super.addDamage(attacker, damage, skill);
 		
-		if (attacker instanceof L2Attackable)
-		{
+		if (attacker instanceof L2Attackable) {
 			EventDispatcher.getInstance().notifyEventAsync(new OnAttackableAttack(null, this, damage, skill, false), this);
 		}
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
+	public boolean doDie(L2Character killer) {
 		// Kill the L2NpcInstance (the corpse disappeared after 7 seconds)
-		if (!super.doDie(killer))
-		{
+		if (!super.doDie(killer)) {
 			return false;
 		}
 		
-		if (killer instanceof L2Attackable)
-		{
+		if (killer instanceof L2Attackable) {
 			// Delayed notification
 			EventDispatcher.getInstance().notifyEventAsyncDelayed(new OnAttackableKill(null, this, false), this, _onKillDelay);
 		}
@@ -75,33 +68,27 @@ public final class L2QuestGuardInstance extends L2GuardInstance
 	}
 	
 	@Override
-	public void addDamageHate(L2Character attacker, int damage, long aggro)
-	{
-		if (!_isPassive && !(attacker instanceof L2PcInstance))
-		{
+	public void addDamageHate(L2Character attacker, int damage, long aggro) {
+		if (!_isPassive && !(attacker instanceof L2PcInstance)) {
 			super.addDamageHate(attacker, damage, aggro);
 		}
 	}
 	
-	public void setPassive(boolean state)
-	{
+	public void setPassive(boolean state) {
 		_isPassive = state;
 	}
 	
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
+	public boolean isAutoAttackable(L2Character attacker) {
 		return _isAutoAttackable && !(attacker instanceof L2PcInstance);
 	}
 	
 	@Override
-	public void setAutoAttackable(boolean state)
-	{
+	public void setAutoAttackable(boolean state) {
 		_isAutoAttackable = state;
 	}
 	
-	public boolean isPassive()
-	{
+	public boolean isPassive() {
 		return _isPassive;
 	}
 }

@@ -18,20 +18,17 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class SetSummonRemainTime extends L2GameServerPacket
-{
+public final class SetSummonRemainTime extends L2GameServerPacket {
 	private final int _maxTime;
 	private final int _remainingTime;
 	
-	public SetSummonRemainTime(int maxTime, int remainingTime)
-	{
+	public SetSummonRemainTime(int maxTime, int remainingTime) {
 		_remainingTime = remainingTime;
 		_maxTime = maxTime;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xd1);
 		writeD(_maxTime);
 		writeD(_remainingTime);

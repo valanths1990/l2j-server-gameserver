@@ -27,28 +27,23 @@ import com.l2jserver.gameserver.model.actor.instance.L2DefenderInstance;
 /**
  * @author BiggBoss
  */
-public final class L2SpecialSiegeGuardAI extends L2SiegeGuardAI
-{
+public final class L2SpecialSiegeGuardAI extends L2SiegeGuardAI {
 	private final List<Integer> _allied = new ArrayList<>();
 	
 	/**
 	 * @param creature
 	 */
-	public L2SpecialSiegeGuardAI(L2DefenderInstance creature)
-	{
+	public L2SpecialSiegeGuardAI(L2DefenderInstance creature) {
 		super(creature);
 	}
 	
-	public List<Integer> getAlly()
-	{
+	public List<Integer> getAlly() {
 		return _allied;
 	}
 	
 	@Override
-	protected boolean autoAttackCondition(L2Character target)
-	{
-		if (_allied.contains(target.getObjectId()))
-		{
+	protected boolean autoAttackCondition(L2Character target) {
+		if (_allied.contains(target.getObjectId())) {
 			return false;
 		}
 		

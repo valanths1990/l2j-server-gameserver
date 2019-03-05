@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.L2Clan;
 
-public class PledgeInfo extends L2GameServerPacket
-{
+public class PledgeInfo extends L2GameServerPacket {
 	private final L2Clan _clan;
 	
-	public PledgeInfo(L2Clan clan)
-	{
+	public PledgeInfo(L2Clan clan) {
 		_clan = clan;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x89);
 		writeD(_clan.getId());
 		writeS(_clan.getName());

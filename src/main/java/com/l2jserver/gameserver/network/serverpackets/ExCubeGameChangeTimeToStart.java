@@ -21,22 +21,19 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author mrTJO
  */
-public class ExCubeGameChangeTimeToStart extends L2GameServerPacket
-{
+public class ExCubeGameChangeTimeToStart extends L2GameServerPacket {
 	int _seconds;
 	
 	/**
 	 * Update Minigame Waiting List Time to Start
 	 * @param seconds
 	 */
-	public ExCubeGameChangeTimeToStart(int seconds)
-	{
+	public ExCubeGameChangeTimeToStart(int seconds) {
 		_seconds = seconds;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x97);
 		writeD(0x03);

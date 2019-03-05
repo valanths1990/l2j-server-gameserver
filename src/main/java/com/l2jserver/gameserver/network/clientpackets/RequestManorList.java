@@ -23,28 +23,23 @@ import com.l2jserver.gameserver.network.serverpackets.ExSendManorList;
 /**
  * @author l3x
  */
-public class RequestManorList extends L2GameClientPacket
-{
+public class RequestManorList extends L2GameClientPacket {
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		sendPacket(new ExSendManorList());
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return "[C] D0:01 RequestManorList";
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

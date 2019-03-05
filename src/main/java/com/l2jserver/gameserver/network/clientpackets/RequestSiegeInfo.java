@@ -22,25 +22,21 @@ package com.l2jserver.gameserver.network.clientpackets;
  * Format: (c) (no data, trigger)
  * @author -Wooden-
  */
-public class RequestSiegeInfo extends L2GameClientPacket
-{
+public class RequestSiegeInfo extends L2GameClientPacket {
 	private static final String _C__58_REQUESTSIEGEINFO = "[C] 58 RequestSiegeInfo";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// TODO this
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__58_REQUESTSIEGEINFO;
 	}
 }

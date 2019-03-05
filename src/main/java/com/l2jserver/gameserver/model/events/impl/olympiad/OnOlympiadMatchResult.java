@@ -26,37 +26,31 @@ import com.l2jserver.gameserver.model.olympiad.Participant;
 /**
  * @author UnAfraid
  */
-public class OnOlympiadMatchResult implements IBaseEvent
-{
+public class OnOlympiadMatchResult implements IBaseEvent {
 	private final Participant _winner;
 	private final Participant _loser;
 	private final CompetitionType _type;
 	
-	public OnOlympiadMatchResult(Participant winner, Participant looser, CompetitionType type)
-	{
+	public OnOlympiadMatchResult(Participant winner, Participant looser, CompetitionType type) {
 		_winner = winner;
 		_loser = looser;
 		_type = type;
 	}
 	
-	public Participant getWinner()
-	{
+	public Participant getWinner() {
 		return _winner;
 	}
 	
-	public Participant getLoser()
-	{
+	public Participant getLoser() {
 		return _loser;
 	}
 	
-	public CompetitionType getCompetitionType()
-	{
+	public CompetitionType getCompetitionType() {
 		return _type;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_OLYMPIAD_MATCH_RESULT;
 	}
 }

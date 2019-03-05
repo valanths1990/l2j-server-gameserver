@@ -27,58 +27,44 @@ import com.l2jserver.gameserver.model.items.L2Armor;
 import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class PreparedListContainer extends ListContainer
-{
+public class PreparedListContainer extends ListContainer {
 	private int _npcObjectId = 0;
 	
-	public PreparedListContainer(ListContainer template, boolean inventoryOnly, L2PcInstance player, L2Npc npc)
-	{
+	public PreparedListContainer(ListContainer template, boolean inventoryOnly, L2PcInstance player, L2Npc npc) {
 		super(template.getListId());
 		setMaintainEnchantment(template.getMaintainEnchantment());
 		setApplyTaxes(false);
 		double taxRate = 0;
-		if (npc != null)
-		{
+		if (npc != null) {
 			_npcObjectId = npc.getObjectId();
-			if (template.getApplyTaxes() && npc.getIsInTown() && (npc.getCastle().getOwnerId() > 0))
-			{
+			if (template.getApplyTaxes() && npc.getIsInTown() && (npc.getCastle().getOwnerId() > 0)) {
 				setApplyTaxes(true);
 				taxRate = npc.getCastle().getTaxRate();
 			}
 		}
 		
-		if (inventoryOnly)
-		{
-			if (player == null)
-			{
+		if (inventoryOnly) {
+			if (player == null) {
 				return;
 			}
 			
 			final L2ItemInstance[] items;
-			if (getMaintainEnchantment())
-			{
+			if (getMaintainEnchantment()) {
 				items = player.getInventory().getUniqueItemsByEnchantLevel(false, false, false);
-			}
-			else
-			{
+			} else {
 				items = player.getInventory().getUniqueItems(false, false, false);
 			}
 			
 			_entries = new LinkedList<>();
-			for (L2ItemInstance item : items)
-			{
+			for (L2ItemInstance item : items) {
 				// only do the match up on equippable items that are not currently equipped
 				// so for each appropriate item, produce a set of entries for the multisell list.
-				if (!item.isEquipped() && ((item.getItem() instanceof L2Armor) || (item.getItem() instanceof L2Weapon)))
-				{
+				if (!item.isEquipped() && ((item.getItem() instanceof L2Armor) || (item.getItem() instanceof L2Weapon))) {
 					// loop through the entries to see which ones we wish to include
-					for (Entry ent : template.getEntries())
-					{
+					for (Entry ent : template.getEntries()) {
 						// check ingredients of this entry to see if it's an entry we'd like to include.
-						for (Ingredient ing : ent.getIngredients())
-						{
-							if (item.getId() == ing.getItemId())
-							{
+						for (Ingredient ing : ent.getIngredients()) {
+							if (item.getId() == ing.getItemId()) {
 								_entries.add(new PreparedEntry(ent, item, getApplyTaxes(), getMaintainEnchantment(), taxRate));
 								break; // next entry
 							}
@@ -86,19 +72,15 @@ public class PreparedListContainer extends ListContainer
 					}
 				}
 			}
-		}
-		else
-		{
+		} else {
 			_entries = new ArrayList<>(template.getEntries().size());
-			for (Entry ent : template.getEntries())
-			{
+			for (Entry ent : template.getEntries()) {
 				_entries.add(new PreparedEntry(ent, null, getApplyTaxes(), false, taxRate));
 			}
 		}
 	}
 	
-	public final boolean checkNpcObjectId(int npcObjectId)
-	{
+	public final boolean checkNpcObjectId(int npcObjectId) {
 		return _npcObjectId != 0 ? _npcObjectId == npcObjectId : true;
 	}
 }

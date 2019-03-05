@@ -25,28 +25,24 @@ import com.l2jserver.gameserver.network.serverpackets.PackageSendableList;
  * @author -Wooden-
  * @author UnAfraid Thanks mrTJO
  */
-public class RequestPackageSendableItemList extends L2GameClientPacket
-{
+public class RequestPackageSendableItemList extends L2GameClientPacket {
 	
 	private static final String _C_A7_REQUESTPACKAGESENDABLEITEMLIST = "[C] A7 RequestPackageSendableItemList";
 	private int _objectID;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectID = readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		L2ItemInstance[] items = getClient().getActiveChar().getInventory().getAvailableItems(true, true, true);
 		sendPacket(new PackageSendableList(items, _objectID));
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C_A7_REQUESTPACKAGESENDABLEITEMLIST;
 	}
 }

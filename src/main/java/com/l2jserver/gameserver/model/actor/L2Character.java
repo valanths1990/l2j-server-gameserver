@@ -495,8 +495,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			spawnMe(getX(), getY(), getZ());
 			setIsTeleporting(false);
 			EventDispatcher.getInstance().notifyEventAsync(new OnCreatureTeleported(this), this);
-		}
-		finally {
+		} finally {
 			_teleportLock.unlock();
 		}
 	}
@@ -977,8 +976,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			
 			// Notify AI with EVT_READY_TO_ACT
 			ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(this, CtrlEvent.EVT_READY_TO_ACT), timeAtk + reuse);
-		}
-		finally {
+		} finally {
 			_attackLock.unlockWrite(stamp);
 		}
 	}
@@ -3477,8 +3475,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 					
 					getAI().notifyEvent(CtrlEvent.EVT_ARRIVED);
-				}
-				catch (final Throwable e) {
+				} catch (final Throwable e) {
 					LOG.warn("{}", e);
 				}
 			});
@@ -3744,8 +3741,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 							return;
 						}
 						_move.onGeodataPathIndex = -1; // Set not on geodata path
-					}
-					catch (NullPointerException e) {
+					} catch (NullPointerException e) {
 						// nothing
 					}
 				}
@@ -4754,8 +4750,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 			
 			// Launch the magic skill in order to calculate its effects
 			callSkill(mut.getSkill(), mut.getTargets());
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			LOG.warn("{}", e);
 		}
 		
@@ -5018,8 +5013,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 					}
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.warn("callSkill() failed. {}", e);
 		}
 	}
@@ -5571,8 +5565,7 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 				// Launch the magic skill and calculate its effects
 				skill.activateSkill(this, targets);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.warn("{}", e);
 		}
 	}

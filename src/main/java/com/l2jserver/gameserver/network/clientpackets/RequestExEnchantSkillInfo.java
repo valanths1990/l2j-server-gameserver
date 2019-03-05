@@ -28,54 +28,45 @@ import com.l2jserver.gameserver.network.serverpackets.ExEnchantSkillInfo;
  * Format (ch) dd c: (id) 0xD0 h: (subid) 0x06 d: skill id d: skill lvl
  * @author -Wooden-
  */
-public final class RequestExEnchantSkillInfo extends L2GameClientPacket
-{
+public final class RequestExEnchantSkillInfo extends L2GameClientPacket {
 	private static final String _C__D0_0E_REQUESTEXENCHANTSKILLINFO = "[C] D0:0E RequestExEnchantSkillInfo";
 	
 	private int _skillId;
 	private int _skillLvl;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_skillId = readD();
 		_skillLvl = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if ((_skillId <= 0) || (_skillLvl <= 0))
-		{
+	protected void runImpl() {
+		if ((_skillId <= 0) || (_skillLvl <= 0)) {
 			return;
 		}
 		
 		L2PcInstance activeChar = getClient().getActiveChar();
 		
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (activeChar.getLevel() < 76)
-		{
+		if (activeChar.getLevel() < 76) {
 			return;
 		}
 		
 		final Skill skill = SkillData.getInstance().getSkill(_skillId, _skillLvl);
-		if ((skill == null) || (skill.getId() != _skillId))
-		{
+		if ((skill == null) || (skill.getId() != _skillId)) {
 			return;
 		}
 		
-		if (EnchantSkillGroupsData.getInstance().getSkillEnchantmentBySkillId(_skillId) == null)
-		{
+		if (EnchantSkillGroupsData.getInstance().getSkillEnchantmentBySkillId(_skillId) == null) {
 			return;
 		}
 		
 		int playerSkillLvl = activeChar.getSkillLevel(_skillId);
-		if ((playerSkillLvl == -1) || (playerSkillLvl != _skillLvl))
-		{
+		if ((playerSkillLvl == -1) || (playerSkillLvl != _skillLvl)) {
 			return;
 		}
 		
@@ -83,8 +74,7 @@ public final class RequestExEnchantSkillInfo extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_0E_REQUESTEXENCHANTSKILLINFO;
 	}
 }

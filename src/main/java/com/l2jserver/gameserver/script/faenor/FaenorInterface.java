@@ -30,34 +30,28 @@ import com.l2jserver.gameserver.script.EngineInterface;
 /**
  * @author Luis Arias
  */
-public class FaenorInterface implements EngineInterface
-{
+public class FaenorInterface implements EngineInterface {
 	protected static final Logger _log = Logger.getLogger(FaenorInterface.class.getName());
 	
-	public static FaenorInterface getInstance()
-	{
+	public static FaenorInterface getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	public List<?> getAllPlayers()
-	{
+	public List<?> getAllPlayers() {
 		return null;
 	}
 	
 	@Override
-	public void addEventDrop(int[] items, int[] count, double chance, DateRange range)
-	{
+	public void addEventDrop(int[] items, int[] count, double chance, DateRange range) {
 		EventDroplist.getInstance().addGlobalDrop(items, count, (int) (chance * 1000000), range);
 	}
 	
 	@Override
-	public void onPlayerLogin(String message, DateRange validDateRange)
-	{
+	public void onPlayerLogin(String message, DateRange validDateRange) {
 		AnnouncementsTable.getInstance().addAnnouncement(new EventAnnouncement(validDateRange, message));
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final FaenorInterface _instance = new FaenorInterface();
 	}
 }

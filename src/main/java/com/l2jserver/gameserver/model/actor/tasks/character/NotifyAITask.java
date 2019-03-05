@@ -25,22 +25,18 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  * Task dedicated to notify character's AI
  * @author xban1x
  */
-public final class NotifyAITask implements Runnable
-{
+public final class NotifyAITask implements Runnable {
 	private final L2Character _character;
 	private final CtrlEvent _event;
 	
-	public NotifyAITask(L2Character character, CtrlEvent event)
-	{
+	public NotifyAITask(L2Character character, CtrlEvent event) {
 		_character = character;
 		_event = event;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_character != null)
-		{
+	public void run() {
+		if (_character != null) {
 			_character.getAI().notifyEvent(_event);
 		}
 	}

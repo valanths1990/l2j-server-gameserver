@@ -26,26 +26,21 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2MonsterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class MonsterKnownList extends AttackableKnownList
-{
-	public MonsterKnownList(L2MonsterInstance activeChar)
-	{
+public class MonsterKnownList extends AttackableKnownList {
+	public MonsterKnownList(L2MonsterInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public boolean addKnownObject(L2Object object)
-	{
-		if (!super.addKnownObject(object))
-		{
+	public boolean addKnownObject(L2Object object) {
+		if (!super.addKnownObject(object)) {
 			return false;
 		}
 		
 		final L2CharacterAI ai = getActiveChar().getAI(); // force AI creation
 		
 		// Set the L2MonsterInstance Intention to AI_INTENTION_ACTIVE if the state was AI_INTENTION_IDLE
-		if ((object instanceof L2PcInstance) && (ai != null) && (ai.getIntention() == CtrlIntention.AI_INTENTION_IDLE))
-		{
+		if ((object instanceof L2PcInstance) && (ai != null) && (ai.getIntention() == CtrlIntention.AI_INTENTION_IDLE)) {
 			ai.setIntention(CtrlIntention.AI_INTENTION_ACTIVE, null);
 		}
 		
@@ -53,26 +48,21 @@ public class MonsterKnownList extends AttackableKnownList
 	}
 	
 	@Override
-	protected boolean removeKnownObject(L2Object object, boolean forget)
-	{
-		if (!super.removeKnownObject(object, forget))
-		{
+	protected boolean removeKnownObject(L2Object object, boolean forget) {
+		if (!super.removeKnownObject(object, forget)) {
 			return false;
 		}
 		
-		if (!(object instanceof L2Character))
-		{
+		if (!(object instanceof L2Character)) {
 			return true;
 		}
 		
-		if (getActiveChar().hasAI())
-		{
+		if (getActiveChar().hasAI()) {
 			// Notify the L2MonsterInstance AI with EVT_FORGET_OBJECT
 			getActiveChar().getAI().notifyEvent(CtrlEvent.EVT_FORGET_OBJECT, object);
 		}
 		
-		if (getActiveChar().isVisible() && getKnownPlayers().isEmpty() && getKnownSummons().isEmpty())
-		{
+		if (getActiveChar().isVisible() && getKnownPlayers().isEmpty() && getKnownSummons().isEmpty()) {
 			// Clear the _aggroList of the L2MonsterInstance
 			getActiveChar().clearAggroList();
 		}
@@ -81,8 +71,7 @@ public class MonsterKnownList extends AttackableKnownList
 	}
 	
 	@Override
-	public final L2MonsterInstance getActiveChar()
-	{
+	public final L2MonsterInstance getActiveChar() {
 		return (L2MonsterInstance) super.getActiveChar();
 	}
 }

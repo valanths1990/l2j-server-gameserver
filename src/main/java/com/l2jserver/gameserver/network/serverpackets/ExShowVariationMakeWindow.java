@@ -22,17 +22,14 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Trigger packet
  * @author KenM
  */
-public class ExShowVariationMakeWindow extends L2GameServerPacket
-{
+public class ExShowVariationMakeWindow extends L2GameServerPacket {
 	public static final ExShowVariationMakeWindow STATIC_PACKET = new ExShowVariationMakeWindow();
 	
-	private ExShowVariationMakeWindow()
-	{
+	private ExShowVariationMakeWindow() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x51);
 	}

@@ -25,26 +25,20 @@ import com.l2jserver.gameserver.model.itemauction.ItemAuctionState;
 /**
  * @author Forsaiken
  */
-public final class ExItemAuctionInfoPacket extends AbstractItemPacket
-{
+public final class ExItemAuctionInfoPacket extends AbstractItemPacket {
 	private final boolean _refresh;
 	private final int _timeRemaining;
 	private final ItemAuction _currentAuction;
 	private final ItemAuction _nextAuction;
 	
-	public ExItemAuctionInfoPacket(final boolean refresh, final ItemAuction currentAuction, final ItemAuction nextAuction)
-	{
-		if (currentAuction == null)
-		{
+	public ExItemAuctionInfoPacket(final boolean refresh, final ItemAuction currentAuction, final ItemAuction nextAuction) {
+		if (currentAuction == null) {
 			throw new NullPointerException();
 		}
 		
-		if (currentAuction.getAuctionState() != ItemAuctionState.STARTED)
-		{
+		if (currentAuction.getAuctionState() != ItemAuctionState.STARTED) {
 			_timeRemaining = 0;
-		}
-		else
-		{
+		} else {
 			_timeRemaining = (int) (currentAuction.getFinishingTimeRemaining() / 1000); // in seconds
 		}
 		
@@ -54,8 +48,7 @@ public final class ExItemAuctionInfoPacket extends AbstractItemPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x68);
 		writeC(_refresh ? 0x00 : 0x01);
@@ -67,8 +60,7 @@ public final class ExItemAuctionInfoPacket extends AbstractItemPacket
 		writeD(_timeRemaining);
 		writeItem(_currentAuction.getItemInfo());
 		
-		if (_nextAuction != null)
-		{
+		if (_nextAuction != null) {
 			writeQ(_nextAuction.getAuctionInitBid());
 			writeD((int) (_nextAuction.getStartingTime() / 1000)); // unix time in seconds
 			writeItem(_nextAuction.getItemInfo());

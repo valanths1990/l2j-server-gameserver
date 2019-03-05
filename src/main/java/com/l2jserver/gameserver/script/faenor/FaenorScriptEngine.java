@@ -39,70 +39,53 @@ import com.l2jserver.util.file.filter.XMLFilter;
 /**
  * @author Luis Arias
  */
-public class FaenorScriptEngine extends ScriptEngine
-{
+public class FaenorScriptEngine extends ScriptEngine {
 	private static final Logger _log = Logger.getLogger(FaenorScriptEngine.class.getName());
 	public static final String PACKAGE_DIRECTORY = "data/faenor/";
 	
-	protected FaenorScriptEngine()
-	{
+	protected FaenorScriptEngine() {
 		final File packDirectory = new File(Config.DATAPACK_ROOT, PACKAGE_DIRECTORY);
 		final File[] files = packDirectory.listFiles(new XMLFilter());
-		if (files != null)
-		{
-			for (File file : files)
-			{
-				try (InputStream in = new FileInputStream(file))
-				{
+		if (files != null) {
+			for (File file : files) {
+				try (InputStream in = new FileInputStream(file)) {
 					parseScript(new ScriptDocument(file.getName(), in), null);
-				}
-				catch (IOException e)
-				{
+				} catch (IOException e) {
 					_log.log(Level.WARNING, e.getMessage(), e);
 				}
 			}
 		}
 	}
 	
-	public void parseScript(ScriptDocument script, ScriptContext context)
-	{
+	public void parseScript(ScriptDocument script, ScriptContext context) {
 		Node node = script.getDocument().getFirstChild();
 		String parserClass = "faenor.Faenor" + node.getNodeName() + "Parser";
 		
 		Parser parser = null;
-		try
-		{
+		try {
 			parser = createParser(parserClass);
-		}
-		catch (ParserNotCreatedException e)
-		{
+		} catch (ParserNotCreatedException e) {
 			_log.log(Level.WARNING, "ERROR: No parser registered for Script: " + parserClass + ": " + e.getMessage(), e);
 		}
 		
-		if (parser == null)
-		{
+		if (parser == null) {
 			_log.warning("Unknown Script Type: " + script.getName());
 			return;
 		}
 		
-		try
-		{
+		try {
 			parser.parseScript(node, context);
 			_log.info(getClass().getSimpleName() + ": Loaded  " + script.getName() + " successfully.");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Script Parsing Failed: " + e.getMessage(), e);
 		}
 	}
 	
-	public static FaenorScriptEngine getInstance()
-	{
+	public static FaenorScriptEngine getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final FaenorScriptEngine _instance = new FaenorScriptEngine();
 	}
 }

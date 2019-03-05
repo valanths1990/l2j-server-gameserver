@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author UnAfraid
  */
-public interface IEventListener
-{
+public interface IEventListener {
 	/**
 	 * @return {@code true} if player is on event, {@code false} otherwise.
 	 */

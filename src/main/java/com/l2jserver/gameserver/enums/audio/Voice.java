@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.network.serverpackets.PlaySound;
 /**
  * @author Zealar
  */
-public enum Voice implements IAudio
-{
+public enum Voice implements IAudio {
 	TUTORIAL_VOICE_001A_2000("tutorial_voice_001a", 2000),
 	TUTORIAL_VOICE_001B_2000("tutorial_voice_001b", 2000),
 	TUTORIAL_VOICE_001C_2000("tutorial_voice_001c", 2000),
@@ -73,25 +72,21 @@ public enum Voice implements IAudio
 	
 	private final PlaySound _playSound;
 	
-	private Voice(String soundName)
-	{
+	private Voice(String soundName) {
 		_playSound = PlaySound.createVoice(soundName, 0);
 	}
 	
-	private Voice(String soundName, int delay)
-	{
+	private Voice(String soundName, int delay) {
 		_playSound = PlaySound.createVoice(soundName, delay);
 	}
 	
 	@Override
-	public String getSoundName()
-	{
+	public String getSoundName() {
 		return _playSound.getSoundName();
 	}
 	
 	@Override
-	public PlaySound getPacket()
-	{
+	public PlaySound getPacket() {
 		return _playSound;
 	}
 }

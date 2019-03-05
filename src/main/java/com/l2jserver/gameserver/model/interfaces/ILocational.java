@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.interfaces;
  * Object world location storage interface.
  * @author xban1x
  */
-public interface ILocational
-{
+public interface ILocational {
 	/**
 	 * Gets the X coordinate of this object.
 	 * @return the X coordinate

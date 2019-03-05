@@ -29,101 +29,76 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * A simple no restart zone
  * @author GKR
  */
-public class L2NoRestartZone extends L2ZoneType
-{
+public class L2NoRestartZone extends L2ZoneType {
 	private int _restartAllowedTime = 0;
 	private int _restartTime = 0;
 	private boolean _enabled = true;
 	
-	public L2NoRestartZone(int id)
-	{
+	public L2NoRestartZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equalsIgnoreCase("default_enabled"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equalsIgnoreCase("default_enabled")) {
 			_enabled = Boolean.parseBoolean(value);
-		}
-		else if (name.equalsIgnoreCase("restartAllowedTime"))
-		{
+		} else if (name.equalsIgnoreCase("restartAllowedTime")) {
 			_restartAllowedTime = Integer.parseInt(value) * 1000;
-		}
-		else if (name.equalsIgnoreCase("restartTime"))
-		{
+		} else if (name.equalsIgnoreCase("restartTime")) {
 			_restartTime = Integer.parseInt(value) * 1000;
-		}
-		else if (name.equalsIgnoreCase("instanceId"))
-		{
+		} else if (name.equalsIgnoreCase("instanceId")) {
 			// Do nothing.
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (!_enabled)
-		{
+	protected void onEnter(L2Character character) {
+		if (!_enabled) {
 			return;
 		}
 		
-		if (character.isPlayer())
-		{
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.NO_RESTART, true);
 		}
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (!_enabled)
-		{
+	protected void onExit(L2Character character) {
+		if (!_enabled) {
 			return;
 		}
 		
-		if (character.isPlayer())
-		{
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.NO_RESTART, false);
 		}
 	}
 	
 	@Override
-	public void onPlayerLoginInside(L2PcInstance player)
-	{
-		if (!_enabled)
-		{
+	public void onPlayerLoginInside(L2PcInstance player) {
+		if (!_enabled) {
 			return;
 		}
 		
-		if (((System.currentTimeMillis() - player.getLastAccess()) > getRestartTime()) && ((System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis()) > getRestartAllowedTime()))
-		{
+		if (((System.currentTimeMillis() - player.getLastAccess()) > getRestartTime()) && ((System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis()) > getRestartAllowedTime())) {
 			player.teleToLocation(TeleportWhereType.TOWN);
 		}
 	}
 	
-	public int getRestartAllowedTime()
-	{
+	public int getRestartAllowedTime() {
 		return _restartAllowedTime;
 	}
 	
-	public void setRestartAllowedTime(int time)
-	{
+	public void setRestartAllowedTime(int time) {
 		_restartAllowedTime = time;
 	}
 	
-	public int getRestartTime()
-	{
+	public int getRestartTime() {
 		return _restartTime;
 	}
 	
-	public void setRestartTime(int time)
-	{
+	public void setRestartTime(int time) {
 		_restartTime = time;
 	}
 }

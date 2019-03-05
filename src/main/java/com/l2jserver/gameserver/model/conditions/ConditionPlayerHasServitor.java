@@ -27,19 +27,15 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * The Class ConditionPlayerHasServitor.
  * @author Zealar
  */
-public class ConditionPlayerHasServitor extends Condition
-{
+public class ConditionPlayerHasServitor extends Condition {
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector.getActingPlayer() == null))
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector.getActingPlayer() == null)) {
 			return false;
 		}
 		
-		if (!effector.getActingPlayer().hasSummon())
-		{
+		if (!effector.getActingPlayer().hasSummon()) {
 			effector.sendPacket(SystemMessageId.CANNOT_USE_SKILL_WITHOUT_SERVITOR);
 			return false;
 		}

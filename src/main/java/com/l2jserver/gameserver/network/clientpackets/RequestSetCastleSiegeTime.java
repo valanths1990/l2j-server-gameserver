@@ -34,43 +34,33 @@ import com.l2jserver.gameserver.util.Broadcast;
 /**
  * @author UnAfraid
  */
-public class RequestSetCastleSiegeTime extends L2GameClientPacket
-{
+public class RequestSetCastleSiegeTime extends L2GameClientPacket {
 	private int _castleId;
 	private long _time;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_castleId = readD();
 		_time = readD();
 		_time *= 1000;
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
 		final Castle castle = CastleManager.getInstance().getCastleById(_castleId);
-		if ((activeChar == null) || (castle == null))
-		{
+		if ((activeChar == null) || (castle == null)) {
 			_log.log(Level.WARNING, getType() + ": activeChar: " + activeChar + " castle: " + castle + " castleId: " + _castleId);
 			return;
 		}
-		if ((castle.getOwnerId() > 0) && (castle.getOwnerId() != activeChar.getClanId()))
-		{
+		if ((castle.getOwnerId() > 0) && (castle.getOwnerId() != activeChar.getClanId())) {
 			_log.log(Level.WARNING, getType() + ": activeChar: " + activeChar + " castle: " + castle + " castleId: " + _castleId + " is trying to change siege date of not his own castle!");
 			return;
-		}
-		else if (!activeChar.isClanLeader())
-		{
+		} else if (!activeChar.isClanLeader()) {
 			_log.log(Level.WARNING, getType() + ": activeChar: " + activeChar + " castle: " + castle + " castleId: " + _castleId + " is trying to change siege date but is not clan leader!");
 			return;
-		}
-		else if (!castle.getIsTimeRegistrationOver())
-		{
-			if (isSiegeTimeValid(castle.getSiegeDate().getTimeInMillis(), _time))
-			{
+		} else if (!castle.getIsTimeRegistrationOver()) {
+			if (isSiegeTimeValid(castle.getSiegeDate().getTimeInMillis(), _time)) {
 				castle.getSiegeDate().setTimeInMillis(_time);
 				castle.setIsTimeRegistrationOver(true);
 				castle.getSiege().saveSiegeDate();
@@ -78,20 +68,15 @@ public class RequestSetCastleSiegeTime extends L2GameClientPacket
 				msg.addCastleId(_castleId);
 				Broadcast.toAllOnlinePlayers(msg);
 				activeChar.sendPacket(new SiegeInfo(castle));
-			}
-			else
-			{
+			} else {
 				_log.log(Level.WARNING, getType() + ": activeChar: " + activeChar + " castle: " + castle + " castleId: " + _castleId + " is trying to an invalid time (" + new Date(_time) + " !");
 			}
-		}
-		else
-		{
+		} else {
 			_log.log(Level.WARNING, getType() + ": activeChar: " + activeChar + " castle: " + castle + " castleId: " + _castleId + " is trying to change siege date but currently not possible!");
 		}
 	}
 	
-	private static boolean isSiegeTimeValid(long siegeDate, long choosenDate)
-	{
+	private static boolean isSiegeTimeValid(long siegeDate, long choosenDate) {
 		Calendar cal1 = Calendar.getInstance();
 		cal1.setTimeInMillis(siegeDate);
 		cal1.set(Calendar.MINUTE, 0);
@@ -100,23 +85,18 @@ public class RequestSetCastleSiegeTime extends L2GameClientPacket
 		Calendar cal2 = Calendar.getInstance();
 		cal2.setTimeInMillis(choosenDate);
 		
-		for (int hour : Config.SIEGE_HOUR_LIST)
-		{
+		for (int hour : Config.SIEGE_HOUR_LIST) {
 			cal1.set(Calendar.HOUR_OF_DAY, hour);
-			if (isEqual(cal1, cal2, Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH, Calendar.HOUR, Calendar.MINUTE, Calendar.SECOND))
-			{
+			if (isEqual(cal1, cal2, Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH, Calendar.HOUR, Calendar.MINUTE, Calendar.SECOND)) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private static boolean isEqual(Calendar cal1, Calendar cal2, int... fields)
-	{
-		for (int field : fields)
-		{
-			if (cal1.get(field) != cal2.get(field))
-			{
+	private static boolean isEqual(Calendar cal1, Calendar cal2, int... fields) {
+		for (int field : fields) {
+			if (cal1.get(field) != cal2.get(field)) {
 				return false;
 			}
 		}
@@ -124,8 +104,7 @@ public class RequestSetCastleSiegeTime extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return getClass().getSimpleName();
 	}
 }

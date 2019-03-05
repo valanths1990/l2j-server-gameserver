@@ -21,21 +21,18 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author NosBit
  */
-public enum Team
-{
+public enum Team {
 	NONE(0),
 	BLUE(1),
 	RED(2);
 	
 	private int _id;
 	
-	private Team(int id)
-	{
+	private Team(int id) {
 		_id = id;
 	}
 	
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 }

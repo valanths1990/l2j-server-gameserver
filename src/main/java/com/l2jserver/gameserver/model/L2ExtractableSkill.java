@@ -24,8 +24,7 @@ import java.util.List;
  * Extractable skill DTO.
  * @author Zoey76
  */
-public class L2ExtractableSkill
-{
+public class L2ExtractableSkill {
 	private final int _hash;
 	private final List<L2ExtractableProductItem> _product;
 	
@@ -34,8 +33,7 @@ public class L2ExtractableSkill
 	 * @param hash the hash
 	 * @param products the products
 	 */
-	public L2ExtractableSkill(int hash, List<L2ExtractableProductItem> products)
-	{
+	public L2ExtractableSkill(int hash, List<L2ExtractableProductItem> products) {
 		_hash = hash;
 		_product = products;
 	}
@@ -44,8 +42,7 @@ public class L2ExtractableSkill
 	 * Gets the skill hash.
 	 * @return the skill hash
 	 */
-	public int getSkillHash()
-	{
+	public int getSkillHash() {
 		return _hash;
 	}
 	
@@ -53,8 +50,7 @@ public class L2ExtractableSkill
 	 * Gets the product items.
 	 * @return the product items
 	 */
-	public List<L2ExtractableProductItem> getProductItems()
-	{
+	public List<L2ExtractableProductItem> getProductItems() {
 		return _product;
 	}
 }

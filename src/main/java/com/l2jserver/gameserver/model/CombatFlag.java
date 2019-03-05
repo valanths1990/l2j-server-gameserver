@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.network.serverpackets.InventoryUpdate;
 import com.l2jserver.gameserver.network.serverpackets.ItemList;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-public class CombatFlag
-{
+public class CombatFlag {
 	// private static final Logger _log = Logger.getLogger(CombatFlag.class.getName());
 	
 	private L2PcInstance _player = null;
@@ -38,35 +37,28 @@ public class CombatFlag
 	private final Location _location;
 	private final int _itemId;
 	
-	public CombatFlag(int fort_id, int x, int y, int z, int heading, int item_id)
-	{
+	public CombatFlag(int fort_id, int x, int y, int z, int heading, int item_id) {
 		_location = new Location(x, y, z, heading);
 		_itemId = item_id;
 	}
 	
-	public synchronized void spawnMe()
-	{
+	public synchronized void spawnMe() {
 		// Init the dropped L2ItemInstance and add it in the world as a visible object at the position where mob was last
 		_itemInstance = ItemTable.getInstance().createItem("Combat", _itemId, 1, null, null);
 		_itemInstance.dropMe(null, _location.getX(), _location.getY(), _location.getZ());
 	}
 	
-	public synchronized void unSpawnMe()
-	{
-		if (_player != null)
-		{
+	public synchronized void unSpawnMe() {
+		if (_player != null) {
 			dropIt();
 		}
-		if (_itemInstance != null)
-		{
+		if (_itemInstance != null) {
 			_itemInstance.decayMe();
 		}
 	}
 	
-	public boolean activate(L2PcInstance player, L2ItemInstance item)
-	{
-		if (player.isMounted())
-		{
+	public boolean activate(L2PcInstance player, L2ItemInstance item) {
+		if (player.isMounted()) {
 			player.sendPacket(SystemMessageId.CANNOT_EQUIP_ITEM_DUE_TO_BAD_CONDITION);
 			return false;
 		}
@@ -84,14 +76,11 @@ public class CombatFlag
 		_player.sendPacket(sm);
 		
 		// Refresh inventory
-		if (!Config.FORCE_INVENTORY_UPDATE)
-		{
+		if (!Config.FORCE_INVENTORY_UPDATE) {
 			InventoryUpdate iu = new InventoryUpdate();
 			iu.addItem(_item);
 			_player.sendPacket(iu);
-		}
-		else
-		{
+		} else {
 			_player.sendPacket(new ItemList(_player, false));
 		}
 		// Refresh player stats
@@ -100,8 +89,7 @@ public class CombatFlag
 		return true;
 	}
 	
-	public void dropIt()
-	{
+	public void dropIt() {
 		// Reset player stats
 		_player.setCombatFlagEquipped(false);
 		int slot = _player.getInventory().getSlotFromItem(_item);
@@ -113,13 +101,11 @@ public class CombatFlag
 		_playerId = 0;
 	}
 	
-	public int getPlayerObjectId()
-	{
+	public int getPlayerObjectId() {
 		return _playerId;
 	}
 	
-	public L2ItemInstance getCombatFlagInstance()
-	{
+	public L2ItemInstance getCombatFlagInstance() {
 		return _itemInstance;
 	}
 }

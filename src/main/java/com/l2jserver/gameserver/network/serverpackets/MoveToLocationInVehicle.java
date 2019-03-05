@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Maktakien
  */
-public class MoveToLocationInVehicle extends L2GameServerPacket
-{
+public class MoveToLocationInVehicle extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _boatId;
 	private final Location _destination;
@@ -36,8 +35,7 @@ public class MoveToLocationInVehicle extends L2GameServerPacket
 	 * @param destination
 	 * @param origin
 	 */
-	public MoveToLocationInVehicle(L2PcInstance player, Location destination, Location origin)
-	{
+	public MoveToLocationInVehicle(L2PcInstance player, Location destination, Location origin) {
 		_charObjId = player.getObjectId();
 		_boatId = player.getBoat().getObjectId();
 		_destination = destination;
@@ -45,8 +43,7 @@ public class MoveToLocationInVehicle extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0x7e);
 		writeD(_charObjId);
 		writeD(_boatId);

@@ -52,12 +52,10 @@ import com.l2jserver.gameserver.util.Util;
  * RequestBypassToServer client packet implementation.
  * @author HorridoJoho
  */
-public final class RequestBypassToServer extends L2GameClientPacket
-{
+public final class RequestBypassToServer extends L2GameClientPacket {
 	private static final String _C__23_REQUESTBYPASSTOSERVER = "[C] 23 RequestBypassToServer";
 	// FIXME: This is for compatibility, will be changed when bypass functionality got an overhaul by NosBit
-	private static final String[] _possibleNonHtmlCommands =
-	{
+	private static final String[] _possibleNonHtmlCommands = {
 		"_bbs",
 		"bbs",
 		"_mail",
@@ -72,247 +70,181 @@ public final class RequestBypassToServer extends L2GameClientPacket
 	private String _command;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_command = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (_command.isEmpty())
-		{
+		if (_command.isEmpty()) {
 			_log.warning("Player " + activeChar.getName() + " sent empty bypass!");
 			activeChar.logout();
 			return;
 		}
 		
 		boolean requiresBypassValidation = true;
-		for (String possibleNonHtmlCommand : _possibleNonHtmlCommands)
-		{
-			if (_command.startsWith(possibleNonHtmlCommand))
-			{
+		for (String possibleNonHtmlCommand : _possibleNonHtmlCommands) {
+			if (_command.startsWith(possibleNonHtmlCommand)) {
 				requiresBypassValidation = false;
 				break;
 			}
 		}
 		
 		int bypassOriginId = 0;
-		if (requiresBypassValidation)
-		{
+		if (requiresBypassValidation) {
 			bypassOriginId = activeChar.validateHtmlAction(_command);
-			if (bypassOriginId == -1)
-			{
+			if (bypassOriginId == -1) {
 				_log.warning("Player " + activeChar.getName() + " sent non cached bypass: '" + _command + "'");
 				return;
 			}
 			
-			if ((bypassOriginId > 0) && !Util.isInsideRangeOfObjectId(activeChar, bypassOriginId, L2Npc.INTERACTION_DISTANCE))
-			{
+			if ((bypassOriginId > 0) && !Util.isInsideRangeOfObjectId(activeChar, bypassOriginId, L2Npc.INTERACTION_DISTANCE)) {
 				// No logging here, this could be a common case where the player has the html still open and run too far away and then clicks a html action
 				return;
 			}
 		}
 		
-		if (!getClient().getFloodProtectors().getServerBypass().tryPerformAction(_command))
-		{
+		if (!getClient().getFloodProtectors().getServerBypass().tryPerformAction(_command)) {
 			return;
 		}
 		
-		try
-		{
-			if (_command.startsWith("admin_"))
-			{
+		try {
+			if (_command.startsWith("admin_")) {
 				String command = _command.split(" ")[0];
 				
 				IAdminCommandHandler ach = AdminCommandHandler.getInstance().getHandler(command);
 				
-				if (ach == null)
-				{
-					if (activeChar.isGM())
-					{
+				if (ach == null) {
+					if (activeChar.isGM()) {
 						activeChar.sendMessage("The command " + command.substring(6) + " does not exist!");
 					}
 					_log.warning(activeChar + " requested not registered admin command '" + command + "'");
 					return;
 				}
 				
-				if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel()))
-				{
+				if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel())) {
 					activeChar.sendMessage("You don't have the access rights to use this command!");
 					_log.warning("Character " + activeChar.getName() + " tried to use admin command " + command + ", without proper access level!");
 					return;
 				}
 				
-				if (AdminData.getInstance().requireConfirm(command))
-				{
+				if (AdminData.getInstance().requireConfirm(command)) {
 					activeChar.setAdminConfirmCmd(_command);
 					ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.S1);
 					dlg.addString("Are you sure you want execute command " + _command.substring(6) + " ?");
 					activeChar.addAction(PlayerAction.ADMIN_COMMAND);
 					activeChar.sendPacket(dlg);
-				}
-				else
-				{
-					if (Config.GMAUDIT)
-					{
+				} else {
+					if (Config.GMAUDIT) {
 						GMAudit.auditGMAction(activeChar.getName() + " [" + activeChar.getObjectId() + "]", _command, (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"));
 					}
 					
 					ach.useAdminCommand(_command, activeChar);
 				}
-			}
-			else if (CommunityBoardHandler.getInstance().isCommunityBoardCommand(_command))
-			{
+			} else if (CommunityBoardHandler.getInstance().isCommunityBoardCommand(_command)) {
 				CommunityBoardHandler.getInstance().handleParseCommand(_command, activeChar);
-			}
-			else if (_command.equals("come_here") && activeChar.isGM())
-			{
+			} else if (_command.equals("come_here") && activeChar.isGM()) {
 				comeHere(activeChar);
-			}
-			else if (_command.startsWith("npc_"))
-			{
+			} else if (_command.startsWith("npc_")) {
 				int endOfId = _command.indexOf('_', 5);
 				String id;
-				if (endOfId > 0)
-				{
+				if (endOfId > 0) {
 					id = _command.substring(4, endOfId);
-				}
-				else
-				{
+				} else {
 					id = _command.substring(4);
 				}
-				if (Util.isDigit(id))
-				{
+				if (Util.isDigit(id)) {
 					L2Object object = L2World.getInstance().findObject(Integer.parseInt(id));
 					
-					if ((object != null) && object.isNpc() && (endOfId > 0) && activeChar.isInsideRadius(object, L2Npc.INTERACTION_DISTANCE, false, false))
-					{
+					if ((object != null) && object.isNpc() && (endOfId > 0) && activeChar.isInsideRadius(object, L2Npc.INTERACTION_DISTANCE, false, false)) {
 						((L2Npc) object).onBypassFeedback(activeChar, _command.substring(endOfId + 1));
 					}
 				}
 				
 				activeChar.sendPacket(ActionFailed.STATIC_PACKET);
-			}
-			else if (_command.startsWith("item_"))
-			{
+			} else if (_command.startsWith("item_")) {
 				int endOfId = _command.indexOf('_', 5);
 				String id;
-				if (endOfId > 0)
-				{
+				if (endOfId > 0) {
 					id = _command.substring(5, endOfId);
-				}
-				else
-				{
+				} else {
 					id = _command.substring(5);
 				}
-				try
-				{
+				try {
 					final L2ItemInstance item = activeChar.getInventory().getItemByObjectId(Integer.parseInt(id));
-					if ((item != null) && (endOfId > 0))
-					{
+					if ((item != null) && (endOfId > 0)) {
 						item.onBypassFeedback(activeChar, _command.substring(endOfId + 1));
 					}
 					
 					activeChar.sendPacket(ActionFailed.STATIC_PACKET);
-				}
-				catch (NumberFormatException nfe)
-				{
+				} catch (NumberFormatException nfe) {
 					_log.log(Level.WARNING, "NFE for command [" + _command + "]", nfe);
 				}
-			}
-			else if (_command.startsWith("_match"))
-			{
+			} else if (_command.startsWith("_match")) {
 				String params = _command.substring(_command.indexOf("?") + 1);
 				StringTokenizer st = new StringTokenizer(params, "&");
 				int heroclass = Integer.parseInt(st.nextToken().split("=")[1]);
 				int heropage = Integer.parseInt(st.nextToken().split("=")[1]);
 				int heroid = Hero.getInstance().getHeroByClass(heroclass);
-				if (heroid > 0)
-				{
+				if (heroid > 0) {
 					Hero.getInstance().showHeroFights(activeChar, heroclass, heroid, heropage);
 				}
-			}
-			else if (_command.startsWith("_diary"))
-			{
+			} else if (_command.startsWith("_diary")) {
 				String params = _command.substring(_command.indexOf("?") + 1);
 				StringTokenizer st = new StringTokenizer(params, "&");
 				int heroclass = Integer.parseInt(st.nextToken().split("=")[1]);
 				int heropage = Integer.parseInt(st.nextToken().split("=")[1]);
 				int heroid = Hero.getInstance().getHeroByClass(heroclass);
-				if (heroid > 0)
-				{
+				if (heroid > 0) {
 					Hero.getInstance().showHeroDiary(activeChar, heroclass, heroid, heropage);
 				}
-			}
-			else if (_command.startsWith("_olympiad?command"))
-			{
+			} else if (_command.startsWith("_olympiad?command")) {
 				int arenaId = Integer.parseInt(_command.split("=")[2]);
 				final IBypassHandler handler = BypassHandler.getInstance().getHandler("arenachange");
-				if (handler != null)
-				{
+				if (handler != null) {
 					handler.useBypass("arenachange " + (arenaId - 1), activeChar, null);
 				}
-			}
-			else if (_command.startsWith("manor_menu_select"))
-			{
+			} else if (_command.startsWith("manor_menu_select")) {
 				final L2Npc lastNpc = activeChar.getLastFolkNPC();
-				if (Config.ALLOW_MANOR && (lastNpc != null) && lastNpc.canInteract(activeChar))
-				{
+				if (Config.ALLOW_MANOR && (lastNpc != null) && lastNpc.canInteract(activeChar)) {
 					final String[] split = _command.substring(_command.indexOf("?") + 1).split("&");
 					final int ask = Integer.parseInt(split[0].split("=")[1]);
 					final int state = Integer.parseInt(split[1].split("=")[1]);
 					final boolean time = split[2].split("=")[1].equals("1");
 					EventDispatcher.getInstance().notifyEventAsync(new OnNpcManorBypass(activeChar, lastNpc, ask, state, time), lastNpc);
 				}
-			}
-			else
-			{
+			} else {
 				final IBypassHandler handler = BypassHandler.getInstance().getHandler(_command);
-				if (handler != null)
-				{
-					if (bypassOriginId > 0)
-					{
+				if (handler != null) {
+					if (bypassOriginId > 0) {
 						L2Object bypassOrigin = activeChar.getKnownList().getKnownObjects().get(bypassOriginId);
-						if ((bypassOrigin != null) && bypassOrigin.isInstanceTypes(InstanceType.L2Character))
-						{
+						if ((bypassOrigin != null) && bypassOrigin.isInstanceTypes(InstanceType.L2Character)) {
 							handler.useBypass(_command, activeChar, (L2Character) bypassOrigin);
-						}
-						else
-						{
+						} else {
 							handler.useBypass(_command, activeChar, null);
 						}
-					}
-					else
-					{
+					} else {
 						handler.useBypass(_command, activeChar, null);
 					}
-				}
-				else
-				{
+				} else {
 					_log.warning(getClient() + " sent not handled RequestBypassToServer: [" + _command + "]");
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.log(Level.WARNING, "Exception processing bypass from player " + activeChar.getName() + ": " + _command, e);
 			
-			if (activeChar.isGM())
-			{
+			if (activeChar.isGM()) {
 				StringBuilder sb = new StringBuilder(200);
 				sb.append("<html><body>");
 				sb.append("Bypass error: " + e + "<br1>");
 				sb.append("Bypass command: " + _command + "<br1>");
 				sb.append("StackTrace:<br1>");
-				for (StackTraceElement ste : e.getStackTrace())
-				{
+				for (StackTraceElement ste : e.getStackTrace()) {
 					sb.append(ste.toString() + "<br1>");
 				}
 				sb.append("</body></html>");
@@ -329,15 +261,12 @@ public final class RequestBypassToServer extends L2GameClientPacket
 	/**
 	 * @param activeChar
 	 */
-	private static void comeHere(L2PcInstance activeChar)
-	{
+	private static void comeHere(L2PcInstance activeChar) {
 		L2Object obj = activeChar.getTarget();
-		if (obj == null)
-		{
+		if (obj == null) {
 			return;
 		}
-		if (obj instanceof L2Npc)
-		{
+		if (obj instanceof L2Npc) {
 			L2Npc temp = (L2Npc) obj;
 			temp.setTarget(activeChar);
 			temp.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, activeChar.getLocation());
@@ -345,8 +274,7 @@ public final class RequestBypassToServer extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__23_REQUESTBYPASSTOSERVER;
 	}
 }

@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.punishment.PunishmentType;
 /**
  * @author UnAfraid
  */
-public interface IPunishmentHandler
-{
+public interface IPunishmentHandler {
 	static final Logger _log = Logger.getLogger(IPunishmentHandler.class.getName());
 	
 	public void onStart(PunishmentTask task);

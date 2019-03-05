@@ -27,19 +27,16 @@ import com.l2jserver.gameserver.model.entity.Castle;
 /**
  * @author l3x
  */
-public final class ExSendManorList extends L2GameServerPacket
-{
+public final class ExSendManorList extends L2GameServerPacket {
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		final List<Castle> castles = CastleManager.getInstance().getCastles();
 		castles.sort(Comparator.comparing(Castle::getResidenceId));
 		
 		writeC(0xFE);
 		writeH(0x22);
 		writeD(castles.size());
-		for (Castle castle : castles)
-		{
+		for (Castle castle : castles) {
 			writeD(castle.getResidenceId());
 			writeS(castle.getName().toLowerCase());
 		}

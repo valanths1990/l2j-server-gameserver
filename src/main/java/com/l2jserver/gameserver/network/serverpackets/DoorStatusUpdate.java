@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 
-public final class DoorStatusUpdate extends L2GameServerPacket
-{
+public final class DoorStatusUpdate extends L2GameServerPacket {
 	private final L2DoorInstance _door;
 	
-	public DoorStatusUpdate(L2DoorInstance door)
-	{
+	public DoorStatusUpdate(L2DoorInstance door) {
 		_door = door;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x4d);
 		writeD(_door.getObjectId());
 		writeD(_door.getOpen() ? 0 : 1);

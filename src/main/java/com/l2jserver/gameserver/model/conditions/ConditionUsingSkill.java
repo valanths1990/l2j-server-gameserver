@@ -26,24 +26,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionUsingSkill.
  * @author mkizub
  */
-public final class ConditionUsingSkill extends Condition
-{
+public final class ConditionUsingSkill extends Condition {
 	private final int _skillId;
 	
 	/**
 	 * Instantiates a new condition using skill.
 	 * @param skillId the skill id
 	 */
-	public ConditionUsingSkill(int skillId)
-	{
+	public ConditionUsingSkill(int skillId) {
 		_skillId = skillId;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (skill == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (skill == null) {
 			return false;
 		}
 		return skill.getId() == _skillId;

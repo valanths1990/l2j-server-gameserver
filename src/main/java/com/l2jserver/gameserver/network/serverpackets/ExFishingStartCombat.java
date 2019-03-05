@@ -23,14 +23,12 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 /**
  * @author -Wooden-
  */
-public class ExFishingStartCombat extends L2GameServerPacket
-{
+public class ExFishingStartCombat extends L2GameServerPacket {
 	private final L2Character _activeChar;
 	private final int _time, _hp;
 	private final int _lureType, _deceptiveMode, _mode;
 	
-	public ExFishingStartCombat(L2Character character, int time, int hp, int mode, int lureType, int deceptiveMode)
-	{
+	public ExFishingStartCombat(L2Character character, int time, int hp, int mode, int lureType, int deceptiveMode) {
 		_activeChar = character;
 		_time = time;
 		_hp = hp;
@@ -40,8 +38,7 @@ public class ExFishingStartCombat extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x27);
 		

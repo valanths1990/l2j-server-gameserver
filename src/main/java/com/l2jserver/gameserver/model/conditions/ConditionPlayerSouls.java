@@ -25,22 +25,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerSouls.
  */
-public class ConditionPlayerSouls extends Condition
-{
+public class ConditionPlayerSouls extends Condition {
 	private final int _souls;
 	
 	/**
 	 * Instantiates a new condition player souls.
 	 * @param souls the souls
 	 */
-	public ConditionPlayerSouls(int souls)
-	{
+	public ConditionPlayerSouls(int souls) {
 		_souls = souls;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effector.getActingPlayer() != null) && (effector.getActingPlayer().getChargedSouls() >= _souls);
 	}
 }

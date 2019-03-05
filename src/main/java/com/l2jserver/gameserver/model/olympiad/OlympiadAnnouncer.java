@@ -30,35 +30,28 @@ import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 /**
  * @author DS
  */
-public final class OlympiadAnnouncer implements Runnable
-{
+public final class OlympiadAnnouncer implements Runnable {
 	private static final int OLY_MANAGER = 31688;
 	private final Set<L2Spawn> _managers;
 	private int _currentStadium = 0;
 	
-	public OlympiadAnnouncer()
-	{
+	public OlympiadAnnouncer() {
 		_managers = SpawnTable.getInstance().getSpawns(OLY_MANAGER);
 	}
 	
 	@Override
-	public void run()
-	{
+	public void run() {
 		OlympiadGameTask task;
-		for (int i = OlympiadGameManager.getInstance().getNumberOfStadiums(); --i >= 0; _currentStadium++)
-		{
-			if (_currentStadium >= OlympiadGameManager.getInstance().getNumberOfStadiums())
-			{
+		for (int i = OlympiadGameManager.getInstance().getNumberOfStadiums(); --i >= 0; _currentStadium++) {
+			if (_currentStadium >= OlympiadGameManager.getInstance().getNumberOfStadiums()) {
 				_currentStadium = 0;
 			}
 			
 			task = OlympiadGameManager.getInstance().getOlympiadTask(_currentStadium);
-			if ((task != null) && (task.getGame() != null) && task.needAnnounce())
-			{
+			if ((task != null) && (task.getGame() != null) && task.needAnnounce()) {
 				NpcStringId npcString;
 				final String arenaId = String.valueOf(task.getGame().getStadiumId() + 1);
-				switch (task.getGame().getType())
-				{
+				switch (task.getGame().getType()) {
 					case NON_CLASSED:
 						npcString = NpcStringId.OLYMPIAD_CLASS_FREE_INDIVIDUAL_MATCH_IS_GOING_TO_BEGIN_IN_ARENA_S1_IN_A_MOMENT;
 						break;
@@ -74,11 +67,9 @@ public final class OlympiadAnnouncer implements Runnable
 				
 				L2Npc manager;
 				NpcSay packet;
-				for (L2Spawn spawn : _managers)
-				{
+				for (L2Spawn spawn : _managers) {
 					manager = spawn.getLastSpawn();
-					if (manager != null)
-					{
+					if (manager != null) {
 						packet = new NpcSay(manager.getObjectId(), Say2.NPC_SHOUT, manager.getId(), npcString);
 						packet.addStringParameter(arenaId);
 						manager.broadcastPacket(packet);

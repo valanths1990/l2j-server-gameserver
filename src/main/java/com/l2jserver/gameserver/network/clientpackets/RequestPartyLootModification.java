@@ -25,44 +25,37 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author JIV
  */
-public class RequestPartyLootModification extends L2GameClientPacket
-{
+public class RequestPartyLootModification extends L2GameClientPacket {
 	private static final String _C__D0_78_REQUESTPARTYLOOTMODIFICATION = "[C] D0:78 RequestPartyLootModification";
 	
 	private int _partyDistributionTypeId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_partyDistributionTypeId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final PartyDistributionType partyDistributionType = PartyDistributionType.findById(_partyDistributionTypeId);
-		if (partyDistributionType == null)
-		{
+		if (partyDistributionType == null) {
 			return;
 		}
 		
 		final L2Party party = activeChar.getParty();
-		if ((party == null) || !party.isLeader(activeChar) || (partyDistributionType == party.getDistributionType()))
-		{
+		if ((party == null) || !party.isLeader(activeChar) || (partyDistributionType == party.getDistributionType())) {
 			return;
 		}
 		party.requestLootChange(partyDistributionType);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_78_REQUESTPARTYLOOTMODIFICATION;
 	}
 }

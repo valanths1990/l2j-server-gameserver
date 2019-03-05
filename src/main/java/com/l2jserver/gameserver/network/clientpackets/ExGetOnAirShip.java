@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.network.clientpackets;
  * Format: (c) dddd d: dx d: dy d: dz d: AirShip id ??
  * @author -Wooden-
  */
-public class ExGetOnAirShip extends L2GameClientPacket
-{
+public class ExGetOnAirShip extends L2GameClientPacket {
 	private static final String _C__D0_36_EXGETONAIRSHIP = "[C] D0:36 ExGetOnAirShip";
 	
 	private int _x;
@@ -32,8 +31,7 @@ public class ExGetOnAirShip extends L2GameClientPacket
 	private int _shipId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_x = readD();
 		_y = readD();
 		_z = readD();
@@ -41,8 +39,7 @@ public class ExGetOnAirShip extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		_log.info("[T1:ExGetOnAirShip] x: " + _x);
 		_log.info("[T1:ExGetOnAirShip] y: " + _y);
 		_log.info("[T1:ExGetOnAirShip] z: " + _z);
@@ -50,8 +47,7 @@ public class ExGetOnAirShip extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_36_EXGETONAIRSHIP;
 	}
 }

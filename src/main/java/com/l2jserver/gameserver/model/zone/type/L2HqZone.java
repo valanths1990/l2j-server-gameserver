@@ -26,52 +26,36 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * Zone where 'Build Headquarters' is allowed.
  * @author Gnacik
  */
-public class L2HqZone extends L2ZoneType
-{
-	public L2HqZone(final int id)
-	{
+public class L2HqZone extends L2ZoneType {
+	public L2HqZone(final int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if ("castleId".equals(name))
-		{
+	public void setParameter(String name, String value) {
+		if ("castleId".equals(name)) {
 			// TODO
-		}
-		else if ("fortId".equals(name))
-		{
+		} else if ("fortId".equals(name)) {
 			// TODO
-		}
-		else if ("clanHallId".equals(name))
-		{
+		} else if ("clanHallId".equals(name)) {
 			// TODO
-		}
-		else if ("territoryId".equals(name))
-		{
+		} else if ("territoryId".equals(name)) {
 			// TODO
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(final L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(final L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.HQ, true);
 		}
 	}
 	
 	@Override
-	protected void onExit(final L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(final L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.HQ, false);
 		}
 	}

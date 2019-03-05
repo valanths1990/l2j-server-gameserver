@@ -36,78 +36,58 @@ import com.l2jserver.gameserver.util.GMAudit;
 /**
  * @author Dezmond_snz
  */
-public final class DlgAnswer extends L2GameClientPacket
-{
+public final class DlgAnswer extends L2GameClientPacket {
 	private static final String _C__C6_DLGANSWER = "[C] C6 DlgAnswer";
 	private int _messageId;
 	private int _answer;
 	private int _requesterId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_messageId = readD();
 		_answer = readD();
 		_requesterId = readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final TerminateReturn term = EventDispatcher.getInstance().notifyEvent(new OnPlayerDlgAnswer(activeChar, _messageId, _answer, _requesterId), activeChar, TerminateReturn.class);
-		if ((term != null) && term.terminate())
-		{
+		if ((term != null) && term.terminate()) {
 			return;
 		}
 		
-		if (_messageId == SystemMessageId.S1.getId())
-		{
-			if (activeChar.removeAction(PlayerAction.USER_ENGAGE))
-			{
-				if (Config.L2JMOD_ALLOW_WEDDING)
-				{
+		if (_messageId == SystemMessageId.S1.getId()) {
+			if (activeChar.removeAction(PlayerAction.USER_ENGAGE)) {
+				if (Config.L2JMOD_ALLOW_WEDDING) {
 					activeChar.engageAnswer(_answer);
 				}
-			}
-			else if (activeChar.removeAction(PlayerAction.ADMIN_COMMAND))
-			{
+			} else if (activeChar.removeAction(PlayerAction.ADMIN_COMMAND)) {
 				String cmd = activeChar.getAdminConfirmCmd();
 				activeChar.setAdminConfirmCmd(null);
-				if (_answer == 0)
-				{
+				if (_answer == 0) {
 					return;
 				}
 				String command = cmd.split(" ")[0];
 				IAdminCommandHandler ach = AdminCommandHandler.getInstance().getHandler(command);
-				if (AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel()))
-				{
-					if (Config.GMAUDIT)
-					{
+				if (AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel())) {
+					if (Config.GMAUDIT) {
 						GMAudit.auditGMAction(activeChar.getName() + " [" + activeChar.getObjectId() + "]", cmd, (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"));
 					}
 					ach.useAdminCommand(cmd, activeChar);
 				}
 			}
-		}
-		else if ((_messageId == SystemMessageId.RESURRECTION_REQUEST_BY_C1_FOR_S2_XP.getId()) || (_messageId == SystemMessageId.RESURRECT_USING_CHARM_OF_COURAGE.getId()))
-		{
+		} else if ((_messageId == SystemMessageId.RESURRECTION_REQUEST_BY_C1_FOR_S2_XP.getId()) || (_messageId == SystemMessageId.RESURRECT_USING_CHARM_OF_COURAGE.getId())) {
 			activeChar.reviveAnswer(_answer);
-		}
-		else if (_messageId == SystemMessageId.C1_WISHES_TO_SUMMON_YOU_FROM_S2_DO_YOU_ACCEPT.getId())
-		{
+		} else if (_messageId == SystemMessageId.C1_WISHES_TO_SUMMON_YOU_FROM_S2_DO_YOU_ACCEPT.getId()) {
 			final SummonRequestHolder holder = activeChar.removeScript(SummonRequestHolder.class);
-			if ((_answer == 1) && (holder != null) && holder.getRequester().canSummonTarget(activeChar) && (holder.getRequester().getObjectId() == _requesterId))
-			{
-				if ((holder.getItemId() != 0) && (holder.getItemCount() != 0))
-				{
-					if (activeChar.getInventory().getInventoryItemCount(holder.getItemId(), 0) < holder.getItemCount())
-					{
+			if ((_answer == 1) && (holder != null) && holder.getRequester().canSummonTarget(activeChar) && (holder.getRequester().getObjectId() == _requesterId)) {
+				if ((holder.getItemId() != 0) && (holder.getItemCount() != 0)) {
+					if (activeChar.getInventory().getInventoryItemCount(holder.getItemId(), 0) < holder.getItemCount()) {
 						SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_REQUIRED_FOR_SUMMONING);
 						sm.addItemName(holder.getItemId());
 						activeChar.sendPacket(sm);
@@ -120,28 +100,21 @@ public final class DlgAnswer extends L2GameClientPacket
 				}
 				activeChar.teleToLocation(holder.getRequester().getLocation(), true);
 			}
-		}
-		else if (_messageId == SystemMessageId.WOULD_YOU_LIKE_TO_OPEN_THE_GATE.getId())
-		{
+		} else if (_messageId == SystemMessageId.WOULD_YOU_LIKE_TO_OPEN_THE_GATE.getId()) {
 			final DoorRequestHolder holder = activeChar.removeScript(DoorRequestHolder.class);
-			if ((holder != null) && (holder.getDoor() == activeChar.getTarget()) && (_answer == 1))
-			{
+			if ((holder != null) && (holder.getDoor() == activeChar.getTarget()) && (_answer == 1)) {
 				holder.getDoor().openMe();
 			}
-		}
-		else if (_messageId == SystemMessageId.WOULD_YOU_LIKE_TO_CLOSE_THE_GATE.getId())
-		{
+		} else if (_messageId == SystemMessageId.WOULD_YOU_LIKE_TO_CLOSE_THE_GATE.getId()) {
 			final DoorRequestHolder holder = activeChar.removeScript(DoorRequestHolder.class);
-			if ((holder != null) && (holder.getDoor() == activeChar.getTarget()) && (_answer == 1))
-			{
+			if ((holder != null) && (holder.getDoor() == activeChar.getTarget()) && (_answer == 1)) {
 				holder.getDoor().closeMe();
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__C6_DLGANSWER;
 	}
 }

@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.items.type;
  * Material Type enumerated.
  * @author Adry_85
  */
-public enum MaterialType
-{
+public enum MaterialType {
 	STEEL,
 	FINE_STEEL,
 	COTTON,

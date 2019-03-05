@@ -31,8 +31,7 @@ import com.l2jserver.gameserver.network.serverpackets.NpcSay;
 /**
  * @author sandman
  */
-public class L2SepulcherMonsterInstance extends L2MonsterInstance
-{
+public class L2SepulcherMonsterInstance extends L2MonsterInstance {
 	protected static final SkillHolder FAKE_PETRIFICATION = new SkillHolder(4616, 1);
 	
 	public int mysteriousBoxId = 0;
@@ -45,13 +44,11 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 	/**
 	 * @param template
 	 */
-	public L2SepulcherMonsterInstance(L2NpcTemplate template)
-	{
+	public L2SepulcherMonsterInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2SepulcherMonsterInstance);
 		setShowSummonAnimation(true);
-		switch (template.getId())
-		{
+		switch (template.getId()) {
 			case 25339:
 			case 25342:
 			case 25346:
@@ -61,11 +58,9 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 	}
 	
 	@Override
-	public void onSpawn()
-	{
+	public void onSpawn() {
 		setShowSummonAnimation(false);
-		switch (getId())
-		{
+		switch (getId()) {
 			case 18150:
 			case 18151:
 			case 18152:
@@ -74,13 +69,11 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 18155:
 			case 18156:
 			case 18157:
-				if (_victimSpawnKeyBoxTask != null)
-				{
+				if (_victimSpawnKeyBoxTask != null) {
 					_victimSpawnKeyBoxTask.cancel(true);
 				}
 				_victimSpawnKeyBoxTask = ThreadPoolManager.getInstance().scheduleEffect(new VictimSpawnKeyBox(this), 300000);
-				if (_victimShout != null)
-				{
+				if (_victimShout != null) {
 					_victimShout.cancel(true);
 				}
 				_victimShout = ThreadPoolManager.getInstance().scheduleEffect(new VictimShout(this), 5000);
@@ -116,8 +109,7 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 18241:
 			case 18242:
 			case 18243:
-				if (_changeImmortalTask != null)
-				{
+				if (_changeImmortalTask != null) {
 					_changeImmortalTask.cancel(true);
 				}
 				_changeImmortalTask = ThreadPoolManager.getInstance().scheduleEffect(new ChangeImmortal(this), 1600);
@@ -136,15 +128,12 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 	}
 	
 	@Override
-	public boolean doDie(L2Character killer)
-	{
-		if (!super.doDie(killer))
-		{
+	public boolean doDie(L2Character killer) {
+		if (!super.doDie(killer)) {
 			return false;
 		}
 		
-		switch (getId())
-		{
+		switch (getId()) {
 			case 18120:
 			case 18121:
 			case 18122:
@@ -176,8 +165,7 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 18217:
 			case 18218:
 			case 18219:
-				if (_onDeadEventTask != null)
-				{
+				if (_onDeadEventTask != null) {
 					_onDeadEventTask.cancel(true);
 				}
 				_onDeadEventTask = ThreadPoolManager.getInstance().scheduleEffect(new OnDeadEvent(this), 3500);
@@ -191,18 +179,15 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 18155:
 			case 18156:
 			case 18157:
-				if (_victimSpawnKeyBoxTask != null)
-				{
+				if (_victimSpawnKeyBoxTask != null) {
 					_victimSpawnKeyBoxTask.cancel(true);
 					_victimSpawnKeyBoxTask = null;
 				}
-				if (_victimShout != null)
-				{
+				if (_victimShout != null) {
 					_victimShout.cancel(true);
 					_victimShout = null;
 				}
-				if (_onDeadEventTask != null)
-				{
+				if (_onDeadEventTask != null) {
 					_onDeadEventTask.cancel(true);
 				}
 				_onDeadEventTask = ThreadPoolManager.getInstance().scheduleEffect(new OnDeadEvent(this), 3500);
@@ -216,10 +201,8 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 18146:
 			case 18147:
 			case 18148:
-				if (FourSepulchersManager.getInstance().isViscountMobsAnnihilated(mysteriousBoxId))
-				{
-					if (_onDeadEventTask != null)
-					{
+				if (FourSepulchersManager.getInstance().isViscountMobsAnnihilated(mysteriousBoxId)) {
+					if (_onDeadEventTask != null) {
 						_onDeadEventTask.cancel(true);
 					}
 					_onDeadEventTask = ThreadPoolManager.getInstance().scheduleEffect(new OnDeadEvent(this), 3500);
@@ -247,10 +230,8 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 18238:
 			case 18239:
 			case 18240:
-				if (FourSepulchersManager.getInstance().isDukeMobsAnnihilated(mysteriousBoxId))
-				{
-					if (_onDeadEventTask != null)
-					{
+				if (FourSepulchersManager.getInstance().isDukeMobsAnnihilated(mysteriousBoxId)) {
+					if (_onDeadEventTask != null) {
 						_onDeadEventTask.cancel(true);
 					}
 					_onDeadEventTask = ThreadPoolManager.getInstance().scheduleEffect(new OnDeadEvent(this), 3500);
@@ -261,8 +242,7 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 			case 25342:
 			case 25346:
 			case 25349:
-				if (_onDeadEventTask != null)
-				{
+				if (_onDeadEventTask != null) {
 					_onDeadEventTask.cancel(true);
 				}
 				_onDeadEventTask = ThreadPoolManager.getInstance().scheduleEffect(new OnDeadEvent(this), 8500);
@@ -272,15 +252,12 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 	}
 	
 	@Override
-	public boolean deleteMe()
-	{
-		if (_victimSpawnKeyBoxTask != null)
-		{
+	public boolean deleteMe() {
+		if (_victimSpawnKeyBoxTask != null) {
 			_victimSpawnKeyBoxTask.cancel(true);
 			_victimSpawnKeyBoxTask = null;
 		}
-		if (_onDeadEventTask != null)
-		{
+		if (_onDeadEventTask != null) {
 			_onDeadEventTask.cancel(true);
 			_onDeadEventTask = null;
 		}
@@ -288,25 +265,20 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 		return super.deleteMe();
 	}
 	
-	private class VictimShout implements Runnable
-	{
+	private class VictimShout implements Runnable {
 		private final L2SepulcherMonsterInstance _activeChar;
 		
-		public VictimShout(L2SepulcherMonsterInstance activeChar)
-		{
+		public VictimShout(L2SepulcherMonsterInstance activeChar) {
 			_activeChar = activeChar;
 		}
 		
 		@Override
-		public void run()
-		{
-			if (_activeChar.isDead())
-			{
+		public void run() {
+			if (_activeChar.isDead()) {
 				return;
 			}
 			
-			if (!_activeChar.isVisible())
-			{
+			if (!_activeChar.isVisible()) {
 				return;
 			}
 			
@@ -314,52 +286,42 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 		}
 	}
 	
-	private class VictimSpawnKeyBox implements Runnable
-	{
+	private class VictimSpawnKeyBox implements Runnable {
 		private final L2SepulcherMonsterInstance _activeChar;
 		
-		public VictimSpawnKeyBox(L2SepulcherMonsterInstance activeChar)
-		{
+		public VictimSpawnKeyBox(L2SepulcherMonsterInstance activeChar) {
 			_activeChar = activeChar;
 		}
 		
 		@Override
-		public void run()
-		{
-			if (_activeChar.isDead())
-			{
+		public void run() {
+			if (_activeChar.isDead()) {
 				return;
 			}
 			
-			if (!_activeChar.isVisible())
-			{
+			if (!_activeChar.isVisible()) {
 				return;
 			}
 			
 			FourSepulchersManager.getInstance().spawnKeyBox(_activeChar);
 			broadcastPacket(new NpcSay(getObjectId(), 0, getId(), "Many thanks for rescue me."));
-			if (_victimShout != null)
-			{
+			if (_victimShout != null) {
 				_victimShout.cancel(true);
 			}
 			
 		}
 	}
 	
-	private static class OnDeadEvent implements Runnable
-	{
+	private static class OnDeadEvent implements Runnable {
 		L2SepulcherMonsterInstance _activeChar;
 		
-		public OnDeadEvent(L2SepulcherMonsterInstance activeChar)
-		{
+		public OnDeadEvent(L2SepulcherMonsterInstance activeChar) {
 			_activeChar = activeChar;
 		}
 		
 		@Override
-		public void run()
-		{
-			switch (_activeChar.getId())
-			{
+		public void run() {
+			switch (_activeChar.getId()) {
 				case 18120:
 				case 18121:
 				case 18122:
@@ -450,26 +412,22 @@ public class L2SepulcherMonsterInstance extends L2MonsterInstance
 		}
 	}
 	
-	private static class ChangeImmortal implements Runnable
-	{
+	private static class ChangeImmortal implements Runnable {
 		L2SepulcherMonsterInstance activeChar;
 		
-		public ChangeImmortal(L2SepulcherMonsterInstance mob)
-		{
+		public ChangeImmortal(L2SepulcherMonsterInstance mob) {
 			activeChar = mob;
 		}
 		
 		@Override
-		public void run()
-		{
+		public void run() {
 			// Invulnerable by petrification
 			FAKE_PETRIFICATION.getSkill().applyEffects(activeChar, activeChar);
 		}
 	}
 	
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
+	public boolean isAutoAttackable(L2Character attacker) {
 		return true;
 	}
 }

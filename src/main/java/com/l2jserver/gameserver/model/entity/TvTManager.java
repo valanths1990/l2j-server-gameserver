@@ -30,44 +30,35 @@ import com.l2jserver.gameserver.util.Broadcast;
  * TVT Manager.
  * @author HorridoJoho
  */
-public class TvTManager
-{
+public class TvTManager {
 	protected static final Logger _log = Logger.getLogger(TvTManager.class.getName());
 	
 	private TvTStartTask _task;
 	
-	protected TvTManager()
-	{
-		if (Config.TVT_EVENT_ENABLED)
-		{
+	protected TvTManager() {
+		if (Config.TVT_EVENT_ENABLED) {
 			TvTEvent.init();
 			
 			scheduleEventStart();
 			_log.info("TvTEventEngine[TvTManager.TvTManager()]: Started.");
-		}
-		else
-		{
+		} else {
 			_log.info("TvTEventEngine[TvTManager.TvTManager()]: Engine is disabled.");
 		}
 	}
 	
-	public static TvTManager getInstance()
-	{
+	public static TvTManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
 	/**
 	 * Starts TvTStartTask
 	 */
-	public void scheduleEventStart()
-	{
-		try
-		{
+	public void scheduleEventStart() {
+		try {
 			Calendar currentTime = Calendar.getInstance();
 			Calendar nextStartTime = null;
 			Calendar testStartTime = null;
-			for (String timeOfDay : Config.TVT_EVENT_INTERVAL)
-			{
+			for (String timeOfDay : Config.TVT_EVENT_INTERVAL) {
 				// Creating a Calendar object from the specified interval value
 				testStartTime = Calendar.getInstance();
 				testStartTime.setLenient(true);
@@ -75,24 +66,19 @@ public class TvTManager
 				testStartTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(splitTimeOfDay[0]));
 				testStartTime.set(Calendar.MINUTE, Integer.parseInt(splitTimeOfDay[1]));
 				// If the date is in the past, make it the next day (Example: Checking for "1:00", when the time is 23:57.)
-				if (testStartTime.getTimeInMillis() < currentTime.getTimeInMillis())
-				{
+				if (testStartTime.getTimeInMillis() < currentTime.getTimeInMillis()) {
 					testStartTime.add(Calendar.DAY_OF_MONTH, 1);
 				}
 				// Check for the test date to be the minimum (smallest in the specified list)
-				if ((nextStartTime == null) || (testStartTime.getTimeInMillis() < nextStartTime.getTimeInMillis()))
-				{
+				if ((nextStartTime == null) || (testStartTime.getTimeInMillis() < nextStartTime.getTimeInMillis())) {
 					nextStartTime = testStartTime;
 				}
 			}
-			if (nextStartTime != null)
-			{
+			if (nextStartTime != null) {
 				_task = new TvTStartTask(nextStartTime.getTimeInMillis());
 				ThreadPoolManager.getInstance().executeGeneral(_task);
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_log.warning("TvTEventEngine[TvTManager.scheduleEventStart()]: Error figuring out a start time. Check TvTEventInterval in config file.");
 		}
 	}
@@ -100,17 +86,13 @@ public class TvTManager
 	/**
 	 * Method to start participation
 	 */
-	public void startReg()
-	{
-		if (!TvTEvent.startParticipation())
-		{
+	public void startReg() {
+		if (!TvTEvent.startParticipation()) {
 			Broadcast.toAllOnlinePlayers("TvT Event: Event was cancelled.");
 			_log.warning("TvTEventEngine[TvTManager.run()]: Error spawning event npc for participation.");
 			
 			scheduleEventStart();
-		}
-		else
-		{
+		} else {
 			Broadcast.toAllOnlinePlayers("TvT Event: Registration opened for " + Config.TVT_EVENT_PARTICIPATION_TIME + " minute(s).");
 			
 			// schedule registration end
@@ -122,17 +104,13 @@ public class TvTManager
 	/**
 	 * Method to start the fight
 	 */
-	public void startEvent()
-	{
-		if (!TvTEvent.startFight())
-		{
+	public void startEvent() {
+		if (!TvTEvent.startFight()) {
 			Broadcast.toAllOnlinePlayers("TvT Event: Event cancelled due to lack of Participation.");
 			_log.info("TvTEventEngine[TvTManager.run()]: Lack of registration, abort event.");
 			
 			scheduleEventStart();
-		}
-		else
-		{
+		} else {
 			TvTEvent.sysMsgToAllParticipants("TvT Event: Teleporting participants to an arena in " + Config.TVT_EVENT_START_LEAVE_TELEPORT_DELAY + " second(s).");
 			_task.setStartTime(System.currentTimeMillis() + (60000L * Config.TVT_EVENT_RUNNING_TIME));
 			ThreadPoolManager.getInstance().executeGeneral(_task);
@@ -142,8 +120,7 @@ public class TvTManager
 	/**
 	 * Method to end the event and reward
 	 */
-	public void endEvent()
-	{
+	public void endEvent() {
 		Broadcast.toAllOnlinePlayers(TvTEvent.calculateRewards());
 		TvTEvent.sysMsgToAllParticipants("TvT Event: Teleporting back to the registration npc in " + Config.TVT_EVENT_START_LEAVE_TELEPORT_DELAY + " second(s).");
 		TvTEvent.stopFight();
@@ -151,10 +128,8 @@ public class TvTManager
 		scheduleEventStart();
 	}
 	
-	public void skipDelay()
-	{
-		if (_task.nextRun.cancel(false))
-		{
+	public void skipDelay() {
+		if (_task.nextRun.cancel(false)) {
 			_task.setStartTime(System.currentTimeMillis());
 			ThreadPoolManager.getInstance().executeGeneral(_task);
 		}
@@ -163,127 +138,83 @@ public class TvTManager
 	/**
 	 * Class for TvT cycles
 	 */
-	class TvTStartTask implements Runnable
-	{
+	class TvTStartTask implements Runnable {
 		private long _startTime;
 		public ScheduledFuture<?> nextRun;
 		
-		public TvTStartTask(long startTime)
-		{
+		public TvTStartTask(long startTime) {
 			_startTime = startTime;
 		}
 		
-		public void setStartTime(long startTime)
-		{
+		public void setStartTime(long startTime) {
 			_startTime = startTime;
 		}
 		
 		@Override
-		public void run()
-		{
+		public void run() {
 			int delay = (int) Math.round((_startTime - System.currentTimeMillis()) / 1000.0);
 			
-			if (delay > 0)
-			{
+			if (delay > 0) {
 				announce(delay);
 			}
 			
 			int nextMsg = 0;
-			if (delay > 3600)
-			{
+			if (delay > 3600) {
 				nextMsg = delay - 3600;
-			}
-			else if (delay > 1800)
-			{
+			} else if (delay > 1800) {
 				nextMsg = delay - 1800;
-			}
-			else if (delay > 900)
-			{
+			} else if (delay > 900) {
 				nextMsg = delay - 900;
-			}
-			else if (delay > 600)
-			{
+			} else if (delay > 600) {
 				nextMsg = delay - 600;
-			}
-			else if (delay > 300)
-			{
+			} else if (delay > 300) {
 				nextMsg = delay - 300;
-			}
-			else if (delay > 60)
-			{
+			} else if (delay > 60) {
 				nextMsg = delay - 60;
-			}
-			else if (delay > 5)
-			{
+			} else if (delay > 5) {
 				nextMsg = delay - 5;
-			}
-			else if (delay > 0)
-			{
+			} else if (delay > 0) {
 				nextMsg = delay;
-			}
-			else
-			{
+			} else {
 				// start
-				if (TvTEvent.isInactive())
-				{
+				if (TvTEvent.isInactive()) {
 					startReg();
-				}
-				else if (TvTEvent.isParticipating())
-				{
+				} else if (TvTEvent.isParticipating()) {
 					startEvent();
-				}
-				else
-				{
+				} else {
 					endEvent();
 				}
 			}
 			
-			if (delay > 0)
-			{
+			if (delay > 0) {
 				nextRun = ThreadPoolManager.getInstance().scheduleGeneral(this, nextMsg * 1000);
 			}
 		}
 		
-		private void announce(long time)
-		{
-			if ((time >= 3600) && ((time % 3600) == 0))
-			{
-				if (TvTEvent.isParticipating())
-				{
+		private void announce(long time) {
+			if ((time >= 3600) && ((time % 3600) == 0)) {
+				if (TvTEvent.isParticipating()) {
 					Broadcast.toAllOnlinePlayers("TvT Event: " + (time / 60 / 60) + " hour(s) until registration is closed!");
-				}
-				else if (TvTEvent.isStarted())
-				{
+				} else if (TvTEvent.isStarted()) {
 					TvTEvent.sysMsgToAllParticipants("TvT Event: " + (time / 60 / 60) + " hour(s) until event is finished!");
 				}
-			}
-			else if (time >= 60)
-			{
-				if (TvTEvent.isParticipating())
-				{
+			} else if (time >= 60) {
+				if (TvTEvent.isParticipating()) {
 					Broadcast.toAllOnlinePlayers("TvT Event: " + (time / 60) + " minute(s) until registration is closed!");
-				}
-				else if (TvTEvent.isStarted())
-				{
+				} else if (TvTEvent.isStarted()) {
 					TvTEvent.sysMsgToAllParticipants("TvT Event: " + (time / 60) + " minute(s) until the event is finished!");
 				}
-			}
-			else
-			{
-				if (TvTEvent.isParticipating())
-				{
+			} else {
+				if (TvTEvent.isParticipating()) {
 					Broadcast.toAllOnlinePlayers("TvT Event: " + time + " second(s) until registration is closed!");
-				}
-				else if (TvTEvent.isStarted())
-				{
+				} else if (TvTEvent.isStarted()) {
 					TvTEvent.sysMsgToAllParticipants("TvT Event: " + time + " second(s) until the event is finished!");
 				}
 			}
 		}
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final TvTManager INSTANCE = new TvTManager();
 	}
 }

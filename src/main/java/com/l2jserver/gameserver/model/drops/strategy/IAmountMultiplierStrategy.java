@@ -27,36 +27,25 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 /**
  * @author Battlecruiser
  */
-public interface IAmountMultiplierStrategy
-{
+public interface IAmountMultiplierStrategy {
 	public static final IAmountMultiplierStrategy DROP = DEFAULT_STRATEGY(Config.RATE_DEATH_DROP_AMOUNT_MULTIPLIER);
 	public static final IAmountMultiplierStrategy SPOIL = DEFAULT_STRATEGY(Config.RATE_CORPSE_DROP_AMOUNT_MULTIPLIER);
 	public static final IAmountMultiplierStrategy STATIC = (item, victim) -> 1;
 	
-	public static IAmountMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier)
-	{
-		return (item, victim) ->
-		{
+	public static IAmountMultiplierStrategy DEFAULT_STRATEGY(final double defaultMultiplier) {
+		return (item, victim) -> {
 			double multiplier = 1;
-			if (victim.isChampion())
-			{
+			if (victim.isChampion()) {
 				multiplier *= item.getItemId() != Inventory.ADENA_ID ? Config.L2JMOD_CHAMPION_REWARDS_AMOUNT : Config.L2JMOD_CHAMPION_ADENAS_REWARDS_AMOUNT;
 			}
 			Float dropAmountMultiplier = Config.RATE_DROP_AMOUNT_MULTIPLIER.get(item.getItemId());
-			if (dropAmountMultiplier != null)
-			{
+			if (dropAmountMultiplier != null) {
 				multiplier *= dropAmountMultiplier;
-			}
-			else if (ItemTable.getInstance().getTemplate(item.getItemId()).hasExImmediateEffect())
-			{
+			} else if (ItemTable.getInstance().getTemplate(item.getItemId()).hasExImmediateEffect()) {
 				multiplier *= Config.RATE_HERB_DROP_AMOUNT_MULTIPLIER;
-			}
-			else if (victim.isRaid())
-			{
+			} else if (victim.isRaid()) {
 				multiplier *= Config.RATE_RAID_DROP_AMOUNT_MULTIPLIER;
-			}
-			else
-			{
+			} else {
 				multiplier *= defaultMultiplier;
 			}
 			return multiplier;

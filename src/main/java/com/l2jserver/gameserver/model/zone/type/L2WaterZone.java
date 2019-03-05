@@ -28,43 +28,30 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
 import com.l2jserver.gameserver.network.serverpackets.AbstractNpcInfo;
 import com.l2jserver.gameserver.network.serverpackets.ServerObjectInfo;
 
-public class L2WaterZone extends L2ZoneType
-{
-	public L2WaterZone(int id)
-	{
+public class L2WaterZone extends L2ZoneType {
+	public L2WaterZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
+	protected void onEnter(L2Character character) {
 		character.setInsideZone(ZoneId.WATER, true);
 		
 		// TODO: update to only send speed status when that packet is known
-		if (character.isPlayer())
-		{
+		if (character.isPlayer()) {
 			L2PcInstance player = character.getActingPlayer();
-			if (player.isTransformed() && !player.getTransformation().canSwim())
-			{
+			if (player.isTransformed() && !player.getTransformation().canSwim()) {
 				character.stopTransformation(true);
-			}
-			else
-			{
+			} else {
 				player.broadcastUserInfo();
 			}
-		}
-		else if (character.isNpc())
-		{
+		} else if (character.isNpc()) {
 			Collection<L2PcInstance> plrs = character.getKnownList().getKnownPlayers().values();
 			
-			for (L2PcInstance player : plrs)
-			{
-				if (character.getRunSpeed() == 0)
-				{
+			for (L2PcInstance player : plrs) {
+				if (character.getRunSpeed() == 0) {
 					player.sendPacket(new ServerObjectInfo((L2Npc) character, player));
-				}
-				else
-				{
+				} else {
 					player.sendPacket(new AbstractNpcInfo.NpcInfo((L2Npc) character, player));
 				}
 			}
@@ -72,34 +59,25 @@ public class L2WaterZone extends L2ZoneType
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
+	protected void onExit(L2Character character) {
 		character.setInsideZone(ZoneId.WATER, false);
 		
 		// TODO: update to only send speed status when that packet is known
-		if (character.isPlayer())
-		{
+		if (character.isPlayer()) {
 			character.getActingPlayer().broadcastUserInfo();
-		}
-		else if (character.isNpc())
-		{
+		} else if (character.isNpc()) {
 			Collection<L2PcInstance> plrs = character.getKnownList().getKnownPlayers().values();
-			for (L2PcInstance player : plrs)
-			{
-				if (character.getRunSpeed() == 0)
-				{
+			for (L2PcInstance player : plrs) {
+				if (character.getRunSpeed() == 0) {
 					player.sendPacket(new ServerObjectInfo((L2Npc) character, player));
-				}
-				else
-				{
+				} else {
 					player.sendPacket(new AbstractNpcInfo.NpcInfo((L2Npc) character, player));
 				}
 			}
 		}
 	}
 	
-	public int getWaterZ()
-	{
+	public int getWaterZ() {
 		return getZone().getHighZ();
 	}
 }

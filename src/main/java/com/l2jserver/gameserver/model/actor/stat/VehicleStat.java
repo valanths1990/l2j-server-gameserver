@@ -20,34 +20,28 @@ package com.l2jserver.gameserver.model.actor.stat;
 
 import com.l2jserver.gameserver.model.actor.L2Vehicle;
 
-public class VehicleStat extends CharStat
-{
+public class VehicleStat extends CharStat {
 	private float _moveSpeed = 0;
 	private int _rotationSpeed = 0;
 	
-	public VehicleStat(L2Vehicle activeChar)
-	{
+	public VehicleStat(L2Vehicle activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public double getMoveSpeed()
-	{
+	public double getMoveSpeed() {
 		return _moveSpeed;
 	}
 	
-	public final void setMoveSpeed(float speed)
-	{
+	public final void setMoveSpeed(float speed) {
 		_moveSpeed = speed;
 	}
 	
-	public final double getRotationSpeed()
-	{
+	public final double getRotationSpeed() {
 		return _rotationSpeed;
 	}
 	
-	public final void setRotationSpeed(int speed)
-	{
+	public final void setRotationSpeed(int speed) {
 		_rotationSpeed = speed;
 	}
 }

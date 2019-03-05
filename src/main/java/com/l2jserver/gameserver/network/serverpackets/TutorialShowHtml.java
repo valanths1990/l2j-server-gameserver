@@ -24,10 +24,8 @@ import com.l2jserver.gameserver.enums.HtmlActionScope;
  * TutorialShowHtml server packet implementation.
  * @author HorridoJoho
  */
-public final class TutorialShowHtml extends AbstractHtmlPacket
-{
-	public TutorialShowHtml(String html)
-	{
+public final class TutorialShowHtml extends AbstractHtmlPacket {
+	public TutorialShowHtml(String html) {
 		super(html);
 	}
 	
@@ -37,21 +35,18 @@ public final class TutorialShowHtml extends AbstractHtmlPacket
 	 * @param npcObjId
 	 * @param html
 	 */
-	public TutorialShowHtml(int npcObjId, String html)
-	{
+	public TutorialShowHtml(int npcObjId, String html) {
 		super(npcObjId, html);
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xA6);
 		writeS(getHtml());
 	}
 	
 	@Override
-	public HtmlActionScope getScope()
-	{
+	public HtmlActionScope getScope() {
 		return HtmlActionScope.TUTORIAL_HTML;
 	}
 }

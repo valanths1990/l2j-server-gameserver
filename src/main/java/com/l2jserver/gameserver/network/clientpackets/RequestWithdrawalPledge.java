@@ -31,36 +31,29 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * This class ...
  * @version $Revision: 1.3.2.1.2.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestWithdrawalPledge extends L2GameClientPacket
-{
+public final class RequestWithdrawalPledge extends L2GameClientPacket {
 	private static final String _C__28_REQUESTWITHDRAWALPLEDGE = "[C] 28 RequestWithdrawalPledge";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
-		if (activeChar.getClan() == null)
-		{
+		if (activeChar.getClan() == null) {
 			activeChar.sendPacket(SystemMessageId.YOU_ARE_NOT_A_CLAN_MEMBER);
 			return;
 		}
-		if (activeChar.isClanLeader())
-		{
+		if (activeChar.isClanLeader()) {
 			activeChar.sendPacket(SystemMessageId.CLAN_LEADER_CANNOT_WITHDRAW);
 			return;
 		}
-		if (activeChar.isInCombat())
-		{
+		if (activeChar.isInCombat()) {
 			activeChar.sendPacket(SystemMessageId.YOU_CANNOT_LEAVE_DURING_COMBAT);
 			return;
 		}
@@ -81,8 +74,7 @@ public final class RequestWithdrawalPledge extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__28_REQUESTWITHDRAWALPLEDGE;
 	}
 }

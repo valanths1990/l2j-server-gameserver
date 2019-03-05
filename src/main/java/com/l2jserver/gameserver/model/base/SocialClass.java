@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.base;
  * Enumerated for Social Classes.
  * @author Zoey76
  */
-public enum SocialClass
-{
+public enum SocialClass {
 	VAGABOND,
 	VASSAL,
 	APPRENTICE,

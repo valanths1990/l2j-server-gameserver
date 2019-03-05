@@ -39,51 +39,42 @@ import com.l2jserver.gameserver.taskmanager.AttackStanceTaskManager;
  * This class ...
  * @version $Revision: 1.11.2.1.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestRestart extends L2GameClientPacket
-{
+public final class RequestRestart extends L2GameClientPacket {
 	private static final String _C__57_REQUESTRESTART = "[C] 57 RequestRestart";
 	protected static final Logger _logAccounting = Logger.getLogger("accounting");
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
 		
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if ((player.getActiveEnchantItemId() != L2PcInstance.ID_NONE) || (player.getActiveEnchantAttrItemId() != L2PcInstance.ID_NONE))
-		{
+		if ((player.getActiveEnchantItemId() != L2PcInstance.ID_NONE) || (player.getActiveEnchantAttrItemId() != L2PcInstance.ID_NONE)) {
 			sendPacket(RestartResponse.valueOf(false));
 			return;
 		}
 		
-		if (player.isLocked())
-		{
+		if (player.isLocked()) {
 			_log.warning("Player " + player.getName() + " tried to restart during class change.");
 			sendPacket(RestartResponse.valueOf(false));
 			return;
 		}
 		
-		if (player.getPrivateStoreType() != PrivateStoreType.NONE)
-		{
+		if (player.getPrivateStoreType() != PrivateStoreType.NONE) {
 			player.sendMessage("Cannot restart while trading");
 			sendPacket(RestartResponse.valueOf(false));
 			return;
 		}
 		
-		if (AttackStanceTaskManager.getInstance().hasAttackStanceTask(player) && !(player.isGM() && Config.GM_RESTART_FIGHTING))
-		{
-			if (Config.DEBUG)
-			{
+		if (AttackStanceTaskManager.getInstance().hasAttackStanceTask(player) && !(player.isGM() && Config.GM_RESTART_FIGHTING)) {
+			if (Config.DEBUG) {
 				_log.fine("Player " + player.getName() + " tried to logout while fighting.");
 			}
 			
@@ -95,10 +86,8 @@ public final class RequestRestart extends L2GameClientPacket
 		// Prevent player from restarting if they are a festival participant
 		// and it is in progress, otherwise notify party members that the player
 		// is not longer a participant.
-		if (player.isFestivalParticipant())
-		{
-			if (SevenSignsFestival.getInstance().isFestivalInitialized())
-			{
+		if (player.isFestivalParticipant()) {
+			if (SevenSignsFestival.getInstance().isFestivalInitialized()) {
 				player.sendMessage("You cannot restart while you are a participant in a festival.");
 				sendPacket(RestartResponse.valueOf(false));
 				return;
@@ -106,14 +95,12 @@ public final class RequestRestart extends L2GameClientPacket
 			
 			final L2Party playerParty = player.getParty();
 			
-			if (playerParty != null)
-			{
+			if (playerParty != null) {
 				player.getParty().broadcastString(player.getName() + " has been removed from the upcoming festival.");
 			}
 		}
 		
-		if (player.isBlockedFromExit())
-		{
+		if (player.isBlockedFromExit()) {
 			sendPacket(RestartResponse.valueOf(false));
 			return;
 		}
@@ -124,8 +111,7 @@ public final class RequestRestart extends L2GameClientPacket
 		final L2GameClient client = getClient();
 		
 		LogRecord record = new LogRecord(Level.INFO, "Logged out");
-		record.setParameters(new Object[]
-		{
+		record.setParameters(new Object[] {
 			client
 		});
 		_logAccounting.log(record);
@@ -150,8 +136,7 @@ public final class RequestRestart extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__57_REQUESTRESTART;
 	}
 }

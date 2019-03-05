@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.network.serverpackets.SiegeDefenderList;
  * This class ...
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestConfirmSiegeWaitingList extends L2GameClientPacket
-{
+public final class RequestConfirmSiegeWaitingList extends L2GameClientPacket {
 	private static final String _C__AE_RequestConfirmSiegeWaitingList = "[C] AE RequestConfirmSiegeWaitingList";
 	
 	private int _approved;
@@ -38,63 +37,48 @@ public final class RequestConfirmSiegeWaitingList extends L2GameClientPacket
 	private int _clanId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_castleId = readD();
 		_clanId = readD();
 		_approved = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		// Check if the player has a clan
-		if (activeChar.getClan() == null)
-		{
+		if (activeChar.getClan() == null) {
 			return;
 		}
 		
 		Castle castle = CastleManager.getInstance().getCastleById(_castleId);
-		if (castle == null)
-		{
+		if (castle == null) {
 			return;
 		}
 		
 		// Check if leader of the clan who owns the castle?
-		if ((castle.getOwnerId() != activeChar.getClanId()) || (!activeChar.isClanLeader()))
-		{
+		if ((castle.getOwnerId() != activeChar.getClanId()) || (!activeChar.isClanLeader())) {
 			return;
 		}
 		
 		L2Clan clan = ClanTable.getInstance().getClan(_clanId);
-		if (clan == null)
-		{
+		if (clan == null) {
 			return;
 		}
 		
-		if (!castle.getSiege().getIsRegistrationOver())
-		{
-			if (_approved == 1)
-			{
-				if (castle.getSiege().checkIsDefenderWaiting(clan))
-				{
+		if (!castle.getSiege().getIsRegistrationOver()) {
+			if (_approved == 1) {
+				if (castle.getSiege().checkIsDefenderWaiting(clan)) {
 					castle.getSiege().approveSiegeDefenderClan(_clanId);
-				}
-				else
-				{
+				} else {
 					return;
 				}
-			}
-			else
-			{
-				if ((castle.getSiege().checkIsDefenderWaiting(clan)) || (castle.getSiege().checkIsDefender(clan)))
-				{
+			} else {
+				if ((castle.getSiege().checkIsDefenderWaiting(clan)) || (castle.getSiege().checkIsDefender(clan))) {
 					castle.getSiege().removeSiegeClan(_clanId);
 				}
 			}
@@ -106,8 +90,7 @@ public final class RequestConfirmSiegeWaitingList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__AE_RequestConfirmSiegeWaitingList;
 	}
 }

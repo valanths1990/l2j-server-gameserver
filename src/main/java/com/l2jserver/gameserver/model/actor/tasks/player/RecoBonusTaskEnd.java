@@ -25,20 +25,16 @@ import com.l2jserver.gameserver.network.serverpackets.ExVoteSystemInfo;
  * Task dedicated to end player's recommendation bonus.
  * @author UnAfraid
  */
-public class RecoBonusTaskEnd implements Runnable
-{
+public class RecoBonusTaskEnd implements Runnable {
 	private final L2PcInstance _player;
 	
-	public RecoBonusTaskEnd(L2PcInstance player)
-	{
+	public RecoBonusTaskEnd(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
+	public void run() {
+		if (_player != null) {
 			_player.sendPacket(new ExVoteSystemInfo(_player));
 		}
 	}

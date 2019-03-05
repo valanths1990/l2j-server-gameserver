@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.network.serverpackets.StopRotation;
  * This class ...
  * @version $Revision: 1.1.4.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class FinishRotating extends L2GameClientPacket
-{
+public final class FinishRotating extends L2GameClientPacket {
 	private static final String _C__5C_FINISHROTATING = "[C] 5C FinishRotating";
 	
 	private int _degree;
@@ -34,38 +33,31 @@ public final class FinishRotating extends L2GameClientPacket
 	private int _unknown;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_degree = readD();
 		_unknown = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		StopRotation sr;
-		if (activeChar.isInAirShip() && activeChar.getAirShip().isCaptain(activeChar))
-		{
+		if (activeChar.isInAirShip() && activeChar.getAirShip().isCaptain(activeChar)) {
 			activeChar.getAirShip().setHeading(_degree);
 			sr = new StopRotation(activeChar.getAirShip().getObjectId(), _degree, 0);
 			activeChar.getAirShip().broadcastPacket(sr);
-		}
-		else
-		{
+		} else {
 			sr = new StopRotation(activeChar.getObjectId(), _degree, 0);
 			activeChar.broadcastPacket(sr);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__5C_FINISHROTATING;
 	}
 }

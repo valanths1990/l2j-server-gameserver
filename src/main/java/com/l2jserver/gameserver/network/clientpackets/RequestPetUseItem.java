@@ -27,15 +27,13 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.PetItemList;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
-public final class RequestPetUseItem extends L2GameClientPacket
-{
+public final class RequestPetUseItem extends L2GameClientPacket {
 	private static final String _C__8A_REQUESTPETUSEITEM = "[C] 8A RequestPetUseItem";
 	
 	private int _objectId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectId = readD();
 		// TODO: implement me properly
 		// readQ();
@@ -43,34 +41,28 @@ public final class RequestPetUseItem extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if ((activeChar == null) || !activeChar.hasPet())
-		{
+		if ((activeChar == null) || !activeChar.hasPet()) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getUseItem().tryPerformAction("pet use item"))
-		{
+		if (!getClient().getFloodProtectors().getUseItem().tryPerformAction("pet use item")) {
 			return;
 		}
 		
 		final L2PetInstance pet = (L2PetInstance) activeChar.getSummon();
 		final L2ItemInstance item = pet.getInventory().getItemByObjectId(_objectId);
-		if (item == null)
-		{
+		if (item == null) {
 			return;
 		}
 		
-		if (!item.getItem().isForNpc())
-		{
+		if (!item.getItem().isForNpc()) {
 			activeChar.sendPacket(SystemMessageId.PET_CANNOT_USE_ITEM);
 			return;
 		}
 		
-		if (activeChar.isAlikeDead() || pet.isDead())
-		{
+		if (activeChar.isAlikeDead() || pet.isDead()) {
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addItemName(item);
 			activeChar.sendPacket(sm);
@@ -80,62 +72,46 @@ public final class RequestPetUseItem extends L2GameClientPacket
 		// If the item has reuse time and it has not passed.
 		// Message from reuse delay must come from item.
 		final int reuseDelay = item.getReuseDelay();
-		if (reuseDelay > 0)
-		{
+		if (reuseDelay > 0) {
 			final long reuse = pet.getItemRemainingReuseTime(item.getObjectId());
-			if (reuse > 0)
-			{
+			if (reuse > 0) {
 				return;
 			}
 		}
 		
-		if (!item.isEquipped() && !item.getItem().checkCondition(pet, pet, true))
-		{
+		if (!item.isEquipped() && !item.getItem().checkCondition(pet, pet, true)) {
 			return;
 		}
 		
 		useItem(pet, item, activeChar);
 	}
 	
-	private void useItem(L2PetInstance pet, L2ItemInstance item, L2PcInstance activeChar)
-	{
-		if (item.isEquipable())
-		{
-			if (!item.getItem().isConditionAttached())
-			{
+	private void useItem(L2PetInstance pet, L2ItemInstance item, L2PcInstance activeChar) {
+		if (item.isEquipable()) {
+			if (!item.getItem().isConditionAttached()) {
 				activeChar.sendPacket(SystemMessageId.PET_CANNOT_USE_ITEM);
 				return;
 			}
 			
-			if (item.isEquipped())
-			{
+			if (item.isEquipped()) {
 				pet.getInventory().unEquipItemInSlot(item.getLocationSlot());
-			}
-			else
-			{
+			} else {
 				pet.getInventory().equipItem(item);
 			}
 			
 			activeChar.sendPacket(new PetItemList(pet.getInventory().getItems()));
 			pet.updateAndBroadcastStatus(1);
-		}
-		else
-		{
+		} else {
 			final IItemHandler handler = ItemHandler.getInstance().getHandler(item.getEtcItem());
-			if (handler != null)
-			{
-				if (handler.useItem(pet, item, false))
-				{
+			if (handler != null) {
+				if (handler.useItem(pet, item, false)) {
 					final int reuseDelay = item.getReuseDelay();
-					if (reuseDelay > 0)
-					{
+					if (reuseDelay > 0) {
 						activeChar.addTimeStampItem(item, reuseDelay);
 					}
 					pet.updateAndBroadcastStatus(1);
 				}
-			}
-			else
-			{
+			} else {
 				activeChar.sendPacket(SystemMessageId.PET_CANNOT_USE_ITEM);
 				_log.warning("No item handler registered for itemId: " + item.getId());
 			}
@@ -143,8 +119,7 @@ public final class RequestPetUseItem extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8A_REQUESTPETUSEITEM;
 	}
 }

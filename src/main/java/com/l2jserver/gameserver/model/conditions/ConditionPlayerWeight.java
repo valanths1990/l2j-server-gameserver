@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerWeight.
  * @author Kerberos
  */
-public class ConditionPlayerWeight extends Condition
-{
+public class ConditionPlayerWeight extends Condition {
 	
 	private final int _weight;
 	
@@ -36,17 +35,14 @@ public class ConditionPlayerWeight extends Condition
 	 * Instantiates a new condition player weight.
 	 * @param weight the weight
 	 */
-	public ConditionPlayerWeight(int weight)
-	{
+	public ConditionPlayerWeight(int weight) {
 		_weight = weight;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final L2PcInstance player = effector.getActingPlayer();
-		if ((player != null) && (player.getMaxLoad() > 0))
-		{
+		if ((player != null) && (player.getMaxLoad() > 0)) {
 			int weightproc = (((player.getCurrentLoad() - player.getBonusWeightPenalty()) * 100) / player.getMaxLoad());
 			return (weightproc < _weight) || player.getDietMode();
 		}

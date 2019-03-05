@@ -25,19 +25,16 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
 /**
  * @author Layane
  */
-public class TaskShutdown extends Task
-{
+public class TaskShutdown extends Task {
 	public static final String NAME = "shutdown";
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 	
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
+	public void onTimeElapsed(ExecutedTask task) {
 		Shutdown handler = new Shutdown(Integer.parseInt(task.getParams()[2]), false);
 		handler.start();
 	}

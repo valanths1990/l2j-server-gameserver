@@ -20,8 +20,7 @@ package com.l2jserver.gameserver.handler;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public interface IAdminCommandHandler
-{
+public interface IAdminCommandHandler {
 	/**
 	 * this is the worker method that is called when someone uses an admin command.
 	 * @param activeChar

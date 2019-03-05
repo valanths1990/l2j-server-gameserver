@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.model.base;
 
-public enum PlayerState
-{
+public enum PlayerState {
 	RESTING,
 	MOVING,
 	RUNNING,

@@ -21,22 +21,19 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author VISTALL
  */
-public class ExSubPledgeSkillAdd extends L2GameServerPacket
-{
+public class ExSubPledgeSkillAdd extends L2GameServerPacket {
 	private final int _type;
 	private final int _skillId;
 	private final int _skillLevel;
 	
-	public ExSubPledgeSkillAdd(int type, int skillId, int skillLevel)
-	{
+	public ExSubPledgeSkillAdd(int type, int skillId, int skillLevel) {
 		_type = type;
 		_skillId = skillId;
 		_skillLevel = skillLevel;
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xFE);
 		writeH(0x76);
 		writeD(_type);

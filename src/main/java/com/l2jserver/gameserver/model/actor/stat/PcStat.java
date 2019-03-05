@@ -32,8 +32,7 @@ import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ExVitalityPointInfo;
 
-public class PcStat extends PlayableStat
-{
+public class PcStat extends PlayableStat {
 	private int _oldMaxHp; // stats watch
 	private int _oldMaxMp; // stats watch
 	private int _oldMaxCp; // stats watch
@@ -46,8 +45,7 @@ public class PcStat extends PlayableStat
 	private final AtomicInteger _talismanSlots = new AtomicInteger();
 	private boolean _cloakSlot = false;
 	
-	public static final int VITALITY_LEVELS[] =
-	{
+	public static final int VITALITY_LEVELS[] = {
 		240,
 		2000,
 		13000,
@@ -58,21 +56,17 @@ public class PcStat extends PlayableStat
 	public static final int MAX_VITALITY_POINTS = VITALITY_LEVELS[4];
 	public static final int MIN_VITALITY_POINTS = 1;
 	
-	public PcStat(L2PcInstance activeChar)
-	{
+	public PcStat(L2PcInstance activeChar) {
 		super(activeChar);
 	}
 	
-	public void setStartingExp(long value)
-	{
-		if (Config.BOTREPORT_ENABLE)
-		{
+	public void setStartingExp(long value) {
+		if (Config.BOTREPORT_ENABLE) {
 			_startingXp = value;
 		}
 	}
 	
-	public long getStartingExp()
-	{
+	public long getStartingExp() {
 		return _startingXp;
 	}
 	
@@ -80,8 +74,7 @@ public class PcStat extends PlayableStat
 	 * Gets the maximum cubic count.
 	 * @return the maximum cubic count
 	 */
-	public int getMaxCubicCount()
-	{
+	public int getMaxCubicCount() {
 		return _maxCubicCount;
 	}
 	
@@ -89,8 +82,7 @@ public class PcStat extends PlayableStat
 	 * Sets the maximum cubic count.
 	 * @param cubicCount the maximum cubic count
 	 */
-	public void setMaxCubicCount(int cubicCount)
-	{
+	public void setMaxCubicCount(int cubicCount) {
 		_maxCubicCount = cubicCount;
 	}
 	
@@ -98,38 +90,31 @@ public class PcStat extends PlayableStat
 	 * Gets the maximum talisman count.
 	 * @return the maximum talisman count
 	 */
-	public int getTalismanSlots()
-	{
+	public int getTalismanSlots() {
 		return _talismanSlots.get();
 	}
 	
-	public void addTalismanSlots(int count)
-	{
+	public void addTalismanSlots(int count) {
 		_talismanSlots.addAndGet(count);
 	}
 	
-	public boolean canEquipCloak()
-	{
+	public boolean canEquipCloak() {
 		return _cloakSlot;
 	}
 	
-	public void setCloakSlotStatus(boolean cloakSlot)
-	{
+	public void setCloakSlotStatus(boolean cloakSlot) {
 		_cloakSlot = cloakSlot;
 	}
 	
 	@Override
-	public final int getMaxCp()
-	{
+	public final int getMaxCp() {
 		// Get the Max CP (base+modifier) of the L2PcInstance
 		int val = (getActiveChar() == null) ? 1 : (int) calcStat(Stats.MAX_CP, getActiveChar().getTemplate().getBaseCpMax(getActiveChar().getLevel()));
-		if (val != _oldMaxCp)
-		{
+		if (val != _oldMaxCp) {
 			_oldMaxCp = val;
 			
 			// Launch a regen task if the new Max CP is higher than the old one
-			if (getActiveChar().getStatus().getCurrentCp() != val)
-			{
+			if (getActiveChar().getStatus().getCurrentCp() != val) {
 				getActiveChar().getStatus().setCurrentCp(getActiveChar().getStatus().getCurrentCp()); // trigger start of regeneration
 			}
 		}
@@ -137,17 +122,14 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public final int getMaxHp()
-	{
+	public final int getMaxHp() {
 		// Get the Max HP (base+modifier) of the L2PcInstance
 		int val = (getActiveChar() == null) ? 1 : (int) calcStat(Stats.MAX_HP, getActiveChar().getTemplate().getBaseHpMax(getActiveChar().getLevel()));
-		if (val != _oldMaxHp)
-		{
+		if (val != _oldMaxHp) {
 			_oldMaxHp = val;
 			
 			// Launch a regen task if the new Max HP is higher than the old one
-			if (getActiveChar().getStatus().getCurrentHp() != val)
-			{
+			if (getActiveChar().getStatus().getCurrentHp() != val) {
 				getActiveChar().getStatus().setCurrentHp(getActiveChar().getStatus().getCurrentHp()); // trigger start of regeneration
 			}
 		}
@@ -156,18 +138,15 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public final int getMaxMp()
-	{
+	public final int getMaxMp() {
 		// Get the Max MP (base+modifier) of the L2PcInstance
 		int val = (getActiveChar() == null) ? 1 : (int) calcStat(Stats.MAX_MP, getActiveChar().getTemplate().getBaseMpMax(getActiveChar().getLevel()));
 		
-		if (val != _oldMaxMp)
-		{
+		if (val != _oldMaxMp) {
 			_oldMaxMp = val;
 			
 			// Launch a regen task if the new Max MP is higher than the old one
-			if (getActiveChar().getStatus().getCurrentMp() != val)
-			{
+			if (getActiveChar().getStatus().getCurrentMp() != val) {
 				getActiveChar().getStatus().setCurrentMp(getActiveChar().getStatus().getCurrentMp()); // trigger start of regeneration
 			}
 		}
@@ -180,22 +159,16 @@ public class PcStat extends PlayableStat
 	 * @return the base move speed of given movement type.
 	 */
 	@Override
-	public double getBaseMoveSpeed(MoveType type)
-	{
+	public double getBaseMoveSpeed(MoveType type) {
 		final L2PcInstance player = getActiveChar();
-		if (player.isTransformed())
-		{
+		if (player.isTransformed()) {
 			final TransformTemplate template = player.getTransformation().getTemplate(player);
-			if (template != null)
-			{
+			if (template != null) {
 				return template.getBaseMoveSpeed(type);
 			}
-		}
-		else if (player.isMounted())
-		{
+		} else if (player.isMounted()) {
 			final L2PetLevelData data = PetDataTable.getInstance().getPetLevelData(player.getMountNpcId(), player.getMountLevel());
-			if (data != null)
-			{
+			if (data != null) {
 				return data.getSpeedOnRide(type);
 			}
 		}
@@ -203,27 +176,22 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public double getRunSpeed()
-	{
+	public double getRunSpeed() {
 		double val = super.getRunSpeed() + Config.RUN_SPD_BOOST;
 		
 		// Apply max run speed cap.
-		if ((val > Config.MAX_RUN_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE))
-		{
+		if ((val > Config.MAX_RUN_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE)) {
 			return Config.MAX_RUN_SPEED;
 		}
 		
 		// Check for mount penalties
-		if (getActiveChar().isMounted())
-		{
+		if (getActiveChar().isMounted()) {
 			// if level diff with mount >= 10, it decreases move speed by 50%
-			if ((getActiveChar().getMountLevel() - getActiveChar().getLevel()) >= 10)
-			{
+			if ((getActiveChar().getMountLevel() - getActiveChar().getLevel()) >= 10) {
 				val /= 2;
 			}
 			// if mount is hungry, it decreases move speed by 50%
-			if (getActiveChar().isHungry())
-			{
+			if (getActiveChar().isHungry()) {
 				val /= 2;
 			}
 		}
@@ -232,26 +200,21 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public double getWalkSpeed()
-	{
+	public double getWalkSpeed() {
 		double val = super.getWalkSpeed() + Config.RUN_SPD_BOOST;
 		
 		// Apply max run speed cap.
-		if ((val > Config.MAX_RUN_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE))
-		{
+		if ((val > Config.MAX_RUN_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE)) {
 			return Config.MAX_RUN_SPEED;
 		}
 		
-		if (getActiveChar().isMounted())
-		{
+		if (getActiveChar().isMounted()) {
 			// if level diff with mount >= 10, it decreases move speed by 50%
-			if ((getActiveChar().getMountLevel() - getActiveChar().getLevel()) >= 10)
-			{
+			if ((getActiveChar().getMountLevel() - getActiveChar().getLevel()) >= 10) {
 				val /= 2;
 			}
 			// if mount is hungry, it decreases move speed by 50%
-			if (getActiveChar().isHungry())
-			{
+			if (getActiveChar().isHungry()) {
 				val /= 2;
 			}
 		}
@@ -260,59 +223,40 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public double getPAtkSpd()
-	{
+	public double getPAtkSpd() {
 		double val = super.getPAtkSpd();
 		
-		if ((val > Config.MAX_PATK_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE))
-		{
+		if ((val > Config.MAX_PATK_SPEED) && !getActiveChar().canOverrideCond(PcCondOverride.MAX_STATS_VALUE)) {
 			return Config.MAX_PATK_SPEED;
 		}
 		
 		return val;
 	}
 	
-	private void updateVitalityLevel(boolean quiet)
-	{
+	private void updateVitalityLevel(boolean quiet) {
 		final byte level;
 		
-		if (_vitalityPoints <= VITALITY_LEVELS[0])
-		{
+		if (_vitalityPoints <= VITALITY_LEVELS[0]) {
 			level = 0;
-		}
-		else if (_vitalityPoints <= VITALITY_LEVELS[1])
-		{
+		} else if (_vitalityPoints <= VITALITY_LEVELS[1]) {
 			level = 1;
-		}
-		else if (_vitalityPoints <= VITALITY_LEVELS[2])
-		{
+		} else if (_vitalityPoints <= VITALITY_LEVELS[2]) {
 			level = 2;
-		}
-		else if (_vitalityPoints <= VITALITY_LEVELS[3])
-		{
+		} else if (_vitalityPoints <= VITALITY_LEVELS[3]) {
 			level = 3;
-		}
-		else
-		{
+		} else {
 			level = 4;
 		}
 		
-		if (!quiet && (level != _vitalityLevel))
-		{
-			if (level < _vitalityLevel)
-			{
+		if (!quiet && (level != _vitalityLevel)) {
+			if (level < _vitalityLevel) {
 				getActiveChar().sendPacket(SystemMessageId.VITALITY_HAS_DECREASED);
-			}
-			else
-			{
+			} else {
 				getActiveChar().sendPacket(SystemMessageId.VITALITY_HAS_INCREASED);
 			}
-			if (level == 0)
-			{
+			if (level == 0) {
 				getActiveChar().sendPacket(SystemMessageId.VITALITY_IS_EXHAUSTED);
-			}
-			else if (level == 4)
-			{
+			} else if (level == 4) {
 				getActiveChar().sendPacket(SystemMessageId.VITALITY_IS_AT_MAXIMUM);
 			}
 		}
@@ -323,19 +267,16 @@ public class PcStat extends PlayableStat
 	/*
 	 * Return current vitality points in integer format
 	 */
-	public int getVitalityPoints()
-	{
+	public int getVitalityPoints() {
 		return (int) _vitalityPoints;
 	}
 	
 	/*
 	 * Set current vitality points to this value if quiet = true - does not send system messages
 	 */
-	public void setVitalityPoints(int points, boolean quiet)
-	{
+	public void setVitalityPoints(int points, boolean quiet) {
 		points = Math.min(Math.max(points, MIN_VITALITY_POINTS), MAX_VITALITY_POINTS);
-		if (points == _vitalityPoints)
-		{
+		if (points == _vitalityPoints) {
 			return;
 		}
 		
@@ -344,17 +285,13 @@ public class PcStat extends PlayableStat
 		getActiveChar().sendPacket(new ExVitalityPointInfo(getVitalityPoints()));
 	}
 	
-	public synchronized void updateVitalityPoints(float points, boolean useRates, boolean quiet)
-	{
-		if ((points == 0) || !Config.ENABLE_VITALITY)
-		{
+	public synchronized void updateVitalityPoints(float points, boolean useRates, boolean quiet) {
+		if ((points == 0) || !Config.ENABLE_VITALITY) {
 			return;
 		}
 		
-		if (useRates)
-		{
-			if (getActiveChar().isLucky())
-			{
+		if (useRates) {
+			if (getActiveChar().isLucky()) {
 				return;
 			}
 			
@@ -362,39 +299,30 @@ public class PcStat extends PlayableStat
 			{
 				int stat = (int) calcStat(Stats.VITALITY_CONSUME_RATE, 1, getActiveChar(), null);
 				
-				if (stat == 0)
-				{
+				if (stat == 0) {
 					return;
 				}
-				if (stat < 0)
-				{
+				if (stat < 0) {
 					points = -points;
 				}
 			}
 			
-			if (points > 0)
-			{
+			if (points > 0) {
 				// vitality increased
 				points *= Config.RATE_VITALITY_GAIN;
-			}
-			else
-			{
+			} else {
 				// vitality decreased
 				points *= Config.RATE_VITALITY_LOST;
 			}
 		}
 		
-		if (points > 0)
-		{
+		if (points > 0) {
 			points = Math.min(_vitalityPoints + points, MAX_VITALITY_POINTS);
-		}
-		else
-		{
+		} else {
 			points = Math.max(_vitalityPoints + points, MIN_VITALITY_POINTS);
 		}
 		
-		if (Math.abs(points - _vitalityPoints) <= 1e-6)
-		{
+		if (Math.abs(points - _vitalityPoints) <= 1e-6) {
 			return;
 		}
 		
@@ -402,14 +330,11 @@ public class PcStat extends PlayableStat
 		updateVitalityLevel(quiet);
 	}
 	
-	public double getVitalityMultiplier()
-	{
+	public double getVitalityMultiplier() {
 		double vitality = 1.0;
 		
-		if (Config.ENABLE_VITALITY)
-		{
-			switch (getVitalityLevel())
-			{
+		if (Config.ENABLE_VITALITY) {
+			switch (getVitalityLevel()) {
 				case 1:
 					vitality = Config.RATE_VITALITY_LEVEL_1;
 					break;
@@ -431,13 +356,11 @@ public class PcStat extends PlayableStat
 	/**
 	 * @return the _vitalityLevel
 	 */
-	public byte getVitalityLevel()
-	{
+	public byte getVitalityLevel() {
 		return _vitalityLevel;
 	}
 	
-	public double getExpBonusMultiplier()
-	{
+	public double getExpBonusMultiplier() {
 		double bonus = 1.0;
 		double vitality = 1.0;
 		double nevits = 1.0;
@@ -456,20 +379,16 @@ public class PcStat extends PlayableStat
 		// Bonus exp from skills
 		bonusExp = 1 + (calcStat(Stats.BONUS_EXP, 0, null, null) / 100);
 		
-		if (vitality > 1.0)
-		{
+		if (vitality > 1.0) {
 			bonus += (vitality - 1);
 		}
-		if (nevits > 1.0)
-		{
+		if (nevits > 1.0) {
 			bonus += (nevits - 1);
 		}
-		if (hunting > 1.0)
-		{
+		if (hunting > 1.0) {
 			bonus += (hunting - 1);
 		}
-		if (bonusExp > 1)
-		{
+		if (bonusExp > 1) {
 			bonus += (bonusExp - 1);
 		}
 		
@@ -480,8 +399,7 @@ public class PcStat extends PlayableStat
 		return bonus;
 	}
 	
-	public double getSpBonusMultiplier()
-	{
+	public double getSpBonusMultiplier() {
 		double bonus = 1.0;
 		double vitality = 1.0;
 		double nevits = 1.0;
@@ -500,20 +418,16 @@ public class PcStat extends PlayableStat
 		// Bonus sp from skills
 		bonusSp = 1 + (calcStat(Stats.BONUS_SP, 0, null, null) / 100);
 		
-		if (vitality > 1.0)
-		{
+		if (vitality > 1.0) {
 			bonus += (vitality - 1);
 		}
-		if (nevits > 1.0)
-		{
+		if (nevits > 1.0) {
 			bonus += (nevits - 1);
 		}
-		if (hunting > 1.0)
-		{
+		if (hunting > 1.0) {
 			bonus += (hunting - 1);
 		}
-		if (bonusSp > 1)
-		{
+		if (bonusSp > 1) {
 			bonus += (bonusSp - 1);
 		}
 		
@@ -525,20 +439,17 @@ public class PcStat extends PlayableStat
 	}
 	
 	@Override
-	public int getMaxLevel()
-	{
+	public int getMaxLevel() {
 		return getActiveChar().isSubClassActive() ? Config.MAX_SUBCLASS_LEVEL : Config.MAX_PLAYER_LEVEL;
 	}
 	
 	@Override
-	public int getMaxExpLevel()
-	{
+	public int getMaxExpLevel() {
 		return getActiveChar().isSubClassActive() ? Config.MAX_SUBCLASS_LEVEL + 1 : Config.MAX_PLAYER_LEVEL + 1;
 	}
 	
 	@Override
-	public final L2PcInstance getActiveChar()
-	{
+	public final L2PcInstance getActiveChar() {
 		return (L2PcInstance) super.getActiveChar();
 	}
 }

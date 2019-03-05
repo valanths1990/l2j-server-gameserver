@@ -21,22 +21,19 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.model.Macro;
 import com.l2jserver.gameserver.model.MacroCmd;
 
-public class SendMacroList extends L2GameServerPacket
-{
+public class SendMacroList extends L2GameServerPacket {
 	private final int _rev;
 	private final int _count;
 	private final Macro _macro;
 	
-	public SendMacroList(int rev, int count, Macro macro)
-	{
+	public SendMacroList(int rev, int count, Macro macro) {
 		_rev = rev;
 		_count = count;
 		_macro = macro;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xE8);
 		
 		writeD(_rev); // macro change revision (changes after each macro edition)
@@ -44,8 +41,7 @@ public class SendMacroList extends L2GameServerPacket
 		writeC(_count); // count of Macros
 		writeC(_macro != null ? 1 : 0); // unknown
 		
-		if (_macro != null)
-		{
+		if (_macro != null) {
 			writeD(_macro.getId()); // Macro ID
 			writeS(_macro.getName()); // Macro Name
 			writeS(_macro.getDescr()); // Desc
@@ -55,8 +51,7 @@ public class SendMacroList extends L2GameServerPacket
 			writeC(_macro.getCommands().size()); // count
 			
 			int i = 1;
-			for (MacroCmd cmd : _macro.getCommands())
-			{
+			for (MacroCmd cmd : _macro.getCommands()) {
 				writeC(i++); // command count
 				writeC(cmd.getType().ordinal()); // type 1 = skill, 3 = action, 4 = shortcut
 				writeD(cmd.getD1()); // skill id

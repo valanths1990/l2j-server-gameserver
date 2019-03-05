@@ -24,30 +24,25 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowSeedMapInfo;
 /**
  * RequestSeedPhase client packet
  */
-public class RequestSeedPhase extends L2GameClientPacket
-{
+public class RequestSeedPhase extends L2GameClientPacket {
 	private static final String _C__D0_63_REQUESTSEEDPHASE = "[C] D0:63 RequestSeedPhase";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		activeChar.sendPacket(ExShowSeedMapInfo.STATIC_PACKET);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_63_REQUESTSEEDPHASE;
 	}
 }

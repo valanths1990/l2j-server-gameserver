@@ -21,19 +21,16 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author mrTJO
  */
-public class ExCubeGameCloseUI extends L2GameServerPacket
-{
+public class ExCubeGameCloseUI extends L2GameServerPacket {
 	/**
 	 * Close Minigame Waiting List
 	 */
-	public ExCubeGameCloseUI()
-	{
+	public ExCubeGameCloseUI() {
 		
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x97);
 		writeD(0xffffffff);

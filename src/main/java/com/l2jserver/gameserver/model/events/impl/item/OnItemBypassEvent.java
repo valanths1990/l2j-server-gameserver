@@ -26,37 +26,31 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author UnAfraid
  */
-public class OnItemBypassEvent implements IBaseEvent
-{
+public class OnItemBypassEvent implements IBaseEvent {
 	private final L2ItemInstance _item;
 	private final L2PcInstance _activeChar;
 	private final String _event;
 	
-	public OnItemBypassEvent(L2ItemInstance item, L2PcInstance activeChar, String event)
-	{
+	public OnItemBypassEvent(L2ItemInstance item, L2PcInstance activeChar, String event) {
 		_item = item;
 		_activeChar = activeChar;
 		_event = event;
 	}
 	
-	public L2ItemInstance getItem()
-	{
+	public L2ItemInstance getItem() {
 		return _item;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public String getEvent()
-	{
+	public String getEvent() {
 		return _event;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_ITEM_BYPASS_EVENT;
 	}
 	

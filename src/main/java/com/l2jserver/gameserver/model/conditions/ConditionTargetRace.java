@@ -27,22 +27,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetRace.
  * @author Zealar
  */
-public class ConditionTargetRace extends Condition
-{
+public class ConditionTargetRace extends Condition {
 	private final Race _race;
 	
 	/**
 	 * Instantiates a new condition target race.
 	 * @param race containing the allowed race.
 	 */
-	public ConditionTargetRace(Race race)
-	{
+	public ConditionTargetRace(Race race) {
 		_race = race;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return _race == effected.getRace();
 	}
 }

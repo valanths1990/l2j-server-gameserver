@@ -21,32 +21,26 @@ package com.l2jserver.gameserver.model.actor.knownlist;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Decoy;
 
-public class DecoyKnownList extends CharKnownList
-{
-	public DecoyKnownList(L2Decoy activeChar)
-	{
+public class DecoyKnownList extends CharKnownList {
+	public DecoyKnownList(L2Decoy activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public final L2Decoy getActiveChar()
-	{
+	public final L2Decoy getActiveChar() {
 		return (L2Decoy) super.getActiveChar();
 	}
 	
 	@Override
-	public int getDistanceToForgetObject(L2Object object)
-	{
-		if ((object == getActiveChar().getOwner()) || (object == getActiveChar().getTarget()))
-		{
+	public int getDistanceToForgetObject(L2Object object) {
+		if ((object == getActiveChar().getOwner()) || (object == getActiveChar().getTarget())) {
 			return 6000;
 		}
 		return 3000;
 	}
 	
 	@Override
-	public int getDistanceToWatchObject(L2Object object)
-	{
+	public int getDistanceToWatchObject(L2Object object) {
 		return 1500;
 	}
 }

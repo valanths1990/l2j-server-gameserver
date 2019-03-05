@@ -807,8 +807,7 @@ public final class L2PcInstance extends L2Playable {
 				player.setOverrideCond(masks);
 			}
 			return player;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("Failed loading character.", e);
 		}
 		return null;
@@ -1111,8 +1110,7 @@ public final class L2PcInstance extends L2Playable {
 	public void logout(boolean closeClient) {
 		try {
 			closeNetConnection(closeClient);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.warn("Exception on logout(): {}", e);
 		}
 	}
@@ -1981,8 +1979,7 @@ public final class L2PcInstance extends L2Playable {
 			if (!canOverrideCond(PcCondOverride.SKILL_CONDITIONS) && Config.DECREASE_SKILL_LEVEL) {
 				checkPlayerSkills();
 			}
-		}
-		finally {
+		} finally {
 			_subclassLock.unlock();
 		}
 	}
@@ -7654,8 +7651,7 @@ public final class L2PcInstance extends L2Playable {
 				}
 			}
 			return true;
-		}
-		finally {
+		} finally {
 			_subclassLock.unlock();
 		}
 	}
@@ -7689,8 +7685,7 @@ public final class L2PcInstance extends L2Playable {
 			EventDispatcher.getInstance().notifyEventAsync(new OnPlayerProfessionCancel(this, classId), this);
 			
 			getSubClasses().remove(classIndex);
-		}
-		finally {
+		} finally {
 			_subclassLock.unlock();
 		}
 		
@@ -7805,8 +7800,7 @@ public final class L2PcInstance extends L2Playable {
 			} else {
 				try {
 					setClassTemplate(getSubClasses().get(classIndex).getClassId());
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					LOG.warn("Could not switch {} sub class to class index {}, {}", this, classIndex, e);
 					return false;
 				}
@@ -7896,8 +7890,7 @@ public final class L2PcInstance extends L2Playable {
 			sendPacket(new SkillCoolTime(this));
 			sendPacket(new ExStorageMaxCount(this));
 			return true;
-		}
-		finally {
+		} finally {
 			_subclassLock.unlock();
 		}
 	}
@@ -8021,8 +8014,7 @@ public final class L2PcInstance extends L2Playable {
 			for (L2ZoneType zone : ZoneManager.getInstance().getZones(this)) {
 				zone.onPlayerLoginInside(this);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("{}", e);
 		}
 		
@@ -8518,8 +8510,7 @@ public final class L2PcInstance extends L2Playable {
 			for (L2ZoneType zone : ZoneManager.getInstance().getZones(this)) {
 				zone.onPlayerLogoutInside(this);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8529,8 +8520,7 @@ public final class L2PcInstance extends L2Playable {
 				LOG.error("deleteMe() called on offline {}", this);
 			}
 			setOnlineStatus(false, true);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8538,8 +8528,7 @@ public final class L2PcInstance extends L2Playable {
 			if (Config.ENABLE_BLOCK_CHECKER_EVENT && (getBlockCheckerArena() != -1)) {
 				HandysBlockCheckerManager.getInstance().onDisconnect(this);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8549,8 +8538,7 @@ public final class L2PcInstance extends L2Playable {
 			abortCast();
 			stopMove(null);
 			setDebug(null);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8568,8 +8556,7 @@ public final class L2PcInstance extends L2Playable {
 			} else if (isCombatFlagEquipped()) {
 				TerritoryWarManager.getInstance().dropCombatFlag(this, false, false);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8581,8 +8568,7 @@ public final class L2PcInstance extends L2Playable {
 					room.deleteMember(this);
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8590,46 +8576,40 @@ public final class L2PcInstance extends L2Playable {
 			if (isFlying()) {
 				removeSkill(SkillData.getInstance().getSkill(4289, 1));
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		// Recommendations must be saved before task (timer) is canceled
 		try {
 			storeRecommendations();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		// Stop the HP/MP/CP Regeneration task (scheduled tasks)
 		try {
 			stopAllTimers();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		try {
 			setIsTeleporting(false);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		// Stop crafting, if in progress
 		try {
 			RecipeController.getInstance().requestMakeItemAbort(this);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		// Cancel Attak or Cast
 		try {
 			setTarget(null);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8649,8 +8629,7 @@ public final class L2PcInstance extends L2Playable {
 		// Remove the L2PcInstance from the world
 		try {
 			decayMe();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8658,8 +8637,7 @@ public final class L2PcInstance extends L2Playable {
 		if (isInParty()) {
 			try {
 				leaveParty();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				LOG.error("deleteMe() {}", e);
 			}
 		}
@@ -8678,8 +8656,7 @@ public final class L2PcInstance extends L2Playable {
 				if (hasSummon()) {
 					getSummon().broadcastNpcInfo(0);
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				LOG.error("deleteMe() {}", e);
 			} // returns pet to control item
 		}
@@ -8692,8 +8669,7 @@ public final class L2PcInstance extends L2Playable {
 					clanMember.setPlayerInstance(null);
 				}
 				
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				LOG.error("deleteMe() {}", e);
 			}
 		}
@@ -8708,8 +8684,7 @@ public final class L2PcInstance extends L2Playable {
 		if (isGM()) {
 			try {
 				AdminData.getInstance().deleteGm(this);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				LOG.error("deleteMe() {}", e);
 			}
 		}
@@ -8724,8 +8699,7 @@ public final class L2PcInstance extends L2Playable {
 			if (getVehicle() != null) {
 				getVehicle().oustPlayer(this);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8749,32 +8723,28 @@ public final class L2PcInstance extends L2Playable {
 					}
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		// TvT Event removal
 		try {
 			TvTEvent.onLogout(this);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		// Update database with items in its inventory and remove them from the world
 		try {
 			getInventory().deleteMe();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		// Update database with items in its warehouse and remove them from the world
 		try {
 			clearWarehouse();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		if (Config.WAREHOUSE_CACHE) {
@@ -8783,23 +8753,20 @@ public final class L2PcInstance extends L2Playable {
 		
 		try {
 			getFreight().deleteMe();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		try {
 			clearRefund();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
 		if (isCursedWeaponEquipped()) {
 			try {
 				CursedWeaponsManager.getInstance().getCursedWeapon(_cursedWeaponEquippedId).setPlayer(null);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				LOG.error("deleteMe() {}", e);
 			}
 		}
@@ -8807,8 +8774,7 @@ public final class L2PcInstance extends L2Playable {
 		// Remove all L2Object from _knownObjects and _knownPlayer of the L2Character then cancel Attak or Cast and notify AI
 		try {
 			getKnownList().removeAllKnownObjects();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("deleteMe() {}", e);
 		}
 		
@@ -8832,8 +8798,7 @@ public final class L2PcInstance extends L2Playable {
 		try {
 			notifyFriends();
 			getBlockList().playerLogout();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error("Exception on deleteMe() notifyFriends: {}", e);
 		}
 	}
@@ -10452,8 +10417,7 @@ public final class L2PcInstance extends L2Playable {
 			for (L2BossZone zone : GrandBossManager.getInstance().getZones().values()) {
 				zone.removePlayer(this);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.warn("Exception on removeFromBossZone(): {}", e);
 		}
 	}

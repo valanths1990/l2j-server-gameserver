@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.effects;
 /**
  * @author UnAfraid
  */
-public enum EffectFlag
-{
+public enum EffectFlag {
 	NONE,
 	BLOCK_BUFF,
 	BLOCK_DEBUFF,
@@ -48,8 +47,7 @@ public enum EffectFlag
 	BLOCK_RESURRECTION,
 	SERVITOR_SHARE;
 	
-	public int getMask()
-	{
+	public int getMask() {
 		return 1 << ordinal();
 	}
 }

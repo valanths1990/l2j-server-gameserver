@@ -27,32 +27,26 @@ import com.l2jserver.gameserver.network.serverpackets.ExReplyPostItemList;
 /**
  * @author Migi, DS
  */
-public final class RequestPostItemList extends L2GameClientPacket
-{
+public final class RequestPostItemList extends L2GameClientPacket {
 	private static final String _C__D0_65_REQUESTPOSTITEMLIST = "[C] D0:65 RequestPostItemList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger packet
 	}
 	
 	@Override
-	public void runImpl()
-	{
-		if (!Config.ALLOW_MAIL || !Config.ALLOW_ATTACHMENTS)
-		{
+	public void runImpl() {
+		if (!Config.ALLOW_MAIL || !Config.ALLOW_ATTACHMENTS) {
 			return;
 		}
 		
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!activeChar.isInsideZone(ZoneId.PEACE))
-		{
+		if (!activeChar.isInsideZone(ZoneId.PEACE)) {
 			activeChar.sendPacket(SystemMessageId.CANT_USE_MAIL_OUTSIDE_PEACE_ZONE);
 			return;
 		}
@@ -61,14 +55,12 @@ public final class RequestPostItemList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_65_REQUESTPOSTITEMLIST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

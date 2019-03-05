@@ -21,36 +21,27 @@ package com.l2jserver.gameserver.script;
 /**
  * @author -Nemesiss-
  */
-public class ShortList
-{
-	public static short[] parse(String range)
-	{
-		if (range.contains("-"))
-		{
+public class ShortList {
+	public static short[] parse(String range) {
+		if (range.contains("-")) {
 			return getShortList(range.split("-"));
-		}
-		else if (range.contains(","))
-		{
+		} else if (range.contains(",")) {
 			return getShortList(range.split(","));
 		}
 		
-		short[] list =
-		{
+		short[] list = {
 			getShort(range)
 		};
 		return list;
 	}
 	
-	private static short getShort(String number)
-	{
+	private static short getShort(String number) {
 		return Short.parseShort(number);
 	}
 	
-	private static short[] getShortList(String[] numbers)
-	{
+	private static short[] getShortList(String[] numbers) {
 		short[] list = new short[numbers.length];
-		for (int i = 0; i < list.length; i++)
-		{
+		for (int i = 0; i < list.length; i++) {
 			list[i] = getShort(numbers[i]);
 		}
 		return list;

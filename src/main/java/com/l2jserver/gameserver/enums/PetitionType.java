@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.enums;
  * Enum with petition types.
  * @author xban1x
  */
-public enum PetitionType
-{
+public enum PetitionType {
 	IMMOBILITY,
 	RECOVERY_RELATED,
 	BUG_REPORT,

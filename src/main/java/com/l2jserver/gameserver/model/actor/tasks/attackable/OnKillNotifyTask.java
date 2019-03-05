@@ -25,15 +25,13 @@ import com.l2jserver.gameserver.model.quest.Quest;
 /**
  * @author xban1x
  */
-public final class OnKillNotifyTask implements Runnable
-{
+public final class OnKillNotifyTask implements Runnable {
 	private final L2Attackable _attackable;
 	private final Quest _quest;
 	private final L2PcInstance _killer;
 	private final boolean _isSummon;
 	
-	public OnKillNotifyTask(L2Attackable attackable, Quest quest, L2PcInstance killer, boolean isSummon)
-	{
+	public OnKillNotifyTask(L2Attackable attackable, Quest quest, L2PcInstance killer, boolean isSummon) {
 		_attackable = attackable;
 		_quest = quest;
 		_killer = killer;
@@ -41,10 +39,8 @@ public final class OnKillNotifyTask implements Runnable
 	}
 	
 	@Override
-	public void run()
-	{
-		if ((_quest != null) && (_attackable != null) && (_killer != null))
-		{
+	public void run() {
+		if ((_quest != null) && (_attackable != null) && (_killer != null)) {
 			_quest.notifyKill(_attackable, _killer, _isSummon);
 		}
 	}

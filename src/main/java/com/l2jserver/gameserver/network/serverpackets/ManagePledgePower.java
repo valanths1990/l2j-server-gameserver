@@ -20,25 +20,21 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.L2Clan;
 
-public class ManagePledgePower extends L2GameServerPacket
-{
+public class ManagePledgePower extends L2GameServerPacket {
 	
 	private final int _action;
 	private final L2Clan _clan;
 	private final int _rank;
 	
-	public ManagePledgePower(L2Clan clan, int action, int rank)
-	{
+	public ManagePledgePower(L2Clan clan, int action, int rank) {
 		_clan = clan;
 		_action = action;
 		_rank = rank;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
-		if (_action == 1)
-		{
+	protected final void writeImpl() {
+		if (_action == 1) {
 			writeC(0x2a);
 			writeD(0);
 			writeD(0);

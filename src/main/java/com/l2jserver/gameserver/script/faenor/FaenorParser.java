@@ -34,96 +34,74 @@ import com.l2jserver.gameserver.script.Parser;
 /**
  * @author Luis Arias
  */
-public abstract class FaenorParser extends Parser
-{
+public abstract class FaenorParser extends Parser {
 	protected static FaenorInterface _bridge = FaenorInterface.getInstance();
 	protected final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy", Locale.US);
 	
 	/*
 	 * UTILITY FUNCTIONS
 	 */
-	public static String attribute(Node node, String attributeName)
-	{
+	public static String attribute(Node node, String attributeName) {
 		return attribute(node, attributeName, null);
 	}
 	
-	public static String element(Node node, String elementName)
-	{
+	public static String element(Node node, String elementName) {
 		return element(node, elementName, null);
 	}
 	
-	public static String attribute(Node node, String attributeName, String defaultValue)
-	{
-		try
-		{
+	public static String attribute(Node node, String attributeName, String defaultValue) {
+		try {
 			return node.getAttributes().getNamedItem(attributeName).getNodeValue();
-		}
-		catch (Exception e)
-		{
-			if (defaultValue != null)
-			{
+		} catch (Exception e) {
+			if (defaultValue != null) {
 				return defaultValue;
 			}
 			throw new NullPointerException(e.getMessage());
 		}
 	}
 	
-	public static String element(Node parentNode, String elementName, String defaultValue)
-	{
-		try
-		{
+	public static String element(Node parentNode, String elementName, String defaultValue) {
+		try {
 			NodeList list = parentNode.getChildNodes();
-			for (int i = 0; i < list.getLength(); i++)
-			{
+			for (int i = 0; i < list.getLength(); i++) {
 				Node node = list.item(i);
-				if (node.getNodeName().equalsIgnoreCase(elementName))
-				{
+				if (node.getNodeName().equalsIgnoreCase(elementName)) {
 					return node.getTextContent();
 				}
 			}
+		} catch (Exception e) {
 		}
-		catch (Exception e)
-		{
-		}
-		if (defaultValue != null)
-		{
+		if (defaultValue != null) {
 			return defaultValue;
 		}
 		throw new NullPointerException();
 	}
 	
-	public static boolean isNodeName(Node node, String name)
-	{
+	public static boolean isNodeName(Node node, String name) {
 		return node.getNodeName().equalsIgnoreCase(name);
 	}
 	
-	public Date getDate(String date) throws ParseException
-	{
+	public Date getDate(String date) throws ParseException {
 		return DATE_FORMAT.parse(date);
 	}
 	
-	public static double getPercent(String percent)
-	{
+	public static double getPercent(String percent) {
 		return (Double.parseDouble(percent.split("%")[0]) / 100.0);
 	}
 	
-	protected static int getInt(String number)
-	{
+	protected static int getInt(String number) {
 		return Integer.parseInt(number);
 	}
 	
-	protected static double getDouble(String number)
-	{
+	protected static double getDouble(String number) {
 		return Double.parseDouble(number);
 	}
 	
-	protected static float getFloat(String number)
-	{
+	protected static float getFloat(String number) {
 		return Float.parseFloat(number);
 	}
 	
-	protected static String getParserName(String name)
-	{
+	protected static String getParserName(String name) {
 		return "faenor.Faenor" + name + "Parser";
 	}
 	

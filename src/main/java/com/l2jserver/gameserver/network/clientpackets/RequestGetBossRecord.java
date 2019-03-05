@@ -28,28 +28,23 @@ import com.l2jserver.gameserver.network.serverpackets.ExGetBossRecord;
  * Format: (ch) d
  * @author -Wooden-
  */
-public class RequestGetBossRecord extends L2GameClientPacket
-{
+public class RequestGetBossRecord extends L2GameClientPacket {
 	private static final String _C__D0_40_REQUESTGETBOSSRECORD = "[C] D0:40 RequestGetBossRecord";
 	private int _bossId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_bossId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (_bossId != 0)
-		{
+		if (_bossId != 0) {
 			_log.info("C5: RequestGetBossRecord: d: " + _bossId + " ActiveChar: " + activeChar); // should be always 0, log it if isnt 0 for furture research
 		}
 		
@@ -63,14 +58,12 @@ public class RequestGetBossRecord extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_40_REQUESTGETBOSSRECORD;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

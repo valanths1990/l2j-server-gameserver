@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetLevel.
  * @author mkizub
  */
-public class ConditionTargetLevel extends Condition
-{
+public class ConditionTargetLevel extends Condition {
 	
 	private final int _level;
 	
@@ -35,16 +34,13 @@ public class ConditionTargetLevel extends Condition
 	 * Instantiates a new condition target level.
 	 * @param level the level
 	 */
-	public ConditionTargetLevel(int level)
-	{
+	public ConditionTargetLevel(int level) {
 		_level = level;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effected == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effected == null) {
 			return false;
 		}
 		return effected.getLevel() >= _level;

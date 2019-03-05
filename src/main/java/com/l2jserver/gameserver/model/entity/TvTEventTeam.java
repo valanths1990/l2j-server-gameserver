@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author HorridoJoho
  */
-public class TvTEventTeam
-{
+public class TvTEventTeam {
 	/** The name of the team. */
 	private final String _name;
 	/** The team spot coordinated. */
@@ -37,8 +36,7 @@ public class TvTEventTeam
 	/** Name and instance of all participated players in map. */
 	private final Map<Integer, L2PcInstance> _participatedPlayers = new ConcurrentHashMap<>();
 	
-	public TvTEventTeam(String name, int[] coordinates)
-	{
+	public TvTEventTeam(String name, int[] coordinates) {
 		_name = name;
 		_coordinates = coordinates;
 		_points = 0;
@@ -49,10 +47,8 @@ public class TvTEventTeam
 	 * @param playerInstance as L2PcInstance
 	 * @return boolean: true if success, otherwise false
 	 */
-	public boolean addPlayer(L2PcInstance playerInstance)
-	{
-		if (playerInstance == null)
-		{
+	public boolean addPlayer(L2PcInstance playerInstance) {
+		if (playerInstance == null) {
 			return false;
 		}
 		
@@ -65,24 +61,21 @@ public class TvTEventTeam
 	 * Removes a player from the team
 	 * @param playerObjectId
 	 */
-	public void removePlayer(int playerObjectId)
-	{
+	public void removePlayer(int playerObjectId) {
 		_participatedPlayers.remove(playerObjectId);
 	}
 	
 	/**
 	 * Increases the points of the team.
 	 */
-	public void increasePoints()
-	{
+	public void increasePoints() {
 		++_points;
 	}
 	
 	/**
 	 * Cleanup the team and make it ready for adding players again.
 	 */
-	public void cleanMe()
-	{
+	public void cleanMe() {
 		_participatedPlayers.clear();
 		_points = 0;
 	}
@@ -92,8 +85,7 @@ public class TvTEventTeam
 	 * @param playerObjectId
 	 * @return boolean: true if player is in this team, otherwise false
 	 */
-	public boolean containsPlayer(int playerObjectId)
-	{
+	public boolean containsPlayer(int playerObjectId) {
 		return _participatedPlayers.containsKey(playerObjectId);
 	}
 	
@@ -101,8 +93,7 @@ public class TvTEventTeam
 	 * Returns the name of the team.
 	 * @return String: name of the team
 	 */
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
@@ -110,8 +101,7 @@ public class TvTEventTeam
 	 * Returns the coordinates of the team spot.
 	 * @return team coordinates
 	 */
-	public int[] getCoordinates()
-	{
+	public int[] getCoordinates() {
 		return _coordinates;
 	}
 	
@@ -119,8 +109,7 @@ public class TvTEventTeam
 	 * Returns the points of the team.
 	 * @return short: team points
 	 */
-	public short getPoints()
-	{
+	public short getPoints() {
 		return _points;
 	}
 	
@@ -128,8 +117,7 @@ public class TvTEventTeam
 	 * Returns name and instance of all participated players in Map.
 	 * @return map of players in this team
 	 */
-	public Map<Integer, L2PcInstance> getParticipatedPlayers()
-	{
+	public Map<Integer, L2PcInstance> getParticipatedPlayers() {
 		return _participatedPlayers;
 	}
 	
@@ -137,8 +125,7 @@ public class TvTEventTeam
 	 * Returns player count of this team.
 	 * @return number of players in team
 	 */
-	public int getParticipatedPlayerCount()
-	{
+	public int getParticipatedPlayerCount() {
 		return _participatedPlayers.size();
 	}
 }

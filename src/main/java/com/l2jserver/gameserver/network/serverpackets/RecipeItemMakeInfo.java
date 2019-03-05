@@ -22,41 +22,34 @@ import com.l2jserver.gameserver.data.xml.impl.RecipeData;
 import com.l2jserver.gameserver.model.L2RecipeList;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class RecipeItemMakeInfo extends L2GameServerPacket
-{
+public class RecipeItemMakeInfo extends L2GameServerPacket {
 	private final int _id;
 	private final L2PcInstance _activeChar;
 	private final boolean _success;
 	
-	public RecipeItemMakeInfo(int id, L2PcInstance player, boolean success)
-	{
+	public RecipeItemMakeInfo(int id, L2PcInstance player, boolean success) {
 		_id = id;
 		_activeChar = player;
 		_success = success;
 	}
 	
-	public RecipeItemMakeInfo(int id, L2PcInstance player)
-	{
+	public RecipeItemMakeInfo(int id, L2PcInstance player) {
 		_id = id;
 		_activeChar = player;
 		_success = true;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		final L2RecipeList recipe = RecipeData.getInstance().getRecipeList(_id);
-		if (recipe != null)
-		{
+		if (recipe != null) {
 			writeC(0xDD);
 			writeD(_id);
 			writeD(recipe.isDwarvenRecipe() ? 0 : 1); // 0 = Dwarven - 1 = Common
 			writeD((int) _activeChar.getCurrentMp());
 			writeD(_activeChar.getMaxMp());
 			writeD(_success ? 1 : 0); // item creation success/failed
-		}
-		else
-		{
+		} else {
 			_log.info("Character: " + getClient().getActiveChar() + ": Requested unexisting recipe with id = " + _id);
 		}
 	}

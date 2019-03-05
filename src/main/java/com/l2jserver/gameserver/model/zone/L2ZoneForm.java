@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * Abstract base class for any zone form
  * @author durgus
  */
-public abstract class L2ZoneForm
-{
+public abstract class L2ZoneForm {
 	protected static final int STEP = 10;
 	
 	public abstract boolean isInsideZone(int x, int y, int z);
@@ -42,15 +41,13 @@ public abstract class L2ZoneForm
 	
 	// landing coordinates.
 	
-	protected boolean lineSegmentsIntersect(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2)
-	{
+	protected boolean lineSegmentsIntersect(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2) {
 		return java.awt.geom.Line2D.linesIntersect(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2);
 	}
 	
 	public abstract void visualizeZone(int z);
 	
-	protected final void dropDebugItem(int itemId, int num, int x, int y, int z)
-	{
+	protected final void dropDebugItem(int itemId, int num, int x, int y, int z) {
 		L2ItemInstance item = new L2ItemInstance(IdFactory.getInstance().getNextId(), itemId);
 		item.setCount(num);
 		item.spawnMe(x, y, z + 5);

@@ -23,8 +23,7 @@ import com.l2jserver.gameserver.data.xml.impl.AdminData;
 /**
  * @author HorridoJoho
  */
-public class L2AccessLevel
-{
+public class L2AccessLevel {
 	/** The access level. */
 	private int _accessLevel = 0;
 	/** The access level name. */
@@ -54,8 +53,7 @@ public class L2AccessLevel
 	/** Flag to gain exp in party */
 	private boolean _gainExp = false;
 	
-	public L2AccessLevel(StatsSet set)
-	{
+	public L2AccessLevel(StatsSet set) {
 		_accessLevel = set.getInt("level");
 		_name = set.getString("name");
 		_nameColor = Integer.decode("0x" + set.getString("nameColor", "FFFFFF"));
@@ -71,8 +69,7 @@ public class L2AccessLevel
 		_gainExp = set.getBoolean("gainExp", true);
 	}
 	
-	public L2AccessLevel()
-	{
+	public L2AccessLevel() {
 		_accessLevel = 0;
 		_name = "User";
 		_nameColor = Integer.decode("0xFFFFFF");
@@ -92,8 +89,7 @@ public class L2AccessLevel
 	 * Gets the access level.
 	 * @return the access level
 	 */
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _accessLevel;
 	}
 	
@@ -101,8 +97,7 @@ public class L2AccessLevel
 	 * Gets the access level name.
 	 * @return the access level name
 	 */
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
@@ -110,8 +105,7 @@ public class L2AccessLevel
 	 * Gets the name color of the access level.
 	 * @return the name color for the access level
 	 */
-	public int getNameColor()
-	{
+	public int getNameColor() {
 		return _nameColor;
 	}
 	
@@ -119,8 +113,7 @@ public class L2AccessLevel
 	 * Gets the title color color of the access level.
 	 * @return the title color for the access level
 	 */
-	public int getTitleColor()
-	{
+	public int getTitleColor() {
 		return _titleColor;
 	}
 	
@@ -128,8 +121,7 @@ public class L2AccessLevel
 	 * Verifies if the access level has GM access or not.
 	 * @return {@code true} if access level have GM access, otherwise {@code false}
 	 */
-	public boolean isGm()
-	{
+	public boolean isGm() {
 		return _isGm;
 	}
 	
@@ -137,8 +129,7 @@ public class L2AccessLevel
 	 * Verifies if the access level is allowed to attack in peace zone or not.
 	 * @return {@code true} if the access level is allowed to attack in peace zone, otherwise {@code false}
 	 */
-	public boolean allowPeaceAttack()
-	{
+	public boolean allowPeaceAttack() {
 		return _allowPeaceAttack;
 	}
 	
@@ -146,8 +137,7 @@ public class L2AccessLevel
 	 * Verifies if the access level is allowed to use fixed resurrection or not.
 	 * @return {@ode true} if the access level is allowed to use fixed resurrection, otherwise {@code false}
 	 */
-	public boolean allowFixedRes()
-	{
+	public boolean allowFixedRes() {
 		return _allowFixedRes;
 	}
 	
@@ -155,8 +145,7 @@ public class L2AccessLevel
 	 * Verifies if the access level is allowed to perform transactions or not.
 	 * @return {@ode true} if access level is allowed to perform transactions, otherwise {@code false}
 	 */
-	public boolean allowTransaction()
-	{
+	public boolean allowTransaction() {
 		return _allowTransaction;
 	}
 	
@@ -164,8 +153,7 @@ public class L2AccessLevel
 	 * Verifies if the access level is allowed to use AltG commands or not.
 	 * @return {@ode true} if access level is allowed to use AltG commands, otherwise {@code false}
 	 */
-	public boolean allowAltG()
-	{
+	public boolean allowAltG() {
 		return _allowAltG;
 	}
 	
@@ -173,8 +161,7 @@ public class L2AccessLevel
 	 * Verifies if the access level can give damage or not.
 	 * @return {@ode true} if the access level can give damage, otherwise {@code false}
 	 */
-	public boolean canGiveDamage()
-	{
+	public boolean canGiveDamage() {
 		return _giveDamage;
 	}
 	
@@ -182,8 +169,7 @@ public class L2AccessLevel
 	 * Verifies if the access level can take aggro or not.
 	 * @return {@ode true} if the access level can take aggro, otherwise {@code false}
 	 */
-	public boolean canTakeAggro()
-	{
+	public boolean canTakeAggro() {
 		return _takeAggro;
 	}
 	
@@ -191,8 +177,7 @@ public class L2AccessLevel
 	 * Verifies if the access level can gain exp or not.
 	 * @return {@ode true} if the access level can gain exp, otherwise {@code false}
 	 */
-	public boolean canGainExp()
-	{
+	public boolean canGainExp() {
 		return _gainExp;
 	}
 	
@@ -201,12 +186,9 @@ public class L2AccessLevel
 	 * @param accessLevel the parent access level
 	 * @return {@ode true} if a child access level is equals to allowedAccess, otherwise {@code false}
 	 */
-	public boolean hasChildAccess(L2AccessLevel accessLevel)
-	{
-		if (_childsAccessLevel == null)
-		{
-			if (_child <= 0)
-			{
+	public boolean hasChildAccess(L2AccessLevel accessLevel) {
+		if (_childsAccessLevel == null) {
+			if (_child <= 0) {
 				return false;
 			}
 			

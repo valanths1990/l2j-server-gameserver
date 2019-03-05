@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionUsingItemType.
  * @author mkizub
  */
-public final class ConditionUsingItemType extends Condition
-{
+public final class ConditionUsingItemType extends Condition {
 	private final boolean _armor;
 	private final int _mask;
 	
@@ -38,40 +37,33 @@ public final class ConditionUsingItemType extends Condition
 	 * Instantiates a new condition using item type.
 	 * @param mask the mask
 	 */
-	public ConditionUsingItemType(int mask)
-	{
+	public ConditionUsingItemType(int mask) {
 		_mask = mask;
 		_armor = (_mask & (ArmorType.MAGIC.mask() | ArmorType.LIGHT.mask() | ArmorType.HEAVY.mask())) != 0;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector == null) {
 			return false;
 		}
 		
-		if (!effector.isPlayer())
-		{
+		if (!effector.isPlayer()) {
 			return _armor ? false : (_mask & effector.getAttackType().mask()) != 0;
 		}
 		
 		final Inventory inv = effector.getInventory();
 		// If ConditionUsingItemType is one between Light, Heavy or Magic
-		if (_armor)
-		{
+		if (_armor) {
 			// Get the itemMask of the weared chest (if exists)
 			L2ItemInstance chest = inv.getPaperdollItem(Inventory.PAPERDOLL_CHEST);
-			if (chest == null)
-			{
+			if (chest == null) {
 				return false;
 			}
 			int chestMask = chest.getItem().getItemMask();
 			
 			// If chest armor is different from the condition one return false
-			if ((_mask & chestMask) == 0)
-			{
+			if ((_mask & chestMask) == 0) {
 				return false;
 			}
 			
@@ -79,14 +71,12 @@ public final class ConditionUsingItemType extends Condition
 			
 			int chestBodyPart = chest.getItem().getBodyPart();
 			// return True if chest armor is a Full Armor
-			if (chestBodyPart == L2Item.SLOT_FULL_ARMOR)
-			{
+			if (chestBodyPart == L2Item.SLOT_FULL_ARMOR) {
 				return true;
 			}
 			// check legs armor
 			L2ItemInstance legs = inv.getPaperdollItem(Inventory.PAPERDOLL_LEGS);
-			if (legs == null)
-			{
+			if (legs == null) {
 				return false;
 			}
 			int legMask = legs.getItem().getItemMask();

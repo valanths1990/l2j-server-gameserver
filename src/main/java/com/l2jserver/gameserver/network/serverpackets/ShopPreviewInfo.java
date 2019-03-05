@@ -25,18 +25,15 @@ import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 /**
  ** @author Gnacik
  */
-public class ShopPreviewInfo extends L2GameServerPacket
-{
+public class ShopPreviewInfo extends L2GameServerPacket {
 	private final Map<Integer, Integer> _itemlist;
 	
-	public ShopPreviewInfo(Map<Integer, Integer> itemlist)
-	{
+	public ShopPreviewInfo(Map<Integer, Integer> itemlist) {
 		_itemlist = itemlist;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xF6);
 		writeD(Inventory.PAPERDOLL_TOTALSLOTS);
 		// Slots
@@ -61,8 +58,7 @@ public class ShopPreviewInfo extends L2GameServerPacket
 		writeD(getFromList(Inventory.PAPERDOLL_LBRACELET));
 	}
 	
-	private int getFromList(int key)
-	{
+	private int getFromList(int key) {
 		return (_itemlist.containsKey(key) ? _itemlist.get(key) : 0);
 	}
 }

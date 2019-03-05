@@ -27,44 +27,37 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author UnAfraid
  */
-public class OnPlayerAugment implements IBaseEvent
-{
+public class OnPlayerAugment implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final L2ItemInstance _item;
 	private final L2Augmentation _augmentation;
 	private final boolean _isAugment; // true = is being augmented // false = augment is being removed
 	
-	public OnPlayerAugment(L2PcInstance activeChar, L2ItemInstance item, L2Augmentation augment, boolean isAugment)
-	{
+	public OnPlayerAugment(L2PcInstance activeChar, L2ItemInstance item, L2Augmentation augment, boolean isAugment) {
 		_activeChar = activeChar;
 		_item = item;
 		_augmentation = augment;
 		_isAugment = isAugment;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public L2ItemInstance getItem()
-	{
+	public L2ItemInstance getItem() {
 		return _item;
 	}
 	
-	public L2Augmentation getAugmentation()
-	{
+	public L2Augmentation getAugmentation() {
 		return _augmentation;
 	}
 	
-	public boolean isAugment()
-	{
+	public boolean isAugment() {
 		return _isAugment;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_AUGMENT;
 	}
 }

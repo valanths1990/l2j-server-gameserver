@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author KenM
  */
-public class ExAskJoinPartyRoom extends L2GameServerPacket
-{
+public class ExAskJoinPartyRoom extends L2GameServerPacket {
 	private final String _charName;
 	
-	public ExAskJoinPartyRoom(String charName)
-	{
+	public ExAskJoinPartyRoom(String charName) {
 		_charName = charName;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x35);
 		writeS(_charName);

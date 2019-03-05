@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.network.NpcStringId;
 /**
  * @author Kerberos
  */
-public final class NpcSay extends L2GameServerPacket
-{
+public final class NpcSay extends L2GameServerPacket {
 	private final int _objectId;
 	private final int _textType;
 	private final int _npcId;
@@ -42,8 +41,7 @@ public final class NpcSay extends L2GameServerPacket
 	 * @param npcId
 	 * @param text
 	 */
-	public NpcSay(int objectId, int messageType, int npcId, String text)
-	{
+	public NpcSay(int objectId, int messageType, int npcId, String text) {
 		_objectId = objectId;
 		_textType = messageType;
 		_npcId = 1000000 + npcId;
@@ -51,8 +49,7 @@ public final class NpcSay extends L2GameServerPacket
 		_text = text;
 	}
 	
-	public NpcSay(L2Npc npc, int messageType, String text)
-	{
+	public NpcSay(L2Npc npc, int messageType, String text) {
 		_objectId = npc.getObjectId();
 		_textType = messageType;
 		_npcId = 1000000 + npc.getId();
@@ -60,16 +57,14 @@ public final class NpcSay extends L2GameServerPacket
 		_text = text;
 	}
 	
-	public NpcSay(int objectId, int messageType, int npcId, NpcStringId npcString)
-	{
+	public NpcSay(int objectId, int messageType, int npcId, NpcStringId npcString) {
 		_objectId = objectId;
 		_textType = messageType;
 		_npcId = 1000000 + npcId;
 		_npcString = npcString.getId();
 	}
 	
-	public NpcSay(L2Npc npc, int messageType, NpcStringId npcString)
-	{
+	public NpcSay(L2Npc npc, int messageType, NpcStringId npcString) {
 		_objectId = npc.getObjectId();
 		_textType = messageType;
 		_npcId = 1000000 + npc.getId();
@@ -80,10 +75,8 @@ public final class NpcSay extends L2GameServerPacket
 	 * @param text the text to add as a parameter for this packet's message (replaces S1, S2 etc.)
 	 * @return this NpcSay packet object
 	 */
-	public NpcSay addStringParameter(String text)
-	{
-		if (_parameters == null)
-		{
+	public NpcSay addStringParameter(String text) {
+		if (_parameters == null) {
 			_parameters = new ArrayList<>();
 		}
 		_parameters.add(text);
@@ -94,19 +87,14 @@ public final class NpcSay extends L2GameServerPacket
 	 * @param params a list of strings to add as parameters for this packet's message (replaces S1, S2 etc.)
 	 * @return this NpcSay packet object
 	 */
-	public NpcSay addStringParameters(String... params)
-	{
-		if ((params != null) && (params.length > 0))
-		{
-			if (_parameters == null)
-			{
+	public NpcSay addStringParameters(String... params) {
+		if ((params != null) && (params.length > 0)) {
+			if (_parameters == null) {
 				_parameters = new ArrayList<>();
 			}
 			
-			for (String item : params)
-			{
-				if ((item != null) && (item.length() > 0))
-				{
+			for (String item : params) {
+				if ((item != null) && (item.length() > 0)) {
 					_parameters.add(item);
 				}
 			}
@@ -115,21 +103,16 @@ public final class NpcSay extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x30);
 		writeD(_objectId);
 		writeD(_textType);
 		writeD(_npcId);
 		writeD(_npcString);
-		if (_npcString == -1)
-		{
+		if (_npcString == -1) {
 			writeS(_text);
-		}
-		else if (_parameters != null)
-		{
-			for (String s : _parameters)
-			{
+		} else if (_parameters != null) {
+			for (String s : _parameters) {
 				writeS(s);
 			}
 		}

@@ -23,55 +23,45 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author xban1x
  */
-public class SeedProduction
-{
+public class SeedProduction {
 	private final int _seedId;
 	private final long _price;
 	private final long _startAmount;
 	private final AtomicLong _amount;
 	
-	public SeedProduction(int id, long amount, long price, long startAmount)
-	{
+	public SeedProduction(int id, long amount, long price, long startAmount) {
 		_seedId = id;
 		_amount = new AtomicLong(amount);
 		_price = price;
 		_startAmount = startAmount;
 	}
 	
-	public final int getId()
-	{
+	public final int getId() {
 		return _seedId;
 	}
 	
-	public final long getAmount()
-	{
+	public final long getAmount() {
 		return _amount.get();
 	}
 	
-	public final long getPrice()
-	{
+	public final long getPrice() {
 		return _price;
 	}
 	
-	public final long getStartAmount()
-	{
+	public final long getStartAmount() {
 		return _startAmount;
 	}
 	
-	public final void setAmount(long amount)
-	{
+	public final void setAmount(long amount) {
 		_amount.set(amount);
 	}
 	
-	public final boolean decreaseAmount(long val)
-	{
+	public final boolean decreaseAmount(long val) {
 		long current, next;
-		do
-		{
+		do {
 			current = _amount.get();
 			next = current - val;
-			if (next < 0)
-			{
+			if (next < 0) {
 				return false;
 			}
 		}

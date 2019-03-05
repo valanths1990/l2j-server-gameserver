@@ -28,29 +28,22 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncGatesPDefMod extends AbstractFunction
-{
+public class FuncGatesPDefMod extends AbstractFunction {
 	private static final FuncGatesPDefMod _fmm_instance = new FuncGatesPDefMod();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fmm_instance;
 	}
 	
-	private FuncGatesPDefMod()
-	{
+	private FuncGatesPDefMod() {
 		super(Stats.POWER_DEFENCE, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
-		if (SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE) == SevenSigns.CABAL_DAWN)
-		{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
+		if (SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE) == SevenSigns.CABAL_DAWN) {
 			return initVal * Config.ALT_SIEGE_DAWN_GATES_PDEF_MULT;
-		}
-		else if (SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE) == SevenSigns.CABAL_DUSK)
-		{
+		} else if (SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE) == SevenSigns.CABAL_DUSK) {
 			return initVal * Config.ALT_SIEGE_DUSK_GATES_PDEF_MULT;
 		}
 		return initVal;

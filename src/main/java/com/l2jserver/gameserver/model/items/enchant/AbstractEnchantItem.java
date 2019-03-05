@@ -33,12 +33,10 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author UnAfraid
  */
-public abstract class AbstractEnchantItem
-{
+public abstract class AbstractEnchantItem {
 	protected static final Logger _log = Logger.getLogger(AbstractEnchantItem.class.getName());
 	
-	private static final ItemType[] ENCHANT_TYPES = new ItemType[]
-	{
+	private static final ItemType[] ENCHANT_TYPES = new ItemType[] {
 		EtcItemType.ANCIENT_CRYSTAL_ENCHANT_AM,
 		EtcItemType.ANCIENT_CRYSTAL_ENCHANT_WP,
 		EtcItemType.BLESS_SCRL_ENCHANT_AM,
@@ -54,15 +52,11 @@ public abstract class AbstractEnchantItem
 	private final int _maxEnchantLevel;
 	private final double _bonusRate;
 	
-	public AbstractEnchantItem(StatsSet set)
-	{
+	public AbstractEnchantItem(StatsSet set) {
 		_id = set.getInt("id");
-		if (getItem() == null)
-		{
+		if (getItem() == null) {
 			throw new NullPointerException();
-		}
-		else if (!Util.contains(ENCHANT_TYPES, getItem().getItemType()))
-		{
+		} else if (!Util.contains(ENCHANT_TYPES, getItem().getItemType())) {
 			throw new IllegalAccessError();
 		}
 		_grade = set.getEnum("targetGrade", CrystalType.class, CrystalType.NONE);
@@ -73,32 +67,28 @@ public abstract class AbstractEnchantItem
 	/**
 	 * @return id of current item
 	 */
-	public final int getId()
-	{
+	public final int getId() {
 		return _id;
 	}
 	
 	/**
 	 * @return bonus chance that would be added
 	 */
-	public final double getBonusRate()
-	{
+	public final double getBonusRate() {
 		return _bonusRate;
 	}
 	
 	/**
 	 * @return {@link L2Item} current item/scroll
 	 */
-	public final L2Item getItem()
-	{
+	public final L2Item getItem() {
 		return ItemTable.getInstance().getTemplate(_id);
 	}
 	
 	/**
 	 * @return grade of the item/scroll.
 	 */
-	public final CrystalType getGrade()
-	{
+	public final CrystalType getGrade() {
 		return _grade;
 	}
 	
@@ -110,8 +100,7 @@ public abstract class AbstractEnchantItem
 	/**
 	 * @return the maximum enchant level that this scroll/item can be used with
 	 */
-	public int getMaxEnchantLevel()
-	{
+	public int getMaxEnchantLevel() {
 		return _maxEnchantLevel;
 	}
 	
@@ -120,26 +109,16 @@ public abstract class AbstractEnchantItem
 	 * @param supportItem
 	 * @return {@code true} if this support item can be used with the item to be enchanted, {@code false} otherwise
 	 */
-	public boolean isValid(L2ItemInstance itemToEnchant, EnchantSupportItem supportItem)
-	{
-		if (itemToEnchant == null)
-		{
+	public boolean isValid(L2ItemInstance itemToEnchant, EnchantSupportItem supportItem) {
+		if (itemToEnchant == null) {
 			return false;
-		}
-		else if (itemToEnchant.isEnchantable() == 0)
-		{
+		} else if (itemToEnchant.isEnchantable() == 0) {
 			return false;
-		}
-		else if (!isValidItemType(itemToEnchant.getItem().getType2()))
-		{
+		} else if (!isValidItemType(itemToEnchant.getItem().getType2())) {
 			return false;
-		}
-		else if ((_maxEnchantLevel != 0) && (itemToEnchant.getEnchantLevel() >= _maxEnchantLevel))
-		{
+		} else if ((_maxEnchantLevel != 0) && (itemToEnchant.getEnchantLevel() >= _maxEnchantLevel)) {
 			return false;
-		}
-		else if (_grade != itemToEnchant.getItem().getItemGradeSPlus())
-		{
+		} else if (_grade != itemToEnchant.getItem().getItemGradeSPlus()) {
 			return false;
 		}
 		return true;
@@ -149,14 +128,10 @@ public abstract class AbstractEnchantItem
 	 * @param type2
 	 * @return {@code true} if current type2 is valid to be enchanted, {@code false} otherwise
 	 */
-	private final boolean isValidItemType(ItemType2 type2)
-	{
-		if (type2 == ItemType2.WEAPON)
-		{
+	private final boolean isValidItemType(ItemType2 type2) {
+		if (type2 == ItemType2.WEAPON) {
 			return isWeapon();
-		}
-		else if ((type2 == ItemType2.SHIELD_ARMOR) || (type2 == ItemType2.ACCESSORY))
-		{
+		} else if ((type2 == ItemType2.SHIELD_ARMOR) || (type2 == ItemType2.ACCESSORY)) {
 			return !isWeapon();
 		}
 		return false;

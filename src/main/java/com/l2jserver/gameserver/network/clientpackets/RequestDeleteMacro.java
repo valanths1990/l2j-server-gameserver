@@ -18,31 +18,26 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-public final class RequestDeleteMacro extends L2GameClientPacket
-{
+public final class RequestDeleteMacro extends L2GameClientPacket {
 	private static final String _C__CE_REQUESTDELETEMACRO = "[C] CE RequestDeleteMacro";
 	
 	private int _id;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_id = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (getClient().getActiveChar() == null)
-		{
+	protected void runImpl() {
+		if (getClient().getActiveChar() == null) {
 			return;
 		}
 		getClient().getActiveChar().deleteMacro(_id);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__CE_REQUESTDELETEMACRO;
 	}
 }

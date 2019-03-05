@@ -28,35 +28,26 @@ import com.l2jserver.gameserver.network.serverpackets.ExRpItemLink;
 /**
  * @author KenM
  */
-public class RequestExRqItemLink extends L2GameClientPacket
-{
+public class RequestExRqItemLink extends L2GameClientPacket {
 	private static final String _C__D0_1E_REQUESTEXRQITEMLINK = "[C] D0:1E RequestExRqItemLink";
 	private int _objectId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2GameClient client = getClient();
-		if (client != null)
-		{
+		if (client != null) {
 			L2Object object = L2World.getInstance().findObject(_objectId);
-			if (object instanceof L2ItemInstance)
-			{
+			if (object instanceof L2ItemInstance) {
 				L2ItemInstance item = (L2ItemInstance) object;
-				if (item.isPublished())
-				{
+				if (item.isPublished()) {
 					client.sendPacket(new ExRpItemLink(item));
-				}
-				else
-				{
-					if (Config.DEBUG)
-					{
+				} else {
+					if (Config.DEBUG) {
 						_log.info(getClient() + " requested item link for item which wasnt published! ID:" + _objectId);
 					}
 				}
@@ -65,8 +56,7 @@ public class RequestExRqItemLink extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_1E_REQUESTEXRQITEMLINK;
 	}
 }

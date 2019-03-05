@@ -25,24 +25,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerIsClanLeader.
  */
-public class ConditionPlayerIsClanLeader extends Condition
-{
+public class ConditionPlayerIsClanLeader extends Condition {
 	private final boolean _val;
 	
 	/**
 	 * Instantiates a new condition player is clan leader.
 	 * @param val the val
 	 */
-	public ConditionPlayerIsClanLeader(boolean val)
-	{
+	public ConditionPlayerIsClanLeader(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		return (effector.getActingPlayer().isClanLeader() == _val);

@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.Hit;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public class Attack extends L2GameServerPacket
-{
+public class Attack extends L2GameServerPacket {
 	private final int _attackerObjId;
 	private final boolean _soulshot;
 	private final int _ssGrade;
@@ -41,8 +40,7 @@ public class Attack extends L2GameServerPacket
 	 * @param useShots
 	 * @param ssGrade
 	 */
-	public Attack(L2Character attacker, L2Character target, boolean useShots, int ssGrade)
-	{
+	public Attack(L2Character attacker, L2Character target, boolean useShots, int ssGrade) {
 		_attackerObjId = attacker.getObjectId();
 		_soulshot = useShots;
 		_ssGrade = ssGrade;
@@ -58,24 +56,21 @@ public class Attack extends L2GameServerPacket
 	 * @param crit
 	 * @param shld
 	 */
-	public void addHit(L2Character target, int damage, boolean miss, boolean crit, byte shld)
-	{
+	public void addHit(L2Character target, int damage, boolean miss, boolean crit, byte shld) {
 		_hits.add(new Hit(target, damage, miss, crit, shld, _soulshot, _ssGrade));
 	}
 	
 	/**
 	 * @return {@code true} if current attack contains at least 1 hit.
 	 */
-	public boolean hasHits()
-	{
+	public boolean hasHits() {
 		return !_hits.isEmpty();
 	}
 	
 	/**
 	 * @return {@code true} if attack has soul shot charged.
 	 */
-	public boolean hasSoulshot()
-	{
+	public boolean hasSoulshot() {
 		return _soulshot;
 	}
 	
@@ -83,16 +78,14 @@ public class Attack extends L2GameServerPacket
 	 * Writes current hit
 	 * @param hit
 	 */
-	private void writeHit(Hit hit)
-	{
+	private void writeHit(Hit hit) {
 		writeD(hit.getTargetId());
 		writeD(hit.getDamage());
 		writeC(hit.getFlags());
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		final Iterator<Hit> it = _hits.iterator();
 		writeC(0x33);
 		
@@ -101,8 +94,7 @@ public class Attack extends L2GameServerPacket
 		writeLoc(_attackerLoc);
 		
 		writeH(_hits.size() - 1);
-		while (it.hasNext())
-		{
+		while (it.hasNext()) {
 			writeHit(it.next());
 		}
 		

@@ -22,15 +22,13 @@ import com.l2jserver.gameserver.model.TradeItem;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class PrivateStoreManageListBuy extends AbstractItemPacket
-{
+public class PrivateStoreManageListBuy extends AbstractItemPacket {
 	private final int _objId;
 	private final long _playerAdena;
 	private final L2ItemInstance[] _itemList;
 	private final TradeItem[] _buyList;
 	
-	public PrivateStoreManageListBuy(L2PcInstance player)
-	{
+	public PrivateStoreManageListBuy(L2PcInstance player) {
 		_objId = player.getObjectId();
 		_playerAdena = player.getAdena();
 		_itemList = player.getInventory().getUniqueItems(false, true);
@@ -38,8 +36,7 @@ public class PrivateStoreManageListBuy extends AbstractItemPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xbd);
 		// section 1
 		writeD(_objId);
@@ -47,16 +44,14 @@ public class PrivateStoreManageListBuy extends AbstractItemPacket
 		
 		// section2
 		writeD(_itemList.length); // inventory items for potential buy
-		for (L2ItemInstance item : _itemList)
-		{
+		for (L2ItemInstance item : _itemList) {
 			writeItem(item);
 			writeQ(item.getItem().getReferencePrice() * 2);
 		}
 		
 		// section 3
 		writeD(_buyList.length); // count for all items already added for buy
-		for (TradeItem item : _buyList)
-		{
+		for (TradeItem item : _buyList) {
 			writeItem(item);
 			writeQ(item.getPrice());
 			writeQ(item.getItem().getReferencePrice() * 2);

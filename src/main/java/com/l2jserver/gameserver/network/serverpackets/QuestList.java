@@ -24,11 +24,9 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.model.quest.QuestState;
 
-public class QuestList extends L2GameServerPacket
-{
+public class QuestList extends L2GameServerPacket {
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		/**
 		 * <pre>
 		 * This text was wrote by XaKa
@@ -63,8 +61,7 @@ public class QuestList extends L2GameServerPacket
 		 */
 		
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
@@ -72,23 +69,18 @@ public class QuestList extends L2GameServerPacket
 		
 		writeC(0x86);
 		writeH(quests.size());
-		for (Quest q : quests)
-		{
+		for (Quest q : quests) {
 			writeD(q.getId());
 			QuestState qs = activeChar.getQuestState(q.getName());
-			if (qs == null)
-			{
+			if (qs == null) {
 				writeD(0);
 				continue;
 			}
 			
 			int states = qs.getInt("__compltdStateFlags");
-			if (states > 0)
-			{
+			if (states > 0) {
 				writeD(states);
-			}
-			else
-			{
+			} else {
 				writeD(qs.getInt("cond"));
 			}
 		}

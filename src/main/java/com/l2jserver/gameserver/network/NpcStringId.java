@@ -42,8 +42,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowScreenMessage;
  * NpcStringId implementation, based on SystemMessageId class
  * @author mrTJO
  */
-public final class NpcStringId
-{
+public final class NpcStringId {
 	private static final Logger _log = Logger.getLogger(NpcStringId.class.getName());
 	private static final NSLocalisation[] EMPTY_NSL_ARRAY = new NSLocalisation[0];
 	public static final NpcStringId[] EMPTY_ARRAY = new NpcStringId[0];
@@ -21617,8 +21616,7 @@ public final class NpcStringId
 	 */
 	private static Map<Integer, NpcStringId> VALUES = new HashMap<>();
 	
-	static
-	{
+	static {
 		HELLO_I_AM_S1_YOU_ARE_S2_RIGHT_HEHEHE = new NpcStringId(1);
 		S1_S2_S3_S4_S5_HEHEHE = new NpcStringId(2);
 		WITHDRAW_THE_FEE_FOR_THE_NEXT_TIME_AT_S1_S2_S4 = new NpcStringId(5);
@@ -25217,45 +25215,35 @@ public final class NpcStringId
 		buildFastLookupTable();
 	}
 	
-	private static final void buildFastLookupTable()
-	{
+	private static final void buildFastLookupTable() {
 		final Field[] fields = NpcStringId.class.getDeclaredFields();
 		
 		int mod;
 		NpcStringId nsId;
-		for (final Field field : fields)
-		{
+		for (final Field field : fields) {
 			mod = field.getModifiers();
-			if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && field.getType().equals(NpcStringId.class))
-			{
-				try
-				{
+			if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && field.getType().equals(NpcStringId.class)) {
+				try {
 					nsId = (NpcStringId) field.get(null);
 					nsId.setName(field.getName());
 					nsId.setParamCount(parseMessageParameters(field.getName()));
 					
 					VALUES.put(nsId.getId(), nsId);
-				}
-				catch (final Exception e)
-				{
+				} catch (final Exception e) {
 					_log.log(Level.WARNING, "NpcStringId: Failed field access for '" + field.getName() + "'", e);
 				}
 			}
 		}
 	}
 	
-	private static final int parseMessageParameters(final String name)
-	{
+	private static final int parseMessageParameters(final String name) {
 		int paramCount = 0;
 		char c1, c2;
-		for (int i = 0; i < (name.length() - 1); i++)
-		{
+		for (int i = 0; i < (name.length() - 1); i++) {
 			c1 = name.charAt(i);
-			if ((c1 == 'C') || (c1 == 'S'))
-			{
+			if ((c1 == 'C') || (c1 == 'S')) {
 				c2 = name.charAt(i + 1);
-				if (Character.isDigit(c2))
-				{
+				if (Character.isDigit(c2)) {
 					paramCount = Math.max(paramCount, Character.getNumericValue(c2));
 					i++;
 				}
@@ -25264,41 +25252,31 @@ public final class NpcStringId
 		return paramCount;
 	}
 	
-	public static final NpcStringId getNpcStringId(final int id)
-	{
+	public static final NpcStringId getNpcStringId(final int id) {
 		final NpcStringId nsi = getNpcStringIdInternal(id);
 		return nsi == null ? new NpcStringId(id) : nsi;
 	}
 	
-	private static final NpcStringId getNpcStringIdInternal(final int id)
-	{
+	private static final NpcStringId getNpcStringIdInternal(final int id) {
 		return VALUES.get(id);
 	}
 	
-	public static final NpcStringId getNpcStringId(final String name)
-	{
-		try
-		{
+	public static final NpcStringId getNpcStringId(final String name) {
+		try {
 			return (NpcStringId) NpcStringId.class.getField(name).get(null);
-		}
-		catch (final Exception e)
-		{
+		} catch (final Exception e) {
 			return null;
 		}
 	}
 	
-	public static final void reloadLocalisations()
-	{
-		for (final NpcStringId nsId : VALUES.values())
-		{
-			if (nsId != null)
-			{
+	public static final void reloadLocalisations() {
+		for (final NpcStringId nsId : VALUES.values()) {
+			if (nsId != null) {
 				nsId.removeAllLocalisations();
 			}
 		}
 		
-		if (!Config.L2JMOD_MULTILANG_NS_ENABLE)
-		{
+		if (!Config.L2JMOD_MULTILANG_NS_ENABLE) {
 			_log.log(Level.INFO, "NpcStringId: MultiLanguage disabled.");
 			return;
 		}
@@ -25314,59 +25292,45 @@ public final class NpcStringId
 		NamedNodeMap nnmb;
 		NpcStringId nsId;
 		String text;
-		for (final String lang : languages)
-		{
+		for (final String lang : languages) {
 			file = new File(Config.DATAPACK_ROOT, "/data/lang/" + lang + "/ns/NpcStringLocalisation.xml");
-			if (!file.isFile())
-			{
+			if (!file.isFile()) {
 				continue;
 			}
 			
 			_log.log(Level.INFO, "NpcStringId: Loading localisation for '" + lang + "'");
 			
-			try
-			{
+			try {
 				doc = factory.newDocumentBuilder().parse(file);
-				for (Node na = doc.getFirstChild(); na != null; na = na.getNextSibling())
-				{
-					if ("list".equals(na.getNodeName()))
-					{
-						for (Node nb = na.getFirstChild(); nb != null; nb = nb.getNextSibling())
-						{
-							if ("ns".equals(nb.getNodeName()))
-							{
+				for (Node na = doc.getFirstChild(); na != null; na = na.getNextSibling()) {
+					if ("list".equals(na.getNodeName())) {
+						for (Node nb = na.getFirstChild(); nb != null; nb = nb.getNextSibling()) {
+							if ("ns".equals(nb.getNodeName())) {
 								nnmb = nb.getAttributes();
 								node = nnmb.getNamedItem("id");
-								if (node != null)
-								{
+								if (node != null) {
 									nsId = getNpcStringId(Integer.parseInt(node.getNodeValue()));
-									if (nsId == null)
-									{
+									if (nsId == null) {
 										_log.log(Level.WARNING, "NpcStringId: Unknown NSID '" + node.getNodeValue() + "', lang '" + lang + "'.");
 										continue;
 									}
-								}
-								else
-								{
+								} else {
 									node = nnmb.getNamedItem("name");
 									nsId = getNpcStringId(node.getNodeValue());
-									if (nsId == null)
-									{
+									if (nsId == null) {
 										_log.log(Level.WARNING, "NpcStringId: Unknown NSID '" + node.getNodeValue() + "', lang '" + lang + "'.");
 										continue;
 									}
 								}
 								
 								node = nnmb.getNamedItem("text");
-								if (node == null)
-								{
+								if (node == null) {
 									_log.log(Level.WARNING, "NpcStringId: No text defined for NSID '" + nsId + "', lang '" + lang + "'.");
 									continue;
 								}
 								
 								text = node.getNodeValue();
-								if (text.isEmpty() || (text.length() > 255))
-								{
+								if (text.isEmpty() || (text.length() > 255)) {
 									_log.log(Level.WARNING, "NpcStringId: Invalid text defined for NSID '" + nsId + "' (to long or empty), lang '" + lang + "'.");
 									continue;
 								}
@@ -25376,9 +25340,7 @@ public final class NpcStringId
 						}
 					}
 				}
-			}
-			catch (final Exception e)
-			{
+			} catch (final Exception e) {
 				_log.log(Level.SEVERE, "NpcStringId: Failed loading '" + file + "'", e);
 			}
 		}
@@ -25390,29 +25352,24 @@ public final class NpcStringId
 	private NSLocalisation[] _localisations;
 	private ExShowScreenMessage _staticScreenMessage;
 	
-	private NpcStringId(final int id)
-	{
+	private NpcStringId(final int id) {
 		_id = id;
 		_localisations = EMPTY_NSL_ARRAY;
 	}
 	
-	public final int getId()
-	{
+	public final int getId() {
 		return _id;
 	}
 	
-	private final void setName(final String name)
-	{
+	private final void setName(final String name) {
 		_name = name;
 	}
 	
-	public final String getName()
-	{
+	public final String getName() {
 		return _name;
 	}
 	
-	public final int getParamCount()
-	{
+	public final int getParamCount() {
 		return _params;
 	}
 	
@@ -25420,87 +25377,71 @@ public final class NpcStringId
 	 * You better don`t touch this!
 	 * @param params
 	 */
-	public final void setParamCount(final int params)
-	{
-		if (params < 0)
-		{
+	public final void setParamCount(final int params) {
+		if (params < 0) {
 			throw new IllegalArgumentException("Invalid negative param count: " + params);
 		}
 		
-		if (params > 10)
-		{
+		if (params > 10) {
 			throw new IllegalArgumentException("Maximum param count exceeded: " + params);
 		}
 		
-		if (params != 0)
-		{
+		if (params != 0) {
 			_staticScreenMessage = null;
 		}
 		
 		_params = (byte) params;
 	}
 	
-	public final NSLocalisation getLocalisation(final String lang)
-	{
+	public final NSLocalisation getLocalisation(final String lang) {
 		NSLocalisation nsl;
-		for (int i = _localisations.length; i-- > 0;)
-		{
+		for (int i = _localisations.length; i-- > 0;) {
 			nsl = _localisations[i];
-			if (nsl.getLanguage().hashCode() == lang.hashCode())
-			{
+			if (nsl.getLanguage().hashCode() == lang.hashCode()) {
 				return nsl;
 			}
 		}
 		return null;
 	}
 	
-	public final void attachLocalizedText(final String lang, final String text)
-	{
+	public final void attachLocalizedText(final String lang, final String text) {
 		final int length = _localisations.length;
 		final NSLocalisation[] localisations = Arrays.copyOf(_localisations, length + 1);
 		localisations[length] = new NSLocalisation(lang, text);
 		_localisations = localisations;
 	}
 	
-	public final void removeAllLocalisations()
-	{
+	public final void removeAllLocalisations() {
 		_localisations = EMPTY_NSL_ARRAY;
 	}
 	
-	public final ExShowScreenMessage getStaticScreenMessage()
-	{
+	public final ExShowScreenMessage getStaticScreenMessage() {
 		return _staticScreenMessage;
 	}
 	
-	public final void setStaticSystemMessage(final ExShowScreenMessage ns)
-	{
+	public final void setStaticSystemMessage(final ExShowScreenMessage ns) {
 		_staticScreenMessage = ns;
 	}
 	
 	@Override
-	public final String toString()
-	{
+	public final String toString() {
 		return "NS[" + getId() + ":" + getName() + "]";
 	}
 	
-	public static final class NSLocalisation
-	{
+	public static final class NSLocalisation {
 		private final String _lang;
 		private final Builder _builder;
 		
-		public NSLocalisation(final String lang, final String text)
-		{
+		public NSLocalisation(final String lang, final String text) {
 			_lang = lang;
 			_builder = Builder.newBuilder(text);
 		}
 		
-		public final String getLanguage()
-		{
+		public final String getLanguage() {
 			return _lang;
 		}
 		
-		public final String getLocalisation(final Object... params)
-		{
+		public final String getLocalisation(final Object... params) {
 			return _builder.toString(params);
 		}
 	}

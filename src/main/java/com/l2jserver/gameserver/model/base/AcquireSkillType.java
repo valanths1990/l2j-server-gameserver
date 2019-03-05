@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.base;
  * Learning skill types.
  * @author Zoey76
  */
-public enum AcquireSkillType
-{
+public enum AcquireSkillType {
 	CLASS,
 	FISHING,
 	PLEDGE,
@@ -33,8 +32,7 @@ public enum AcquireSkillType
 	SUBCLASS,
 	COLLECT;
 	
-	public static AcquireSkillType getAcquireSkillType(int id)
-	{
+	public static AcquireSkillType getAcquireSkillType(int id) {
 		return values()[id];
 	}
 }

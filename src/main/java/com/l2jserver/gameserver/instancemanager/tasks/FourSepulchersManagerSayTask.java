@@ -28,17 +28,13 @@ import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
  * Four Sepulchers manager say task.
  * @author xban1x
  */
-public final class FourSepulchersManagerSayTask implements Runnable
-{
+public final class FourSepulchersManagerSayTask implements Runnable {
 	@Override
-	public void run()
-	{
-		if (FourSepulchersManager.getInstance().isAttackTime())
-		{
+	public void run() {
+		if (FourSepulchersManager.getInstance().isAttackTime()) {
 			final Calendar tmp = Calendar.getInstance();
 			tmp.setTimeInMillis(Calendar.getInstance().getTimeInMillis() - FourSepulchersManager.getInstance().getWarmUpTimeEnd());
-			if ((tmp.get(Calendar.MINUTE) + 5) < Config.FS_TIME_ATTACK)
-			{
+			if ((tmp.get(Calendar.MINUTE) + 5) < Config.FS_TIME_ATTACK) {
 				FourSepulchersManager.getInstance().managerSay((byte) tmp.get(Calendar.MINUTE)); // byte
 				// because
 				// minute
@@ -48,13 +44,10 @@ public final class FourSepulchersManagerSayTask implements Runnable
 				ThreadPoolManager.getInstance().scheduleGeneral(new FourSepulchersManagerSayTask(), 5 * 60000);
 			}
 			// attack time ending chat
-			else if ((tmp.get(Calendar.MINUTE) + 5) >= Config.FS_TIME_ATTACK)
-			{
+			else if ((tmp.get(Calendar.MINUTE) + 5) >= Config.FS_TIME_ATTACK) {
 				FourSepulchersManager.getInstance().managerSay((byte) 90); // sending a unique id :D
 			}
-		}
-		else if (FourSepulchersManager.getInstance().isEntryTime())
-		{
+		} else if (FourSepulchersManager.getInstance().isEntryTime()) {
 			FourSepulchersManager.getInstance().managerSay((byte) 0);
 		}
 	}

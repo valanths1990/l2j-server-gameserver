@@ -30,50 +30,32 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Player Can Escape condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanEscape extends Condition
-{
+public class ConditionPlayerCanEscape extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanEscape(boolean val)
-	{
+	public ConditionPlayerCanEscape(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean canTeleport = true;
 		final L2PcInstance player = effector.getActingPlayer();
-		if (player == null)
-		{
+		if (player == null) {
 			canTeleport = false;
-		}
-		else if (!TvTEvent.onEscapeUse(player.getObjectId()))
-		{
+		} else if (!TvTEvent.onEscapeUse(player.getObjectId())) {
 			canTeleport = false;
-		}
-		else if (player.isInDuel())
-		{
+		} else if (player.isInDuel()) {
 			canTeleport = false;
-		}
-		else if (player.isAfraid())
-		{
+		} else if (player.isAfraid()) {
 			canTeleport = false;
-		}
-		else if (player.isCombatFlagEquipped())
-		{
+		} else if (player.isCombatFlagEquipped()) {
 			canTeleport = false;
-		}
-		else if (player.isFlying() || player.isFlyingMounted())
-		{
+		} else if (player.isFlying() || player.isFlyingMounted()) {
 			canTeleport = false;
-		}
-		else if (player.isInOlympiadMode())
-		{
+		} else if (player.isInOlympiadMode()) {
 			canTeleport = false;
-		}
-		else if ((GrandBossManager.getInstance().getZone(player) != null) && !player.canOverrideCond(PcCondOverride.SKILL_CONDITIONS))
-		{
+		} else if ((GrandBossManager.getInstance().getZone(player) != null) && !player.canOverrideCond(PcCondOverride.SKILL_CONDITIONS)) {
 			canTeleport = false;
 		}
 		return (_val == canTeleport);

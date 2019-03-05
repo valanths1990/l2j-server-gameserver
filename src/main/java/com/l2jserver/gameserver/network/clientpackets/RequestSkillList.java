@@ -23,36 +23,30 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @version 1.4
  */
-public final class RequestSkillList extends L2GameClientPacket
-{
+public final class RequestSkillList extends L2GameClientPacket {
 	private static final String _C__50_REQUESTSKILLLIST = "[C] 50 RequestSkillList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// Trigger skill.
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance cha = getClient().getActiveChar();
 		
-		if (cha != null)
-		{
+		if (cha != null) {
 			cha.sendSkillList();
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__50_REQUESTSKILLLIST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

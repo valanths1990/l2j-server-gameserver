@@ -28,49 +28,39 @@ import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
  * This class is a super-class for L2ControlTowerInstance and L2FlameTowerInstance.
  * @author Zoey76
  */
-public abstract class L2Tower extends L2Npc
-{
+public abstract class L2Tower extends L2Npc {
 	/**
 	 * Creates an abstract Tower.
 	 * @param template the tower template
 	 */
-	public L2Tower(L2NpcTemplate template)
-	{
+	public L2Tower(L2NpcTemplate template) {
 		super(template);
 		setIsInvul(false);
 	}
 	
 	@Override
-	public boolean canBeAttacked()
-	{
+	public boolean canBeAttacked() {
 		// Attackable during siege by attacker only
 		return ((getCastle() != null) && (getCastle().getResidenceId() > 0) && getCastle().getSiege().isInProgress());
 	}
 	
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
+	public boolean isAutoAttackable(L2Character attacker) {
 		// Attackable during siege by attacker only
 		return ((attacker != null) && attacker.isPlayer() && (getCastle() != null) && (getCastle().getResidenceId() > 0) && getCastle().getSiege().isInProgress() && getCastle().getSiege().checkIsAttacker(((L2PcInstance) attacker).getClan()));
 	}
 	
 	@Override
-	public void onAction(L2PcInstance player, boolean interact)
-	{
-		if (!canTarget(player))
-		{
+	public void onAction(L2PcInstance player, boolean interact) {
+		if (!canTarget(player)) {
 			return;
 		}
 		
-		if (this != player.getTarget())
-		{
+		if (this != player.getTarget()) {
 			// Set the target of the L2PcInstance player
 			player.setTarget(this);
-		}
-		else if (interact)
-		{
-			if (isAutoAttackable(player) && (Math.abs(player.getZ() - getZ()) < 100) && GeoData.getInstance().canSeeTarget(player, this))
-			{
+		} else if (interact) {
+			if (isAutoAttackable(player) && (Math.abs(player.getZ() - getZ()) < 100) && GeoData.getInstance().canSeeTarget(player, this)) {
 				// Notify the L2PcInstance AI with AI_INTENTION_INTERACT
 				player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
 			}
@@ -80,8 +70,7 @@ public abstract class L2Tower extends L2Npc
 	}
 	
 	@Override
-	public void onForcedAttack(L2PcInstance player)
-	{
+	public void onForcedAttack(L2PcInstance player) {
 		onAction(player);
 	}
 }

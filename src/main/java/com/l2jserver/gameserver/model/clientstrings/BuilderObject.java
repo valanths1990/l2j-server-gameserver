@@ -21,44 +21,36 @@ package com.l2jserver.gameserver.model.clientstrings;
 /**
  * @author Forsaiken
  */
-final class BuilderObject extends Builder
-{
+final class BuilderObject extends Builder {
 	private final int _index;
 	
-	BuilderObject(final int id)
-	{
-		if ((id < 1) || (id > 9))
-		{
+	BuilderObject(final int id) {
+		if ((id < 1) || (id > 9)) {
 			throw new RuntimeException("Illegal Id: " + id);
 		}
 		_index = id - 1;
 	}
 	
 	@Override
-	public final String toString(final Object param)
-	{
+	public final String toString(final Object param) {
 		return param == null ? "null" : param.toString();
 	}
 	
 	@Override
-	public final String toString(final Object... params)
-	{
-		if ((params == null) || (params.length == 0))
-		{
+	public final String toString(final Object... params) {
+		if ((params == null) || (params.length == 0)) {
 			return "null";
 		}
 		return params[0].toString();
 	}
 	
 	@Override
-	public final int getIndex()
-	{
+	public final int getIndex() {
 		return _index;
 	}
 	
 	@Override
-	public final String toString()
-	{
+	public final String toString() {
 		return "[PARAM-" + (_index + 1) + "]";
 	}
 }

@@ -21,24 +21,20 @@ package com.l2jserver.gameserver.network.clientpackets;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.serverpackets.RecipeItemMakeInfo;
 
-public final class RequestRecipeItemMakeInfo extends L2GameClientPacket
-{
+public final class RequestRecipeItemMakeInfo extends L2GameClientPacket {
 	private static final String _C__B7_REQUESTRECIPEITEMMAKEINFO = "[C] B7 RequestRecipeItemMakeInfo";
 	
 	private int _id;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_id = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
@@ -47,8 +43,7 @@ public final class RequestRecipeItemMakeInfo extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__B7_REQUESTRECIPEITEMMAKEINFO;
 	}
 }

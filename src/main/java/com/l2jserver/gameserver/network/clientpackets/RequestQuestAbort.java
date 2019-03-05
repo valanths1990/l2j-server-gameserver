@@ -29,56 +29,43 @@ import com.l2jserver.gameserver.network.serverpackets.QuestList;
  * This class ...
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestQuestAbort extends L2GameClientPacket
-{
+public final class RequestQuestAbort extends L2GameClientPacket {
 	private static final String _C__63_REQUESTQUESTABORT = "[C] 63 RequestQuestAbort";
 	
 	private int _questId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_questId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		Quest qe = QuestManager.getInstance().getQuest(_questId);
-		if (qe != null)
-		{
+		if (qe != null) {
 			QuestState qs = activeChar.getQuestState(qe.getName());
-			if (qs != null)
-			{
+			if (qs != null) {
 				qs.exitQuest(true);
 				activeChar.sendPacket(new QuestList());
-			}
-			else
-			{
-				if (Config.DEBUG)
-				{
+			} else {
+				if (Config.DEBUG) {
 					_log.info("Player '" + activeChar.getName() + "' try to abort quest " + qe.getName() + " but he didn't have it started.");
 				}
 			}
-		}
-		else
-		{
-			if (Config.DEBUG)
-			{
+		} else {
+			if (Config.DEBUG) {
 				_log.warning("Quest (id='" + _questId + "') not found.");
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__63_REQUESTQUESTABORT;
 	}
 }

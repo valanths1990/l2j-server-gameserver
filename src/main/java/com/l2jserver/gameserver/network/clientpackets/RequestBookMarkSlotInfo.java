@@ -24,26 +24,22 @@ import com.l2jserver.gameserver.network.serverpackets.ExGetBookMarkInfoPacket;
 /**
  * @author ShanSoft Packets Structure: chddd
  */
-public final class RequestBookMarkSlotInfo extends L2GameClientPacket
-{
+public final class RequestBookMarkSlotInfo extends L2GameClientPacket {
 	private static final String _C__D0_51_00_REQUESTBOOKMARKSLOTINFO = "[C] D0:51:00 RequestBookMarkSlotInfo";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// There is nothing to read.
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
 		player.sendPacket(new ExGetBookMarkInfoPacket(player));
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_51_00_REQUESTBOOKMARKSLOTINFO;
 	}
 }

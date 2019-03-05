@@ -26,16 +26,13 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
 /**
  * @author Layane
  */
-public abstract class Task
-{
+public abstract class Task {
 	protected final Logger _log = Logger.getLogger(getClass().getName());
 	
-	public void initializate()
-	{
+	public void initializate() {
 	}
 	
-	public ScheduledFuture<?> launchSpecial(ExecutedTask instance)
-	{
+	public ScheduledFuture<?> launchSpecial(ExecutedTask instance) {
 		return null;
 	}
 	
@@ -43,8 +40,7 @@ public abstract class Task
 	
 	public abstract void onTimeElapsed(ExecutedTask task);
 	
-	public void onDestroy()
-	{
+	public void onDestroy() {
 		
 	}
 }

@@ -27,14 +27,12 @@ import com.l2jserver.gameserver.model.stats.Stats;
 /**
  * @author UnAfraid
  */
-public final class TransformLevelData
-{
+public final class TransformLevelData {
 	private final int _level;
 	private final double _levelMod;
 	private Map<Integer, Double> _stats;
 	
-	public TransformLevelData(StatsSet set)
-	{
+	public TransformLevelData(StatsSet set) {
 		_level = set.getInt("val");
 		_levelMod = set.getDouble("levelMod");
 		addStats(Stats.MAX_HP, set.getDouble("hp"));
@@ -45,31 +43,25 @@ public final class TransformLevelData
 		addStats(Stats.REGENERATE_CP_RATE, set.getDouble("cpRegen"));
 	}
 	
-	private void addStats(Stats stat, double val)
-	{
-		if (_stats == null)
-		{
+	private void addStats(Stats stat, double val) {
+		if (_stats == null) {
 			_stats = new HashMap<>();
 		}
 		_stats.put(stat.ordinal(), val);
 	}
 	
-	public double getStats(Stats stats)
-	{
-		if ((_stats == null) || !_stats.containsKey(stats.ordinal()))
-		{
+	public double getStats(Stats stats) {
+		if ((_stats == null) || !_stats.containsKey(stats.ordinal())) {
 			return 0;
 		}
 		return _stats.get(stats.ordinal());
 	}
 	
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _level;
 	}
 	
-	public double getLevelMod()
-	{
+	public double getLevelMod() {
 		return _levelMod;
 	}
 }

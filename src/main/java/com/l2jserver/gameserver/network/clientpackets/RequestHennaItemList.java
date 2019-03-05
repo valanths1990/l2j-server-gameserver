@@ -24,32 +24,27 @@ import com.l2jserver.gameserver.network.serverpackets.HennaEquipList;
 /**
  * @author Tempy, Zoey76
  */
-public final class RequestHennaItemList extends L2GameClientPacket
-{
+public final class RequestHennaItemList extends L2GameClientPacket {
 	private static final String _C__C3_REQUESTHENNAITEMLIST = "[C] C3 RequestHennaItemList";
 	
 	@SuppressWarnings("unused")
 	private int _unknown;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_unknown = readD(); // TODO: Identify.
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar != null)
-		{
+		if (activeChar != null) {
 			activeChar.sendPacket(new HennaEquipList(activeChar));
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__C3_REQUESTHENNAITEMLIST;
 	}
 }

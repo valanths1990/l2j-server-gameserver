@@ -25,44 +25,37 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerDlgAnswer implements IBaseEvent
-{
+public class OnPlayerDlgAnswer implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _messageId;
 	private final int _answer;
 	private final int _requesterId;
 	
-	public OnPlayerDlgAnswer(L2PcInstance activeChar, int messageId, int answer, int requesterId)
-	{
+	public OnPlayerDlgAnswer(L2PcInstance activeChar, int messageId, int answer, int requesterId) {
 		_activeChar = activeChar;
 		_messageId = messageId;
 		_answer = answer;
 		_requesterId = requesterId;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getMessageId()
-	{
+	public int getMessageId() {
 		return _messageId;
 	}
 	
-	public int getAnswer()
-	{
+	public int getAnswer() {
 		return _answer;
 	}
 	
-	public int getRequesterId()
-	{
+	public int getRequesterId() {
 		return _requesterId;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_DLG_ANSWER;
 	}
 	

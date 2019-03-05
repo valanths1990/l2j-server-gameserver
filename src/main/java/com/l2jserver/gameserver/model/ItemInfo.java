@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * Get all information from L2ItemInstance to generate ItemInfo.
  */
-public class ItemInfo
-{
+public class ItemInfo {
 	/** Identifier of the L2ItemInstance */
 	private int _objectId;
 	
@@ -62,8 +61,7 @@ public class ItemInfo
 	
 	private int _elemAtkType = -2;
 	private int _elemAtkPower = 0;
-	private final int[] _elemDefAttr =
-	{
+	private final int[] _elemDefAttr = {
 		0,
 		0,
 		0,
@@ -78,10 +76,8 @@ public class ItemInfo
 	 * Get all information from L2ItemInstance to generate ItemInfo.
 	 * @param item
 	 */
-	public ItemInfo(L2ItemInstance item)
-	{
-		if (item == null)
-		{
+	public ItemInfo(L2ItemInstance item) {
+		if (item == null) {
 			return;
 		}
 		
@@ -95,12 +91,9 @@ public class ItemInfo
 		_enchant = item.getEnchantLevel();
 		
 		// Get the augmentation boni
-		if (item.isAugmented())
-		{
+		if (item.isAugmented()) {
 			_augmentation = item.getAugmentation().getAugmentationId();
-		}
-		else
-		{
+		} else {
 			_augmentation = 0;
 		}
 		
@@ -115,20 +108,16 @@ public class ItemInfo
 		_equipped = item.isEquipped() ? 1 : 0;
 		
 		// Get the action to do clientside
-		switch (item.getLastChange())
-		{
-			case (L2ItemInstance.ADDED):
-			{
+		switch (item.getLastChange()) {
+			case (L2ItemInstance.ADDED): {
 				_change = 1;
 				break;
 			}
-			case (L2ItemInstance.MODIFIED):
-			{
+			case (L2ItemInstance.MODIFIED): {
 				_change = 2;
 				break;
 			}
-			case (L2ItemInstance.REMOVED):
-			{
+			case (L2ItemInstance.REMOVED): {
 				_change = 3;
 				break;
 			}
@@ -141,23 +130,19 @@ public class ItemInfo
 		
 		_elemAtkType = item.getAttackElementType();
 		_elemAtkPower = item.getAttackElementPower();
-		for (byte i = 0; i < 6; i++)
-		{
+		for (byte i = 0; i < 6; i++) {
 			_elemDefAttr[i] = item.getElementDefAttr(i);
 		}
 		_option = item.getEnchantOptions();
 	}
 	
-	public ItemInfo(L2ItemInstance item, int change)
-	{
+	public ItemInfo(L2ItemInstance item, int change) {
 		this(item);
 		_change = change;
 	}
 	
-	public ItemInfo(TradeItem item)
-	{
-		if (item == null)
-		{
+	public ItemInfo(TradeItem item) {
+		if (item == null) {
 			return;
 		}
 		
@@ -194,96 +179,78 @@ public class ItemInfo
 		
 		_elemAtkType = item.getAttackElementType();
 		_elemAtkPower = item.getAttackElementPower();
-		for (byte i = 0; i < 6; i++)
-		{
+		for (byte i = 0; i < 6; i++) {
 			_elemDefAttr[i] = item.getElementDefAttr(i);
 		}
 		
 		_option = item.getEnchantOptions();
 	}
 	
-	public int getObjectId()
-	{
+	public int getObjectId() {
 		return _objectId;
 	}
 	
-	public L2Item getItem()
-	{
+	public L2Item getItem() {
 		return _item;
 	}
 	
-	public int getEnchant()
-	{
+	public int getEnchant() {
 		return _enchant;
 	}
 	
-	public int getAugmentationBonus()
-	{
+	public int getAugmentationBonus() {
 		return _augmentation;
 	}
 	
-	public long getCount()
-	{
+	public long getCount() {
 		return _count;
 	}
 	
-	public int getPrice()
-	{
+	public int getPrice() {
 		return _price;
 	}
 	
-	public int getCustomType1()
-	{
+	public int getCustomType1() {
 		return _type1;
 	}
 	
-	public int getCustomType2()
-	{
+	public int getCustomType2() {
 		return _type2;
 	}
 	
-	public int getEquipped()
-	{
+	public int getEquipped() {
 		return _equipped;
 	}
 	
-	public int getChange()
-	{
+	public int getChange() {
 		return _change;
 	}
 	
-	public int getMana()
-	{
+	public int getMana() {
 		return _mana;
 	}
 	
-	public int getTime()
-	{
+	public int getTime() {
 		return _time;
 	}
 	
-	public int getLocation()
-	{
+	public int getLocation() {
 		return _location;
 	}
 	
-	public int getAttackElementType()
-	{
+	public int getAttackElementType() {
 		return _elemAtkType;
 	}
 	
-	public int getAttackElementPower()
-	{
+	public int getAttackElementPower() {
 		return _elemAtkPower;
 	}
 	
-	public int getElementDefAttr(byte i)
-	{
+	public int getElementDefAttr(byte i) {
 		return _elemDefAttr[i];
 	}
 	
-	public int[] getEnchantOptions()
-	{
+	public int[] getEnchantOptions() {
 		return _option;
 	}
 }

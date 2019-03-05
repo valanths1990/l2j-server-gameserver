@@ -24,35 +24,29 @@ import com.l2jserver.gameserver.network.serverpackets.ItemList;
  * This class ...
  * @version $Revision: 1.3.4.3 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestItemList extends L2GameClientPacket
-{
+public final class RequestItemList extends L2GameClientPacket {
 	private static final String _C__14_REQUESTITEMLIST = "[C] 14 RequestItemList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if ((getClient() != null) && (getClient().getActiveChar() != null) && !getClient().getActiveChar().isInventoryDisabled())
-		{
+	protected void runImpl() {
+		if ((getClient() != null) && (getClient().getActiveChar() != null) && !getClient().getActiveChar().isInventoryDisabled()) {
 			ItemList il = new ItemList(getClient().getActiveChar(), true);
 			sendPacket(il);
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__14_REQUESTITEMLIST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

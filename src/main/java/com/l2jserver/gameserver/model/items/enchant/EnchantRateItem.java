@@ -23,23 +23,20 @@ import com.l2jserver.gameserver.model.items.L2Item;
 /**
  * @author UnAfraid
  */
-public final class EnchantRateItem
-{
+public final class EnchantRateItem {
 	private final String _name;
 	private int _itemId;
 	private int _slot;
 	private Boolean _isMagicWeapon = null;
 	
-	public EnchantRateItem(String name)
-	{
+	public EnchantRateItem(String name) {
 		_name = name;
 	}
 	
 	/**
 	 * @return name of enchant group.
 	 */
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
@@ -47,8 +44,7 @@ public final class EnchantRateItem
 	 * Adds item id verification.
 	 * @param id
 	 */
-	public void setItemId(int id)
-	{
+	public void setItemId(int id) {
 		_itemId = id;
 	}
 	
@@ -56,8 +52,7 @@ public final class EnchantRateItem
 	 * Adds body slot verification.
 	 * @param slot
 	 */
-	public void addSlot(int slot)
-	{
+	public void addSlot(int slot) {
 		_slot |= slot;
 	}
 	
@@ -65,8 +60,7 @@ public final class EnchantRateItem
 	 * Adds magic weapon verification.
 	 * @param magicWeapon
 	 */
-	public void setMagicWeapon(boolean magicWeapon)
-	{
+	public void setMagicWeapon(boolean magicWeapon) {
 		_isMagicWeapon = magicWeapon;
 	}
 	
@@ -74,18 +68,12 @@ public final class EnchantRateItem
 	 * @param item
 	 * @return {@code true} if item can be used with this rate group, {@code false} otherwise.
 	 */
-	public boolean validate(L2Item item)
-	{
-		if ((_itemId != 0) && (_itemId != item.getId()))
-		{
+	public boolean validate(L2Item item) {
+		if ((_itemId != 0) && (_itemId != item.getId())) {
 			return false;
-		}
-		else if ((_slot != 0) && ((item.getBodyPart() & _slot) == 0))
-		{
+		} else if ((_slot != 0) && ((item.getBodyPart() & _slot) == 0)) {
 			return false;
-		}
-		else if ((_isMagicWeapon != null) && (item.isMagicWeapon() != _isMagicWeapon))
-		{
+		} else if ((_isMagicWeapon != null) && (item.isMagicWeapon() != _isMagicWeapon)) {
 			return false;
 		}
 		return true;

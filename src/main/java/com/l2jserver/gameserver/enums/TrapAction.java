@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.enums;
 
-public enum TrapAction
-{
+public enum TrapAction {
 	TRAP_TRIGGERED,
 	TRAP_DETECTED,
 	TRAP_DISARMED

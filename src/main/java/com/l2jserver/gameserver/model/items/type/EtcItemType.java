@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.items.type;
 /**
  * EtcItem Type enumerated.
  */
-public enum EtcItemType implements ItemType
-{
+public enum EtcItemType implements ItemType {
 	NONE,
 	ARROW,
 	POTION,
@@ -63,8 +62,7 @@ public enum EtcItemType implements ItemType
 	 * @return the ID of the item after applying the mask.
 	 */
 	@Override
-	public int mask()
-	{
+	public int mask() {
 		return 0;
 	}
 }

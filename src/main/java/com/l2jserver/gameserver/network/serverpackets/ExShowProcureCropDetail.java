@@ -29,36 +29,30 @@ import com.l2jserver.gameserver.model.entity.Castle;
 /**
  * @author l3x
  */
-public class ExShowProcureCropDetail extends L2GameServerPacket
-{
+public class ExShowProcureCropDetail extends L2GameServerPacket {
 	private final int _cropId;
 	private final Map<Integer, CropProcure> _castleCrops = new HashMap<>();
 	
-	public ExShowProcureCropDetail(int cropId)
-	{
+	public ExShowProcureCropDetail(int cropId) {
 		_cropId = cropId;
 		
-		for (Castle c : CastleManager.getInstance().getCastles())
-		{
+		for (Castle c : CastleManager.getInstance().getCastles()) {
 			final CropProcure cropItem = CastleManorManager.getInstance().getCropProcure(c.getResidenceId(), cropId, false);
-			if ((cropItem != null) && (cropItem.getAmount() > 0))
-			{
+			if ((cropItem != null) && (cropItem.getAmount() > 0)) {
 				_castleCrops.put(c.getResidenceId(), cropItem);
 			}
 		}
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xFE);
 		writeH(0x78);
 		
 		writeD(_cropId); // crop id
 		writeD(_castleCrops.size()); // size
 		
-		for (Map.Entry<Integer, CropProcure> entry : _castleCrops.entrySet())
-		{
+		for (Map.Entry<Integer, CropProcure> entry : _castleCrops.entrySet()) {
 			final CropProcure crop = entry.getValue();
 			writeD(entry.getKey()); // manor name
 			writeQ(crop.getAmount()); // buy residual

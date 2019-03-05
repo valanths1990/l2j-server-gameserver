@@ -39,8 +39,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * </ul>
  * @author Nik, xban1x
  */
-public final class PlayerEventHolder
-{
+public final class PlayerEventHolder {
 	private final L2PcInstance _player;
 	private final String _name;
 	private final String _title;
@@ -53,13 +52,11 @@ public final class PlayerEventHolder
 	private final List<L2PcInstance> _kills = new CopyOnWriteArrayList<>();
 	private boolean _sitForced;
 	
-	public PlayerEventHolder(L2PcInstance player)
-	{
+	public PlayerEventHolder(L2PcInstance player) {
 		this(player, false);
 	}
 	
-	public PlayerEventHolder(L2PcInstance player, boolean sitForced)
-	{
+	public PlayerEventHolder(L2PcInstance player, boolean sitForced) {
 		_player = player;
 		_name = player.getName();
 		_title = player.getTitle();
@@ -72,8 +69,7 @@ public final class PlayerEventHolder
 		_sitForced = sitForced;
 	}
 	
-	public void restorePlayerStats()
-	{
+	public void restorePlayerStats() {
 		_player.setName(_name);
 		_player.setTitle(_title);
 		_player.setClan(ClanTable.getInstance().getClan(_clanId));
@@ -84,18 +80,15 @@ public final class PlayerEventHolder
 		
 	}
 	
-	public void setSitForced(boolean sitForced)
-	{
+	public void setSitForced(boolean sitForced) {
 		_sitForced = sitForced;
 	}
 	
-	public boolean isSitForced()
-	{
+	public boolean isSitForced() {
 		return _sitForced;
 	}
 	
-	public List<L2PcInstance> getKills()
-	{
+	public List<L2PcInstance> getKills() {
 		return _kills;
 	}
 }

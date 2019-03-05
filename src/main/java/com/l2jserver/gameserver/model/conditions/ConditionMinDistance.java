@@ -26,22 +26,19 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionMinDistance.
  * @author Didldak
  */
-public class ConditionMinDistance extends Condition
-{
+public class ConditionMinDistance extends Condition {
 	private final int _sqDistance;
 	
 	/**
 	 * Instantiates a new condition min distance.
 	 * @param sqDistance the sq distance
 	 */
-	public ConditionMinDistance(int sqDistance)
-	{
+	public ConditionMinDistance(int sqDistance) {
 		_sqDistance = sqDistance;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effected != null) && (effector.calculateDistance(effected, true, true) >= _sqDistance);
 	}
 }

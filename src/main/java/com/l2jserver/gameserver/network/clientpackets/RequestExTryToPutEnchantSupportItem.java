@@ -29,37 +29,31 @@ import com.l2jserver.gameserver.network.serverpackets.ExPutEnchantSupportItemRes
 /**
  * @author KenM
  */
-public class RequestExTryToPutEnchantSupportItem extends L2GameClientPacket
-{
+public class RequestExTryToPutEnchantSupportItem extends L2GameClientPacket {
 	private static final String _C__D0_4D_REQUESTEXTRYTOPUTENCHANTSUPPORTITEM = "[C] D0:4D RequestExTryToPutEnchantSupportItem";
 	
 	private int _supportObjectId;
 	private int _enchantObjectId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_supportObjectId = readD();
 		_enchantObjectId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (activeChar.isEnchanting())
-		{
+		if (activeChar.isEnchanting()) {
 			final L2ItemInstance item = activeChar.getInventory().getItemByObjectId(_enchantObjectId);
 			final L2ItemInstance scroll = activeChar.getInventory().getItemByObjectId(activeChar.getActiveEnchantItemId());
 			final L2ItemInstance support = activeChar.getInventory().getItemByObjectId(_supportObjectId);
 			
-			if ((item == null) || (scroll == null) || (support == null))
-			{
+			if ((item == null) || (scroll == null) || (support == null)) {
 				// message may be custom
 				activeChar.sendPacket(SystemMessageId.INAPPROPRIATE_ENCHANT_CONDITION);
 				activeChar.setActiveEnchantSupportItemId(L2PcInstance.ID_NONE);
@@ -69,8 +63,7 @@ public class RequestExTryToPutEnchantSupportItem extends L2GameClientPacket
 			final EnchantScroll scrollTemplate = EnchantItemData.getInstance().getEnchantScroll(scroll);
 			final EnchantSupportItem supportTemplate = EnchantItemData.getInstance().getSupportItem(support);
 			
-			if ((scrollTemplate == null) || (supportTemplate == null) || !scrollTemplate.isValid(item, supportTemplate))
-			{
+			if ((scrollTemplate == null) || (supportTemplate == null) || !scrollTemplate.isValid(item, supportTemplate)) {
 				// message may be custom
 				activeChar.sendPacket(SystemMessageId.INAPPROPRIATE_ENCHANT_CONDITION);
 				activeChar.setActiveEnchantSupportItemId(L2PcInstance.ID_NONE);
@@ -83,8 +76,7 @@ public class RequestExTryToPutEnchantSupportItem extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_4D_REQUESTEXTRYTOPUTENCHANTSUPPORTITEM;
 	}
 }

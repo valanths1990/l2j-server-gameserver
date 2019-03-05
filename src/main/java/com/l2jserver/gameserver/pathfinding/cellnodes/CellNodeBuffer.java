@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.config.Config;
 /**
  * @author DS Credits to Diamond
  */
-public class CellNodeBuffer
-{
+public class CellNodeBuffer {
 	private static final int MAX_ITERATIONS = 3500;
 	
 	private final ReentrantLock _lock = new ReentrantLock();
@@ -47,19 +46,16 @@ public class CellNodeBuffer
 	
 	private CellNode _current = null;
 	
-	public CellNodeBuffer(int size)
-	{
+	public CellNodeBuffer(int size) {
 		_mapSize = size;
 		_buffer = new CellNode[_mapSize][_mapSize];
 	}
 	
-	public final boolean lock()
-	{
+	public final boolean lock() {
 		return _lock.tryLock();
 	}
 	
-	public final CellNode findPath(int x, int y, int z, int tx, int ty, int tz)
-	{
+	public final CellNode findPath(int x, int y, int z, int tx, int ty, int tz) {
 		_timeStamp = System.currentTimeMillis();
 		_baseX = x + ((tx - x - _mapSize) / 2); // middle of the line (x,y) - (tx,ty)
 		_baseY = y + ((ty - y - _mapSize) / 2); // will be in the center of the buffer
@@ -69,16 +65,13 @@ public class CellNodeBuffer
 		_current = getNode(x, y, z);
 		_current.setCost(getCost(x, y, z, Config.HIGH_WEIGHT));
 		
-		for (int count = 0; count < MAX_ITERATIONS; count++)
-		{
-			if ((_current.getLoc().getNodeX() == _targetX) && (_current.getLoc().getNodeY() == _targetY) && (Math.abs(_current.getLoc().getZ() - _targetZ) < 64))
-			{
+		for (int count = 0; count < MAX_ITERATIONS; count++) {
+			if ((_current.getLoc().getNodeX() == _targetX) && (_current.getLoc().getNodeY() == _targetY) && (Math.abs(_current.getLoc().getZ() - _targetZ) < 64)) {
 				return _current; // found
 			}
 			
 			getNeighbors();
-			if (_current.getNext() == null)
-			{
+			if (_current.getNext() == null) {
 				return null; // no more ways
 			}
 			
@@ -87,18 +80,14 @@ public class CellNodeBuffer
 		return null;
 	}
 	
-	public final void free()
-	{
+	public final void free() {
 		_current = null;
 		
 		CellNode node;
-		for (int i = 0; i < _mapSize; i++)
-		{
-			for (int j = 0; j < _mapSize; j++)
-			{
+		for (int i = 0; i < _mapSize; i++) {
+			for (int j = 0; j < _mapSize; j++) {
 				node = _buffer[i][j];
-				if (node != null)
-				{
+				if (node != null) {
 					node.free();
 				}
 			}
@@ -108,27 +97,21 @@ public class CellNodeBuffer
 		_lastElapsedTime = System.currentTimeMillis() - _timeStamp;
 	}
 	
-	public final long getElapsedTime()
-	{
+	public final long getElapsedTime() {
 		return _lastElapsedTime;
 	}
 	
-	public final List<CellNode> debugPath()
-	{
+	public final List<CellNode> debugPath() {
 		final List<CellNode> result = new LinkedList<>();
-		for (CellNode n = _current; n.getParent() != null; n = (CellNode) n.getParent())
-		{
+		for (CellNode n = _current; n.getParent() != null; n = (CellNode) n.getParent()) {
 			result.add(n);
 			n.setCost(-n.getCost());
 		}
 		
-		for (int i = 0; i < _mapSize; i++)
-		{
-			for (int j = 0; j < _mapSize; j++)
-			{
+		for (int i = 0; i < _mapSize; i++) {
+			for (int j = 0; j < _mapSize; j++) {
 				CellNode n = _buffer[i][j];
-				if ((n == null) || !n.isInUse() || (n.getCost() <= 0))
-				{
+				if ((n == null) || !n.isInUse() || (n.getCost() <= 0)) {
 					continue;
 				}
 				
@@ -138,10 +121,8 @@ public class CellNodeBuffer
 		return result;
 	}
 	
-	private final void getNeighbors()
-	{
-		if (_current.getLoc().canGoNone())
-		{
+	private final void getNeighbors() {
+		if (_current.getLoc().canGoNone()) {
 			return;
 		}
 		
@@ -155,99 +136,77 @@ public class CellNodeBuffer
 		CellNode nodeN = null;
 		
 		// East
-		if (_current.getLoc().canGoEast())
-		{
+		if (_current.getLoc().canGoEast()) {
 			nodeE = addNode(x + 1, y, z, false);
 		}
 		
 		// South
-		if (_current.getLoc().canGoSouth())
-		{
+		if (_current.getLoc().canGoSouth()) {
 			nodeS = addNode(x, y + 1, z, false);
 		}
 		
 		// West
-		if (_current.getLoc().canGoWest())
-		{
+		if (_current.getLoc().canGoWest()) {
 			nodeW = addNode(x - 1, y, z, false);
 		}
 		
 		// North
-		if (_current.getLoc().canGoNorth())
-		{
+		if (_current.getLoc().canGoNorth()) {
 			nodeN = addNode(x, y - 1, z, false);
 		}
 		
-		if (Config.ADVANCED_DIAGONAL_STRATEGY)
-		{
+		if (Config.ADVANCED_DIAGONAL_STRATEGY) {
 			// SouthEast
-			if ((nodeE != null) && (nodeS != null))
-			{
-				if (nodeE.getLoc().canGoSouth() && nodeS.getLoc().canGoEast())
-				{
+			if ((nodeE != null) && (nodeS != null)) {
+				if (nodeE.getLoc().canGoSouth() && nodeS.getLoc().canGoEast()) {
 					addNode(x + 1, y + 1, z, true);
 				}
 			}
 			
 			// SouthWest
-			if ((nodeS != null) && (nodeW != null))
-			{
-				if (nodeW.getLoc().canGoSouth() && nodeS.getLoc().canGoWest())
-				{
+			if ((nodeS != null) && (nodeW != null)) {
+				if (nodeW.getLoc().canGoSouth() && nodeS.getLoc().canGoWest()) {
 					addNode(x - 1, y + 1, z, true);
 				}
 			}
 			
 			// NorthEast
-			if ((nodeN != null) && (nodeE != null))
-			{
-				if (nodeE.getLoc().canGoNorth() && nodeN.getLoc().canGoEast())
-				{
+			if ((nodeN != null) && (nodeE != null)) {
+				if (nodeE.getLoc().canGoNorth() && nodeN.getLoc().canGoEast()) {
 					addNode(x + 1, y - 1, z, true);
 				}
 			}
 			
 			// NorthWest
-			if ((nodeN != null) && (nodeW != null))
-			{
-				if (nodeW.getLoc().canGoNorth() && nodeN.getLoc().canGoWest())
-				{
+			if ((nodeN != null) && (nodeW != null)) {
+				if (nodeW.getLoc().canGoNorth() && nodeN.getLoc().canGoWest()) {
 					addNode(x - 1, y - 1, z, true);
 				}
 			}
 		}
 	}
 	
-	private final CellNode getNode(int x, int y, int z)
-	{
+	private final CellNode getNode(int x, int y, int z) {
 		final int aX = x - _baseX;
-		if ((aX < 0) || (aX >= _mapSize))
-		{
+		if ((aX < 0) || (aX >= _mapSize)) {
 			return null;
 		}
 		
 		final int aY = y - _baseY;
-		if ((aY < 0) || (aY >= _mapSize))
-		{
+		if ((aY < 0) || (aY >= _mapSize)) {
 			return null;
 		}
 		
 		CellNode result = _buffer[aX][aY];
-		if (result == null)
-		{
+		if (result == null) {
 			result = new CellNode(new NodeLoc(x, y, z));
 			_buffer[aX][aY] = result;
-		}
-		else if (!result.isInUse())
-		{
+		} else if (!result.isInUse()) {
 			result.setInUse();
 			// reinit node if needed
-			if (result.getLoc() != null)
-			{
+			if (result.getLoc() != null) {
 				result.getLoc().set(x, y, z);
-			}
-			else
-			{
+			} else {
 				result.setLoc(new NodeLoc(x, y, z));
 			}
 		}
@@ -255,15 +214,12 @@ public class CellNodeBuffer
 		return result;
 	}
 	
-	private final CellNode addNode(int x, int y, int z, boolean diagonal)
-	{
+	private final CellNode addNode(int x, int y, int z, boolean diagonal) {
 		CellNode newNode = getNode(x, y, z);
-		if (newNode == null)
-		{
+		if (newNode == null) {
 			return null;
 		}
-		if (newNode.getCost() >= 0)
-		{
+		if (newNode.getCost() >= 0) {
 			return newNode;
 		}
 		
@@ -272,26 +228,16 @@ public class CellNodeBuffer
 		final int stepZ = Math.abs(geoZ - _current.getLoc().getZ());
 		float weight = diagonal ? Config.DIAGONAL_WEIGHT : Config.LOW_WEIGHT;
 		
-		if (!newNode.getLoc().canGoAll() || (stepZ > 16))
-		{
+		if (!newNode.getLoc().canGoAll() || (stepZ > 16)) {
 			weight = Config.HIGH_WEIGHT;
-		}
-		else
-		{
-			if (isHighWeight(x + 1, y, geoZ))
-			{
+		} else {
+			if (isHighWeight(x + 1, y, geoZ)) {
 				weight = Config.MEDIUM_WEIGHT;
-			}
-			else if (isHighWeight(x - 1, y, geoZ))
-			{
+			} else if (isHighWeight(x - 1, y, geoZ)) {
 				weight = Config.MEDIUM_WEIGHT;
-			}
-			else if (isHighWeight(x, y + 1, geoZ))
-			{
+			} else if (isHighWeight(x, y + 1, geoZ)) {
 				weight = Config.MEDIUM_WEIGHT;
-			}
-			else if (isHighWeight(x, y - 1, geoZ))
-			{
+			} else if (isHighWeight(x, y - 1, geoZ)) {
 				weight = Config.MEDIUM_WEIGHT;
 			}
 		}
@@ -301,19 +247,16 @@ public class CellNodeBuffer
 		
 		CellNode node = _current;
 		int count = 0;
-		while ((node.getNext() != null) && (count < (MAX_ITERATIONS * 4)))
-		{
+		while ((node.getNext() != null) && (count < (MAX_ITERATIONS * 4))) {
 			count++;
-			if (node.getNext().getCost() > newNode.getCost())
-			{
+			if (node.getNext().getCost() > newNode.getCost()) {
 				// insert node into a chain
 				newNode.setNext(node.getNext());
 				break;
 			}
 			node = node.getNext();
 		}
-		if (count == (MAX_ITERATIONS * 4))
-		{
+		if (count == (MAX_ITERATIONS * 4)) {
 			System.err.println("Pathfinding: too long loop detected, cost:" + newNode.getCost());
 		}
 		
@@ -322,40 +265,33 @@ public class CellNodeBuffer
 		return newNode;
 	}
 	
-	private final boolean isHighWeight(int x, int y, int z)
-	{
+	private final boolean isHighWeight(int x, int y, int z) {
 		final CellNode result = getNode(x, y, z);
-		if (result == null)
-		{
+		if (result == null) {
 			return true;
 		}
 		
-		if (!result.getLoc().canGoAll())
-		{
+		if (!result.getLoc().canGoAll()) {
 			return true;
 		}
-		if (Math.abs(result.getLoc().getZ() - z) > 16)
-		{
+		if (Math.abs(result.getLoc().getZ() - z) > 16) {
 			return true;
 		}
 		
 		return false;
 	}
 	
-	private final double getCost(int x, int y, int z, float weight)
-	{
+	private final double getCost(int x, int y, int z, float weight) {
 		final int dX = x - _targetX;
 		final int dY = y - _targetY;
 		final int dZ = z - _targetZ;
 		// Math.abs(dx) + Math.abs(dy) + Math.abs(dz) / 16
 		double result = Math.sqrt((dX * dX) + (dY * dY) + ((dZ * dZ) / 256.0));
-		if (result > weight)
-		{
+		if (result > weight) {
 			result += weight;
 		}
 		
-		if (result > Float.MAX_VALUE)
-		{
+		if (result > Float.MAX_VALUE) {
 			result = Float.MAX_VALUE;
 		}
 		

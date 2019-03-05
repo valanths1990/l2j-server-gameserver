@@ -33,39 +33,30 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncArmorSet extends AbstractFunction
-{
+public class FuncArmorSet extends AbstractFunction {
 	private static final Map<Stats, FuncArmorSet> _fh_instance = new HashMap<>();
 	
-	public static AbstractFunction getInstance(Stats st)
-	{
-		if (!_fh_instance.containsKey(st))
-		{
+	public static AbstractFunction getInstance(Stats st) {
+		if (!_fh_instance.containsKey(st)) {
 			_fh_instance.put(st, new FuncArmorSet(st));
 		}
 		return _fh_instance.get(st);
 	}
 	
-	private FuncArmorSet(Stats stat)
-	{
+	private FuncArmorSet(Stats stat) {
 		super(stat, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		double value = initVal;
 		L2PcInstance player = effector.getActingPlayer();
-		if (player != null)
-		{
+		if (player != null) {
 			L2ItemInstance chest = player.getChestArmorInstance();
-			if (chest != null)
-			{
+			if (chest != null) {
 				L2ArmorSet set = ArmorSetsData.getInstance().getSet(chest.getId());
-				if ((set != null) && set.containAll(player))
-				{
-					switch (getStat())
-					{
+				if ((set != null) && set.containAll(player)) {
+					switch (getStat()) {
 						case STAT_STR:
 							value += set.getSTR();
 							break;

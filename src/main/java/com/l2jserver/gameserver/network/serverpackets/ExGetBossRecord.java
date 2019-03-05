@@ -23,38 +23,31 @@ import java.util.Map;
 /**
  * @author KenM
  */
-public class ExGetBossRecord extends L2GameServerPacket
-{
+public class ExGetBossRecord extends L2GameServerPacket {
 	private final Map<Integer, Integer> _bossRecordInfo;
 	private final int _ranking;
 	private final int _totalPoints;
 	
-	public ExGetBossRecord(int ranking, int totalScore, Map<Integer, Integer> list)
-	{
+	public ExGetBossRecord(int ranking, int totalScore, Map<Integer, Integer> list) {
 		_ranking = ranking;
 		_totalPoints = totalScore;
 		_bossRecordInfo = list;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x34);
 		writeD(_ranking);
 		writeD(_totalPoints);
-		if (_bossRecordInfo == null)
-		{
+		if (_bossRecordInfo == null) {
 			writeD(0x00);
 			writeD(0x00);
 			writeD(0x00);
 			writeD(0x00);
-		}
-		else
-		{
+		} else {
 			writeD(_bossRecordInfo.size()); // list size
-			for (int bossId : _bossRecordInfo.keySet())
-			{
+			for (int bossId : _bossRecordInfo.keySet()) {
 				writeD(bossId);
 				writeD(_bossRecordInfo.get(bossId));
 				writeD(0x00); // ??

@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * This class manages requests (transactions) between two L2PcInstance.
  * @author kriau
  */
-public class L2Request
-{
+public class L2Request {
 	private static final int REQUEST_TIMEOUT = 15; // in secs
 	
 	protected L2PcInstance _player;
@@ -38,13 +37,11 @@ public class L2Request
 	protected boolean _isAnswerer;
 	protected L2GameClientPacket _requestPacket;
 	
-	public L2Request(L2PcInstance player)
-	{
+	public L2Request(L2PcInstance player) {
 		_player = player;
 	}
 	
-	protected void clear()
-	{
+	protected void clear() {
 		_partner = null;
 		_requestPacket = null;
 		_isRequestor = false;
@@ -55,16 +52,14 @@ public class L2Request
 	 * Set the L2PcInstance member of a transaction (ex : FriendInvite, JoinAlly, JoinParty...).
 	 * @param partner
 	 */
-	private synchronized void setPartner(L2PcInstance partner)
-	{
+	private synchronized void setPartner(L2PcInstance partner) {
 		_partner = partner;
 	}
 	
 	/**
 	 * @return the L2PcInstance member of a transaction (ex : FriendInvite, JoinAlly, JoinParty...).
 	 */
-	public L2PcInstance getPartner()
-	{
+	public L2PcInstance getPartner() {
 		return _partner;
 	}
 	
@@ -72,8 +67,7 @@ public class L2Request
 	 * Set the packet incomed from requester.
 	 * @param packet
 	 */
-	private synchronized void setRequestPacket(L2GameClientPacket packet)
-	{
+	private synchronized void setRequestPacket(L2GameClientPacket packet) {
 		_requestPacket = packet;
 	}
 	
@@ -81,8 +75,7 @@ public class L2Request
 	 * Return the packet originally incomed from requester.
 	 * @return
 	 */
-	public L2GameClientPacket getRequestPacket()
-	{
+	public L2GameClientPacket getRequestPacket() {
 		return _requestPacket;
 	}
 	
@@ -92,22 +85,18 @@ public class L2Request
 	 * @param packet
 	 * @return
 	 */
-	public synchronized boolean setRequest(L2PcInstance partner, L2GameClientPacket packet)
-	{
-		if (partner == null)
-		{
+	public synchronized boolean setRequest(L2PcInstance partner, L2GameClientPacket packet) {
+		if (partner == null) {
 			_player.sendPacket(SystemMessageId.YOU_HAVE_INVITED_THE_WRONG_TARGET);
 			return false;
 		}
-		if (partner.getRequest().isProcessingRequest())
-		{
+		if (partner.getRequest().isProcessingRequest()) {
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_IS_BUSY_TRY_LATER);
 			sm.addString(partner.getName());
 			_player.sendPacket(sm);
 			return false;
 		}
-		if (isProcessingRequest())
-		{
+		if (isProcessingRequest()) {
 			_player.sendPacket(SystemMessageId.WAITING_FOR_ANOTHER_REPLY);
 			return false;
 		}
@@ -121,8 +110,7 @@ public class L2Request
 		return true;
 	}
 	
-	private void setOnRequestTimer(boolean isRequestor)
-	{
+	private void setOnRequestTimer(boolean isRequestor) {
 		_isRequestor = isRequestor ? true : false;
 		_isAnswerer = isRequestor ? false : true;
 		ThreadPoolManager.getInstance().scheduleGeneral(() -> clear(), REQUEST_TIMEOUT * 1000);
@@ -131,10 +119,8 @@ public class L2Request
 	/**
 	 * Clears PC request state. Should be called after answer packet receive.
 	 */
-	public void onRequestResponse()
-	{
-		if (_partner != null)
-		{
+	public void onRequestResponse() {
+		if (_partner != null) {
 			_partner.getRequest().clear();
 		}
 		clear();
@@ -143,8 +129,7 @@ public class L2Request
 	/**
 	 * @return {@code true} if a transaction is in progress.
 	 */
-	public boolean isProcessingRequest()
-	{
+	public boolean isProcessingRequest() {
 		return _partner != null;
 	}
 }

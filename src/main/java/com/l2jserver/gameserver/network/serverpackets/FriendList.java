@@ -31,35 +31,29 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * This packet is sent only at login.
  * @author Tempy
  */
-public class FriendList extends L2GameServerPacket
-{
+public class FriendList extends L2GameServerPacket {
 	private List<FriendInfo> _info;
 	
-	private static class FriendInfo
-	{
+	private static class FriendInfo {
 		int _objId;
 		String _name;
 		boolean _online;
 		
-		public FriendInfo(int objId, String name, boolean online)
-		{
+		public FriendInfo(int objId, String name, boolean online) {
 			_objId = objId;
 			_name = name;
 			_online = online;
 		}
 	}
 	
-	public FriendList(L2PcInstance player)
-	{
-		if (!player.hasFriends())
-		{
+	public FriendList(L2PcInstance player) {
+		if (!player.hasFriends()) {
 			_info = Collections.emptyList();
 			return;
 		}
 		
 		_info = new ArrayList<>(player.getFriends().size());
-		for (int objId : player.getFriends())
-		{
+		for (int objId : player.getFriends()) {
 			final String name = CharNameTable.getInstance().getNameById(objId);
 			final L2PcInstance friend = L2World.getInstance().getPlayer(objId);
 			final boolean online = (friend != null) && friend.isOnline();
@@ -68,12 +62,10 @@ public class FriendList extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x75);
 		writeD(_info.size());
-		for (FriendInfo info : _info)
-		{
+		for (FriendInfo info : _info) {
 			writeD(info._objId); // character id
 			writeS(info._name);
 			writeD(info._online ? 0x01 : 0x00); // online

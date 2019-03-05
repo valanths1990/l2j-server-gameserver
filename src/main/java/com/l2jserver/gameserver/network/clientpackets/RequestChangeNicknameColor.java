@@ -24,12 +24,10 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author KenM, Gnacik
  */
-public class RequestChangeNicknameColor extends L2GameClientPacket
-{
+public class RequestChangeNicknameColor extends L2GameClientPacket {
 	private static final String _C__D0_4F_REQUESTCHANGENICKNAMECOLOR = "[C] D0:4F RequestChangeNicknameColor";
 	
-	private static final int COLORS[] =
-	{
+	private static final int COLORS[] = {
 		0x9393FF, // Pink
 		0x7C49FC, // Rose Pink
 		0x97F8FC, // Lemon Yellow
@@ -46,35 +44,29 @@ public class RequestChangeNicknameColor extends L2GameClientPacket
 	private String _title;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_colorNum = readD();
 		_title = readS();
 		_itemObjectId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if ((_colorNum < 0) || (_colorNum >= COLORS.length))
-		{
+		if ((_colorNum < 0) || (_colorNum >= COLORS.length)) {
 			return;
 		}
 		
 		final L2ItemInstance item = activeChar.getInventory().getItemByObjectId(_itemObjectId);
-		if ((item == null) || (item.getEtcItem() == null) || (item.getEtcItem().getHandlerName() == null) || !item.getEtcItem().getHandlerName().equalsIgnoreCase("NicknameColor"))
-		{
+		if ((item == null) || (item.getEtcItem() == null) || (item.getEtcItem().getHandlerName() == null) || !item.getEtcItem().getHandlerName().equalsIgnoreCase("NicknameColor")) {
 			return;
 		}
 		
-		if (activeChar.destroyItem("Consume", item, 1, null, true))
-		{
+		if (activeChar.destroyItem("Consume", item, 1, null, true)) {
 			activeChar.setTitle(_title);
 			activeChar.getAppearance().setTitleColor(COLORS[_colorNum]);
 			activeChar.broadcastUserInfo();
@@ -82,8 +74,7 @@ public class RequestChangeNicknameColor extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_4F_REQUESTCHANGENICKNAMECOLOR;
 	}
 }

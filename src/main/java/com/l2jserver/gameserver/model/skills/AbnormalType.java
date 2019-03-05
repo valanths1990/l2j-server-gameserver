@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.skills;
  * Abnormal type enumerate.
  * @author Zoey76
  */
-public enum AbnormalType
-{
+public enum AbnormalType {
 	ABILITY_CHANGE,
 	ABNORMAL_INVINCIBILITY,
 	ABNORMAL_ITEM,
@@ -412,8 +411,7 @@ public enum AbnormalType
 	 * Verify if this enumerate is default.
 	 * @return {@code true} if this enumerate is none, {@code false} otherwise
 	 */
-	public boolean isNone()
-	{
+	public boolean isNone() {
 		return this == NONE;
 	}
 }

@@ -30,8 +30,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2CharTemplate;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 
-public class BoatManager
-{
+public class BoatManager {
 	private final Map<Integer, L2BoatInstance> _boats = new ConcurrentHashMap<>();
 	private final boolean[] _docksBusy = new boolean[3];
 	
@@ -39,23 +38,18 @@ public class BoatManager
 	public static final int GLUDIN_HARBOR = 2;
 	public static final int RUNE_HARBOR = 3;
 	
-	public static final BoatManager getInstance()
-	{
+	public static final BoatManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	protected BoatManager()
-	{
-		for (int i = 0; i < _docksBusy.length; i++)
-		{
+	protected BoatManager() {
+		for (int i = 0; i < _docksBusy.length; i++) {
 			_docksBusy[i] = false;
 		}
 	}
 	
-	public L2BoatInstance getNewBoat(int boatId, int x, int y, int z, int heading)
-	{
-		if (!Config.ALLOW_BOAT)
-		{
+	public L2BoatInstance getNewBoat(int boatId, int x, int y, int z, int heading) {
+		if (!Config.ALLOW_BOAT) {
 			return null;
 		}
 		
@@ -116,8 +110,7 @@ public class BoatManager
 	 * @param boatId
 	 * @return
 	 */
-	public L2BoatInstance getBoat(int boatId)
-	{
+	public L2BoatInstance getBoat(int boatId) {
 		return _boats.get(boatId);
 	}
 	
@@ -126,14 +119,10 @@ public class BoatManager
 	 * @param h Dock Id
 	 * @param value True if dock is locked
 	 */
-	public void dockShip(int h, boolean value)
-	{
-		try
-		{
+	public void dockShip(int h, boolean value) {
+		try {
 			_docksBusy[h] = value;
-		}
-		catch (ArrayIndexOutOfBoundsException e)
-		{
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
 	}
 	
@@ -142,14 +131,10 @@ public class BoatManager
 	 * @param h Dock Id
 	 * @return Trye if dock is locked
 	 */
-	public boolean dockBusy(int h)
-	{
-		try
-		{
+	public boolean dockBusy(int h) {
+		try {
 			return _docksBusy[h];
-		}
-		catch (ArrayIndexOutOfBoundsException e)
-		{
+		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		}
 	}
@@ -160,8 +145,7 @@ public class BoatManager
 	 * @param point2
 	 * @param packet
 	 */
-	public void broadcastPacket(VehiclePathPoint point1, VehiclePathPoint point2, L2GameServerPacket packet)
-	{
+	public void broadcastPacket(VehiclePathPoint point1, VehiclePathPoint point2, L2GameServerPacket packet) {
 		broadcastPacketsToPlayers(point1, point2, packet);
 	}
 	
@@ -171,28 +155,19 @@ public class BoatManager
 	 * @param point2
 	 * @param packets
 	 */
-	public void broadcastPackets(VehiclePathPoint point1, VehiclePathPoint point2, L2GameServerPacket... packets)
-	{
+	public void broadcastPackets(VehiclePathPoint point1, VehiclePathPoint point2, L2GameServerPacket... packets) {
 		broadcastPacketsToPlayers(point1, point2, packets);
 	}
 	
-	private void broadcastPacketsToPlayers(VehiclePathPoint point1, VehiclePathPoint point2, L2GameServerPacket... packets)
-	{
-		for (L2PcInstance player : L2World.getInstance().getPlayers())
-		{
-			if (Math.hypot(player.getX() - point1.getX(), player.getY() - point1.getY()) < Config.BOAT_BROADCAST_RADIUS)
-			{
-				for (L2GameServerPacket p : packets)
-				{
+	private void broadcastPacketsToPlayers(VehiclePathPoint point1, VehiclePathPoint point2, L2GameServerPacket... packets) {
+		for (L2PcInstance player : L2World.getInstance().getPlayers()) {
+			if (Math.hypot(player.getX() - point1.getX(), player.getY() - point1.getY()) < Config.BOAT_BROADCAST_RADIUS) {
+				for (L2GameServerPacket p : packets) {
 					player.sendPacket(p);
 				}
-			}
-			else
-			{
-				if (Math.hypot(player.getX() - point2.getX(), player.getY() - point2.getY()) < Config.BOAT_BROADCAST_RADIUS)
-				{
-					for (L2GameServerPacket p : packets)
-					{
+			} else {
+				if (Math.hypot(player.getX() - point2.getX(), player.getY() - point2.getY()) < Config.BOAT_BROADCAST_RADIUS) {
+					for (L2GameServerPacket p : packets) {
 						player.sendPacket(p);
 					}
 				}
@@ -200,8 +175,7 @@ public class BoatManager
 		}
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final BoatManager _instance = new BoatManager();
 	}
 }

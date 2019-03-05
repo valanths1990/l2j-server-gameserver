@@ -28,24 +28,20 @@ import com.l2jserver.gameserver.util.Util;
  * The Class ConditionPlayerRace.
  * @author mkizub, Zoey76
  */
-public class ConditionPlayerRace extends Condition
-{
+public class ConditionPlayerRace extends Condition {
 	private final Race[] _races;
 	
 	/**
 	 * Instantiates a new condition player race.
 	 * @param races the list containing the allowed races.
 	 */
-	public ConditionPlayerRace(Race[] races)
-	{
+	public ConditionPlayerRace(Race[] races) {
 		_races = races;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return false;
 		}
 		return Util.contains(_races, effector.getActingPlayer().getRace());

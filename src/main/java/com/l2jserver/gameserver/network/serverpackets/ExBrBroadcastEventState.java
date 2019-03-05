@@ -23,8 +23,7 @@ package com.l2jserver.gameserver.network.serverpackets;
  * @author Kerberos
  * @author mrTJO
  */
-public class ExBrBroadcastEventState extends L2GameServerPacket
-{
+public class ExBrBroadcastEventState extends L2GameServerPacket {
 	private final int _eventId;
 	private final int _eventState;
 	private int _param0;
@@ -41,14 +40,12 @@ public class ExBrBroadcastEventState extends L2GameServerPacket
 	public static final int RAISING_RUDOLPH = 20091225; // event state (0 - hide, 1 - show)
 	public static final int LOVERS_JUBILEE = 20100214; // event state (0 - hide, 1 - show)
 	
-	public ExBrBroadcastEventState(int eventId, int eventState)
-	{
+	public ExBrBroadcastEventState(int eventId, int eventState) {
 		_eventId = eventId;
 		_eventState = eventState;
 	}
 	
-	public ExBrBroadcastEventState(int eventId, int eventState, int param0, int param1, int param2, int param3, int param4, String param5, String param6)
-	{
+	public ExBrBroadcastEventState(int eventId, int eventState, int param0, int param1, int param2, int param3, int param4, String param5, String param6) {
 		_eventId = eventId;
 		_eventState = eventState;
 		_param0 = param0;
@@ -61,8 +58,7 @@ public class ExBrBroadcastEventState extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0xBC);
 		writeD(_eventId);

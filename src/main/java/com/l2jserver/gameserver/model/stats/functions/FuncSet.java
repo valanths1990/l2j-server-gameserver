@@ -27,18 +27,14 @@ import com.l2jserver.gameserver.model.stats.Stats;
  * Returns the function value, if the condition are met.
  * @author Zoey76
  */
-public class FuncSet extends AbstractFunction
-{
-	public FuncSet(Stats stat, int order, Object owner, double value, Condition applayCond)
-	{
+public class FuncSet extends AbstractFunction {
+	public FuncSet(Stats stat, int order, Object owner, double value, Condition applayCond) {
 		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
-		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill))
-		{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
+		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill)) {
 			return getValue();
 		}
 		return initVal;

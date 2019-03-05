@@ -24,29 +24,24 @@ import com.l2jserver.gameserver.data.xml.impl.AdminData;
  * This class handles RequestGmLista packet triggered by /gmlist command
  * @version $Revision: 1.1.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestGmList extends L2GameClientPacket
-{
+public final class RequestGmList extends L2GameClientPacket {
 	private static final String _C__8B_REQUESTGMLIST = "[C] 8B RequestGmList";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (getClient().getActiveChar() == null)
-		{
+	protected void runImpl() {
+		if (getClient().getActiveChar() == null) {
 			return;
 		}
 		AdminData.getInstance().sendListToPlayer(getClient().getActiveChar());
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8B_REQUESTGMLIST;
 	}
 }

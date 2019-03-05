@@ -26,22 +26,18 @@ import com.l2jserver.gameserver.model.events.AbstractScript;
  * @author KenM
  * @param <S>
  */
-public abstract class ScriptManager<S extends AbstractScript>
-{
+public abstract class ScriptManager<S extends AbstractScript> {
 	public abstract Map<String, S> getScripts();
 	
-	public boolean reload(S ms)
-	{
+	public boolean reload(S ms) {
 		return ms.reload();
 	}
 	
-	public boolean unload(S ms)
-	{
+	public boolean unload(S ms) {
 		return ms.unload();
 	}
 	
-	public void setActive(S ms, boolean status)
-	{
+	public void setActive(S ms, boolean status) {
 		ms.setActive(status);
 	}
 	

@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerActiveEffectId.
  */
-public class ConditionPlayerActiveEffectId extends Condition
-{
+public class ConditionPlayerActiveEffectId extends Condition {
 	
 	private final int _effectId;
 	private final int _effectLvl;
@@ -36,8 +35,7 @@ public class ConditionPlayerActiveEffectId extends Condition
 	 * Instantiates a new condition player active effect id.
 	 * @param effectId the effect id
 	 */
-	public ConditionPlayerActiveEffectId(int effectId)
-	{
+	public ConditionPlayerActiveEffectId(int effectId) {
 		_effectId = effectId;
 		_effectLvl = -1;
 	}
@@ -47,15 +45,13 @@ public class ConditionPlayerActiveEffectId extends Condition
 	 * @param effectId the effect id
 	 * @param effectLevel the effect level
 	 */
-	public ConditionPlayerActiveEffectId(int effectId, int effectLevel)
-	{
+	public ConditionPlayerActiveEffectId(int effectId, int effectLevel) {
 		_effectId = effectId;
 		_effectLvl = effectLevel;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final BuffInfo info = effector.getEffectList().getBuffInfoBySkillId(_effectId);
 		return ((info != null) && ((_effectLvl == -1) || (_effectLvl <= info.getSkill().getLevel())));
 	}

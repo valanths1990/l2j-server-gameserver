@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author KenM
  */
-public class ExShowVariationCancelWindow extends L2GameServerPacket
-{
+public class ExShowVariationCancelWindow extends L2GameServerPacket {
 	public static final ExShowVariationCancelWindow STATIC_PACKET = new ExShowVariationCancelWindow();
 	
-	private ExShowVariationCancelWindow()
-	{
+	private ExShowVariationCancelWindow() {
 		
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x52);
 	}

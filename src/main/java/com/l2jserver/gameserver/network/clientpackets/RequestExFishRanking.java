@@ -22,25 +22,21 @@ package com.l2jserver.gameserver.network.clientpackets;
  * Format: (ch) just a trigger
  * @author -Wooden-
  */
-public final class RequestExFishRanking extends L2GameClientPacket
-{
+public final class RequestExFishRanking extends L2GameClientPacket {
 	private static final String _C__D0_18_REQUESTEXFISHRANKING = "[C] D0:18 RequestExFishRanking";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		_log.info("C5: RequestExFishRanking");
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_18_REQUESTEXFISHRANKING;
 	}
 }

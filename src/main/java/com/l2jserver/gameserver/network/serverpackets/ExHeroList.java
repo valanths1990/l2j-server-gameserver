@@ -27,24 +27,20 @@ import com.l2jserver.gameserver.model.olympiad.Olympiad;
 /**
  * @author -Wooden-, KenM, godson
  */
-public class ExHeroList extends L2GameServerPacket
-{
+public class ExHeroList extends L2GameServerPacket {
 	private final Map<Integer, StatsSet> _heroList;
 	
-	public ExHeroList()
-	{
+	public ExHeroList() {
 		_heroList = Hero.getInstance().getHeroes();
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x79);
 		writeD(_heroList.size());
 		
-		for (Integer heroId : _heroList.keySet())
-		{
+		for (Integer heroId : _heroList.keySet()) {
 			StatsSet hero = _heroList.get(heroId);
 			writeS(hero.getString(Olympiad.CHAR_NAME));
 			writeD(hero.getInt(Olympiad.CLASS_ID));

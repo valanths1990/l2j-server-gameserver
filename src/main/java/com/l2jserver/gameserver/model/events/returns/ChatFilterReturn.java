@@ -21,18 +21,15 @@ package com.l2jserver.gameserver.model.events.returns;
 /**
  * @author UnAfraid
  */
-public class ChatFilterReturn extends AbstractEventReturn
-{
+public class ChatFilterReturn extends AbstractEventReturn {
 	private final String _filteredText;
 	
-	public ChatFilterReturn(String filteredText, boolean override, boolean abort)
-	{
+	public ChatFilterReturn(String filteredText, boolean override, boolean abort) {
 		super(override, abort);
 		_filteredText = filteredText;
 	}
 	
-	public String getFilteredText()
-	{
+	public String getFilteredText() {
 		return _filteredText;
 	}
 }

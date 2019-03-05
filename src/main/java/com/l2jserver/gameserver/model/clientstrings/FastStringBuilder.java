@@ -21,25 +21,21 @@ package com.l2jserver.gameserver.model.clientstrings;
 /**
  * @author Forsaiken
  */
-final class FastStringBuilder
-{
+final class FastStringBuilder {
 	private final char[] _array;
 	private int _len;
 	
-	public FastStringBuilder(final int capacity)
-	{
+	public FastStringBuilder(final int capacity) {
 		_array = new char[capacity];
 	}
 	
-	public final void append(final String text)
-	{
+	public final void append(final String text) {
 		text.getChars(0, text.length(), _array, _len);
 		_len += text.length();
 	}
 	
 	@Override
-	public final String toString()
-	{
+	public final String toString() {
 		return new String(_array);
 	}
 }

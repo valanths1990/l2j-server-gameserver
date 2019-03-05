@@ -29,32 +29,25 @@ import com.l2jserver.gameserver.network.serverpackets.SiegeAttackerList;
  * This class ...
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestSiegeAttackerList extends L2GameClientPacket
-{
+public final class RequestSiegeAttackerList extends L2GameClientPacket {
 	private static final String _C__AB_RequestSiegeAttackerList = "[C] AB RequestSiegeAttackerList";
 	
 	private int _castleId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_castleId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		Castle castle = CastleManager.getInstance().getCastleById(_castleId);
-		if (castle != null)
-		{
+		if (castle != null) {
 			SiegeAttackerList sal = new SiegeAttackerList(castle);
 			sendPacket(sal);
-		}
-		else
-		{
+		} else {
 			SiegableHall hall = CHSiegeManager.getInstance().getSiegableHall(_castleId);
-			if (hall != null)
-			{
+			if (hall != null) {
 				SiegeAttackerList sal = new SiegeAttackerList(hall);
 				sendPacket(sal);
 			}
@@ -62,8 +55,7 @@ public final class RequestSiegeAttackerList extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__AB_RequestSiegeAttackerList;
 	}
 }

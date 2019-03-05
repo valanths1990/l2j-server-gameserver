@@ -31,16 +31,14 @@ import com.l2jserver.gameserver.config.Config;
 /**
  * @author Luis Arias
  */
-public class ScriptPackage
-{
+public class ScriptPackage {
 	private static final Logger _log = Logger.getLogger(ScriptPackage.class.getName());
 	
 	private final List<ScriptDocument> _scriptFiles = new ArrayList<>();
 	private final List<String> _otherFiles = new ArrayList<>();
 	private final String _name;
 	
-	public ScriptPackage(ZipFile pack)
-	{
+	public ScriptPackage(ZipFile pack) {
 		_name = pack.getName();
 		addFiles(pack);
 	}
@@ -48,40 +46,30 @@ public class ScriptPackage
 	/**
 	 * @return Returns the otherFiles.
 	 */
-	public List<String> getOtherFiles()
-	{
+	public List<String> getOtherFiles() {
 		return _otherFiles;
 	}
 	
 	/**
 	 * @return Returns the scriptFiles.
 	 */
-	public List<ScriptDocument> getScriptFiles()
-	{
+	public List<ScriptDocument> getScriptFiles() {
 		return _scriptFiles;
 	}
 	
 	/**
 	 * @param pack
 	 */
-	private void addFiles(ZipFile pack)
-	{
-		for (Enumeration<? extends ZipEntry> e = pack.entries(); e.hasMoreElements();)
-		{
+	private void addFiles(ZipFile pack) {
+		for (Enumeration<? extends ZipEntry> e = pack.entries(); e.hasMoreElements();) {
 			ZipEntry entry = e.nextElement();
-			if (entry.getName().endsWith(".xml"))
-			{
-				try
-				{
+			if (entry.getName().endsWith(".xml")) {
+				try {
 					_scriptFiles.add(new ScriptDocument(entry.getName(), pack.getInputStream(entry)));
-				}
-				catch (IOException io)
-				{
+				} catch (IOException io) {
 					_log.warning(getClass().getSimpleName() + ": " + io.getMessage());
 				}
-			}
-			else if (!entry.isDirectory())
-			{
+			} else if (!entry.isDirectory()) {
 				_otherFiles.add(entry.getName());
 			}
 		}
@@ -90,16 +78,13 @@ public class ScriptPackage
 	/**
 	 * @return Returns the name.
 	 */
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
 	@Override
-	public String toString()
-	{
-		if (getScriptFiles().isEmpty() && getOtherFiles().isEmpty())
-		{
+	public String toString() {
+		if (getScriptFiles().isEmpty() && getOtherFiles().isEmpty()) {
 			return "Empty Package.";
 		}
 		
@@ -108,21 +93,17 @@ public class ScriptPackage
 		out.append(getName());
 		out.append(Config.EOL);
 		
-		if (!getScriptFiles().isEmpty())
-		{
+		if (!getScriptFiles().isEmpty()) {
 			out.append("Xml Script Files..." + Config.EOL);
-			for (ScriptDocument script : getScriptFiles())
-			{
+			for (ScriptDocument script : getScriptFiles()) {
 				out.append(script.getName());
 				out.append(Config.EOL);
 			}
 		}
 		
-		if (!getOtherFiles().isEmpty())
-		{
+		if (!getOtherFiles().isEmpty()) {
 			out.append("Other Files..." + Config.EOL);
-			for (String fileName : getOtherFiles())
-			{
+			for (String fileName : getOtherFiles()) {
 				out.append(fileName);
 				out.append(Config.EOL);
 			}

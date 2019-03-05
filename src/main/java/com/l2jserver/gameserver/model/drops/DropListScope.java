@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.drops.strategy.IPreciseDeterminationStrate
 /**
  * @author NosBit
  */
-public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory
-{
+public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory {
 	DEATH((itemId, min, max, chance) -> new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.DROP, IChanceMultiplierStrategy.DROP), chance -> new GroupedGeneralDropItem(chance)),
 	CORPSE((itemId, min, max, chance) -> new GeneralDropItem(itemId, min, max, chance, IAmountMultiplierStrategy.SPOIL, IChanceMultiplierStrategy.SPOIL), DEATH),
 	
@@ -43,21 +42,18 @@ public enum DropListScope implements IDropItemFactory, IGroupedDropItemFactory
 	private final IDropItemFactory _factory;
 	private final IGroupedDropItemFactory _groupFactory;
 	
-	private DropListScope(IDropItemFactory factory, IGroupedDropItemFactory groupFactory)
-	{
+	private DropListScope(IDropItemFactory factory, IGroupedDropItemFactory groupFactory) {
 		_factory = factory;
 		_groupFactory = groupFactory;
 	}
 	
 	@Override
-	public IDropItem newDropItem(int itemId, long min, long max, double chance)
-	{
+	public IDropItem newDropItem(int itemId, long min, long max, double chance) {
 		return _factory.newDropItem(itemId, min, max, chance);
 	}
 	
 	@Override
-	public GroupedGeneralDropItem newGroupedDropItem(double chance)
-	{
+	public GroupedGeneralDropItem newGroupedDropItem(double chance) {
 		return _groupFactory.newGroupedDropItem(chance);
 	}
 }

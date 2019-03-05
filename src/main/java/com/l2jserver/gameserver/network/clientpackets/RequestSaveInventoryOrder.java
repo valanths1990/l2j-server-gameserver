@@ -30,8 +30,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * Format:(ch) d[dd]
  * @author -Wooden-
  */
-public final class RequestSaveInventoryOrder extends L2GameClientPacket
-{
+public final class RequestSaveInventoryOrder extends L2GameClientPacket {
 	private static final String _C__D0_24_REQUESTSAVEINVENTORYORDER = "[C] D0:24 RequestSaveInventoryOrder";
 	
 	private List<InventoryOrder> _order;
@@ -40,13 +39,11 @@ public final class RequestSaveInventoryOrder extends L2GameClientPacket
 	private static final int LIMIT = 125;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		int sz = readD();
 		sz = Math.min(sz, LIMIT);
 		_order = new ArrayList<>(sz);
-		for (int i = 0; i < sz; i++)
-		{
+		for (int i = 0; i < sz; i++) {
 			int objectId = readD();
 			int order = readD();
 			_order.add(new InventoryOrder(objectId, order));
@@ -54,45 +51,37 @@ public final class RequestSaveInventoryOrder extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player != null)
-		{
+		if (player != null) {
 			Inventory inventory = player.getInventory();
-			for (InventoryOrder order : _order)
-			{
+			for (InventoryOrder order : _order) {
 				L2ItemInstance item = inventory.getItemByObjectId(order.objectID);
-				if ((item != null) && (item.getItemLocation() == ItemLocation.INVENTORY))
-				{
+				if ((item != null) && (item.getItemLocation() == ItemLocation.INVENTORY)) {
 					item.setItemLocation(ItemLocation.INVENTORY, order.order);
 				}
 			}
 		}
 	}
 	
-	private static class InventoryOrder
-	{
+	private static class InventoryOrder {
 		int order;
 		
 		int objectID;
 		
-		public InventoryOrder(int id, int ord)
-		{
+		public InventoryOrder(int id, int ord) {
 			objectID = id;
 			order = ord;
 		}
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_24_REQUESTSAVEINVENTORYORDER;
 	}
 }

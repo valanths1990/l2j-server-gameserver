@@ -18,18 +18,15 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class TutorialEnableClientEvent extends L2GameServerPacket
-{
+public class TutorialEnableClientEvent extends L2GameServerPacket {
 	private int _eventId = 0;
 	
-	public TutorialEnableClientEvent(int event)
-	{
+	public TutorialEnableClientEvent(int event) {
 		_eventId = event;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xA8);
 		writeD(_eventId);
 	}

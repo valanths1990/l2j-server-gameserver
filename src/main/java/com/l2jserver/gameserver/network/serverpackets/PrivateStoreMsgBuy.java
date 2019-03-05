@@ -20,23 +20,19 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class PrivateStoreMsgBuy extends L2GameServerPacket
-{
+public class PrivateStoreMsgBuy extends L2GameServerPacket {
 	private final int _objId;
 	private String _storeMsg;
 	
-	public PrivateStoreMsgBuy(L2PcInstance player)
-	{
+	public PrivateStoreMsgBuy(L2PcInstance player) {
 		_objId = player.getObjectId();
-		if (player.getBuyList() != null)
-		{
+		if (player.getBuyList() != null) {
 			_storeMsg = player.getBuyList().getTitle();
 		}
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xBF);
 		writeD(_objId);
 		writeS(_storeMsg);

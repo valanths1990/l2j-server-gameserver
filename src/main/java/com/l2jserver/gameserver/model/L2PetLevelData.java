@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.stats.MoveType;
  * Stats definition for each pet level.
  * @author JIV, Zoey76
  */
-public class L2PetLevelData
-{
+public class L2PetLevelData {
 	private final int _ownerExpTaken;
 	private final int _petFeedBattle;
 	private final int _petFeedNormal;
@@ -48,8 +47,7 @@ public class L2PetLevelData
 	private final double _slowFlySpeedOnRide;
 	private final double _fastFlySpeedOnRide;
 	
-	public L2PetLevelData(StatsSet set)
-	{
+	public L2PetLevelData(StatsSet set) {
 		_ownerExpTaken = set.getInt("get_exp_type");
 		_petMaxExp = (long) set.getDouble("exp");
 		_petMaxHP = set.getFloat("org_hp");
@@ -76,120 +74,105 @@ public class L2PetLevelData
 	/**
 	 * @return the owner's experience points consumed by the pet.
 	 */
-	public int getOwnerExpTaken()
-	{
+	public int getOwnerExpTaken() {
 		return _ownerExpTaken;
 	}
 	
 	/**
 	 * @return the pet's food consume rate at battle state.
 	 */
-	public int getPetFeedBattle()
-	{
+	public int getPetFeedBattle() {
 		return _petFeedBattle;
 	}
 	
 	/**
 	 * @return the pet's food consume rate at normal state.
 	 */
-	public int getPetFeedNormal()
-	{
+	public int getPetFeedNormal() {
 		return _petFeedNormal;
 	}
 	
 	/**
 	 * @return the pet's Magical Attack.
 	 */
-	public float getPetMAtk()
-	{
+	public float getPetMAtk() {
 		return _petMAtk;
 	}
 	
 	/**
 	 * @return the pet's maximum experience points.
 	 */
-	public long getPetMaxExp()
-	{
+	public long getPetMaxExp() {
 		return _petMaxExp;
 	}
 	
 	/**
 	 * @return the pet's maximum feed points.
 	 */
-	public int getPetMaxFeed()
-	{
+	public int getPetMaxFeed() {
 		return _petMaxFeed;
 	}
 	
 	/**
 	 * @return the pet's maximum HP.
 	 */
-	public float getPetMaxHP()
-	{
+	public float getPetMaxHP() {
 		return _petMaxHP;
 	}
 	
 	/**
 	 * @return the pet's maximum MP.
 	 */
-	public float getPetMaxMP()
-	{
+	public float getPetMaxMP() {
 		return _petMaxMP;
 	}
 	
 	/**
 	 * @return the pet's Magical Defense.
 	 */
-	public float getPetMDef()
-	{
+	public float getPetMDef() {
 		return _petMDef;
 	}
 	
 	/**
 	 * @return the pet's Physical Attack.
 	 */
-	public float getPetPAtk()
-	{
+	public float getPetPAtk() {
 		return _petPAtk;
 	}
 	
 	/**
 	 * @return the pet's Physical Defense.
 	 */
-	public float getPetPDef()
-	{
+	public float getPetPDef() {
 		return _petPDef;
 	}
 	
 	/**
 	 * @return the pet's HP regeneration rate.
 	 */
-	public float getPetRegenHP()
-	{
+	public float getPetRegenHP() {
 		return _petRegenHP;
 	}
 	
 	/**
 	 * @return the pet's MP regeneration rate.
 	 */
-	public float getPetRegenMP()
-	{
+	public float getPetRegenMP() {
 		return _petRegenMP;
 	}
 	
 	/**
 	 * @return the pet's soulshot use count.
 	 */
-	public short getPetSoulShot()
-	{
+	public short getPetSoulShot() {
 		return _petSoulShot;
 	}
 	
 	/**
 	 * @return the pet's spiritshot use count.
 	 */
-	public short getPetSpiritShot()
-	{
+	public short getPetSpiritShot() {
 		return _petSpiritShot;
 	}
 	
@@ -197,10 +180,8 @@ public class L2PetLevelData
 	 * @param mt movement type
 	 * @return the base riding speed of given movement type.
 	 */
-	public double getSpeedOnRide(MoveType mt)
-	{
-		switch (mt)
-		{
+	public double getSpeedOnRide(MoveType mt) {
+		switch (mt) {
 			case WALK:
 				return _walkSpeedOnRide;
 			case RUN:

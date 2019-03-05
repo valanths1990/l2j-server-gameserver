@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author FallenAngel
  */
-public enum InstanceReenterType
-{
+public enum InstanceReenterType {
 	NONE,
 	ON_INSTANCE_ENTER,
 	ON_INSTANCE_FINISH,

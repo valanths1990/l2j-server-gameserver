@@ -39,8 +39,7 @@ import com.l2jserver.util.file.filter.XMLFilter;
  * Interface for XML parsers.
  * @author Zoey76
  */
-public interface IXmlReader
-{
+public interface IXmlReader {
 	static final Logger LOG = LoggerFactory.getLogger(IXmlReader.class);
 	
 	static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
@@ -58,8 +57,7 @@ public interface IXmlReader
 	 * Wrapper for {@link #parseFile(File)} method.
 	 * @param path the relative path to the datapack root of the XML file to parse.
 	 */
-	default void parseDatapackFile(String path)
-	{
+	default void parseDatapackFile(String path) {
 		parseFile(new File(Config.DATAPACK_ROOT, path));
 	}
 	
@@ -69,10 +67,8 @@ public interface IXmlReader
 	 * <b>Validation is enforced.</b>
 	 * @param f the XML file to parse.
 	 */
-	default void parseFile(File f)
-	{
-		if (!getCurrentFileFilter().accept(f))
-		{
+	default void parseFile(File f) {
+		if (!getCurrentFileFilter().accept(f)) {
 			LOG.warn("{}: Could not parse {} is not a file or it doesn't exist!", getClass().getSimpleName(), f.getName());
 			return;
 		}
@@ -81,20 +77,15 @@ public interface IXmlReader
 		dbf.setNamespaceAware(true);
 		dbf.setValidating(true);
 		dbf.setIgnoringComments(true);
-		try
-		{
+		try {
 			dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 			final DocumentBuilder db = dbf.newDocumentBuilder();
 			db.setErrorHandler(new XMLErrorHandler());
 			parseDocument(db.parse(f), f);
-		}
-		catch (SAXParseException e)
-		{
+		} catch (SAXParseException e) {
 			LOG.warn("{}: Could not parse file {} at line {}, column {}", getClass().getSimpleName(), f.getName(), e.getLineNumber(), e.getColumnNumber(), e);
 			return;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warn("{}: Could not parse file {}", getClass().getSimpleName(), f.getName(), e);
 			return;
 		}
@@ -105,8 +96,7 @@ public interface IXmlReader
 	 * @param file the path to the directory where the XML files are.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	default boolean parseDirectory(File file)
-	{
+	default boolean parseDirectory(File file) {
 		return parseDirectory(file, false);
 	}
 	
@@ -115,8 +105,7 @@ public interface IXmlReader
 	 * @param path the path to the directory where the XML files are.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	default boolean parseDirectory(String path)
-	{
+	default boolean parseDirectory(String path) {
 		return parseDirectory(new File(path), false);
 	}
 	
@@ -126,8 +115,7 @@ public interface IXmlReader
 	 * @param recursive parses all sub folders if there is.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	default boolean parseDirectory(String path, boolean recursive)
-	{
+	default boolean parseDirectory(String path, boolean recursive) {
 		return parseDirectory(new File(path), recursive);
 	}
 	
@@ -137,25 +125,18 @@ public interface IXmlReader
 	 * @param recursive parses all sub folders if there is.
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise.
 	 */
-	default boolean parseDirectory(File dir, boolean recursive)
-	{
-		if (!dir.exists())
-		{
+	default boolean parseDirectory(File dir, boolean recursive) {
+		if (!dir.exists()) {
 			LOG.warn("{}: Folder {} doesn't exist!", getClass().getSimpleName(), dir.getAbsolutePath());
 			return false;
 		}
 		
 		final File[] files = dir.listFiles();
-		if (files != null)
-		{
-			for (File f : files)
-			{
-				if (recursive && f.isDirectory())
-				{
+		if (files != null) {
+			for (File f : files) {
+				if (recursive && f.isDirectory()) {
 					parseDirectory(f, recursive);
-				}
-				else if (getCurrentFileFilter().accept(f))
-				{
+				} else if (getCurrentFileFilter().accept(f)) {
 					parseFile(f);
 				}
 			}
@@ -169,8 +150,7 @@ public interface IXmlReader
 	 * @param recursive parses all sub folders if there is
 	 * @return {@code false} if it fails to find the directory, {@code true} otherwise
 	 */
-	default boolean parseDatapackDirectory(String path, boolean recursive)
-	{
+	default boolean parseDatapackDirectory(String path, boolean recursive) {
 		return parseDirectory(new File(Config.DATAPACK_ROOT, path), recursive);
 	}
 	
@@ -180,8 +160,7 @@ public interface IXmlReader
 	 * @param doc the current document to parse
 	 * @param f the current file
 	 */
-	default void parseDocument(Document doc, File f)
-	{
+	default void parseDocument(Document doc, File f) {
 		parseDocument(doc);
 	}
 	
@@ -190,8 +169,7 @@ public interface IXmlReader
 	 * Is expected to be call from {@link #parseFile(File)}.
 	 * @param doc the current document to parse
 	 */
-	default void parseDocument(Document doc)
-	{
+	default void parseDocument(Document doc) {
 		LOG.error("{}: Parser not implemented!", getClass().getSimpleName());
 	}
 	
@@ -201,8 +179,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Boolean parseBoolean(Node node, Boolean defaultValue)
-	{
+	default Boolean parseBoolean(Node node, Boolean defaultValue) {
 		return node != null ? Boolean.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -211,8 +188,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Boolean parseBoolean(Node node)
-	{
+	default Boolean parseBoolean(Node node) {
 		return parseBoolean(node, null);
 	}
 	
@@ -222,8 +198,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Boolean parseBoolean(NamedNodeMap attrs, String name)
-	{
+	default Boolean parseBoolean(NamedNodeMap attrs, String name) {
 		return parseBoolean(attrs.getNamedItem(name));
 	}
 	
@@ -234,8 +209,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Boolean parseBoolean(NamedNodeMap attrs, String name, Boolean defaultValue)
-	{
+	default Boolean parseBoolean(NamedNodeMap attrs, String name, Boolean defaultValue) {
 		return parseBoolean(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -245,8 +219,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Byte parseByte(Node node, Byte defaultValue)
-	{
+	default Byte parseByte(Node node, Byte defaultValue) {
 		return node != null ? Byte.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -255,8 +228,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Byte parseByte(Node node)
-	{
+	default Byte parseByte(Node node) {
 		return parseByte(node, null);
 	}
 	
@@ -266,8 +238,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Byte parseByte(NamedNodeMap attrs, String name)
-	{
+	default Byte parseByte(NamedNodeMap attrs, String name) {
 		return parseByte(attrs.getNamedItem(name));
 	}
 	
@@ -278,8 +249,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Byte parseByte(NamedNodeMap attrs, String name, Byte defaultValue)
-	{
+	default Byte parseByte(NamedNodeMap attrs, String name, Byte defaultValue) {
 		return parseByte(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -289,8 +259,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Short parseShort(Node node, Short defaultValue)
-	{
+	default Short parseShort(Node node, Short defaultValue) {
 		return node != null ? Short.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -299,8 +268,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Short parseShort(Node node)
-	{
+	default Short parseShort(Node node) {
 		return parseShort(node, null);
 	}
 	
@@ -310,8 +278,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Short parseShort(NamedNodeMap attrs, String name)
-	{
+	default Short parseShort(NamedNodeMap attrs, String name) {
 		return parseShort(attrs.getNamedItem(name));
 	}
 	
@@ -322,8 +289,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Short parseShort(NamedNodeMap attrs, String name, Short defaultValue)
-	{
+	default Short parseShort(NamedNodeMap attrs, String name, Short defaultValue) {
 		return parseShort(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -333,8 +299,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default int parseInt(Node node, Integer defaultValue)
-	{
+	default int parseInt(Node node, Integer defaultValue) {
 		return node != null ? Integer.parseInt(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -343,8 +308,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default int parseInt(Node node)
-	{
+	default int parseInt(Node node) {
 		return parseInt(node, -1);
 	}
 	
@@ -354,8 +318,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Integer parseInteger(Node node, Integer defaultValue)
-	{
+	default Integer parseInteger(Node node, Integer defaultValue) {
 		return node != null ? Integer.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -364,8 +327,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Integer parseInteger(Node node)
-	{
+	default Integer parseInteger(Node node) {
 		return parseInteger(node, null);
 	}
 	
@@ -375,8 +337,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Integer parseInteger(NamedNodeMap attrs, String name)
-	{
+	default Integer parseInteger(NamedNodeMap attrs, String name) {
 		return parseInteger(attrs.getNamedItem(name));
 	}
 	
@@ -387,8 +348,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Integer parseInteger(NamedNodeMap attrs, String name, Integer defaultValue)
-	{
+	default Integer parseInteger(NamedNodeMap attrs, String name, Integer defaultValue) {
 		return parseInteger(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -398,8 +358,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Long parseLong(Node node, Long defaultValue)
-	{
+	default Long parseLong(Node node, Long defaultValue) {
 		return node != null ? Long.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -408,8 +367,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Long parseLong(Node node)
-	{
+	default Long parseLong(Node node) {
 		return parseLong(node, null);
 	}
 	
@@ -419,8 +377,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Long parseLong(NamedNodeMap attrs, String name)
-	{
+	default Long parseLong(NamedNodeMap attrs, String name) {
 		return parseLong(attrs.getNamedItem(name));
 	}
 	
@@ -431,8 +388,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Long parseLong(NamedNodeMap attrs, String name, Long defaultValue)
-	{
+	default Long parseLong(NamedNodeMap attrs, String name, Long defaultValue) {
 		return parseLong(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -442,8 +398,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Float parseFloat(Node node, Float defaultValue)
-	{
+	default Float parseFloat(Node node, Float defaultValue) {
 		return node != null ? Float.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -452,8 +407,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Float parseFloat(Node node)
-	{
+	default Float parseFloat(Node node) {
 		return parseFloat(node, null);
 	}
 	
@@ -463,8 +417,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Float parseFloat(NamedNodeMap attrs, String name)
-	{
+	default Float parseFloat(NamedNodeMap attrs, String name) {
 		return parseFloat(attrs.getNamedItem(name));
 	}
 	
@@ -475,8 +428,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Float parseFloat(NamedNodeMap attrs, String name, Float defaultValue)
-	{
+	default Float parseFloat(NamedNodeMap attrs, String name, Float defaultValue) {
 		return parseFloat(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -486,8 +438,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Double parseDouble(Node node, Double defaultValue)
-	{
+	default Double parseDouble(Node node, Double defaultValue) {
 		return node != null ? Double.valueOf(node.getNodeValue()) : defaultValue;
 	}
 	
@@ -496,8 +447,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Double parseDouble(Node node)
-	{
+	default Double parseDouble(Node node) {
 		return parseDouble(node, null);
 	}
 	
@@ -507,8 +457,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default Double parseDouble(NamedNodeMap attrs, String name)
-	{
+	default Double parseDouble(NamedNodeMap attrs, String name) {
 		return parseDouble(attrs.getNamedItem(name));
 	}
 	
@@ -519,8 +468,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default Double parseDouble(NamedNodeMap attrs, String name, Double defaultValue)
-	{
+	default Double parseDouble(NamedNodeMap attrs, String name, Double defaultValue) {
 		return parseDouble(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -530,8 +478,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default String parseString(Node node, String defaultValue)
-	{
+	default String parseString(Node node, String defaultValue) {
 		return node != null ? node.getNodeValue() : defaultValue;
 	}
 	
@@ -540,8 +487,7 @@ public interface IXmlReader
 	 * @param node the node to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default String parseString(Node node)
-	{
+	default String parseString(Node node) {
 		return parseString(node, null);
 	}
 	
@@ -551,8 +497,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null, the value of the parsed node, otherwise null
 	 */
-	default String parseString(NamedNodeMap attrs, String name)
-	{
+	default String parseString(NamedNodeMap attrs, String name) {
 		return parseString(attrs.getNamedItem(name));
 	}
 	
@@ -563,8 +508,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null, the value of the parsed node, otherwise the default value
 	 */
-	default String parseString(NamedNodeMap attrs, String name, String defaultValue)
-	{
+	default String parseString(NamedNodeMap attrs, String name, String defaultValue) {
 		return parseString(attrs.getNamedItem(name), defaultValue);
 	}
 	
@@ -576,19 +520,14 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise the default value
 	 */
-	default <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz, T defaultValue)
-	{
-		if (node == null)
-		{
+	default <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz, T defaultValue) {
+		if (node == null) {
 			return defaultValue;
 		}
 		
-		try
-		{
+		try {
 			return Enum.valueOf(clazz, node.getNodeValue());
-		}
-		catch (IllegalArgumentException e)
-		{
+		} catch (IllegalArgumentException e) {
 			LOG.warn("Invalid value specified for node: {} specified value: {} should be enum value of \"{}\" using default value: {}", node.getNodeName(), node.getNodeValue(), clazz.getSimpleName(), defaultValue);
 			return defaultValue;
 		}
@@ -601,8 +540,7 @@ public interface IXmlReader
 	 * @param clazz the class of the enumerated
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise null
 	 */
-	default <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz)
-	{
+	default <T extends Enum<T>> T parseEnum(Node node, Class<T> clazz) {
 		return parseEnum(node, clazz, null);
 	}
 	
@@ -614,8 +552,7 @@ public interface IXmlReader
 	 * @param name the name of the attribute to parse
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise null
 	 */
-	default <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name)
-	{
+	default <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name) {
 		return parseEnum(attrs.getNamedItem(name), clazz);
 	}
 	
@@ -628,8 +565,7 @@ public interface IXmlReader
 	 * @param defaultValue the default value
 	 * @return if the node is not null and the node value is valid the parsed value, otherwise the default value
 	 */
-	default <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name, T defaultValue)
-	{
+	default <T extends Enum<T>> T parseEnum(NamedNodeMap attrs, Class<T> clazz, String name, T defaultValue) {
 		return parseEnum(attrs.getNamedItem(name), clazz, defaultValue);
 	}
 	
@@ -637,8 +573,7 @@ public interface IXmlReader
 	 * Gets the current file filter.
 	 * @return the current file filter
 	 */
-	default FileFilter getCurrentFileFilter()
-	{
+	default FileFilter getCurrentFileFilter() {
 		return XML_FILTER;
 	}
 	
@@ -646,23 +581,19 @@ public interface IXmlReader
 	 * Simple XML error handler.
 	 * @author Zoey76
 	 */
-	static class XMLErrorHandler implements ErrorHandler
-	{
+	static class XMLErrorHandler implements ErrorHandler {
 		@Override
-		public void warning(SAXParseException e) throws SAXParseException
-		{
+		public void warning(SAXParseException e) throws SAXParseException {
 			throw e;
 		}
 		
 		@Override
-		public void error(SAXParseException e) throws SAXParseException
-		{
+		public void error(SAXParseException e) throws SAXParseException {
 			throw e;
 		}
 		
 		@Override
-		public void fatalError(SAXParseException e) throws SAXParseException
-		{
+		public void fatalError(SAXParseException e) throws SAXParseException {
 			throw e;
 		}
 	}

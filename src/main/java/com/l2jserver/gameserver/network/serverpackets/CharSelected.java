@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class CharSelected extends L2GameServerPacket
-{
+public class CharSelected extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final int _sessionId;
 	
@@ -30,15 +29,13 @@ public class CharSelected extends L2GameServerPacket
 	 * @param cha
 	 * @param sessionId
 	 */
-	public CharSelected(L2PcInstance cha, int sessionId)
-	{
+	public CharSelected(L2PcInstance cha, int sessionId) {
 		_activeChar = cha;
 		_sessionId = sessionId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x0b);
 		
 		writeS(_activeChar.getName());

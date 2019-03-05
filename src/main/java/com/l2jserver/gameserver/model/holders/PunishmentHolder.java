@@ -27,18 +27,15 @@ import com.l2jserver.gameserver.model.punishment.PunishmentType;
 /**
  * @author UnAfraid
  */
-public final class PunishmentHolder
-{
+public final class PunishmentHolder {
 	private final Map<String, Map<PunishmentType, PunishmentTask>> _holder = new ConcurrentHashMap<>();
 	
 	/**
 	 * Stores the punishment task in the Map.
 	 * @param task
 	 */
-	public void addPunishment(PunishmentTask task)
-	{
-		if (!task.isExpired())
-		{
+	public void addPunishment(PunishmentTask task) {
+		if (!task.isExpired()) {
 			final String key = String.valueOf(task.getKey());
 			_holder.computeIfAbsent(key, k -> new ConcurrentHashMap<>()).put(task.getType(), task);
 		}
@@ -48,16 +45,13 @@ public final class PunishmentHolder
 	 * Removes previously stopped task from the Map.
 	 * @param task
 	 */
-	public void stopPunishment(PunishmentTask task)
-	{
+	public void stopPunishment(PunishmentTask task) {
 		String key = String.valueOf(task.getKey());
-		if (_holder.containsKey(key))
-		{
+		if (_holder.containsKey(key)) {
 			task.stopPunishment();
 			final Map<PunishmentType, PunishmentTask> punishments = _holder.get(key);
 			punishments.remove(task.getType());
-			if (punishments.isEmpty())
-			{
+			if (punishments.isEmpty()) {
 				_holder.remove(key);
 			}
 		}
@@ -68,8 +62,7 @@ public final class PunishmentHolder
 	 * @param type
 	 * @return {@code true} if Map contains the current key and type, {@code false} otherwise.
 	 */
-	public boolean hasPunishment(String key, PunishmentType type)
-	{
+	public boolean hasPunishment(String key, PunishmentType type) {
 		return getPunishment(key, type) != null;
 	}
 	
@@ -78,10 +71,8 @@ public final class PunishmentHolder
 	 * @param type
 	 * @return {@link PunishmentTask} by specified key and type if exists, null otherwise.
 	 */
-	public PunishmentTask getPunishment(String key, PunishmentType type)
-	{
-		if (_holder.containsKey(key))
-		{
+	public PunishmentTask getPunishment(String key, PunishmentType type) {
+		if (_holder.containsKey(key)) {
 			return _holder.get(key).get(type);
 		}
 		return null;

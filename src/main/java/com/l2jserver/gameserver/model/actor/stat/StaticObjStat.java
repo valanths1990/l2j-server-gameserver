@@ -20,22 +20,18 @@ package com.l2jserver.gameserver.model.actor.stat;
 
 import com.l2jserver.gameserver.model.actor.instance.L2StaticObjectInstance;
 
-public class StaticObjStat extends CharStat
-{
-	public StaticObjStat(L2StaticObjectInstance activeChar)
-	{
+public class StaticObjStat extends CharStat {
+	public StaticObjStat(L2StaticObjectInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public L2StaticObjectInstance getActiveChar()
-	{
+	public L2StaticObjectInstance getActiveChar() {
 		return (L2StaticObjectInstance) super.getActiveChar();
 	}
 	
 	@Override
-	public final int getLevel()
-	{
+	public final int getLevel() {
 		return getActiveChar().getLevel();
 	}
 }

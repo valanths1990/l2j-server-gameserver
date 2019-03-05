@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.enums;
 
-public enum StatType
-{
+public enum StatType {
 	
 	HP,
 	MP,

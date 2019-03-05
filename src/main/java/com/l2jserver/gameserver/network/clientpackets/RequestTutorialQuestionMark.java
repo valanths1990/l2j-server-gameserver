@@ -22,32 +22,27 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialQuestionMark;
 
-public class RequestTutorialQuestionMark extends L2GameClientPacket
-{
+public class RequestTutorialQuestionMark extends L2GameClientPacket {
 	private static final String _C__87_REQUESTTUTORIALQUESTIONMARK = "[C] 87 RequestTutorialQuestionMark";
 	
 	private int _number = 0;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_number = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerTutorialQuestionMark(player, _number), player);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__87_REQUESTTUTORIALQUESTIONMARK;
 	}
 }

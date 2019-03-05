@@ -28,36 +28,28 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author -Nemesiss-
  */
-public class WarehouseCacheManager
-{
+public class WarehouseCacheManager {
 	protected final Map<L2PcInstance, Long> _cachedWh = new ConcurrentHashMap<>();
 	protected final long _cacheTime = Config.WAREHOUSE_CACHE_TIME * 60000L;
 	
-	protected WarehouseCacheManager()
-	{
+	protected WarehouseCacheManager() {
 		ThreadPoolManager.getInstance().scheduleAiAtFixedRate(new CacheScheduler(), 120000, 60000);
 	}
 	
-	public void addCacheTask(L2PcInstance pc)
-	{
+	public void addCacheTask(L2PcInstance pc) {
 		_cachedWh.put(pc, System.currentTimeMillis());
 	}
 	
-	public void remCacheTask(L2PcInstance pc)
-	{
+	public void remCacheTask(L2PcInstance pc) {
 		_cachedWh.remove(pc);
 	}
 	
-	public class CacheScheduler implements Runnable
-	{
+	public class CacheScheduler implements Runnable {
 		@Override
-		public void run()
-		{
+		public void run() {
 			long cTime = System.currentTimeMillis();
-			for (L2PcInstance pc : _cachedWh.keySet())
-			{
-				if ((cTime - _cachedWh.get(pc)) > _cacheTime)
-				{
+			for (L2PcInstance pc : _cachedWh.keySet()) {
+				if ((cTime - _cachedWh.get(pc)) > _cacheTime) {
 					pc.clearWarehouse();
 					_cachedWh.remove(pc);
 				}
@@ -65,13 +57,11 @@ public class WarehouseCacheManager
 		}
 	}
 	
-	public static WarehouseCacheManager getInstance()
-	{
+	public static WarehouseCacheManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final WarehouseCacheManager _instance = new WarehouseCacheManager();
 	}
 }

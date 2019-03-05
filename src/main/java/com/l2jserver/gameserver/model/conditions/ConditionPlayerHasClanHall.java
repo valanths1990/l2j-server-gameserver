@@ -29,16 +29,14 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerHasClanHall.
  * @author MrPoke
  */
-public final class ConditionPlayerHasClanHall extends Condition
-{
+public final class ConditionPlayerHasClanHall extends Condition {
 	private final ArrayList<Integer> _clanHall;
 	
 	/**
 	 * Instantiates a new condition player has clan hall.
 	 * @param clanHall the clan hall
 	 */
-	public ConditionPlayerHasClanHall(ArrayList<Integer> clanHall)
-	{
+	public ConditionPlayerHasClanHall(ArrayList<Integer> clanHall) {
 		_clanHall = clanHall;
 	}
 	
@@ -47,22 +45,18 @@ public final class ConditionPlayerHasClanHall extends Condition
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		
 		final L2Clan clan = effector.getActingPlayer().getClan();
-		if (clan == null)
-		{
+		if (clan == null) {
 			return ((_clanHall.size() == 1) && (_clanHall.get(0) == 0));
 		}
 		
 		// All Clan Hall
-		if ((_clanHall.size() == 1) && (_clanHall.get(0) == -1))
-		{
+		if ((_clanHall.size() == 1) && (_clanHall.get(0) == -1)) {
 			return clan.getHideoutId() > 0;
 		}
 		return _clanHall.contains(clan.getHideoutId());

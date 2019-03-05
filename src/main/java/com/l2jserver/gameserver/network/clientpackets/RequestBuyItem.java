@@ -40,8 +40,7 @@ import com.l2jserver.gameserver.network.serverpackets.StatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
 
-public final class RequestBuyItem extends L2GameClientPacket
-{
+public final class RequestBuyItem extends L2GameClientPacket {
 	private static final String _C__40_REQUESTBUYITEM = "[C] 40 RequestBuyItem";
 	
 	private static final int BATCH_LENGTH = 12;
@@ -49,22 +48,18 @@ public final class RequestBuyItem extends L2GameClientPacket
 	private List<ItemHolder> _items = null;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_listId = readD();
 		int size = readD();
-		if ((size <= 0) || (size > Config.MAX_ITEM_IN_PACKET) || ((size * BATCH_LENGTH) != _buf.remaining()))
-		{
+		if ((size <= 0) || (size > Config.MAX_ITEM_IN_PACKET) || ((size * BATCH_LENGTH) != _buf.remaining())) {
 			return;
 		}
 		
 		_items = new ArrayList<>(size);
-		for (int i = 0; i < size; i++)
-		{
+		for (int i = 0; i < size; i++) {
 			int itemId = readD();
 			long count = readQ();
-			if ((itemId < 1) || (count < 1))
-			{
+			if ((itemId < 1) || (count < 1)) {
 				_items = null;
 				return;
 			}
@@ -73,39 +68,32 @@ public final class RequestBuyItem extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("buy"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("buy")) {
 			player.sendMessage("You are buying too fast.");
 			return;
 		}
 		
-		if (_items == null)
-		{
+		if (_items == null) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Alt game - Karma punishment
-		if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && (player.getKarma() > 0))
-		{
+		if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && (player.getKarma() > 0)) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		L2Object target = player.getTarget();
 		L2Character merchant = null;
-		if (!player.isGM())
-		{
-			if (!(target instanceof L2MerchantInstance) || (!player.isInsideRadius(target, INTERACTION_DISTANCE, true, false)) || (player.getInstanceId() != target.getInstanceId()))
-			{
+		if (!player.isGM()) {
+			if (!(target instanceof L2MerchantInstance) || (!player.isInsideRadius(target, INTERACTION_DISTANCE, true, false)) || (player.getInstanceId() != target.getInstanceId())) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
@@ -115,34 +103,27 @@ public final class RequestBuyItem extends L2GameClientPacket
 		double castleTaxRate = 0;
 		double baseTaxRate = 0;
 		
-		if ((merchant == null) && !player.isGM())
-		{
+		if ((merchant == null) && !player.isGM()) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		final L2BuyList buyList = BuyListData.getInstance().getBuyList(_listId);
-		if (buyList == null)
-		{
+		if (buyList == null) {
 			Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " sent a false BuyList list_id " + _listId, Config.DEFAULT_PUNISH);
 			return;
 		}
 		
-		if (merchant != null)
-		{
-			if (!buyList.isNpcAllowed(merchant.getId()))
-			{
+		if (merchant != null) {
+			if (!buyList.isNpcAllowed(merchant.getId())) {
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 			
-			if (merchant instanceof L2MerchantInstance)
-			{
+			if (merchant instanceof L2MerchantInstance) {
 				castleTaxRate = ((L2MerchantInstance) merchant).getMpc().getCastleTaxRate();
 				baseTaxRate = ((L2MerchantInstance) merchant).getMpc().getBaseTaxRate();
-			}
-			else
-			{
+			} else {
 				baseTaxRate = 0.5;
 			}
 		}
@@ -152,123 +133,102 @@ public final class RequestBuyItem extends L2GameClientPacket
 		// Check for buylist validity and calculates summary values
 		long slots = 0;
 		long weight = 0;
-		for (ItemHolder i : _items)
-		{
+		for (ItemHolder i : _items) {
 			long price = -1;
 			
 			final Product product = buyList.getProductByItemId(i.getId());
-			if (product == null)
-			{
+			if (product == null) {
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " sent a false BuyList list_id " + _listId + " and item_id " + i.getId(), Config.DEFAULT_PUNISH);
 				return;
 			}
 			
-			if (!product.getItem().isStackable() && (i.getCount() > 1))
-			{
+			if (!product.getItem().isStackable() && (i.getCount() > 1)) {
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " tried to purchase invalid quantity of items at the same time.", Config.DEFAULT_PUNISH);
 				sendPacket(SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EXCEEDED_QUANTITY_THAT_CAN_BE_INPUTTED));
 				return;
 			}
 			
 			price = product.getPrice();
-			if ((product.getItemId() >= 3960) && (product.getItemId() <= 4026))
-			{
+			if ((product.getItemId() >= 3960) && (product.getItemId() <= 4026)) {
 				price *= Config.RATE_SIEGE_GUARDS_PRICE;
 			}
 			
-			if (price < 0)
-			{
+			if (price < 0) {
 				_log.warning("ERROR, no price found .. wrong buylist ??");
 				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 			
-			if ((price == 0) && !player.isGM() && Config.ONLY_GM_ITEMS_FREE)
-			{
+			if ((price == 0) && !player.isGM() && Config.ONLY_GM_ITEMS_FREE) {
 				player.sendMessage("Ohh Cheat dont work? You have a problem now!");
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " tried buy item for 0 adena.", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
-			if (product.hasLimitedStock())
-			{
+			if (product.hasLimitedStock()) {
 				// trying to buy more then available
-				if (i.getCount() > product.getCount())
-				{
+				if (i.getCount() > product.getCount()) {
 					sendPacket(ActionFailed.STATIC_PACKET);
 					return;
 				}
 			}
 			
-			if ((MAX_ADENA / i.getCount()) < price)
-			{
+			if ((MAX_ADENA / i.getCount()) < price) {
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " tried to purchase over " + MAX_ADENA + " adena worth of goods.", Config.DEFAULT_PUNISH);
 				return;
 			}
 			// first calculate price per item with tax, then multiply by count
 			price = (long) (price * (1 + castleTaxRate + baseTaxRate));
 			subTotal += i.getCount() * price;
-			if (subTotal > MAX_ADENA)
-			{
+			if (subTotal > MAX_ADENA) {
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " tried to purchase over " + MAX_ADENA + " adena worth of goods.", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
 			weight += i.getCount() * product.getItem().getWeight();
-			if (player.getInventory().getItemByItemId(product.getItemId()) == null)
-			{
+			if (player.getInventory().getItemByItemId(product.getItemId()) == null) {
 				slots++;
 			}
 		}
 		
-		if (!player.isGM() && ((weight > Integer.MAX_VALUE) || (weight < 0) || !player.getInventory().validateWeight((int) weight)))
-		{
+		if (!player.isGM() && ((weight > Integer.MAX_VALUE) || (weight < 0) || !player.getInventory().validateWeight((int) weight))) {
 			player.sendPacket(SystemMessageId.WEIGHT_LIMIT_EXCEEDED);
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
-		if (!player.isGM() && ((slots > Integer.MAX_VALUE) || (slots < 0) || !player.getInventory().validateCapacity((int) slots)))
-		{
+		if (!player.isGM() && ((slots > Integer.MAX_VALUE) || (slots < 0) || !player.getInventory().validateCapacity((int) slots))) {
 			player.sendPacket(SystemMessageId.SLOTS_FULL);
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Charge buyer and add tax to castle treasury if not owned by npc clan
-		if ((subTotal < 0) || !player.reduceAdena("Buy", subTotal, player.getLastFolkNPC(), false))
-		{
+		if ((subTotal < 0) || !player.reduceAdena("Buy", subTotal, player.getLastFolkNPC(), false)) {
 			player.sendPacket(SystemMessageId.YOU_NOT_ENOUGH_ADENA);
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		// Proceed the purchase
-		for (ItemHolder i : _items)
-		{
+		for (ItemHolder i : _items) {
 			Product product = buyList.getProductByItemId(i.getId());
-			if (product == null)
-			{
+			if (product == null) {
 				Util.handleIllegalPlayerAction(player, "Warning!! Character " + player.getName() + " of account " + player.getAccountName() + " sent a false BuyList list_id " + _listId + " and item_id " + i.getId(), Config.DEFAULT_PUNISH);
 				continue;
 			}
 			
-			if (product.hasLimitedStock())
-			{
-				if (product.decreaseCount(i.getCount()))
-				{
+			if (product.hasLimitedStock()) {
+				if (product.decreaseCount(i.getCount())) {
 					player.getInventory().addItem("Buy", i.getId(), i.getCount(), player, merchant);
 				}
-			}
-			else
-			{
+			} else {
 				player.getInventory().addItem("Buy", i.getId(), i.getCount(), player, merchant);
 			}
 		}
 		
 		// add to castle treasury
-		if (merchant instanceof L2MerchantInstance)
-		{
+		if (merchant instanceof L2MerchantInstance) {
 			((L2MerchantInstance) merchant).getCastle().addToTreasury((long) (subTotal * castleTaxRate));
 		}
 		
@@ -279,8 +239,7 @@ public final class RequestBuyItem extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__40_REQUESTBUYITEM;
 	}
 }

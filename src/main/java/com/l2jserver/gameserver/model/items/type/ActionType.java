@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.model.items.type;
  * Action Type enumerated.
  * @author nBd
  */
-public enum ActionType
-{
+public enum ActionType {
 	CALC,
 	CALL_SKILL,
 	CAPSULE,

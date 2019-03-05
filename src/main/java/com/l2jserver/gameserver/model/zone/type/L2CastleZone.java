@@ -25,36 +25,28 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * A castle zone
  * @author durgus
  */
-public final class L2CastleZone extends L2ResidenceZone
-{
+public final class L2CastleZone extends L2ResidenceZone {
 	
-	public L2CastleZone(int id)
-	{
+	public L2CastleZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	public void setParameter(String name, String value)
-	{
-		if (name.equals("castleId"))
-		{
+	public void setParameter(String name, String value) {
+		if (name.equals("castleId")) {
 			setResidenceId(Integer.parseInt(value));
-		}
-		else
-		{
+		} else {
 			super.setParameter(name, value);
 		}
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
+	protected void onEnter(L2Character character) {
 		character.setInsideZone(ZoneId.CASTLE, true);
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
+	protected void onExit(L2Character character) {
 		character.setInsideZone(ZoneId.CASTLE, false);
 	}
 }

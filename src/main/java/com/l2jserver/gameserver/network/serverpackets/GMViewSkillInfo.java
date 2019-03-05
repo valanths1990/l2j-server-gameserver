@@ -25,28 +25,24 @@ import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
 
-public class GMViewSkillInfo extends L2GameServerPacket
-{
+public class GMViewSkillInfo extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final Collection<Skill> _skills;
 	
-	public GMViewSkillInfo(L2PcInstance cha)
-	{
+	public GMViewSkillInfo(L2PcInstance cha) {
 		_activeChar = cha;
 		_skills = _activeChar.getAllSkills();
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x97);
 		writeS(_activeChar.getName());
 		writeD(_skills.size());
 		
 		boolean isDisabled = (_activeChar.getClan() != null) ? (_activeChar.getClan().getReputationScore() < 0) : false;
 		
-		for (Skill skill : _skills)
-		{
+		for (Skill skill : _skills) {
 			writeD(skill.isPassive() ? 1 : 0);
 			writeD(skill.getDisplayLevel());
 			writeD(skill.getDisplayId());

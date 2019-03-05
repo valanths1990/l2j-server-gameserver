@@ -24,33 +24,28 @@ import com.l2jserver.gameserver.network.serverpackets.AllyCrest;
  * This class ...
  * @version $Revision: 1.3.4.4 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestAllyCrest extends L2GameClientPacket
-{
+public final class RequestAllyCrest extends L2GameClientPacket {
 	private static final String _C__92_REQUESTALLYCREST = "[C] 92 RequestAllyCrest";
 	
 	private int _crestId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_crestId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		sendPacket(new AllyCrest(_crestId));
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__92_REQUESTALLYCREST;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

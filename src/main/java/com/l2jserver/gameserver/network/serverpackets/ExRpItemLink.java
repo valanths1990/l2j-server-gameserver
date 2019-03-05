@@ -23,18 +23,15 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author KenM
  */
-public final class ExRpItemLink extends L2GameServerPacket
-{
+public final class ExRpItemLink extends L2GameServerPacket {
 	private final L2ItemInstance _item;
 	
-	public ExRpItemLink(L2ItemInstance item)
-	{
+	public ExRpItemLink(L2ItemInstance item) {
 		_item = item;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x6C);
 		writeD(_item.getObjectId());
@@ -47,25 +44,20 @@ public final class ExRpItemLink extends L2GameServerPacket
 		writeD(_item.getItem().getBodyPart());
 		writeH(_item.getEnchantLevel());
 		writeH(_item.getCustomType2());
-		if (_item.isAugmented())
-		{
+		if (_item.isAugmented()) {
 			writeD(_item.getAugmentation().getAugmentationId());
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 		}
 		writeD(_item.getMana());
 		writeD(_item.isTimeLimitedItem() ? (int) (_item.getRemainingTime() / 1000) : -9999);
 		writeH(_item.getAttackElementType());
 		writeH(_item.getAttackElementPower());
-		for (byte i = 0; i < 6; i++)
-		{
+		for (byte i = 0; i < 6; i++) {
 			writeH(_item.getElementDefAttr(i));
 		}
 		// Enchant Effects
-		for (int op : _item.getEnchantOptions())
-		{
+		for (int op : _item.getEnchantOptions()) {
 			writeH(op);
 		}
 	}

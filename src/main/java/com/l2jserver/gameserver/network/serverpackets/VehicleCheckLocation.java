@@ -23,21 +23,18 @@ import com.l2jserver.gameserver.model.actor.L2Character;
 /**
  * @author Maktakien
  */
-public class VehicleCheckLocation extends L2GameServerPacket
-{
+public class VehicleCheckLocation extends L2GameServerPacket {
 	private final L2Character _boat;
 	
 	/**
 	 * @param boat
 	 */
-	public VehicleCheckLocation(L2Character boat)
-	{
+	public VehicleCheckLocation(L2Character boat) {
 		_boat = boat;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0x6d);
 		writeD(_boat.getObjectId());
 		writeD(_boat.getX());

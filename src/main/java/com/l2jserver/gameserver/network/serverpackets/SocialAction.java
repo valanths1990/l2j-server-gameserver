@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class SocialAction extends L2GameServerPacket
-{
+public class SocialAction extends L2GameServerPacket {
 	public static final int LEVEL_UP = 2122;
 	
 	private final int _charObjId;
@@ -29,15 +28,13 @@ public class SocialAction extends L2GameServerPacket
 	 * @param objectId
 	 * @param actionId
 	 */
-	public SocialAction(int objectId, int actionId)
-	{
+	public SocialAction(int objectId, int actionId) {
 		_charObjId = objectId;
 		_actionId = actionId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x27);
 		writeD(_charObjId);
 		writeD(_actionId);

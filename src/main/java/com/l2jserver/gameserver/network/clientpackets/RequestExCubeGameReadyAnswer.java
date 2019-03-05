@@ -25,16 +25,14 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Format: chddd d: Arena d: Answer
  * @author mrTJO
  */
-public final class RequestExCubeGameReadyAnswer extends L2GameClientPacket
-{
+public final class RequestExCubeGameReadyAnswer extends L2GameClientPacket {
 	private static final String _C__D0_5C_REQUESTEXCUBEGAMEREADYANSWER = "[C] D0:5C RequestExCubeGameReadyAnswer";
 	
 	private int _arena;
 	private int _answer;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// client sends -1,0,1,2 for arena parameter
 		_arena = readD() + 1;
 		// client sends 1 if clicked confirm on not clicked, 0 if clicked cancel
@@ -42,17 +40,14 @@ public final class RequestExCubeGameReadyAnswer extends L2GameClientPacket
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
 		
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		switch (_answer)
-		{
+		switch (_answer) {
 			case 0:
 				// Cancel - Answer No
 				break;
@@ -67,8 +62,7 @@ public final class RequestExCubeGameReadyAnswer extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_5C_REQUESTEXCUBEGAMEREADYANSWER;
 	}
 }

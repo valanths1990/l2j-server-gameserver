@@ -24,35 +24,29 @@ import com.l2jserver.gameserver.network.serverpackets.ExShowCastleInfo;
 /**
  * @author KenM
  */
-public class RequestAllCastleInfo extends L2GameClientPacket
-{
+public class RequestAllCastleInfo extends L2GameClientPacket {
 	private static final String _C__D0_3C_REQUESTALLCASTLEINFO = "[C] D0:3C RequestAllCastleInfo";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// trigger
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2GameClient client = getClient();
-		if (client != null)
-		{
+		if (client != null) {
 			client.sendPacket(new ExShowCastleInfo());
 		}
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_3C_REQUESTALLCASTLEINFO;
 	}
 }

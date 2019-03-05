@@ -44,56 +44,44 @@ import com.l2jserver.gameserver.model.entity.ClanHall;
  * d = (UNKNOW) Siege Time Select Related?
  * @author KenM
  */
-public class SiegeInfo extends L2GameServerPacket
-{
+public class SiegeInfo extends L2GameServerPacket {
 	private Castle _castle;
 	private ClanHall _hall;
 	
-	public SiegeInfo(Castle castle)
-	{
+	public SiegeInfo(Castle castle) {
 		_castle = castle;
 	}
 	
-	public SiegeInfo(ClanHall hall)
-	{
+	public SiegeInfo(ClanHall hall) {
 		_hall = hall;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		writeC(0xc9);
-		if (_castle != null)
-		{
+		if (_castle != null) {
 			writeD(_castle.getResidenceId());
 			
 			final int ownerId = _castle.getOwnerId();
 			
 			writeD(((ownerId == activeChar.getClanId()) && (activeChar.isClanLeader())) ? 0x01 : 0x00);
 			writeD(ownerId);
-			if (ownerId > 0)
-			{
+			if (ownerId > 0) {
 				L2Clan owner = ClanTable.getInstance().getClan(ownerId);
-				if (owner != null)
-				{
+				if (owner != null) {
 					writeS(owner.getName()); // Clan Name
 					writeS(owner.getLeaderName()); // Clan Leader Name
 					writeD(owner.getAllyId()); // Ally ID
 					writeS(owner.getAllyName()); // Ally Name
-				}
-				else
-				{
+				} else {
 					_log.warning("Null owner for castle: " + _castle.getName());
 				}
-			}
-			else
-			{
+			} else {
 				writeS(""); // Clan Name
 				writeS(""); // Clan Leader Name
 				writeD(0); // Ally ID
@@ -101,8 +89,7 @@ public class SiegeInfo extends L2GameServerPacket
 			}
 			
 			writeD((int) (System.currentTimeMillis() / 1000));
-			if (!_castle.getIsTimeRegistrationOver() && activeChar.isClanLeader() && (activeChar.getClanId() == _castle.getOwnerId()))
-			{
+			if (!_castle.getIsTimeRegistrationOver() && activeChar.isClanLeader() && (activeChar.getClanId() == _castle.getOwnerId())) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTimeInMillis(_castle.getSiegeDate().getTimeInMillis());
 				cal.set(Calendar.MINUTE, 0);
@@ -110,43 +97,32 @@ public class SiegeInfo extends L2GameServerPacket
 				
 				writeD(0x00);
 				writeD(Config.SIEGE_HOUR_LIST.size());
-				for (int hour : Config.SIEGE_HOUR_LIST)
-				{
+				for (int hour : Config.SIEGE_HOUR_LIST) {
 					cal.set(Calendar.HOUR_OF_DAY, hour);
 					writeD((int) (cal.getTimeInMillis() / 1000));
 				}
-			}
-			else
-			{
+			} else {
 				writeD((int) (_castle.getSiegeDate().getTimeInMillis() / 1000));
 				writeD(0x00);
 			}
-		}
-		else
-		{
+		} else {
 			writeD(_hall.getId());
 			
 			final int ownerId = _hall.getOwnerId();
 			
 			writeD(((ownerId == activeChar.getClanId()) && (activeChar.isClanLeader())) ? 0x01 : 0x00);
 			writeD(ownerId);
-			if (ownerId > 0)
-			{
+			if (ownerId > 0) {
 				L2Clan owner = ClanTable.getInstance().getClan(ownerId);
-				if (owner != null)
-				{
+				if (owner != null) {
 					writeS(owner.getName()); // Clan Name
 					writeS(owner.getLeaderName()); // Clan Leader Name
 					writeD(owner.getAllyId()); // Ally ID
 					writeS(owner.getAllyName()); // Ally Name
-				}
-				else
-				{
+				} else {
 					_log.warning("Null owner for siegable hall: " + _hall.getName());
 				}
-			}
-			else
-			{
+			} else {
 				writeS(""); // Clan Name
 				writeS(""); // Clan Leader Name
 				writeD(0); // Ally ID

@@ -25,33 +25,28 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Format: chdd d: Arena d: Team
  * @author mrTJO
  */
-public final class RequestExCubeGameChangeTeam extends L2GameClientPacket
-{
+public final class RequestExCubeGameChangeTeam extends L2GameClientPacket {
 	private static final String _C__D0_5A_REQUESTEXCUBEGAMECHANGETEAM = "[C] D0:5A RequestExCubeGameChangeTeam";
 	
 	private int _arena;
 	private int _team;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// client sends -1,0,1,2 for arena parameter
 		_arena = readD() + 1;
 		_team = readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
+	public void runImpl() {
 		// do not remove players after start
-		if (HandysBlockCheckerManager.getInstance().arenaIsBeingUsed(_arena))
-		{
+		if (HandysBlockCheckerManager.getInstance().arenaIsBeingUsed(_arena)) {
 			return;
 		}
 		L2PcInstance player = getClient().getActiveChar();
 		
-		switch (_team)
-		{
+		switch (_team) {
 			case 0:
 			case 1:
 				// Change Player Team
@@ -63,8 +58,7 @@ public final class RequestExCubeGameChangeTeam extends L2GameClientPacket
 				int team = HandysBlockCheckerManager.getInstance().getHolder(_arena).getPlayerTeam(player);
 				// client sends two times this packet if click on exit
 				// client did not send this packet on restart
-				if (team > -1)
-				{
+				if (team > -1) {
 					HandysBlockCheckerManager.getInstance().removePlayer(player, _arena, team);
 				}
 				break;
@@ -76,8 +70,7 @@ public final class RequestExCubeGameChangeTeam extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_5A_REQUESTEXCUBEGAMECHANGETEAM;
 	}
 }

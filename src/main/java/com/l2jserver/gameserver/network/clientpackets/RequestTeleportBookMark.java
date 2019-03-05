@@ -23,32 +23,27 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author ShanSoft Packets Structure: chdd
  */
-public final class RequestTeleportBookMark extends L2GameClientPacket
-{
+public final class RequestTeleportBookMark extends L2GameClientPacket {
 	private static final String _C__D0_51_04_REQUESTTELEPORTBOOKMARK = "[C] D0:51:04 RequestTeleportBookMark";
 	
 	private int id;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		id = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		activeChar.teleportBookmarkGo(id);
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_51_04_REQUESTTELEPORTBOOKMARK;
 	}
 }

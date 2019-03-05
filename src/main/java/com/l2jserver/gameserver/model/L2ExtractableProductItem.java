@@ -25,13 +25,11 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
 /**
  * @author Zoey76
  */
-public class L2ExtractableProductItem
-{
+public class L2ExtractableProductItem {
 	private final List<ItemHolder> _items;
 	private final double _chance;
 	
-	public L2ExtractableProductItem(List<ItemHolder> items, double chance)
-	{
+	public L2ExtractableProductItem(List<ItemHolder> items, double chance) {
 		_items = items;
 		_chance = chance;
 	}
@@ -39,16 +37,14 @@ public class L2ExtractableProductItem
 	/**
 	 * @return the the production list.
 	 */
-	public List<ItemHolder> getItems()
-	{
+	public List<ItemHolder> getItems() {
 		return _items;
 	}
 	
 	/**
 	 * @return the chance of the production list.
 	 */
-	public double getChance()
-	{
+	public double getChance() {
 		return _chance;
 	}
 }

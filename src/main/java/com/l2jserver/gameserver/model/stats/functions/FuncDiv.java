@@ -27,24 +27,17 @@ import com.l2jserver.gameserver.model.stats.Stats;
  * Returns the initial value divided the function value, if the condition are met.
  * @author Zoey76
  */
-public class FuncDiv extends AbstractFunction
-{
-	public FuncDiv(Stats stat, int order, Object owner, double value, Condition applayCond)
-	{
+public class FuncDiv extends AbstractFunction {
+	public FuncDiv(Stats stat, int order, Object owner, double value, Condition applayCond) {
 		super(stat, order, owner, value, applayCond);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
-		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill))
-		{
-			try
-			{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
+		if ((getApplayCond() == null) || getApplayCond().test(effector, effected, skill)) {
+			try {
 				return initVal / getValue();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				LOG.warning(FuncDiv.class.getSimpleName() + ": Division by zero: " + getValue() + "!");
 			}
 		}

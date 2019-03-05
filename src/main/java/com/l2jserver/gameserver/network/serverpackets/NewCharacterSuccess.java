@@ -23,25 +23,20 @@ import java.util.List;
 
 import com.l2jserver.gameserver.model.actor.templates.L2PcTemplate;
 
-public final class NewCharacterSuccess extends L2GameServerPacket
-{
+public final class NewCharacterSuccess extends L2GameServerPacket {
 	private final List<L2PcTemplate> _chars = new ArrayList<>();
 	
-	public void addChar(L2PcTemplate template)
-	{
+	public void addChar(L2PcTemplate template) {
 		_chars.add(template);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x0D);
 		writeD(_chars.size());
 		
-		for (L2PcTemplate chr : _chars)
-		{
-			if (chr == null)
-			{
+		for (L2PcTemplate chr : _chars) {
+			if (chr == null) {
 				continue;
 			}
 			

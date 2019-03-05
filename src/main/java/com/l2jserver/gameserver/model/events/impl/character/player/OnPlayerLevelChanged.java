@@ -25,37 +25,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerLevelChanged implements IBaseEvent
-{
+public class OnPlayerLevelChanged implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _oldLevel;
 	private final int _newLevel;
 	
-	public OnPlayerLevelChanged(L2PcInstance activeChar, int oldLevel, int newLevel)
-	{
+	public OnPlayerLevelChanged(L2PcInstance activeChar, int oldLevel, int newLevel) {
 		_activeChar = activeChar;
 		_oldLevel = oldLevel;
 		_newLevel = newLevel;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getOldLevel()
-	{
+	public int getOldLevel() {
 		return _oldLevel;
 	}
 	
-	public int getNewLevel()
-	{
+	public int getNewLevel() {
 		return _newLevel;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_LEVEL_CHANGED;
 	}
 }

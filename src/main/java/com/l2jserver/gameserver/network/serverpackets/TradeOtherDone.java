@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class TradeOtherDone extends L2GameServerPacket
-{
+public class TradeOtherDone extends L2GameServerPacket {
 	public static final TradeOtherDone STATIC_PACKET = new TradeOtherDone();
 	
-	private TradeOtherDone()
-	{
+	private TradeOtherDone() {
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x82);
 	}
 }

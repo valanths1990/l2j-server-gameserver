@@ -29,37 +29,28 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Target My Party Except Me condition implementation.
  * @author Adry_85
  */
-public class ConditionTargetMyPartyExceptMe extends Condition
-{
+public class ConditionTargetMyPartyExceptMe extends Condition {
 	private final boolean _val;
 	
-	public ConditionTargetMyPartyExceptMe(boolean val)
-	{
+	public ConditionTargetMyPartyExceptMe(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean isPartyMember = true;
 		final L2PcInstance player = effector.getActingPlayer();
-		if ((player == null))
-		{
-			if (!effected.isPlayer())
-			{
+		if ((player == null)) {
+			if (!effected.isPlayer()) {
 				final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 				sm.addSkillName(skill);
 				effector.sendPacket(sm);
 			}
 			isPartyMember = false;
-		}
-		else if (player == effected)
-		{
+		} else if (player == effected) {
 			player.sendPacket(SystemMessageId.CANNOT_USE_ON_YOURSELF);
 			isPartyMember = false;
-		}
-		else if (!player.isInParty() || !player.getParty().equals(effected.getParty()))
-		{
+		} else if (!player.isInParty() || !player.getParty().equals(effected.getParty())) {
 			final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
 			sm.addSkillName(skill);
 			player.sendPacket(sm);

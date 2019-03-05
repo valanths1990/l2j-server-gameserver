@@ -31,8 +31,7 @@ import com.l2jserver.gameserver.model.actor.L2Character;
  * </ul>
  * @author xban1x
  */
-public final class HitTask implements Runnable
-{
+public final class HitTask implements Runnable {
 	private final L2Character _character;
 	private final L2Character _hitTarget;
 	private final int _damage;
@@ -41,8 +40,7 @@ public final class HitTask implements Runnable
 	private final byte _shld;
 	private final boolean _soulshot;
 	
-	public HitTask(L2Character character, L2Character target, int damage, boolean crit, boolean miss, boolean soulshot, byte shld)
-	{
+	public HitTask(L2Character character, L2Character target, int damage, boolean crit, boolean miss, boolean soulshot, byte shld) {
 		_character = character;
 		_hitTarget = target;
 		_damage = damage;
@@ -53,10 +51,8 @@ public final class HitTask implements Runnable
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_character != null)
-		{
+	public void run() {
+		if (_character != null) {
 			_character.onHitTimer(_hitTarget, _damage, _crit, _miss, _soulshot, _shld);
 		}
 	}

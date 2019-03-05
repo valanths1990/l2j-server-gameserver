@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
 /**
  * @author devScarlet, mrTJO
  */
-public final class ServerObjectInfo extends L2GameServerPacket
-{
+public final class ServerObjectInfo extends L2GameServerPacket {
 	private final L2Npc _activeChar;
 	private final int _x, _y, _z, _heading;
 	private final int _idTemplate;
@@ -33,8 +32,7 @@ public final class ServerObjectInfo extends L2GameServerPacket
 	private final double _collisionHeight, _collisionRadius;
 	private final String _name;
 	
-	public ServerObjectInfo(L2Npc activeChar, L2Character actor)
-	{
+	public ServerObjectInfo(L2Npc activeChar, L2Character actor) {
 		_activeChar = activeChar;
 		_idTemplate = _activeChar.getTemplate().getDisplayId();
 		_isAttackable = _activeChar.isAutoAttackable(actor);
@@ -48,8 +46,7 @@ public final class ServerObjectInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x92);
 		writeD(_activeChar.getObjectId());
 		writeD(_idTemplate + 1000000);

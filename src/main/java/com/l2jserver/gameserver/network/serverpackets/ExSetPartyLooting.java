@@ -23,20 +23,17 @@ import com.l2jserver.gameserver.enums.PartyDistributionType;
 /**
  * @author JIV
  */
-public class ExSetPartyLooting extends L2GameServerPacket
-{
+public class ExSetPartyLooting extends L2GameServerPacket {
 	private final int _result;
 	private final PartyDistributionType _partyDistributionType;
 	
-	public ExSetPartyLooting(int result, PartyDistributionType partyDistributionType)
-	{
+	public ExSetPartyLooting(int result, PartyDistributionType partyDistributionType) {
 		_result = result;
 		_partyDistributionType = partyDistributionType;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xC0);
 		writeD(_result);

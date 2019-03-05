@@ -25,30 +25,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerTransform implements IBaseEvent
-{
+public class OnPlayerTransform implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final int _transformId;
 	
-	public OnPlayerTransform(L2PcInstance activeChar, int transformId)
-	{
+	public OnPlayerTransform(L2PcInstance activeChar, int transformId) {
 		_activeChar = activeChar;
 		_transformId = transformId;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public int getTransformId()
-	{
+	public int getTransformId() {
 		return _transformId;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_TRANSFORM;
 	}
 }

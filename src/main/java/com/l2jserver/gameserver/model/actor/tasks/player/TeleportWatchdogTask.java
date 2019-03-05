@@ -24,20 +24,16 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Task dedicated watch for player teleportation.
  * @author UnAfraid
  */
-public class TeleportWatchdogTask implements Runnable
-{
+public class TeleportWatchdogTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public TeleportWatchdogTask(L2PcInstance player)
-	{
+	public TeleportWatchdogTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if ((_player == null) || !_player.isTeleporting())
-		{
+	public void run() {
+		if ((_player == null) || !_player.isTeleporting()) {
 			return;
 		}
 		_player.onTeleported();

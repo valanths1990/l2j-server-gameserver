@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.drops;
 /**
  * @author Battlecruiser
  */
-public interface IDropItemFactory
-{
+public interface IDropItemFactory {
 	/**
 	 * @param itemId the item id
 	 * @param min the min count

@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model;
 /**
  * @author UnAfraid
  */
-public class Hit
-{
+public class Hit {
 	private static final int HITFLAG_USESS = 0x10;
 	private static final int HITFLAG_CRIT = 0x20;
 	private static final int HITFLAG_SHLD = 0x40;
@@ -32,44 +31,36 @@ public class Hit
 	private final int _damage;
 	private int _flags = 0;
 	
-	public Hit(L2Object target, int damage, boolean miss, boolean crit, byte shld, boolean soulshot, int ssGrade)
-	{
+	public Hit(L2Object target, int damage, boolean miss, boolean crit, byte shld, boolean soulshot, int ssGrade) {
 		_targetId = target.getObjectId();
 		_damage = damage;
 		
-		if (soulshot)
-		{
+		if (soulshot) {
 			_flags |= HITFLAG_USESS | ssGrade;
 		}
 		
-		if (crit)
-		{
+		if (crit) {
 			_flags |= HITFLAG_CRIT;
 		}
 		
-		if (shld > 0)
-		{
+		if (shld > 0) {
 			_flags |= HITFLAG_SHLD;
 		}
 		
-		if (miss)
-		{
+		if (miss) {
 			_flags |= HITFLAG_MISS;
 		}
 	}
 	
-	public int getTargetId()
-	{
+	public int getTargetId() {
 		return _targetId;
 	}
 	
-	public int getDamage()
-	{
+	public int getDamage() {
 		return _damage;
 	}
 	
-	public int getFlags()
-	{
+	public int getFlags() {
 		return _flags;
 	}
 }

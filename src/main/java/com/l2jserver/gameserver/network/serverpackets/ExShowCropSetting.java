@@ -29,38 +29,32 @@ import com.l2jserver.gameserver.model.L2Seed;
 /**
  * @author l3x
  */
-public class ExShowCropSetting extends L2GameServerPacket
-{
+public class ExShowCropSetting extends L2GameServerPacket {
 	private final int _manorId;
 	private final Set<L2Seed> _seeds;
 	private final Map<Integer, CropProcure> _current = new HashMap<>();
 	private final Map<Integer, CropProcure> _next = new HashMap<>();
 	
-	public ExShowCropSetting(int manorId)
-	{
+	public ExShowCropSetting(int manorId) {
 		final CastleManorManager manor = CastleManorManager.getInstance();
 		_manorId = manorId;
 		_seeds = manor.getSeedsForCastle(_manorId);
-		for (L2Seed s : _seeds)
-		{
+		for (L2Seed s : _seeds) {
 			// Current period
 			CropProcure cp = manor.getCropProcure(manorId, s.getCropId(), false);
-			if (cp != null)
-			{
+			if (cp != null) {
 				_current.put(s.getCropId(), cp);
 			}
 			// Next period
 			cp = manor.getCropProcure(manorId, s.getCropId(), true);
-			if (cp != null)
-			{
+			if (cp != null) {
 				_next.put(s.getCropId(), cp);
 			}
 		}
 	}
 	
 	@Override
-	public void writeImpl()
-	{
+	public void writeImpl() {
 		writeC(0xFE); // Id
 		writeH(0x2b); // SubId
 		
@@ -68,8 +62,7 @@ public class ExShowCropSetting extends L2GameServerPacket
 		writeD(_seeds.size()); // size
 		
 		CropProcure cp;
-		for (L2Seed s : _seeds)
-		{
+		for (L2Seed s : _seeds) {
 			writeD(s.getCropId()); // crop id
 			writeD(s.getLevel()); // seed level
 			writeC(1);
@@ -81,29 +74,23 @@ public class ExShowCropSetting extends L2GameServerPacket
 			writeD(s.getCropMinPrice()); // min crop price
 			writeD(s.getCropMaxPrice()); // max crop price
 			// Current period
-			if (_current.containsKey(s.getCropId()))
-			{
+			if (_current.containsKey(s.getCropId())) {
 				cp = _current.get(s.getCropId());
 				writeQ(cp.getStartAmount()); // buy
 				writeQ(cp.getPrice()); // price
 				writeC(cp.getReward()); // reward
-			}
-			else
-			{
+			} else {
 				writeQ(0);
 				writeQ(0);
 				writeC(0);
 			}
 			// Next period
-			if (_next.containsKey(s.getCropId()))
-			{
+			if (_next.containsKey(s.getCropId())) {
 				cp = _next.get(s.getCropId());
 				writeQ(cp.getStartAmount()); // buy
 				writeQ(cp.getPrice()); // price
 				writeC(cp.getReward()); // reward
-			}
-			else
-			{
+			} else {
 				writeQ(0);
 				writeQ(0);
 				writeC(0);

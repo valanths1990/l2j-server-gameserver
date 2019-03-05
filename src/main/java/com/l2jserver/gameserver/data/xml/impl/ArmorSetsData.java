@@ -33,121 +33,96 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * Loads armor set bonuses.
  * @author godson, Luno, UnAfraid
  */
-public final class ArmorSetsData implements IXmlReader
-{
+public final class ArmorSetsData implements IXmlReader {
 	private final Map<Integer, L2ArmorSet> _armorSets = new HashMap<>();
 	
 	/**
 	 * Instantiates a new armor sets data.
 	 */
-	protected ArmorSetsData()
-	{
+	protected ArmorSetsData() {
 		load();
 	}
 	
 	@Override
-	public void load()
-	{
+	public void load() {
 		_armorSets.clear();
 		parseDatapackDirectory("data/stats/armorsets", false);
 		LOG.info("{}: Loaded {} Armor sets.", getClass().getSimpleName(), _armorSets.size());
 	}
 	
 	@Override
-	public void parseDocument(Document doc)
-	{
-		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if ("list".equalsIgnoreCase(n.getNodeName()))
-			{
-				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if ("set".equalsIgnoreCase(d.getNodeName()))
-					{
+	public void parseDocument(Document doc) {
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("set".equalsIgnoreCase(d.getNodeName())) {
 						final L2ArmorSet set = new L2ArmorSet();
-						for (Node a = d.getFirstChild(); a != null; a = a.getNextSibling())
-						{
+						for (Node a = d.getFirstChild(); a != null; a = a.getNextSibling()) {
 							final NamedNodeMap attrs = a.getAttributes();
-							switch (a.getNodeName())
-							{
-								case "chest":
-								{
+							switch (a.getNodeName()) {
+								case "chest": {
 									set.addChest(parseInteger(attrs, "id"));
 									break;
 								}
-								case "feet":
-								{
+								case "feet": {
 									set.addFeet(parseInteger(attrs, "id"));
 									break;
 								}
-								case "gloves":
-								{
+								case "gloves": {
 									set.addGloves(parseInteger(attrs, "id"));
 									break;
 								}
-								case "head":
-								{
+								case "head": {
 									set.addHead(parseInteger(attrs, "id"));
 									break;
 								}
-								case "legs":
-								{
+								case "legs": {
 									set.addLegs(parseInteger(attrs, "id"));
 									break;
 								}
-								case "shield":
-								{
+								case "shield": {
 									set.addShield(parseInteger(attrs, "id"));
 									break;
 								}
-								case "skill":
-								{
+								case "skill": {
 									int skillId = parseInteger(attrs, "id");
 									int skillLevel = parseInteger(attrs, "level");
 									set.addSkill(new SkillHolder(skillId, skillLevel));
 									break;
 								}
-								case "shield_skill":
-								{
+								case "shield_skill": {
 									int skillId = parseInteger(attrs, "id");
 									int skillLevel = parseInteger(attrs, "level");
 									set.addShieldSkill(new SkillHolder(skillId, skillLevel));
 									break;
 								}
-								case "enchant6skill":
-								{
+								case "enchant6skill": {
 									int skillId = parseInteger(attrs, "id");
 									int skillLevel = parseInteger(attrs, "level");
 									set.addEnchant6Skill(new SkillHolder(skillId, skillLevel));
 									break;
 								}
-								case "con":
-								{
+								case "con": {
 									set.addCon(parseInteger(attrs, "val"));
 									break;
 								}
-								case "dex":
-								{
+								case "dex": {
 									set.addDex(parseInteger(attrs, "val"));
 									break;
 								}
-								case "str":
-								{
+								case "str": {
 									set.addStr(parseInteger(attrs, "val"));
 									break;
 								}
-								case "men":
-								{
+								case "men": {
 									set.addMen(parseInteger(attrs, "val"));
 									break;
 								}
-								case "wit":
-								{
+								case "wit": {
 									set.addWit(parseInteger(attrs, "val"));
 									break;
 								}
-								case "int":
-								{
+								case "int": {
 									set.addInt(parseInteger(attrs, "val"));
 									break;
 								}
@@ -165,8 +140,7 @@ public final class ArmorSetsData implements IXmlReader
 	 * @param chestId the chest Id to verify.
 	 * @return {@code true} if the chest Id belongs to a registered armor set, {@code false} otherwise.
 	 */
-	public boolean isArmorSet(int chestId)
-	{
+	public boolean isArmorSet(int chestId) {
 		return _armorSets.containsKey(chestId);
 	}
 	
@@ -175,8 +149,7 @@ public final class ArmorSetsData implements IXmlReader
 	 * @param chestId the chest Id identifying the armor set.
 	 * @return the armor set associated to the give chest Id.
 	 */
-	public L2ArmorSet getSet(int chestId)
-	{
+	public L2ArmorSet getSet(int chestId) {
 		return _armorSets.get(chestId);
 	}
 	
@@ -184,13 +157,11 @@ public final class ArmorSetsData implements IXmlReader
 	 * Gets the single instance of ArmorSetsData.
 	 * @return single instance of ArmorSetsData
 	 */
-	public static ArmorSetsData getInstance()
-	{
+	public static ArmorSetsData getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final ArmorSetsData _instance = new ArmorSetsData();
 	}
 }

@@ -31,144 +31,109 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 /**
  * @author xban1x
  */
-public final class ArenaParticipantsHolder
-{
+public final class ArenaParticipantsHolder {
 	private final int _arena;
 	private final List<L2PcInstance> _redPlayers;
 	private final List<L2PcInstance> _bluePlayers;
 	private final BlockCheckerEngine _engine;
 	
-	public ArenaParticipantsHolder(int arena)
-	{
+	public ArenaParticipantsHolder(int arena) {
 		_arena = arena;
 		_redPlayers = new ArrayList<>(6);
 		_bluePlayers = new ArrayList<>(6);
 		_engine = new BlockCheckerEngine(this, _arena);
 	}
 	
-	public List<L2PcInstance> getRedPlayers()
-	{
+	public List<L2PcInstance> getRedPlayers() {
 		return _redPlayers;
 	}
 	
-	public List<L2PcInstance> getBluePlayers()
-	{
+	public List<L2PcInstance> getBluePlayers() {
 		return _bluePlayers;
 	}
 	
-	public List<L2PcInstance> getAllPlayers()
-	{
+	public List<L2PcInstance> getAllPlayers() {
 		List<L2PcInstance> all = new ArrayList<>(12);
 		all.addAll(_redPlayers);
 		all.addAll(_bluePlayers);
 		return all;
 	}
 	
-	public void addPlayer(L2PcInstance player, int team)
-	{
-		if (team == 0)
-		{
+	public void addPlayer(L2PcInstance player, int team) {
+		if (team == 0) {
 			_redPlayers.add(player);
-		}
-		else
-		{
+		} else {
 			_bluePlayers.add(player);
 		}
 	}
 	
-	public void removePlayer(L2PcInstance player, int team)
-	{
-		if (team == 0)
-		{
+	public void removePlayer(L2PcInstance player, int team) {
+		if (team == 0) {
 			_redPlayers.remove(player);
-		}
-		else
-		{
+		} else {
 			_bluePlayers.remove(player);
 		}
 	}
 	
-	public int getPlayerTeam(L2PcInstance player)
-	{
-		if (_redPlayers.contains(player))
-		{
+	public int getPlayerTeam(L2PcInstance player) {
+		if (_redPlayers.contains(player)) {
 			return 0;
-		}
-		else if (_bluePlayers.contains(player))
-		{
+		} else if (_bluePlayers.contains(player)) {
 			return 1;
-		}
-		else
-		{
+		} else {
 			return -1;
 		}
 	}
 	
-	public int getRedTeamSize()
-	{
+	public int getRedTeamSize() {
 		return _redPlayers.size();
 	}
 	
-	public int getBlueTeamSize()
-	{
+	public int getBlueTeamSize() {
 		return _bluePlayers.size();
 	}
 	
-	public void broadCastPacketToTeam(L2GameServerPacket packet)
-	{
-		for (L2PcInstance p : _redPlayers)
-		{
+	public void broadCastPacketToTeam(L2GameServerPacket packet) {
+		for (L2PcInstance p : _redPlayers) {
 			p.sendPacket(packet);
 		}
-		for (L2PcInstance p : _bluePlayers)
-		{
+		for (L2PcInstance p : _bluePlayers) {
 			p.sendPacket(packet);
 		}
 	}
 	
-	public void clearPlayers()
-	{
+	public void clearPlayers() {
 		_redPlayers.clear();
 		_bluePlayers.clear();
 	}
 	
-	public BlockCheckerEngine getEvent()
-	{
+	public BlockCheckerEngine getEvent() {
 		return _engine;
 	}
 	
-	public void updateEvent()
-	{
+	public void updateEvent() {
 		_engine.updatePlayersOnStart(this);
 	}
 	
-	public void checkAndShuffle()
-	{
+	public void checkAndShuffle() {
 		final int redSize = _redPlayers.size();
 		final int blueSize = _bluePlayers.size();
-		if (redSize > (blueSize + 1))
-		{
+		if (redSize > (blueSize + 1)) {
 			broadCastPacketToTeam(SystemMessage.getSystemMessage(SystemMessageId.TEAM_ADJUSTED_BECAUSE_WRONG_POPULATION_RATIO));
 			final int needed = redSize - (blueSize + 1);
-			for (int i = 0; i < (needed + 1); i++)
-			{
+			for (int i = 0; i < (needed + 1); i++) {
 				final L2PcInstance plr = _redPlayers.get(i);
-				if (plr == null)
-				{
+				if (plr == null) {
 					continue;
 				}
 				HandysBlockCheckerManager.getInstance().changePlayerToTeam(plr, _arena, 1);
 			}
-		}
-		else if (blueSize > (redSize + 1))
-		{
+		} else if (blueSize > (redSize + 1)) {
 			broadCastPacketToTeam(SystemMessage.getSystemMessage(SystemMessageId.TEAM_ADJUSTED_BECAUSE_WRONG_POPULATION_RATIO));
 			final int needed = blueSize - (redSize + 1);
-			for (int i = 0; i < (needed + 1); i++)
-			{
+			for (int i = 0; i < (needed + 1); i++) {
 				final L2PcInstance plr = _bluePlayers.get(i);
-				if (plr == null)
-				{
+				if (plr == null) {
 					continue;
 				}
 				HandysBlockCheckerManager.getInstance().changePlayerToTeam(plr, _arena, 0);

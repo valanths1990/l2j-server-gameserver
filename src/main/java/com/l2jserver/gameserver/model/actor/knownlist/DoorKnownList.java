@@ -22,28 +22,21 @@ import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.instance.L2DefenderInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2DoorInstance;
 
-public class DoorKnownList extends CharKnownList
-{
-	public DoorKnownList(L2DoorInstance activeChar)
-	{
+public class DoorKnownList extends CharKnownList {
+	public DoorKnownList(L2DoorInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public final L2DoorInstance getActiveChar()
-	{
+	public final L2DoorInstance getActiveChar() {
 		return (L2DoorInstance) super.getActiveChar();
 	}
 	
 	@Override
-	public int getDistanceToForgetObject(L2Object object)
-	{
-		if (object instanceof L2DefenderInstance)
-		{
+	public int getDistanceToForgetObject(L2Object object) {
+		if (object instanceof L2DefenderInstance) {
 			return 800;
-		}
-		else if (!object.isPlayer())
-		{
+		} else if (!object.isPlayer()) {
 			return 0;
 		}
 		
@@ -51,14 +44,10 @@ public class DoorKnownList extends CharKnownList
 	}
 	
 	@Override
-	public int getDistanceToWatchObject(L2Object object)
-	{
-		if (object instanceof L2DefenderInstance)
-		{
+	public int getDistanceToWatchObject(L2Object object) {
+		if (object instanceof L2DefenderInstance) {
 			return 600;
-		}
-		else if (!object.isPlayer())
-		{
+		} else if (!object.isPlayer()) {
 			return 0;
 		}
 		return 3500;

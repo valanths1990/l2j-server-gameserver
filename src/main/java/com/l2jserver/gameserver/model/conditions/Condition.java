@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class Condition.
  * @author mkizub
  */
-public abstract class Condition implements ConditionListener
-{
+public abstract class Condition implements ConditionListener {
 	private ConditionListener _listener;
 	private String _msg;
 	private int _msgId;
@@ -38,8 +37,7 @@ public abstract class Condition implements ConditionListener
 	 * Sets the message.
 	 * @param msg the new message
 	 */
-	public final void setMessage(String msg)
-	{
+	public final void setMessage(String msg) {
 		_msg = msg;
 	}
 	
@@ -47,8 +45,7 @@ public abstract class Condition implements ConditionListener
 	 * Gets the message.
 	 * @return the message
 	 */
-	public final String getMessage()
-	{
+	public final String getMessage() {
 		return _msg;
 	}
 	
@@ -56,8 +53,7 @@ public abstract class Condition implements ConditionListener
 	 * Sets the message id.
 	 * @param msgId the new message id
 	 */
-	public final void setMessageId(int msgId)
-	{
+	public final void setMessageId(int msgId) {
 		_msgId = msgId;
 	}
 	
@@ -65,16 +61,14 @@ public abstract class Condition implements ConditionListener
 	 * Gets the message id.
 	 * @return the message id
 	 */
-	public final int getMessageId()
-	{
+	public final int getMessageId() {
 		return _msgId;
 	}
 	
 	/**
 	 * Adds the name.
 	 */
-	public final void addName()
-	{
+	public final void addName() {
 		_addName = true;
 	}
 	
@@ -82,8 +76,7 @@ public abstract class Condition implements ConditionListener
 	 * Checks if is adds the name.
 	 * @return true, if is adds the name
 	 */
-	public final boolean isAddName()
-	{
+	public final boolean isAddName() {
 		return _addName;
 	}
 	
@@ -91,8 +84,7 @@ public abstract class Condition implements ConditionListener
 	 * Sets the listener.
 	 * @param listener the new listener
 	 */
-	void setListener(ConditionListener listener)
-	{
+	void setListener(ConditionListener listener) {
 		_listener = listener;
 		notifyChanged();
 	}
@@ -101,26 +93,21 @@ public abstract class Condition implements ConditionListener
 	 * Gets the listener.
 	 * @return the listener
 	 */
-	final ConditionListener getListener()
-	{
+	final ConditionListener getListener() {
 		return _listener;
 	}
 	
-	public final boolean test(L2Character caster, L2Character target, Skill skill)
-	{
+	public final boolean test(L2Character caster, L2Character target, Skill skill) {
 		return test(caster, target, skill, null);
 	}
 	
-	public final boolean test(L2Character caster, L2Character target, L2Item item)
-	{
+	public final boolean test(L2Character caster, L2Character target, L2Item item) {
 		return test(caster, target, null, null);
 	}
 	
-	public final boolean test(L2Character caster, L2Character target, Skill skill, L2Item item)
-	{
+	public final boolean test(L2Character caster, L2Character target, Skill skill, L2Item item) {
 		boolean res = testImpl(caster, target, skill, item);
-		if ((_listener != null) && (res != _result))
-		{
+		if ((_listener != null) && (res != _result)) {
 			_result = res;
 			notifyChanged();
 		}
@@ -138,10 +125,8 @@ public abstract class Condition implements ConditionListener
 	public abstract boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item);
 	
 	@Override
-	public void notifyChanged()
-	{
-		if (_listener != null)
-		{
+	public void notifyChanged() {
+		if (_listener != null) {
 			_listener.notifyChanged();
 		}
 	}

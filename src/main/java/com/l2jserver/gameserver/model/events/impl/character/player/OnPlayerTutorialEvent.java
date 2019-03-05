@@ -26,30 +26,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * @author Zealar
  * @since 2.6.0.0
  */
-public class OnPlayerTutorialEvent implements IBaseEvent
-{
+public class OnPlayerTutorialEvent implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final String _command;
 	
-	public OnPlayerTutorialEvent(L2PcInstance activeChar, String command)
-	{
+	public OnPlayerTutorialEvent(L2PcInstance activeChar, String command) {
 		_activeChar = activeChar;
 		_command = command;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public String getCommand()
-	{
+	public String getCommand() {
 		return _command;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_TUTORIAL_EVENT;
 	}
 }

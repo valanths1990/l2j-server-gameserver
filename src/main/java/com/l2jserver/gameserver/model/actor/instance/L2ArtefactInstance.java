@@ -25,21 +25,18 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 
-public final class L2ArtefactInstance extends L2Npc
-{
+public final class L2ArtefactInstance extends L2Npc {
 	/**
 	 * Creates a castle siege artifact.
 	 * @param template the artifact NPC template
 	 */
-	public L2ArtefactInstance(L2NpcTemplate template)
-	{
+	public L2ArtefactInstance(L2NpcTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2ArtefactInstance);
 	}
 	
 	@Override
-	public void onSpawn()
-	{
+	public void onSpawn() {
 		super.onSpawn();
 		getCastle().registerArtefact(this);
 	}
@@ -48,31 +45,26 @@ public final class L2ArtefactInstance extends L2Npc
 	 * Return False.
 	 */
 	@Override
-	public boolean isAutoAttackable(L2Character attacker)
-	{
+	public boolean isAutoAttackable(L2Character attacker) {
 		return false;
 	}
 	
 	@Override
-	public boolean canBeAttacked()
-	{
+	public boolean canBeAttacked() {
 		return false;
 	}
 	
 	@Override
-	public void onForcedAttack(L2PcInstance player)
-	{
+	public void onForcedAttack(L2PcInstance player) {
 		// Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
 		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 	
 	@Override
-	public void reduceCurrentHp(double damage, L2Character attacker, Skill skill)
-	{
+	public void reduceCurrentHp(double damage, L2Character attacker, Skill skill) {
 	}
 	
 	@Override
-	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake, boolean isDOT, Skill skill)
-	{
+	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake, boolean isDOT, Skill skill) {
 	}
 }

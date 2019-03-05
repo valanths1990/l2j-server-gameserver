@@ -28,8 +28,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerState.
  * @author mkizub
  */
-public class ConditionPlayerState extends Condition
-{
+public class ConditionPlayerState extends Condition {
 	private final PlayerState _check;
 	private final boolean _required;
 	
@@ -38,22 +37,18 @@ public class ConditionPlayerState extends Condition
 	 * @param check the player state to be verified.
 	 * @param required the required value.
 	 */
-	public ConditionPlayerState(PlayerState check, boolean required)
-	{
+	public ConditionPlayerState(PlayerState check, boolean required) {
 		_check = check;
 		_required = required;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final L2Character character = effector;
 		final L2PcInstance player = effector.getActingPlayer();
-		switch (_check)
-		{
+		switch (_check) {
 			case RESTING:
-				if (player != null)
-				{
+				if (player != null) {
 					return (player.isSitting() == _required);
 				}
 				return !_required;
@@ -62,8 +57,7 @@ public class ConditionPlayerState extends Condition
 			case RUNNING:
 				return character.isRunning() == _required;
 			case STANDING:
-				if (player != null)
-				{
+				if (player != null) {
 					return (_required != (player.isSitting() || player.isMoving()));
 				}
 				return (_required != character.isMoving());
@@ -74,14 +68,12 @@ public class ConditionPlayerState extends Condition
 			case FRONT:
 				return (character.isInFrontOfTarget() == _required);
 			case CHAOTIC:
-				if (player != null)
-				{
+				if (player != null) {
 					return ((player.getKarma() > 0) == _required);
 				}
 				return !_required;
 			case OLYMPIAD:
-				if (player != null)
-				{
+				if (player != null) {
 					return (player.isInOlympiadMode() == _required);
 				}
 				return !_required;

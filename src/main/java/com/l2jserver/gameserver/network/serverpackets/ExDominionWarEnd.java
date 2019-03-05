@@ -22,11 +22,9 @@ package com.l2jserver.gameserver.network.serverpackets;
  * Possibly trigger packet only, need to be verified.
  * @author JIV
  */
-public class ExDominionWarEnd extends L2GameServerPacket
-{
+public class ExDominionWarEnd extends L2GameServerPacket {
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xA4);
 	}

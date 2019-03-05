@@ -27,23 +27,19 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncMaxHpMul extends AbstractFunction
-{
+public class FuncMaxHpMul extends AbstractFunction {
 	private static final FuncMaxHpMul _fmhm_instance = new FuncMaxHpMul();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fmhm_instance;
 	}
 	
-	private FuncMaxHpMul()
-	{
+	private FuncMaxHpMul() {
 		super(Stats.MAX_HP, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		return initVal * BaseStats.CON.calcBonus(effector);
 	}
 }

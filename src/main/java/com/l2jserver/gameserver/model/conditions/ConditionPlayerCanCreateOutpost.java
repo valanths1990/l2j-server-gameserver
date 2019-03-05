@@ -34,64 +34,47 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Player Can Create Outpost condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanCreateOutpost extends Condition
-{
+public class ConditionPlayerCanCreateOutpost extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanCreateOutpost(boolean val)
-	{
+	public ConditionPlayerCanCreateOutpost(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return !_val;
 		}
 		
 		final L2PcInstance player = effector.getActingPlayer();
 		boolean canCreateOutpost = true;
-		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || (player.getClan() == null))
-		{
+		if (player.isAlikeDead() || player.isCursedWeaponEquipped() || (player.getClan() == null)) {
 			canCreateOutpost = false;
 		}
 		
 		final Castle castle = CastleManager.getInstance().getCastle(player);
 		final Fort fort = FortManager.getInstance().getFort(player);
-		if ((castle == null) && (fort == null))
-		{
+		if ((castle == null) && (fort == null)) {
 			canCreateOutpost = false;
 		}
 		
-		if (((fort != null) && (fort.getResidenceId() == 0)) || ((castle != null) && (castle.getResidenceId() == 0)))
-		{
+		if (((fort != null) && (fort.getResidenceId() == 0)) || ((castle != null) && (castle.getResidenceId() == 0))) {
 			player.sendMessage("You must be on fort or castle ground to construct an outpost or flag.");
 			canCreateOutpost = false;
-		}
-		else if (((fort != null) && !fort.getZone().isActive()) || ((castle != null) && !castle.getZone().isActive()))
-		{
+		} else if (((fort != null) && !fort.getZone().isActive()) || ((castle != null) && !castle.getZone().isActive())) {
 			player.sendMessage("You can only construct an outpost or flag on siege field.");
 			canCreateOutpost = false;
-		}
-		else if (!player.isClanLeader())
-		{
+		} else if (!player.isClanLeader()) {
 			player.sendMessage("You must be a clan leader to construct an outpost or flag.");
 			canCreateOutpost = false;
-		}
-		else if (TerritoryWarManager.getInstance().getHQForClan(player.getClan()) != null)
-		{
+		} else if (TerritoryWarManager.getInstance().getHQForClan(player.getClan()) != null) {
 			player.sendPacket(SystemMessageId.NOT_ANOTHER_HEADQUARTERS);
 			canCreateOutpost = false;
-		}
-		else if (TerritoryWarManager.getInstance().getFlagForClan(player.getClan()) != null)
-		{
+		} else if (TerritoryWarManager.getInstance().getFlagForClan(player.getClan()) != null) {
 			player.sendPacket(SystemMessageId.A_FLAG_IS_ALREADY_BEING_DISPLAYED_ANOTHER_FLAG_CANNOT_BE_DISPLAYED);
 			canCreateOutpost = false;
-		}
-		else if (!player.isInsideZone(ZoneId.HQ))
-		{
+		} else if (!player.isInsideZone(ZoneId.HQ)) {
 			player.sendPacket(SystemMessageId.NOT_SET_UP_BASE_HERE);
 			canCreateOutpost = false;
 		}

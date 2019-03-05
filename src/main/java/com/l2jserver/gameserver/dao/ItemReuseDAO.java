@@ -24,8 +24,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Item Reuse DAO interface.
  * @author Zoey76
  */
-public interface ItemReuseDAO
-{
+public interface ItemReuseDAO {
 	/**
 	 * Restores the item reuse for the given player.
 	 * @param player the player

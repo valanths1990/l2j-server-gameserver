@@ -30,8 +30,7 @@ import java.lang.annotation.Target;
 @Repeatable(Ranges.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Range
-{
+public @interface Range {
 	public int from();
 	
 	public int to();

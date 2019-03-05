@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model;
 /**
  * This class describes a Recipe used by Dwarf to craft Item. All L2RecipeList are made of L2RecipeInstance (1 line of the recipe : Item-Quantity needed).
  */
-public class L2RecipeList
-{
+public class L2RecipeList {
 	/** The table containing all L2RecipeInstance (1 line of the recipe : Item-Quantity needed) of the L2RecipeList */
 	private L2RecipeInstance[] _recipes;
 	
@@ -70,8 +69,7 @@ public class L2RecipeList
 	 * @param set
 	 * @param haveRare
 	 */
-	public L2RecipeList(StatsSet set, boolean haveRare)
-	{
+	public L2RecipeList(StatsSet set, boolean haveRare) {
 		_recipes = new L2RecipeInstance[0];
 		_statUse = new L2RecipeStatInstance[0];
 		_altStatChange = new L2RecipeStatInstance[0];
@@ -82,8 +80,7 @@ public class L2RecipeList
 		_successRate = set.getInt("successRate");
 		_itemId = set.getInt("itemId");
 		_count = set.getInt("count");
-		if (haveRare)
-		{
+		if (haveRare) {
 			_rareItemId = set.getInt("rareItemId");
 			_rareCount = set.getInt("rareCount");
 			_rarity = set.getInt("rarity");
@@ -95,8 +92,7 @@ public class L2RecipeList
 	 * Add a L2RecipeInstance to the L2RecipeList (add a line Item-Quantity needed to the Recipe).
 	 * @param recipe
 	 */
-	public void addRecipe(L2RecipeInstance recipe)
-	{
+	public void addRecipe(L2RecipeInstance recipe) {
 		int len = _recipes.length;
 		L2RecipeInstance[] tmp = new L2RecipeInstance[len + 1];
 		System.arraycopy(_recipes, 0, tmp, 0, len);
@@ -108,8 +104,7 @@ public class L2RecipeList
 	 * Add a L2RecipeStatInstance of the statUse parameter to the L2RecipeList.
 	 * @param statUse
 	 */
-	public void addStatUse(L2RecipeStatInstance statUse)
-	{
+	public void addStatUse(L2RecipeStatInstance statUse) {
 		int len = _statUse.length;
 		L2RecipeStatInstance[] tmp = new L2RecipeStatInstance[len + 1];
 		System.arraycopy(_statUse, 0, tmp, 0, len);
@@ -121,8 +116,7 @@ public class L2RecipeList
 	 * Add a L2RecipeStatInstance of the altStatChange parameter to the L2RecipeList.
 	 * @param statChange
 	 */
-	public void addAltStatChange(L2RecipeStatInstance statChange)
-	{
+	public void addAltStatChange(L2RecipeStatInstance statChange) {
 		int len = _altStatChange.length;
 		L2RecipeStatInstance[] tmp = new L2RecipeStatInstance[len + 1];
 		System.arraycopy(_altStatChange, 0, tmp, 0, len);
@@ -133,112 +127,98 @@ public class L2RecipeList
 	/**
 	 * @return the Identifier of the Instance.
 	 */
-	public int getId()
-	{
+	public int getId() {
 		return _id;
 	}
 	
 	/**
 	 * @return the crafting level needed to use this L2RecipeList.
 	 */
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _level;
 	}
 	
 	/**
 	 * @return the Identifier of the L2RecipeList.
 	 */
-	public int getRecipeId()
-	{
+	public int getRecipeId() {
 		return _recipeId;
 	}
 	
 	/**
 	 * @return the name of the L2RecipeList.
 	 */
-	public String getRecipeName()
-	{
+	public String getRecipeName() {
 		return _recipeName;
 	}
 	
 	/**
 	 * @return the crafting success rate when using the L2RecipeList.
 	 */
-	public int getSuccessRate()
-	{
+	public int getSuccessRate() {
 		return _successRate;
 	}
 	
 	/**
 	 * @return the Identifier of the Item crafted with this L2RecipeList.
 	 */
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 	
 	/**
 	 * @return the quantity of Item crafted when using this L2RecipeList.
 	 */
-	public int getCount()
-	{
+	public int getCount() {
 		return _count;
 	}
 	
 	/**
 	 * @return the Identifier of the Rare Item crafted with this L2RecipeList.
 	 */
-	public int getRareItemId()
-	{
+	public int getRareItemId() {
 		return _rareItemId;
 	}
 	
 	/**
 	 * @return the quantity of Rare Item crafted when using this L2RecipeList.
 	 */
-	public int getRareCount()
-	{
+	public int getRareCount() {
 		return _rareCount;
 	}
 	
 	/**
 	 * @return the chance of Rare Item crafted when using this L2RecipeList.
 	 */
-	public int getRarity()
-	{
+	public int getRarity() {
 		return _rarity;
 	}
 	
 	/**
 	 * @return {@code true} if this a Dwarven recipe or {@code false} if its a Common recipe
 	 */
-	public boolean isDwarvenRecipe()
-	{
+	public boolean isDwarvenRecipe() {
 		return _isDwarvenRecipe;
 	}
 	
 	/**
 	 * @return the table containing all L2RecipeInstance (1 line of the recipe : Item-Quantity needed) of the L2RecipeList.
 	 */
-	public L2RecipeInstance[] getRecipes()
-	{
+	public L2RecipeInstance[] getRecipes() {
 		return _recipes;
 	}
 	
 	/**
 	 * @return the table containing all L2RecipeStatInstance of the statUse parameter of the L2RecipeList.
 	 */
-	public L2RecipeStatInstance[] getStatUse()
-	{
+	public L2RecipeStatInstance[] getStatUse() {
 		return _statUse;
 	}
 	
 	/**
 	 * @return the table containing all L2RecipeStatInstance of the AltStatChange parameter of the L2RecipeList.
 	 */
-	public L2RecipeStatInstance[] getAltStatChange()
-	{
+	public L2RecipeStatInstance[] getAltStatChange() {
 		return _altStatChange;
 	}
 }

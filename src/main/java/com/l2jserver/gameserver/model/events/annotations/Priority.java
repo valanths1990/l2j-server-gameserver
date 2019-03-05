@@ -28,7 +28,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Priority
-{
+public @interface Priority {
 	public int value() default 0;
 }

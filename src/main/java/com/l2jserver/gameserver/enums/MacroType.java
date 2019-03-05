@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.enums;
  * Macro type enumerated.
  * @author Zoey76
  */
-public enum MacroType
-{
+public enum MacroType {
 	NONE,
 	SKILL,
 	ACTION,

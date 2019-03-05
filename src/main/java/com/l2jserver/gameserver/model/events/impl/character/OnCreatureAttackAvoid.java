@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
  * An instantly executed event when L2Character attack miss L2Character.
  * @author Zealar
  */
-public class OnCreatureAttackAvoid implements IBaseEvent
-{
+public class OnCreatureAttackAvoid implements IBaseEvent {
 	private final L2Character _attacker;
 	private final L2Character _target;
 	private final boolean _damageOverTime;
@@ -37,34 +36,29 @@ public class OnCreatureAttackAvoid implements IBaseEvent
 	 * @param target who avoid
 	 * @param isDot is dot damage
 	 */
-	public OnCreatureAttackAvoid(L2Character attacker, L2Character target, boolean isDot)
-	{
+	public OnCreatureAttackAvoid(L2Character attacker, L2Character target, boolean isDot) {
 		_attacker = attacker;
 		_target = target;
 		_damageOverTime = isDot;
 	}
 	
-	public final L2Character getAttacker()
-	{
+	public final L2Character getAttacker() {
 		return _attacker;
 	}
 	
-	public final L2Character getTarget()
-	{
+	public final L2Character getTarget() {
 		return _target;
 	}
 	
 	/**
 	 * @return
 	 */
-	public boolean isDamageOverTime()
-	{
+	public boolean isDamageOverTime() {
 		return _damageOverTime;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_CREATURE_ATTACK_AVOID;
 	}
 }

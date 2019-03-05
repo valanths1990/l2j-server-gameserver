@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerBaseStats.
  * @author mkizub
  */
-public class ConditionPlayerBaseStats extends Condition
-{
+public class ConditionPlayerBaseStats extends Condition {
 	
 	private final BaseStat _stat;
 	private final int _value;
@@ -39,8 +38,7 @@ public class ConditionPlayerBaseStats extends Condition
 	 * @param stat the stat
 	 * @param value the value
 	 */
-	public ConditionPlayerBaseStats(L2Character player, BaseStat stat, int value)
-	{
+	public ConditionPlayerBaseStats(L2Character player, BaseStat stat, int value) {
 		super();
 		_stat = stat;
 		_value = value;
@@ -51,15 +49,12 @@ public class ConditionPlayerBaseStats extends Condition
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		final L2PcInstance player = effector.getActingPlayer();
-		switch (_stat)
-		{
+		switch (_stat) {
 			case Int:
 				return player.getINT() >= _value;
 			case Str:
@@ -77,8 +72,7 @@ public class ConditionPlayerBaseStats extends Condition
 	}
 }
 
-enum BaseStat
-{
+enum BaseStat {
 	Int,
 	Str,
 	Con,

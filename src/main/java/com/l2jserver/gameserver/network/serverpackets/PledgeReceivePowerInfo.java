@@ -23,21 +23,18 @@ import com.l2jserver.gameserver.model.L2ClanMember;
 /**
  * @author -Wooden-
  */
-public class PledgeReceivePowerInfo extends L2GameServerPacket
-{
+public class PledgeReceivePowerInfo extends L2GameServerPacket {
 	private final L2ClanMember _member;
 	
 	/**
 	 * @param member
 	 */
-	public PledgeReceivePowerInfo(L2ClanMember member)
-	{
+	public PledgeReceivePowerInfo(L2ClanMember member) {
 		_member = member;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x3d);
 		

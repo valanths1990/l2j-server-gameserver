@@ -26,27 +26,21 @@ import com.l2jserver.gameserver.model.zone.ZoneId;
  * A landing zone
  * @author Kerberos
  */
-public class L2LandingZone extends L2ZoneType
-{
-	public L2LandingZone(int id)
-	{
+public class L2LandingZone extends L2ZoneType {
+	public L2LandingZone(int id) {
 		super(id);
 	}
 	
 	@Override
-	protected void onEnter(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onEnter(L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.LANDING, true);
 		}
 	}
 	
 	@Override
-	protected void onExit(L2Character character)
-	{
-		if (character.isPlayer())
-		{
+	protected void onExit(L2Character character) {
+		if (character.isPlayer()) {
 			character.setInsideZone(ZoneId.LANDING, false);
 		}
 	}

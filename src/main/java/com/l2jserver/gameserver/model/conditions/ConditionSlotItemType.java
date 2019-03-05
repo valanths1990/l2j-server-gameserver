@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionSlotItemType.
  * @author mkizub
  */
-public final class ConditionSlotItemType extends ConditionInventory
-{
+public final class ConditionSlotItemType extends ConditionInventory {
 	private final int _mask;
 	
 	/**
@@ -36,23 +35,19 @@ public final class ConditionSlotItemType extends ConditionInventory
 	 * @param slot the slot
 	 * @param mask the mask
 	 */
-	public ConditionSlotItemType(int slot, int mask)
-	{
+	public ConditionSlotItemType(int slot, int mask) {
 		super(slot);
 		_mask = mask;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if ((effector == null) || !effector.isPlayer())
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if ((effector == null) || !effector.isPlayer()) {
 			return false;
 		}
 		
 		final L2ItemInstance itemSlot = effector.getInventory().getPaperdollItem(_slot);
-		if (itemSlot == null)
-		{
+		if (itemSlot == null) {
 			return false;
 		}
 		return (itemSlot.getItem().getItemMask() & _mask) != 0;

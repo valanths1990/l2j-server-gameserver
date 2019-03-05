@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author -Wooden-
  */
-public class ExSearchOrc extends L2GameServerPacket
-{
+public class ExSearchOrc extends L2GameServerPacket {
 	public static final ExSearchOrc STATIC_PACKET = new ExSearchOrc();
 	
-	private ExSearchOrc()
-	{
+	private ExSearchOrc() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x45);
 	}

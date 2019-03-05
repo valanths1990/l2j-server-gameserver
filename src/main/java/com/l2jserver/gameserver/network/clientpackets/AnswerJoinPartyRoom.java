@@ -33,36 +33,29 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Format: (ch) d
  * @author -Wooden-, Tryskell
  */
-public final class AnswerJoinPartyRoom extends L2GameClientPacket
-{
+public final class AnswerJoinPartyRoom extends L2GameClientPacket {
 	private static final String _C__D0_30_ANSWERJOINPARTYROOM = "[C] D0:30 AnswerJoinPartyRoom";
 	private int _answer; // 1 or 0
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_answer = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
 		L2PcInstance partner = player.getActiveRequester();
-		if (partner == null)
-		{
+		if (partner == null) {
 			// Partner hasn't been found, cancel the invitation
 			player.sendPacket(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
 			player.setActiveRequester(null);
 			return;
-		}
-		else if (L2World.getInstance().getPlayer(partner.getObjectId()) == null)
-		{
+		} else if (L2World.getInstance().getPlayer(partner.getObjectId()) == null) {
 			// Partner hasn't been found, cancel the invitation
 			player.sendPacket(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
 			player.setActiveRequester(null);
@@ -70,16 +63,13 @@ public final class AnswerJoinPartyRoom extends L2GameClientPacket
 		}
 		
 		// If answer is positive, join the requester's PartyRoom.
-		if ((_answer == 1) && !partner.isRequestExpired())
-		{
+		if ((_answer == 1) && !partner.isRequestExpired()) {
 			PartyMatchRoom room = PartyMatchRoomList.getInstance().getRoom(partner.getPartyRoom());
-			if (room == null)
-			{
+			if (room == null) {
 				return;
 			}
 			
-			if ((player.getLevel() >= room.getMinLvl()) && (player.getLevel() <= room.getMaxLvl()))
-			{
+			if ((player.getLevel() >= room.getMinLvl()) && (player.getLevel() <= room.getMaxLvl())) {
 				// Remove from waiting list
 				PartyMatchWaitingList.getInstance().removePlayer(player);
 				
@@ -88,10 +78,8 @@ public final class AnswerJoinPartyRoom extends L2GameClientPacket
 				player.sendPacket(new PartyMatchDetail(player, room));
 				player.sendPacket(new ExPartyRoomMember(player, room, 0));
 				
-				for (L2PcInstance member : room.getPartyMembers())
-				{
-					if (member == null)
-					{
+				for (L2PcInstance member : room.getPartyMembers()) {
+					if (member == null) {
 						continue;
 					}
 					
@@ -102,14 +90,10 @@ public final class AnswerJoinPartyRoom extends L2GameClientPacket
 				
 				// Info Broadcast
 				player.broadcastUserInfo();
-			}
-			else
-			{
+			} else {
 				player.sendPacket(SystemMessageId.CANT_ENTER_PARTY_ROOM);
 			}
-		}
-		else
-		{
+		} else {
 			partner.sendPacket(SystemMessageId.PARTY_MATCHING_REQUEST_NO_RESPONSE);
 		}
 		
@@ -119,8 +103,7 @@ public final class AnswerJoinPartyRoom extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_30_ANSWERJOINPARTYROOM;
 	}
 }

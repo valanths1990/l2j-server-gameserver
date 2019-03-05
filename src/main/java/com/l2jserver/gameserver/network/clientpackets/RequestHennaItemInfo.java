@@ -26,32 +26,26 @@ import com.l2jserver.gameserver.network.serverpackets.HennaItemDrawInfo;
 /**
  * @author Zoey76
  */
-public final class RequestHennaItemInfo extends L2GameClientPacket
-{
+public final class RequestHennaItemInfo extends L2GameClientPacket {
 	private static final String _C__C4_REQUESTHENNAITEMINFO = "[C] C4 RequestHennaItemInfo";
 	
 	private int _symbolId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_symbolId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Henna henna = HennaData.getInstance().getHenna(_symbolId);
-		if (henna == null)
-		{
-			if (_symbolId != 0)
-			{
+		if (henna == null) {
+			if (_symbolId != 0) {
 				_log.warning(getClass().getSimpleName() + ": Invalid Henna Id: " + _symbolId + " from player " + activeChar);
 			}
 			sendActionFailed();
@@ -61,8 +55,7 @@ public final class RequestHennaItemInfo extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__C4_REQUESTHENNAITEMINFO;
 	}
 }

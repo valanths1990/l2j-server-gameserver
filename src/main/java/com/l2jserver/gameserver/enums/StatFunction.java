@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.enums;
 /**
  * @author Zealar
  */
-public enum StatFunction
-{
+public enum StatFunction {
 	ADD("Add", 30),
 	DIV("Div", 20),
 	ENCHANT("Enchant", 0),
@@ -35,19 +34,16 @@ public enum StatFunction
 	private String _name;
 	private int _order;
 	
-	StatFunction(String name, int order)
-	{
+	StatFunction(String name, int order) {
 		_name = name;
 		_order = order;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public int getOrder()
-	{
+	public int getOrder() {
 		return _order;
 	}
 }

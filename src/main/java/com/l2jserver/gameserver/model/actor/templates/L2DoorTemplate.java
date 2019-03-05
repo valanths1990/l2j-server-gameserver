@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
  * Doors template.
  * @author JIV
  */
-public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable
-{
+public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable {
 	private final int _doorId;
 	private final int _nodeX[];
 	private final int _nodeY[];
@@ -59,8 +58,7 @@ public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable
 	private final int _clanhallId;
 	private final boolean _stealth;
 	
-	public L2DoorTemplate(StatsSet set)
-	{
+	public L2DoorTemplate(StatsSet set) {
 		super(set);
 		_doorId = set.getInt("id");
 		_name = set.getString("name");
@@ -74,8 +72,7 @@ public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable
 		_nodeZ = set.getInt("nodeZ");
 		_nodeX = new int[4]; // 4 * x
 		_nodeY = new int[4]; // 4 * y
-		for (int i = 0; i < 4; i++)
-		{
+		for (int i = 0; i < 4; i++) {
 			String split[] = set.getString("node" + (i + 1)).split(",");
 			_nodeX[i] = Integer.parseInt(split[0]);
 			_nodeY[i] = Integer.parseInt(split[1]);
@@ -101,8 +98,7 @@ public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable
 		_level = set.getInt("level", 0);
 		_openType = set.getInt("open_method", 0);
 		_checkCollision = set.getBoolean("check_collision", true);
-		if ((_openType & L2DoorInstance.OPEN_BY_TIME) == L2DoorInstance.OPEN_BY_TIME)
-		{
+		if ((_openType & L2DoorInstance.OPEN_BY_TIME) == L2DoorInstance.OPEN_BY_TIME) {
 			_openTime = set.getInt("open_time");
 			_randomTime = set.getInt("random_time", -1);
 		}
@@ -116,138 +112,111 @@ public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable
 	 * @return the door ID
 	 */
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return _doorId;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public int[] getNodeX()
-	{
+	public int[] getNodeX() {
 		return _nodeX;
 	}
 	
-	public int[] getNodeY()
-	{
+	public int[] getNodeY() {
 		return _nodeY;
 	}
 	
-	public int getNodeZ()
-	{
+	public int getNodeZ() {
 		return _nodeZ;
 	}
 	
-	public int getHeight()
-	{
+	public int getHeight() {
 		return _height;
 	}
 	
-	public int getX()
-	{
+	public int getX() {
 		return _posX;
 	}
 	
-	public int getY()
-	{
+	public int getY() {
 		return _posY;
 	}
 	
-	public int getZ()
-	{
+	public int getZ() {
 		return _posZ;
 	}
 	
-	public int getEmmiter()
-	{
+	public int getEmmiter() {
 		return _emmiter;
 	}
 	
-	public int getChildDoorId()
-	{
+	public int getChildDoorId() {
 		return _childDoorId;
 	}
 	
-	public String getGroupName()
-	{
+	public String getGroupName() {
 		return _groupName;
 	}
 	
-	public boolean isShowHp()
-	{
+	public boolean isShowHp() {
 		return _showHp;
 	}
 	
-	public boolean isWall()
-	{
+	public boolean isWall() {
 		return _isWall;
 	}
 	
-	public byte getMasterDoorOpen()
-	{
+	public byte getMasterDoorOpen() {
 		return _masterDoorOpen;
 	}
 	
-	public byte getMasterDoorClose()
-	{
+	public byte getMasterDoorClose() {
 		return _masterDoorClose;
 	}
 	
-	public boolean isTargetable()
-	{
+	public boolean isTargetable() {
 		return _isTargetable;
 	}
 	
-	public boolean isOpenByDefault()
-	{
+	public boolean isOpenByDefault() {
 		return _default_status;
 	}
 	
-	public int getOpenTime()
-	{
+	public int getOpenTime() {
 		return _openTime;
 	}
 	
-	public int getRandomTime()
-	{
+	public int getRandomTime() {
 		return _randomTime;
 	}
 	
-	public int getCloseTime()
-	{
+	public int getCloseTime() {
 		return _closeTime;
 	}
 	
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _level;
 	}
 	
-	public int getOpenType()
-	{
+	public int getOpenType() {
 		return _openType;
 	}
 	
-	public boolean isCheckCollision()
-	{
+	public boolean isCheckCollision() {
 		return _checkCollision;
 	}
 	
-	public boolean isAttackable()
-	{
+	public boolean isAttackable() {
 		return _isAttackableDoor;
 	}
 	
-	public int getClanHallId()
-	{
+	public int getClanHallId() {
 		return _clanhallId;
 	}
 	
-	public boolean isStealth()
-	{
+	public boolean isStealth() {
 		return _stealth;
 	}
 }

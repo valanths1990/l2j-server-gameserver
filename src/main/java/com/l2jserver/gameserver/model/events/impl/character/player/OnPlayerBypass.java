@@ -25,30 +25,25 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnPlayerBypass implements IBaseEvent
-{
+public class OnPlayerBypass implements IBaseEvent {
 	private final L2PcInstance _activeChar;
 	private final String _command;
 	
-	public OnPlayerBypass(L2PcInstance activeChar, String command)
-	{
+	public OnPlayerBypass(L2PcInstance activeChar, String command) {
 		_activeChar = activeChar;
 		_command = command;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public String getCommand()
-	{
+	public String getCommand() {
 		return _command;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_BYPASS;
 	}
 }

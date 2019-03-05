@@ -23,8 +23,7 @@ package com.l2jserver.gameserver.model.interfaces;
  * More suitable for developers not sure about their data.<br>
  * @author xban1x
  */
-public interface IParserUtils
-{
+public interface IParserUtils {
 	public boolean getBoolean(String key, boolean defaultValue);
 	
 	public byte getByte(String key, byte defaultValue);

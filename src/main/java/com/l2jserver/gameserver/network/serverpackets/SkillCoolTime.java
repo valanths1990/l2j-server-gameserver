@@ -29,19 +29,14 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Skill Cool Time server packet implementation.
  * @author KenM, Zoey76
  */
-public class SkillCoolTime extends L2GameServerPacket
-{
+public class SkillCoolTime extends L2GameServerPacket {
 	private final List<TimeStamp> _skillReuseTimeStamps = new ArrayList<>();
 	
-	public SkillCoolTime(L2PcInstance player)
-	{
+	public SkillCoolTime(L2PcInstance player) {
 		final Map<Integer, TimeStamp> skillReuseTimeStamps = player.getSkillReuseTimeStamps();
-		if (skillReuseTimeStamps != null)
-		{
-			for (TimeStamp ts : skillReuseTimeStamps.values())
-			{
-				if (ts.hasNotPassed())
-				{
+		if (skillReuseTimeStamps != null) {
+			for (TimeStamp ts : skillReuseTimeStamps.values()) {
+				if (ts.hasNotPassed()) {
 					_skillReuseTimeStamps.add(ts);
 				}
 			}
@@ -49,12 +44,10 @@ public class SkillCoolTime extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xC7);
 		writeD(_skillReuseTimeStamps.size());
-		for (TimeStamp ts : _skillReuseTimeStamps)
-		{
+		for (TimeStamp ts : _skillReuseTimeStamps) {
 			writeD(ts.getSkillId());
 			writeD(ts.getSkillLvl());
 			writeD((int) ts.getReuse() / 1000);

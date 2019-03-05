@@ -21,11 +21,9 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author KenM
  */
-public class ExCaptureOrc extends L2GameServerPacket
-{
+public class ExCaptureOrc extends L2GameServerPacket {
 	private static final byte[] _test;
-	static
-	{
+	static {
 		// TODO: Verify the data
 		//@formatter:off
 		_test = new byte[]
@@ -43,8 +41,7 @@ public class ExCaptureOrc extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x45);
 		writeB(_test);

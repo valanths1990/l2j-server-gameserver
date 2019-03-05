@@ -20,15 +20,13 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public class MoveToPawn extends L2GameServerPacket
-{
+public class MoveToPawn extends L2GameServerPacket {
 	private final int _charObjId;
 	private final int _targetId;
 	private final int _distance;
 	private final int _x, _y, _z, _tx, _ty, _tz;
 	
-	public MoveToPawn(L2Character cha, L2Character target, int distance)
-	{
+	public MoveToPawn(L2Character cha, L2Character target, int distance) {
 		_charObjId = cha.getObjectId();
 		_targetId = target.getObjectId();
 		_distance = distance;
@@ -41,8 +39,7 @@ public class MoveToPawn extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x72);
 		
 		writeD(_charObjId);

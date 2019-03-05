@@ -26,26 +26,21 @@ import com.l2jserver.gameserver.model.Location;
  * Format: (ch) d[ddddd]
  * @author -Wooden-
  */
-public class ExCursedWeaponLocation extends L2GameServerPacket
-{
+public class ExCursedWeaponLocation extends L2GameServerPacket {
 	private final List<CursedWeaponInfo> _cursedWeaponInfo;
 	
-	public ExCursedWeaponLocation(List<CursedWeaponInfo> cursedWeaponInfo)
-	{
+	public ExCursedWeaponLocation(List<CursedWeaponInfo> cursedWeaponInfo) {
 		_cursedWeaponInfo = cursedWeaponInfo;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x47);
 		
-		if (!_cursedWeaponInfo.isEmpty())
-		{
+		if (!_cursedWeaponInfo.isEmpty()) {
 			writeD(_cursedWeaponInfo.size());
-			for (CursedWeaponInfo w : _cursedWeaponInfo)
-			{
+			for (CursedWeaponInfo w : _cursedWeaponInfo) {
 				writeD(w.id);
 				writeD(w.activated);
 				
@@ -53,22 +48,18 @@ public class ExCursedWeaponLocation extends L2GameServerPacket
 				writeD(w.pos.getY());
 				writeD(w.pos.getZ());
 			}
-		}
-		else
-		{
+		} else {
 			writeD(0);
 			writeD(0);
 		}
 	}
 	
-	public static class CursedWeaponInfo
-	{
+	public static class CursedWeaponInfo {
 		public Location pos;
 		public int id;
 		public int activated; // 0 - not activated ? 1 - activated
 		
-		public CursedWeaponInfo(Location p, int ID, int status)
-		{
+		public CursedWeaponInfo(Location p, int ID, int status) {
 			pos = p;
 			id = ID;
 			activated = status;

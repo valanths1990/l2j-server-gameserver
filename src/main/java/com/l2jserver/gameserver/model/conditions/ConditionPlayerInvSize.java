@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionPlayerInvSize.
  * @author Kerberos
  */
-public class ConditionPlayerInvSize extends Condition
-{
+public class ConditionPlayerInvSize extends Condition {
 	
 	private final int _size;
 	
@@ -35,16 +34,13 @@ public class ConditionPlayerInvSize extends Condition
 	 * Instantiates a new condition player inv size.
 	 * @param size the size
 	 */
-	public ConditionPlayerInvSize(int size)
-	{
+	public ConditionPlayerInvSize(int size) {
 		_size = size;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() != null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() != null) {
 			return effector.getActingPlayer().getInventory().getSize(false) <= (effector.getActingPlayer().getInventoryLimit() - _size);
 		}
 		return true;

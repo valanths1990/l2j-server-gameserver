@@ -25,34 +25,29 @@ import com.l2jserver.gameserver.handler.CommunityBoardHandler;
  * RequestShowBoard client packet implementation.
  * @author Zoey76
  */
-public final class RequestShowBoard extends L2GameClientPacket
-{
+public final class RequestShowBoard extends L2GameClientPacket {
 	private static final String _C__5E_REQUESTSHOWBOARD = "[C] 5E RequestShowBoard";
 	
 	@SuppressWarnings("unused")
 	private int _unknown;
 	
 	@Override
-	protected final void readImpl()
-	{
+	protected final void readImpl() {
 		_unknown = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		CommunityBoardHandler.getInstance().handleParseCommand(Config.BBS_DEFAULT, getActiveChar());
 	}
 	
 	@Override
-	public final String getType()
-	{
+	public final String getType() {
 		return _C__5E_REQUESTSHOWBOARD;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

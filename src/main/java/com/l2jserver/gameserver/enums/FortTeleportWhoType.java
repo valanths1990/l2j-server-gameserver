@@ -18,8 +18,7 @@
  */
 package com.l2jserver.gameserver.enums;
 
-public enum FortTeleportWhoType
-{
+public enum FortTeleportWhoType {
 	All,
 	Attacker,
 	Owner,

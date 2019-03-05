@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.itemcontainer.PcInventory;
  * Selection screen.
  * @version $Revision: 1.2.2.2.2.4 $ $Date: 2005/03/27 15:29:33 $
  */
-public class CharSelectInfoPackage
-{
+public class CharSelectInfoPackage {
 	private String _name;
 	private int _objectId = 0;
 	private long _exp = 0;
@@ -64,8 +63,7 @@ public class CharSelectInfoPackage
 	 * @param objectId character object Id.
 	 * @param name the character's name.
 	 */
-	public CharSelectInfoPackage(int objectId, String name)
-	{
+	public CharSelectInfoPackage(int objectId, String name) {
 		setObjectId(objectId);
 		_name = name;
 		_paperdoll = PcInventory.restoreVisibleInventory(objectId);
@@ -74,318 +72,256 @@ public class CharSelectInfoPackage
 	/**
 	 * @return the character object Id.
 	 */
-	public int getObjectId()
-	{
+	public int getObjectId() {
 		return _objectId;
 	}
 	
-	public void setObjectId(int objectId)
-	{
+	public void setObjectId(int objectId) {
 		_objectId = objectId;
 	}
 	
 	/**
 	 * @return the character's access level.
 	 */
-	public int getAccessLevel()
-	{
+	public int getAccessLevel() {
 		return _accessLevel;
 	}
 	
 	/**
 	 * @param level the character's access level to be set.
 	 */
-	public void setAccessLevel(int level)
-	{
+	public void setAccessLevel(int level) {
 		_accessLevel = level;
 	}
 	
-	public int getClanId()
-	{
+	public int getClanId() {
 		return _clanId;
 	}
 	
-	public void setClanId(int clanId)
-	{
+	public void setClanId(int clanId) {
 		_clanId = clanId;
 	}
 	
-	public int getClassId()
-	{
+	public int getClassId() {
 		return _classId;
 	}
 	
-	public int getBaseClassId()
-	{
+	public int getBaseClassId() {
 		return _baseClassId;
 	}
 	
-	public void setClassId(int classId)
-	{
+	public void setClassId(int classId) {
 		_classId = classId;
 	}
 	
-	public void setBaseClassId(int baseClassId)
-	{
+	public void setBaseClassId(int baseClassId) {
 		_baseClassId = baseClassId;
 	}
 	
-	public double getCurrentHp()
-	{
+	public double getCurrentHp() {
 		return _currentHp;
 	}
 	
-	public void setCurrentHp(double currentHp)
-	{
+	public void setCurrentHp(double currentHp) {
 		_currentHp = currentHp;
 	}
 	
-	public double getCurrentMp()
-	{
+	public double getCurrentMp() {
 		return _currentMp;
 	}
 	
-	public void setCurrentMp(double currentMp)
-	{
+	public void setCurrentMp(double currentMp) {
 		_currentMp = currentMp;
 	}
 	
-	public long getDeleteTimer()
-	{
+	public long getDeleteTimer() {
 		return _deleteTimer;
 	}
 	
-	public void setDeleteTimer(long deleteTimer)
-	{
+	public void setDeleteTimer(long deleteTimer) {
 		_deleteTimer = deleteTimer;
 	}
 	
-	public long getLastAccess()
-	{
+	public long getLastAccess() {
 		return _lastAccess;
 	}
 	
-	public void setLastAccess(long lastAccess)
-	{
+	public void setLastAccess(long lastAccess) {
 		_lastAccess = lastAccess;
 	}
 	
-	public long getExp()
-	{
+	public long getExp() {
 		return _exp;
 	}
 	
-	public void setExp(long exp)
-	{
+	public void setExp(long exp) {
 		_exp = exp;
 	}
 	
-	public int getFace()
-	{
+	public int getFace() {
 		return _face;
 	}
 	
-	public void setFace(int face)
-	{
+	public void setFace(int face) {
 		_face = face;
 	}
 	
-	public int getHairColor()
-	{
+	public int getHairColor() {
 		return _hairColor;
 	}
 	
-	public void setHairColor(int hairColor)
-	{
+	public void setHairColor(int hairColor) {
 		_hairColor = hairColor;
 	}
 	
-	public int getHairStyle()
-	{
+	public int getHairStyle() {
 		return _hairStyle;
 	}
 	
-	public void setHairStyle(int hairStyle)
-	{
+	public void setHairStyle(int hairStyle) {
 		_hairStyle = hairStyle;
 	}
 	
-	public int getPaperdollObjectId(int slot)
-	{
+	public int getPaperdollObjectId(int slot) {
 		return _paperdoll[slot][0];
 	}
 	
-	public int getPaperdollItemId(int slot)
-	{
+	public int getPaperdollItemId(int slot) {
 		return _paperdoll[slot][1];
 	}
 	
-	public int getLevel()
-	{
+	public int getLevel() {
 		return _level;
 	}
 	
-	public void setLevel(int level)
-	{
+	public void setLevel(int level) {
 		_level = level;
 	}
 	
-	public int getMaxHp()
-	{
+	public int getMaxHp() {
 		return _maxHp;
 	}
 	
-	public void setMaxHp(int maxHp)
-	{
+	public void setMaxHp(int maxHp) {
 		_maxHp = maxHp;
 	}
 	
-	public int getMaxMp()
-	{
+	public int getMaxMp() {
 		return _maxMp;
 	}
 	
-	public void setMaxMp(int maxMp)
-	{
+	public void setMaxMp(int maxMp) {
 		_maxMp = maxMp;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public void setName(String name)
-	{
+	public void setName(String name) {
 		_name = name;
 	}
 	
-	public int getRace()
-	{
+	public int getRace() {
 		return _race;
 	}
 	
-	public void setRace(int race)
-	{
+	public void setRace(int race) {
 		_race = race;
 	}
 	
-	public int getSex()
-	{
+	public int getSex() {
 		return _sex;
 	}
 	
-	public void setSex(int sex)
-	{
+	public void setSex(int sex) {
 		_sex = sex;
 	}
 	
-	public int getSp()
-	{
+	public int getSp() {
 		return _sp;
 	}
 	
-	public void setSp(int sp)
-	{
+	public void setSp(int sp) {
 		_sp = sp;
 	}
 	
-	public int getEnchantEffect()
-	{
-		if (_paperdoll[Inventory.PAPERDOLL_RHAND][2] > 0)
-		{
+	public int getEnchantEffect() {
+		if (_paperdoll[Inventory.PAPERDOLL_RHAND][2] > 0) {
 			return _paperdoll[Inventory.PAPERDOLL_RHAND][2];
 		}
 		return _paperdoll[Inventory.PAPERDOLL_RHAND][2];
 	}
 	
-	public void setKarma(int k)
-	{
+	public void setKarma(int k) {
 		_karma = k;
 	}
 	
-	public int getKarma()
-	{
+	public int getKarma() {
 		return _karma;
 	}
 	
-	public void setAugmentationId(int augmentationId)
-	{
+	public void setAugmentationId(int augmentationId) {
 		_augmentationId = augmentationId;
 	}
 	
-	public int getAugmentationId()
-	{
+	public int getAugmentationId() {
 		return _augmentationId;
 	}
 	
-	public void setPkKills(int PkKills)
-	{
+	public void setPkKills(int PkKills) {
 		_pkKills = PkKills;
 	}
 	
-	public int getPkKills()
-	{
+	public int getPkKills() {
 		return _pkKills;
 	}
 	
-	public void setPvPKills(int PvPKills)
-	{
+	public void setPvPKills(int PvPKills) {
 		_pvpKills = PvPKills;
 	}
 	
-	public int getPvPKills()
-	{
+	public int getPvPKills() {
 		return _pvpKills;
 	}
 	
-	public int getX()
-	{
+	public int getX() {
 		return _x;
 	}
 	
-	public int getY()
-	{
+	public int getY() {
 		return _y;
 	}
 	
-	public int getZ()
-	{
+	public int getZ() {
 		return _z;
 	}
 	
-	public void setX(int x)
-	{
+	public void setX(int x) {
 		_x = x;
 	}
 	
-	public void setY(int y)
-	{
+	public void setY(int y) {
 		_y = y;
 	}
 	
-	public void setZ(int z)
-	{
+	public void setZ(int z) {
 		_z = z;
 	}
 	
-	public String getHtmlPrefix()
-	{
+	public String getHtmlPrefix() {
 		return _htmlPrefix;
 	}
 	
-	public void setHtmlPrefix(String s)
-	{
+	public void setHtmlPrefix(String s) {
 		_htmlPrefix = s;
 	}
 	
-	public void setVitalityPoints(int points)
-	{
+	public void setVitalityPoints(int points) {
 		_vitalityPoints = points;
 	}
 	
-	public int getVitalityPoints()
-	{
+	public int getVitalityPoints() {
 		return _vitalityPoints;
 	}
 }

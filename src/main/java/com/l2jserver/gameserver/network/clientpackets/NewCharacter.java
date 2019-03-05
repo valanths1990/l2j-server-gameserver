@@ -26,21 +26,17 @@ import com.l2jserver.gameserver.network.serverpackets.NewCharacterSuccess;
 /**
  * @author Zoey76
  */
-public final class NewCharacter extends L2GameClientPacket
-{
+public final class NewCharacter extends L2GameClientPacket {
 	private static final String _C__13_NEWCHARACTER = "[C] 13 NewCharacter";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (Config.DEBUG)
-		{
+	protected void runImpl() {
+		if (Config.DEBUG) {
 			_log.fine(_C__13_NEWCHARACTER);
 		}
 		
@@ -60,8 +56,7 @@ public final class NewCharacter extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__13_NEWCHARACTER;
 	}
 }

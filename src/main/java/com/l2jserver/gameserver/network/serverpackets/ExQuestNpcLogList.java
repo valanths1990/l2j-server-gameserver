@@ -24,66 +24,55 @@ import java.util.List;
 /**
  * @author UnAfraid
  */
-public class ExQuestNpcLogList extends L2GameServerPacket
-{
+public class ExQuestNpcLogList extends L2GameServerPacket {
 	private final int _questId;
 	private final List<NpcHolder> _npcs = new ArrayList<>();
 	
-	public ExQuestNpcLogList(int questId)
-	{
+	public ExQuestNpcLogList(int questId) {
 		_questId = questId;
 	}
 	
-	public void addNpc(int npcId, int count)
-	{
+	public void addNpc(int npcId, int count) {
 		_npcs.add(new NpcHolder(npcId, 0, count));
 	}
 	
-	public void addNpc(int npcId, int unknown, int count)
-	{
+	public void addNpc(int npcId, int unknown, int count) {
 		_npcs.add(new NpcHolder(npcId, unknown, count));
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xC5);
 		writeD(_questId);
 		writeC(_npcs.size());
-		for (NpcHolder holder : _npcs)
-		{
+		for (NpcHolder holder : _npcs) {
 			writeD((holder.getNpcId() + 1000000));
 			writeC(holder.getUnknown());
 			writeD(holder.getCount());
 		}
 	}
 	
-	private class NpcHolder
-	{
+	private class NpcHolder {
 		private final int _npcId;
 		private final int _unknown;
 		private final int _count;
 		
-		public NpcHolder(int npcId, int unknown, int count)
-		{
+		public NpcHolder(int npcId, int unknown, int count) {
 			_npcId = npcId;
 			_unknown = unknown;
 			_count = count;
 		}
 		
-		public int getNpcId()
-		{
+		public int getNpcId() {
 			return _npcId;
 		}
 		
-		public int getUnknown()
-		{
+		public int getUnknown() {
 			return _unknown;
 		}
 		
-		public int getCount()
-		{
+		public int getCount() {
 			return _count;
 		}
 	}

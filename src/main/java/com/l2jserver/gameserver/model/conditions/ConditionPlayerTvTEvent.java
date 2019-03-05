@@ -27,25 +27,21 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerTvTEvent.
  */
-public class ConditionPlayerTvTEvent extends Condition
-{
+public class ConditionPlayerTvTEvent extends Condition {
 	private final boolean _val;
 	
 	/**
 	 * Instantiates a new condition player tv t event.
 	 * @param val the val
 	 */
-	public ConditionPlayerTvTEvent(boolean val)
-	{
+	public ConditionPlayerTvTEvent(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		final L2PcInstance player = effector.getActingPlayer();
-		if ((player == null) || !TvTEvent.isStarted())
-		{
+		if ((player == null) || !TvTEvent.isStarted()) {
 			return !_val;
 		}
 		return (TvTEvent.isPlayerParticipant(player.getObjectId()) == _val);

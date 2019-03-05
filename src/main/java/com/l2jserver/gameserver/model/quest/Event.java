@@ -24,10 +24,8 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Abstract event class.
  * @author JIV
  */
-public abstract class Event extends Quest
-{
-	public Event(String name, String descr)
-	{
+public abstract class Event extends Quest {
+	public Event(String name, String descr) {
 		super(-1, name, descr);
 	}
 	

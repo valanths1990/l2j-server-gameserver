@@ -24,16 +24,14 @@ import java.util.concurrent.Future;
  * Basic task zone settings implementation.
  * @author UnAfraid
  */
-public class TaskZoneSettings extends AbstractZoneSettings
-{
+public class TaskZoneSettings extends AbstractZoneSettings {
 	private Future<?> _task;
 	
 	/**
 	 * Gets the task.
 	 * @return the task
 	 */
-	public Future<?> getTask()
-	{
+	public Future<?> getTask() {
 		return _task;
 	}
 	
@@ -41,16 +39,13 @@ public class TaskZoneSettings extends AbstractZoneSettings
 	 * Sets the task.
 	 * @param task the new task
 	 */
-	public void setTask(Future<?> task)
-	{
+	public void setTask(Future<?> task) {
 		_task = task;
 	}
 	
 	@Override
-	public void clear()
-	{
-		if (_task != null)
-		{
+	public void clear() {
+		if (_task != null) {
 			_task.cancel(true);
 			_task = null;
 		}

@@ -20,8 +20,7 @@ package com.l2jserver.gameserver.model.actor.appearance;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class PcAppearance
-{
+public class PcAppearance {
 	public static final int DEFAULT_TITLE_COLOR = 0xECF9A2;
 	
 	private L2PcInstance _owner;
@@ -49,8 +48,7 @@ public class PcAppearance
 	/** The default title color is 0xECF9A2. */
 	private int _titleColor = DEFAULT_TITLE_COLOR;
 	
-	public PcAppearance(byte face, byte hColor, byte hStyle, boolean sex)
-	{
+	public PcAppearance(byte face, byte hColor, byte hStyle, boolean sex) {
 		_face = face;
 		_hairColor = hColor;
 		_hairStyle = hStyle;
@@ -60,18 +58,15 @@ public class PcAppearance
 	/**
 	 * @param visibleName The visibleName to set.
 	 */
-	public final void setVisibleName(String visibleName)
-	{
+	public final void setVisibleName(String visibleName) {
 		_visibleName = visibleName;
 	}
 	
 	/**
 	 * @return Returns the visibleName.
 	 */
-	public final String getVisibleName()
-	{
-		if (_visibleName == null)
-		{
+	public final String getVisibleName() {
+		if (_visibleName == null) {
 			return getOwner().getName();
 		}
 		return _visibleName;
@@ -80,141 +75,118 @@ public class PcAppearance
 	/**
 	 * @param visibleTitle The visibleTitle to set.
 	 */
-	public final void setVisibleTitle(String visibleTitle)
-	{
+	public final void setVisibleTitle(String visibleTitle) {
 		_visibleTitle = visibleTitle;
 	}
 	
 	/**
 	 * @return Returns the visibleTitle.
 	 */
-	public final String getVisibleTitle()
-	{
-		if (_visibleTitle == null)
-		{
+	public final String getVisibleTitle() {
+		if (_visibleTitle == null) {
 			return getOwner().getTitle();
 		}
 		return _visibleTitle;
 	}
 	
-	public final byte getFace()
-	{
+	public final byte getFace() {
 		return _face;
 	}
 	
 	/**
 	 * @param value
 	 */
-	public final void setFace(int value)
-	{
+	public final void setFace(int value) {
 		_face = (byte) value;
 	}
 	
-	public final byte getHairColor()
-	{
+	public final byte getHairColor() {
 		return _hairColor;
 	}
 	
 	/**
 	 * @param value
 	 */
-	public final void setHairColor(int value)
-	{
+	public final void setHairColor(int value) {
 		_hairColor = (byte) value;
 	}
 	
-	public final byte getHairStyle()
-	{
+	public final byte getHairStyle() {
 		return _hairStyle;
 	}
 	
 	/**
 	 * @param value
 	 */
-	public final void setHairStyle(int value)
-	{
+	public final void setHairStyle(int value) {
 		_hairStyle = (byte) value;
 	}
 	
 	/**
 	 * @return true if char is female
 	 */
-	public final boolean getSex()
-	{
+	public final boolean getSex() {
 		return _sex;
 	}
 	
 	/**
 	 * @param isfemale
 	 */
-	public final void setSex(boolean isfemale)
-	{
+	public final void setSex(boolean isfemale) {
 		_sex = isfemale;
 	}
 	
-	public void setGhostMode(boolean b)
-	{
+	public void setGhostMode(boolean b) {
 		_ghostmode = b;
 	}
 	
-	public boolean isGhost()
-	{
+	public boolean isGhost() {
 		return _ghostmode;
 	}
 	
-	public int getNameColor()
-	{
+	public int getNameColor() {
 		return _nameColor;
 	}
 	
-	public void setNameColor(int nameColor)
-	{
-		if (nameColor < 0)
-		{
+	public void setNameColor(int nameColor) {
+		if (nameColor < 0) {
 			return;
 		}
 		
 		_nameColor = nameColor;
 	}
 	
-	public void setNameColor(int red, int green, int blue)
-	{
+	public void setNameColor(int red, int green, int blue) {
 		_nameColor = (red & 0xFF) + ((green & 0xFF) << 8) + ((blue & 0xFF) << 16);
 	}
 	
-	public int getTitleColor()
-	{
+	public int getTitleColor() {
 		return _titleColor;
 	}
 	
-	public void setTitleColor(int titleColor)
-	{
-		if (titleColor < 0)
-		{
+	public void setTitleColor(int titleColor) {
+		if (titleColor < 0) {
 			return;
 		}
 		
 		_titleColor = titleColor;
 	}
 	
-	public void setTitleColor(int red, int green, int blue)
-	{
+	public void setTitleColor(int red, int green, int blue) {
 		_titleColor = (red & 0xFF) + ((green & 0xFF) << 8) + ((blue & 0xFF) << 16);
 	}
 	
 	/**
 	 * @param owner The owner to set.
 	 */
-	public void setOwner(L2PcInstance owner)
-	{
+	public void setOwner(L2PcInstance owner) {
 		_owner = owner;
 	}
 	
 	/**
 	 * @return Returns the owner.
 	 */
-	public L2PcInstance getOwner()
-	{
+	public L2PcInstance getOwner() {
 		return _owner;
 	}
 }

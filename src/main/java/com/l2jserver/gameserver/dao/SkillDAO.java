@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Skill DAO interface.
  * @author Zoey76
  */
-public interface SkillDAO
-{
+public interface SkillDAO {
 	void insert(L2PcInstance player, int classIndex, Skill skill);
 	
 	void update(L2PcInstance player, int classIndex, Skill newSkill, Skill oldSkill);

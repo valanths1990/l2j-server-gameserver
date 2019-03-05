@@ -29,45 +29,37 @@ import com.l2jserver.gameserver.network.serverpackets.TradeDone;
  * This class ...
  * @version $Revision: 1.5.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class AnswerTradeRequest extends L2GameClientPacket
-{
+public final class AnswerTradeRequest extends L2GameClientPacket {
 	private static final String _C__55_ANSWERTRADEREQUEST = "[C] 55 AnswerTradeRequest";
 	
 	private int _response;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_response = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance player = getClient().getActiveChar();
-		if (player == null)
-		{
+		if (player == null) {
 			return;
 		}
 		
-		if (!player.getAccessLevel().allowTransaction())
-		{
+		if (!player.getAccessLevel().allowTransaction()) {
 			player.sendPacket(SystemMessageId.YOU_ARE_NOT_AUTHORIZED_TO_DO_THAT);
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 		
 		L2PcInstance partner = player.getActiveRequester();
-		if (partner == null)
-		{
+		if (partner == null) {
 			// Trade partner not found, cancel trade
 			player.sendPacket(new TradeDone(0));
 			player.sendPacket(SystemMessage.getSystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME));
 			player.setActiveRequester(null);
 			return;
-		}
-		else if (L2World.getInstance().getPlayer(partner.getObjectId()) == null)
-		{
+		} else if (L2World.getInstance().getPlayer(partner.getObjectId()) == null) {
 			// Trade partner not found, cancel trade
 			player.sendPacket(new TradeDone(0));
 			player.sendPacket(SystemMessage.getSystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME));
@@ -75,12 +67,9 @@ public final class AnswerTradeRequest extends L2GameClientPacket
 			return;
 		}
 		
-		if ((_response == 1) && !partner.isRequestExpired())
-		{
+		if ((_response == 1) && !partner.isRequestExpired()) {
 			player.startTrade(partner);
-		}
-		else
-		{
+		} else {
 			SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.C1_DENIED_TRADE_REQUEST);
 			msg.addString(player.getName());
 			partner.sendPacket(msg);
@@ -92,8 +81,7 @@ public final class AnswerTradeRequest extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__55_ANSWERTRADEREQUEST;
 	}
 }

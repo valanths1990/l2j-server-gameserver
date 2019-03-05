@@ -39,43 +39,31 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * If two or more conditions aren't meet at the same time, one message per condition will be shown.
  * @author Zoey76
  */
-public class ConditionPlayerCanSweep extends Condition
-{
+public class ConditionPlayerCanSweep extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCanSweep(boolean val)
-	{
+	public ConditionPlayerCanSweep(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean canSweep = false;
-		if (effector.getActingPlayer() != null)
-		{
+		if (effector.getActingPlayer() != null) {
 			final L2PcInstance sweeper = effector.getActingPlayer();
-			if (skill != null)
-			{
+			if (skill != null) {
 				final L2Object[] targets = skill.getTargetList(sweeper);
-				if (targets != null)
-				{
+				if (targets != null) {
 					L2Attackable target;
-					for (L2Object objTarget : targets)
-					{
-						if (objTarget instanceof L2Attackable)
-						{
+					for (L2Object objTarget : targets) {
+						if (objTarget instanceof L2Attackable) {
 							target = (L2Attackable) objTarget;
-							if (target.isDead())
-							{
-								if (target.isSpoiled())
-								{
+							if (target.isDead()) {
+								if (target.isSpoiled()) {
 									canSweep = target.checkSpoilOwner(sweeper, true);
 									canSweep &= !target.isOldCorpse(sweeper, Config.CORPSE_CONSUME_SKILL_ALLOWED_TIME_BEFORE_DECAY, true);
 									canSweep &= sweeper.getInventory().checkInventorySlotsAndWeight(target.getSpoilLootItems(), true, true);
-								}
-								else
-								{
+								} else {
 									sweeper.sendPacket(SystemMessageId.SWEEPER_FAILED_TARGET_NOT_SPOILED);
 								}
 							}

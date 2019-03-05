@@ -27,60 +27,50 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * This class ...
  * @version $Revision: 1.3.4.4 $ $Date: 2005/04/06 16:13:48 $
  */
-public final class RequestChangePetName extends L2GameClientPacket
-{
+public final class RequestChangePetName extends L2GameClientPacket {
 	private static final String _C__93_REQUESTCHANGEPETNAME = "[C] 93 RequestChangePetName";
 	private static final int PET_NAME_MAX_LENGHT = 16;
 	
 	private String _name;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_name = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		final L2Summon pet = activeChar.getSummon();
-		if (pet == null)
-		{
+		if (pet == null) {
 			return;
 		}
 		
-		if (!pet.isPet())
-		{
+		if (!pet.isPet()) {
 			activeChar.sendPacket(SystemMessageId.DONT_HAVE_PET);
 			return;
 		}
 		
-		if (pet.getName() != null)
-		{
+		if (pet.getName() != null) {
 			activeChar.sendPacket(SystemMessageId.NAMING_YOU_CANNOT_SET_NAME_OF_THE_PET);
 			return;
 		}
 		
-		if (PetNameTable.getInstance().doesPetNameExist(_name))
-		{
+		if (PetNameTable.getInstance().doesPetNameExist(_name)) {
 			activeChar.sendPacket(SystemMessageId.NAMING_ALREADY_IN_USE_BY_ANOTHER_PET);
 			return;
 		}
 		
-		if (_name.isEmpty() || (_name.length() > PET_NAME_MAX_LENGHT))
-		{
+		if (_name.isEmpty() || (_name.length() > PET_NAME_MAX_LENGHT)) {
 			activeChar.sendPacket(SystemMessageId.NAMING_CHARNAME_UP_TO_16CHARS);
 			return;
 		}
 		
-		if (!PetNameTable.getInstance().isValidPetName(_name))
-		{
+		if (!PetNameTable.getInstance().isValidPetName(_name)) {
 			activeChar.sendPacket(SystemMessageId.NAMING_PETNAME_CONTAINS_INVALID_CHARS);
 			return;
 		}
@@ -90,8 +80,7 @@ public final class RequestChangePetName extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__93_REQUESTCHANGEPETNAME;
 	}
 }

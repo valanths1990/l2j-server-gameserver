@@ -32,8 +32,7 @@ import com.l2jserver.gameserver.model.stats.Stats;
  * Function template.
  * @author mkizub, Zoey76
  */
-public final class FuncTemplate
-{
+public final class FuncTemplate {
 	private static final Logger LOG = Logger.getLogger(FuncTemplate.class.getName());
 	
 	private final Condition _attachCond;
@@ -43,15 +42,11 @@ public final class FuncTemplate
 	private final int _order;
 	private final double _value;
 	
-	public FuncTemplate(Condition attachCond, Condition applayCond, String functionName, int order, Stats stat, double value)
-	{
+	public FuncTemplate(Condition attachCond, Condition applayCond, String functionName, int order, Stats stat, double value) {
 		final StatFunction function = StatFunction.valueOf(functionName.toUpperCase());
-		if (order >= 0)
-		{
+		if (order >= 0) {
 			_order = order;
-		}
-		else
-		{
+		} else {
 			_order = function.getOrder();
 		}
 		
@@ -60,8 +55,7 @@ public final class FuncTemplate
 		_stat = stat;
 		_value = value;
 		
-		try
-		{
+		try {
 			final Class<?> functionClass = Class.forName("com.l2jserver.gameserver.model.stats.functions.Func" + function.getName());
 			_constructor = functionClass.getConstructor(Stats.class, // Stats to update
 				Integer.TYPE, // Order of execution
@@ -69,9 +63,7 @@ public final class FuncTemplate
 				Double.TYPE, // Value for function
 				Condition.class // Condition
 			);
-		}
-		catch (ClassNotFoundException | NoSuchMethodException e)
-		{
+		} catch (ClassNotFoundException | NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -80,8 +72,7 @@ public final class FuncTemplate
 	 * Gets the function stat.
 	 * @return the stat.
 	 */
-	public Stats getStat()
-	{
+	public Stats getStat() {
 		return _stat;
 	}
 	
@@ -89,8 +80,7 @@ public final class FuncTemplate
 	 * Gets the function priority order.
 	 * @return the order
 	 */
-	public int getOrder()
-	{
+	public int getOrder() {
 		return _order;
 	}
 	
@@ -98,8 +88,7 @@ public final class FuncTemplate
 	 * Gets the function value.
 	 * @return the value
 	 */
-	public double getValue()
-	{
+	public double getValue() {
 		return _value;
 	}
 	
@@ -111,8 +100,7 @@ public final class FuncTemplate
 	 * @param owner the owner
 	 * @return the function if conditions are met, {@code null} otherwise
 	 */
-	public AbstractFunction getFunc(L2Character caster, L2Character target, Skill skill, Object owner)
-	{
+	public AbstractFunction getFunc(L2Character caster, L2Character target, Skill skill, Object owner) {
 		return getFunc(caster, target, skill, null, owner);
 	}
 	
@@ -124,8 +112,7 @@ public final class FuncTemplate
 	 * @param owner the owner
 	 * @return the function if conditions are met, {@code null} otherwise
 	 */
-	public AbstractFunction getFunc(L2Character caster, L2Character target, L2ItemInstance item, Object owner)
-	{
+	public AbstractFunction getFunc(L2Character caster, L2Character target, L2ItemInstance item, Object owner) {
 		return getFunc(caster, target, null, item, owner);
 	}
 	
@@ -138,18 +125,13 @@ public final class FuncTemplate
 	 * @param owner the owner
 	 * @return the function if conditions are met, {@code null} otherwise
 	 */
-	private AbstractFunction getFunc(L2Character caster, L2Character target, Skill skill, L2ItemInstance item, Object owner)
-	{
-		if ((_attachCond != null) && !_attachCond.test(caster, target, skill))
-		{
+	private AbstractFunction getFunc(L2Character caster, L2Character target, Skill skill, L2ItemInstance item, Object owner) {
+		if ((_attachCond != null) && !_attachCond.test(caster, target, skill)) {
 			return null;
 		}
-		try
-		{
+		try {
 			return (AbstractFunction) _constructor.newInstance(_stat, _order, owner, _value, _applayCond);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			LOG.warning(FuncTemplate.class.getSimpleName() + ": " + e.getMessage());
 		}
 		return null;

@@ -30,47 +30,39 @@ import com.l2jserver.gameserver.network.serverpackets.ExPutEnchantTargetItemResu
 /**
  * @author KenM
  */
-public class RequestExTryToPutEnchantTargetItem extends L2GameClientPacket
-{
+public class RequestExTryToPutEnchantTargetItem extends L2GameClientPacket {
 	private static final String _C__D0_4C_REQUESTEXTRYTOPUTENCHANTTARGETITEM = "[C] D0:4C RequestExTryToPutEnchantTargetItem";
 	
 	private int _objectId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectId = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if ((_objectId == 0) || (activeChar == null))
-		{
+		if ((_objectId == 0) || (activeChar == null)) {
 			return;
 		}
 		
-		if (activeChar.isEnchanting())
-		{
+		if (activeChar.isEnchanting()) {
 			return;
 		}
 		
 		final L2ItemInstance item = activeChar.getInventory().getItemByObjectId(_objectId);
 		final L2ItemInstance scroll = activeChar.getInventory().getItemByObjectId(activeChar.getActiveEnchantItemId());
-		if ((item == null) || (scroll == null))
-		{
+		if ((item == null) || (scroll == null)) {
 			return;
 		}
 		
 		final EnchantScroll scrollTemplate = EnchantItemData.getInstance().getEnchantScroll(scroll);
-		if ((scrollTemplate == null) || !scrollTemplate.isValid(item, null))
-		{
+		if ((scrollTemplate == null) || !scrollTemplate.isValid(item, null)) {
 			activeChar.sendPacket(SystemMessageId.DOES_NOT_FIT_SCROLL_CONDITIONS);
 			activeChar.setActiveEnchantItemId(L2PcInstance.ID_NONE);
 			activeChar.sendPacket(new ExPutEnchantTargetItemResult(0));
-			if (scrollTemplate == null)
-			{
+			if (scrollTemplate == null) {
 				_log.log(Level.WARNING, getClass().getSimpleName() + ": Undefined scroll have been used id: " + scroll.getId());
 			}
 			return;
@@ -81,8 +73,7 @@ public class RequestExTryToPutEnchantTargetItem extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_4C_REQUESTEXTRYTOPUTENCHANTTARGETITEM;
 	}
 }

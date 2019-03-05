@@ -26,45 +26,35 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncAtkEvasion extends AbstractFunction
-{
+public class FuncAtkEvasion extends AbstractFunction {
 	private static final FuncAtkEvasion _fae_instance = new FuncAtkEvasion();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fae_instance;
 	}
 	
-	private FuncAtkEvasion()
-	{
+	private FuncAtkEvasion() {
 		super(Stats.EVASION_RATE, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		final int level = effector.getLevel();
 		double value = initVal;
-		if (effector.isPlayer())
-		{
+		if (effector.isPlayer()) {
 			// [Square(DEX)] * 6 + lvl;
 			value += (Math.sqrt(effector.getDEX()) * 6) + level;
 			double diff = level - 69;
-			if (level >= 78)
-			{
+			if (level >= 78) {
 				diff *= 1.2;
 			}
-			if (level >= 70)
-			{
+			if (level >= 70) {
 				value += diff;
 			}
-		}
-		else
-		{
+		} else {
 			// [Square(DEX)] * 6 + lvl;
 			value += (Math.sqrt(effector.getDEX()) * 6) + level;
-			if (level > 69)
-			{
+			if (level > 69) {
 				value += (level - 69) + 2;
 			}
 		}

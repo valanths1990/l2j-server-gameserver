@@ -27,8 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author KenM
  */
-public class RequestDispel extends L2GameClientPacket
-{
+public class RequestDispel extends L2GameClientPacket {
 	private static final String _C_D0_4B_REQUESTDISPEL = "[C] D0:4B RequestDispel";
 	
 	private int _objectId;
@@ -36,58 +35,45 @@ public class RequestDispel extends L2GameClientPacket
 	private int _skillLevel;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_objectId = readD();
 		_skillId = readD();
 		_skillLevel = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if ((_skillId <= 0) || (_skillLevel <= 0))
-		{
+	protected void runImpl() {
+		if ((_skillId <= 0) || (_skillLevel <= 0)) {
 			return;
 		}
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		final Skill skill = SkillData.getInstance().getSkill(_skillId, _skillLevel);
-		if (skill == null)
-		{
+		if (skill == null) {
 			return;
 		}
-		if (skill.isIrreplaceableBuff() || skill.isStayAfterDeath() || skill.isDebuff())
-		{
+		if (skill.isIrreplaceableBuff() || skill.isStayAfterDeath() || skill.isDebuff()) {
 			return;
 		}
-		if (skill.getAbnormalType() == AbnormalType.TRANSFORM)
-		{
+		if (skill.getAbnormalType() == AbnormalType.TRANSFORM) {
 			return;
 		}
-		if (skill.isDance() && !Config.DANCE_CANCEL_BUFF)
-		{
+		if (skill.isDance() && !Config.DANCE_CANCEL_BUFF) {
 			return;
 		}
-		if (activeChar.getObjectId() == _objectId)
-		{
+		if (activeChar.getObjectId() == _objectId) {
 			activeChar.stopSkillEffects(true, _skillId);
-		}
-		else
-		{
-			if (activeChar.hasSummon() && (activeChar.getSummon().getObjectId() == _objectId))
-			{
+		} else {
+			if (activeChar.hasSummon() && (activeChar.getSummon().getObjectId() == _objectId)) {
 				activeChar.getSummon().stopSkillEffects(true, _skillId);
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C_D0_4B_REQUESTDISPEL;
 	}
 }

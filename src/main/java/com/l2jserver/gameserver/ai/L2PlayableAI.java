@@ -29,23 +29,18 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * This class manages AI of L2Playable.
  * @author JIV
  */
-public abstract class L2PlayableAI extends L2CharacterAI
-{
+public abstract class L2PlayableAI extends L2CharacterAI {
 	/**
 	 * @param creature the creature
 	 */
-	public L2PlayableAI(L2Playable creature)
-	{
+	public L2PlayableAI(L2Playable creature) {
 		super(creature);
 	}
 	
 	@Override
-	protected void onIntentionAttack(L2Character target)
-	{
-		if (target instanceof L2Playable)
-		{
-			if (target.getActingPlayer().isProtectionBlessingAffected() && ((_actor.getActingPlayer().getLevel() - target.getActingPlayer().getLevel()) >= 10) && (_actor.getActingPlayer().getKarma() > 0) && !(target.isInsideZone(ZoneId.PVP)))
-			{
+	protected void onIntentionAttack(L2Character target) {
+		if (target instanceof L2Playable) {
+			if (target.getActingPlayer().isProtectionBlessingAffected() && ((_actor.getActingPlayer().getLevel() - target.getActingPlayer().getLevel()) >= 10) && (_actor.getActingPlayer().getKarma() > 0) && !(target.isInsideZone(ZoneId.PVP))) {
 				// If attacker have karma and have level >= 10 than his target and target have
 				// Newbie Protection Buff,
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
@@ -53,8 +48,7 @@ public abstract class L2PlayableAI extends L2CharacterAI
 				return;
 			}
 			
-			if (_actor.getActingPlayer().isProtectionBlessingAffected() && ((target.getActingPlayer().getLevel() - _actor.getActingPlayer().getLevel()) >= 10) && (target.getActingPlayer().getKarma() > 0) && !(target.isInsideZone(ZoneId.PVP)))
-			{
+			if (_actor.getActingPlayer().isProtectionBlessingAffected() && ((target.getActingPlayer().getLevel() - _actor.getActingPlayer().getLevel()) >= 10) && (target.getActingPlayer().getKarma() > 0) && !(target.isInsideZone(ZoneId.PVP))) {
 				// If target have karma and have level >= 10 than his target and actor have
 				// Newbie Protection Buff,
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
@@ -62,15 +56,13 @@ public abstract class L2PlayableAI extends L2CharacterAI
 				return;
 			}
 			
-			if (target.getActingPlayer().isCursedWeaponEquipped() && (_actor.getActingPlayer().getLevel() <= 20))
-			{
+			if (target.getActingPlayer().isCursedWeaponEquipped() && (_actor.getActingPlayer().getLevel() <= 20)) {
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
 				clientActionFailed();
 				return;
 			}
 			
-			if (_actor.getActingPlayer().isCursedWeaponEquipped() && (target.getActingPlayer().getLevel() <= 20))
-			{
+			if (_actor.getActingPlayer().isCursedWeaponEquipped() && (target.getActingPlayer().getLevel() <= 20)) {
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
 				clientActionFailed();
 				return;
@@ -81,12 +73,9 @@ public abstract class L2PlayableAI extends L2CharacterAI
 	}
 	
 	@Override
-	protected void onIntentionCast(Skill skill, L2Object target)
-	{
-		if ((target instanceof L2Playable) && skill.isBad())
-		{
-			if (target.getActingPlayer().isProtectionBlessingAffected() && ((_actor.getActingPlayer().getLevel() - target.getActingPlayer().getLevel()) >= 10) && (_actor.getActingPlayer().getKarma() > 0) && !target.isInsideZone(ZoneId.PVP))
-			{
+	protected void onIntentionCast(Skill skill, L2Object target) {
+		if ((target instanceof L2Playable) && skill.isBad()) {
+			if (target.getActingPlayer().isProtectionBlessingAffected() && ((_actor.getActingPlayer().getLevel() - target.getActingPlayer().getLevel()) >= 10) && (_actor.getActingPlayer().getKarma() > 0) && !target.isInsideZone(ZoneId.PVP)) {
 				// If attacker have karma and have level >= 10 than his target and target have
 				// Newbie Protection Buff,
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
@@ -95,8 +84,7 @@ public abstract class L2PlayableAI extends L2CharacterAI
 				return;
 			}
 			
-			if (_actor.getActingPlayer().isProtectionBlessingAffected() && ((target.getActingPlayer().getLevel() - _actor.getActingPlayer().getLevel()) >= 10) && (target.getActingPlayer().getKarma() > 0) && !target.isInsideZone(ZoneId.PVP))
-			{
+			if (_actor.getActingPlayer().isProtectionBlessingAffected() && ((target.getActingPlayer().getLevel() - _actor.getActingPlayer().getLevel()) >= 10) && (target.getActingPlayer().getKarma() > 0) && !target.isInsideZone(ZoneId.PVP)) {
 				// If target have karma and have level >= 10 than his target and actor have
 				// Newbie Protection Buff,
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
@@ -105,8 +93,7 @@ public abstract class L2PlayableAI extends L2CharacterAI
 				return;
 			}
 			
-			if (target.getActingPlayer().isCursedWeaponEquipped() && ((_actor.getActingPlayer().getLevel() <= 20) || (target.getActingPlayer().getLevel() <= 20)))
-			{
+			if (target.getActingPlayer().isCursedWeaponEquipped() && ((_actor.getActingPlayer().getLevel() <= 20) || (target.getActingPlayer().getLevel() <= 20))) {
 				_actor.getActingPlayer().sendPacket(SystemMessageId.TARGET_IS_INCORRECT);
 				clientActionFailed();
 				_actor.setIsCastingNow(false);

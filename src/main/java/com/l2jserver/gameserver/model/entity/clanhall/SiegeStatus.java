@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.entity.clanhall;
 /**
  * @author BiggBoss
  */
-public enum SiegeStatus
-{
+public enum SiegeStatus {
 	REGISTERING,
 	WAITING_BATTLE,
 	RUNNING

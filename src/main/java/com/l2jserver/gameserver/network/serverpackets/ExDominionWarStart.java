@@ -24,22 +24,19 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author JIV
  */
-public class ExDominionWarStart extends L2GameServerPacket
-{
+public class ExDominionWarStart extends L2GameServerPacket {
 	private final int _objId;
 	private final int _terId;
 	private final boolean _isDisguised;
 	
-	public ExDominionWarStart(L2PcInstance player)
-	{
+	public ExDominionWarStart(L2PcInstance player) {
 		_objId = player.getObjectId();
 		_terId = TerritoryWarManager.getInstance().getRegisteredTerritoryId(player);
 		_isDisguised = TerritoryWarManager.getInstance().isDisguised(_objId);
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0xA3);
 		writeD(_objId);

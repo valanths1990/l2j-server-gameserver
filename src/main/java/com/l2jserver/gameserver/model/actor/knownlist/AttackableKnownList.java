@@ -26,32 +26,26 @@ import com.l2jserver.gameserver.model.actor.L2Attackable;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public class AttackableKnownList extends NpcKnownList
-{
-	public AttackableKnownList(L2Attackable activeChar)
-	{
+public class AttackableKnownList extends NpcKnownList {
+	public AttackableKnownList(L2Attackable activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	protected boolean removeKnownObject(L2Object object, boolean forget)
-	{
-		if (!super.removeKnownObject(object, forget))
-		{
+	protected boolean removeKnownObject(L2Object object, boolean forget) {
+		if (!super.removeKnownObject(object, forget)) {
 			return false;
 		}
 		
 		// Remove the L2Object from the _aggrolist of the L2Attackable
-		if (object instanceof L2Character)
-		{
+		if (object instanceof L2Character) {
 			getActiveChar().getAggroList().remove(object);
 		}
 		// Set the L2Attackable Intention to AI_INTENTION_IDLE
 		final Collection<L2PcInstance> known = getKnownPlayers().values();
 		
 		// FIXME: This is a temporary solution && support for Walking Manager
-		if (getActiveChar().hasAI() && ((known == null) || known.isEmpty()) && !getActiveChar().isWalker())
-		{
+		if (getActiveChar().hasAI() && ((known == null) || known.isEmpty()) && !getActiveChar().isWalker()) {
 			getActiveChar().getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE, null);
 		}
 		
@@ -59,27 +53,22 @@ public class AttackableKnownList extends NpcKnownList
 	}
 	
 	@Override
-	public L2Attackable getActiveChar()
-	{
+	public L2Attackable getActiveChar() {
 		return (L2Attackable) super.getActiveChar();
 	}
 	
 	@Override
-	public int getDistanceToForgetObject(L2Object object)
-	{
+	public int getDistanceToForgetObject(L2Object object) {
 		return (int) (getDistanceToWatchObject(object) * 1.5);
 	}
 	
 	@Override
-	public int getDistanceToWatchObject(L2Object object)
-	{
-		if (!(object instanceof L2Character))
-		{
+	public int getDistanceToWatchObject(L2Object object) {
+		if (!(object instanceof L2Character)) {
 			return 0;
 		}
 		
-		if (object.isPlayable())
-		{
+		if (object.isPlayable()) {
 			return object.getKnownList().getDistanceToWatchObject(getActiveObject());
 		}
 		

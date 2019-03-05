@@ -21,8 +21,7 @@ package com.l2jserver.gameserver.model.items.type;
 /**
  * Armor Type enumerated.
  */
-public enum ArmorType implements ItemType
-{
+public enum ArmorType implements ItemType {
 	NONE,
 	LIGHT,
 	HEAVY,
@@ -37,8 +36,7 @@ public enum ArmorType implements ItemType
 	/**
 	 * Constructor of the ArmorType.
 	 */
-	private ArmorType()
-	{
+	private ArmorType() {
 		_mask = 1 << (ordinal() + WeaponType.values().length);
 	}
 	
@@ -46,8 +44,7 @@ public enum ArmorType implements ItemType
 	 * @return the ID of the ArmorType after applying a mask.
 	 */
 	@Override
-	public int mask()
-	{
+	public int mask() {
 		return _mask;
 	}
 }

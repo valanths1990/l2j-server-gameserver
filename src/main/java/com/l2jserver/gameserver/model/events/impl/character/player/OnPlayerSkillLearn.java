@@ -28,44 +28,37 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author UnAfraid
  */
-public class OnPlayerSkillLearn implements IBaseEvent
-{
+public class OnPlayerSkillLearn implements IBaseEvent {
 	private final L2Npc _trainer;
 	private final L2PcInstance _activeChar;
 	private final Skill _skill;
 	private final AcquireSkillType _type;
 	
-	public OnPlayerSkillLearn(L2Npc trainer, L2PcInstance activeChar, Skill skill, AcquireSkillType type)
-	{
+	public OnPlayerSkillLearn(L2Npc trainer, L2PcInstance activeChar, Skill skill, AcquireSkillType type) {
 		_trainer = trainer;
 		_activeChar = activeChar;
 		_skill = skill;
 		_type = type;
 	}
 	
-	public L2Npc getTrainer()
-	{
+	public L2Npc getTrainer() {
 		return _trainer;
 	}
 	
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return _activeChar;
 	}
 	
-	public Skill getSkill()
-	{
+	public Skill getSkill() {
 		return _skill;
 	}
 	
-	public AcquireSkillType getAcquireType()
-	{
+	public AcquireSkillType getAcquireType() {
 		return _type;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_PLAYER_SKILL_LEARN;
 	}
 }

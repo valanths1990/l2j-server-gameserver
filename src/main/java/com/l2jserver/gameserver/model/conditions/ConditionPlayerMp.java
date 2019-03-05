@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerMp.
  */
-public class ConditionPlayerMp extends Condition
-{
+public class ConditionPlayerMp extends Condition {
 	
 	private final int _mp;
 	
@@ -34,14 +33,12 @@ public class ConditionPlayerMp extends Condition
 	 * Instantiates a new condition player mp.
 	 * @param mp the mp
 	 */
-	public ConditionPlayerMp(int mp)
-	{
+	public ConditionPlayerMp(int mp) {
 		_mp = mp;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return ((effector.getCurrentMp() * 100) / effector.getMaxMp()) <= _mp;
 	}
 }

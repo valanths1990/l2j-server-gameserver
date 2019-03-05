@@ -22,8 +22,7 @@ import com.l2jserver.gameserver.enums.ShortcutType;
 import com.l2jserver.gameserver.model.Shortcut;
 import com.l2jserver.gameserver.network.serverpackets.ShortCutRegister;
 
-public final class RequestShortCutReg extends L2GameClientPacket
-{
+public final class RequestShortCutReg extends L2GameClientPacket {
 	private static final String _C__3D_REQUESTSHORTCUTREG = "[C] 3D RequestShortCutReg";
 	
 	private ShortcutType _type;
@@ -34,8 +33,7 @@ public final class RequestShortCutReg extends L2GameClientPacket
 	private int _characterType; // 1 - player, 2 - pet
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		final int typeId = readD();
 		_type = ShortcutType.values()[(typeId < 1) || (typeId > 6) ? 0 : typeId];
 		final int slot = readD();
@@ -47,10 +45,8 @@ public final class RequestShortCutReg extends L2GameClientPacket
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if ((getActiveChar() == null) || (_page > 10) || (_page < 0))
-		{
+	protected void runImpl() {
+		if ((getActiveChar() == null) || (_page > 10) || (_page < 0)) {
 			return;
 		}
 		
@@ -60,14 +56,12 @@ public final class RequestShortCutReg extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__3D_REQUESTSHORTCUTREG;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

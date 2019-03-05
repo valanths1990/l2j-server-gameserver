@@ -34,27 +34,23 @@ import com.l2jserver.gameserver.network.serverpackets.GmViewQuestInfo;
  * This class ...
  * @version $Revision: 1.1.2.2.2.2 $ $Date: 2005/03/27 15:29:30 $
  */
-public final class RequestGMCommand extends L2GameClientPacket
-{
+public final class RequestGMCommand extends L2GameClientPacket {
 	private static final String _C__7E_REQUESTGMCOMMAND = "[C] 7E RequestGMCommand";
 	
 	private String _targetName;
 	private int _command;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_targetName = readS();
 		_command = readD();
 		// _unknown = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// prevent non gm or low level GMs from vieweing player stuff
-		if (!getClient().getActiveChar().isGM() || !getClient().getActiveChar().getAccessLevel().allowAltG())
-		{
+		if (!getClient().getActiveChar().isGM() || !getClient().getActiveChar().getAccessLevel().allowAltG()) {
 			return;
 		}
 		
@@ -63,13 +59,11 @@ public final class RequestGMCommand extends L2GameClientPacket
 		L2Clan clan = ClanTable.getInstance().getClanByName(_targetName);
 		
 		// player name was incorrect?
-		if ((player == null) && ((clan == null) || (_command != 6)))
-		{
+		if ((player == null) && ((clan == null) || (_command != 6))) {
 			return;
 		}
 		
-		switch (_command)
-		{
+		switch (_command) {
 			case 1: // player status
 			{
 				sendPacket(new GMViewCharacterInfo(player));
@@ -78,8 +72,7 @@ public final class RequestGMCommand extends L2GameClientPacket
 			}
 			case 2: // player clan
 			{
-				if ((player != null) && (player.getClan() != null))
-				{
+				if ((player != null) && (player.getClan() != null)) {
 					sendPacket(new GMViewPledgeInfo(player.getClan(), player));
 				}
 				break;
@@ -103,13 +96,10 @@ public final class RequestGMCommand extends L2GameClientPacket
 			case 6: // player warehouse
 			{
 				// gm warehouse view to be implemented
-				if (player != null)
-				{
+				if (player != null) {
 					sendPacket(new GMViewWarehouseWithdrawList(player));
 					// clan warehouse
-				}
-				else
-				{
+				} else {
 					sendPacket(new GMViewWarehouseWithdrawList(clan));
 				}
 				break;
@@ -119,8 +109,7 @@ public final class RequestGMCommand extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__7E_REQUESTGMCOMMAND;
 	}
 }

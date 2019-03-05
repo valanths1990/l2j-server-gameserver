@@ -24,19 +24,16 @@ import com.l2jserver.gameserver.enums.HtmlActionScope;
  * NpcQuestHtmlMessage server packet implementation.
  * @author HorridoJoho
  */
-public final class NpcQuestHtmlMessage extends AbstractHtmlPacket
-{
+public final class NpcQuestHtmlMessage extends AbstractHtmlPacket {
 	private final int _questId;
 	
-	public NpcQuestHtmlMessage(int npcObjId, int questId)
-	{
+	public NpcQuestHtmlMessage(int npcObjId, int questId) {
 		super(npcObjId);
 		_questId = questId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xFE);
 		writeH(0x8D);
 		writeD(getNpcObjId());
@@ -45,8 +42,7 @@ public final class NpcQuestHtmlMessage extends AbstractHtmlPacket
 	}
 	
 	@Override
-	public HtmlActionScope getScope()
-	{
+	public HtmlActionScope getScope() {
 		return HtmlActionScope.NPC_QUEST_HTML;
 	}
 }

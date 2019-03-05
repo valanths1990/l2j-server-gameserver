@@ -30,8 +30,7 @@ import com.l2jserver.gameserver.model.interfaces.IPositionable;
  * MagicSkillUse server packet implementation.
  * @author UnAfraid, NosBit
  */
-public final class MagicSkillUse extends L2GameServerPacket
-{
+public final class MagicSkillUse extends L2GameServerPacket {
 	private final int _skillId;
 	private final int _skillLevel;
 	private final int _hitTime;
@@ -41,8 +40,7 @@ public final class MagicSkillUse extends L2GameServerPacket
 	private final List<Integer> _unknown = Collections.emptyList();
 	private final List<Location> _groundLocations;
 	
-	public MagicSkillUse(L2Character cha, L2Character target, int skillId, int skillLevel, int hitTime, int reuseDelay)
-	{
+	public MagicSkillUse(L2Character cha, L2Character target, int skillId, int skillLevel, int hitTime, int reuseDelay) {
 		_activeChar = cha;
 		_target = target;
 		_skillId = skillId;
@@ -52,14 +50,12 @@ public final class MagicSkillUse extends L2GameServerPacket
 		_groundLocations = cha.isPlayer() && (cha.getActingPlayer().getCurrentSkillWorldPosition() != null) ? Arrays.asList(cha.getActingPlayer().getCurrentSkillWorldPosition()) : Collections.<Location> emptyList();
 	}
 	
-	public MagicSkillUse(L2Character cha, int skillId, int skillLevel, int hitTime, int reuseDelay)
-	{
+	public MagicSkillUse(L2Character cha, int skillId, int skillLevel, int hitTime, int reuseDelay) {
 		this(cha, cha, skillId, skillLevel, hitTime, reuseDelay);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x48);
 		writeD(_activeChar.getObjectId());
 		writeD(_target.getObjectId());
@@ -69,13 +65,11 @@ public final class MagicSkillUse extends L2GameServerPacket
 		writeD(_reuseDelay);
 		writeLoc(_activeChar);
 		writeH(_unknown.size()); // TODO: Implement me!
-		for (int unknown : _unknown)
-		{
+		for (int unknown : _unknown) {
 			writeH(unknown);
 		}
 		writeH(_groundLocations.size());
-		for (IPositionable target : _groundLocations)
-		{
+		for (IPositionable target : _groundLocations) {
 			writeLoc(target);
 		}
 		writeLoc(_target);

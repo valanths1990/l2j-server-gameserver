@@ -25,35 +25,29 @@ import com.l2jserver.gameserver.model.actor.instance.L2MerchantInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public class SellList extends L2GameServerPacket
-{
+public class SellList extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private final L2MerchantInstance _lease;
 	private final long _money;
 	private final List<L2ItemInstance> _selllist = new ArrayList<>();
 	
-	public SellList(L2PcInstance player)
-	{
+	public SellList(L2PcInstance player) {
 		_activeChar = player;
 		_lease = null;
 		_money = _activeChar.getAdena();
 		doLease();
 	}
 	
-	public SellList(L2PcInstance player, L2MerchantInstance lease)
-	{
+	public SellList(L2PcInstance player, L2MerchantInstance lease) {
 		_activeChar = player;
 		_lease = lease;
 		_money = _activeChar.getAdena();
 		doLease();
 	}
 	
-	private void doLease()
-	{
-		if (_lease == null)
-		{
-			for (L2ItemInstance item : _activeChar.getInventory().getItems())
-			{
+	private void doLease() {
+		if (_lease == null) {
+			for (L2ItemInstance item : _activeChar.getInventory().getItems()) {
 				if (!item.isEquipped() && item.isSellable() && (!_activeChar.hasSummon() || (item.getObjectId() != _activeChar.getSummon().getControlObjectId()))) // Pet is summoned and not the item that summoned the pet
 				{
 					_selllist.add(item);
@@ -63,15 +57,13 @@ public class SellList extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x06);
 		writeQ(_money);
 		writeD(_lease == null ? 0x00 : 1000000 + _lease.getTemplate().getId());
 		writeH(_selllist.size());
 		
-		for (L2ItemInstance item : _selllist)
-		{
+		for (L2ItemInstance item : _selllist) {
 			writeH(item.getItem().getType1().getId());
 			writeD(item.getObjectId());
 			writeD(item.getDisplayId());
@@ -86,13 +78,11 @@ public class SellList extends L2GameServerPacket
 			// T1
 			writeH(item.getAttackElementType());
 			writeH(item.getAttackElementPower());
-			for (byte i = 0; i < 6; i++)
-			{
+			for (byte i = 0; i < 6; i++) {
 				writeH(item.getElementDefAttr(i));
 			}
 			// Enchant Effects
-			for (int op : item.getEnchantOptions())
-			{
+			for (int op : item.getEnchantOptions()) {
 				writeH(op);
 			}
 		}

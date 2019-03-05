@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class SunSet extends L2GameServerPacket
-{
+public class SunSet extends L2GameServerPacket {
 	public static final SunSet STATIC_PACKET = new SunSet();
 	
-	private SunSet()
-	{
+	private SunSet() {
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x13);
 	}
 }

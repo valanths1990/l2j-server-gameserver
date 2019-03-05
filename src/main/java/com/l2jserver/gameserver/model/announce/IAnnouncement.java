@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.interfaces.IUpdatable;
 /**
  * @author UnAfraid
  */
-public interface IAnnouncement extends IStorable, IUpdatable, IDeletable
-{
+public interface IAnnouncement extends IStorable, IUpdatable, IDeletable {
 	public int getId();
 	
 	public AnnouncementType getType();

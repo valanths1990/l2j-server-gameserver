@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 
-public final class PartySmallWindowUpdate extends L2GameServerPacket
-{
+public final class PartySmallWindowUpdate extends L2GameServerPacket {
 	private final L2PcInstance _member;
 	
-	public PartySmallWindowUpdate(L2PcInstance member)
-	{
+	public PartySmallWindowUpdate(L2PcInstance member) {
 		_member = member;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x52);
 		writeD(_member.getObjectId());
 		writeS(_member.getName());

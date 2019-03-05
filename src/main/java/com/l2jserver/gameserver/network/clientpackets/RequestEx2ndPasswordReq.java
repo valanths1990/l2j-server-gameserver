@@ -26,53 +26,43 @@ import com.l2jserver.gameserver.security.SecondaryPasswordAuth;
  * (ch)cS{S} c: change pass? S: current password S: new password
  * @author mrTJO
  */
-public class RequestEx2ndPasswordReq extends L2GameClientPacket
-{
+public class RequestEx2ndPasswordReq extends L2GameClientPacket {
 	private static final String _C__D0_AF_REQUESTEX2NDPASSWORDREQ = "[C] D0:AF RequestEx2ndPasswordReq";
 	
 	private int _changePass;
 	private String _password, _newPassword;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_changePass = readC();
 		_password = readS();
-		if (_changePass == 2)
-		{
+		if (_changePass == 2) {
 			_newPassword = readS();
 		}
 	}
 	
 	@Override
-	protected void runImpl()
-	{
-		if (!SecondaryAuthData.getInstance().isEnabled())
-		{
+	protected void runImpl() {
+		if (!SecondaryAuthData.getInstance().isEnabled()) {
 			return;
 		}
 		
 		SecondaryPasswordAuth spa = getClient().getSecondaryAuth();
 		boolean exVal = false;
 		
-		if ((_changePass == 0) && !spa.passwordExist())
-		{
+		if ((_changePass == 0) && !spa.passwordExist()) {
 			exVal = spa.savePassword(_password);
-		}
-		else if ((_changePass == 2) && spa.passwordExist())
-		{
+		} else if ((_changePass == 2) && spa.passwordExist()) {
 			exVal = spa.changePassword(_password, _newPassword);
 		}
 		
-		if (exVal)
-		{
+		if (exVal) {
 			getClient().sendPacket(new Ex2ndPasswordAck(Ex2ndPasswordAck.SUCCESS));
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_AF_REQUESTEX2NDPASSWORDREQ;
 	}
 }

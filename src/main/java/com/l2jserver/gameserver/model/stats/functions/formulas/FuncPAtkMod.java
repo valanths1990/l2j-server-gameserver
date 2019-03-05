@@ -27,23 +27,19 @@ import com.l2jserver.gameserver.model.stats.functions.AbstractFunction;
 /**
  * @author UnAfraid
  */
-public class FuncPAtkMod extends AbstractFunction
-{
+public class FuncPAtkMod extends AbstractFunction {
 	private static final FuncPAtkMod _fpa_instance = new FuncPAtkMod();
 	
-	public static AbstractFunction getInstance()
-	{
+	public static AbstractFunction getInstance() {
 		return _fpa_instance;
 	}
 	
-	private FuncPAtkMod()
-	{
+	private FuncPAtkMod() {
 		super(Stats.POWER_ATTACK, 1, null, 0, null);
 	}
 	
 	@Override
-	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal)
-	{
+	public double calc(L2Character effector, L2Character effected, Skill skill, double initVal) {
 		return initVal * BaseStats.STR.calcBonus(effector) * effector.getLevelMod();
 	}
 }

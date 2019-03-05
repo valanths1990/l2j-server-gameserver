@@ -21,17 +21,14 @@ package com.l2jserver.gameserver.network.serverpackets;
 /**
  * @author devScarlet, mrTJO
  */
-public class ExPlayScene extends L2GameServerPacket
-{
+public class ExPlayScene extends L2GameServerPacket {
 	public static final ExPlayScene STATIC_PACKET = new ExPlayScene();
 	
-	private ExPlayScene()
-	{
+	private ExPlayScene() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x5C);
 	}

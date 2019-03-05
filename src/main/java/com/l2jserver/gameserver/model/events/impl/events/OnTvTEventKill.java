@@ -26,37 +26,31 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnTvTEventKill implements IBaseEvent
-{
+public class OnTvTEventKill implements IBaseEvent {
 	private final L2PcInstance _killer;
 	private final L2PcInstance _victim;
 	private final TvTEventTeam _killerTeam;
 	
-	public OnTvTEventKill(L2PcInstance killer, L2PcInstance victim, TvTEventTeam killerTeam)
-	{
+	public OnTvTEventKill(L2PcInstance killer, L2PcInstance victim, TvTEventTeam killerTeam) {
 		_killer = killer;
 		_victim = victim;
 		_killerTeam = killerTeam;
 	}
 	
-	public L2PcInstance getKiller()
-	{
+	public L2PcInstance getKiller() {
 		return _killer;
 	}
 	
-	public L2PcInstance getVictim()
-	{
+	public L2PcInstance getVictim() {
 		return _victim;
 	}
 	
-	public TvTEventTeam getKillerTeam()
-	{
+	public TvTEventTeam getKillerTeam() {
 		return _killerTeam;
 	}
 	
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_TVT_EVENT_KILL;
 	}
 }

@@ -28,22 +28,18 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * Player Can Refuel Airship condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCanRefuelAirship extends Condition
-{
+public class ConditionPlayerCanRefuelAirship extends Condition {
 	private final int _val;
 	
-	public ConditionPlayerCanRefuelAirship(int val)
-	{
+	public ConditionPlayerCanRefuelAirship(int val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean canRefuelAirship = true;
 		final L2PcInstance player = effector.getActingPlayer();
-		if ((player == null) || (player.getAirShip() == null) || !(player.getAirShip() instanceof L2ControllableAirShipInstance) || ((player.getAirShip().getFuel() + _val) > player.getAirShip().getMaxFuel()))
-		{
+		if ((player == null) || (player.getAirShip() == null) || !(player.getAirShip() instanceof L2ControllableAirShipInstance) || ((player.getAirShip().getFuel() + _val) > player.getAirShip().getMaxFuel())) {
 			canRefuelAirship = false;
 		}
 		return canRefuelAirship;

@@ -29,8 +29,7 @@ import com.l2jserver.util.Rnd;
  * Dimensional Rift Room.
  * @author xban1x
  */
-public final class DimensionalRiftRoom
-{
+public final class DimensionalRiftRoom {
 	private final byte _type;
 	private final byte _room;
 	private final int _xMin;
@@ -45,8 +44,7 @@ public final class DimensionalRiftRoom
 	private final List<L2Spawn> _roomSpawns = new ArrayList<>();
 	private boolean _partyInside = false;
 	
-	public DimensionalRiftRoom(byte type, byte room, int xMin, int xMax, int yMin, int yMax, int zMin, int zMax, int xT, int yT, int zT, boolean isBossRoom)
-	{
+	public DimensionalRiftRoom(byte type, byte room, int xMin, int xMax, int yMin, int yMax, int zMin, int zMax, int xT, int yT, int zT, boolean isBossRoom) {
 		_type = type;
 		_room = room;
 		_xMin = (xMin + 128);
@@ -57,14 +55,12 @@ public final class DimensionalRiftRoom
 		_zMax = zMax;
 		_teleportCoords = new Location(xT, yT, zT);
 		_isBossRoom = isBossRoom;
-		_s = new Polygon(new int[]
-		{
+		_s = new Polygon(new int[] {
 			xMin,
 			xMax,
 			xMax,
 			xMin
-		}, new int[]
-		{
+		}, new int[] {
 			yMin,
 			yMin,
 			yMax,
@@ -72,62 +68,49 @@ public final class DimensionalRiftRoom
 		}, 4);
 	}
 	
-	public byte getType()
-	{
+	public byte getType() {
 		return _type;
 	}
 	
-	public byte getRoom()
-	{
+	public byte getRoom() {
 		return _room;
 	}
 	
-	public int getRandomX()
-	{
+	public int getRandomX() {
 		return Rnd.get(_xMin, _xMax);
 	}
 	
-	public int getRandomY()
-	{
+	public int getRandomY() {
 		return Rnd.get(_yMin, _yMax);
 	}
 	
-	public Location getTeleportCoorinates()
-	{
+	public Location getTeleportCoorinates() {
 		return _teleportCoords;
 	}
 	
-	public boolean checkIfInZone(int x, int y, int z)
-	{
+	public boolean checkIfInZone(int x, int y, int z) {
 		return _s.contains(x, y) && (z >= _zMin) && (z <= _zMax);
 	}
 	
-	public boolean isBossRoom()
-	{
+	public boolean isBossRoom() {
 		return _isBossRoom;
 	}
 	
-	public List<L2Spawn> getSpawns()
-	{
+	public List<L2Spawn> getSpawns() {
 		return _roomSpawns;
 	}
 	
-	public void spawn()
-	{
-		for (L2Spawn spawn : _roomSpawns)
-		{
+	public void spawn() {
+		for (L2Spawn spawn : _roomSpawns) {
 			spawn.doSpawn();
 			spawn.startRespawn();
 		}
 	}
 	
-	public DimensionalRiftRoom unspawn()
-	{
-		for (L2Spawn spawn : _roomSpawns)
-		{
+	public DimensionalRiftRoom unspawn() {
+		for (L2Spawn spawn : _roomSpawns) {
 			spawn.stopRespawn();
-			if (spawn.getLastSpawn() != null)
-			{
+			if (spawn.getLastSpawn() != null) {
 				spawn.getLastSpawn().deleteMe();
 			}
 		}
@@ -138,8 +121,7 @@ public final class DimensionalRiftRoom
 	 * Returns if party is inside the room.
 	 * @return {@code true} if there is a party inside, {@code false} otherwise
 	 */
-	public boolean isPartyInside()
-	{
+	public boolean isPartyInside() {
 		return _partyInside;
 	}
 	
@@ -147,8 +129,7 @@ public final class DimensionalRiftRoom
 	 * Sets the party inside.
 	 * @param partyInside
 	 */
-	public void setPartyInside(boolean partyInside)
-	{
+	public void setPartyInside(boolean partyInside) {
 		_partyInside = partyInside;
 	}
 }

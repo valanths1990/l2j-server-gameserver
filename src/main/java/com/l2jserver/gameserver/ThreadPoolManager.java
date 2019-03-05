@@ -68,32 +68,24 @@ import com.l2jserver.util.StringUtil;
  * </p>
  * @author -Wooden-
  */
-public class ThreadPoolManager
-{
+public class ThreadPoolManager {
 	protected static final Logger LOG = LoggerFactory.getLogger(ThreadPoolManager.class);
 	
-	private static final class RunnableWrapper implements Runnable
-	{
+	private static final class RunnableWrapper implements Runnable {
 		private final Runnable _r;
 		
-		public RunnableWrapper(final Runnable r)
-		{
+		public RunnableWrapper(final Runnable r) {
 			_r = r;
 		}
 		
 		@Override
-		public final void run()
-		{
-			try
-			{
+		public final void run() {
+			try {
 				_r.run();
-			}
-			catch (final Throwable e)
-			{
+			} catch (final Throwable e) {
 				final Thread t = Thread.currentThread();
 				final UncaughtExceptionHandler h = t.getUncaughtExceptionHandler();
-				if (h != null)
-				{
+				if (h != null) {
 					h.uncaughtException(t, e);
 				}
 			}
@@ -111,13 +103,11 @@ public class ThreadPoolManager
 	
 	private boolean _shutdown;
 	
-	public static ThreadPoolManager getInstance()
-	{
+	public static ThreadPoolManager getInstance() {
 		return SingletonHolder._instance;
 	}
 	
-	protected ThreadPoolManager()
-	{
+	protected ThreadPoolManager() {
 		_effectsScheduledThreadPool = new ScheduledThreadPoolExecutor(Config.THREAD_P_EFFECTS, new PriorityThreadFactory("EffectsSTPool", Thread.NORM_PRIORITY));
 		_generalScheduledThreadPool = new ScheduledThreadPoolExecutor(Config.THREAD_P_GENERAL, new PriorityThreadFactory("GeneralSTPool", Thread.NORM_PRIORITY));
 		_eventScheduledThreadPool = new ScheduledThreadPoolExecutor(Config.THREAD_E_EVENTS, new PriorityThreadFactory("EventSTPool", Thread.NORM_PRIORITY));
@@ -137,14 +127,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the delay parameter
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEffect(Runnable task, long delay, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleEffect(Runnable task, long delay, TimeUnit unit) {
+		try {
 			return _effectsScheduledThreadPool.schedule(new RunnableWrapper(task), delay, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null;
 		}
 	}
@@ -155,8 +141,7 @@ public class ThreadPoolManager
 	 * @param delay the delay in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEffect(Runnable task, long delay)
-	{
+	public ScheduledFuture<?> scheduleEffect(Runnable task, long delay) {
 		return scheduleEffect(task, delay, TimeUnit.MILLISECONDS);
 	}
 	
@@ -168,14 +153,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the initialDelay and period parameters
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEffectAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleEffectAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
+		try {
 			return _effectsScheduledThreadPool.scheduleAtFixedRate(new RunnableWrapper(task), initialDelay, period, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -187,8 +168,7 @@ public class ThreadPoolManager
 	 * @param period the period between executions in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEffectAtFixedRate(Runnable task, long initialDelay, long period)
-	{
+	public ScheduledFuture<?> scheduleEffectAtFixedRate(Runnable task, long initialDelay, long period) {
 		return scheduleEffectAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
 	}
 	
@@ -199,14 +179,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the delay parameter
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleGeneral(Runnable task, long delay, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleGeneral(Runnable task, long delay, TimeUnit unit) {
+		try {
 			return _generalScheduledThreadPool.schedule(new RunnableWrapper(task), delay, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -217,8 +193,7 @@ public class ThreadPoolManager
 	 * @param delay the delay in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleGeneral(Runnable task, long delay)
-	{
+	public ScheduledFuture<?> scheduleGeneral(Runnable task, long delay) {
 		return scheduleGeneral(task, delay, TimeUnit.MILLISECONDS);
 	}
 	
@@ -230,14 +205,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the initialDelay and period parameters
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleGeneralAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleGeneralAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
+		try {
 			return _generalScheduledThreadPool.scheduleAtFixedRate(new RunnableWrapper(task), initialDelay, period, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -249,14 +220,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the delay parameter
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEvent(Runnable task, long delay, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleEvent(Runnable task, long delay, TimeUnit unit) {
+		try {
 			return _eventScheduledThreadPool.schedule(new RunnableWrapper(task), delay, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -267,8 +234,7 @@ public class ThreadPoolManager
 	 * @param delay the delay in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEvent(Runnable task, long delay)
-	{
+	public ScheduledFuture<?> scheduleEvent(Runnable task, long delay) {
 		return scheduleEvent(task, delay, TimeUnit.MILLISECONDS);
 	}
 	
@@ -280,14 +246,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the initialDelay and period parameters
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleEventAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleEventAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
+		try {
 			return _eventScheduledThreadPool.scheduleAtFixedRate(new RunnableWrapper(task), initialDelay, period, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -299,8 +261,7 @@ public class ThreadPoolManager
 	 * @param period the period between executions in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleGeneralAtFixedRate(Runnable task, long initialDelay, long period)
-	{
+	public ScheduledFuture<?> scheduleGeneralAtFixedRate(Runnable task, long initialDelay, long period) {
 		return scheduleGeneralAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
 	}
 	
@@ -311,14 +272,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the delay parameter
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleAi(Runnable task, long delay, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleAi(Runnable task, long delay, TimeUnit unit) {
+		try {
 			return _aiScheduledThreadPool.schedule(new RunnableWrapper(task), delay, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -329,8 +286,7 @@ public class ThreadPoolManager
 	 * @param delay the delay in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleAi(Runnable task, long delay)
-	{
+	public ScheduledFuture<?> scheduleAi(Runnable task, long delay) {
 		return scheduleAi(task, delay, TimeUnit.MILLISECONDS);
 	}
 	
@@ -342,14 +298,10 @@ public class ThreadPoolManager
 	 * @param unit the time unit of the initialDelay and period parameters
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleAiAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit)
-	{
-		try
-		{
+	public ScheduledFuture<?> scheduleAiAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
+		try {
 			return _aiScheduledThreadPool.scheduleAtFixedRate(new RunnableWrapper(task), initialDelay, period, unit);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			return null; /* shutdown, ignore */
 		}
 	}
@@ -361,8 +313,7 @@ public class ThreadPoolManager
 	 * @param period the period between executions in milliseconds
 	 * @return a ScheduledFuture representing pending completion of the task, and whose get() method will throw an exception upon cancellation
 	 */
-	public ScheduledFuture<?> scheduleAiAtFixedRate(Runnable task, long initialDelay, long period)
-	{
+	public ScheduledFuture<?> scheduleAiAtFixedRate(Runnable task, long initialDelay, long period) {
 		return scheduleAiAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
 	}
 	
@@ -370,14 +321,10 @@ public class ThreadPoolManager
 	 * Executes a packet task sometime in future in another thread.
 	 * @param task the task to execute
 	 */
-	public void executePacket(Runnable task)
-	{
-		try
-		{
+	public void executePacket(Runnable task) {
+		try {
 			_generalPacketsThreadPool.execute(task);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			/* shutdown, ignore */
 		}
 	}
@@ -386,14 +333,10 @@ public class ThreadPoolManager
 	 * Executes an IO packet task sometime in future in another thread.
 	 * @param task the task to execute
 	 */
-	public void executeIOPacket(Runnable task)
-	{
-		try
-		{
+	public void executeIOPacket(Runnable task) {
+		try {
 			_ioPacketsThreadPool.execute(task);
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			/* shutdown, ignore */
 		}
 	}
@@ -402,14 +345,10 @@ public class ThreadPoolManager
 	 * Executes a general task sometime in future in another thread.
 	 * @param task the task to execute
 	 */
-	public void executeGeneral(Runnable task)
-	{
-		try
-		{
+	public void executeGeneral(Runnable task) {
+		try {
 			_generalThreadPool.execute(new RunnableWrapper(task));
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			/* shutdown, ignore */
 		}
 	}
@@ -418,14 +357,10 @@ public class ThreadPoolManager
 	 * Executes an AI task sometime in future in another thread.
 	 * @param task the task to execute
 	 */
-	public void executeAi(Runnable task)
-	{
-		try
-		{
+	public void executeAi(Runnable task) {
+		try {
 			_aiScheduledThreadPool.execute(new RunnableWrapper(task));
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			/* shutdown, ignore */
 		}
 	}
@@ -434,22 +369,16 @@ public class ThreadPoolManager
 	 * Executes an Event task sometime in future in another thread.
 	 * @param task the task to execute
 	 */
-	public void executeEvent(Runnable task)
-	{
-		try
-		{
+	public void executeEvent(Runnable task) {
+		try {
 			_eventThreadPool.execute(new RunnableWrapper(task));
-		}
-		catch (RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 			/* shutdown, ignore */
 		}
 	}
 	
-	public String[] getStats()
-	{
-		return new String[]
-		{
+	public String[] getStats() {
+		return new String[] {
 			"STP:",
 			" + Effects:",
 			" |- ActiveThreads:   " + _effectsScheduledThreadPool.getActiveCount(),
@@ -522,39 +451,33 @@ public class ThreadPoolManager
 		};
 	}
 	
-	private static class PriorityThreadFactory implements ThreadFactory
-	{
+	private static class PriorityThreadFactory implements ThreadFactory {
 		private final int _prio;
 		private final String _name;
 		private final AtomicInteger _threadNumber = new AtomicInteger(1);
 		private final ThreadGroup _group;
 		
-		public PriorityThreadFactory(String name, int prio)
-		{
+		public PriorityThreadFactory(String name, int prio) {
 			_prio = prio;
 			_name = name;
 			_group = new ThreadGroup(_name);
 		}
 		
 		@Override
-		public Thread newThread(Runnable r)
-		{
+		public Thread newThread(Runnable r) {
 			Thread t = new Thread(_group, r, _name + "-" + _threadNumber.getAndIncrement());
 			t.setPriority(_prio);
 			return t;
 		}
 		
-		public ThreadGroup getGroup()
-		{
+		public ThreadGroup getGroup() {
 			return _group;
 		}
 	}
 	
-	public void shutdown()
-	{
+	public void shutdown() {
 		_shutdown = true;
-		try
-		{
+		try {
 			_effectsScheduledThreadPool.awaitTermination(1, TimeUnit.SECONDS);
 			_generalScheduledThreadPool.awaitTermination(1, TimeUnit.SECONDS);
 			_generalPacketsThreadPool.awaitTermination(1, TimeUnit.SECONDS);
@@ -569,20 +492,16 @@ public class ThreadPoolManager
 			_eventThreadPool.shutdown();
 			LOG.info("All ThreadPools are now stopped");
 			
-		}
-		catch (InterruptedException e)
-		{
+		} catch (InterruptedException e) {
 			LOG.warn("There has been a problem shuting down the thread pool manager!", e);
 		}
 	}
 	
-	public boolean isShutdown()
-	{
+	public boolean isShutdown() {
 		return _shutdown;
 	}
 	
-	public void purge()
-	{
+	public void purge() {
 		_effectsScheduledThreadPool.purge();
 		_generalScheduledThreadPool.purge();
 		_aiScheduledThreadPool.purge();
@@ -593,27 +512,22 @@ public class ThreadPoolManager
 		_eventThreadPool.purge();
 	}
 	
-	public String getPacketStats()
-	{
+	public String getPacketStats() {
 		final StringBuilder sb = new StringBuilder(1000);
 		ThreadFactory tf = _generalPacketsThreadPool.getThreadFactory();
-		if (tf instanceof PriorityThreadFactory)
-		{
+		if (tf instanceof PriorityThreadFactory) {
 			PriorityThreadFactory ptf = (PriorityThreadFactory) tf;
 			int count = ptf.getGroup().activeCount();
 			Thread[] threads = new Thread[count + 2];
 			ptf.getGroup().enumerate(threads);
 			StringUtil.append(sb, "General Packet Thread Pool:" + Config.EOL + "Tasks in the queue: ", String.valueOf(_generalPacketsThreadPool.getQueue().size()), Config.EOL + "Showing threads stack trace:" + Config.EOL + "There should be ", String.valueOf(count), " Threads" + Config.EOL);
-			for (Thread t : threads)
-			{
-				if (t == null)
-				{
+			for (Thread t : threads) {
+				if (t == null) {
 					continue;
 				}
 				
 				StringUtil.append(sb, t.getName(), Config.EOL);
-				for (StackTraceElement ste : t.getStackTrace())
-				{
+				for (StackTraceElement ste : t.getStackTrace()) {
 					StringUtil.append(sb, ste.toString(), Config.EOL);
 				}
 			}
@@ -624,30 +538,25 @@ public class ThreadPoolManager
 		return sb.toString();
 	}
 	
-	public String getIOPacketStats()
-	{
+	public String getIOPacketStats() {
 		final StringBuilder sb = new StringBuilder(1000);
 		ThreadFactory tf = _ioPacketsThreadPool.getThreadFactory();
 		
-		if (tf instanceof PriorityThreadFactory)
-		{
+		if (tf instanceof PriorityThreadFactory) {
 			PriorityThreadFactory ptf = (PriorityThreadFactory) tf;
 			int count = ptf.getGroup().activeCount();
 			Thread[] threads = new Thread[count + 2];
 			ptf.getGroup().enumerate(threads);
 			StringUtil.append(sb, "I/O Packet Thread Pool:" + Config.EOL + "Tasks in the queue: ", String.valueOf(_ioPacketsThreadPool.getQueue().size()), Config.EOL + "Showing threads stack trace:" + Config.EOL + "There should be ", String.valueOf(count), " Threads" + Config.EOL);
 			
-			for (Thread t : threads)
-			{
-				if (t == null)
-				{
+			for (Thread t : threads) {
+				if (t == null) {
 					continue;
 				}
 				
 				StringUtil.append(sb, t.getName(), Config.EOL);
 				
-				for (StackTraceElement ste : t.getStackTrace())
-				{
+				for (StackTraceElement ste : t.getStackTrace()) {
 					StringUtil.append(sb, ste.toString(), Config.EOL);
 				}
 			}
@@ -658,30 +567,25 @@ public class ThreadPoolManager
 		return sb.toString();
 	}
 	
-	public String getGeneralStats()
-	{
+	public String getGeneralStats() {
 		final StringBuilder sb = new StringBuilder(1000);
 		ThreadFactory tf = _generalThreadPool.getThreadFactory();
 		
-		if (tf instanceof PriorityThreadFactory)
-		{
+		if (tf instanceof PriorityThreadFactory) {
 			PriorityThreadFactory ptf = (PriorityThreadFactory) tf;
 			int count = ptf.getGroup().activeCount();
 			Thread[] threads = new Thread[count + 2];
 			ptf.getGroup().enumerate(threads);
 			StringUtil.append(sb, "General Thread Pool:" + Config.EOL + "Tasks in the queue: ", String.valueOf(_generalThreadPool.getQueue().size()), Config.EOL + "Showing threads stack trace:" + Config.EOL + "There should be ", String.valueOf(count), " Threads" + Config.EOL);
 			
-			for (Thread t : threads)
-			{
-				if (t == null)
-				{
+			for (Thread t : threads) {
+				if (t == null) {
 					continue;
 				}
 				
 				StringUtil.append(sb, t.getName(), Config.EOL);
 				
-				for (StackTraceElement ste : t.getStackTrace())
-				{
+				for (StackTraceElement ste : t.getStackTrace()) {
 					StringUtil.append(sb, ste.toString(), Config.EOL);
 				}
 			}
@@ -692,8 +596,7 @@ public class ThreadPoolManager
 		return sb.toString();
 	}
 	
-	protected class PurgeTask implements Runnable
-	{
+	protected class PurgeTask implements Runnable {
 		private final ScheduledThreadPoolExecutor _effectsScheduled;
 		
 		private final ScheduledThreadPoolExecutor _generalScheduled;
@@ -703,8 +606,7 @@ public class ThreadPoolManager
 		private final ThreadPoolExecutor _eventScheduled;
 		
 		PurgeTask(ScheduledThreadPoolExecutor effectsScheduledThreadPool, ScheduledThreadPoolExecutor generalScheduledThreadPool, //
-			ScheduledThreadPoolExecutor aiScheduledThreadPool, ThreadPoolExecutor eventScheduledThreadPool)
-		{
+			ScheduledThreadPoolExecutor aiScheduledThreadPool, ThreadPoolExecutor eventScheduledThreadPool) {
 			_effectsScheduled = effectsScheduledThreadPool;
 			_generalScheduled = generalScheduledThreadPool;
 			_aiScheduled = aiScheduledThreadPool;
@@ -712,8 +614,7 @@ public class ThreadPoolManager
 		}
 		
 		@Override
-		public void run()
-		{
+		public void run() {
 			_effectsScheduled.purge();
 			_generalScheduled.purge();
 			_aiScheduled.purge();
@@ -721,8 +622,7 @@ public class ThreadPoolManager
 		}
 	}
 	
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final ThreadPoolManager _instance = new ThreadPoolManager();
 	}
 }

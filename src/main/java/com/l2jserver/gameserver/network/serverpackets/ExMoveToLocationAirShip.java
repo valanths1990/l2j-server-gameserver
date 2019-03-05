@@ -20,12 +20,10 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public class ExMoveToLocationAirShip extends L2GameServerPacket
-{
+public class ExMoveToLocationAirShip extends L2GameServerPacket {
 	private final int _objId, _tx, _ty, _tz, _x, _y, _z;
 	
-	public ExMoveToLocationAirShip(L2Character cha)
-	{
+	public ExMoveToLocationAirShip(L2Character cha) {
 		_objId = cha.getObjectId();
 		_tx = cha.getXdestination();
 		_ty = cha.getYdestination();
@@ -36,8 +34,7 @@ public class ExMoveToLocationAirShip extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x65);
 		

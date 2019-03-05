@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author mrTJO
  */
-public class ExCubeGameTeamList extends L2GameServerPacket
-{
+public class ExCubeGameTeamList extends L2GameServerPacket {
 	// Players Lists
 	List<L2PcInstance> _bluePlayers;
 	List<L2PcInstance> _redPlayers;
@@ -40,16 +39,14 @@ public class ExCubeGameTeamList extends L2GameServerPacket
 	 * @param bluePlayers Blue Players List
 	 * @param roomNumber Arena/Room ID
 	 */
-	public ExCubeGameTeamList(List<L2PcInstance> redPlayers, List<L2PcInstance> bluePlayers, int roomNumber)
-	{
+	public ExCubeGameTeamList(List<L2PcInstance> redPlayers, List<L2PcInstance> bluePlayers, int roomNumber) {
 		_redPlayers = redPlayers;
 		_bluePlayers = bluePlayers;
 		_roomNumber = roomNumber - 1;
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xfe);
 		writeH(0x97);
 		writeD(0x00);
@@ -58,14 +55,12 @@ public class ExCubeGameTeamList extends L2GameServerPacket
 		writeD(0xffffffff);
 		
 		writeD(_bluePlayers.size());
-		for (L2PcInstance player : _bluePlayers)
-		{
+		for (L2PcInstance player : _bluePlayers) {
 			writeD(player.getObjectId());
 			writeS(player.getName());
 		}
 		writeD(_redPlayers.size());
-		for (L2PcInstance player : _redPlayers)
-		{
+		for (L2PcInstance player : _redPlayers) {
 			writeD(player.getObjectId());
 			writeS(player.getName());
 		}

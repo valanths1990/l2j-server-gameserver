@@ -26,25 +26,20 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 /**
  * @author Advi, UnAfraid
  */
-public class InventoryUpdate extends AbstractInventoryUpdate
-{
-	public InventoryUpdate()
-	{
+public class InventoryUpdate extends AbstractInventoryUpdate {
+	public InventoryUpdate() {
 	}
 	
-	public InventoryUpdate(L2ItemInstance item)
-	{
+	public InventoryUpdate(L2ItemInstance item) {
 		super(item);
 	}
 	
-	public InventoryUpdate(List<ItemInfo> items)
-	{
+	public InventoryUpdate(List<ItemInfo> items) {
 		super(items);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x21);
 		writeItems();
 	}

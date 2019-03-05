@@ -23,25 +23,19 @@ import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.instance.L2RaceManagerInstance;
 import com.l2jserver.gameserver.network.serverpackets.DeleteObject;
 
-public class RaceManagerKnownList extends NpcKnownList
-{
-	public RaceManagerKnownList(L2RaceManagerInstance activeChar)
-	{
+public class RaceManagerKnownList extends NpcKnownList {
+	public RaceManagerKnownList(L2RaceManagerInstance activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	protected boolean removeKnownObject(L2Object object, boolean forget)
-	{
-		if (!super.removeKnownObject(object, forget))
-		{
+	protected boolean removeKnownObject(L2Object object, boolean forget) {
+		if (!super.removeKnownObject(object, forget)) {
 			return false;
 		}
 		
-		if (object.isPlayer())
-		{
-			for (int i = 0; i < 8; i++)
-			{
+		if (object.isPlayer()) {
+			for (int i = 0; i < 8; i++) {
 				object.sendPacket(new DeleteObject(MonsterRace.getInstance().getMonsters()[i]));
 			}
 		}
@@ -50,8 +44,7 @@ public class RaceManagerKnownList extends NpcKnownList
 	}
 	
 	@Override
-	public L2RaceManagerInstance getActiveChar()
-	{
+	public L2RaceManagerInstance getActiveChar() {
 		return (L2RaceManagerInstance) super.getActiveChar();
 	}
 }

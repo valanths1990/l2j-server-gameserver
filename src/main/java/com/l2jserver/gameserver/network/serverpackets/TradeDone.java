@@ -18,18 +18,15 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class TradeDone extends L2GameServerPacket
-{
+public class TradeDone extends L2GameServerPacket {
 	private final int _num;
 	
-	public TradeDone(int num)
-	{
+	public TradeDone(int num) {
 		_num = num;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x1c);
 		writeD(_num);
 	}

@@ -32,30 +32,25 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Basic instance zone data transfer object.
  * @author Zoey76
  */
-public class InstanceWorld
-{
+public class InstanceWorld {
 	private int _instanceId;
 	private int _templateId = -1;
 	private final List<Integer> _allowed = new CopyOnWriteArrayList<>();
 	private final AtomicInteger _status = new AtomicInteger();
 	
-	public List<Integer> getAllowed()
-	{
+	public List<Integer> getAllowed() {
 		return _allowed;
 	}
 	
-	public void removeAllowed(int id)
-	{
+	public void removeAllowed(int id) {
 		_allowed.remove(_allowed.indexOf(Integer.valueOf(id)));
 	}
 	
-	public void addAllowed(int id)
-	{
+	public void addAllowed(int id) {
 		_allowed.add(id);
 	}
 	
-	public boolean isAllowed(int id)
-	{
+	public boolean isAllowed(int id) {
 		return _allowed.contains(id);
 	}
 	
@@ -63,8 +58,7 @@ public class InstanceWorld
 	 * Gets the dynamically generated instance ID.
 	 * @return the instance ID
 	 */
-	public int getInstanceId()
-	{
+	public int getInstanceId() {
 		return _instanceId;
 	}
 	
@@ -72,8 +66,7 @@ public class InstanceWorld
 	 * Sets the instance ID.
 	 * @param instanceId the instance ID
 	 */
-	public void setInstanceId(int instanceId)
-	{
+	public void setInstanceId(int instanceId) {
 		_instanceId = instanceId;
 	}
 	
@@ -81,8 +74,7 @@ public class InstanceWorld
 	 * Gets the client's template instance ID.
 	 * @return the template ID
 	 */
-	public int getTemplateId()
-	{
+	public int getTemplateId() {
 		return _templateId;
 	}
 	
@@ -90,28 +82,23 @@ public class InstanceWorld
 	 * Sets the template ID.
 	 * @param templateId the template ID
 	 */
-	public void setTemplateId(int templateId)
-	{
+	public void setTemplateId(int templateId) {
 		_templateId = templateId;
 	}
 	
-	public int getStatus()
-	{
+	public int getStatus() {
 		return _status.get();
 	}
 	
-	public boolean isStatus(int status)
-	{
+	public boolean isStatus(int status) {
 		return _status.get() == status;
 	}
 	
-	public void setStatus(int status)
-	{
+	public void setStatus(int status) {
 		_status.set(status);
 	}
 	
-	public void incStatus()
-	{
+	public void incStatus() {
 		_status.incrementAndGet();
 	}
 	
@@ -119,13 +106,10 @@ public class InstanceWorld
 	 * @param killer
 	 * @param victim
 	 */
-	public void onDeath(L2Character killer, L2Character victim)
-	{
-		if ((victim != null) && victim.isPlayer())
-		{
+	public void onDeath(L2Character killer, L2Character victim) {
+		if ((victim != null) && victim.isPlayer()) {
 			final Instance instance = InstanceManager.getInstance().getInstance(getInstanceId());
-			if (instance != null)
-			{
+			if (instance != null) {
 				final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_WILL_BE_EXPELLED_IN_S1);
 				sm.addInt(instance.getEjectTime() / 60 / 1000);
 				victim.getActingPlayer().sendPacket(sm);

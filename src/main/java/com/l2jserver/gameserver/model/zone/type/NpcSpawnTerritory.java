@@ -26,36 +26,30 @@ import com.l2jserver.gameserver.model.zone.L2ZoneForm;
  * Just dummy zone, needs only for geometry calculations
  * @author GKR
  */
-public class NpcSpawnTerritory
-{
+public class NpcSpawnTerritory {
 	private final String _name;
 	private final L2ZoneForm _territory;
 	@SuppressWarnings("unused")
 	private List<L2ZoneForm> _bannedTerritories; // TODO: Implement it
 	
-	public NpcSpawnTerritory(String name, L2ZoneForm territory)
-	{
+	public NpcSpawnTerritory(String name, L2ZoneForm territory) {
 		_name = name;
 		_territory = territory;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 	
-	public int[] getRandomPoint()
-	{
+	public int[] getRandomPoint() {
 		return _territory.getRandomPoint();
 	}
 	
-	public boolean isInsideZone(int x, int y, int z)
-	{
+	public boolean isInsideZone(int x, int y, int z) {
 		return _territory.isInsideZone(x, y, z);
 	}
 	
-	public void visualizeZone(int z)
-	{
+	public void visualizeZone(int z) {
 		_territory.visualizeZone(z);
 	}
 }

@@ -33,8 +33,7 @@ import com.l2jserver.gameserver.model.items.type.EtcItemType;
 import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.items.type.MaterialType;
 
-public class SortedWareHouseWithdrawalList extends L2GameServerPacket
-{
+public class SortedWareHouseWithdrawalList extends L2GameServerPacket {
 	public static final int PRIVATE = 1;
 	public static final int CLAN = 2;
 	public static final int CASTLE = 3; // not sure
@@ -44,8 +43,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	private List<L2WarehouseItem> _objects = new ArrayList<>();
 	private int _whType;
 	
-	public static enum WarehouseListType
-	{
+	public static enum WarehouseListType {
 		WEAPON,
 		ARMOR,
 		ETCITEM,
@@ -86,20 +84,17 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param itemtype is the Itemtype to sort for
 	 * @param sortorder is the integer Sortorder like 1 for A..Z (use public constant)
 	 */
-	public SortedWareHouseWithdrawalList(L2PcInstance player, int type, WarehouseListType itemtype, byte sortorder)
-	{
+	public SortedWareHouseWithdrawalList(L2PcInstance player, int type, WarehouseListType itemtype, byte sortorder) {
 		_whType = type;
 		
 		_playerAdena = player.getAdena();
-		if (player.getActiveWarehouse() == null)
-		{
+		if (player.getActiveWarehouse() == null) {
 			// Something went wrong!
 			_log.warning("error while sending withdraw request to: " + player.getName());
 			return;
 		}
 		
-		switch (itemtype)
-		{
+		switch (itemtype) {
 			case WEAPON:
 				_objects = createWeaponList(player.getActiveWarehouse().getItems());
 				break;
@@ -142,46 +137,38 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 				break;
 		}
 		
-		try
-		{
-			switch (sortorder)
-			{
+		try {
+			switch (sortorder) {
 				case A2Z:
 				case Z2A:
 					Collections.sort(_objects, new WarehouseItemNameComparator(sortorder));
 					break;
 				case GRADE:
-					if ((itemtype == WarehouseListType.ARMOR) || (itemtype == WarehouseListType.WEAPON))
-					{
+					if ((itemtype == WarehouseListType.ARMOR) || (itemtype == WarehouseListType.WEAPON)) {
 						Collections.sort(_objects, new WarehouseItemNameComparator(A2Z));
 						Collections.sort(_objects, new WarehouseItemGradeComparator(A2Z));
 					}
 					break;
 				case LEVEL:
-					if (itemtype == WarehouseListType.RECIPE)
-					{
+					if (itemtype == WarehouseListType.RECIPE) {
 						Collections.sort(_objects, new WarehouseItemNameComparator(A2Z));
 						Collections.sort(_objects, new WarehouseItemRecipeComparator(A2Z));
 					}
 					break;
 				case TYPE:
-					if (itemtype == WarehouseListType.MATERIAL)
-					{
+					if (itemtype == WarehouseListType.MATERIAL) {
 						Collections.sort(_objects, new WarehouseItemNameComparator(A2Z));
 						Collections.sort(_objects, new WarehouseItemTypeComparator(A2Z));
 					}
 					break;
 				case WEAR:
-					if (itemtype == WarehouseListType.ARMOR)
-					{
+					if (itemtype == WarehouseListType.ARMOR) {
 						Collections.sort(_objects, new WarehouseItemNameComparator(A2Z));
 						Collections.sort(_objects, new WarehouseItemBodypartComparator(A2Z));
 					}
 					break;
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 		}
 	}
 	
@@ -190,40 +177,23 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param order
 	 * @return the integer of the sortorder or 1 as default value
 	 */
-	public static byte getOrder(String order)
-	{
-		if (order == null)
-		{
+	public static byte getOrder(String order) {
+		if (order == null) {
 			return A2Z;
-		}
-		else if (order.startsWith("A2Z"))
-		{
+		} else if (order.startsWith("A2Z")) {
 			return A2Z;
-		}
-		else if (order.startsWith("Z2A"))
-		{
+		} else if (order.startsWith("Z2A")) {
 			return Z2A;
-		}
-		else if (order.startsWith("GRADE"))
-		{
+		} else if (order.startsWith("GRADE")) {
 			return GRADE;
-		}
-		else if (order.startsWith("TYPE"))
-		{
+		} else if (order.startsWith("TYPE")) {
 			return TYPE;
-		}
-		else if (order.startsWith("WEAR"))
-		{
+		} else if (order.startsWith("WEAR")) {
 			return WEAR;
-		}
-		else
-		{
-			try
-			{
+		} else {
+			try {
 				return Byte.parseByte(order);
-			}
-			catch (NumberFormatException ex)
-			{
+			} catch (NumberFormatException ex) {
 				return A2Z;
 			}
 		}
@@ -232,24 +202,19 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	/**
 	 * This is the common Comparator to sort the items by Name
 	 */
-	private static class WarehouseItemNameComparator implements Comparator<L2WarehouseItem>
-	{
+	private static class WarehouseItemNameComparator implements Comparator<L2WarehouseItem> {
 		private byte order = 0;
 		
-		protected WarehouseItemNameComparator(byte sortOrder)
-		{
+		protected WarehouseItemNameComparator(byte sortOrder) {
 			order = sortOrder;
 		}
 		
 		@Override
-		public int compare(L2WarehouseItem o1, L2WarehouseItem o2)
-		{
-			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY))
-			{
+		public int compare(L2WarehouseItem o1, L2WarehouseItem o2) {
+			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? Z2A : A2Z);
 			}
-			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY))
-			{
+			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? A2Z : Z2A);
 			}
 			String s1 = o1.getItemName();
@@ -261,42 +226,33 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	/**
 	 * This Comparator is used to sort by Recipe Level
 	 */
-	private static class WarehouseItemRecipeComparator implements Comparator<L2WarehouseItem>
-	{
+	private static class WarehouseItemRecipeComparator implements Comparator<L2WarehouseItem> {
 		private int order = 0;
 		
 		private RecipeData rd = null;
 		
-		protected WarehouseItemRecipeComparator(int sortOrder)
-		{
+		protected WarehouseItemRecipeComparator(int sortOrder) {
 			order = sortOrder;
 			rd = RecipeData.getInstance();
 		}
 		
 		@Override
-		public int compare(L2WarehouseItem o1, L2WarehouseItem o2)
-		{
-			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY))
-			{
+		public int compare(L2WarehouseItem o1, L2WarehouseItem o2) {
+			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? Z2A : A2Z);
 			}
-			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY))
-			{
+			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? A2Z : Z2A);
 			}
-			if ((o1.isEtcItem() && (o1.getItemType() == EtcItemType.RECIPE)) && (o2.isEtcItem() && (o2.getItemType() == EtcItemType.RECIPE)))
-			{
-				try
-				{
+			if ((o1.isEtcItem() && (o1.getItemType() == EtcItemType.RECIPE)) && (o2.isEtcItem() && (o2.getItemType() == EtcItemType.RECIPE))) {
+				try {
 					L2RecipeList rp1 = rd.getRecipeByItemId(o1.getItemId());
 					L2RecipeList rp2 = rd.getRecipeByItemId(o2.getItemId());
 					
-					if (rp1 == null)
-					{
+					if (rp1 == null) {
 						return (order == A2Z ? A2Z : Z2A);
 					}
-					if (rp2 == null)
-					{
+					if (rp2 == null) {
 						return (order == A2Z ? Z2A : A2Z);
 					}
 					
@@ -304,9 +260,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 					Integer i2 = rp2.getLevel();
 					
 					return (order == A2Z ? i1.compareTo(i2) : i2.compareTo(i1));
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					return 0;
 				}
 			}
@@ -320,24 +274,19 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	/**
 	 * This Comparator is used to sort the Items by BodyPart
 	 */
-	private static class WarehouseItemBodypartComparator implements Comparator<L2WarehouseItem>
-	{
+	private static class WarehouseItemBodypartComparator implements Comparator<L2WarehouseItem> {
 		private byte order = 0;
 		
-		protected WarehouseItemBodypartComparator(byte sortOrder)
-		{
+		protected WarehouseItemBodypartComparator(byte sortOrder) {
 			order = sortOrder;
 		}
 		
 		@Override
-		public int compare(L2WarehouseItem o1, L2WarehouseItem o2)
-		{
-			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY))
-			{
+		public int compare(L2WarehouseItem o1, L2WarehouseItem o2) {
+			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? Z2A : A2Z);
 			}
-			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY))
-			{
+			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? A2Z : Z2A);
 			}
 			Integer i1 = o1.getBodyPart();
@@ -349,24 +298,19 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	/**
 	 * This Comparator is used to sort by the Item Grade (e.g. Non..S-Grade)
 	 */
-	private static class WarehouseItemGradeComparator implements Comparator<L2WarehouseItem>
-	{
+	private static class WarehouseItemGradeComparator implements Comparator<L2WarehouseItem> {
 		byte order = 0;
 		
-		protected WarehouseItemGradeComparator(byte sortOrder)
-		{
+		protected WarehouseItemGradeComparator(byte sortOrder) {
 			order = sortOrder;
 		}
 		
 		@Override
-		public int compare(L2WarehouseItem o1, L2WarehouseItem o2)
-		{
-			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY))
-			{
+		public int compare(L2WarehouseItem o1, L2WarehouseItem o2) {
+			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? Z2A : A2Z);
 			}
-			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY))
-			{
+			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? A2Z : Z2A);
 			}
 			CrystalType i1 = o1.getItemGrade();
@@ -378,34 +322,26 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	/**
 	 * This Comparator will sort by Item Type. Unfortunatly this will only have a good result if the Database Table for the ETCITEM.TYPE column is fixed!
 	 */
-	private static class WarehouseItemTypeComparator implements Comparator<L2WarehouseItem>
-	{
+	private static class WarehouseItemTypeComparator implements Comparator<L2WarehouseItem> {
 		byte order = 0;
 		
-		protected WarehouseItemTypeComparator(byte sortOrder)
-		{
+		protected WarehouseItemTypeComparator(byte sortOrder) {
 			order = sortOrder;
 		}
 		
 		@Override
-		public int compare(L2WarehouseItem o1, L2WarehouseItem o2)
-		{
-			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY))
-			{
+		public int compare(L2WarehouseItem o1, L2WarehouseItem o2) {
+			if ((o1.getType2() == ItemType2.MONEY) && (o2.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? Z2A : A2Z);
 			}
-			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY))
-			{
+			if ((o2.getType2() == ItemType2.MONEY) && (o1.getType2() != ItemType2.MONEY)) {
 				return (order == A2Z ? A2Z : Z2A);
 			}
-			try
-			{
+			try {
 				MaterialType i1 = o1.getItem().getMaterialType();
 				MaterialType i2 = o2.getItem().getMaterialType();
 				return (order == A2Z ? i1.compareTo(i2) : i2.compareTo(i1));
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				return 0;
 			}
 		}
@@ -419,19 +355,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createWeaponList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createWeaponList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if (item.isWeapon() || (item.getItem().getType2() == ItemType2.WEAPON) || (item.isEtcItem() && (item.getItemType() == EtcItemType.ARROW)) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if (item.isWeapon() || (item.getItem().getType2() == ItemType2.WEAPON) || (item.isEtcItem() && (item.getItemType() == EtcItemType.ARROW)) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -446,19 +376,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createArmorList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createArmorList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if (item.isArmor() || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if (item.isArmor() || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -473,19 +397,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createEtcItemList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createEtcItemList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if (item.isEtcItem() || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if (item.isEtcItem() || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -500,19 +418,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createMatList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createMatList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.MATERIAL)) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.MATERIAL)) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -527,19 +439,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createRecipeList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createRecipeList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.RECIPE)) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.RECIPE)) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -554,19 +460,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createAmulettList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createAmulettList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (item.getItemName().toUpperCase().startsWith("AMULET"))) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (item.getItemName().toUpperCase().startsWith("AMULET"))) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -581,19 +481,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createSpellbookList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createSpellbookList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (!item.getItemName().toUpperCase().startsWith("AMULET"))) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (!item.getItemName().toUpperCase().startsWith("AMULET"))) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -608,19 +502,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createConsumableList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createConsumableList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && ((item.getEtcItem().getItemType() == EtcItemType.SCROLL) || (item.getEtcItem().getItemType() == EtcItemType.SHOT))) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && ((item.getEtcItem().getItemType() == EtcItemType.SCROLL) || (item.getEtcItem().getItemType() == EtcItemType.SHOT))) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -635,19 +523,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createShotList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createShotList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SHOT)) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SHOT)) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -662,19 +544,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createScrollList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createScrollList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SCROLL)) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SCROLL)) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -689,19 +565,13 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createSeedList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createSeedList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SEED)) || (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+		for (L2ItemInstance item : _items) {
+			if ((item.isEtcItem() && (item.getEtcItem().getItemType() == EtcItemType.SEED)) || (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -716,20 +586,14 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createOtherList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createOtherList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
+		for (L2ItemInstance item : _items) {
 			if ((item.isEtcItem() && ((item.getEtcItem().getItemType() != EtcItemType.MATERIAL) && (item.getEtcItem().getItemType() != EtcItemType.RECIPE) && (item.getEtcItem().getItemType() != EtcItemType.SCROLL) && (item.getEtcItem().getItemType() != EtcItemType.SHOT)))
-				|| (item.getItem().getType2() == ItemType2.MONEY))
-			{
-				if (list.size() < MAX_SORT_LIST_ITEMS)
-				{
+				|| (item.getItem().getType2() == ItemType2.MONEY)) {
+				if (list.size() < MAX_SORT_LIST_ITEMS) {
 					list.add(new L2WarehouseItem(item));
-				}
-				else
-				{
+				} else {
 					continue;
 				}
 			}
@@ -743,17 +607,12 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	 * @param _items complete Warehouse List
 	 * @return limited Item List
 	 */
-	private List<L2WarehouseItem> createAllList(L2ItemInstance[] _items)
-	{
+	private List<L2WarehouseItem> createAllList(L2ItemInstance[] _items) {
 		List<L2WarehouseItem> list = new ArrayList<>();
-		for (L2ItemInstance item : _items)
-		{
-			if (list.size() < MAX_SORT_LIST_ITEMS)
-			{
+		for (L2ItemInstance item : _items) {
+			if (list.size() < MAX_SORT_LIST_ITEMS) {
 				list.add(new L2WarehouseItem(item));
-			}
-			else
-			{
+			} else {
 				continue;
 			}
 		}
@@ -761,8 +620,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x42);
 		/*
 		 * 0x01-Private Warehouse 0x02-Clan Warehouse 0x03-Castle Warehouse 0x04-Warehouse
@@ -771,8 +629,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 		writeQ(_playerAdena);
 		writeH(_objects.size());
 		
-		for (L2WarehouseItem item : _objects)
-		{
+		for (L2WarehouseItem item : _objects) {
 			writeD(item.getObjectId());
 			writeD(item.getItem().getDisplayId());
 			writeD(item.getLocationSlot());
@@ -783,25 +640,20 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 			writeD(item.getItem().getBodyPart());
 			writeH(item.getEnchantLevel());
 			writeH(item.getCustomType2());
-			if (item.isAugmented())
-			{
+			if (item.isAugmented()) {
 				writeD(item.getAugmentationId());
-			}
-			else
-			{
+			} else {
 				writeD(0x00);
 			}
 			writeD(item.getMana());
 			writeD(item.getTime());
 			writeH(item.getAttackElementType());
 			writeH(item.getAttackElementPower());
-			for (byte i = 0; i < 6; i++)
-			{
+			for (byte i = 0; i < 6; i++) {
 				writeH(item.getElementDefAttr(i));
 			}
 			// Enchant Effects
-			for (int op : item.getEnchantOptions())
-			{
+			for (int op : item.getEnchantOptions()) {
 				writeH(op);
 			}
 			writeD(item.getObjectId());

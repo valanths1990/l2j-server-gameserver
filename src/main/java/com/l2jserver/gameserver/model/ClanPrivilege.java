@@ -23,8 +23,7 @@ package com.l2jserver.gameserver.model;
  * The ordinal of each entry is the bit index in the privilege bitmask.
  * @author HorridoJoho
  */
-public enum ClanPrivilege
-{
+public enum ClanPrivilege {
 	/** dummy entry */
 	DUMMY,
 	/** Privilege to join clan */
@@ -57,8 +56,7 @@ public enum ClanPrivilege
 	CS_MERCENARIES,
 	CS_SET_FUNCTIONS;
 	
-	public int getBitmask()
-	{
+	public int getBitmask() {
 		return 1 << ordinal();
 	}
 }

@@ -27,24 +27,20 @@ import com.l2jserver.gameserver.model.entity.Fort;
 /**
  * @author KenM
  */
-public class ExShowFortressInfo extends L2GameServerPacket
-{
+public class ExShowFortressInfo extends L2GameServerPacket {
 	public static final ExShowFortressInfo STATIC_PACKET = new ExShowFortressInfo();
 	
-	private ExShowFortressInfo()
-	{
+	private ExShowFortressInfo() {
 		
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x15);
 		List<Fort> forts = FortManager.getInstance().getForts();
 		writeD(forts.size());
-		for (Fort fort : forts)
-		{
+		for (Fort fort : forts) {
 			L2Clan clan = fort.getOwnerClan();
 			writeD(fort.getResidenceId());
 			writeS(clan != null ? clan.getName() : "");

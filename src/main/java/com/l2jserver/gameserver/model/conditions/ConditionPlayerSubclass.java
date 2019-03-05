@@ -25,24 +25,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerSubclass.
  */
-public class ConditionPlayerSubclass extends Condition
-{
+public class ConditionPlayerSubclass extends Condition {
 	private final boolean _val;
 	
 	/**
 	 * Instantiates a new condition player subclass.
 	 * @param val the val
 	 */
-	public ConditionPlayerSubclass(boolean val)
-	{
+	public ConditionPlayerSubclass(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return true;
 		}
 		return effector.getActingPlayer().isSubClassActive() == _val;

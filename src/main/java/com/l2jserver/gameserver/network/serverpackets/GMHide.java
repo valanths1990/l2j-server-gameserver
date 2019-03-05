@@ -22,21 +22,18 @@ package com.l2jserver.gameserver.network.serverpackets;
  * @author Kerberos
  */
 @Deprecated
-public class GMHide extends L2GameServerPacket
-{
+public class GMHide extends L2GameServerPacket {
 	private final int _mode;
 	
 	/**
 	 * @param mode (0 = display windows, 1 = hide windows)
 	 */
-	public GMHide(int mode)
-	{
+	public GMHide(int mode) {
 		_mode = mode;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x93);
 		writeD(_mode);
 	}

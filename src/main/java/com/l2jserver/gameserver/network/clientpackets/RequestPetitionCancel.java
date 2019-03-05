@@ -35,44 +35,32 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * </p>
  * @author -Wooden-, TempyIncursion
  */
-public final class RequestPetitionCancel extends L2GameClientPacket
-{
+public final class RequestPetitionCancel extends L2GameClientPacket {
 	private static final String _C__8A_REQUEST_PETITIONCANCEL = "[C] 8A RequestPetitionCancel";
 	
 	// private int _unknown;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// _unknown = readD(); This is pretty much a trigger packet.
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (PetitionManager.getInstance().isPlayerInConsultation(activeChar))
-		{
-			if (activeChar.isGM())
-			{
+		if (PetitionManager.getInstance().isPlayerInConsultation(activeChar)) {
+			if (activeChar.isGM()) {
 				PetitionManager.getInstance().endActivePetition(activeChar);
-			}
-			else
-			{
+			} else {
 				activeChar.sendPacket(SystemMessageId.PETITION_UNDER_PROCESS);
 			}
-		}
-		else
-		{
-			if (PetitionManager.getInstance().isPlayerPetitionPending(activeChar))
-			{
-				if (PetitionManager.getInstance().cancelActivePetition(activeChar))
-				{
+		} else {
+			if (PetitionManager.getInstance().isPlayerPetitionPending(activeChar)) {
+				if (PetitionManager.getInstance().cancelActivePetition(activeChar)) {
 					int numRemaining = Config.MAX_PETITIONS_PER_PLAYER - PetitionManager.getInstance().getPlayerTotalPetitionCount(activeChar);
 					
 					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.PETITION_CANCELED_SUBMIT_S1_MORE_TODAY);
@@ -82,22 +70,17 @@ public final class RequestPetitionCancel extends L2GameClientPacket
 					// Notify all GMs that the player's pending petition has been cancelled.
 					String msgContent = activeChar.getName() + " has canceled a pending petition.";
 					AdminData.getInstance().broadcastToGMs(new CreatureSay(activeChar.getObjectId(), Say2.HERO_VOICE, "Petition System", msgContent));
-				}
-				else
-				{
+				} else {
 					activeChar.sendPacket(SystemMessageId.FAILED_CANCEL_PETITION_TRY_LATER);
 				}
-			}
-			else
-			{
+			} else {
 				activeChar.sendPacket(SystemMessageId.PETITION_NOT_SUBMITTED);
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__8A_REQUEST_PETITIONCANCEL;
 	}
 }

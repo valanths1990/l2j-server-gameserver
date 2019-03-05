@@ -20,18 +20,15 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.model.Location;
 
-public class ObservationMode extends L2GameServerPacket
-{
+public class ObservationMode extends L2GameServerPacket {
 	private final Location _loc;
 	
-	public ObservationMode(Location loc)
-	{
+	public ObservationMode(Location loc) {
 		_loc = loc;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xEB);
 		writeD(_loc.getX());
 		writeD(_loc.getY());

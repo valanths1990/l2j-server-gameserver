@@ -24,42 +24,35 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * ConfirmDlg server packet implementation.
  * @author kombat, UnAfraid
  */
-public class ConfirmDlg extends AbstractMessagePacket<ConfirmDlg>
-{
+public class ConfirmDlg extends AbstractMessagePacket<ConfirmDlg> {
 	private int _time;
 	private int _requesterId;
 	
-	public ConfirmDlg(SystemMessageId smId)
-	{
+	public ConfirmDlg(SystemMessageId smId) {
 		super(smId);
 	}
 	
-	public ConfirmDlg(int id)
-	{
+	public ConfirmDlg(int id) {
 		this(SystemMessageId.getSystemMessageId(id));
 	}
 	
-	public ConfirmDlg(String text)
-	{
+	public ConfirmDlg(String text) {
 		this(SystemMessageId.S1);
 		addString(text);
 	}
 	
-	public ConfirmDlg addTime(int time)
-	{
+	public ConfirmDlg addTime(int time) {
 		_time = time;
 		return this;
 	}
 	
-	public ConfirmDlg addRequesterId(int id)
-	{
+	public ConfirmDlg addRequesterId(int id) {
 		_requesterId = id;
 		return this;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xF3);
 		writeMe();
 		writeD(_time);

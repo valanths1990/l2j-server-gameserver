@@ -25,7 +25,6 @@ import com.l2jserver.gameserver.model.actor.L2Npc;
  * @version $Revision: 1.2 $ $Date: 2004/06/27 08:12:59 $
  */
 
-public interface SpawnListener
-{
+public interface SpawnListener {
 	public void npcSpawned(L2Npc npc);
 }

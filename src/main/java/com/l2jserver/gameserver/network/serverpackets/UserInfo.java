@@ -29,8 +29,7 @@ import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.skills.AbnormalVisualEffect;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 
-public final class UserInfo extends L2GameServerPacket
-{
+public final class UserInfo extends L2GameServerPacket {
 	private final L2PcInstance _activeChar;
 	private int _relation;
 	private int _airShipHelm;
@@ -40,34 +39,25 @@ public final class UserInfo extends L2GameServerPacket
 	private final int _flyRunSpd, _flyWalkSpd;
 	private final double _moveMultiplier;
 	
-	public UserInfo(L2PcInstance cha)
-	{
+	public UserInfo(L2PcInstance cha) {
 		_activeChar = cha;
 		
 		int _territoryId = TerritoryWarManager.getInstance().getRegisteredTerritoryId(cha);
 		_relation = _activeChar.isClanLeader() ? 0x40 : 0;
-		if (_activeChar.getSiegeState() == 1)
-		{
-			if (_territoryId == 0)
-			{
+		if (_activeChar.getSiegeState() == 1) {
+			if (_territoryId == 0) {
 				_relation |= 0x180;
-			}
-			else
-			{
+			} else {
 				_relation |= 0x1000;
 			}
 		}
-		if (_activeChar.getSiegeState() == 2)
-		{
+		if (_activeChar.getSiegeState() == 2) {
 			_relation |= 0x80;
 		}
 		// _isDisguised = TerritoryWarManager.getInstance().isDisguised(character.getObjectId());
-		if (_activeChar.isInAirShip() && _activeChar.getAirShip().isCaptain(_activeChar))
-		{
+		if (_activeChar.isInAirShip() && _activeChar.getAirShip().isCaptain(_activeChar)) {
 			_airShipHelm = _activeChar.getAirShip().getHelmItemId();
-		}
-		else
-		{
+		} else {
 			_airShipHelm = 0;
 		}
 		
@@ -81,8 +71,7 @@ public final class UserInfo extends L2GameServerPacket
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0x32);
 		
 		writeD(_activeChar.getX());
@@ -116,18 +105,15 @@ public final class UserInfo extends L2GameServerPacket
 		
 		writeD(_activeChar.getActiveWeaponItem() != null ? 40 : 20); // 20 no weapon, 40 weapon equipped
 		
-		for (int slot : getPaperdollOrder())
-		{
+		for (int slot : getPaperdollOrder()) {
 			writeD(_activeChar.getInventory().getPaperdollObjectId(slot));
 		}
 		
-		for (int slot : getPaperdollOrder())
-		{
+		for (int slot : getPaperdollOrder()) {
 			writeD(_activeChar.getInventory().getPaperdollItemDisplayId(slot));
 		}
 		
-		for (int slot : getPaperdollOrder())
-		{
+		for (int slot : getPaperdollOrder()) {
 			writeD(_activeChar.getInventory().getPaperdollAugmentationId(slot));
 		}
 		
@@ -169,15 +155,12 @@ public final class UserInfo extends L2GameServerPacket
 		writeD(_activeChar.isGM() ? 1 : 0); // builder level
 		
 		String title = _activeChar.getTitle();
-		if (_activeChar.isGM() && _activeChar.isInvisible())
-		{
+		if (_activeChar.isGM() && _activeChar.isInvisible()) {
 			title = "Invisible";
 		}
-		if (_activeChar.getPoly().isMorphed())
-		{
+		if (_activeChar.getPoly().isMorphed()) {
 			final L2NpcTemplate polyObj = NpcData.getInstance().getTemplate(_activeChar.getPoly().getPolyId());
-			if (polyObj != null)
-			{
+			if (polyObj != null) {
 				title += " - " + polyObj.getName();
 			}
 		}
@@ -197,8 +180,7 @@ public final class UserInfo extends L2GameServerPacket
 		writeD(_activeChar.getPvpKills());
 		
 		writeH(_activeChar.getCubics().size());
-		for (int cubicId : _activeChar.getCubics().keySet())
-		{
+		for (int cubicId : _activeChar.getCubics().keySet()) {
 			writeH(cubicId);
 		}
 		

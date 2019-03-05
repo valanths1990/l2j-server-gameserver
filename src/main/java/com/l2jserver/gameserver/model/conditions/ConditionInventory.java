@@ -26,8 +26,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionInventory.
  * @author mkizub
  */
-public abstract class ConditionInventory extends Condition
-{
+public abstract class ConditionInventory extends Condition {
 	
 	protected final int _slot;
 	
@@ -35,8 +34,7 @@ public abstract class ConditionInventory extends Condition
 	 * Instantiates a new condition inventory.
 	 * @param slot the slot
 	 */
-	public ConditionInventory(int slot)
-	{
+	public ConditionInventory(int slot) {
 		_slot = slot;
 	}
 	

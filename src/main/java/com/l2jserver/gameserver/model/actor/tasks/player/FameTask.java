@@ -28,26 +28,21 @@ import com.l2jserver.gameserver.network.serverpackets.UserInfo;
  * Task dedicated to reward player with fame while standing on siege zone.
  * @author UnAfraid
  */
-public class FameTask implements Runnable
-{
+public class FameTask implements Runnable {
 	private final L2PcInstance _player;
 	private final int _value;
 	
-	public FameTask(L2PcInstance player, int value)
-	{
+	public FameTask(L2PcInstance player, int value) {
 		_player = player;
 		_value = value;
 	}
 	
 	@Override
-	public void run()
-	{
-		if ((_player == null) || (_player.isDead() && !Config.FAME_FOR_DEAD_PLAYERS))
-		{
+	public void run() {
+		if ((_player == null) || (_player.isDead() && !Config.FAME_FOR_DEAD_PLAYERS)) {
 			return;
 		}
-		if (((_player.getClient() == null) || _player.getClient().isDetached()) && !Config.OFFLINE_FAME)
-		{
+		if (((_player.getClient() == null) || _player.getClient().isDetached()) && !Config.OFFLINE_FAME) {
 			return;
 		}
 		_player.setFame(_player.getFame() + _value);

@@ -18,17 +18,14 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public final class ActionFailed extends L2GameServerPacket
-{
+public final class ActionFailed extends L2GameServerPacket {
 	public static final ActionFailed STATIC_PACKET = new ActionFailed();
 	
-	private ActionFailed()
-	{
+	private ActionFailed() {
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0x1f);
 	}
 }

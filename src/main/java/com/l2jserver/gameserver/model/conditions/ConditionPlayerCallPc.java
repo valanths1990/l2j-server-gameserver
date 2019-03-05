@@ -30,41 +30,29 @@ import com.l2jserver.gameserver.network.SystemMessageId;
  * Player Call Pc condition implementation.
  * @author Adry_85
  */
-public class ConditionPlayerCallPc extends Condition
-{
+public class ConditionPlayerCallPc extends Condition {
 	private final boolean _val;
 	
-	public ConditionPlayerCallPc(boolean val)
-	{
+	public ConditionPlayerCallPc(boolean val) {
 		_val = val;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		boolean canCallPlayer = true;
 		final L2PcInstance player = effector.getActingPlayer();
 		
-		if (player == null)
-		{
+		if (player == null) {
 			canCallPlayer = false;
-		}
-		else if (player.isInOlympiadMode())
-		{
+		} else if (player.isInOlympiadMode()) {
 			player.sendPacket(SystemMessageId.YOU_MAY_NOT_SUMMON_FROM_YOUR_CURRENT_LOCATION);
 			canCallPlayer = false;
-		}
-		else if (player.inObserverMode())
-		{
+		} else if (player.inObserverMode()) {
 			canCallPlayer = false;
-		}
-		else if (!TvTEvent.onEscapeUse(player.getObjectId()))
-		{
+		} else if (!TvTEvent.onEscapeUse(player.getObjectId())) {
 			player.sendPacket(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING);
 			canCallPlayer = false;
-		}
-		else if (player.isInsideZone(ZoneId.NO_SUMMON_FRIEND) || player.isInsideZone(ZoneId.JAIL) || player.isFlyingMounted())
-		{
+		} else if (player.isInsideZone(ZoneId.NO_SUMMON_FRIEND) || player.isInsideZone(ZoneId.JAIL) || player.isFlyingMounted()) {
 			player.sendPacket(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING);
 			canCallPlayer = false;
 		}

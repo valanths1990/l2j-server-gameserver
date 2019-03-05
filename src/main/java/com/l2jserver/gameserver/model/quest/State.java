@@ -30,8 +30,7 @@ package com.l2jserver.gameserver.model.quest;
  * All quests have these and only these states.
  * @author Luis Arias; version 2 by Fulminus
  */
-public class State
-{
+public class State {
 	public static final byte CREATED = 0;
 	public static final byte STARTED = 1;
 	public static final byte COMPLETED = 2;
@@ -41,10 +40,8 @@ public class State
 	 * @param state the byte value of the state
 	 * @return the String representation of the quest state (default: Start)
 	 */
-	public static String getStateName(byte state)
-	{
-		switch (state)
-		{
+	public static String getStateName(byte state) {
+		switch (state) {
 			case 1:
 				return "Started";
 			case 2:
@@ -59,10 +56,8 @@ public class State
 	 * @param statename the String representation of the state
 	 * @return the byte value of the quest state (default: 0)
 	 */
-	public static byte getStateId(String statename)
-	{
-		switch (statename)
-		{
+	public static byte getStateId(String statename) {
+		switch (statename) {
 			case "Started":
 				return 1;
 			case "Completed":

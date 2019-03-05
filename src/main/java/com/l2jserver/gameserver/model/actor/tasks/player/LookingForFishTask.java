@@ -25,16 +25,14 @@ import com.l2jserver.util.Rnd;
  * Task dedicated for looking for fishes.
  * @author UnAfraid
  */
-public class LookingForFishTask implements Runnable
-{
+public class LookingForFishTask implements Runnable {
 	private final L2PcInstance _player;
 	private final boolean _isNoob, _isUpperGrade;
 	private final int _fishGroup;
 	private final double _fishGutsCheck;
 	private final long _endTaskTime;
 	
-	public LookingForFishTask(L2PcInstance player, int startCombatTime, double fishGutsCheck, int fishGroup, boolean isNoob, boolean isUpperGrade)
-	{
+	public LookingForFishTask(L2PcInstance player, int startCombatTime, double fishGutsCheck, int fishGroup, boolean isNoob, boolean isUpperGrade) {
 		_player = player;
 		_fishGutsCheck = fishGutsCheck;
 		_endTaskTime = System.currentTimeMillis() + (startCombatTime * 1000) + 10000;
@@ -44,22 +42,17 @@ public class LookingForFishTask implements Runnable
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player != null)
-		{
-			if (System.currentTimeMillis() >= _endTaskTime)
-			{
+	public void run() {
+		if (_player != null) {
+			if (System.currentTimeMillis() >= _endTaskTime) {
 				_player.endFishing(false);
 				return;
 			}
-			if (_fishGroup == -1)
-			{
+			if (_fishGroup == -1) {
 				return;
 			}
 			int check = Rnd.get(100);
-			if (_fishGutsCheck > check)
-			{
+			if (_fishGutsCheck > check) {
 				_player.stopLookingForFishTask();
 				_player.startFishCombat(_isNoob, _isUpperGrade);
 			}

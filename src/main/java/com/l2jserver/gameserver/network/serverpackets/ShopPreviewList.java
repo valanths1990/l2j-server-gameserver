@@ -25,31 +25,27 @@ import com.l2jserver.gameserver.model.buylist.L2BuyList;
 import com.l2jserver.gameserver.model.buylist.Product;
 import com.l2jserver.gameserver.model.items.type.ItemType1;
 
-public class ShopPreviewList extends L2GameServerPacket
-{
+public class ShopPreviewList extends L2GameServerPacket {
 	private final int _listId;
 	private final Collection<Product> _list;
 	private final long _money;
 	private int _expertise;
 	
-	public ShopPreviewList(L2BuyList list, long currentMoney, int expertiseIndex)
-	{
+	public ShopPreviewList(L2BuyList list, long currentMoney, int expertiseIndex) {
 		_listId = list.getListId();
 		_list = list.getProducts();
 		_money = currentMoney;
 		_expertise = expertiseIndex;
 	}
 	
-	public ShopPreviewList(Collection<Product> lst, int listId, long currentMoney)
-	{
+	public ShopPreviewList(Collection<Product> lst, int listId, long currentMoney) {
 		_listId = listId;
 		_list = lst;
 		_money = currentMoney;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xF5);
 		writeC(0xC0); // ?
 		writeC(0x13); // ?
@@ -59,28 +55,21 @@ public class ShopPreviewList extends L2GameServerPacket
 		writeD(_listId);
 		
 		int newlength = 0;
-		for (Product product : _list)
-		{
-			if ((product.getItem().getCrystalType().getId() <= _expertise) && product.getItem().isEquipable())
-			{
+		for (Product product : _list) {
+			if ((product.getItem().getCrystalType().getId() <= _expertise) && product.getItem().isEquipable()) {
 				newlength++;
 			}
 		}
 		writeH(newlength);
 		
-		for (Product product : _list)
-		{
-			if ((product.getItem().getCrystalType().getId() <= _expertise) && product.getItem().isEquipable())
-			{
+		for (Product product : _list) {
+			if ((product.getItem().getCrystalType().getId() <= _expertise) && product.getItem().isEquipable()) {
 				writeD(product.getItemId());
 				writeH(product.getItem().getType2().getId()); // item type2
 				
-				if (product.getItem().getType1() != ItemType1.ITEM_QUESTITEM_ADENA)
-				{
+				if (product.getItem().getType1() != ItemType1.ITEM_QUESTITEM_ADENA) {
 					writeH(product.getItem().getBodyPart()); // rev 415 slot 0006-lr.ear 0008-neck 0030-lr.finger 0040-head 0080-?? 0100-l.hand 0200-gloves 0400-chest 0800-pants 1000-feet 2000-?? 4000-r.hand 8000-r.hand
-				}
-				else
-				{
+				} else {
 					writeH(0x00); // rev 415 slot 0006-lr.ear 0008-neck 0030-lr.finger 0040-head 0080-?? 0100-l.hand 0200-gloves 0400-chest 0800-pants 1000-feet 2000-?? 4000-r.hand 8000-r.hand
 				}
 				

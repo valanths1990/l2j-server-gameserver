@@ -42,181 +42,147 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * @author Migi, DS
  */
-public final class RequestPostAttachment extends L2GameClientPacket
-{
+public final class RequestPostAttachment extends L2GameClientPacket {
 	private static final String _C__D0_6A_REQUESTPOSTATTACHMENT = "[C] D0:6A RequestPostAttachment";
 	
 	private int _msgId;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_msgId = readD();
 	}
 	
 	@Override
-	public void runImpl()
-	{
-		if (!Config.ALLOW_MAIL || !Config.ALLOW_ATTACHMENTS)
-		{
+	public void runImpl() {
+		if (!Config.ALLOW_MAIL || !Config.ALLOW_ATTACHMENTS) {
 			return;
 		}
 		
 		final L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
-		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("getattach"))
-		{
+		if (!getClient().getFloodProtectors().getTransaction().tryPerformAction("getattach")) {
 			return;
 		}
 		
-		if (!activeChar.getAccessLevel().allowTransaction())
-		{
+		if (!activeChar.getAccessLevel().allowTransaction()) {
 			activeChar.sendMessage("Transactions are disabled for your Access Level");
 			return;
 		}
 		
-		if (!activeChar.isInsideZone(ZoneId.PEACE))
-		{
+		if (!activeChar.isInsideZone(ZoneId.PEACE)) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_NOT_IN_PEACE_ZONE);
 			return;
 		}
 		
-		if (activeChar.getActiveTradeList() != null)
-		{
+		if (activeChar.getActiveTradeList() != null) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_DURING_EXCHANGE);
 			return;
 		}
 		
-		if (activeChar.isEnchanting())
-		{
+		if (activeChar.isEnchanting()) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_DURING_ENCHANT);
 			return;
 		}
 		
-		if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE)
-		{
+		if (activeChar.getPrivateStoreType() != PrivateStoreType.NONE) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_PRIVATE_STORE);
 			return;
 		}
 		
 		final Message msg = MailManager.getInstance().getMessage(_msgId);
-		if (msg == null)
-		{
+		if (msg == null) {
 			return;
 		}
 		
-		if (msg.getReceiverId() != activeChar.getObjectId())
-		{
+		if (msg.getReceiverId() != activeChar.getObjectId()) {
 			Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to get not own attachment!", Config.DEFAULT_PUNISH);
 			return;
 		}
 		
-		if (!msg.hasAttachments())
-		{
+		if (!msg.hasAttachments()) {
 			return;
 		}
 		
 		final ItemContainer attachments = msg.getAttachments();
-		if (attachments == null)
-		{
+		if (attachments == null) {
 			return;
 		}
 		
 		int weight = 0;
 		int slots = 0;
 		
-		for (L2ItemInstance item : attachments.getItems())
-		{
-			if (item == null)
-			{
+		for (L2ItemInstance item : attachments.getItems()) {
+			if (item == null) {
 				continue;
 			}
 			
 			// Calculate needed slots
-			if (item.getOwnerId() != msg.getSenderId())
-			{
+			if (item.getOwnerId() != msg.getSenderId()) {
 				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to get wrong item (ownerId != senderId) from attachment!", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
-			if (item.getItemLocation() != ItemLocation.MAIL)
-			{
+			if (item.getItemLocation() != ItemLocation.MAIL) {
 				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to get wrong item (Location != MAIL) from attachment!", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
-			if (item.getLocationSlot() != msg.getId())
-			{
+			if (item.getLocationSlot() != msg.getId()) {
 				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to get items from different attachment!", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
 			weight += item.getCount() * item.getItem().getWeight();
-			if (!item.isStackable())
-			{
+			if (!item.isStackable()) {
 				slots += item.getCount();
-			}
-			else if (activeChar.getInventory().getItemByItemId(item.getId()) == null)
-			{
+			} else if (activeChar.getInventory().getItemByItemId(item.getId()) == null) {
 				slots++;
 			}
 		}
 		
 		// Item Max Limit Check
-		if (!activeChar.getInventory().validateCapacity(slots))
-		{
+		if (!activeChar.getInventory().validateCapacity(slots)) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_INVENTORY_FULL);
 			return;
 		}
 		
 		// Weight limit Check
-		if (!activeChar.getInventory().validateWeight(weight))
-		{
+		if (!activeChar.getInventory().validateWeight(weight)) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_INVENTORY_FULL);
 			return;
 		}
 		
 		long adena = msg.getReqAdena();
-		if ((adena > 0) && !activeChar.reduceAdena("PayMail", adena, null, true))
-		{
+		if ((adena > 0) && !activeChar.reduceAdena("PayMail", adena, null, true)) {
 			activeChar.sendPacket(SystemMessageId.CANT_RECEIVE_NO_ADENA);
 			return;
 		}
 		
 		// Proceed to the transfer
 		InventoryUpdate playerIU = Config.FORCE_INVENTORY_UPDATE ? null : new InventoryUpdate();
-		for (L2ItemInstance item : attachments.getItems())
-		{
-			if (item == null)
-			{
+		for (L2ItemInstance item : attachments.getItems()) {
+			if (item == null) {
 				continue;
 			}
 			
-			if (item.getOwnerId() != msg.getSenderId())
-			{
+			if (item.getOwnerId() != msg.getSenderId()) {
 				Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " tried to get items with owner != sender !", Config.DEFAULT_PUNISH);
 				return;
 			}
 			
 			long count = item.getCount();
 			final L2ItemInstance newItem = attachments.transferItem(attachments.getName(), item.getObjectId(), item.getCount(), activeChar.getInventory(), activeChar, null);
-			if (newItem == null)
-			{
+			if (newItem == null) {
 				return;
 			}
 			
-			if (playerIU != null)
-			{
-				if (newItem.getCount() > count)
-				{
+			if (playerIU != null) {
+				if (newItem.getCount() > count) {
 					playerIU.addModifiedItem(newItem);
-				}
-				else
-				{
+				} else {
 					playerIU.addNewItem(newItem);
 				}
 			}
@@ -227,12 +193,9 @@ public final class RequestPostAttachment extends L2GameClientPacket
 		}
 		
 		// Send updated item list to the player
-		if (playerIU != null)
-		{
+		if (playerIU != null) {
 			activeChar.sendPacket(playerIU);
-		}
-		else
-		{
+		} else {
 			activeChar.sendPacket(new ItemList(activeChar, false));
 		}
 		
@@ -245,27 +208,21 @@ public final class RequestPostAttachment extends L2GameClientPacket
 		
 		SystemMessage sm;
 		final L2PcInstance sender = L2World.getInstance().getPlayer(msg.getSenderId());
-		if (adena > 0)
-		{
-			if (sender != null)
-			{
+		if (adena > 0) {
+			if (sender != null) {
 				sender.addAdena("PayMail", adena, activeChar, false);
 				sm = SystemMessage.getSystemMessage(SystemMessageId.PAYMENT_OF_S1_ADENA_COMPLETED_BY_S2);
 				sm.addLong(adena);
 				sm.addCharName(activeChar);
 				sender.sendPacket(sm);
-			}
-			else
-			{
+			} else {
 				L2ItemInstance paidAdena = ItemTable.getInstance().createItem("PayMail", ADENA_ID, adena, activeChar, null);
 				paidAdena.setOwnerId(msg.getSenderId());
 				paidAdena.setItemLocation(ItemLocation.INVENTORY);
 				paidAdena.updateDatabase(true);
 				L2World.getInstance().removeObject(paidAdena);
 			}
-		}
-		else if (sender != null)
-		{
+		} else if (sender != null) {
 			sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ACQUIRED_ATTACHED_ITEM);
 			sm.addCharName(activeChar);
 			sender.sendPacket(sm);
@@ -276,14 +233,12 @@ public final class RequestPostAttachment extends L2GameClientPacket
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_6A_REQUESTPOSTATTACHMENT;
 	}
 	
 	@Override
-	protected boolean triggersOnActionRequest()
-	{
+	protected boolean triggersOnActionRequest() {
 		return false;
 	}
 }

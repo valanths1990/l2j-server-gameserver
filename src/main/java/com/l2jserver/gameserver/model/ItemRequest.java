@@ -21,68 +21,56 @@ package com.l2jserver.gameserver.model;
 /**
  *
  */
-public class ItemRequest
-{
+public class ItemRequest {
 	int _objectId;
 	int _itemId;
 	long _count;
 	long _price;
 	
-	public ItemRequest(int objectId, long count, long price)
-	{
+	public ItemRequest(int objectId, long count, long price) {
 		_objectId = objectId;
 		_count = count;
 		_price = price;
 	}
 	
-	public ItemRequest(int objectId, int itemId, long count, long price)
-	{
+	public ItemRequest(int objectId, int itemId, long count, long price) {
 		_objectId = objectId;
 		_itemId = itemId;
 		_count = count;
 		_price = price;
 	}
 	
-	public int getObjectId()
-	{
+	public int getObjectId() {
 		return _objectId;
 	}
 	
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 	
-	public void setCount(long count)
-	{
+	public void setCount(long count) {
 		_count = count;
 	}
 	
-	public long getCount()
-	{
+	public long getCount() {
 		return _count;
 	}
 	
-	public long getPrice()
-	{
+	public long getPrice() {
 		return _price;
 	}
 	
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		return _objectId;
 	}
 	
 	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof ItemRequest))
-		{
+		if (!(obj instanceof ItemRequest)) {
 			return false;
 		}
 		return (_objectId != ((ItemRequest) obj)._objectId);

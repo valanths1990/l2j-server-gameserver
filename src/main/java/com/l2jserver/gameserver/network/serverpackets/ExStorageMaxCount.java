@@ -25,8 +25,7 @@ import com.l2jserver.gameserver.model.stats.Stats;
 /**
  * @author -Wooden-, KenM
  */
-public class ExStorageMaxCount extends L2GameServerPacket
-{
+public class ExStorageMaxCount extends L2GameServerPacket {
 	private final int _inventory;
 	private final int _warehouse;
 	private final int _clan;
@@ -37,8 +36,7 @@ public class ExStorageMaxCount extends L2GameServerPacket
 	private final int _inventoryExtraSlots;
 	private final int _inventoryQuestItems;
 	
-	public ExStorageMaxCount(L2PcInstance activeChar)
-	{
+	public ExStorageMaxCount(L2PcInstance activeChar) {
 		_inventory = activeChar.getInventoryLimit();
 		_warehouse = activeChar.getWareHouseLimit();
 		_privateSell = activeChar.getPrivateSellStoreLimit();
@@ -51,8 +49,7 @@ public class ExStorageMaxCount extends L2GameServerPacket
 	}
 	
 	@Override
-	protected void writeImpl()
-	{
+	protected void writeImpl() {
 		writeC(0xFE);
 		writeH(0x2F);
 		

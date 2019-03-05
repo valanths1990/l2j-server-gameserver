@@ -23,30 +23,25 @@ import com.l2jserver.gameserver.model.PcCondOverride;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
-public final class TradeStart extends AbstractItemPacket
-{
+public final class TradeStart extends AbstractItemPacket {
 	private final L2PcInstance _activeChar;
 	private final L2ItemInstance[] _itemList;
 	
-	public TradeStart(L2PcInstance player)
-	{
+	public TradeStart(L2PcInstance player) {
 		_activeChar = player;
 		_itemList = _activeChar.getInventory().getAvailableItems(true, (_activeChar.canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && Config.GM_TRADE_RESTRICTED_ITEMS), false);
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
-		if ((_activeChar.getActiveTradeList() == null) || (_activeChar.getActiveTradeList().getPartner() == null))
-		{
+	protected final void writeImpl() {
+		if ((_activeChar.getActiveTradeList() == null) || (_activeChar.getActiveTradeList().getPartner() == null)) {
 			return;
 		}
 		
 		writeC(0x14);
 		writeD(_activeChar.getActiveTradeList().getPartner().getObjectId());
 		writeH(_itemList.length);
-		for (L2ItemInstance item : _itemList)
-		{
+		for (L2ItemInstance item : _itemList) {
 			writeItem(item);
 		}
 	}

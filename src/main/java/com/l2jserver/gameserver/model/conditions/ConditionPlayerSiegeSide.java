@@ -25,24 +25,20 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * The Class ConditionPlayerSiegeSide.
  */
-public class ConditionPlayerSiegeSide extends Condition
-{
+public class ConditionPlayerSiegeSide extends Condition {
 	private final int _siegeSide;
 	
 	/**
 	 * Instantiates a new condition player siege side.
 	 * @param side the side
 	 */
-	public ConditionPlayerSiegeSide(int side)
-	{
+	public ConditionPlayerSiegeSide(int side) {
 		_siegeSide = side;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effector.getActingPlayer() == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effector.getActingPlayer() == null) {
 			return false;
 		}
 		return effector.getActingPlayer().getSiegeSide() == _siegeSide;

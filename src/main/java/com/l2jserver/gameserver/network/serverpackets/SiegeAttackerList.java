@@ -48,44 +48,36 @@ import com.l2jserver.gameserver.model.entity.clanhall.SiegableHall;
  * d = AllyCrestID<BR>
  * @author KenM
  */
-public final class SiegeAttackerList extends L2GameServerPacket
-{
+public final class SiegeAttackerList extends L2GameServerPacket {
 	private Castle _castle;
 	private SiegableHall _hall;
 	
-	public SiegeAttackerList(Castle castle)
-	{
+	public SiegeAttackerList(Castle castle) {
 		_castle = castle;
 	}
 	
-	public SiegeAttackerList(SiegableHall hall)
-	{
+	public SiegeAttackerList(SiegableHall hall) {
 		_hall = hall;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xca);
 		
-		if (_castle != null)
-		{
+		if (_castle != null) {
 			writeD(_castle.getResidenceId());
 			writeD(0x00); // 0
 			writeD(0x01); // 1
 			writeD(0x00); // 0
 			int size = _castle.getSiege().getAttackerClans().size();
-			if (size > 0)
-			{
+			if (size > 0) {
 				L2Clan clan;
 				
 				writeD(size);
 				writeD(size);
-				for (L2SiegeClan siegeclan : _castle.getSiege().getAttackerClans())
-				{
+				for (L2SiegeClan siegeclan : _castle.getSiege().getAttackerClans()) {
 					clan = ClanTable.getInstance().getClan(siegeclan.getClanId());
-					if (clan == null)
-					{
+					if (clan == null) {
 						continue;
 					}
 					
@@ -99,30 +91,23 @@ public final class SiegeAttackerList extends L2GameServerPacket
 					writeS(""); // AllyLeaderName
 					writeD(clan.getAllyCrestId());
 				}
-			}
-			else
-			{
+			} else {
 				writeD(0x00);
 				writeD(0x00);
 			}
-		}
-		else
-		{
+		} else {
 			writeD(_hall.getId());
 			writeD(0x00); // 0
 			writeD(0x01); // 1
 			writeD(0x00); // 0
 			final Collection<L2SiegeClan> attackers = _hall.getSiege().getAttackerClans();
 			final int size = attackers.size();
-			if (size > 0)
-			{
+			if (size > 0) {
 				writeD(size);
 				writeD(size);
-				for (L2SiegeClan sClan : attackers)
-				{
+				for (L2SiegeClan sClan : attackers) {
 					final L2Clan clan = ClanTable.getInstance().getClan(sClan.getClanId());
-					if (clan == null)
-					{
+					if (clan == null) {
 						continue;
 					}
 					
@@ -136,9 +121,7 @@ public final class SiegeAttackerList extends L2GameServerPacket
 					writeS(""); // AllyLeaderName
 					writeD(clan.getAllyCrestId());
 				}
-			}
-			else
-			{
+			} else {
 				writeD(0x00);
 				writeD(0x00);
 			}

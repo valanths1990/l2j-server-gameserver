@@ -23,77 +23,61 @@ import com.l2jserver.gameserver.model.L2ClanMember;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
-public class RequestGiveNickName extends L2GameClientPacket
-{
+public class RequestGiveNickName extends L2GameClientPacket {
 	private static final String _C__0B_REQUESTGIVENICKNAME = "[C] 0B RequestGiveNickName";
 	
 	private String _target;
 	private String _title;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_target = readS();
 		_title = readS();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		L2PcInstance activeChar = getClient().getActiveChar();
-		if (activeChar == null)
-		{
+		if (activeChar == null) {
 			return;
 		}
 		
 		// Noblesse can bestow a title to themselves
-		if (activeChar.isNoble() && _target.equalsIgnoreCase(activeChar.getName()))
-		{
+		if (activeChar.isNoble() && _target.equalsIgnoreCase(activeChar.getName())) {
 			activeChar.setTitle(_title);
 			activeChar.sendPacket(SystemMessageId.TITLE_CHANGED);
 			activeChar.broadcastTitleInfo();
-		}
-		else
-		{
+		} else {
 			// Can the player change/give a title?
-			if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_GIVE_TITLE))
-			{
+			if (!activeChar.hasClanPrivilege(ClanPrivilege.CL_GIVE_TITLE)) {
 				activeChar.sendPacket(SystemMessageId.YOU_ARE_NOT_AUTHORIZED_TO_DO_THAT);
 				return;
 			}
 			
-			if (activeChar.getClan().getLevel() < 3)
-			{
+			if (activeChar.getClan().getLevel() < 3) {
 				activeChar.sendPacket(SystemMessageId.CLAN_LVL_3_NEEDED_TO_ENDOWE_TITLE);
 				return;
 			}
 			
 			L2ClanMember member1 = activeChar.getClan().getClanMember(_target);
-			if (member1 != null)
-			{
+			if (member1 != null) {
 				L2PcInstance member = member1.getPlayerInstance();
-				if (member != null)
-				{
+				if (member != null) {
 					// is target from the same clan?
 					member.setTitle(_title);
 					member.sendPacket(SystemMessageId.TITLE_CHANGED);
 					member.broadcastTitleInfo();
-				}
-				else
-				{
+				} else {
 					activeChar.sendPacket(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
 				}
-			}
-			else
-			{
+			} else {
 				activeChar.sendPacket(SystemMessageId.TARGET_MUST_BE_IN_CLAN);
 			}
 		}
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__0B_REQUESTGIVENICKNAME;
 	}
 }

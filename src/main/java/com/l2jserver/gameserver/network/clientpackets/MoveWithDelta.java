@@ -22,8 +22,7 @@ package com.l2jserver.gameserver.network.clientpackets;
  * Format: (c) ddd d: dx d: dy d: dz
  * @author -Wooden-
  */
-public class MoveWithDelta extends L2GameClientPacket
-{
+public class MoveWithDelta extends L2GameClientPacket {
 	private static final String _C__52_MOVEWITHDELTA = "[C] 52 MoveWithDelta";
 	
 	@SuppressWarnings("unused")
@@ -34,22 +33,19 @@ public class MoveWithDelta extends L2GameClientPacket
 	private int _dz;
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		_dx = readD();
 		_dy = readD();
 		_dz = readD();
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		// TODO this
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__52_MOVEWITHDELTA;
 	}
 }

@@ -27,30 +27,25 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * The Class ConditionTargetUsesWeaponKind.
  * @author mkizub
  */
-public class ConditionTargetUsesWeaponKind extends Condition
-{
+public class ConditionTargetUsesWeaponKind extends Condition {
 	private final int _weaponMask;
 	
 	/**
 	 * Instantiates a new condition target uses weapon kind.
 	 * @param weaponMask the weapon mask
 	 */
-	public ConditionTargetUsesWeaponKind(int weaponMask)
-	{
+	public ConditionTargetUsesWeaponKind(int weaponMask) {
 		_weaponMask = weaponMask;
 	}
 	
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
-		if (effected == null)
-		{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
+		if (effected == null) {
 			return false;
 		}
 		
 		L2Weapon weapon = effected.getActiveWeaponItem();
-		if (weapon == null)
-		{
+		if (weapon == null) {
 			return false;
 		}
 		

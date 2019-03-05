@@ -25,27 +25,22 @@ import com.l2jserver.gameserver.pathfinding.AbstractNode;
 /**
  * @author -Nemesiss-
  */
-public class FastNodeList
-{
+public class FastNodeList {
 	private final ArrayList<AbstractNode<?>> _list;
 	
-	public FastNodeList(int size)
-	{
+	public FastNodeList(int size) {
 		_list = new ArrayList<>(size);
 	}
 	
-	public void add(AbstractNode<?> n)
-	{
+	public void add(AbstractNode<?> n) {
 		_list.add(n);
 	}
 	
-	public boolean contains(AbstractNode<?> n)
-	{
+	public boolean contains(AbstractNode<?> n) {
 		return _list.contains(n);
 	}
 	
-	public boolean containsRev(AbstractNode<?> n)
-	{
+	public boolean containsRev(AbstractNode<?> n) {
 		return _list.lastIndexOf(n) != -1;
 	}
 }

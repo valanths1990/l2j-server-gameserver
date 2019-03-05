@@ -21,18 +21,14 @@ package com.l2jserver.gameserver.model.actor.knownlist;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.actor.L2Character;
 
-public class VehicleKnownList extends CharKnownList
-{
-	public VehicleKnownList(L2Character activeChar)
-	{
+public class VehicleKnownList extends CharKnownList {
+	public VehicleKnownList(L2Character activeChar) {
 		super(activeChar);
 	}
 	
 	@Override
-	public int getDistanceToForgetObject(L2Object object)
-	{
-		if (!object.isPlayer())
-		{
+	public int getDistanceToForgetObject(L2Object object) {
+		if (!object.isPlayer()) {
 			return 0;
 		}
 		
@@ -40,10 +36,8 @@ public class VehicleKnownList extends CharKnownList
 	}
 	
 	@Override
-	public int getDistanceToWatchObject(L2Object object)
-	{
-		if (!object.isPlayer())
-		{
+	public int getDistanceToWatchObject(L2Object object) {
+		if (!object.isPlayer()) {
 			return 0;
 		}
 		

@@ -26,8 +26,7 @@ package com.l2jserver.gameserver.model.conditions;
  * When the condition event occurs, that object's appropriate method is invoked.
  * @author mkizub
  */
-public interface ConditionListener
-{
+public interface ConditionListener {
 	/**
 	 * Notify changed.
 	 */

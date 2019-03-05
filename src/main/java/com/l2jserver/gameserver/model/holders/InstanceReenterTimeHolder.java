@@ -24,46 +24,39 @@ import java.time.DayOfWeek;
  * Simple class for storing Reenter Data for Instances.
  * @author FallenAngel
  */
-public final class InstanceReenterTimeHolder
-{
+public final class InstanceReenterTimeHolder {
 	private final DayOfWeek _day;
 	private final int _hour;
 	private final int _minute;
 	private final long _time;
 	
-	public InstanceReenterTimeHolder(long time)
-	{
+	public InstanceReenterTimeHolder(long time) {
 		_time = time;
 		_day = null;
 		_hour = -1;
 		_minute = -1;
 	}
 	
-	public InstanceReenterTimeHolder(DayOfWeek day, int hour, int minute)
-	{
+	public InstanceReenterTimeHolder(DayOfWeek day, int hour, int minute) {
 		_time = -1;
 		_day = day;
 		_hour = hour;
 		_minute = minute;
 	}
 	
-	public final Long getTime()
-	{
+	public final Long getTime() {
 		return _time;
 	}
 	
-	public final DayOfWeek getDay()
-	{
+	public final DayOfWeek getDay() {
 		return _day;
 	}
 	
-	public final int getHour()
-	{
+	public final int getHour() {
 		return _hour;
 	}
 	
-	public final int getMinute()
-	{
+	public final int getMinute() {
 		return _minute;
 	}
 }

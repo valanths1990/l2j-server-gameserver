@@ -26,11 +26,9 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * @author DS
  */
-public class ConditionTargetPlayable extends Condition
-{
+public class ConditionTargetPlayable extends Condition {
 	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item)
-	{
+	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
 		return (effected instanceof L2Playable);
 	}
 }

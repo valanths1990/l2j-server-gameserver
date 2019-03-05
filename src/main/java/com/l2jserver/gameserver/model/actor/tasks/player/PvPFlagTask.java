@@ -24,33 +24,24 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * Task dedicated to update player's current pvp status.
  * @author UnAfraid
  */
-public class PvPFlagTask implements Runnable
-{
+public class PvPFlagTask implements Runnable {
 	private final L2PcInstance _player;
 	
-	public PvPFlagTask(L2PcInstance player)
-	{
+	public PvPFlagTask(L2PcInstance player) {
 		_player = player;
 	}
 	
 	@Override
-	public void run()
-	{
-		if (_player == null)
-		{
+	public void run() {
+		if (_player == null) {
 			return;
 		}
 		
-		if (System.currentTimeMillis() > _player.getPvpFlagLasts())
-		{
+		if (System.currentTimeMillis() > _player.getPvpFlagLasts()) {
 			_player.stopPvPFlag();
-		}
-		else if (System.currentTimeMillis() > (_player.getPvpFlagLasts() - 20000))
-		{
+		} else if (System.currentTimeMillis() > (_player.getPvpFlagLasts() - 20000)) {
 			_player.updatePvPFlag(2);
-		}
-		else
-		{
+		} else {
 			_player.updatePvPFlag(1);
 		}
 	}

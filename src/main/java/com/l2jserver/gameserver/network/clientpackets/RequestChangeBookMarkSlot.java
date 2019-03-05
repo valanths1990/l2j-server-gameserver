@@ -21,25 +21,21 @@ package com.l2jserver.gameserver.network.clientpackets;
 /**
  * @author ShanSoft Packets Structure: chddd
  */
-public final class RequestChangeBookMarkSlot extends L2GameClientPacket
-{
+public final class RequestChangeBookMarkSlot extends L2GameClientPacket {
 	private static final String _C__D0_51_05_REQUESCHANGEBOOKMARKSLOT = "[C] D0:51:05 RequestChangeBookMarkSlot";
 	
 	@Override
-	protected void readImpl()
-	{
+	protected void readImpl() {
 		// There is nothing to read.
 	}
 	
 	@Override
-	protected void runImpl()
-	{
+	protected void runImpl() {
 		
 	}
 	
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _C__D0_51_05_REQUESCHANGEBOOKMARKSLOT;
 	}
 }

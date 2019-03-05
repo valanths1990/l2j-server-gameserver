@@ -18,21 +18,18 @@
  */
 package com.l2jserver.gameserver.network.serverpackets;
 
-public class ShowCalculator extends L2GameServerPacket
-{
+public class ShowCalculator extends L2GameServerPacket {
 	private final int _calculatorId;
 	
 	/**
 	 * @param calculatorId
 	 */
-	public ShowCalculator(int calculatorId)
-	{
+	public ShowCalculator(int calculatorId) {
 		_calculatorId = calculatorId;
 	}
 	
 	@Override
-	protected final void writeImpl()
-	{
+	protected final void writeImpl() {
 		writeC(0xe2);
 		writeD(_calculatorId);
 	}

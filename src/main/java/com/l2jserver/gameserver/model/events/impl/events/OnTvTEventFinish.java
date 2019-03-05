@@ -24,11 +24,9 @@ import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
 /**
  * @author UnAfraid
  */
-public class OnTvTEventFinish implements IBaseEvent
-{
+public class OnTvTEventFinish implements IBaseEvent {
 	@Override
-	public EventType getType()
-	{
+	public EventType getType() {
 		return EventType.ON_TVT_EVENT_FINISH;
 	}
 }
