@@ -23,8 +23,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
@@ -63,7 +64,9 @@ import com.l2jserver.util.EnumIntBitmask;
  * This class loads the clan related data.
  */
 public class ClanTable {
-	private static final Logger _log = Logger.getLogger(ClanTable.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ClanTable.class);
+	
 	public static final int CLAN_NAME_MAX_LENGHT = 16;
 	
 	private final Map<Integer, L2Clan> _clans = new ConcurrentHashMap<>();
@@ -89,10 +92,10 @@ public class ClanTable {
 				}
 				clanCount++;
 			}
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, "Error restoring ClanTable.", e);
+		} catch (Exception ex) {
+			LOG.error("There has been an error restoring clans from database!", ex);
 		}
-		_log.info(getClass().getSimpleName() + ": Restored " + clanCount + " clans from the database.");
+		LOG.info("Restored {} clans from the database.", clanCount);
 		allianceCheck();
 		restorewars();
 	}
@@ -113,10 +116,6 @@ public class ClanTable {
 		return _clans.size();
 	}
 	
-	/**
-	 * @param clanId
-	 * @return
-	 */
 	public L2Clan getClan(int clanId) {
 		return _clans.get(clanId);
 	}
@@ -137,7 +136,7 @@ public class ClanTable {
 		}
 		
 		if (Config.DEBUG) {
-			_log.info(getClass().getSimpleName() + ": " + player.getObjectId() + "(" + player.getName() + ") requested a clan creation.");
+			LOG.info("{} requested a clan creation.", player);
 		}
 		
 		if (10 > player.getLevel()) {
@@ -162,7 +161,6 @@ public class ClanTable {
 		}
 		
 		if (null != getClanByName(clanName)) {
-			// clan name is already taken
 			SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_ALREADY_EXISTS);
 			sm.addString(clanName);
 			player.sendPacket(sm);
@@ -295,8 +293,8 @@ public class ClanTable {
 					hall.free();
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error removing clan from DB.", e);
+		} catch (Exception ex) {
+			LOG.error("There has been an error deleting a clan from database!", ex);
 		}
 		
 		// Notify to scripts
@@ -340,8 +338,8 @@ public class ClanTable {
 			ps.setInt(3, 0);
 			ps.setInt(4, 0);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error storing clan wars data.", e);
+		} catch (Exception ex) {
+			LOG.error("There has been an error saving clan wars data!", ex);
 		}
 		
 		// SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.WAR_WITH_THE_S1_CLAN_HAS_BEGUN);
@@ -374,8 +372,8 @@ public class ClanTable {
 			ps.setInt(1, clanId1);
 			ps.setInt(2, clanId2);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error removing clan wars data.", e);
+		} catch (Exception ex) {
+			LOG.error("There has been an error removing clan wars data!", ex);
 		}
 		
 		// SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.WAR_WITH_THE_S1_CLAN_HAS_ENDED);
@@ -413,11 +411,11 @@ public class ClanTable {
 					clan1.setEnemyClan(rset.getInt("clan2"));
 					clan2.setAttackerClan(rset.getInt("clan1"));
 				} else {
-					_log.log(Level.WARNING, getClass().getSimpleName() + ": restorewars one of clans is null clan1:" + clan1 + " clan2:" + clan2);
+					LOG.warn("While restoring clan wars on of the clans [{}, {}] is null!", clan1, clan2);
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error restoring clan wars data.", e);
+		} catch (Exception ex) {
+			LOG.error("There has been an error restoring clan wars data!", ex);
 		}
 	}
 	
@@ -433,7 +431,7 @@ public class ClanTable {
 					clan.setAllyName(null);
 					clan.changeAllyCrest(0, true);
 					clan.updateClanInDB();
-					_log.info(getClass().getSimpleName() + ": Removed alliance from clan: " + clan);
+					LOG.info("Removed alliance from clan {}.", clan);
 				}
 			}
 		}

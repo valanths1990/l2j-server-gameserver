@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -40,6 +42,8 @@ import com.l2jserver.gameserver.util.Util;
  */
 public final class EnchantItemGroupsData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(EnchantItemGroupsData.class);
+	
 	private final Map<String, EnchantItemGroup> _itemGroups = new HashMap<>();
 	
 	private final Map<Integer, EnchantScrollGroup> _scrollGroups = new HashMap<>();
@@ -53,8 +57,8 @@ public final class EnchantItemGroupsData implements IXmlReader {
 		_itemGroups.clear();
 		_scrollGroups.clear();
 		parseDatapackFile("data/enchantItemGroups.xml");
-		LOG.info("{}: Loaded: {} item group templates.", getClass().getSimpleName(), _itemGroups.size());
-		LOG.info("{}: Loaded: {} scroll group templates.", getClass().getSimpleName(), _scrollGroups.size());
+		LOG.info("Loaded {} item group templates.", _itemGroups.size());
+		LOG.info("Loaded {} scroll group templates.", _scrollGroups.size());
 	}
 	
 	@Override

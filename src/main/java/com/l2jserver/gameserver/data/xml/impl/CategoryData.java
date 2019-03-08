@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -35,6 +37,9 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author NosBit, xban1x
  */
 public final class CategoryData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CategoryData.class);
+	
 	private final Map<CategoryType, Set<Integer>> _categories = new HashMap<>();
 	
 	protected CategoryData() {
@@ -45,7 +50,7 @@ public final class CategoryData implements IXmlReader {
 	public void load() {
 		_categories.clear();
 		parseDatapackFile("data/categoryData.xml");
-		LOG.info("{}: Loaded {} Categories.", getClass().getSimpleName(), _categories.size());
+		LOG.info("Loaded {} Categories.", _categories.size());
 	}
 	
 	@Override
@@ -57,7 +62,7 @@ public final class CategoryData implements IXmlReader {
 						final NamedNodeMap attrs = list_node.getAttributes();
 						final CategoryType categoryType = CategoryType.findByName(attrs.getNamedItem("name").getNodeValue());
 						if (categoryType == null) {
-							LOG.warn("{}: Can't find category by name :{}", getClass().getSimpleName(), attrs.getNamedItem("name").getNodeValue());
+							LOG.warn("Can't find category by name :{}", attrs.getNamedItem("name").getNodeValue());
 							continue;
 						}
 						
@@ -83,7 +88,7 @@ public final class CategoryData implements IXmlReader {
 	public boolean isInCategory(CategoryType type, int id) {
 		final Set<Integer> category = getCategoryByType(type);
 		if (category == null) {
-			LOG.warn("{}: Can't find category type: {}", getClass().getSimpleName(), type);
+			LOG.warn("Can not find category type {}!", type);
 			return false;
 		}
 		return category.contains(id);
@@ -99,10 +104,10 @@ public final class CategoryData implements IXmlReader {
 	}
 	
 	public static CategoryData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final CategoryData _instance = new CategoryData();
+		protected static final CategoryData INSTANCE = new CategoryData();
 	}
 }

@@ -46,7 +46,8 @@ import com.l2jserver.gameserver.config.Config;
 public final class ScriptEngineManager {
 	private static final Logger LOG = LoggerFactory.getLogger(ScriptEngineManager.class);
 	
-	public static final File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getAbsolutePath(), "data/scripts");
+	// TODO(Zoey76): Implement this correctly.
+	public static final File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getParentFile(), "java");
 	
 	private static final String CLASS_PATH = SCRIPT_FOLDER.getAbsolutePath() + System.getProperty("path.separator") + System.getProperty("java.class.path");
 	
@@ -58,12 +59,14 @@ public final class ScriptEngineManager {
 		String[].class
 	};
 	
-	private static final InMemoryJavaCompiler COMPILER = InMemoryJavaCompiler.newInstance().useOptions("-classpath", CLASS_PATH);
+	private static final InMemoryJavaCompiler COMPILER = InMemoryJavaCompiler.newInstance() //
+		.useOptions("-classpath", CLASS_PATH) //
+		.ignoreWarnings();
 	
 	public void executeScriptList(File list) throws Exception {
 		if (Config.NO_QUESTS) {
 			if (!Config.NO_HANDLERS) {
-				addSource(new File(SCRIPT_FOLDER, "handlers/MasterHandler.java"));
+				addSource(new File(SCRIPT_FOLDER, "com/l2jserver/datapack/handlers/MasterHandler.java"));
 				LOG.info("Handlers loaded, all other scripts skipped!");
 			}
 			return;

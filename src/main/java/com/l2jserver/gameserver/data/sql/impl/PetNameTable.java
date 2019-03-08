@@ -18,19 +18,15 @@
  */
 package com.l2jserver.gameserver.data.sql.impl;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
 
 public class PetNameTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(PetNameTable.class.getName());
-	
-	public static PetNameTable getInstance() {
-		return SingletonHolder._instance;
-	}
+	private static final Logger LOG = LoggerFactory.getLogger(PetNameTable.class);
 	
 	public boolean doesPetNameExist(String name) {
 		try (var con = ConnectionFactory.getInstance().getConnection();
@@ -39,8 +35,8 @@ public class PetNameTable {
 			try (var rs = ps.executeQuery()) {
 				return rs.next();
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not check existing petname:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not check existing pet name {}!", ex);
 		}
 		return false;
 	}
@@ -49,7 +45,11 @@ public class PetNameTable {
 		return Config.PET_NAME_TEMPLATE.matcher(name).matches();
 	}
 	
+	public static PetNameTable getInstance() {
+		return SingletonHolder.INSTANCE;
+	}
+	
 	private static class SingletonHolder {
-		protected static final PetNameTable _instance = new PetNameTable();
+		protected static final PetNameTable INSTANCE = new PetNameTable();
 	}
 }

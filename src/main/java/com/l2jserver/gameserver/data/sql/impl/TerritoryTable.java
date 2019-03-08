@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.data.sql.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.L2Territory;
@@ -31,13 +32,11 @@ import com.l2jserver.gameserver.model.Location;
  * @author MrBalancer
  */
 public class TerritoryTable {
-	private static final Logger LOGGER = Logger.getLogger(TerritoryTable.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TerritoryTable.class);
 	
 	private static final Map<Integer, L2Territory> _territory = new HashMap<>();
 	
-	/**
-	 * Instantiates a new territory.
-	 */
 	protected TerritoryTable() {
 		load();
 	}
@@ -77,21 +76,17 @@ public class TerritoryTable {
 				}
 				terr.add(rset.getInt("loc_x"), rset.getInt("loc_y"), rset.getInt("loc_zmin"), rset.getInt("loc_zmax"), rset.getInt("proc"));
 			}
-			LOGGER.info("TerritoryTable: Loaded " + _territory.size() + " territories from database.");
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "TerritoryTable: Failed to load territories from database!", e);
+			LOG.info("Loaded {} territories from database.", _territory.size());
+		} catch (Exception ex) {
+			LOG.error("Failed to load territories from database!", ex);
 		}
 	}
 	
-	/**
-	 * Gets the single instance of Territory.
-	 * @return single instance of Territory
-	 */
 	public static TerritoryTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final TerritoryTable _instance = new TerritoryTable();
+		protected static final TerritoryTable INSTANCE = new TerritoryTable();
 	}
 }

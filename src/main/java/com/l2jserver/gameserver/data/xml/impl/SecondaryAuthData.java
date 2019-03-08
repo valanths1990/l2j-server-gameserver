@@ -22,6 +22,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -32,6 +34,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author NosBit
  */
 public class SecondaryAuthData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SecondaryAuthData.class);
 	
 	private final Set<String> _forbiddenPasswords = new HashSet<>();
 	
@@ -51,7 +55,7 @@ public class SecondaryAuthData implements IXmlReader {
 	public synchronized void load() {
 		_forbiddenPasswords.clear();
 		parseFile(new File("config/SecondaryAuth.xml"));
-		LOG.info("{}: Loaded {} forbidden passwords.", getClass().getSimpleName(), _forbiddenPasswords.size());
+		LOG.info("Loaded {} forbidden passwords.", _forbiddenPasswords.size());
 	}
 	
 	@Override
@@ -78,8 +82,8 @@ public class SecondaryAuthData implements IXmlReader {
 					}
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("Failed to load secondary auth data from xml.", e);
+		} catch (Exception ex) {
+			LOG.warn("Failed to load secondary auth data from xml.", ex);
 		}
 	}
 	
@@ -108,10 +112,10 @@ public class SecondaryAuthData implements IXmlReader {
 	}
 	
 	public static SecondaryAuthData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final SecondaryAuthData _instance = new SecondaryAuthData();
+		protected static final SecondaryAuthData INSTANCE = new SecondaryAuthData();
 	}
 }

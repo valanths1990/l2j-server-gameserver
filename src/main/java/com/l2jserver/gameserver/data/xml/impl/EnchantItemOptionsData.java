@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -33,6 +35,8 @@ import com.l2jserver.gameserver.util.Util;
  * @author UnAfraid
  */
 public class EnchantItemOptionsData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(EnchantItemOptionsData.class);
 	
 	private final Map<Integer, Map<Integer, EnchantOptions>> _data = new HashMap<>();
 	
@@ -75,14 +79,9 @@ public class EnchantItemOptionsData implements IXmlReader {
 				}
 			}
 		}
-		LOG.info("{}: Loaded: {} Items and {} Options.", getClass().getSimpleName(), _data.size(), counter);
+		LOG.info("Loaded {} items and {} options.", _data.size(), counter);
 	}
 	
-	/**
-	 * @param itemId
-	 * @param enchantLevel
-	 * @return enchant effects information.
-	 */
 	public EnchantOptions getOptions(int itemId, int enchantLevel) {
 		if (!_data.containsKey(itemId) || !_data.get(itemId).containsKey(enchantLevel)) {
 			return null;
@@ -90,18 +89,10 @@ public class EnchantItemOptionsData implements IXmlReader {
 		return _data.get(itemId).get(enchantLevel);
 	}
 	
-	/**
-	 * @param item
-	 * @return enchant effects information.
-	 */
 	public EnchantOptions getOptions(L2ItemInstance item) {
 		return item != null ? getOptions(item.getId(), item.getEnchantLevel()) : null;
 	}
 	
-	/**
-	 * Gets the single instance of EnchantOptionsData.
-	 * @return single instance of EnchantOptionsData
-	 */
 	public static final EnchantItemOptionsData getInstance() {
 		return SingletonHolder._instance;
 	}

@@ -22,7 +22,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -33,12 +35,15 @@ import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.util.file.filter.XMLFilter;
 
 /**
+ * Document Engine.
  * @author mkizub
  */
 public class DocumentEngine {
-	private static final Logger _log = Logger.getLogger(DocumentEngine.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(DocumentEngine.class);
 	
 	private final List<File> _itemFiles = new ArrayList<>();
+	
 	private final List<File> _skillFiles = new ArrayList<>();
 	
 	public static DocumentEngine getInstance() {
@@ -57,13 +62,13 @@ public class DocumentEngine {
 	}
 	
 	private void hashFiles(String dirname, List<File> hash) {
-		File dir = new File(Config.DATAPACK_ROOT, dirname);
+		final var dir = new File(Config.DATAPACK_ROOT, dirname);
 		if (!dir.exists()) {
-			_log.warning("Dir " + dir.getAbsolutePath() + " not exists");
+			LOG.warn("Directory {} does not exists!", dir.getAbsolutePath());
 			return;
 		}
 		
-		final File[] files = dir.listFiles(new XMLFilter());
+		final var files = dir.listFiles(new XMLFilter());
 		if (files != null) {
 			for (File f : files) {
 				hash.add(f);
@@ -73,7 +78,7 @@ public class DocumentEngine {
 	
 	public List<Skill> loadSkills(File file) {
 		if (file == null) {
-			_log.warning("Skill file not found.");
+			LOG.warn("Skill file not found!");
 			return null;
 		}
 		DocumentSkill doc = new DocumentSkill(file);
@@ -93,7 +98,7 @@ public class DocumentEngine {
 				count++;
 			}
 		}
-		_log.info(getClass().getSimpleName() + ": Loaded " + count + " Skill templates from XML files.");
+		LOG.info("Loaded {} skill templates from XML files.", count);
 	}
 	
 	/**

@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -38,7 +39,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  */
 public class RaidBossPointsManager {
 	
-	private static final Logger _log = Logger.getLogger(RaidBossPointsManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(RaidBossPointsManager.class);
 	
 	private final Map<Integer, Map<Integer, Integer>> _list = new ConcurrentHashMap<>();
 	
@@ -61,9 +62,9 @@ public class RaidBossPointsManager {
 				values.put(bossId, points);
 				_list.put(charId, values);
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded " + _list.size() + " Characters Raid Points.");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldnt load raid points ", e);
+			LOG.info("Loaded {} characters raid points.", _list.size());
+		} catch (Exception ex) {
+			LOG.warn("Couldnt load character raid points!", ex);
 		}
 	}
 	
@@ -74,8 +75,8 @@ public class RaidBossPointsManager {
 			ps.setInt(2, raidId);
 			ps.setInt(3, points);
 			ps.executeUpdate();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't update char raid points for player: " + player, e);
+		} catch (Exception ex) {
+			LOG.warn("Could not update character raid points for player {}!", player, ex);
 		}
 	}
 	
@@ -107,8 +108,8 @@ public class RaidBossPointsManager {
 			var s = con.createStatement()) {
 			s.executeUpdate("DELETE from character_raid_points WHERE charId > 0");
 			_list.clear();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't clean raid points", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not clean character raid points!", ex);
 		}
 	}
 	

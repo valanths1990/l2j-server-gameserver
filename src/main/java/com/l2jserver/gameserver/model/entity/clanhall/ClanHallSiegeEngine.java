@@ -56,7 +56,7 @@ import com.l2jserver.gameserver.util.Broadcast;
  */
 public abstract class ClanHallSiegeEngine extends Quest implements Siegable {
 	
-	private static final Logger _log = LoggerFactory.getLogger(ClanHallSiegeEngine.class);
+	public static final Logger _log = LoggerFactory.getLogger(ClanHallSiegeEngine.class);
 	
 	private static final String SQL_LOAD_ATTACKERS = "SELECT attacker_id FROM clanhall_siege_attackers WHERE clanhall_id = ?";
 	

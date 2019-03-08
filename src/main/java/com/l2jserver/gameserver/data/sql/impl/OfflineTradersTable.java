@@ -18,9 +18,12 @@
  */
 package com.l2jserver.gameserver.data.sql.impl;
 
+import static com.l2jserver.gameserver.enums.PrivateStoreType.NONE;
+
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
@@ -35,7 +38,7 @@ import com.l2jserver.gameserver.network.L2GameClient.GameClientState;
 
 public class OfflineTradersTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(OfflineTradersTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(OfflineTradersTable.class);
 	
 	private static final String SAVE_OFFLINE_STATUS = "INSERT INTO character_offline_trade (`charId`,`time`,`type`,`title`) VALUES (?,?,?,?)";
 	
@@ -61,10 +64,10 @@ public class OfflineTradersTable {
 			
 			for (L2PcInstance pc : L2World.getInstance().getPlayers()) {
 				try {
-					if ((pc.getPrivateStoreType() != PrivateStoreType.NONE) && pc.isInOfflineMode()) {
-						stm3.setInt(1, pc.getObjectId()); // Char Id
+					if ((pc.getPrivateStoreType() != NONE) && pc.isInOfflineMode()) {
+						stm3.setInt(1, pc.getObjectId());
 						stm3.setLong(2, pc.getOfflineStartTime());
-						stm3.setInt(3, pc.getPrivateStoreType().getId()); // store type
+						stm3.setInt(3, pc.getPrivateStoreType().getId());
 						String title = null;
 						
 						switch (pc.getPrivateStoreType()) {
@@ -116,18 +119,18 @@ public class OfflineTradersTable {
 						stm3.clearParameters();
 						con.commit(); // flush
 					}
-				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while saving offline trader: " + pc.getObjectId() + " " + e, e);
+				} catch (Exception ex) {
+					LOG.warn("There has been an error while saving offline trader {}!", pc, ex);
 				}
 			}
-			LOGGER.info(getClass().getSimpleName() + ": Offline traders stored.");
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while saving offline traders: " + e, e);
+			LOG.info("Offline traders stored.");
+		} catch (Exception ex) {
+			LOG.warn("There has been an error while saving offline traders!", ex);
 		}
 	}
 	
 	public void restoreOfflineTraders() {
-		LOGGER.info(getClass().getSimpleName() + ": Loading offline traders...");
+		LOG.info("Loading offline traders...");
 		int nTraders = 0;
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var stm = con.createStatement();
@@ -143,13 +146,13 @@ public class OfflineTradersTable {
 					}
 				}
 				
-				PrivateStoreType type = PrivateStoreType.findById(rs.getInt("type"));
+				final var type = PrivateStoreType.findById(rs.getInt("type"));
 				if (type == null) {
-					LOGGER.warning(getClass().getSimpleName() + ": PrivateStoreType with id " + rs.getInt("type") + " could not be found.");
+					LOG.warn("PrivateStoreType with Id {} could not be found!", rs.getInt("type"));
 					continue;
 				}
 				
-				if (type == PrivateStoreType.NONE) {
+				if (type == NONE) {
 					continue;
 				}
 				
@@ -208,34 +211,30 @@ public class OfflineTradersTable {
 					player.restoreEffects();
 					player.broadcastUserInfo();
 					nTraders++;
-				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error loading trader: " + player, e);
+				} catch (Exception ex) {
+					LOG.warn("There has been an error loading trader {}!", player, ex);
 					if (player != null) {
 						player.deleteMe();
 					}
 				}
 			}
 			
-			LOGGER.info(getClass().getSimpleName() + ": Loaded: " + nTraders + " offline trader(s)");
+			LOG.info("Loaded  {} offline trader(s).", nTraders);
 			
 			try (var stm1 = con.createStatement()) {
 				stm1.execute(CLEAR_OFFLINE_TABLE);
 				stm1.execute(CLEAR_OFFLINE_TABLE_ITEMS);
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while loading offline traders: ", e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error while loading offline traders!", ex);
 		}
 	}
 	
-	/**
-	 * Gets the single instance of OfflineTradersTable.
-	 * @return single instance of OfflineTradersTable
-	 */
 	public static OfflineTradersTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final OfflineTradersTable _instance = new OfflineTradersTable();
+		protected static final OfflineTradersTable INSTANCE = new OfflineTradersTable();
 	}
 }

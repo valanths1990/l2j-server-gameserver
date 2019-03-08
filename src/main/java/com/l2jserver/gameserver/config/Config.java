@@ -3589,6 +3589,8 @@ public final class Config {
 	
 	private static class IPConfigData implements IXmlReader {
 		
+		private static final Logger LOG = LoggerFactory.getLogger(IPConfigData.class);
+		
 		private static final List<String> _subnets = new ArrayList<>(5);
 		
 		private static final List<String> _hosts = new ArrayList<>(5);

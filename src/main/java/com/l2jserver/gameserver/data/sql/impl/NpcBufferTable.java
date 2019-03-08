@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.data.sql.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
@@ -30,7 +31,7 @@ import com.l2jserver.gameserver.model.holders.SkillHolder;
 
 public class NpcBufferTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(NpcBufferTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(NpcBufferTable.class);
 	
 	private final Map<Integer, NpcBufferSkills> _buffers = new HashMap<>();
 	
@@ -108,8 +109,8 @@ public class NpcBufferTable {
 			if (lastNpcId != 0) {
 				_buffers.put(lastNpcId, skills);
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error reading npc_buffer table: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error reading npc_buffer table!", ex);
 		}
 		
 		if (Config.CUSTOM_NPCBUFFER_TABLES) {
@@ -143,11 +144,11 @@ public class NpcBufferTable {
 				if (lastNpcId != 0) {
 					_buffers.put(lastNpcId, skills);
 				}
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error reading custom_npc_buffer table: " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("There has been an error reading custom_npc_buffer table!", ex);
 			}
 		}
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _buffers.size() + " buffers and " + skillCount + " skills.");
+		LOG.info("Loaded {} buffers and {} skills.", _buffers.size(), skillCount);
 	}
 	
 	public NpcBufferData getSkillInfo(int npcId, int buffGroup) {

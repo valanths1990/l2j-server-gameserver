@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.data.sql.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
@@ -29,7 +30,7 @@ import com.l2jserver.gameserver.model.L2TeleportLocation;
 
 public class TeleportLocationTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(TeleportLocationTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(TeleportLocationTable.class);
 	
 	private final Map<Integer, L2TeleportLocation> _teleports = new HashMap<>();
 	
@@ -56,9 +57,9 @@ public class TeleportLocationTable {
 				
 				_teleports.put(teleport.getTeleId(), teleport);
 			}
-			LOGGER.info(getClass().getSimpleName() + ": Loaded " + _teleports.size() + " Teleport Location Templates.");
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error loading Teleport Table.", e);
+			LOG.info("Loaded {} teleport location templates.", _teleports.size());
+		} catch (Exception ex) {
+			LOG.error("There has been an error loading teleport table.", ex);
 		}
 		
 		if (Config.CUSTOM_TELEPORT_TABLE) {
@@ -81,27 +82,23 @@ public class TeleportLocationTable {
 				}
 				_cTeleCount = _teleports.size() - _cTeleCount;
 				if (_cTeleCount > 0) {
-					LOGGER.info(getClass().getSimpleName() + ": Loaded " + _cTeleCount + " Custom Teleport Location Templates.");
+					LOG.info("Loaded {} custom teleport location templates.", _cTeleCount);
 				}
-			} catch (Exception e) {
-				LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while creating custom teleport table " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("There has been an error while creating custom teleport table!", ex);
 			}
 		}
 	}
 	
-	/**
-	 * @param id
-	 * @return
-	 */
 	public L2TeleportLocation getTemplate(int id) {
 		return _teleports.get(id);
 	}
 	
 	public static TeleportLocationTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final TeleportLocationTable _instance = new TeleportLocationTable();
+		protected static final TeleportLocationTable INSTANCE = new TeleportLocationTable();
 	}
 }

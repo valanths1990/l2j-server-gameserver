@@ -55,7 +55,7 @@ public final class EffectHandler implements IHandler<Class<? extends AbstractEff
 	}
 	
 	public void executeScript() throws Exception {
-		ScriptEngineManager.getInstance().executeScript("handlers/EffectMasterHandler.java");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/handlers/EffectMasterHandler.java");
 	}
 	
 	public static EffectHandler getInstance() {

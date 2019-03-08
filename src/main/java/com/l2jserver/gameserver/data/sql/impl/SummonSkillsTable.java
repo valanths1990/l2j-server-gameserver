@@ -23,8 +23,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -32,7 +33,7 @@ import com.l2jserver.gameserver.model.actor.L2Summon;
 
 public class SummonSkillsTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(SummonSkillsTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(SummonSkillsTable.class);
 	
 	private final Map<Integer, Map<Integer, L2PetSkillLearn>> _skillTrees = new HashMap<>();
 	
@@ -59,16 +60,16 @@ public class SummonSkillsTable {
 				skillTree.put(SkillData.getSkillHashCode(id, lvl + 1), new L2PetSkillLearn(id, lvl, rs.getInt("minLvl")));
 				count++;
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, getClass().getSimpleName() + ": Error while loading pet skill tree:", e);
+		} catch (Exception ex) {
+			LOG.error("Error while loading pet skill tree!", ex);
 		}
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + count + " skills.");
+		LOG.info("Loaded {} summon skills.", count);
 	}
 	
 	public int getAvailableLevel(L2Summon cha, int skillId) {
 		int lvl = 0;
 		if (!_skillTrees.containsKey(cha.getId())) {
-			LOGGER.warning(getClass().getSimpleName() + ": Pet id " + cha.getId() + " does not have any skills assigned.");
+			LOG.warn("Pet Id {} does not have any skills assigned!", cha.getId());
 			return lvl;
 		}
 		Collection<L2PetSkillLearn> skills = _skillTrees.get(cha.getId()).values();
@@ -104,7 +105,7 @@ public class SummonSkillsTable {
 	public List<Integer> getAvailableSkills(L2Summon cha) {
 		List<Integer> skillIds = new ArrayList<>();
 		if (!_skillTrees.containsKey(cha.getId())) {
-			LOGGER.warning(getClass().getSimpleName() + ": Pet id " + cha.getId() + " does not have any skills assigned.");
+			LOG.warn("Pet Id {} does not have any skills assigned!", cha.getId());
 			return skillIds;
 		}
 		Collection<L2PetSkillLearn> skills = _skillTrees.get(cha.getId()).values();

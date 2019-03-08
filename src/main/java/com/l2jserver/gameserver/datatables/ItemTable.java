@@ -26,7 +26,9 @@ import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
@@ -54,9 +56,9 @@ import com.l2jserver.gameserver.util.GMAudit;
  */
 public class ItemTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(ItemTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ItemTable.class);
 	
-	private static final Logger LOGGER_ITEMS = Logger.getLogger("item");
+	private static final java.util.logging.Logger LOGGER_ITEMS = java.util.logging.Logger.getLogger("item");
 	
 	public static final Map<String, Integer> SLOTS = new HashMap<>();
 	
@@ -107,9 +109,6 @@ public class ItemTable {
 		SLOTS.put("waist", L2Item.SLOT_BELT);
 	}
 	
-	/**
-	 * @return a reference to this ItemTable object
-	 */
 	public static ItemTable getInstance() {
 		return SingletonHolder._instance;
 	}
@@ -135,11 +134,13 @@ public class ItemTable {
 				_weapons.put(item.getId(), (L2Weapon) item);
 			}
 		}
+		
 		buildFastLookupTable(highest);
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _etcItems.size() + " Etc Items");
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _armors.size() + " Armor Items");
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _weapons.size() + " Weapon Items");
-		LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + (_etcItems.size() + _armors.size() + _weapons.size()) + " Items in total.");
+		
+		LOG.info("Loaded: {} Etc items.", _etcItems.size());
+		LOG.info("Loaded: {} Armor items.", _armors.size());
+		LOG.info("Loaded: {} Weapon items.", _weapons.size());
+		LOG.info("Loaded: {} items in total.", (_etcItems.size() + _armors.size() + _weapons.size()));
 	}
 	
 	/**
@@ -148,7 +149,7 @@ public class ItemTable {
 	 */
 	private void buildFastLookupTable(int size) {
 		// Create a FastLookUp Table called _allTemplates of size : value of the highest item ID
-		LOGGER.info(getClass().getSimpleName() + ": Highest item id used:" + size);
+		LOG.info("Highest item Id used {}.", size);
 		_allTemplates = new L2Item[size + 1];
 		
 		// Insert armor item in Fast Look Up Table
@@ -215,7 +216,7 @@ public class ItemTable {
 		}
 		
 		if (Config.DEBUG) {
-			LOGGER.fine(getClass().getSimpleName() + ": Item created  oid:" + item.getObjectId() + " itemid:" + itemId);
+			LOG.info("Item created object Id {} and item Id {}.", item.getObjectId(), itemId);
 		}
 		
 		// Add the L2ItemInstance object to _allObjects of L2world
@@ -322,8 +323,8 @@ public class ItemTable {
 					var statement = con.prepareStatement("DELETE FROM pets WHERE item_obj_id=?")) {
 					statement.setInt(1, item.getObjectId());
 					statement.execute();
-				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "could not delete pet objectid:", e);
+				} catch (Exception ex) {
+					LOG.warn("Could not delete pet object Id {}!", item.getObjectId(), ex);
 				}
 			}
 		}

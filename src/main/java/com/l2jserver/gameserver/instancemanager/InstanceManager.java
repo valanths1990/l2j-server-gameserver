@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -38,13 +40,14 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class InstanceManager implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(InstanceManager.class);
+	
 	private static final Map<Integer, Instance> INSTANCES = new ConcurrentHashMap<>();
 	
 	private final Map<Integer, InstanceWorld> _instanceWorlds = new ConcurrentHashMap<>();
 	
 	private int _dynamic = 300000;
 	
-	// InstanceId Names
 	private static final Map<Integer, String> _instanceIdNames = new HashMap<>();
 	
 	private final Map<Integer, Map<Integer, Long>> _playerInstanceTimes = new ConcurrentHashMap<>();
@@ -58,10 +61,10 @@ public final class InstanceManager implements IXmlReader {
 	protected InstanceManager() {
 		// Creates the multiverse.
 		INSTANCES.put(-1, new Instance(-1, "multiverse"));
-		LOG.info("{}: Multiverse Instance created.", getClass().getSimpleName());
+		LOG.info("Multiverse Instance created.");
 		// Creates the universe.
 		INSTANCES.put(0, new Instance(0, "universe"));
-		LOG.info("{}: Universe Instance created.", getClass().getSimpleName());
+		LOG.info("Universe Instance created.");
 		load();
 	}
 	
@@ -69,7 +72,7 @@ public final class InstanceManager implements IXmlReader {
 	public void load() {
 		_instanceIdNames.clear();
 		parseDatapackFile("data/instancenames.xml");
-		LOG.info("{}: Loaded {} instance names.", getClass().getSimpleName(), _instanceIdNames.size());
+		LOG.info("Loaded {} instance names.", _instanceIdNames.size());
 	}
 	
 	public long getInstanceTime(int playerObjId, int id) {
@@ -102,8 +105,8 @@ public final class InstanceManager implements IXmlReader {
 			ps.setLong(4, time);
 			ps.execute();
 			_playerInstanceTimes.get(playerObjId).put(id, time);
-		} catch (Exception e) {
-			LOG.warn("{}: Could not insert character instance time data!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not insert character instance time data!", ex);
 		}
 	}
 	
@@ -114,8 +117,8 @@ public final class InstanceManager implements IXmlReader {
 			ps.setInt(2, id);
 			ps.execute();
 			_playerInstanceTimes.get(playerObjId).remove(id);
-		} catch (Exception e) {
-			LOG.warn("{}: Could not delete character instance time data!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not delete character instance time data!", ex);
 		}
 	}
 	
@@ -138,8 +141,8 @@ public final class InstanceManager implements IXmlReader {
 					}
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("{}: Could not delete character instance time data!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not delete character instance time data!", ex);
 		}
 	}
 	
@@ -254,7 +257,7 @@ public final class InstanceManager implements IXmlReader {
 		while (getInstance(_dynamic) != null) {
 			_dynamic++;
 			if (_dynamic == Integer.MAX_VALUE) {
-				LOG.warn("{}: More then {} instances has been created!", getClass().getSimpleName(), (Integer.MAX_VALUE - 300000));
+				LOG.warn("More then {} instances has been created!", Integer.MAX_VALUE - 300000);
 				_dynamic = 300000;
 			}
 		}
@@ -266,10 +269,6 @@ public final class InstanceManager implements IXmlReader {
 		return _dynamic;
 	}
 	
-	/**
-	 * Gets the single instance of {@code InstanceManager}.
-	 * @return single instance of {@code InstanceManager}
-	 */
 	public static final InstanceManager getInstance() {
 		return SingletonHolder._instance;
 	}

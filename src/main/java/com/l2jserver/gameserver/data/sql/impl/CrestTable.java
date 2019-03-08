@@ -18,23 +18,22 @@
  */
 package com.l2jserver.gameserver.data.sql.impl;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.sql.ResultSet;
+import static java.sql.ResultSet.CONCUR_UPDATABLE;
+import static java.sql.ResultSet.TYPE_FORWARD_ONLY;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Crest;
 import com.l2jserver.gameserver.model.L2Crest.CrestType;
-import com.l2jserver.util.file.filter.BMPFilter;
 
 /**
  * Loads and saves crests from database.
@@ -42,7 +41,7 @@ import com.l2jserver.util.file.filter.BMPFilter;
  */
 public final class CrestTable {
 	
-	private static final Logger LOGGER = Logger.getLogger(CrestTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(CrestTable.class);
 	
 	private final Map<Integer, L2Crest> _crests = new ConcurrentHashMap<>();
 	
@@ -70,7 +69,7 @@ public final class CrestTable {
 		}
 		
 		try (var con = ConnectionFactory.getInstance().getConnection();
-			var statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+			var statement = con.createStatement(TYPE_FORWARD_ONLY, CONCUR_UPDATABLE);
 			var rs = statement.executeQuery("SELECT `crest_id`, `data`, `type` FROM `crests` ORDER BY `crest_id` DESC")) {
 			while (rs.next()) {
 				int id = rs.getInt("crest_id");
@@ -79,7 +78,7 @@ public final class CrestTable {
 					_nextId.set(id + 1);
 				}
 				
-				// delete all unused crests except the last one we dont want to reuse
+				// delete all unused crests except the last one we don't want to reuse
 				// a crest id because client will display wrong crest if its reused
 				if (!crestsInUse.contains(id) && (id != (_nextId.get() - 1))) {
 					rs.deleteRow();
@@ -91,22 +90,20 @@ public final class CrestTable {
 				if (crestType != null) {
 					_crests.put(id, new L2Crest(id, data, crestType));
 				} else {
-					LOGGER.warning("Unknown crest type found in database. Type:" + rs.getInt("type"));
+					LOG.warn("Unknown crest type {} found in database!", rs.getInt("type"));
 				}
 			}
 			
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "There was an error while loading crests from database:", e);
+		} catch (Exception ex) {
+			LOG.warn("There was an error while loading crests from database!", ex);
 		}
 		
-		moveOldCrestsToDb(crestsInUse);
-		
-		LOGGER.info(getClass().getSimpleName() + ": Loaded " + _crests.size() + " Crests.");
+		LOG.info("Loaded {} crests.", _crests.size());
 		
 		for (L2Clan clan : ClanTable.getInstance().getClans()) {
 			if (clan.getCrestId() != 0) {
 				if (getCrest(clan.getCrestId()) == null) {
-					LOGGER.info("Removing non-existent crest for clan " + clan.getName() + " [" + clan.getId() + "], crestId:" + clan.getCrestId());
+					LOG.info("Removing non-existent crest Id {} for clan {}.", clan.getCrestId(), clan.getName());
 					clan.setCrestId(0);
 					clan.changeClanCrest(0);
 				}
@@ -114,7 +111,7 @@ public final class CrestTable {
 			
 			if (clan.getCrestLargeId() != 0) {
 				if (getCrest(clan.getCrestLargeId()) == null) {
-					LOGGER.info("Removing non-existent large crest for clan " + clan.getName() + " [" + clan.getId() + "], crestLargeId:" + clan.getCrestLargeId());
+					LOG.info("Removing non-existent large crest Id {} for clan {}.", clan.getCrestId(), clan.getName());
 					clan.setCrestLargeId(0);
 					clan.changeLargeCrest(0);
 				}
@@ -122,76 +119,11 @@ public final class CrestTable {
 			
 			if (clan.getAllyCrestId() != 0) {
 				if (getCrest(clan.getAllyCrestId()) == null) {
-					LOGGER.info("Removing non-existent ally crest for clan " + clan.getName() + " [" + clan.getId() + "], allyCrestId:" + clan.getAllyCrestId());
+					LOG.info("Removing non-existent ally crest Id {} for clan {}.", clan.getCrestId(), clan.getName());
 					clan.setAllyCrestId(0);
 					clan.changeAllyCrest(0, true);
 				}
 			}
-		}
-	}
-	
-	/**
-	 * Moves old crests from data/crests folder to database and deletes crest folder<br>
-	 * <b>TODO:</b> remove it after some time
-	 * @param crestsInUse the set of crests in use
-	 */
-	private void moveOldCrestsToDb(Set<Integer> crestsInUse) {
-		final File crestDir = new File(Config.DATAPACK_ROOT, "data/crests/");
-		if (crestDir.exists()) {
-			final File[] files = crestDir.listFiles(new BMPFilter());
-			if (files == null) {
-				return;
-			}
-			
-			for (File file : files) {
-				try {
-					final byte[] data = Files.readAllBytes(file.toPath());
-					if (file.getName().startsWith("Crest_Large_")) {
-						final int crestId = Integer.parseInt(file.getName().substring(12, file.getName().length() - 4));
-						if (crestsInUse.contains(crestId)) {
-							final L2Crest crest = createCrest(data, CrestType.PLEDGE_LARGE);
-							if (crest != null) {
-								for (L2Clan clan : ClanTable.getInstance().getClans()) {
-									if (clan.getCrestLargeId() == crestId) {
-										clan.setCrestLargeId(0);
-										clan.changeLargeCrest(crest.getId());
-									}
-								}
-							}
-						}
-					} else if (file.getName().startsWith("Crest_")) {
-						final int crestId = Integer.parseInt(file.getName().substring(6, file.getName().length() - 4));
-						if (crestsInUse.contains(crestId)) {
-							final L2Crest crest = createCrest(data, CrestType.PLEDGE);
-							if (crest != null) {
-								for (L2Clan clan : ClanTable.getInstance().getClans()) {
-									if (clan.getCrestId() == crestId) {
-										clan.setCrestId(0);
-										clan.changeClanCrest(crest.getId());
-									}
-								}
-							}
-						}
-					} else if (file.getName().startsWith("AllyCrest_")) {
-						final int crestId = Integer.parseInt(file.getName().substring(10, file.getName().length() - 4));
-						if (crestsInUse.contains(crestId)) {
-							final L2Crest crest = createCrest(data, CrestType.ALLY);
-							if (crest != null) {
-								for (L2Clan clan : ClanTable.getInstance().getClans()) {
-									if (clan.getAllyCrestId() == crestId) {
-										clan.setAllyCrestId(0);
-										clan.changeAllyCrest(crest.getId(), false);
-									}
-								}
-							}
-						}
-					}
-					file.delete();
-				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "There was an error while moving crest file " + file.getName() + " to database:", e);
-				}
-			}
-			crestDir.delete();
 		}
 	}
 	
@@ -219,8 +151,8 @@ public final class CrestTable {
 			statement.executeUpdate();
 			_crests.put(crest.getId(), crest);
 			return crest;
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "There was an error while saving crest in database:", e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error while saving crest in database!", ex);
 		}
 		return null;
 	}
@@ -232,7 +164,7 @@ public final class CrestTable {
 	public void removeCrest(int crestId) {
 		_crests.remove(crestId);
 		
-		// avoid removing last crest id we dont want to lose index...
+		// avoid removing last crest id we don't want to lose index...
 		// because client will display wrong crest if its reused
 		if (crestId == (_nextId.get() - 1)) {
 			return;
@@ -242,23 +174,20 @@ public final class CrestTable {
 			var statement = con.prepareStatement("DELETE FROM `crests` WHERE `crest_id` = ?")) {
 			statement.setInt(1, crestId);
 			statement.executeUpdate();
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "There was an error while deleting crest from database:", e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an  error while deleting crest from database!", ex);
 		}
 	}
 	
-	/**
-	 * @return The next crest id.
-	 */
 	public int getNextId() {
 		return _nextId.getAndIncrement();
 	}
 	
 	public static CrestTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final CrestTable _instance = new CrestTable();
+		protected static final CrestTable INSTANCE = new CrestTable();
 	}
 }
