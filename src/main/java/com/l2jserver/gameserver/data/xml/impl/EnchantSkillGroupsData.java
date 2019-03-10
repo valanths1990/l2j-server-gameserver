@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -39,20 +41,25 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author Micr0
  */
 public class EnchantSkillGroupsData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(EnchantSkillGroupsData.class);
+	
 	public static final int NORMAL_ENCHANT_COST_MULTIPLIER = Config.NORMAL_ENCHANT_COST_MULTIPLIER;
+	
 	public static final int SAFE_ENCHANT_COST_MULTIPLIER = Config.SAFE_ENCHANT_COST_MULTIPLIER;
 	
 	public static final int NORMAL_ENCHANT_BOOK = 6622;
+	
 	public static final int SAFE_ENCHANT_BOOK = 9627;
+	
 	public static final int CHANGE_ENCHANT_BOOK = 9626;
+	
 	public static final int UNTRAIN_ENCHANT_BOOK = 9625;
 	
 	private final Map<Integer, L2EnchantSkillGroup> _enchantSkillGroups = new HashMap<>();
+	
 	private final Map<Integer, L2EnchantSkillLearn> _enchantSkillTrees = new HashMap<>();
 	
-	/**
-	 * Instantiates a new enchant groups table.
-	 */
 	protected EnchantSkillGroupsData() {
 		load();
 	}
@@ -66,7 +73,7 @@ public class EnchantSkillGroupsData implements IXmlReader {
 		for (L2EnchantSkillGroup group : _enchantSkillGroups.values()) {
 			routes += group.getEnchantGroupDetails().size();
 		}
-		LOG.info("{}: Loaded {} groups and {} routes.", getClass().getSimpleName(), _enchantSkillGroups.size(), routes);
+		LOG.info("Loaded {} groups and {} routes.", _enchantSkillGroups.size(), routes);
 	}
 	
 	@Override
@@ -120,7 +127,7 @@ public class EnchantSkillGroupsData implements IXmlReader {
 			
 			return _enchantSkillGroups.get(group).getEnchantGroupDetails().size();
 		}
-		LOG.error("{}: Error while loading generating enchant skill ID: {} route: {} missing group: {}", skillId, route, group);
+		LOG.error("There has been an error while loading generating enchant skill Id {}, route {} and group {}!", skillId, route, group);
 		return 0;
 	}
 	
@@ -205,15 +212,11 @@ public class EnchantSkillGroupsData implements IXmlReader {
 		return 0;
 	}
 	
-	/**
-	 * Gets the single instance of EnchantGroupsData.
-	 * @return single instance of EnchantGroupsData
-	 */
 	public static EnchantSkillGroupsData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final EnchantSkillGroupsData _instance = new EnchantSkillGroupsData();
+		protected static final EnchantSkillGroupsData INSTANCE = new EnchantSkillGroupsData();
 	}
 }

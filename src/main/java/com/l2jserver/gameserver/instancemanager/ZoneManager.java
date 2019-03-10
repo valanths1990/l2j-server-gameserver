@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -55,6 +57,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class ZoneManager implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(ZoneManager.class);
+	
 	private static final Map<String, AbstractZoneSettings> _settings = new HashMap<>();
 	
 	private final Map<Class<? extends L2ZoneType>, Map<Integer, ? extends L2ZoneType>> _classZones = new HashMap<>();
@@ -65,16 +69,10 @@ public final class ZoneManager implements IXmlReader {
 	
 	private List<L2ItemInstance> _debugItems;
 	
-	/**
-	 * Instantiates a new zone manager.
-	 */
 	protected ZoneManager() {
 		load();
 	}
 	
-	/**
-	 * Reload.
-	 */
 	public void reload() {
 		// Get the world regions
 		int count = 0;
@@ -96,8 +94,9 @@ public final class ZoneManager implements IXmlReader {
 				count++;
 			}
 		}
+		
 		GrandBossManager.getInstance().getZones().clear();
-		LOG.info("{}: Removed zones in " + count + " regions.", getClass().getSimpleName());
+		LOG.info("Removed zones in {} regions.", count);
 		
 		// Load the zones
 		load();
@@ -139,7 +138,7 @@ public final class ZoneManager implements IXmlReader {
 						if (attribute != null) {
 							zoneType = attribute.getNodeValue();
 						} else {
-							LOG.warn("ZoneData: Missing type for zone in file {}", f.getName());
+							LOG.warn("Missing type for zone in file {}!", f);
 							continue;
 						}
 						
@@ -160,10 +159,10 @@ public final class ZoneManager implements IXmlReader {
 						// Check zone name for NpcSpawnTerritory. Must exist and to be unique
 						if (zoneType.equalsIgnoreCase("NpcSpawnTerritory")) {
 							if (zoneName == null) {
-								LOG.warn("ZoneData: Missing name for NpcSpawnTerritory in file: {}, skipping zone!", f.getName());
+								LOG.warn("Missing name for NpcSpawnTerritory in file: {}, skipping zone!", f);
 								continue;
 							} else if (_spawnTerritories.containsKey(zoneName)) {
-								LOG.warn("ZoneData: Name {} already used for another zone, check file {}, skipping zone!", zoneName, f.getName());
+								LOG.warn("Name {} already used for another zone, check file {}, skipping zone!", zoneName, f);
 								continue;
 							}
 						}
@@ -191,7 +190,7 @@ public final class ZoneManager implements IXmlReader {
 							rs.clear();
 							
 							if ((coords == null) || (coords.length == 0)) {
-								LOG.warn("{}: ZoneData: missing data for zone: {} XML file {}!", getClass().getSimpleName(), zoneId, f.getName());
+								LOG.warn("Missing data for zone {} XML file {}!", zoneId, f);
 								continue;
 							}
 							
@@ -201,7 +200,7 @@ public final class ZoneManager implements IXmlReader {
 								if (coords.length == 2) {
 									zoneForm = new ZoneCuboid(coords[0][0], coords[1][0], coords[0][1], coords[1][1], minZ, maxZ);
 								} else {
-									LOG.warn("{}: ZoneData: Missing cuboid vertex in sql data for zone: {} in file {}!", getClass().getSimpleName(), zoneId, f.getName());
+									LOG.warn("Missing cuboid vertex in SQL data for zone {} in file {}!", zoneId, f);
 									continue;
 								}
 							} else if (zoneShape.equalsIgnoreCase("NPoly")) {
@@ -215,7 +214,7 @@ public final class ZoneManager implements IXmlReader {
 									}
 									zoneForm = new ZoneNPoly(aX, aY, minZ, maxZ);
 								} else {
-									LOG.warn("{}: ZoneData: Bad data for zone: {} in file {}!", getClass().getSimpleName(), zoneId, f.getName());
+									LOG.warn("Bad data for zone {} in file {}!", zoneId, f);
 									continue;
 								}
 							} else if (zoneShape.equalsIgnoreCase("Cylinder")) {
@@ -226,15 +225,15 @@ public final class ZoneManager implements IXmlReader {
 								if ((coords.length == 1) && (zoneRad > 0)) {
 									zoneForm = new ZoneCylinder(coords[0][0], coords[0][1], minZ, maxZ, zoneRad);
 								} else {
-									LOG.warn("{}: ZoneData: Bad data for zone: {} in file {}!", getClass().getSimpleName(), zoneId, f.getName());
+									LOG.warn("Bad data for zone {} in file {}!", zoneId, f);
 									continue;
 								}
 							} else {
-								LOG.warn("{}: ZoneData: Unknown shape: {}  for zone {} in file {}", getClass().getSimpleName(), zoneShape, zoneId, f.getName());
+								LOG.warn("Unknown shape: {} for zone {} in file {}!", zoneShape, zoneId, f);
 								continue;
 							}
 						} catch (Exception e) {
-							LOG.warn("{}: ZoneData: Failed to load zone {} coordinates!", getClass().getSimpleName(), zoneId, e);
+							LOG.warn("Failed to load zone {} coordinates!", zoneId, e);
 						}
 						
 						// No further parameters needed, if NpcSpawnTerritory is loading
@@ -253,7 +252,7 @@ public final class ZoneManager implements IXmlReader {
 							temp = (L2ZoneType) zoneConstructor.newInstance(zoneId);
 							temp.setZone(zoneForm);
 						} catch (Exception e) {
-							LOG.warn("{}: ZoneData: No such zone type: {} in file {}!", getClass().getSimpleName(), zoneType, f.getName());
+							LOG.warn("No such zone type {} in file {}!", zoneType, f);
 							continue;
 						}
 						
@@ -282,7 +281,7 @@ public final class ZoneManager implements IXmlReader {
 						}
 						
 						if (checkId(zoneId)) {
-							LOG.debug("{}: Caution: Zone ({}) from file {} overrides previous definition.", getClass().getSimpleName(), zoneId, f.getName());
+							LOG.debug("Caution: Zone ({}) from file {} overrides previous definition.", zoneId, f);
 						}
 						
 						if ((zoneName != null) && !zoneName.isEmpty()) {
@@ -318,8 +317,8 @@ public final class ZoneManager implements IXmlReader {
 		_spawnTerritories.clear();
 		parseDatapackDirectory("data/zones", false);
 		parseDatapackDirectory("data/zones/npcSpawnTerritories", false);
-		LOG.info("{}: Loaded {} zone classes and {} zones.", getClass().getSimpleName(), _classZones.size(), getSize());
-		LOG.info("{}: Loaded {} NPC spawn territoriers.", getClass().getSimpleName(), _spawnTerritories.size());
+		LOG.info("Loaded {} zone classes and {} zones.", _classZones.size(), getSize());
+		LOG.info("Loaded {} NPC spawn territoriers.", _spawnTerritories.size());
 	}
 	
 	/**
@@ -617,15 +616,11 @@ public final class ZoneManager implements IXmlReader {
 		return _settings.get(name);
 	}
 	
-	/**
-	 * Gets the single instance of ZoneManager.
-	 * @return single instance of ZoneManager
-	 */
 	public static final ZoneManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final ZoneManager _instance = new ZoneManager();
+		protected static final ZoneManager INSTANCE = new ZoneManager();
 	}
 }

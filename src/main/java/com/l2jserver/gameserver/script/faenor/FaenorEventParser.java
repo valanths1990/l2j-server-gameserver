@@ -19,11 +19,11 @@
 package com.l2jserver.gameserver.script.faenor;
 
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.script.ScriptContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -37,22 +37,24 @@ import com.l2jserver.gameserver.script.ScriptEngine;
  * @author Luis Arias
  */
 public class FaenorEventParser extends FaenorParser {
-	static Logger _log = Logger.getLogger(FaenorEventParser.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(FaenorEventParser.class);
+	
 	private DateRange _eventDates = null;
 	
 	@Override
 	public void parseScript(final Node eventNode, ScriptContext context) {
-		String ID = attribute(eventNode, "ID");
+		String id = attribute(eventNode, "ID");
 		_eventDates = DateRange.parse(attribute(eventNode, "Active"), DATE_FORMAT);
 		
 		Date currentDate = new Date();
 		if (_eventDates.getEndDate().before(currentDate)) {
-			_log.info("Event ID: (" + ID + ") has passed... Ignored.");
+			LOG.info("Event Id {} has passed... Ignored.", id);
 			return;
 		}
 		
 		if (_eventDates.getStartDate().after(currentDate)) {
-			_log.info("Event ID: (" + ID + ") is not active yet... Ignored.");
+			LOG.info("Event Id {} is not active yet... Ignored.", id);
 			ThreadPoolManager.getInstance().scheduleGeneral(() -> parseEventDropAndMessage(eventNode), _eventDates.getStartDate().getTime() - currentDate.getTime());
 			return;
 		}
@@ -78,8 +80,8 @@ public class FaenorEventParser extends FaenorParser {
 			if (type.equalsIgnoreCase("OnJoin")) {
 				_bridge.onPlayerLogin(message, _eventDates);
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Error in event parser: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error in event parser!", ex);
 		}
 	}
 	
@@ -98,8 +100,8 @@ public class FaenorEventParser extends FaenorParser {
 			double chance = getPercent(attribute(drop, "Chance"));
 			
 			_bridge.addEventDrop(items, count, chance, _eventDates);
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "ERROR(parseEventDrop):" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error parsing drops!", ex);
 		}
 	}
 	

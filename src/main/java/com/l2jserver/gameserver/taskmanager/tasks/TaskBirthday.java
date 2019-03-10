@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.taskmanager.tasks;
 
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.instancemanager.MailManager;
@@ -34,6 +37,8 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
  * @author Zoey76
  */
 public class TaskBirthday extends Task {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskBirthday.class);
 	
 	private static final String NAME = "birthday";
 	
@@ -50,7 +55,7 @@ public class TaskBirthday extends Task {
 		// TODO(Zoey76): Fix first run.
 		final int birthdayGiftCount = giveBirthdayGifts(task.getLastActivation());
 		
-		_log.info("BirthdayManager: " + birthdayGiftCount + " gifts sent.");
+		LOG.info("{} gifts sent.", birthdayGiftCount);
 	}
 	
 	private int giveBirthdayGifts(long lastActivation) {
@@ -70,15 +75,14 @@ public class TaskBirthday extends Task {
 					birthdayGiftCount++;
 				}
 			}
-		} catch (Exception e) {
-			_log.warning("Error checking birthdays: " + e.getMessage());
+		} catch (Exception ex) {
+			LOG.warn("There has been an error sending gifts!", ex);
 		}
 		return birthdayGiftCount;
 	}
 	
 	@Override
 	public void initializate() {
-		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", "06:30:00", "");
 	}
 }

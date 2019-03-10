@@ -25,6 +25,7 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
  * @author Tempy
  */
 public final class TaskCleanUp extends Task {
+	
 	public static final String NAME = "clean_up";
 	
 	@Override

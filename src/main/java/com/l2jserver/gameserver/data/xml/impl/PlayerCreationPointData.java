@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -37,6 +39,8 @@ import com.l2jserver.util.Rnd;
  */
 public class PlayerCreationPointData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(PlayerCreationPointData.class);
+	
 	private final Map<ClassId, Location[]> _creationPointData = new HashMap<>();
 	
 	protected PlayerCreationPointData() {
@@ -47,7 +51,7 @@ public class PlayerCreationPointData implements IXmlReader {
 	public void load() {
 		_creationPointData.clear();
 		parseDatapackFile("data/stats/chars/pcCreationPoints.xml");
-		LOG.info("{}: Loaded {} character creation points.", getClass().getSimpleName(), _creationPointData.values().stream().mapToInt(array -> array.length).sum());
+		LOG.info("Loaded {} character creation points.", _creationPointData.values().stream().mapToInt(array -> array.length).sum());
 	}
 	
 	/**
@@ -80,10 +84,10 @@ public class PlayerCreationPointData implements IXmlReader {
 	}
 	
 	public static final PlayerCreationPointData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final PlayerCreationPointData _instance = new PlayerCreationPointData();
+		protected static final PlayerCreationPointData INSTANCE = new PlayerCreationPointData();
 	}
 }

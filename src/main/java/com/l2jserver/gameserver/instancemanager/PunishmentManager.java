@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.instancemanager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.holders.PunishmentHolder;
@@ -35,7 +36,7 @@ import com.l2jserver.gameserver.model.punishment.PunishmentType;
  */
 public final class PunishmentManager {
 	
-	private static final Logger _log = Logger.getLogger(PunishmentManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(PunishmentManager.class);
 	
 	private final Map<PunishmentAffect, PunishmentHolder> _tasks = new ConcurrentHashMap<>();
 	
@@ -73,11 +74,11 @@ public final class PunishmentManager {
 					}
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while loading punishments: ", e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error while loading punishments!", ex);
 		}
 		
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded " + initiated + " active and " + expired + " expired punishments.");
+		LOG.info("Loaded {} active and {} expired punishments.", initiated, expired);
 	}
 	
 	public void startPunishment(PunishmentTask task) {

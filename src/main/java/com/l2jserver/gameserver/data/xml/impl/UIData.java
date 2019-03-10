@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -34,6 +36,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author Zoey76
  */
 public class UIData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(UIData.class);
 	
 	private final Map<Integer, List<ActionKey>> _storedKeys = new HashMap<>();
 	
@@ -48,7 +52,7 @@ public class UIData implements IXmlReader {
 		_storedKeys.clear();
 		_storedCategories.clear();
 		parseDatapackFile("data/ui/ui_en.xml");
-		LOG.info("{}: Loaded {} keys {} categories.", getClass().getSimpleName(), _storedKeys.size(), _storedCategories.size());
+		LOG.info("Loaded {} keys {} categories.", _storedKeys.size(), _storedCategories.size());
 	}
 	
 	@Override
@@ -153,10 +157,10 @@ public class UIData implements IXmlReader {
 	}
 	
 	public static UIData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final UIData _instance = new UIData();
+		protected static final UIData INSTANCE = new UIData();
 	}
 }

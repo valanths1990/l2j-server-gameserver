@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.instancemanager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.InstanceListManager;
@@ -31,7 +32,7 @@ import com.l2jserver.gameserver.model.entity.Fort;
 
 public final class FortManager implements InstanceListManager {
 	
-	private static final Logger _log = Logger.getLogger(FortManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(FortManager.class);
 	
 	private final List<Fort> _forts = new ArrayList<>();
 	
@@ -138,12 +139,13 @@ public final class FortManager implements InstanceListManager {
 				_forts.add(new Fort(rs.getInt("id")));
 			}
 			
-			_log.info(getClass().getSimpleName() + ": Loaded: " + _forts.size() + " fortress");
+			LOG.info("Loaded {} fortress.", _forts.size());
+			
 			for (Fort fort : _forts) {
 				fort.getSiege().getSiegeGuardManager().loadSiegeGuard();
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Exception: loadFortData(): " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading fort instances!", ex);
 		}
 	}
 	

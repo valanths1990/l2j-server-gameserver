@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -34,11 +36,11 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author Zoey76
  */
 public final class ClassListData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ClassListData.class);
+	
 	private final Map<ClassId, ClassInfo> _classData = new HashMap<>();
 	
-	/**
-	 * Instantiates a new class list data.
-	 */
 	protected ClassListData() {
 		load();
 	}
@@ -47,7 +49,7 @@ public final class ClassListData implements IXmlReader {
 	public void load() {
 		_classData.clear();
 		parseDatapackFile("data/stats/chars/classList.xml");
-		LOG.info("{}: Loaded {} Class data.", getClass().getSimpleName(), _classData.size());
+		LOG.info("Loaded {} class data.", _classData.size());
 	}
 	
 	@Override
@@ -97,15 +99,11 @@ public final class ClassListData implements IXmlReader {
 		return (id != null) ? _classData.get(id) : null;
 	}
 	
-	/**
-	 * Gets the single instance of ClassListData.
-	 * @return single instance of ClassListData
-	 */
 	public static ClassListData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final ClassListData _instance = new ClassListData();
+		protected static final ClassListData INSTANCE = new ClassListData();
 	}
 }

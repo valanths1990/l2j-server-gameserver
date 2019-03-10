@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,15 +47,14 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class InitialShortcutData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(InitialShortcutData.class);
+	
 	private final Map<ClassId, List<Shortcut>> _initialShortcutData = new HashMap<>();
 	
 	private final List<Shortcut> _initialGlobalShortcutList = new ArrayList<>();
 	
 	private final Map<Integer, Macro> _macroPresets = new HashMap<>();
 	
-	/**
-	 * Instantiates a new initial shortcuts data.
-	 */
 	protected InitialShortcutData() {
 		load();
 	}
@@ -65,9 +66,9 @@ public final class InitialShortcutData implements IXmlReader {
 		
 		parseDatapackFile("data/stats/initialShortcuts.xml");
 		
-		LOG.info("{}: Loaded {} Initial Global Shortcuts data.", getClass().getSimpleName(), _initialGlobalShortcutList.size());
-		LOG.info("{}: Loaded {} Initial Shortcuts data.", getClass().getSimpleName(), _initialShortcutData.size());
-		LOG.info("{}: Loaded {} Macros presets.", getClass().getSimpleName(), _macroPresets.size());
+		LOG.info("Loaded {} initial dlobal shortcuts data.", _initialGlobalShortcutList.size());
+		LOG.info("Loaded {} initial shortcuts data.", _initialShortcutData.size());
+		LOG.info("Loaded {} macros presets.", _macroPresets.size());
 	}
 	
 	@Override
@@ -302,15 +303,11 @@ public final class InitialShortcutData implements IXmlReader {
 		}
 	}
 	
-	/**
-	 * Gets the single instance of InitialEquipmentData.
-	 * @return single instance of InitialEquipmentData
-	 */
 	public static InitialShortcutData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final InitialShortcutData _instance = new InitialShortcutData();
+		protected static final InitialShortcutData INSTANCE = new InitialShortcutData();
 	}
 }

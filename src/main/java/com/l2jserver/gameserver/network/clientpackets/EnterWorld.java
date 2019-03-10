@@ -45,7 +45,7 @@ import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.data.sql.impl.AnnouncementsTable;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
 import com.l2jserver.gameserver.instancemanager.CoupleManager;
@@ -253,7 +253,7 @@ public class EnterWorld extends L2GameClientPacket {
 				}
 			}
 			
-			for (SiegableHall hall : CHSiegeManager.getInstance().getConquerableHalls().values()) {
+			for (SiegableHall hall : ClanHallSiegeManager.getInstance().getConquerableHalls().values()) {
 				if (!hall.isInSiege()) {
 					continue;
 				}

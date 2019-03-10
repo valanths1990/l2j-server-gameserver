@@ -24,6 +24,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -43,13 +45,12 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public class EnchantItemHPBonusData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(EnchantItemHPBonusData.class);
+	
 	private static final float FULL_ARMOR_MODIFIER = 1.5f; // TODO: Move it to config!
 	
 	private final Map<CrystalType, List<Integer>> _armorHPBonuses = new EnumMap<>(CrystalType.class);
 	
-	/**
-	 * Instantiates a new enchant hp bonus data.
-	 */
 	protected EnchantItemHPBonusData() {
 		load();
 	}
@@ -58,7 +59,7 @@ public class EnchantItemHPBonusData implements IXmlReader {
 	public void load() {
 		_armorHPBonuses.clear();
 		parseDatapackFile("data/stats/enchantHPBonus.xml");
-		LOG.info("{}: Loaded {} Enchant HP Bonuses.", getClass().getSimpleName(), _armorHPBonuses.size());
+		LOG.info("Loaded {} Enchant HP Bonuses.", _armorHPBonuses.size());
 	}
 	
 	@Override
@@ -125,15 +126,11 @@ public class EnchantItemHPBonusData implements IXmlReader {
 		return bonus;
 	}
 	
-	/**
-	 * Gets the single instance of EnchantHPBonusData.
-	 * @return single instance of EnchantHPBonusData
-	 */
 	public static final EnchantItemHPBonusData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final EnchantItemHPBonusData _instance = new EnchantItemHPBonusData();
+		protected static final EnchantItemHPBonusData INSTANCE = new EnchantItemHPBonusData();
 	}
 }

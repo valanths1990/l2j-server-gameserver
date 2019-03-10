@@ -19,7 +19,7 @@
 
 package com.l2jserver.gameserver.network.clientpackets;
 
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -81,16 +81,16 @@ public final class RequestJoinSiege extends L2GameClientPacket {
 			castle.getSiege().listRegisterClan(activeChar);
 		}
 		
-		SiegableHall hall = CHSiegeManager.getInstance().getSiegableHall(_castleId);
+		SiegableHall hall = ClanHallSiegeManager.getInstance().getSiegableHall(_castleId);
 		if (hall != null) {
 			if (_isJoining == 1) {
 				if (System.currentTimeMillis() < clan.getDissolvingExpiryTime()) {
 					activeChar.sendPacket(SystemMessageId.CANT_PARTICIPATE_IN_SIEGE_WHILE_DISSOLUTION_IN_PROGRESS);
 					return;
 				}
-				CHSiegeManager.getInstance().registerClan(clan, hall, activeChar);
+				ClanHallSiegeManager.getInstance().registerClan(clan, hall, activeChar);
 			} else {
-				CHSiegeManager.getInstance().unRegisterClan(clan, hall);
+				ClanHallSiegeManager.getInstance().unRegisterClan(clan, hall);
 			}
 			activeChar.sendPacket(new SiegeInfo(hall));
 		}

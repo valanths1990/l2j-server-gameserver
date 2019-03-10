@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -52,6 +54,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class WalkingManager implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(WalkingManager.class);
+	
 	// Repeat style:
 	// -1 - no repeat
 	// 0 - go back
@@ -75,7 +79,7 @@ public final class WalkingManager implements IXmlReader {
 	@Override
 	public final void load() {
 		parseDatapackFile("data/Routes.xml");
-		LOG.info("{}: Loaded {} walking routes.", getClass().getSimpleName(), _routes.size());
+		LOG.info("Loaded {} walking routes.", _routes.size());
 	}
 	
 	@Override
@@ -131,7 +135,7 @@ public final class WalkingManager implements IXmlReader {
 							if (node != null) {
 								npcString = NpcStringId.getNpcStringId(node.getNodeValue());
 								if (npcString == null) {
-									LOG.warn("{}: Unknown NPC String {} for route {}!", getClass().getSimpleName(), node.getNodeValue(), routeName);
+									LOG.warn("Unknown NPC String {} for route {}!", node.getNodeValue(), routeName);
 									continue;
 								}
 							} else {
@@ -139,7 +143,7 @@ public final class WalkingManager implements IXmlReader {
 								if (node != null) {
 									npcString = NpcStringId.getNpcStringId(Integer.parseInt(node.getNodeValue()));
 									if (npcString == null) {
-										LOG.warn("{}: Unknown npcString {} for route {}!", getClass().getSimpleName(), node.getNodeValue(), routeName);
+										LOG.warn("Unknown npcString {} for route {}!", node.getNodeValue(), routeName);
 										continue;
 									}
 								}
@@ -160,7 +164,7 @@ public final class WalkingManager implements IXmlReader {
 							holder.addRoute(routeName, new Location(x, y, z));
 							_routesToAttach.put(npcId, holder);
 						} catch (Exception e) {
-							LOG.warn("{}: Error in target definition for route {}!", getClass().getSimpleName(), routeName);
+							LOG.warn("Error in target definition for route {}!", routeName);
 						}
 					}
 				}
@@ -244,8 +248,8 @@ public final class WalkingManager implements IXmlReader {
 					
 					if (!npc.isInsideRadius(node, 3000, true, false)) {
 						final String message = "Route '" + routeName + "': NPC (id=" + npc.getId() + ", x=" + npc.getX() + ", y=" + npc.getY() + ", z=" + npc.getZ() + ") is too far from starting point (node x=" + node.getX() + ", y=" + node.getY() + ", z=" + node.getZ() + ", range="
-							+ npc.calculateDistance(node, true, true) + "), walking will not start";
-						LOG.warn("{}: {}", getClass().getSimpleName(), message);
+							+ npc.calculateDistance(node, true, true) + "), walking will not start!";
+						LOG.warn(message);
 						npc.sendDebugMessage(message);
 						return;
 					}
@@ -408,10 +412,10 @@ public final class WalkingManager implements IXmlReader {
 	}
 	
 	public static final WalkingManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final WalkingManager _instance = new WalkingManager();
+		protected static final WalkingManager INSTANCE = new WalkingManager();
 	}
 }

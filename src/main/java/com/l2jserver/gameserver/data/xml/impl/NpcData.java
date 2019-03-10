@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -58,6 +60,8 @@ import com.l2jserver.gameserver.util.Util;
  */
 public class NpcData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(NpcData.class);
+	
 	private final Map<Integer, L2NpcTemplate> _npcs = new ConcurrentHashMap<>();
 	
 	private final Map<String, Integer> _clans = new ConcurrentHashMap<>();
@@ -73,12 +77,12 @@ public class NpcData implements IXmlReader {
 		_minionData = new MinionData();
 		
 		parseDatapackDirectory("data/stats/npcs", false);
-		LOG.info("{}: Loaded {} NPCs.", getClass().getSimpleName(), _npcs.size());
+		LOG.info("Loaded {} NPCs.", _npcs.size());
 		
 		if (Config.CUSTOM_NPC_DATA) {
 			final int npcCount = _npcs.size();
 			parseDatapackDirectory("data/stats/npcs/custom", true);
-			LOG.info("{}: Loaded {} custom NPCs.", getClass().getSimpleName(), (_npcs.size() - npcCount));
+			LOG.info("Loaded {} custom NPCs.", (_npcs.size() - npcCount));
 		}
 		
 		_minionData = null;
@@ -295,7 +299,7 @@ public class NpcData implements IXmlReader {
 											if (skill != null) {
 												skills.put(skill.getId(), skill);
 											} else {
-												LOG.warn("[{}] skill not found. NPC ID: {} Skill ID: {} Skill Level: {}!", f.getName(), npcId, skillId, skillLevel);
+												LOG.warn("{} skill not found. NPC Id {}, skill Id {}, skill level: {}!", f, npcId, skillId, skillLevel);
 											}
 										}
 									}
@@ -528,7 +532,7 @@ public class NpcData implements IXmlReader {
 						if (item instanceof GeneralDropItem) {
 							items.add((GeneralDropItem) item);
 						} else {
-							LOG.warn("[{}] grouped general drop item supports only general drop item.", f);
+							LOG.warn("{} grouped general drop item supports only general drop item.", f);
 						}
 					}
 					dropItem.setItems(items);
@@ -667,7 +671,10 @@ public class NpcData implements IXmlReader {
 	 * Once Spawn System gets reworked delete this class<br>
 	 * @author Zealar
 	 */
-	private final class MinionData implements IXmlReader {
+	private static class MinionData implements IXmlReader {
+		
+		private static final Logger LOG = LoggerFactory.getLogger(MinionData.class);
+		
 		public final Map<Integer, List<MinionHolder>> _tempMinions = new HashMap<>();
 		
 		protected MinionData() {
@@ -678,7 +685,7 @@ public class NpcData implements IXmlReader {
 		public void load() {
 			_tempMinions.clear();
 			parseDatapackFile("data/minionData.xml");
-			LOG.info("{}: Loaded {} minions data.", getClass().getSimpleName(), _tempMinions.size());
+			LOG.info("Loaded {} minions data.", _tempMinions.size());
 		}
 		
 		@Override
@@ -704,15 +711,11 @@ public class NpcData implements IXmlReader {
 		}
 	}
 	
-	/**
-	 * Gets the single instance of NpcData.
-	 * @return single instance of NpcData
-	 */
 	public static NpcData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final NpcData _instance = new NpcData();
+		protected static final NpcData INSTANCE = new NpcData();
 	}
 }

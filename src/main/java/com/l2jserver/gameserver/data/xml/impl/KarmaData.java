@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -33,6 +35,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public class KarmaData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(KarmaData.class);
+	
 	private final Map<Integer, Double> _karmaTable = new HashMap<>();
 	
 	public KarmaData() {
@@ -43,7 +47,7 @@ public class KarmaData implements IXmlReader {
 	public synchronized void load() {
 		_karmaTable.clear();
 		parseDatapackFile("data/stats/chars/pcKarmaIncrease.xml");
-		LOG.info("{}: Loaded {} karma modifiers.", getClass().getSimpleName(), _karmaTable.size());
+		LOG.info("Loaded {} karma modifiers.", _karmaTable.size());
 	}
 	
 	@Override
@@ -68,15 +72,11 @@ public class KarmaData implements IXmlReader {
 		return _karmaTable.get(level);
 	}
 	
-	/**
-	 * Gets the single instance of KarmaData.
-	 * @return single instance of KarmaData
-	 */
 	public static KarmaData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final KarmaData _instance = new KarmaData();
+		protected static final KarmaData INSTANCE = new KarmaData();
 	}
 }

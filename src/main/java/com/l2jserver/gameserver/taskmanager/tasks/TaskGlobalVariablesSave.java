@@ -42,7 +42,6 @@ public class TaskGlobalVariablesSave extends Task {
 	
 	@Override
 	public void initializate() {
-		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_FIXED_SHEDULED, "500000", "1800000", "");
 	}
 }

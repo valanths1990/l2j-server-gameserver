@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -34,11 +36,11 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author nonom
  */
 public final class FishingMonstersData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(FishingMonstersData.class);
+	
 	private final Map<Integer, L2FishingMonster> _fishingMonstersData = new HashMap<>();
 	
-	/**
-	 * Instantiates a new fishing monsters data.
-	 */
 	protected FishingMonstersData() {
 		load();
 	}
@@ -47,7 +49,7 @@ public final class FishingMonstersData implements IXmlReader {
 	public void load() {
 		_fishingMonstersData.clear();
 		parseDatapackFile("data/stats/fishing/fishingMonsters.xml");
-		LOG.info("{}: Loaded {} Fishing Monsters.", getClass().getSimpleName(), _fishingMonstersData.size());
+		LOG.info("Loaded {} fishing monsters.", _fishingMonstersData.size());
 	}
 	
 	@Override
@@ -98,15 +100,11 @@ public final class FishingMonstersData implements IXmlReader {
 		return null;
 	}
 	
-	/**
-	 * Gets the single instance of FishingMonsterData.
-	 * @return single instance of FishingMonsterData
-	 */
 	public static FishingMonstersData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final FishingMonstersData _instance = new FishingMonstersData();
+		protected static final FishingMonstersData INSTANCE = new FishingMonstersData();
 	}
 }

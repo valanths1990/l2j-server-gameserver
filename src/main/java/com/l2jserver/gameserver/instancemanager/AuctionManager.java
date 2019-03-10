@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.instancemanager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.entity.Auction;
@@ -31,7 +32,7 @@ import com.l2jserver.gameserver.model.entity.Auction;
  */
 public final class AuctionManager {
 	
-	private static final Logger _log = Logger.getLogger(AuctionManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(AuctionManager.class);
 	
 	private final List<Auction> _auctions = new ArrayList<>();
 	
@@ -77,7 +78,7 @@ public final class AuctionManager {
 	};
 	
 	// @formatter:off
-	private static final int[] ItemInitDataId =
+	private static final int[] ITEM_INIT_DATA_ID =
 	{
 		22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42,
 		43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61
@@ -100,9 +101,9 @@ public final class AuctionManager {
 			while (rs.next()) {
 				_auctions.add(new Auction(rs.getInt("id")));
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded: " + _auctions.size() + " auction(s)");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Exception: AuctionManager.load(): " + e.getMessage(), e);
+			LOG.info("Loaded {} auction(s).", _auctions.size());
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading auctions from database!", ex);
 		}
 	}
 	
@@ -131,13 +132,13 @@ public final class AuctionManager {
 	
 	public void initNPC(int id) {
 		int i;
-		for (i = 0; i < ItemInitDataId.length; i++) {
-			if (ItemInitDataId[i] == id) {
+		for (i = 0; i < ITEM_INIT_DATA_ID.length; i++) {
+			if (ITEM_INIT_DATA_ID[i] == id) {
 				break;
 			}
 		}
-		if ((i >= ItemInitDataId.length) || (ItemInitDataId[i] != id)) {
-			_log.warning(getClass().getSimpleName() + ": Clan Hall auction not found for Id :" + id);
+		if ((i >= ITEM_INIT_DATA_ID.length) || (ITEM_INIT_DATA_ID[i] != id)) {
+			LOG.warn("Clan hall auction not found for Id {}!", id);
 			return;
 		}
 		
@@ -145,17 +146,17 @@ public final class AuctionManager {
 			var s = con.createStatement()) {
 			s.executeUpdate("INSERT INTO `auction` VALUES " + ITEM_INIT_DATA[i]);
 			_auctions.add(new Auction(id));
-			_log.info(getClass().getSimpleName() + ": Created auction for ClanHall: " + id);
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Exception: Auction.initNPC(): " + e.getMessage(), e);
+			LOG.info("Created auction for clan hall Id {}.", id);
+		} catch (Exception ex) {
+			LOG.error("There has been an error storing auction!", ex);
 		}
 	}
 	
 	public static final AuctionManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final AuctionManager _instance = new AuctionManager();
+		protected static final AuctionManager INSTANCE = new AuctionManager();
 	}
 }

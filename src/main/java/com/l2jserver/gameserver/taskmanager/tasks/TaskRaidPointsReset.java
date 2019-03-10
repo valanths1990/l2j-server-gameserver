@@ -22,6 +22,9 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.instancemanager.RaidBossPointsManager;
@@ -32,6 +35,9 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
 import com.l2jserver.gameserver.taskmanager.TaskTypes;
 
 public class TaskRaidPointsReset extends Task {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskRaidPointsReset.class);
+	
 	public static final String NAME = "raid_points_reset";
 	
 	@Override
@@ -94,13 +100,12 @@ public class TaskRaidPointsReset extends Task {
 			}
 			
 			RaidBossPointsManager.getInstance().cleanUp();
-			_log.info("Raid Points Reset Global Task: launched.");
+			LOG.info("Raid points reset global task launched.");
 		}
 	}
 	
 	@Override
 	public void initializate() {
-		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", "00:10:00", "");
 	}
 }

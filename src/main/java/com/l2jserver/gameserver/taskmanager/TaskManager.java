@@ -32,8 +32,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -51,11 +52,12 @@ import com.l2jserver.gameserver.taskmanager.tasks.TaskSevenSignsUpdate;
 import com.l2jserver.gameserver.taskmanager.tasks.TaskShutdown;
 
 /**
+ * Task Manager.
  * @author Layane
  */
 public final class TaskManager {
 	
-	private static final Logger _log = Logger.getLogger(TaskManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(TaskManager.class);
 	
 	private final Map<Integer, Task> _tasks = new ConcurrentHashMap<>();
 	
@@ -71,7 +73,7 @@ public final class TaskManager {
 	protected TaskManager() {
 		initializate();
 		startAllTasks();
-		_log.log(Level.INFO, getClass().getSimpleName() + ": Loaded: " + _tasks.size() + " Tasks");
+		LOG.info("Loaded {} tasks.", _tasks.size());
 	}
 	
 	public class ExecutedTask implements Runnable {
@@ -103,8 +105,8 @@ public final class TaskManager {
 				statement.setLong(1, lastActivation);
 				statement.setInt(2, id);
 				statement.executeUpdate();
-			} catch (SQLException e) {
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Cannot updated the Global Task " + id + ": " + e.getMessage(), e);
+			} catch (SQLException ex) {
+				LOG.warn("Cannot updated global task Id {}!", id, ex);
 			}
 			
 			if ((type == TYPE_SHEDULED) || (type == TYPE_TIME)) {
@@ -201,8 +203,8 @@ public final class TaskManager {
 					}
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Error while loading Global Task table: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error while loading global task table!", ex);
 		}
 	}
 	
@@ -231,7 +233,7 @@ public final class TaskManager {
 						task.scheduled = scheduler.scheduleGeneral(task, diff);
 						return true;
 					}
-					_log.info(getClass().getSimpleName() + ": Task " + task.getId() + " is obsoleted.");
+					LOG.info("Task {} is due.", task.getId());
 				} catch (Exception e) {
 				}
 				break;
@@ -247,7 +249,7 @@ public final class TaskManager {
 				String[] hour = task.getParams()[1].split(":");
 				
 				if (hour.length != 3) {
-					_log.warning(getClass().getSimpleName() + ": Task " + task.getId() + " has incorrect parameters");
+					LOG.warn("Task {} has incorrect parameters!", task.getId());
 					return false;
 				}
 				
@@ -259,8 +261,8 @@ public final class TaskManager {
 					min.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour[0]));
 					min.set(Calendar.MINUTE, Integer.parseInt(hour[1]));
 					min.set(Calendar.SECOND, Integer.parseInt(hour[2]));
-				} catch (Exception e) {
-					_log.log(Level.WARNING, getClass().getSimpleName() + ": Bad parameter on task " + task.getId() + ": " + e.getMessage(), e);
+				} catch (Exception ex) {
+					LOG.warn("Bad parameter on task Id {}!" + task.getId(), ex);
 					return false;
 				}
 				
@@ -299,8 +301,8 @@ public final class TaskManager {
 				}
 			}
 			return true;
-		} catch (SQLException e) {
-			_log.log(Level.WARNING, TaskManager.class.getSimpleName() + ": Cannot add the unique task: " + e.getMessage(), e);
+		} catch (SQLException ex) {
+			LOG.warn("Cannot add the unique task!", ex);
 		}
 		return false;
 	}
@@ -320,17 +322,17 @@ public final class TaskManager {
 			statement.setString(6, param3);
 			statement.execute();
 			return true;
-		} catch (SQLException e) {
-			_log.log(Level.WARNING, TaskManager.class.getSimpleName() + ": Cannot add the task:  " + e.getMessage(), e);
+		} catch (SQLException ex) {
+			LOG.warn("Cannot add the task {}!", task, ex);
 		}
 		return false;
 	}
 	
 	public static TaskManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final TaskManager _instance = new TaskManager();
+		protected static final TaskManager INSTANCE = new TaskManager();
 	}
 }

@@ -21,8 +21,9 @@ package com.l2jserver.gameserver.instancemanager;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.quest.Quest;
@@ -35,7 +36,8 @@ import com.l2jserver.util.Util;
  * @author Zoey76
  */
 public final class QuestManager extends ScriptManager<Quest> {
-	protected static final Logger _log = Logger.getLogger(QuestManager.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(QuestManager.class);
 	
 	/** Map containing all the quests. */
 	private final Map<String, Quest> _quests = new ConcurrentHashMap<>();
@@ -72,7 +74,7 @@ public final class QuestManager extends ScriptManager<Quest> {
 	 * Unload all quests and scripts and load scripts.cfg.
 	 */
 	public void reloadAllScripts() {
-		_log.info(getClass().getSimpleName() + ": Reloading all server scripts.");
+		LOG.info("Reloading all server scripts.");
 		
 		// Unload quests.
 		for (Quest quest : _quests.values()) {
@@ -93,19 +95,16 @@ public final class QuestManager extends ScriptManager<Quest> {
 		
 		try {
 			ScriptEngineManager.getInstance().executeScriptList(new File(Config.DATAPACK_ROOT, "data/scripts.cfg"));
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, getClass().getSimpleName() + ": Failed loading scripts.cfg, no script going to be loaded!", e);
+		} catch (Exception ex) {
+			LOG.warn("Failed loading scripts.cfg, no script going to be loaded!", ex);
 		}
 		
-		QuestManager.getInstance().report();
+		report();
 	}
 	
-	/**
-	 * Logs how many quests and scripts are loaded.
-	 */
 	public void report() {
-		_log.info(getClass().getSimpleName() + ": Loaded: " + _quests.size() + " quests.");
-		_log.info(getClass().getSimpleName() + ": Loaded: " + _scripts.size() + " scripts.");
+		LOG.info("Loaded {} quests.", _quests.size());
+		LOG.info("Loaded {} scripts.", _scripts.size());
 	}
 	
 	/**
@@ -171,13 +170,13 @@ public final class QuestManager extends ScriptManager<Quest> {
 		final Quest old = _quests.put(quest.getName(), quest);
 		if (old != null) {
 			old.unload();
-			_log.info(getClass().getSimpleName() + ": Replaced quest " + old.getName() + " (" + old.getId() + ") with a new version!");
+			LOG.info("Replaced quest {} with a new version.", old);
 			
 		}
 		
 		if (Config.ALT_DEV_SHOW_QUESTS_LOAD_IN_LOGS) {
 			final String questName = quest.getName().contains("_") ? quest.getName().substring(quest.getName().indexOf('_') + 1) : quest.getName();
-			_log.info("Loaded quest " + Util.splitWords(questName) + ".");
+			LOG.info("Loaded quest {}.", Util.splitWords(questName));
 		}
 	}
 	
@@ -229,23 +228,19 @@ public final class QuestManager extends ScriptManager<Quest> {
 		final Quest old = _scripts.put(script.getClass().getSimpleName(), script);
 		if (old != null) {
 			old.unload();
-			_log.info(getClass().getSimpleName() + ": Replaced script " + old.getName() + " with a new version!");
+			LOG.info("Replaced script {} with a new version.", old);
 		}
 		
 		if (Config.ALT_DEV_SHOW_SCRIPTS_LOAD_IN_LOGS) {
-			_log.info("Loaded script " + Util.splitWords(script.getClass().getSimpleName()) + ".");
+			LOG.info("Loaded script {}.", Util.splitWords(script.getClass().getSimpleName()));
 		}
 	}
 	
-	/**
-	 * Gets the single instance of {@code QuestManager}.
-	 * @return single instance of {@code QuestManager}
-	 */
 	public static QuestManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final QuestManager _instance = new QuestManager();
+		protected static final QuestManager INSTANCE = new QuestManager();
 	}
 }

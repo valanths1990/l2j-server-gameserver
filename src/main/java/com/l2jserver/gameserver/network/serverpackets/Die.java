@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.network.serverpackets;
 
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
@@ -80,7 +80,7 @@ public class Die extends L2GameServerPacket {
 			L2SiegeClan siegeClan = null;
 			Castle castle = CastleManager.getInstance().getCastle(_activeChar);
 			Fort fort = FortManager.getInstance().getFort(_activeChar);
-			SiegableHall hall = CHSiegeManager.getInstance().getNearbyClanHall(_activeChar);
+			SiegableHall hall = ClanHallSiegeManager.getInstance().getNearbyClanHall(_activeChar);
 			if ((castle != null) && castle.getSiege().isInProgress()) {
 				// siege in progress
 				siegeClan = castle.getSiege().getAttackerClan(_clan);

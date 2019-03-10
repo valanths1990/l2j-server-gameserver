@@ -47,7 +47,7 @@ import com.l2jserver.gameserver.enums.ShotType;
 import com.l2jserver.gameserver.enums.Team;
 import com.l2jserver.gameserver.handler.BypassHandler;
 import com.l2jserver.gameserver.handler.IBypassHandler;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.TownManager;
@@ -557,7 +557,7 @@ public class L2Npc extends L2Character {
 	}
 	
 	public final SiegableHall getConquerableHall() {
-		return CHSiegeManager.getInstance().getNearbyClanHall(getX(), getY(), 10000);
+		return ClanHallSiegeManager.getInstance().getNearbyClanHall(getX(), getY(), 10000);
 	}
 	
 	/**

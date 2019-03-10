@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.taskmanager.tasks;
 
 import java.util.Calendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -33,6 +36,9 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
  * @author UnAfraid
  */
 public class TaskClanLeaderApply extends Task {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskClanLeaderApply.class);
+	
 	private static final String NAME = "clanleaderapply";
 	
 	@Override
@@ -54,7 +60,7 @@ public class TaskClanLeaderApply extends Task {
 					clan.setNewLeader(member);
 				}
 			}
-			_log.info(getClass().getSimpleName() + ": launched.");
+			LOG.info("Task launched.");
 		}
 	}
 	

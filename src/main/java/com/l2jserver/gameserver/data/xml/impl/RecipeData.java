@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -40,6 +42,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public class RecipeData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(RecipeData.class);
+	
 	private final Map<Integer, L2RecipeList> _recipes = new HashMap<>();
 	
 	protected RecipeData() {
@@ -50,7 +54,7 @@ public class RecipeData implements IXmlReader {
 	public void load() {
 		_recipes.clear();
 		parseDatapackFile("data/recipes.xml");
-		LOG.info("{}: Loaded {} recipes.", getClass().getSimpleName(), _recipes.size());
+		LOG.info("Loaded {} recipes.", _recipes.size());
 	}
 	
 	@Override
@@ -75,7 +79,7 @@ public class RecipeData implements IXmlReader {
 						
 						att = attrs.getNamedItem("id");
 						if (att == null) {
-							LOG.error("{}: Missing id for recipe item, skipping!", getClass().getSimpleName());
+							LOG.error("Missing id for recipe item, skipping!");
 							continue;
 						}
 						id = Integer.parseInt(att.getNodeValue());
@@ -83,35 +87,35 @@ public class RecipeData implements IXmlReader {
 						
 						att = attrs.getNamedItem("recipeId");
 						if (att == null) {
-							LOG.error("{}: Missing recipeId for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("Missing recipeId for recipe item ID: {}, skipping!", id);
 							continue;
 						}
 						set.set("recipeId", Integer.parseInt(att.getNodeValue()));
 						
 						att = attrs.getNamedItem("name");
 						if (att == null) {
-							LOG.error("{}: Missing name for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("Missing name for recipe item ID: {}, skipping!", id);
 							continue;
 						}
 						set.set("recipeName", att.getNodeValue());
 						
 						att = attrs.getNamedItem("craftLevel");
 						if (att == null) {
-							LOG.error("{}: Missing level for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("Missing level for recipe item ID: {}, skipping!", id);
 							continue;
 						}
 						set.set("craftLevel", Integer.parseInt(att.getNodeValue()));
 						
 						att = attrs.getNamedItem("type");
 						if (att == null) {
-							LOG.error("{}: Missing type for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("Missing type for recipe item ID: {}, skipping!", id);
 							continue;
 						}
 						set.set("isDwarvenRecipe", att.getNodeValue().equalsIgnoreCase("dwarven"));
 						
 						att = attrs.getNamedItem("successRate");
 						if (att == null) {
-							LOG.error("{}: Missing successRate for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+							LOG.error("Missing successRate for recipe item ID: {}, skipping!", id);
 							continue;
 						}
 						set.set("successRate", Integer.parseInt(att.getNodeValue()));
@@ -123,7 +127,7 @@ public class RecipeData implements IXmlReader {
 								try {
 									recipeStatUseList.add(new L2RecipeStatInstance(statName, value));
 								} catch (Exception e) {
-									LOG.error("{}: Error in StatUse parameter for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+									LOG.error("Error in StatUse parameter for recipe item ID: {}, skipping!", id);
 									continue RECIPES_FILE;
 								}
 							} else if ("altStatChange".equalsIgnoreCase(c.getNodeName())) {
@@ -132,7 +136,7 @@ public class RecipeData implements IXmlReader {
 								try {
 									recipeAltStatChangeList.add(new L2RecipeStatInstance(statName, value));
 								} catch (Exception e) {
-									LOG.error("{}: Error in AltStatChange parameter for recipe item ID: {}, skipping!", getClass().getSimpleName(), id);
+									LOG.error("Error in AltStatChange parameter for recipe item ID: {}, skipping!", id);
 									continue RECIPES_FILE;
 								}
 							} else if ("ingredient".equalsIgnoreCase(c.getNodeName())) {
@@ -220,18 +224,11 @@ public class RecipeData implements IXmlReader {
 		return recipeList;
 	}
 	
-	/**
-	 * Gets the single instance of RecipeData.
-	 * @return single instance of RecipeData
-	 */
 	public static RecipeData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
-	/**
-	 * The Class SingletonHolder.
-	 */
 	private static class SingletonHolder {
-		protected static final RecipeData _instance = new RecipeData();
+		protected static final RecipeData INSTANCE = new RecipeData();
 	}
 }

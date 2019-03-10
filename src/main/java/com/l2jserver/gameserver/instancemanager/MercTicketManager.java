@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.instancemanager;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
@@ -43,7 +44,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  */
 public final class MercTicketManager {
 	
-	private static final Logger _log = Logger.getLogger(MercTicketManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(MercTicketManager.class);
 	
 	private static final List<L2ItemInstance> DROPPED_TICKETS = new CopyOnWriteArrayList<>();
 	
@@ -183,9 +184,9 @@ public final class MercTicketManager {
 			rs.close();
 			s.close();
 			
-			_log.info(getClass().getSimpleName() + ": Loaded: " + DROPPED_TICKETS.size() + " Mercenary Tickets");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Exception: loadMercenaryData(): " + e.getMessage(), e);
+			LOG.info("Loaded {} mercenary tickets.", DROPPED_TICKETS.size());
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading mercenary tickets!", ex);
 		}
 	}
 	

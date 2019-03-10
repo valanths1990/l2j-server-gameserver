@@ -30,13 +30,15 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.enums.ManorMode;
 import com.l2jserver.gameserver.model.CropProcure;
 import com.l2jserver.gameserver.model.L2Clan;
@@ -56,6 +58,8 @@ import com.l2jserver.util.Rnd;
  * @author malyelfik
  */
 public final class CastleManorManager implements IXmlReader, IStorable {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CastleManorManager.class);
 	
 	private static final String INSERT_PRODUCT = "INSERT INTO castle_manor_production VALUES (?, ?, ?, ?, ?, ?)";
 	
@@ -100,18 +104,18 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 			
 			// Send debug message
 			if (Config.DEBUG) {
-				LOG.info("{}: Current mode {}", getClass().getSimpleName(), _mode.toString());
+				LOG.info("Current mode {}.", _mode);
 			}
 		} else {
 			_mode = ManorMode.DISABLED;
-			LOG.info("{}: Manor system is deactivated.", getClass().getSimpleName());
+			LOG.info("Manor system is deactivated.");
 		}
 	}
 	
 	@Override
 	public final void load() {
 		parseDatapackFile("data/seeds.xml");
-		LOG.info("{}: Loaded {} seeds.", getClass().getSimpleName(), _seeds.size());
+		LOG.info("Loaded {} seeds.", _seeds.size());
 	}
 	
 	@Override
@@ -170,7 +174,7 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 								pCurrent.add(sp);
 							}
 						} else {
-							LOG.warn("{}: Unknown seed ID: {}!", getClass().getSimpleName(), seedId);
+							LOG.warn("Unknown seed Id {}!", seedId);
 						}
 					}
 				}
@@ -194,22 +198,23 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 								current.add(cp);
 							}
 						} else {
-							LOG.warn("{}: Unknown crop ID: {}!", getClass().getSimpleName(), cropId);
+							LOG.warn("Unknown crop Id {}!", cropId);
 						}
 					}
 				}
 				_procure.put(castleId, current);
 				_procureNext.put(castleId, next);
 			}
-			LOG.info("{}: Manor data loaded.", getClass().getSimpleName());
-		} catch (Exception e) {
-			LOG.warn("{}: Unable to load manor data!", getClass().getSimpleName(), e);
+			LOG.info("Manor data loaded.");
+		} catch (Exception ex) {
+			LOG.warn("Unable to load manor data!", ex);
 		}
 	}
 	
 	// -------------------------------------------------------
 	// Manor methods
 	// -------------------------------------------------------
+	
 	private final void scheduleModeChange() {
 		// Calculate next mode change
 		_nextModeChange = Calendar.getInstance();
@@ -355,7 +360,7 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 		}
 		scheduleModeChange();
 		if (Config.DEBUG) {
-			LOG.info("{}: Manor mode changed to {}!", getClass().getSimpleName(), _mode);
+			LOG.info("Manor mode changed to {}!", _mode);
 		}
 	}
 	
@@ -382,8 +387,8 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 					}
 					ips.executeBatch();
 				}
-			} catch (Exception e) {
-				LOG.error("{}: Unable to store manor data!", getClass().getSimpleName(), e);
+			} catch (Exception ex) {
+				LOG.error("Unable to store manor data!", ex);
 			}
 		}
 	}
@@ -412,8 +417,8 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 					}
 					ips.executeBatch();
 				}
-			} catch (Exception e) {
-				LOG.error("{}: Unable to store manor data!", getClass().getSimpleName(), e);
+			} catch (Exception ex) {
+				LOG.warn("Unable to store manor data!", ex);
 			}
 		}
 	}
@@ -428,8 +433,8 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 				ps.addBatch();
 			}
 			ps.executeBatch();
-		} catch (Exception e) {
-			LOG.info("{}: Unable to store manor data!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Unable to store manor data!", ex);
 		}
 	}
 	
@@ -443,8 +448,8 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 				ps.addBatch();
 			}
 			ps.executeBatch();
-		} catch (Exception e) {
-			LOG.info("{}: Unable to store manor data!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Unable to store manor data!", ex);
 		}
 	}
 	
@@ -563,8 +568,8 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 			ip.executeBatch();
 			
 			return true;
-		} catch (Exception e) {
-			LOG.error("{}: Unable to store manor data!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Unable to store manor data!", ex);
 			return false;
 		}
 	}
@@ -590,8 +595,8 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 				// Delete procure
 				dc.setInt(1, castleId);
 				dc.executeUpdate();
-			} catch (Exception e) {
-				LOG.error("{}: Unable to store manor data!", getClass().getSimpleName(), e);
+			} catch (Exception ex) {
+				LOG.warn("Unable to store manor data!", ex);
 			}
 		}
 	}
@@ -619,6 +624,7 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 	// -------------------------------------------------------
 	// Seed methods
 	// -------------------------------------------------------
+	
 	public final List<L2Seed> getCrops() {
 		final List<L2Seed> seeds = new ArrayList<>();
 		final List<Integer> cropIds = new ArrayList<>();
@@ -666,14 +672,11 @@ public final class CastleManorManager implements IXmlReader, IStorable {
 		return null;
 	}
 	
-	// -------------------------------------------------------
-	// Static methods
-	// -------------------------------------------------------
 	public static final CastleManorManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final CastleManorManager _instance = new CastleManorManager();
+		protected static final CastleManorManager INSTANCE = new CastleManorManager();
 	}
 }

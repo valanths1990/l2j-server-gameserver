@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -41,11 +43,10 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class HennaData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(HennaData.class);
+	
 	private final Map<Integer, L2Henna> _hennaList = new HashMap<>();
 	
-	/**
-	 * Instantiates a new henna data.
-	 */
 	protected HennaData() {
 		load();
 	}
@@ -54,7 +55,7 @@ public final class HennaData implements IXmlReader {
 	public void load() {
 		_hennaList.clear();
 		parseDatapackFile("data/stats/hennaList.xml");
-		LOG.info("{}: Loaded {} Henna data.", getClass().getSimpleName(), _hennaList.size());
+		LOG.info("Loaded {} Henna data.", _hennaList.size());
 	}
 	
 	@Override
@@ -144,15 +145,11 @@ public final class HennaData implements IXmlReader {
 		return list;
 	}
 	
-	/**
-	 * Gets the single instance of HennaData.
-	 * @return single instance of HennaData
-	 */
 	public static HennaData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final HennaData _instance = new HennaData();
+		protected static final HennaData INSTANCE = new HennaData();
 	}
 }

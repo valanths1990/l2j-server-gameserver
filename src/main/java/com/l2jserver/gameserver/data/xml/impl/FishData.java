@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -36,13 +38,15 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author nonom
  */
 public final class FishData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(FishData.class);
+	
 	private final Map<Integer, L2Fish> _fishNormal = new HashMap<>();
+	
 	private final Map<Integer, L2Fish> _fishEasy = new HashMap<>();
+	
 	private final Map<Integer, L2Fish> _fishHard = new HashMap<>();
 	
-	/**
-	 * Instantiates a new fish data.
-	 */
 	protected FishData() {
 		load();
 	}
@@ -53,7 +57,7 @@ public final class FishData implements IXmlReader {
 		_fishNormal.clear();
 		_fishHard.clear();
 		parseDatapackFile("data/stats/fishing/fishes.xml");
-		LOG.info("{}: Loaded {} Fish.", getClass().getSimpleName(), (_fishEasy.size() + _fishNormal.size() + _fishHard.size()));
+		LOG.info("Loaded {} fish.", (_fishEasy.size() + _fishNormal.size() + _fishHard.size()));
 	}
 	
 	@Override
@@ -115,7 +119,7 @@ public final class FishData implements IXmlReader {
 				break;
 			}
 			default: {
-				LOG.warn("{}: Unmanaged fish grade!", getClass().getSimpleName());
+				LOG.warn("Unmanaged fish grade!");
 				return result;
 			}
 		}
@@ -128,20 +132,16 @@ public final class FishData implements IXmlReader {
 		}
 		
 		if (result.isEmpty()) {
-			LOG.warn("{}: Cannot find any fish for level: {} group: {} and grade: {}!", getClass().getSimpleName(), level, group, grade);
+			LOG.warn("Cannot find any fish for level: {} group: {} and grade: {}!", level, group, grade);
 		}
 		return result;
 	}
 	
-	/**
-	 * Gets the single instance of FishData.
-	 * @return single instance of FishData
-	 */
 	public static FishData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final FishData _instance = new FishData();
+		protected static final FishData INSTANCE = new FishData();
 	}
 }

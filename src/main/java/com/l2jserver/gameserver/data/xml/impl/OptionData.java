@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -39,6 +41,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public class OptionData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(OptionData.class);
+	
 	private final Map<Integer, Options> _optionData = new HashMap<>();
 	
 	protected OptionData() {
@@ -49,7 +53,7 @@ public class OptionData implements IXmlReader {
 	public synchronized void load() {
 		_optionData.clear();
 		parseDatapackDirectory("data/stats/options", false);
-		LOG.info("{}: Loaded: {} Options.", getClass().getSimpleName(), _optionData.size());
+		LOG.info("Loaded {} item options.", _optionData.size());
 	}
 	
 	@Override
@@ -125,15 +129,11 @@ public class OptionData implements IXmlReader {
 		return _optionData.get(id);
 	}
 	
-	/**
-	 * Gets the single instance of OptionsData.
-	 * @return single instance of OptionsData
-	 */
 	public static final OptionData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final OptionData _instance = new OptionData();
+		protected static final OptionData INSTANCE = new OptionData();
 	}
 }

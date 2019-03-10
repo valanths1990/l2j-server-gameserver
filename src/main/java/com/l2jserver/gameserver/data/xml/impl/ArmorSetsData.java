@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -31,14 +33,16 @@ import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Loads armor set bonuses.
- * @author godson, Luno, UnAfraid
+ * @author godson
+ * @author Luno
+ * @author UnAfraid
  */
 public final class ArmorSetsData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ArmorSetsData.class);
+	
 	private final Map<Integer, L2ArmorSet> _armorSets = new HashMap<>();
 	
-	/**
-	 * Instantiates a new armor sets data.
-	 */
 	protected ArmorSetsData() {
 		load();
 	}
@@ -47,7 +51,7 @@ public final class ArmorSetsData implements IXmlReader {
 	public void load() {
 		_armorSets.clear();
 		parseDatapackDirectory("data/stats/armorsets", false);
-		LOG.info("{}: Loaded {} Armor sets.", getClass().getSimpleName(), _armorSets.size());
+		LOG.info("Loaded {} armor sets.", _armorSets.size());
 	}
 	
 	@Override
@@ -153,15 +157,11 @@ public final class ArmorSetsData implements IXmlReader {
 		return _armorSets.get(chestId);
 	}
 	
-	/**
-	 * Gets the single instance of ArmorSetsData.
-	 * @return single instance of ArmorSetsData
-	 */
 	public static ArmorSetsData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final ArmorSetsData _instance = new ArmorSetsData();
+		protected static final ArmorSetsData INSTANCE = new ArmorSetsData();
 	}
 }

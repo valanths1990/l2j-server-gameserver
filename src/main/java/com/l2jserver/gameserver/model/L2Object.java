@@ -869,6 +869,6 @@ public abstract class L2Object extends ListenersContainer implements IIdentifiab
 	
 	@Override
 	public String toString() {
-		return (getClass().getSimpleName() + ":" + getName() + "[" + getObjectId() + "]");
+		return getName() + " [" + getObjectId() + "]";
 	}
 }

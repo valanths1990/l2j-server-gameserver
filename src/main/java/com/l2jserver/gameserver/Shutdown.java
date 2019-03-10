@@ -29,7 +29,7 @@ import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.data.sql.impl.OfflineTradersTable;
 import com.l2jserver.gameserver.datatables.BotReportTable;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManorManager;
 import com.l2jserver.gameserver.instancemanager.CursedWeaponsManager;
 import com.l2jserver.gameserver.instancemanager.GlobalVariablesManager;
@@ -464,7 +464,7 @@ public class Shutdown extends Thread {
 			LOG.info("Castle Manor Manager: Data saved({}ms).", tc.getEstimatedTimeAndRestartCounter());
 		}
 		
-		CHSiegeManager.getInstance().onServerShutDown();
+		ClanHallSiegeManager.getInstance().onServerShutDown();
 		LOG.info("CHSiegeManager: Siegable hall attacker lists saved!");
 		
 		// Save all global (non-player specific) Quest data that needs to persist after reboot

@@ -18,18 +18,30 @@
  */
 package com.l2jserver.gameserver.datatables;
 
+import static com.l2jserver.gameserver.network.SystemMessageId.C1_WAS_REPORTED_AS_BOT;
+import static com.l2jserver.gameserver.network.SystemMessageId.CANNOT_REPORT_TARGET_ALREDY_REPORTED_BY_CLAN_ALLY_MEMBER_OR_SAME_IP;
+import static com.l2jserver.gameserver.network.SystemMessageId.TARGET_NOT_REPORT_CANNOT_REPORT_PEACE_PVP_ZONE_OR_OLYMPIAD_OR_CLAN_WAR_ENEMY;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_CANNOT_REPORT_CHARACTER_IN_PEACE_OR_BATTLE_ZONE;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_CANNOT_REPORT_CHAR_AT_THIS_TIME_1;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_CANNOT_REPORT_CHAR_WHO_ACQUIRED_XP;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_CANNOT_REPORT_CLAN_WAR_ENEMY;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_CAN_REPORT_IN_S1_MINS_YOU_HAVE_S2_POINTS_LEFT;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_HAVE_BEEN_REPORTED_AND_CANNOT_REPORT;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_HAVE_USED_ALL_POINTS_POINTS_ARE_RESET_AT_NOON;
+import static com.l2jserver.gameserver.network.SystemMessageId.YOU_HAVE_USED_REPORT_POINT_ON_C1_YOU_HAVE_C2_POINTS_LEFT;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -45,12 +57,13 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 
 /**
+ * Bot Report table.
  * @author BiggBoss
  */
 public final class BotReportTable {
 	
 	// Zoey76: TODO: Split XML parsing from SQL operations, use IXmlReader instead of SAXParser.
-	private static final Logger LOGGER = Logger.getLogger(BotReportTable.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(BotReportTable.class);
 	
 	private static final int COLUMN_BOT_ID = 1;
 	private static final int COLUMN_REPORTER_ID = 2;
@@ -86,8 +99,8 @@ public final class BotReportTable {
 				
 				SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 				parser.parse(punishments, new PunishmentsLoader());
-			} catch (Exception e) {
-				LOGGER.log(Level.WARNING, "BotReportTable: Could not load punishments from /config/botreport_punishments.xml", e);
+			} catch (Exception ex) {
+				LOG.warn("Could not load punishments from /config/botreport_punishments.xml", ex);
 			}
 			
 			loadReportedCharData();
@@ -143,9 +156,9 @@ public final class BotReportTable {
 				}
 			}
 			
-			LOGGER.info("BotReportTable: Loaded " + _reports.size() + " bot reports");
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "BotReportTable: Could not load reported char data!", e);
+			LOG.info("Loaded {} bot reports.", _reports.size());
+		} catch (Exception ex) {
+			LOG.warn("Could not load reported char data!", ex);
 		}
 	}
 	
@@ -168,8 +181,8 @@ public final class BotReportTable {
 					ps.execute();
 				}
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "BotReportTable: Could not update reported char data in database!", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not update reported char data in database!", ex);
 		}
 	}
 	
@@ -192,22 +205,22 @@ public final class BotReportTable {
 		}
 		
 		if (bot.isInsideZone(ZoneId.PEACE) || bot.isInsideZone(ZoneId.PVP)) {
-			reporter.sendPacket(SystemMessageId.YOU_CANNOT_REPORT_CHARACTER_IN_PEACE_OR_BATTLE_ZONE);
+			reporter.sendPacket(YOU_CANNOT_REPORT_CHARACTER_IN_PEACE_OR_BATTLE_ZONE);
 			return false;
 		}
 		
 		if (bot.isInOlympiadMode()) {
-			reporter.sendPacket(SystemMessageId.TARGET_NOT_REPORT_CANNOT_REPORT_PEACE_PVP_ZONE_OR_OLYMPIAD_OR_CLAN_WAR_ENEMY);
+			reporter.sendPacket(TARGET_NOT_REPORT_CANNOT_REPORT_PEACE_PVP_ZONE_OR_OLYMPIAD_OR_CLAN_WAR_ENEMY);
 			return false;
 		}
 		
 		if ((bot.getClan() != null) && bot.getClan().isAtWarWith(reporter.getClan())) {
-			reporter.sendPacket(SystemMessageId.YOU_CANNOT_REPORT_CLAN_WAR_ENEMY);
+			reporter.sendPacket(YOU_CANNOT_REPORT_CLAN_WAR_ENEMY);
 			return false;
 		}
 		
 		if (bot.getExp() == bot.getStat().getStartingExp()) {
-			reporter.sendPacket(SystemMessageId.YOU_CANNOT_REPORT_CHAR_WHO_ACQUIRED_XP);
+			reporter.sendPacket(YOU_CANNOT_REPORT_CHAR_WHO_ACQUIRED_XP);
 			return false;
 		}
 		
@@ -217,37 +230,37 @@ public final class BotReportTable {
 		
 		synchronized (this) {
 			if (_reports.containsKey(reporterId)) {
-				reporter.sendPacket(SystemMessageId.YOU_HAVE_BEEN_REPORTED_AND_CANNOT_REPORT);
+				reporter.sendPacket(YOU_HAVE_BEEN_REPORTED_AND_CANNOT_REPORT);
 				return false;
 			}
 			
 			final int ip = hashIp(reporter);
 			if (!timeHasPassed(_ipRegistry, ip)) {
-				reporter.sendPacket(SystemMessageId.CANNOT_REPORT_TARGET_ALREDY_REPORTED_BY_CLAN_ALLY_MEMBER_OR_SAME_IP);
+				reporter.sendPacket(CANNOT_REPORT_TARGET_ALREDY_REPORTED_BY_CLAN_ALLY_MEMBER_OR_SAME_IP);
 				return false;
 			}
 			
 			if (rcd != null) {
 				if (rcd.alredyReportedBy(reporterId)) {
-					reporter.sendPacket(SystemMessageId.YOU_CANNOT_REPORT_CHAR_AT_THIS_TIME_1);
+					reporter.sendPacket(YOU_CANNOT_REPORT_CHAR_AT_THIS_TIME_1);
 					return false;
 				}
 				
 				if (!Config.BOTREPORT_ALLOW_REPORTS_FROM_SAME_CLAN_MEMBERS && rcd.reportedBySameClan(reporter.getClan())) {
-					reporter.sendPacket(SystemMessageId.CANNOT_REPORT_TARGET_ALREDY_REPORTED_BY_CLAN_ALLY_MEMBER_OR_SAME_IP);
+					reporter.sendPacket(CANNOT_REPORT_TARGET_ALREDY_REPORTED_BY_CLAN_ALLY_MEMBER_OR_SAME_IP);
 					return false;
 				}
 			}
 			
 			if (rcdRep != null) {
 				if (rcdRep.getPointsLeft() == 0) {
-					reporter.sendPacket(SystemMessageId.YOU_HAVE_USED_ALL_POINTS_POINTS_ARE_RESET_AT_NOON);
+					reporter.sendPacket(YOU_HAVE_USED_ALL_POINTS_POINTS_ARE_RESET_AT_NOON);
 					return false;
 				}
 				
 				long reuse = (System.currentTimeMillis() - rcdRep.getLastReporTime());
 				if (reuse < Config.BOTREPORT_REPORT_DELAY) {
-					SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_CAN_REPORT_IN_S1_MINS_YOU_HAVE_S2_POINTS_LEFT);
+					SystemMessage sm = SystemMessage.getSystemMessage(YOU_CAN_REPORT_IN_S1_MINS_YOU_HAVE_S2_POINTS_LEFT);
 					sm.addInt((int) (reuse / 60000));
 					sm.addInt(rcdRep.getPointsLeft());
 					reporter.sendPacket(sm);
@@ -272,11 +285,11 @@ public final class BotReportTable {
 			_charRegistry.put(reporterId, rcdRep);
 		}
 		
-		SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.C1_WAS_REPORTED_AS_BOT);
+		SystemMessage sm = SystemMessage.getSystemMessage(C1_WAS_REPORTED_AS_BOT);
 		sm.addCharName(bot);
 		reporter.sendPacket(sm);
 		
-		sm = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_USED_REPORT_POINT_ON_C1_YOU_HAVE_C2_POINTS_LEFT);
+		sm = SystemMessage.getSystemMessage(YOU_HAVE_USED_REPORT_POINT_ON_C1_YOU_HAVE_C2_POINTS_LEFT);
 		sm.addCharName(bot);
 		sm.addInt(rcdRep.getPointsLeft());
 		reporter.sendPacket(sm);
@@ -332,7 +345,7 @@ public final class BotReportTable {
 		if (sk != null) {
 			_punishments.put(neededReports, new PunishHolder(sk, sysMsg));
 		} else {
-			LOGGER.warning("BotReportTable: Could not add punishment for " + neededReports + " report(s): Skill " + skillId + "-" + skillLevel + " does not exist!");
+			LOG.warn("Could not add punishment for ^* report(s): Skill {}-{} does not exist!", neededReports, skillId, skillLevel);
 		}
 	}
 	
@@ -358,14 +371,10 @@ public final class BotReportTable {
 			}
 			
 			ThreadPoolManager.getInstance().scheduleGeneral(new ResetPointTask(), c.getTimeInMillis() - System.currentTimeMillis());
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			ThreadPoolManager.getInstance().scheduleGeneral(new ResetPointTask(), 24 * 3600 * 1000);
-			LOGGER.log(Level.WARNING, "BotReportTable: Could not properly schedule bot report points reset task. Scheduled in 24 hours.", e);
+			LOG.warn("Could not properly schedule bot report points reset task. Scheduled in 24 hours!", ex);
 		}
-	}
-	
-	public static BotReportTable getInstance() {
-		return SingletonHolder.INSTANCE;
 	}
 	
 	/**
@@ -512,6 +521,10 @@ public final class BotReportTable {
 			resetPointsAndSchedule();
 			
 		}
+	}
+	
+	public static BotReportTable getInstance() {
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static final class SingletonHolder {

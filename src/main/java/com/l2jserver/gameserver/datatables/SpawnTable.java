@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,6 +47,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class SpawnTable implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(SpawnTable.class);
+	
 	private static final String SELECT_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM spawnlist";
 	
 	private static final String SELECT_CUSTOM_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM custom_spawnlist";
@@ -53,23 +57,21 @@ public final class SpawnTable implements IXmlReader {
 	
 	private int _xmlSpawnCount = 0;
 	
-	/**
-	 * Wrapper to load all spawns.
-	 */
 	@Override
 	public void load() {
 		if (!Config.ALT_DEV_NO_SPAWNS) {
 			fillSpawnTable(false);
 			final int spawnCount = _spawnTable.size();
-			LOG.info("{}: Loaded " + spawnCount + " npc spawns.", getClass().getSimpleName());
+			LOG.info("Loaded {} NPC spawns.", spawnCount);
+			
 			if (Config.CUSTOM_SPAWNLIST_TABLE) {
 				fillSpawnTable(true);
-				LOG.info("{}: Loaded " + (_spawnTable.size() - spawnCount) + " custom npc spawns.", getClass().getSimpleName());
+				LOG.info("Loaded {} custom NPC spawns.", (_spawnTable.size() - spawnCount));
 			}
 			
 			// Load XML list
 			parseDatapackDirectory("data/spawnlist", false);
-			LOG.info("{}: Loaded " + _xmlSpawnCount + " npc spawns from XML.", getClass().getSimpleName());
+			LOG.info("Loaded {} NPC spawns from XML.", _xmlSpawnCount);
 		}
 	}
 	
@@ -81,7 +83,7 @@ public final class SpawnTable implements IXmlReader {
 	private boolean checkTemplate(int npcId) {
 		L2NpcTemplate npcTemplate = NpcData.getInstance().getTemplate(npcId);
 		if (npcTemplate == null) {
-			LOG.warn("{}: Data missing in NPC table for ID: {}.", getClass().getSimpleName(), npcId);
+			LOG.warn("Data missing in NPC table for ID {}!", npcId);
 			return false;
 		}
 		
@@ -163,7 +165,7 @@ public final class SpawnTable implements IXmlReader {
 								
 								if ((x == 0) && (y == 0) && (territoryName == null)) // Both coordinates and zone are unspecified
 								{
-									LOG.warn("{}: Spawn could not be initialized, both coordinates and zone are unspecified for ID {}", getClass().getSimpleName(), templateId);
+									LOG.warn("Spawn could not be initialized, both coordinates and zone are unspecified for ID {}!", templateId);
 									continue;
 								}
 								
@@ -241,8 +243,8 @@ public final class SpawnTable implements IXmlReader {
 				spawnInfo.set("isCustomSpawn", isCustom);
 				npcSpawnCount += addSpawn(spawnInfo);
 			}
-		} catch (Exception e) {
-			LOG.warn("{}: Spawn could not be initialized!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Spawn could not be initialized!", ex);
 		}
 		return npcSpawnCount;
 	}
@@ -291,8 +293,8 @@ public final class SpawnTable implements IXmlReader {
 			}
 			
 			addSpawn(spawnDat);
-		} catch (Exception e) {
-			LOG.warn("{}: Spawn could not be initialized!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Spawn could not be initialized!", ex);
 		}
 		return ret;
 	}
@@ -363,8 +365,8 @@ public final class SpawnTable implements IXmlReader {
 				insert.setInt(8, spawn.getRespawnMaxDelay() - spawn.getRespawnMinDelay());
 				insert.setInt(9, spawn.getLocationId());
 				insert.execute();
-			} catch (Exception e) {
-				LOG.warn("{}: Could not store spawn in the DB!", getClass().getSimpleName(), e);
+			} catch (Exception ex) {
+				LOG.warn("Could not store spawn in the DB!", ex);
 			}
 		}
 	}
@@ -388,8 +390,8 @@ public final class SpawnTable implements IXmlReader {
 				delete.setInt(4, spawn.getId());
 				delete.setInt(5, spawn.getHeading());
 				delete.execute();
-			} catch (Exception e) {
-				LOG.warn("{}: Spawn {} could not be removed from DB!", getClass().getSimpleName(), spawn, e);
+			} catch (Exception ex) {
+				LOG.warn("Spawn {} could not be removed from DB!", spawn, ex);
 			}
 		}
 	}
@@ -437,10 +439,10 @@ public final class SpawnTable implements IXmlReader {
 	}
 	
 	public static SpawnTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final SpawnTable _instance = new SpawnTable();
+		protected static final SpawnTable INSTANCE = new SpawnTable();
 	}
 }

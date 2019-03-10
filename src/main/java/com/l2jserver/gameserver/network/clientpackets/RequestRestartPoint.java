@@ -19,7 +19,7 @@
 package com.l2jserver.gameserver.network.clientpackets;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
@@ -168,7 +168,7 @@ public final class RequestRestartPoint extends L2GameClientPacket {
 				L2SiegeClan siegeClan = null;
 				castle = CastleManager.getInstance().getCastle(activeChar);
 				fort = FortManager.getInstance().getFort(activeChar);
-				hall = CHSiegeManager.getInstance().getNearbyClanHall(activeChar);
+				hall = ClanHallSiegeManager.getInstance().getNearbyClanHall(activeChar);
 				L2SiegeFlagInstance flag = TerritoryWarManager.getInstance().getHQForClan(activeChar.getClan());
 				
 				if ((castle != null) && castle.getSiege().isInProgress()) {

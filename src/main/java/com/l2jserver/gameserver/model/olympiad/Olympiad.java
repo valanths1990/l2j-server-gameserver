@@ -47,6 +47,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Broadcast;
 
 /**
+ * Olympiad.
  * @author godson
  */
 public class Olympiad extends ListenersContainer {

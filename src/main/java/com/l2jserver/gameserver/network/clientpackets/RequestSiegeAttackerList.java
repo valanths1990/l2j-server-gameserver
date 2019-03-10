@@ -19,7 +19,7 @@
 
 package com.l2jserver.gameserver.network.clientpackets;
 
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.clanhall.SiegableHall;
@@ -46,7 +46,7 @@ public final class RequestSiegeAttackerList extends L2GameClientPacket {
 			SiegeAttackerList sal = new SiegeAttackerList(castle);
 			sendPacket(sal);
 		} else {
-			SiegableHall hall = CHSiegeManager.getInstance().getSiegableHall(_castleId);
+			SiegableHall hall = ClanHallSiegeManager.getInstance().getSiegableHall(_castleId);
 			if (hall != null) {
 				SiegeAttackerList sal = new SiegeAttackerList(hall);
 				sendPacket(sal);

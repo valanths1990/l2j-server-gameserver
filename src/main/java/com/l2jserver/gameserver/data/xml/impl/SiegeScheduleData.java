@@ -18,10 +18,13 @@
  */
 package com.l2jserver.gameserver.data.xml.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -37,6 +40,8 @@ import com.l2jserver.gameserver.util.Util;
  */
 public class SiegeScheduleData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(SiegeScheduleData.class);
+	
 	private final List<SiegeScheduleDate> _scheduleData = new ArrayList<>();
 	
 	protected SiegeScheduleData() {
@@ -46,11 +51,12 @@ public class SiegeScheduleData implements IXmlReader {
 	@Override
 	public synchronized void load() {
 		_scheduleData.clear();
-		parseDatapackFile("config/SiegeSchedule.xml");
-		LOG.info("{}: Loaded: {} siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
+		parseFile(new File("config/SiegeSchedule.xml"));
+		LOG.info("Loaded: {} siege schedulers.", _scheduleData.size());
+		
 		if (_scheduleData.isEmpty()) {
 			_scheduleData.add(new SiegeScheduleDate(new StatsSet()));
-			LOG.info("{}: Emergency Loaded: {} default siege schedulers.", getClass().getSimpleName(), _scheduleData.size());
+			LOG.info("Emergency Loaded {} default siege schedulers.", _scheduleData.size());
 		}
 	}
 	
@@ -86,8 +92,8 @@ public class SiegeScheduleData implements IXmlReader {
 	private int getValueForField(String field) {
 		try {
 			return Calendar.class.getField(field).getInt(Calendar.class);
-		} catch (Exception e) {
-			LOG.warn("{}: Unable to get value!", getClass().getSimpleName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Unable to get value!", ex);
 			return -1;
 		}
 	}
@@ -97,10 +103,10 @@ public class SiegeScheduleData implements IXmlReader {
 	}
 	
 	public static final SiegeScheduleData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final SiegeScheduleData _instance = new SiegeScheduleData();
+		protected static final SiegeScheduleData INSTANCE = new SiegeScheduleData();
 	}
 }

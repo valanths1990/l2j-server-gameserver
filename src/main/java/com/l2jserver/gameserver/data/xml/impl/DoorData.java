@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -42,11 +44,13 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * Loads doors.
  * @author JIV
  * @author GodKratos
- * @authro UnAfraid
+ * @author UnAfraid
  */
 public class DoorData implements IXmlReader {
 	
-	private static final Map<String, Set<Integer>> _groups = new HashMap<>();
+	private static final Logger LOG = LoggerFactory.getLogger(DoorData.class);
+	
+	private static final Map<String, Set<Integer>> GROUPS = new HashMap<>();
 	
 	private final Map<Integer, L2DoorInstance> _doors = new HashMap<>();
 	
@@ -61,10 +65,10 @@ public class DoorData implements IXmlReader {
 	@Override
 	public void load() {
 		_doors.clear();
-		_groups.clear();
+		GROUPS.clear();
 		_regions.clear();
 		parseDatapackFile("data/doors.xml");
-		LOG.info("{}: Loaded {} Door templates for {} regions.", getClass().getSimpleName(), _doors.size(), _regions.size());
+		LOG.info("Loaded {} door templates for {} regions.", _doors.size(), _regions.size());
 	}
 	
 	@Override
@@ -107,9 +111,6 @@ public class DoorData implements IXmlReader {
 		set.set("collisionHeight", height);
 	}
 	
-	/**
-	 * @param set
-	 */
 	private void makeDoor(StatsSet set) {
 		insertCollisionData(set);
 		L2DoorTemplate template = new L2DoorTemplate(set);
@@ -137,16 +138,16 @@ public class DoorData implements IXmlReader {
 	}
 	
 	public static void addDoorGroup(String groupName, int doorId) {
-		Set<Integer> set = _groups.get(groupName);
+		Set<Integer> set = GROUPS.get(groupName);
 		if (set == null) {
 			set = new HashSet<>();
-			_groups.put(groupName, set);
+			GROUPS.put(groupName, set);
 		}
 		set.add(doorId);
 	}
 	
 	public static Set<Integer> getDoorsByGroup(String groupName) {
-		return _groups.get(groupName);
+		return GROUPS.get(groupName);
 	}
 	
 	public Collection<L2DoorInstance> getDoors() {
@@ -219,10 +220,10 @@ public class DoorData implements IXmlReader {
 	}
 	
 	public static DoorData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final DoorData _instance = new DoorData();
+		protected static final DoorData INSTANCE = new DoorData();
 	}
 }

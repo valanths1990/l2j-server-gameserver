@@ -21,8 +21,9 @@ package com.l2jserver.gameserver.instancemanager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
@@ -41,7 +42,7 @@ import com.l2jserver.gameserver.model.zone.type.L2ClanHallZone;
  */
 public final class ClanHallManager {
 	
-	private static final Logger _log = Logger.getLogger(ClanHallManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ClanHallManager.class);
 	
 	private final Map<Integer, AuctionableHall> _clanHall = new ConcurrentHashMap<>();
 	
@@ -97,11 +98,11 @@ public final class ClanHallManager {
 					AuctionManager.getInstance().initNPC(id);
 				}
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded: " + getClanHalls().size() + " clan halls");
-			_log.info(getClass().getSimpleName() + ": Loaded: " + getFreeClanHalls().size() + " free clan halls");
+			LOG.info("Loaded {} clan halls.", getClanHalls().size());
+			LOG.info("Loaded {} free clan halls.", getFreeClanHalls().size());
 			_loaded = true;
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Exception: ClanHallManager.load(): " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading clan halls from database!", ex);
 		}
 	}
 	
@@ -109,9 +110,6 @@ public final class ClanHallManager {
 		return _allClanHalls;
 	}
 	
-	/**
-	 * @return all FreeClanHalls
-	 */
 	public final Map<Integer, AuctionableHall> getFreeClanHalls() {
 		return _freeClanHall;
 	}
@@ -123,9 +121,6 @@ public final class ClanHallManager {
 		return _clanHall;
 	}
 	
-	/**
-	 * @return all ClanHalls
-	 */
 	public final Map<Integer, AuctionableHall> getAllAuctionableClanHalls() {
 		return _allAuctionableClanHalls;
 	}
@@ -134,10 +129,6 @@ public final class ClanHallManager {
 		_allClanHalls.put(hall.getId(), hall);
 	}
 	
-	/**
-	 * @param chId
-	 * @return true is free ClanHall
-	 */
 	public final boolean isFree(int chId) {
 		if (_freeClanHall.containsKey(chId)) {
 			return true;
@@ -145,10 +136,6 @@ public final class ClanHallManager {
 		return false;
 	}
 	
-	/**
-	 * Free a ClanHall
-	 * @param chId
-	 */
 	public final synchronized void setFree(int chId) {
 		_freeClanHall.put(chId, _clanHall.get(chId));
 		ClanTable.getInstance().getClan(_freeClanHall.get(chId).getOwnerId()).setHideoutId(0);
@@ -172,10 +159,6 @@ public final class ClanHallManager {
 		_clanHall.get(chId).setOwner(clan);
 	}
 	
-	/**
-	 * @param clanHallId
-	 * @return Clan Hall by Id
-	 */
 	public final ClanHall getClanHallById(int clanHallId) {
 		return _allClanHalls.get(clanHallId);
 	}
@@ -184,12 +167,6 @@ public final class ClanHallManager {
 		return _allAuctionableClanHalls.get(clanHallId);
 	}
 	
-	/**
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return Clan Hall by x,y,z
-	 */
 	public final ClanHall getClanHall(int x, int y, int z) {
 		for (ClanHall temp : _allClanHalls.values()) {
 			if (temp.checkIfInZone(x, y, z)) {
@@ -232,10 +209,6 @@ public final class ClanHallManager {
 		return null;
 	}
 	
-	/**
-	 * @param clan
-	 * @return Clan Hall by Owner
-	 */
 	public final AuctionableHall getClanHallByOwner(L2Clan clan) {
 		for (Map.Entry<Integer, AuctionableHall> ch : _clanHall.entrySet()) {
 			if (clan.getId() == ch.getValue().getOwnerId()) {
@@ -252,7 +225,7 @@ public final class ClanHallManager {
 				return ch.getValue();
 			}
 		}
-		for (Map.Entry<Integer, SiegableHall> ch : CHSiegeManager.getInstance().getConquerableHalls().entrySet()) {
+		for (Map.Entry<Integer, SiegableHall> ch : ClanHallSiegeManager.getInstance().getConquerableHalls().entrySet()) {
 			if (clan.getId() == ch.getValue().getOwnerId()) {
 				return ch.getValue();
 			}
@@ -261,10 +234,10 @@ public final class ClanHallManager {
 	}
 	
 	public static ClanHallManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final ClanHallManager _instance = new ClanHallManager();
+		protected static final ClanHallManager INSTANCE = new ClanHallManager();
 	}
 }

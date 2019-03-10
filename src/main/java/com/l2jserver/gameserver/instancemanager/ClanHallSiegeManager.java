@@ -20,7 +20,9 @@ package com.l2jserver.gameserver.instancemanager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
@@ -38,15 +40,15 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Clan Hall Siege Manager.
  * @author BiggBoss
  */
-public final class CHSiegeManager {
+public final class ClanHallSiegeManager {
 	
-	private static final Logger _log = Logger.getLogger(CHSiegeManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ClanHallSiegeManager.class);
 	
 	private static final String SQL_LOAD_HALLS = "SELECT * FROM siegable_clanhall";
 	
 	private final Map<Integer, SiegableHall> _siegableHalls = new HashMap<>();
 	
-	protected CHSiegeManager() {
+	protected ClanHallSiegeManager() {
 		loadClanHalls();
 	}
 	
@@ -73,9 +75,9 @@ public final class CHSiegeManager {
 				_siegableHalls.put(id, hall);
 				ClanHallManager.addClanHall(hall);
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded " + _siegableHalls.size() + " conquerable clan halls.");
-		} catch (Exception e) {
-			_log.warning("CHSiegeManager: Could not load siegable clan halls!:" + e.getMessage());
+			LOG.info("Loaded {} conquerable clan halls.", _siegableHalls.size());
+		} catch (Exception ex) {
+			LOG.warn("Could not load siegable clan halls!", ex);
 		}
 	}
 	
@@ -162,11 +164,11 @@ public final class CHSiegeManager {
 		}
 	}
 	
-	public static CHSiegeManager getInstance() {
-		return SingletonHolder._instance;
+	public static ClanHallSiegeManager getInstance() {
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static final class SingletonHolder {
-		protected static final CHSiegeManager _instance = new CHSiegeManager();
+		protected static final ClanHallSiegeManager INSTANCE = new ClanHallSiegeManager();
 	}
 }

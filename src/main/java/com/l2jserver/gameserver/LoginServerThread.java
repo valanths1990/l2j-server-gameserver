@@ -141,7 +141,7 @@ public class LoginServerThread extends Thread {
 			boolean checksumOk = false;
 			try {
 				// Connection
-				LOG.info("Connecting to login on {}:{}", _hostname, _port);
+				LOG.info("Connecting to login server on {}:{}", _hostname, _port);
 				_loginSocket = new Socket(_hostname, _port);
 				InputStream in = _loginSocket.getInputStream();
 				_out = new BufferedOutputStream(_loginSocket.getOutputStream());

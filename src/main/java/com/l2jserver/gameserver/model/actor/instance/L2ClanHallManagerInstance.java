@@ -29,7 +29,7 @@ import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.data.sql.impl.TeleportLocationTable;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.InstanceType;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
 import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.L2TeleportLocation;
@@ -1265,7 +1265,7 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance {
 		if (_clanHallId < 0) {
 			ClanHall temp = ClanHallManager.getInstance().getNearbyClanHall(getX(), getY(), 500);
 			if (temp == null) {
-				temp = CHSiegeManager.getInstance().getNearbyClanHall(this);
+				temp = ClanHallSiegeManager.getInstance().getNearbyClanHall(this);
 			}
 			
 			if (temp != null) {

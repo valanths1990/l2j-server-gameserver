@@ -18,6 +18,24 @@
  */
 package com.l2jserver.gameserver;
 
+import static com.l2jserver.gameserver.network.SystemMessageId.COMPETITION_PERIOD_BEGUN;
+import static com.l2jserver.gameserver.network.SystemMessageId.DAWN_OBTAINED_AVARICE;
+import static com.l2jserver.gameserver.network.SystemMessageId.DAWN_OBTAINED_GNOSIS;
+import static com.l2jserver.gameserver.network.SystemMessageId.DAWN_OBTAINED_STRIFE;
+import static com.l2jserver.gameserver.network.SystemMessageId.DAWN_WON;
+import static com.l2jserver.gameserver.network.SystemMessageId.DUSK_OBTAINED_AVARICE;
+import static com.l2jserver.gameserver.network.SystemMessageId.DUSK_OBTAINED_GNOSIS;
+import static com.l2jserver.gameserver.network.SystemMessageId.DUSK_OBTAINED_STRIFE;
+import static com.l2jserver.gameserver.network.SystemMessageId.DUSK_WON;
+import static com.l2jserver.gameserver.network.SystemMessageId.PREPARATIONS_PERIOD_BEGUN;
+import static com.l2jserver.gameserver.network.SystemMessageId.QUEST_EVENT_PERIOD_BEGUN;
+import static com.l2jserver.gameserver.network.SystemMessageId.QUEST_EVENT_PERIOD_ENDED;
+import static com.l2jserver.gameserver.network.SystemMessageId.RESULTS_PERIOD_BEGUN;
+import static com.l2jserver.gameserver.network.SystemMessageId.SEAL_OF_STRIFE_FORBIDS_SUMMONING;
+import static com.l2jserver.gameserver.network.SystemMessageId.SEAL_VALIDATION_PERIOD_BEGUN;
+import static com.l2jserver.gameserver.network.SystemMessageId.SEAL_VALIDATION_PERIOD_ENDED;
+import static com.l2jserver.gameserver.network.SystemMessageId.VALIDATION_PERIOD_BEGUN;
+
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
@@ -49,9 +67,9 @@ import com.l2jserver.gameserver.util.Broadcast;
  * @author Tempy
  */
 public class SevenSigns {
-	protected static final Logger LOG = LoggerFactory.getLogger(SevenSigns.class);
 	
-	// Basic Seven Signs Constants \\
+	private static final Logger LOG = LoggerFactory.getLogger(SevenSigns.class);
+	
 	public static final String SEVEN_SIGNS_HTML_PATH = "data/html/seven_signs/";
 	
 	public static final int CABAL_NULL = 0;
@@ -141,29 +159,29 @@ public class SevenSigns {
 	protected SevenSigns() {
 		try {
 			restoreSevenSignsData();
-		} catch (Exception e) {
-			LOG.error("SevenSigns: Failed to load configuration!", e);
+		} catch (Exception ex) {
+			LOG.error("Failed to load configuration!", ex);
 		}
 		
-		LOG.info("SevenSigns: Currently in the {} period.", getCurrentPeriodName());
+		LOG.info("Currently in the {} period.", getCurrentPeriodName());
 		
 		initializeSeals();
 		
 		if (isSealValidationPeriod()) {
 			if (getCabalHighestScore() == CABAL_NULL) {
-				LOG.info("SevenSigns: The competition ended with a tie last week.");
+				LOG.info("The competition ended with a tie last week.");
 			} else {
-				LOG.info("SevenSigns: The {} were victorious last week.", getCabalName(getCabalHighestScore()));
+				LOG.info("The {} were victorious last week.", getCabalName(getCabalHighestScore()));
 			}
 		} else if (getCabalHighestScore() == CABAL_NULL) {
-			LOG.info("SevenSigns: The competition, if the current trend continues, will end in a tie this week.");
+			LOG.info("The competition, if the current trend continues, will end in a tie this week.");
 		} else {
-			LOG.info("SevenSigns: The {} are in the lead this week.", getCabalName(getCabalHighestScore()));
+			LOG.info("The {} are in the lead this week.", getCabalName(getCabalHighestScore()));
 		}
 		
 		long milliToChange = 0;
 		if (isNextPeriodChangeInPast()) {
-			LOG.info("SevenSigns: Next period change was in the past (server was offline), changing periods now!");
+			LOG.info("Next period change was in the past (server was offline), changing periods now!");
 		} else {
 			setCalendarForNextPeriodChange();
 			milliToChange = getMilliToPeriodChange();
@@ -181,7 +199,7 @@ public class SevenSigns {
 		int numHours = (int) Math.floor(countDown % 24);
 		int numDays = (int) Math.floor((countDown - numHours) / 24);
 		
-		LOG.info("SevenSigns: Next period begins in {} days, {} hours and {} mins.", numDays, numHours, numMins);
+		LOG.info("Next period begins in {} days, {} hours and {} mins.", numDays, numHours, numMins);
 		
 	}
 	
@@ -346,10 +364,6 @@ public class SevenSigns {
 		}
 	}
 	
-	public static SevenSigns getInstance() {
-		return SingletonHolder._instance;
-	}
-	
 	public static long calcContributionScore(long blueCount, long greenCount, long redCount) {
 		long contrib = blueCount * BLUE_CONTRIB_POINTS;
 		contrib += greenCount * GREEN_CONTRIB_POINTS;
@@ -455,7 +469,7 @@ public class SevenSigns {
 				_nextPeriodChange.add(Calendar.MILLISECOND, PERIOD_MINOR_LENGTH);
 				break;
 		}
-		LOG.info("SevenSigns: Next period change set to {}.", _nextPeriodChange.getTime());
+		LOG.info("Next period change set to {}.", _nextPeriodChange.getTime());
 	}
 	
 	public final String getCurrentPeriodName() {
@@ -722,8 +736,8 @@ public class SevenSigns {
 					_lastSave.setTimeInMillis(rs.getLong("date"));
 				}
 			}
-		} catch (SQLException e) {
-			LOG.error("SevenSigns: Unable to load Seven Signs data from database!", e);
+		} catch (SQLException ex) {
+			LOG.warn("Unable to load Seven Signs data from database!", ex);
 		}
 	}
 	
@@ -746,8 +760,8 @@ public class SevenSigns {
 				ps.addBatch();
 			}
 			ps.executeBatch();
-		} catch (SQLException e) {
-			LOG.error("SevenSigns: Unable to save data to database!", e);
+		} catch (SQLException ex) {
+			LOG.warn("Unable to save data to database!", ex);
 		}
 	}
 	
@@ -768,8 +782,8 @@ public class SevenSigns {
 			ps.setDouble(7, sevenDat.getDouble("contribution_score"));
 			ps.setInt(8, sevenDat.getInt("charId"));
 			ps.execute();
-		} catch (SQLException e) {
-			LOG.error("SevenSigns: Unable to save data to database!", e);
+		} catch (SQLException ex) {
+			LOG.error("Unable to save data to database!", ex);
 		}
 	}
 	
@@ -800,8 +814,8 @@ public class SevenSigns {
 			_lastSave = Calendar.getInstance();
 			ps.setLong(18 + SevenSignsFestival.FESTIVAL_COUNT, _lastSave.getTimeInMillis());
 			ps.execute();
-		} catch (SQLException e) {
-			LOG.error("SevenSigns: Unable to save data to database!", e);
+		} catch (SQLException ex) {
+			LOG.warn("Unable to save data to database!", ex);
 		}
 	}
 	
@@ -857,8 +871,8 @@ public class SevenSigns {
 				ps.setString(2, getCabalShortName(chosenCabal));
 				ps.setInt(3, chosenSeal);
 				ps.execute();
-			} catch (SQLException e) {
-				LOG.error("SevenSigns: Failed to save data!", e);
+			} catch (SQLException ex) {
+				LOG.warn("Failed to save data!", ex);
 			}
 		}
 		
@@ -980,16 +994,16 @@ public class SevenSigns {
 		
 		switch (getCurrentPeriod()) {
 			case PERIOD_COMP_RECRUITING:
-				sm = SystemMessage.getSystemMessage(SystemMessageId.PREPARATIONS_PERIOD_BEGUN);
+				sm = SystemMessage.getSystemMessage(PREPARATIONS_PERIOD_BEGUN);
 				break;
 			case PERIOD_COMPETITION:
-				sm = SystemMessage.getSystemMessage(SystemMessageId.COMPETITION_PERIOD_BEGUN);
+				sm = SystemMessage.getSystemMessage(COMPETITION_PERIOD_BEGUN);
 				break;
 			case PERIOD_COMP_RESULTS:
-				sm = SystemMessage.getSystemMessage(SystemMessageId.RESULTS_PERIOD_BEGUN);
+				sm = SystemMessage.getSystemMessage(RESULTS_PERIOD_BEGUN);
 				break;
 			case PERIOD_SEAL_VALIDATION:
-				sm = SystemMessage.getSystemMessage(SystemMessageId.VALIDATION_PERIOD_BEGUN);
+				sm = SystemMessage.getSystemMessage(VALIDATION_PERIOD_BEGUN);
 				break;
 		}
 		
@@ -1013,12 +1027,12 @@ public class SevenSigns {
 		for (Entry<Integer, Integer> e : _signsSealOwners.entrySet()) {
 			if (e.getValue() != CABAL_NULL) {
 				if (isSealValidationPeriod()) {
-					LOG.info("SevenSigns: The {} have won the {}.", getCabalName(e.getValue()), getSealName(e.getKey(), false));
+					LOG.info("The {} have won the {}.", getCabalName(e.getValue()), getSealName(e.getKey(), false));
 				} else {
-					LOG.info("SevenSigns: The {} is currently owned by {}.", getSealName(e.getKey(), false), getCabalName(e.getValue()));
+					LOG.info("The {} is currently owned by {}.", getSealName(e.getKey(), false), getCabalName(e.getValue()));
 				}
 			} else {
-				LOG.info("SevenSigns: The {} remains unclaimed.", getSealName(e.getKey(), false));
+				LOG.info("The {} remains unclaimed.", getSealName(e.getKey(), false));
 			}
 		}
 	}
@@ -1141,23 +1155,23 @@ public class SevenSigns {
 			switch (currSeal) {
 				case SEAL_AVARICE:
 					if (newSealOwner == CABAL_DAWN) {
-						sendMessageToAll(SystemMessageId.DAWN_OBTAINED_AVARICE);
+						sendMessageToAll(DAWN_OBTAINED_AVARICE);
 					} else if (newSealOwner == CABAL_DUSK) {
-						sendMessageToAll(SystemMessageId.DUSK_OBTAINED_AVARICE);
+						sendMessageToAll(DUSK_OBTAINED_AVARICE);
 					}
 					break;
 				case SEAL_GNOSIS:
 					if (newSealOwner == CABAL_DAWN) {
-						sendMessageToAll(SystemMessageId.DAWN_OBTAINED_GNOSIS);
+						sendMessageToAll(DAWN_OBTAINED_GNOSIS);
 					} else if (newSealOwner == CABAL_DUSK) {
-						sendMessageToAll(SystemMessageId.DUSK_OBTAINED_GNOSIS);
+						sendMessageToAll(DUSK_OBTAINED_GNOSIS);
 					}
 					break;
 				case SEAL_STRIFE:
 					if (newSealOwner == CABAL_DAWN) {
-						sendMessageToAll(SystemMessageId.DAWN_OBTAINED_STRIFE);
+						sendMessageToAll(DAWN_OBTAINED_STRIFE);
 					} else if (newSealOwner == CABAL_DUSK) {
-						sendMessageToAll(SystemMessageId.DUSK_OBTAINED_STRIFE);
+						sendMessageToAll(DUSK_OBTAINED_STRIFE);
 					}
 					
 					CastleManager.getInstance().validateTaxes(newSealOwner);
@@ -1210,12 +1224,12 @@ public class SevenSigns {
 					SevenSignsFestival.getInstance().startFestivalManager();
 					
 					// Send message that Competition has begun.
-					sendMessageToAll(SystemMessageId.QUEST_EVENT_PERIOD_BEGUN);
+					sendMessageToAll(QUEST_EVENT_PERIOD_BEGUN);
 					break;
 				case PERIOD_COMPETITION: // Results Calculation
 					
 					// Send message that Competition has ended.
-					sendMessageToAll(SystemMessageId.QUEST_EVENT_PERIOD_ENDED);
+					sendMessageToAll(QUEST_EVENT_PERIOD_ENDED);
 					
 					int compWinner = getCabalHighestScore();
 					
@@ -1227,10 +1241,10 @@ public class SevenSigns {
 					
 					switch (compWinner) {
 						case CABAL_DAWN:
-							sendMessageToAll(SystemMessageId.DAWN_WON);
+							sendMessageToAll(DAWN_WON);
 							break;
 						case CABAL_DUSK:
-							sendMessageToAll(SystemMessageId.DUSK_WON);
+							sendMessageToAll(DUSK_WON);
 							break;
 					}
 					
@@ -1250,9 +1264,9 @@ public class SevenSigns {
 					giveCPMult(getSealOwner(SEAL_STRIFE));
 					
 					// Send message that Seal Validation has begun.
-					sendMessageToAll(SystemMessageId.SEAL_VALIDATION_PERIOD_BEGUN);
+					sendMessageToAll(SEAL_VALIDATION_PERIOD_BEGUN);
 					
-					LOG.info("SevenSigns: The {} have won the competition with {} points!", getCabalName(_previousWinner), getCurrentScore(_previousWinner));
+					LOG.info("The {} have won the competition with {} points!", getCabalName(_previousWinner), getCurrentScore(_previousWinner));
 					break;
 				case PERIOD_SEAL_VALIDATION: // Reset for New Cycle
 					
@@ -1260,7 +1274,7 @@ public class SevenSigns {
 					_activePeriod = PERIOD_COMP_RECRUITING;
 					
 					// Send message that Seal Validation has ended.
-					sendMessageToAll(SystemMessageId.SEAL_VALIDATION_PERIOD_ENDED);
+					sendMessageToAll(SEAL_VALIDATION_PERIOD_ENDED);
 					// Clear Seal of Strife influence.
 					removeCPMult();
 					// Reset all data
@@ -1291,7 +1305,7 @@ public class SevenSigns {
 			Broadcast.toAllOnlinePlayers(ss);
 			spawnSevenSignsNPC();
 			
-			LOG.info("SevenSigns: The {} period has begun!", getCurrentPeriodName());
+			LOG.info("The {} period has begun!", getCurrentPeriodName());
 			
 			setCalendarForNextPeriodChange();
 			
@@ -1377,7 +1391,7 @@ public class SevenSigns {
 		if (isSealValidationPeriod()) {
 			if (getSealOwner(SEAL_STRIFE) == CABAL_DAWN) {
 				if (getPlayerCabal(activeChar.getObjectId()) == CABAL_DUSK) {
-					activeChar.sendPacket(SystemMessageId.SEAL_OF_STRIFE_FORBIDS_SUMMONING);
+					activeChar.sendPacket(SEAL_OF_STRIFE_FORBIDS_SUMMONING);
 					return true;
 				}
 			}
@@ -1386,7 +1400,11 @@ public class SevenSigns {
 		return false;
 	}
 	
+	public static SevenSigns getInstance() {
+		return SingletonHolder.INSTANCE;
+	}
+	
 	private static class SingletonHolder {
-		protected static final SevenSigns _instance = new SevenSigns();
+		protected static final SevenSigns INSTANCE = new SevenSigns();
 	}
 }

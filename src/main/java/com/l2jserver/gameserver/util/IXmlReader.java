@@ -40,10 +40,13 @@ import com.l2jserver.util.file.filter.XMLFilter;
  * @author Zoey76
  */
 public interface IXmlReader {
+	
 	static final Logger LOG = LoggerFactory.getLogger(IXmlReader.class);
 	
 	static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+	
 	static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+	
 	/** The default file filter, ".xml" files only. */
 	static final XMLFilter XML_FILTER = new XMLFilter();
 	

@@ -1,17 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="INFO">
 	<Appenders>
-		<Console name="Console" target="SYSTEM_OUT">
+		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
 		</Console>
-		<File name="ServerFile" fileName="logs/server.log">
+		<RollingFile name="server" fileName="logs/server.log" filePattern="logs/server.%d{yyyy-MM-dd-HH-mm-ss}.log" ignoreExceptions="false">
 			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
-		</File>
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="audit" fileName="logs/audit/audit.log" filePattern="logs/audit/audit.%d{yyyy-MM-dd-HH-mm-ss}.log" ignoreExceptions="false">
+			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="accounting" fileName="logs/accounting/accounting.log" filePattern="logs/accounting/accounting.%d{yyyy-MM-dd-HH-mm-ss}.log" ignoreExceptions="false">
+			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="chat" fileName="logs/chat/chat.log" filePattern="logs/chat/chat.%d{yyyy-MM-dd-HH-mm-ss}.log" ignoreExceptions="false">
+			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="item" fileName="logs/item/item.log" filePattern="logs/item/item.%d{yyyy-MM-dd-HH-mm-ss}.log" ignoreExceptions="false">
+			<!-- TODO(Zoey76)> Exclude Arrows and Shots. -->
+			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="error" fileName="logs/error/error.log" filePattern="logs/error/error.%d{yyyy-MM-dd-HH-mm-ss}.log" ignoreExceptions="false">
+			<PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss} %c{1}: %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingFile>
 	</Appenders>
 	<Loggers>
 		<Root level="debug">
-			<appender-ref ref="Console" level="info" />
-			<appender-ref ref="ServerFile" level="info" />
+			<appender-ref ref="console" level="info" />
+			<appender-ref ref="server" level="info" />
+			<appender-ref ref="error" level="warn" />
 		</Root>
+		<Logger name="audit" level="info" additivity="false">
+			<AppenderRef ref="audit" />
+		</Logger>
+		<Logger name="chat" level="info" additivity="false">
+			<AppenderRef ref="chat" />
+		</Logger>
+		<Logger name="item" level="info" additivity="false">
+			<AppenderRef ref="item" />
+		</Logger>
 	</Loggers>
 </Configuration>

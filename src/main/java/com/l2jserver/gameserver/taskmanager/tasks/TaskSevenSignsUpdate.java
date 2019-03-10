@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.taskmanager.tasks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.taskmanager.Task;
@@ -30,6 +33,9 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
  * @author Tempy
  */
 public class TaskSevenSignsUpdate extends Task {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskSevenSignsUpdate.class);
+	
 	private static final String NAME = "seven_signs_update";
 	
 	@Override
@@ -44,15 +50,14 @@ public class TaskSevenSignsUpdate extends Task {
 			if (!SevenSigns.getInstance().isSealValidationPeriod()) {
 				SevenSignsFestival.getInstance().saveFestivalData(false);
 			}
-			_log.info("SevenSigns: Data updated successfully.");
-		} catch (Exception e) {
-			_log.warning(getClass().getSimpleName() + ": SevenSigns: Failed to save Seven Signs configuration: " + e.getMessage());
+			LOG.info("Data updated successfully.");
+		} catch (Exception ex) {
+			LOG.warn("Failed to save Seven Signs configuration!", ex);
 		}
 	}
 	
 	@Override
 	public void initializate() {
-		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_FIXED_SHEDULED, "1800000", "1800000", "");
 	}
 }

@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.MapRegionManager;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2SiegeClan;
@@ -89,7 +89,7 @@ public abstract class ClanHallSiegeEngine extends Quest implements Siegable {
 	public ClanHallSiegeEngine(String name, String descr, final int hallId) {
 		super(-1, name, descr);
 		
-		_hall = CHSiegeManager.getInstance().getSiegableHall(hallId);
+		_hall = ClanHallSiegeManager.getInstance().getSiegableHall(hallId);
 		_hall.setSiege(this);
 		
 		_siegeTask = ThreadPoolManager.getInstance().scheduleGeneral(new PrepareOwner(), _hall.getNextSiegeTime() - System.currentTimeMillis() - 3600000);

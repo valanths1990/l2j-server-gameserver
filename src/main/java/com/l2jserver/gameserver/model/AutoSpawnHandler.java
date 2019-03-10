@@ -28,8 +28,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -59,7 +60,7 @@ import com.l2jserver.util.Rnd;
  */
 public class AutoSpawnHandler {
 	
-	protected static final Logger _log = Logger.getLogger(AutoSpawnHandler.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(AutoSpawnHandler.class);
 	
 	private static final int DEFAULT_INITIAL_SPAWN = 30000; // 30 seconds after registration
 	
@@ -75,14 +76,6 @@ public class AutoSpawnHandler {
 	
 	protected AutoSpawnHandler() {
 		restoreSpawnData();
-	}
-	
-	public static AutoSpawnHandler getInstance() {
-		return SingletonHolder._instance;
-	}
-	
-	public final int size() {
-		return _registeredSpawns.size();
 	}
 	
 	public void reload() {
@@ -133,8 +126,9 @@ public class AutoSpawnHandler {
 					}
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "AutoSpawnHandler: Could not restore spawn data: " + e.getMessage(), e);
+			LOG.info("Loaded {} handlers.", _registeredSpawns.size());
+		} catch (Exception ex) {
+			LOG.warn("Could not restore spawn data!", ex);
 		}
 	}
 	
@@ -208,8 +202,8 @@ public class AutoSpawnHandler {
 			// Cancel the currently associated running scheduled task.
 			ScheduledFuture<?> respawnTask = _runningSpawns.remove(spawnInst._objectId);
 			respawnTask.cancel(false);
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "AutoSpawnHandler: Could not auto spawn for NPC ID " + spawnInst._npcId + " (Object ID = " + spawnInst._objectId + "): " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not auto spawn for NPC Id {} (Object Id={})!", spawnInst._npcId, spawnInst._objectId, ex);
 			return false;
 		}
 		
@@ -373,7 +367,7 @@ public class AutoSpawnHandler {
 				
 				// If there are no set co-ordinates, cancel the spawn task.
 				if (locationList.length == 0) {
-					_log.info("AutoSpawnHandler: No location co-ords specified for spawn instance (Object ID = " + _objectId + ").");
+					LOG.warn("No location co-ords specified for spawn instance (Object Id={}).", _objectId);
 					return;
 				}
 				
@@ -444,8 +438,8 @@ public class AutoSpawnHandler {
 					AutoDespawner rd = new AutoDespawner(_objectId);
 					ThreadPoolManager.getInstance().scheduleAi(rd, spawnInst.getDespawnDelay() - 1000);
 				}
-			} catch (Exception e) {
-				_log.log(Level.WARNING, "AutoSpawnHandler: An error occurred while initializing spawn instance (Object ID = " + _objectId + "): " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("An error occurred while initializing spawn instance (Object Id={})!", _objectId, ex);
 			}
 		}
 	}
@@ -466,9 +460,8 @@ public class AutoSpawnHandler {
 		public void run() {
 			try {
 				AutoSpawnInstance spawnInst = _registeredSpawns.get(_objectId);
-				
 				if (spawnInst == null) {
-					_log.info("AutoSpawnHandler: No spawn registered for object ID = " + _objectId + ".");
+					LOG.warn("No spawn registered for object Id={}!", _objectId);
 					return;
 				}
 				
@@ -477,8 +470,8 @@ public class AutoSpawnHandler {
 					SpawnTable.getInstance().deleteSpawn(npcInst.getSpawn(), false);
 					spawnInst.removeNpcInstance(npcInst);
 				}
-			} catch (Exception e) {
-				_log.log(Level.WARNING, "AutoSpawnHandler: An error occurred while despawning spawn (Object ID = " + _objectId + "): " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("An error occurred while despawning spawn (Object Id={})!", _objectId, ex);
 			}
 		}
 	}
@@ -624,7 +617,11 @@ public class AutoSpawnHandler {
 		}
 	}
 	
+	public static AutoSpawnHandler getInstance() {
+		return SingletonHolder.INSTANCE;
+	}
+	
 	private static class SingletonHolder {
-		protected static final AutoSpawnHandler _instance = new AutoSpawnHandler();
+		protected static final AutoSpawnHandler INSTANCE = new AutoSpawnHandler();
 	}
 }

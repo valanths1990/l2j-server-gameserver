@@ -20,8 +20,9 @@ package com.l2jserver.gameserver.instancemanager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.model.AirShipTeleportList;
@@ -34,7 +35,8 @@ import com.l2jserver.gameserver.model.actor.templates.L2CharTemplate;
 import com.l2jserver.gameserver.network.serverpackets.ExAirShipTeleportList;
 
 public class AirShipManager {
-	private static final Logger _log = Logger.getLogger(AirShipManager.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(AirShipManager.class);
 	
 	private static final String LOAD_DB = "SELECT * FROM airships";
 	private static final String ADD_DB = "INSERT INTO airships (owner_id,fuel) VALUES (?,?)";
@@ -157,8 +159,8 @@ public class AirShipManager {
 				ps.setInt(1, ownerId);
 				ps.setInt(2, info.getInt("fuel"));
 				ps.executeUpdate();
-			} catch (Exception e) {
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not add new airship license: " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("Could not add new airship license!", ex);
 			}
 		}
 	}
@@ -235,10 +237,10 @@ public class AirShipManager {
 				info.set("fuel", rs.getInt("fuel"));
 				_airShipsInfo.put(rs.getInt("owner_id"), info);
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not load airships table: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not load airships table!", ex);
 		}
-		_log.info(getClass().getSimpleName() + ": Loaded " + _airShipsInfo.size() + " private airships");
+		LOG.info("Loaded {} private airships.", _airShipsInfo.size());
 	}
 	
 	private void storeInDb(int ownerId) {
@@ -252,8 +254,8 @@ public class AirShipManager {
 			ps.setInt(1, info.getInt("fuel"));
 			ps.setInt(2, ownerId);
 			ps.executeUpdate();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not update airships table: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not update airships table!", ex);
 		}
 	}
 	

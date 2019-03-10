@@ -26,6 +26,7 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
  * @author Layane
  */
 public final class TaskRestart extends Task {
+	
 	public static final String NAME = "restart";
 	
 	@Override

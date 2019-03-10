@@ -38,6 +38,7 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PetInstance;
 
 public final class L2World {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(L2World.class);
 	
 	/** Gracia border Flying objects not allowed to the east of it. */
@@ -97,7 +98,6 @@ public final class L2World {
 	public void storeObject(L2Object object) {
 		if (_allObjects.containsKey(object.getObjectId())) {
 			LOG.warn("Current object: {} already exist in OID map!", object);
-			LOG.warn("---------------------- End ---------------------");
 			return;
 		}
 		_allObjects.put(object.getObjectId(), object);
@@ -243,7 +243,7 @@ public final class L2World {
 		// in a circular area of 2000 units
 		List<L2Object> visibles = getVisibleObjects(object, 2000);
 		if (Config.DEBUG) {
-			LOG.debug("objects in range: {}", visibles.size());
+			LOG.debug("Objects in range {}.", visibles.size());
 		}
 		
 		// tell the player about the surroundings
@@ -517,7 +517,7 @@ public final class L2World {
 			}
 		}
 		
-		LOG.info("L2World: ({} by {}) World Region Grid set up.", REGIONS_X, REGIONS_Y);
+		LOG.info("{} by {} world region grid set up.", REGIONS_X, REGIONS_Y);
 		
 	}
 	
@@ -525,23 +525,20 @@ public final class L2World {
 	 * Deleted all spawns in the world.
 	 */
 	public void deleteVisibleNpcSpawns() {
-		LOG.info("Deleting all visible NPC's.");
+		LOG.info("Deleting all visible NPCs.");
 		for (int i = 0; i <= REGIONS_X; i++) {
 			for (int j = 0; j <= REGIONS_Y; j++) {
 				_worldRegions[i][j].deleteVisibleNpcSpawns();
 			}
 		}
-		LOG.info("All visible NPC's deleted.");
+		LOG.info("All visible NPCs deleted.");
 	}
 	
-	/**
-	 * @return the current instance of L2World
-	 */
 	public static L2World getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final L2World _instance = new L2World();
+		protected static final L2World INSTANCE = new L2World();
 	}
 }

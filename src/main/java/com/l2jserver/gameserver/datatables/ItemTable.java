@@ -137,10 +137,10 @@ public class ItemTable {
 		
 		buildFastLookupTable(highest);
 		
-		LOG.info("Loaded: {} Etc items.", _etcItems.size());
-		LOG.info("Loaded: {} Armor items.", _armors.size());
-		LOG.info("Loaded: {} Weapon items.", _weapons.size());
-		LOG.info("Loaded: {} items in total.", (_etcItems.size() + _armors.size() + _weapons.size()));
+		LOG.info("Loaded {} Etc items.", _etcItems.size());
+		LOG.info("Loaded {} Armor items.", _armors.size());
+		LOG.info("Loaded {} Weapon items.", _weapons.size());
+		LOG.info("Loaded {} items in total.", (_etcItems.size() + _armors.size() + _weapons.size()));
 	}
 	
 	/**

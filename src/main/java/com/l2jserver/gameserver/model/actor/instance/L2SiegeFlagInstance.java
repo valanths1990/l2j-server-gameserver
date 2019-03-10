@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model.actor.instance;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.enums.InstanceType;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.FortSiegeManager;
 import com.l2jserver.gameserver.instancemanager.SiegeManager;
 import com.l2jserver.gameserver.instancemanager.TerritoryWarManager;
@@ -77,7 +77,7 @@ public class L2SiegeFlagInstance extends L2Npc {
 			_siege = FortSiegeManager.getInstance().getSiege(player.getX(), player.getY(), player.getZ());
 		}
 		if (_siege == null) {
-			_siege = CHSiegeManager.getInstance().getSiege(player);
+			_siege = ClanHallSiegeManager.getInstance().getSiege(player);
 		}
 		if ((_clan == null) || (_siege == null)) {
 			throw new NullPointerException(getClass().getSimpleName() + ": Initialization failed.");

@@ -22,8 +22,9 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
@@ -40,11 +41,14 @@ import com.l2jserver.util.Rnd;
  */
 public class RaidBossSpawnManager {
 	
-	private static final Logger _log = Logger.getLogger(RaidBossSpawnManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(RaidBossSpawnManager.class);
 	
 	protected static final Map<Integer, L2RaidBossInstance> _bosses = new ConcurrentHashMap<>();
+	
 	protected static final Map<Integer, L2Spawn> _spawns = new ConcurrentHashMap<>();
+	
 	protected static final Map<Integer, StatsSet> _storedInfo = new ConcurrentHashMap<>();
+	
 	protected static final Map<Integer, ScheduledFuture<?>> _schedules = new ConcurrentHashMap<>();
 	
 	public static enum StatusEnum {
@@ -53,9 +57,6 @@ public class RaidBossSpawnManager {
 		UNDEFINED
 	}
 	
-	/**
-	 * Instantiates a new raid boss spawn manager.
-	 */
 	protected RaidBossSpawnManager() {
 		load();
 	}
@@ -81,22 +82,18 @@ public class RaidBossSpawnManager {
 				addNewSpawn(spawnDat, rs.getLong("respawn_time"), rs.getDouble("currentHP"), rs.getDouble("currentMP"), false);
 			}
 			
-			_log.info(getClass().getSimpleName() + ": Loaded " + _bosses.size() + " Instances");
-			_log.info(getClass().getSimpleName() + ": Scheduled " + _schedules.size() + " Instances");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error while initializing RaidBossSpawnManager: " + e.getMessage(), e);
+			LOG.info("Loaded {} bosses.", _bosses.size());
+			LOG.info("Scheduled {} boss instances.", _schedules.size());
+		} catch (Exception ex) {
+			LOG.warn("There has been an error while initializing raid boss spawn manager!", ex);
 		}
 	}
 	
 	private static class SpawnSchedule implements Runnable {
-		private static final Logger _log = Logger.getLogger(SpawnSchedule.class.getName());
+		private static final Logger LOG = LoggerFactory.getLogger(SpawnSchedule.class);
 		
 		private final int bossId;
 		
-		/**
-		 * Instantiates a new spawn schedule.
-		 * @param npcId the npc id
-		 */
 		public SpawnSchedule(int npcId) {
 			bossId = npcId;
 		}
@@ -121,7 +118,7 @@ public class RaidBossSpawnManager {
 				
 				_storedInfo.put(bossId, info);
 				
-				_log.info(getClass().getSimpleName() + ": Spawning Raid Boss " + raidboss.getName());
+				LOG.info("Spawning Raid Boss {}.", raidboss.getName());
 				
 				_bosses.put(bossId, raidboss);
 			}
@@ -156,7 +153,7 @@ public class RaidBossSpawnManager {
 			if (!_schedules.containsKey(boss.getId()) && ((respawnMinDelay > 0) || (respawnMaxDelay > 0))) {
 				final Calendar time = Calendar.getInstance();
 				time.setTimeInMillis(respawnTime);
-				_log.info(getClass().getSimpleName() + ": Updated " + boss.getName() + " respawn time to " + time.getTime());
+				LOG.info("Updated {} respawn time to {}.", boss.getName(), time.getTime());
 				
 				_schedules.put(boss.getId(), ThreadPoolManager.getInstance().scheduleGeneral(new SpawnSchedule(boss.getId()), respawnDelay));
 				updateDb();
@@ -235,9 +232,8 @@ public class RaidBossSpawnManager {
 				ps.setDouble(8, currentHP);
 				ps.setDouble(9, currentMP);
 				ps.execute();
-			} catch (Exception e) {
-				// problem with storing spawn
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not store raidboss #" + bossId + " in the DB:" + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("Could not store raid boss Id {} in the DB!", bossId, ex);
 			}
 		}
 	}
@@ -278,8 +274,8 @@ public class RaidBossSpawnManager {
 				var ps = con.prepareStatement("DELETE FROM raidboss_spawnlist WHERE boss_id=?")) {
 				ps.setInt(1, bossId);
 				ps.execute();
-			} catch (Exception e) {
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Could not remove raidboss #" + bossId + " from DB: " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("Could not remove raid boss Id {} from DB!", bossId, ex);
 			}
 		}
 	}
@@ -316,12 +312,12 @@ public class RaidBossSpawnManager {
 					ps.setInt(4, bossId);
 					ps.executeUpdate();
 					ps.clearParameters();
-				} catch (Exception e) {
-					_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldnt update raidboss_spawnlist table " + e.getMessage(), e);
+				} catch (Exception ex) {
+					LOG.warn("Could not update raid boss spawn list table!", ex);
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": SQL error while updating RaidBoss spawn to database: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("SQL error while updating Raid Boss spawn to database!", ex);
 		}
 	}
 	
@@ -399,7 +395,7 @@ public class RaidBossSpawnManager {
 		
 		_storedInfo.put(raidboss.getId(), info);
 		
-		_log.info(getClass().getSimpleName() + ": Spawning Night Raid Boss " + raidboss.getName());
+		LOG.info("Spawning Night Raid Boss {}.", raidboss.getName());
 		
 		_bosses.put(raidboss.getId(), raidboss);
 	}
@@ -457,15 +453,11 @@ public class RaidBossSpawnManager {
 		_spawns.clear();
 	}
 	
-	/**
-	 * Gets the single instance of RaidBossSpawnManager.
-	 * @return single instance of RaidBossSpawnManager
-	 */
 	public static RaidBossSpawnManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final RaidBossSpawnManager _instance = new RaidBossSpawnManager();
+		protected static final RaidBossSpawnManager INSTANCE = new RaidBossSpawnManager();
 	}
 }

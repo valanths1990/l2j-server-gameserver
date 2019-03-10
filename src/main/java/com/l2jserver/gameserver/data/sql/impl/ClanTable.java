@@ -33,7 +33,7 @@ import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
 import com.l2jserver.gameserver.idfactory.IdFactory;
 import com.l2jserver.gameserver.instancemanager.AuctionManager;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.FortSiegeManager;
 import com.l2jserver.gameserver.instancemanager.SiegeManager;
@@ -214,7 +214,7 @@ public class ClanTable {
 		
 		int hallId = clan.getHideoutId();
 		if (hallId == 0) {
-			for (SiegableHall hall : CHSiegeManager.getInstance().getConquerableHalls().values()) {
+			for (SiegableHall hall : ClanHallSiegeManager.getInstance().getConquerableHalls().values()) {
 				hall.removeAttacker(clan);
 			}
 		}
@@ -288,7 +288,7 @@ public class ClanTable {
 			}
 			
 			if (hallId != 0) {
-				SiegableHall hall = CHSiegeManager.getInstance().getSiegableHall(hallId);
+				SiegableHall hall = ClanHallSiegeManager.getInstance().getSiegableHall(hallId);
 				if ((hall != null) && (hall.getOwnerId() == clanId)) {
 					hall.free();
 				}

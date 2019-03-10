@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.InstanceListManager;
@@ -37,7 +38,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 
 public final class CastleManager implements InstanceListManager {
 	
-	private static final Logger _log = Logger.getLogger(CastleManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(CastleManager.class);
 	
 	private final List<Castle> _castles = new ArrayList<>();
 	
@@ -229,8 +230,8 @@ public final class CastleManager implements InstanceListManager {
 				ps.setInt(1, member.getObjectId());
 				ps.setInt(2, circletId);
 				ps.execute();
-			} catch (Exception e) {
-				_log.log(Level.WARNING, "Failed to remove castle circlets offline for player " + member.getName() + ": " + e.getMessage(), e);
+			} catch (Exception ex) {
+				LOG.warn("Failed to remove castle circlets offline for player {}!", player, ex);
 			}
 		}
 	}
@@ -243,9 +244,9 @@ public final class CastleManager implements InstanceListManager {
 			while (rs.next()) {
 				_castles.add(new Castle(rs.getInt("id")));
 			}
-			_log.info(getClass().getSimpleName() + ": Loaded: " + _castles.size() + " castles");
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Exception: loadCastleData(): " + e.getMessage(), e);
+			LOG.info("Loaded {} castles.", _castles.size());
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading castles from database!", ex);
 		}
 	}
 	

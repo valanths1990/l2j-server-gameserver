@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -35,11 +37,10 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class FishingRodsData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(FishingRodsData.class);
+	
 	private final Map<Integer, L2FishingRod> _fishingRods = new HashMap<>();
 	
-	/**
-	 * Instantiates a new fishing rods data.
-	 */
 	protected FishingRodsData() {
 		load();
 	}
@@ -48,7 +49,7 @@ public final class FishingRodsData implements IXmlReader {
 	public void load() {
 		_fishingRods.clear();
 		parseDatapackFile("data/stats/fishing/fishingRods.xml");
-		LOG.info("{}: Loaded {} Fishing Rods.", getClass().getSimpleName(), _fishingRods.size());
+		LOG.info("Loaded {} fishing rods.", _fishingRods.size());
 	}
 	
 	@Override
@@ -81,15 +82,11 @@ public final class FishingRodsData implements IXmlReader {
 		return _fishingRods.get(itemId);
 	}
 	
-	/**
-	 * Gets the single instance of FishingRodsData.
-	 * @return single instance of FishingRodsData
-	 */
 	public static FishingRodsData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final FishingRodsData _instance = new FishingRodsData();
+		protected static final FishingRodsData INSTANCE = new FishingRodsData();
 	}
 }

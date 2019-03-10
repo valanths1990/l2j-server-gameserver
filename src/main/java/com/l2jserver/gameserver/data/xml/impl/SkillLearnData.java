@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -35,6 +37,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class SkillLearnData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(SkillLearnData.class);
+	
 	private final Map<Integer, List<ClassId>> _skillLearn = new HashMap<>();
 	
 	protected SkillLearnData() {
@@ -45,7 +49,7 @@ public final class SkillLearnData implements IXmlReader {
 	public synchronized void load() {
 		_skillLearn.clear();
 		parseDatapackFile("data/skillLearn.xml");
-		LOG.info("{}: Loaded {} Skill Learn data.", getClass().getSimpleName(), _skillLearn.size());
+		LOG.info("Loaded {} skill learn data.", _skillLearn.size());
 	}
 	
 	@Override
@@ -75,15 +79,11 @@ public final class SkillLearnData implements IXmlReader {
 		return _skillLearn.get(npcId);
 	}
 	
-	/**
-	 * Gets the single instance of SkillLearnData.
-	 * @return single instance of SkillLearnData
-	 */
 	public static SkillLearnData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final SkillLearnData _instance = new SkillLearnData();
+		protected static final SkillLearnData INSTANCE = new SkillLearnData();
 	}
 }

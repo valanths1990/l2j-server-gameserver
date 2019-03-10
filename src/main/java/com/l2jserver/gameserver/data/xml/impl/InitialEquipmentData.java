@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -40,15 +42,14 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class InitialEquipmentData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(InitialEquipmentData.class);
+	
 	private static final String NORMAL = "data/stats/initialEquipment.xml";
 	
 	private static final String EVENT = "data/stats/initialEquipmentEvent.xml";
 	
 	private final Map<ClassId, List<PcItemTemplate>> _initialEquipmentList = new HashMap<>();
 	
-	/**
-	 * Instantiates a new initial equipment data.
-	 */
 	protected InitialEquipmentData() {
 		load();
 	}
@@ -57,7 +58,7 @@ public final class InitialEquipmentData implements IXmlReader {
 	public void load() {
 		_initialEquipmentList.clear();
 		parseDatapackFile(Config.INITIAL_EQUIPMENT_EVENT ? EVENT : NORMAL);
-		LOG.info("{}: Loaded {} Initial Equipment data.", getClass().getSimpleName(), _initialEquipmentList.size());
+		LOG.info("Loaded {} initial equipment data.", _initialEquipmentList.size());
 	}
 	
 	@Override
@@ -113,15 +114,11 @@ public final class InitialEquipmentData implements IXmlReader {
 		return _initialEquipmentList.get(ClassId.getClassId(cId));
 	}
 	
-	/**
-	 * Gets the single instance of InitialEquipmentData.
-	 * @return single instance of InitialEquipmentData
-	 */
 	public static InitialEquipmentData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final InitialEquipmentData _instance = new InitialEquipmentData();
+		protected static final InitialEquipmentData INSTANCE = new InitialEquipmentData();
 	}
 }

@@ -18,6 +18,8 @@
  */
 package com.l2jserver.gameserver;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
@@ -25,16 +27,15 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.Server;
 import com.l2jserver.UPnPService;
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.data.sql.impl.AnnouncementsTable;
@@ -93,10 +94,10 @@ import com.l2jserver.gameserver.instancemanager.AirShipManager;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
 import com.l2jserver.gameserver.instancemanager.AuctionManager;
 import com.l2jserver.gameserver.instancemanager.BoatManager;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.instancemanager.CastleManorManager;
 import com.l2jserver.gameserver.instancemanager.ClanHallManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.CoupleManager;
 import com.l2jserver.gameserver.instancemanager.CursedWeaponsManager;
 import com.l2jserver.gameserver.instancemanager.DayNightSpawnManager;
@@ -165,11 +166,11 @@ public final class GameServer {
 	public GameServer() throws Exception {
 		final var serverLoadStart = System.currentTimeMillis();
 		
-		LOG.info("{}: Used memory: {}MB.", getClass().getSimpleName(), getUsedMemoryMB());
+		LOG.info("Used memory {}MB.", getUsedMemoryMB());
 		
 		if (!IdFactory.getInstance().isInitialized()) {
-			LOG.error("{}: Could not read object IDs from database. Please check your configuration.", getClass().getSimpleName());
-			throw new Exception("Could not initialize the ID factory!");
+			LOG.error("Could not read object IDs from database. Please check your configuration.");
+			throw new Exception("Could not initialize the Id factory!");
 		}
 		
 		ThreadPoolManager.getInstance();
@@ -233,7 +234,7 @@ public final class GameServer {
 		
 		printSection("Clans");
 		ClanTable.getInstance();
-		CHSiegeManager.getInstance();
+		ClanHallSiegeManager.getInstance();
 		ClanHallManager.getInstance();
 		AuctionManager.getInstance();
 		
@@ -321,8 +322,6 @@ public final class GameServer {
 		AutoSpawnHandler.getInstance();
 		FaenorScriptEngine.getInstance();
 		
-		LOG.info("AutoSpawnHandler: Loaded {} handlers in total.", AutoSpawnHandler.getInstance().size());
-		
 		if (Config.L2JMOD_ALLOW_WEDDING) {
 			CoupleManager.getInstance();
 		}
@@ -360,7 +359,7 @@ public final class GameServer {
 		// the current allocation pool, freeMemory the unused memory in the allocation pool
 		long freeMem = ((Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory()) + Runtime.getRuntime().freeMemory()) / 1048576;
 		long totalMem = Runtime.getRuntime().maxMemory() / 1048576;
-		LOG.info("{}: Started, free memory {} Mb of {} Mb", getClass().getSimpleName(), freeMem, totalMem);
+		LOG.info("Started, free memory {} Mb of {} Mb", freeMem, totalMem);
 		Toolkit.getDefaultToolkit().beep();
 		LoginServerThread.getInstance().start();
 		
@@ -378,22 +377,22 @@ public final class GameServer {
 		if (!Config.GAMESERVER_HOSTNAME.equals("*")) {
 			try {
 				bindAddress = InetAddress.getByName(Config.GAMESERVER_HOSTNAME);
-			} catch (UnknownHostException e1) {
-				LOG.error("{}: The GameServer bind address is invalid, using all avaliable IPs!", getClass().getSimpleName(), e1);
+			} catch (UnknownHostException ex) {
+				LOG.warn("Bind address is invalid, using all avaliable IPs!", ex);
 			}
 		}
 		
 		try {
 			_selectorThread.openServerSocket(bindAddress, Config.PORT_GAME);
 			_selectorThread.start();
-			LOG.info("{}: is now listening on: {}:{}", getClass().getSimpleName(), Config.GAMESERVER_HOSTNAME, Config.PORT_GAME);
-		} catch (IOException e) {
-			LOG.error("{}: Failed to open server socket!", getClass().getSimpleName(), e);
+			LOG.info("Now listening on {}:{}", Config.GAMESERVER_HOSTNAME, Config.PORT_GAME);
+		} catch (IOException ex) {
+			LOG.error("Failed to open server socket!", ex);
 			System.exit(1);
 		}
 		
-		LOG.info("{}: Maximum numbers of connected players: {}", getClass().getSimpleName(), Config.MAXIMUM_ONLINE_USERS);
-		LOG.info("{}: Server loaded in {} seconds.", getClass().getSimpleName(), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - serverLoadStart));
+		LOG.info("Maximum numbers of connected players: {}.", Config.MAXIMUM_ONLINE_USERS);
+		LOG.info("Server loaded in {} seconds.", MILLISECONDS.toSeconds(System.currentTimeMillis() - serverLoadStart));
 		
 		if (Config.ENABLE_UPNP) {
 			printSection("UPnP");
@@ -434,7 +433,7 @@ public final class GameServer {
 		if (Config.IS_TELNET_ENABLED) {
 			new Status(Server.serverMode).start();
 		} else {
-			LOG.info("{}: Telnet server is currently disabled.", GameServer.class.getSimpleName());
+			LOG.info("Telnet server is currently disabled.");
 		}
 	}
 	

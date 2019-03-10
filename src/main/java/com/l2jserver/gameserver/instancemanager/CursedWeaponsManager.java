@@ -23,11 +23,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -56,7 +56,7 @@ import com.l2jserver.gameserver.util.Broadcast;
  */
 public final class CursedWeaponsManager {
 	
-	private static final Logger _log = Logger.getLogger(CursedWeaponsManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(CursedWeaponsManager.class);
 	
 	private Map<Integer, CursedWeapon> _cursedWeapons;
 	
@@ -74,7 +74,7 @@ public final class CursedWeaponsManager {
 		load();
 		restore();
 		controlPlayers();
-		_log.info(getClass().getSimpleName() + ": Loaded : " + _cursedWeapons.size() + " cursed weapon(s).");
+		LOG.info("Loaded {} cursed weapon(s).", _cursedWeapons.size());
 	}
 	
 	public final void reload() {
@@ -89,7 +89,7 @@ public final class CursedWeaponsManager {
 			
 			File file = new File(Config.DATAPACK_ROOT + "/data/cursedWeapons.xml");
 			if (!file.exists()) {
-				_log.log(Level.WARNING, getClass().getSimpleName() + ": Couldn't find data/" + file.getName());
+				LOG.warn("Couldn't find {}!", file.getAbsoluteFile());
 				return;
 			}
 			
@@ -137,10 +137,8 @@ public final class CursedWeaponsManager {
 					}
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, "Error parsing cursed weapons file.", e);
-			
-			return;
+		} catch (Exception ex) {
+			LOG.warn("There has been an error parsing cursed weapons file!", ex);
 		}
 	}
 	
@@ -159,8 +157,8 @@ public final class CursedWeaponsManager {
 				cw.setEndTime(rs.getLong("endTime"));
 				cw.reActivate();
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Could not restore CursedWeapons data: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not restore cursed weapons data!", ex);
 		}
 	}
 	
@@ -187,14 +185,14 @@ public final class CursedWeaponsManager {
 					if (rset.next()) {
 						// A player has the cursed weapon in his inventory ...
 						int playerId = rset.getInt("owner_id");
-						_log.info("PROBLEM : Player " + playerId + " owns the cursed weapon " + itemId + " but he shouldn't.");
+						LOG.warn("Player {} owns the cursed weapon {} but he shouldn't!", playerId, itemId);
 						
 						// Delete the item
 						try (var delete = con.prepareStatement("DELETE FROM items WHERE owner_id=? AND item_id=?")) {
 							delete.setInt(1, playerId);
 							delete.setInt(2, itemId);
 							if (delete.executeUpdate() != 1) {
-								_log.warning("Error while deleting cursed weapon " + itemId + " from userId " + playerId);
+								LOG.warn("There has been an error while deleting cursed weapon {} from player Id {}!", itemId, playerId);
 							}
 						}
 						
@@ -204,7 +202,7 @@ public final class CursedWeaponsManager {
 							update.setInt(2, cw.getPlayerPkKills());
 							update.setInt(3, playerId);
 							if (update.executeUpdate() != 1) {
-								_log.warning("Error while updating karma & pkkills for userId " + cw.getPlayerId());
+								LOG.warn("There has been an error while updating karma & pkkills for player Id {}!", cw.getPlayerId());
 							}
 						}
 						// clean up the cursed weapons table.
@@ -213,8 +211,8 @@ public final class CursedWeaponsManager {
 				}
 				ps.clearParameters();
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Could not check CursedWeapons data: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Could not check cursed weapons data!", ex);
 		}
 	}
 	
@@ -317,8 +315,8 @@ public final class CursedWeaponsManager {
 			var ps = con.prepareStatement("DELETE FROM cursed_weapons WHERE itemId = ?")) {
 			ps.setInt(1, itemId);
 			ps.executeUpdate();
-		} catch (Exception e) {
-			_log.log(Level.SEVERE, "CursedWeaponsManager: Failed to remove data: " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("Failed to remove cursed weapon Id {}!", itemId, ex);
 		}
 	}
 	

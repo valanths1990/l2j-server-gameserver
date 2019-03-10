@@ -23,6 +23,8 @@ import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -42,9 +44,11 @@ import com.l2jserver.util.file.filter.NumericNameFilter;
  */
 public final class BuyListData implements IXmlReader {
 	
-	private final Map<Integer, L2BuyList> _buyLists = new HashMap<>();
+	private static final Logger LOG = LoggerFactory.getLogger(BuyListData.class);
 	
 	private static final FileFilter NUMERIC_FILTER = new NumericNameFilter();
+	
+	private final Map<Integer, L2BuyList> _buyLists = new HashMap<>();
 	
 	protected BuyListData() {
 		load();
@@ -58,7 +62,7 @@ public final class BuyListData implements IXmlReader {
 			parseDatapackDirectory("data/buylists/custom", false);
 		}
 		
-		LOG.info("{}: Loaded {} BuyLists.", getClass().getSimpleName(), _buyLists.size());
+		LOG.info("Loaded {} buy lists.", _buyLists.size());
 		
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var statement = con.createStatement();
@@ -70,12 +74,12 @@ public final class BuyListData implements IXmlReader {
 				long nextRestockTime = rs.getLong("next_restock_time");
 				final L2BuyList buyList = getBuyList(buyListId);
 				if (buyList == null) {
-					LOG.warn("BuyList found in database but not loaded from xml! BuyListId: {}", buyListId);
+					LOG.warn("Buy list {} found in database but not loaded from XML!", buyListId);
 					continue;
 				}
 				final Product product = buyList.getProductByItemId(itemId);
 				if (product == null) {
-					LOG.warn("ItemId found in database but not loaded from xml! BuyListId: {} Item ID: {}", buyListId, itemId);
+					LOG.warn("Item Id {} found in database but not loaded from XML {}!", itemId, buyListId);
 					continue;
 				}
 				if (count < product.getMaxCount()) {
@@ -83,8 +87,8 @@ public final class BuyListData implements IXmlReader {
 					product.restartRestockTask(nextRestockTime);
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("Failed to load buyList data from database.", e);
+		} catch (Exception ex) {
+			LOG.warn("Failed to load buy list data from database.", ex);
 		}
 	}
 	
@@ -135,8 +139,8 @@ public final class BuyListData implements IXmlReader {
 					_buyLists.put(buyList.getListId(), buyList);
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("Failed to load buyList data from xml File: {}", f.getName(), e);
+		} catch (Exception ex) {
+			LOG.warn("Failed to load buy list data from XML {}!", f.getName(), ex);
 		}
 	}
 	
@@ -150,10 +154,10 @@ public final class BuyListData implements IXmlReader {
 	}
 	
 	public static BuyListData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final BuyListData _instance = new BuyListData();
+		protected static final BuyListData INSTANCE = new BuyListData();
 	}
 }

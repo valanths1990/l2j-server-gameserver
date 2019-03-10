@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -38,6 +40,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class PlayerTemplateData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(PlayerTemplateData.class);
+	
 	private final Map<ClassId, L2PcTemplate> _playerTemplates = new HashMap<>();
 	
 	private int _dataCount = 0;
@@ -50,8 +54,8 @@ public final class PlayerTemplateData implements IXmlReader {
 	public void load() {
 		_playerTemplates.clear();
 		parseDatapackDirectory("data/stats/chars/baseStats", false);
-		LOG.info("{}: Loaded {} character templates.", getClass().getSimpleName(), _playerTemplates.size());
-		LOG.info("{}: Loaded {} level up gain records.", getClass().getSimpleName(), _dataCount);
+		LOG.info("Loaded {} character templates.", _playerTemplates.size());
+		LOG.info("Loaded {} level up gain records.", _dataCount);
 	}
 	
 	@Override
@@ -135,10 +139,10 @@ public final class PlayerTemplateData implements IXmlReader {
 	}
 	
 	public static final PlayerTemplateData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final PlayerTemplateData _instance = new PlayerTemplateData();
+		protected static final PlayerTemplateData INSTANCE = new PlayerTemplateData();
 	}
 }

@@ -22,7 +22,7 @@ import java.util.Calendar;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Castle;
@@ -130,7 +130,7 @@ public class SiegeInfo extends L2GameServerPacket {
 			}
 			
 			writeD((int) (Calendar.getInstance().getTimeInMillis() / 1000));
-			writeD((int) ((CHSiegeManager.getInstance().getSiegableHall(_hall.getId()).getNextSiegeTime()) / 1000));
+			writeD((int) ((ClanHallSiegeManager.getInstance().getSiegableHall(_hall.getId()).getNextSiegeTime()) / 1000));
 			writeD(0x00); // number of choices?
 		}
 	}

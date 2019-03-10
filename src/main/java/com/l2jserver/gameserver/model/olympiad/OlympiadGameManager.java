@@ -20,20 +20,24 @@ package com.l2jserver.gameserver.model.olympiad;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.zone.type.L2OlympiadStadiumZone;
 
 /**
+ * Olympiad Game Manager.
  * @author GodKratos, DS
  */
 public class OlympiadGameManager implements Runnable {
-	private static final Logger _log = Logger.getLogger(OlympiadGameManager.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(OlympiadGameManager.class);
 	
 	private volatile boolean _battleStarted = false;
+	
 	private final OlympiadGameTask[] _tasks;
 	
 	protected OlympiadGameManager() {
@@ -48,11 +52,7 @@ public class OlympiadGameManager implements Runnable {
 			_tasks[i++] = new OlympiadGameTask(zone);
 		}
 		
-		_log.log(Level.INFO, "Olympiad System: Loaded " + _tasks.length + " stadiums.");
-	}
-	
-	public static final OlympiadGameManager getInstance() {
-		return SingletonHolder._instance;
+		LOG.info("Loaded {} stadiums.", _tasks.length);
 	}
 	
 	protected final boolean isBattleStarted() {
@@ -129,7 +129,7 @@ public class OlympiadGameManager implements Runnable {
 			if (isAllTasksFinished()) {
 				OlympiadManager.getInstance().clearRegistered();
 				_battleStarted = false;
-				_log.log(Level.INFO, "Olympiad System: All current games finished.");
+				LOG.info("All current games finished.");
 			}
 		}
 	}
@@ -171,7 +171,11 @@ public class OlympiadGameManager implements Runnable {
 		}
 	}
 	
+	public static final OlympiadGameManager getInstance() {
+		return SingletonHolder.INSTANCE;
+	}
+	
 	private static class SingletonHolder {
-		protected static final OlympiadGameManager _instance = new OlympiadGameManager();
+		protected static final OlympiadGameManager INSTANCE = new OlympiadGameManager();
 	}
 }

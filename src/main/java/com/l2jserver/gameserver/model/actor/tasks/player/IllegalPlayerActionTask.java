@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.model.actor.tasks.player;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
@@ -35,10 +34,13 @@ import com.l2jserver.gameserver.model.punishment.PunishmentType;
  * Task that handles illegal player actions.
  */
 public final class IllegalPlayerActionTask implements Runnable {
-	private static final Logger _log = Logger.getLogger("audit");
+	
+	private static final Logger LOG = LoggerFactory.getLogger("audit");
 	
 	private final String _message;
+	
 	private final IllegalActionPunishmentType _punishment;
+	
 	private final L2PcInstance _actor;
 	
 	public IllegalPlayerActionTask(L2PcInstance actor, String message, IllegalActionPunishmentType punishment) {
@@ -69,12 +71,7 @@ public final class IllegalPlayerActionTask implements Runnable {
 	
 	@Override
 	public void run() {
-		LogRecord record = new LogRecord(Level.INFO, "AUDIT:" + _message);
-		record.setLoggerName("audit");
-		//@formatter:off
-		record.setParameters(new Object[] { _actor, _punishment	});
-		//@formatter:on
-		_log.log(record);
+		LOG.info("Illegal action [{}] by player {}, action taken {}!", _message, _actor, _punishment);
 		
 		AdminData.getInstance().broadcastMessageToGMs(_message);
 		if (!_actor.isGM()) {

@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.taskmanager.tasks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.model.olympiad.Olympiad;
 import com.l2jserver.gameserver.taskmanager.Task;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
@@ -29,6 +32,9 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
  * @author godson
  */
 public class TaskOlympiadSave extends Task {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskOlympiadSave.class);
+	
 	public static final String NAME = "olympiad_save";
 	
 	@Override
@@ -40,7 +46,7 @@ public class TaskOlympiadSave extends Task {
 	public void onTimeElapsed(ExecutedTask task) {
 		if (Olympiad.getInstance().inCompPeriod()) {
 			Olympiad.getInstance().saveOlympiadStatus();
-			_log.info("Olympiad System: Data updated.");
+			LOG.info("Data updated.");
 		}
 	}
 	

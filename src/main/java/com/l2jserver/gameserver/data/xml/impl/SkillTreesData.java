@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -75,6 +77,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author Zoey76
  */
 public final class SkillTreesData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SkillTreesData.class);
 	
 	// ClassId, Map of Skill Hash Code, L2SkillLearn
 	private final Map<ClassId, Map<Integer, L2SkillLearn>> _classSkillTrees = new LinkedHashMap<>();
@@ -1120,17 +1124,10 @@ public final class SkillTreesData implements IXmlReader {
 		}
 	}
 	
-	/**
-	 * Gets the single instance of SkillTreesData.
-	 * @return the only instance of this class
-	 */
 	public static SkillTreesData getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	/**
-	 * Singleton holder for the SkillTreesData class.
-	 */
 	private static class SingletonHolder {
 		protected static final SkillTreesData INSTANCE = new SkillTreesData();
 	}

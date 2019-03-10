@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -38,11 +40,10 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class PetDataTable implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(PetDataTable.class);
+	
 	private final Map<Integer, L2PetData> _pets = new HashMap<>();
 	
-	/**
-	 * Instantiates a new pet data table.
-	 */
 	protected PetDataTable() {
 		load();
 	}
@@ -51,7 +52,7 @@ public final class PetDataTable implements IXmlReader {
 	public void load() {
 		_pets.clear();
 		parseDatapackDirectory("data/stats/pets", false);
-		LOG.info("{}: Loaded {} Pets.", getClass().getSimpleName(), _pets.size());
+		LOG.info("Loaded {} Pets.", _pets.size());
 	}
 	
 	@Override
@@ -119,10 +120,6 @@ public final class PetDataTable implements IXmlReader {
 		}
 	}
 	
-	/**
-	 * @param itemId
-	 * @return
-	 */
 	public L2PetData getPetDataByItemId(int itemId) {
 		for (L2PetData data : _pets.values()) {
 			if (data.getItemId() == itemId) {
@@ -153,7 +150,7 @@ public final class PetDataTable implements IXmlReader {
 	 */
 	public L2PetData getPetData(int petId) {
 		if (!_pets.containsKey(petId)) {
-			LOG.info("{}: Missing pet data for NPC ID {}!", getClass().getSimpleName(), petId);
+			LOG.warn("Missing pet data for NPC Id {}!", petId);
 		}
 		return _pets.get(petId);
 	}
@@ -185,15 +182,11 @@ public final class PetDataTable implements IXmlReader {
 		return MountType.findByNpcId(npcId) != MountType.NONE;
 	}
 	
-	/**
-	 * Gets the single instance of PetDataTable.
-	 * @return this class unique instance.
-	 */
 	public static PetDataTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final PetDataTable _instance = new PetDataTable();
+		protected static final PetDataTable INSTANCE = new PetDataTable();
 	}
 }

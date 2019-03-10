@@ -38,13 +38,19 @@ import com.l2jserver.geodriver.GeoDriver;
 
 /**
  * Geodata.
- * @author -Nemesiss-, HorridoJoho
+ * @author -Nemesiss-
+ * @author HorridoJoho
  */
 public class GeoData {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(GeoData.class);
+	
 	private static final String FILE_NAME_FORMAT = "%d_%d.l2j";
+	
 	private static final int ELEVATED_SEE_OVER_DISTANCE = 2;
+	
 	private static final int MAX_SEE_OVER_HEIGHT = 48;
+	
 	private static final int SPAWN_Z_DELTA_LIMIT = 100;
 	
 	private final GeoDriver _driver = new GeoDriver();
@@ -58,27 +64,27 @@ public class GeoData {
 					final Boolean loadFile = Config.GEODATA_REGIONS.get(regionX + "_" + regionY);
 					if (loadFile != null) {
 						if (loadFile) {
-							LOG.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
+							LOG.info("Loading {}...", geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
 					} else if (Config.TRY_LOAD_UNSPECIFIED_REGIONS && Files.exists(geoFilePath)) {
 						try {
-							LOG.info("{}: Loading {}...", getClass().getSimpleName(), geoFilePath.getFileName());
+							LOG.info("Loading {}...", geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
-						} catch (Exception e) {
-							LOG.warn("{}: Failed to load {}!", getClass().getSimpleName(), geoFilePath.getFileName(), e);
+						} catch (Exception ex) {
+							LOG.warn("Failed to load {}!", geoFilePath.getFileName(), ex);
 						}
 					}
 				}
 			}
-		} catch (Exception e) {
-			LOG.error("{}: Failed to load geodata!", e);
+		} catch (Exception ex) {
+			LOG.error("Failed to load geodata!", ex);
 			System.exit(1);
 		}
 		
-		LOG.info("{}: Loaded {} regions.", getClass().getSimpleName(), loadedRegions);
+		LOG.info("Loaded {} regions.", loadedRegions);
 	}
 	
 	public boolean hasGeoPos(int geoX, int geoY) {
@@ -551,10 +557,10 @@ public class GeoData {
 	}
 	
 	public static GeoData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final GeoData _instance = new GeoData();
+		protected static final GeoData INSTANCE = new GeoData();
 	}
 }

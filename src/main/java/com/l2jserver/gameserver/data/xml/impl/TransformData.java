@@ -21,6 +21,8 @@ package com.l2jserver.gameserver.data.xml.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -42,6 +44,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class TransformData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(TransformData.class);
+	
 	private final Map<Integer, Transform> _transformData = new HashMap<>();
 	
 	protected TransformData() {
@@ -52,7 +56,7 @@ public final class TransformData implements IXmlReader {
 	public synchronized void load() {
 		_transformData.clear();
 		parseDatapackDirectory("data/stats/transformations", false);
-		LOG.info("{}: Loaded: {} transform templates.", getClass().getSimpleName(), _transformData.size());
+		LOG.info("Loaded {} transform templates.", _transformData.size());
 	}
 	
 	@Override

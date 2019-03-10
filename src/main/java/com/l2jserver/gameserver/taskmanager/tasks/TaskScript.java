@@ -20,6 +20,9 @@ package com.l2jserver.gameserver.taskmanager.tasks;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 import com.l2jserver.gameserver.taskmanager.Task;
 import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
@@ -28,7 +31,10 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
  * @author janiii
  */
 public class TaskScript extends Task {
-	public static final String NAME = "script";
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskScript.class);
+	
+	private static final String NAME = "script";
 	
 	@Override
 	public String getName() {
@@ -39,14 +45,14 @@ public class TaskScript extends Task {
 	public void onTimeElapsed(ExecutedTask task) {
 		final File file = new File(ScriptEngineManager.SCRIPT_FOLDER, "cron/" + task.getParams()[2]);
 		if (!file.isFile()) {
-			_log.warning("File Not Found: " + task.getParams()[2]);
+			LOG.warn("File not found {}!", task.getParams()[2]);
 			return;
 		}
 		
 		try {
 			ScriptEngineManager.getInstance().compileScript(file);
-		} catch (Exception e) {
-			_log.warning("Failed loading: " + task.getParams()[2]);
+		} catch (Exception ex) {
+			LOG.warn("Failed loading {}!", task.getParams()[2]);
 		}
 	}
 }

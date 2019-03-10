@@ -18,6 +18,8 @@
  */
 package com.l2jserver.gameserver.data.xml.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -31,6 +33,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  * @author Nik
  */
 public final class HitConditionBonusData implements IXmlReader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(HitConditionBonusData.class);
 	
 	private int frontBonus = 0;
 	
@@ -46,9 +50,6 @@ public final class HitConditionBonusData implements IXmlReader {
 	
 	private int rainBonus = 0;
 	
-	/**
-	 * Instantiates a new hit condition bonus.
-	 */
 	protected HitConditionBonusData() {
 		load();
 	}
@@ -56,14 +57,14 @@ public final class HitConditionBonusData implements IXmlReader {
 	@Override
 	public void load() {
 		parseDatapackFile("data/stats/hitConditionBonus.xml");
-		LOG.info("{}: Loaded Hit Condition bonuses.", getClass().getSimpleName());
-		LOG.debug("{}: Front bonus: {}", getClass().getSimpleName(), frontBonus);
-		LOG.debug("{}: Side bonus: {}", getClass().getSimpleName(), sideBonus);
-		LOG.debug("{}: Back bonus: {}", getClass().getSimpleName(), backBonus);
-		LOG.debug("{}: High bonus: {}", getClass().getSimpleName(), highBonus);
-		LOG.debug("{}: Low bonus: {}", getClass().getSimpleName(), lowBonus);
-		LOG.debug("{}: Dark bonus: {}", getClass().getSimpleName(), darkBonus);
-		LOG.debug("{}: Rain bonus: {}", getClass().getSimpleName(), rainBonus);
+		LOG.info("Loaded Hit Condition bonuses.");
+		LOG.debug("Front bonus {}.", frontBonus);
+		LOG.debug("Side bonus {}.", sideBonus);
+		LOG.debug("Back bonus {}.", backBonus);
+		LOG.debug("High bonus {}.", highBonus);
+		LOG.debug("Low bonus {}.", lowBonus);
+		LOG.debug("Dark bonus {}.", darkBonus);
+		LOG.debug("Rain bonus {}.", rainBonus);
 	}
 	
 	@Override
@@ -138,15 +139,11 @@ public final class HitConditionBonusData implements IXmlReader {
 		return Math.max(mod / 100, 0);
 	}
 	
-	/**
-	 * Gets the single instance of HitConditionBonus.
-	 * @return single instance of HitConditionBonus
-	 */
 	public static HitConditionBonusData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final HitConditionBonusData _instance = new HitConditionBonusData();
+		protected static final HitConditionBonusData INSTANCE = new HitConditionBonusData();
 	}
 }

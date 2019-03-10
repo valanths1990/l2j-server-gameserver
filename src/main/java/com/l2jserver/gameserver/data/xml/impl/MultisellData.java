@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -48,6 +50,8 @@ import com.l2jserver.util.file.filter.NumericNameFilter;
 
 public final class MultisellData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(MultisellData.class);
+	
 	public static final int PAGE_SIZE = 40;
 	// Special IDs.
 	public static final int PC_BANG_POINTS = -100;
@@ -71,7 +75,7 @@ public final class MultisellData implements IXmlReader {
 		}
 		
 		verify();
-		LOG.info("{}: Loaded {} multisell lists.", getClass().getSimpleName(), _entries.size());
+		LOG.info("Loaded {} multisell lists.", _entries.size());
 	}
 	
 	@Override
@@ -98,13 +102,12 @@ public final class MultisellData implements IXmlReader {
 						} catch (NumberFormatException e) {
 							try {
 								list.setUseRate(Config.class.getField(att.getNodeValue()).getDouble(Config.class));
-							} catch (Exception e1) {
-								LOG.warn("{}: Unable to parse {}", getClass().getSimpleName(), doc.getLocalName(), e1);
+							} catch (Exception ex) {
+								LOG.warn("Unable to parse {}!", doc.getLocalName(), ex);
 								list.setUseRate(1.0);
 							}
-							
-						} catch (DOMException e) {
-							LOG.warn("{}: Unable to parse {}", getClass().getSimpleName(), doc.getLocalName(), e);
+						} catch (DOMException ex) {
+							LOG.warn("Unable to parse {}!", doc.getLocalName(), ex);
 						}
 					}
 					
@@ -128,8 +131,8 @@ public final class MultisellData implements IXmlReader {
 				}
 			}
 			_entries.put(id, list);
-		} catch (Exception e) {
-			LOG.error("{}: Error in file {}", getClass().getSimpleName(), f, e);
+		} catch (Exception ex) {
+			LOG.error("There has been an error in file {}!", f, ex);
 		}
 	}
 	

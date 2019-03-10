@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -44,6 +46,8 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class AdminData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(AdminData.class);
+	
 	private final Map<Integer, L2AccessLevel> _accessLevels = new HashMap<>();
 	
 	private final Map<String, L2AdminCommandAccessRight> _adminCommandAccessRights = new HashMap<>();
@@ -61,9 +65,9 @@ public final class AdminData implements IXmlReader {
 		_accessLevels.clear();
 		_adminCommandAccessRights.clear();
 		parseDatapackFile("config/accessLevels.xml");
-		LOG.info("{}: Loaded: {} Access Levels.", getClass().getSimpleName(), _accessLevels.size());
+		LOG.info("Loaded {} access levels.", _accessLevels.size());
 		parseDatapackFile("config/adminCommands.xml");
-		LOG.info("{}: Loaded: {} Access Commands.", getClass().getSimpleName(), _adminCommandAccessRights.size());
+		LOG.info("Loaded {} access commands.", _adminCommandAccessRights.size());
 	}
 	
 	@Override
@@ -145,9 +149,9 @@ public final class AdminData implements IXmlReader {
 			if ((accessLevel.getLevel() > 0) && (accessLevel.getLevel() == _highestLevel)) {
 				acar = new L2AdminCommandAccessRight(adminCommand, true, accessLevel.getLevel());
 				_adminCommandAccessRights.put(adminCommand, acar);
-				LOG.info("{}: No rights defined for admin command {} auto setting accesslevel: {}!", getClass().getSimpleName(), adminCommand, accessLevel.getLevel());
+				LOG.info("No rights defined for admin command {} auto setting accesslevel {}!", adminCommand, accessLevel.getLevel());
 			} else {
-				LOG.info("{}: No rights defined for admin command {}!", getClass().getSimpleName(), adminCommand);
+				LOG.info("No rights defined for admin command {}!", adminCommand);
 				return false;
 			}
 		}
@@ -162,7 +166,7 @@ public final class AdminData implements IXmlReader {
 	public boolean requireConfirm(String command) {
 		final L2AdminCommandAccessRight acar = _adminCommandAccessRights.get(command);
 		if (acar == null) {
-			LOG.info("{}: No rights defined for admin command {}.", getClass().getSimpleName(), command);
+			LOG.info("No rights defined for admin command {}.", command);
 			return false;
 		}
 		return acar.getRequireConfirm();
@@ -289,15 +293,11 @@ public final class AdminData implements IXmlReader {
 		}
 	}
 	
-	/**
-	 * Gets the single instance of AdminTable.
-	 * @return the one and only instance of this class
-	 */
 	public static AdminData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final AdminData _instance = new AdminData();
+		protected static final AdminData INSTANCE = new AdminData();
 	}
 }

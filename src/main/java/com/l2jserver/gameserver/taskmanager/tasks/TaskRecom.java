@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.taskmanager.tasks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.taskmanager.Task;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
@@ -28,6 +31,8 @@ import com.l2jserver.gameserver.taskmanager.TaskTypes;
  * @author Layane
  */
 public class TaskRecom extends Task {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaskRecom.class);
 	
 	private static final String NAME = "recommendations";
 	
@@ -50,15 +55,14 @@ public class TaskRecom extends Task {
 				ps.setInt(2, 3600000); // Timer = 1 hour
 				ps.execute();
 			}
-		} catch (Exception e) {
-			_log.severe(getClass().getSimpleName() + ": Could not reset Recommendations System: " + e);
+		} catch (Exception ex) {
+			LOG.warn("Could not reset recommendations system!", ex);
 		}
-		_log.info("Recommendations System reseted");
+		LOG.info("Recommendations System reseted.");
 	}
 	
 	@Override
 	public void initializate() {
-		super.initializate();
 		TaskManager.addUniqueTask(NAME, TaskTypes.TYPE_GLOBAL_TASK, "1", "06:30:00", "");
 	}
 }

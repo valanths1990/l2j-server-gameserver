@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -37,11 +39,10 @@ import com.l2jserver.gameserver.util.IXmlReader;
  */
 public final class StaticObjectData implements IXmlReader {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(StaticObjectData.class);
+	
 	private final Map<Integer, L2StaticObjectInstance> _staticObjects = new HashMap<>();
 	
-	/**
-	 * Instantiates a new static objects.
-	 */
 	protected StaticObjectData() {
 		load();
 	}
@@ -50,7 +51,7 @@ public final class StaticObjectData implements IXmlReader {
 	public void load() {
 		_staticObjects.clear();
 		parseDatapackFile("data/staticObjects.xml");
-		LOG.info("{}: Loaded {} static object templates.", getClass().getSimpleName(), _staticObjects.size());
+		LOG.info("Loaded {} static object templates.", _staticObjects.size());
 	}
 	
 	@Override
@@ -93,15 +94,11 @@ public final class StaticObjectData implements IXmlReader {
 		return _staticObjects.values();
 	}
 	
-	/**
-	 * Gets the single instance of StaticObjects.
-	 * @return single instance of StaticObjects
-	 */
 	public static StaticObjectData getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final StaticObjectData _instance = new StaticObjectData();
+		protected static final StaticObjectData INSTANCE = new StaticObjectData();
 	}
 }

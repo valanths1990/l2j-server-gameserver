@@ -20,7 +20,9 @@ package com.l2jserver.gameserver.model.entity;
 
 import java.util.Calendar;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -31,7 +33,8 @@ import com.l2jserver.gameserver.util.Broadcast;
  * @author HorridoJoho
  */
 public class TvTManager {
-	protected static final Logger _log = Logger.getLogger(TvTManager.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TvTManager.class);
 	
 	private TvTStartTask _task;
 	
@@ -40,9 +43,9 @@ public class TvTManager {
 			TvTEvent.init();
 			
 			scheduleEventStart();
-			_log.info("TvTEventEngine[TvTManager.TvTManager()]: Started.");
+			LOG.info("Started.");
 		} else {
-			_log.info("TvTEventEngine[TvTManager.TvTManager()]: Engine is disabled.");
+			LOG.info("Engine is disabled.");
 		}
 	}
 	
@@ -50,9 +53,6 @@ public class TvTManager {
 		return SingletonHolder.INSTANCE;
 	}
 	
-	/**
-	 * Starts TvTStartTask
-	 */
 	public void scheduleEventStart() {
 		try {
 			Calendar currentTime = Calendar.getInstance();
@@ -78,8 +78,8 @@ public class TvTManager {
 				_task = new TvTStartTask(nextStartTime.getTimeInMillis());
 				ThreadPoolManager.getInstance().executeGeneral(_task);
 			}
-		} catch (Exception e) {
-			_log.warning("TvTEventEngine[TvTManager.scheduleEventStart()]: Error figuring out a start time. Check TvTEventInterval in config file.");
+		} catch (Exception ex) {
+			LOG.warn("There has been an error figuring out a start time. Check TvTEventInterval in config file.", ex);
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class TvTManager {
 	public void startReg() {
 		if (!TvTEvent.startParticipation()) {
 			Broadcast.toAllOnlinePlayers("TvT Event: Event was cancelled.");
-			_log.warning("TvTEventEngine[TvTManager.run()]: Error spawning event npc for participation.");
+			LOG.warn("There has been an error spawning event NPC for participation.");
 			
 			scheduleEventStart();
 		} else {
@@ -107,7 +107,7 @@ public class TvTManager {
 	public void startEvent() {
 		if (!TvTEvent.startFight()) {
 			Broadcast.toAllOnlinePlayers("TvT Event: Event cancelled due to lack of Participation.");
-			_log.info("TvTEventEngine[TvTManager.run()]: Lack of registration, abort event.");
+			LOG.info("Lack of registration, abort event.");
 			
 			scheduleEventStart();
 		} else {

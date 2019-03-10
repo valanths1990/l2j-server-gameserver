@@ -2691,4 +2691,9 @@ public class Quest extends AbstractScript implements IIdentifiable {
 	public boolean isVisibleInQuestWindow() {
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return _name + " (" + _questId + ")";
+	}
 }

@@ -23,8 +23,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
@@ -36,11 +37,12 @@ import com.l2jserver.gameserver.model.entity.Message;
 import com.l2jserver.gameserver.network.serverpackets.ExNoticePostArrived;
 
 /**
+ * Mail Manager.
  * @author Migi, DS
  */
 public final class MailManager {
 	
-	private static final Logger _log = Logger.getLogger(MailManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(MailManager.class);
 	
 	private final Map<Integer, Message> _messages = new ConcurrentHashMap<>();
 	
@@ -69,10 +71,10 @@ public final class MailManager {
 					ThreadPoolManager.getInstance().scheduleGeneral(new MessageDeletionTask(msgId), expiration - System.currentTimeMillis());
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error loading from database:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading from database!", ex);
 		}
-		_log.info(getClass().getSimpleName() + ": Successfully loaded " + count + " messages.");
+		LOG.info("Successfully loaded {} messages.", count);
 	}
 	
 	public final Message getMessage(int msgId) {
@@ -138,8 +140,8 @@ public final class MailManager {
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var ps = Message.getStatement(msg, con)) {
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error saving message:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error saving message Id {}!", msg.getId(), ex);
 		}
 		
 		final L2PcInstance receiver = L2World.getInstance().getPlayer(msg.getReceiverId());
@@ -155,8 +157,8 @@ public final class MailManager {
 			var ps = con.prepareStatement("UPDATE messages SET isUnread = 'false' WHERE messageId = ?")) {
 			ps.setInt(1, msgId);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error marking as read message:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error marking as read message Id {}!", msgId, ex);
 		}
 	}
 	
@@ -165,8 +167,8 @@ public final class MailManager {
 			var ps = con.prepareStatement("UPDATE messages SET isDeletedBySender = 'true' WHERE messageId = ?")) {
 			ps.setInt(1, msgId);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error marking as deleted by sender message:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error marking as deleted by sender message Id {}!", msgId, ex);
 		}
 	}
 	
@@ -175,8 +177,8 @@ public final class MailManager {
 			var ps = con.prepareStatement("UPDATE messages SET isDeletedByReceiver = 'true' WHERE messageId = ?")) {
 			ps.setInt(1, msgId);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error marking as deleted by receiver message:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error marking as deleted by receiver message Id {}!", msgId, ex);
 		}
 	}
 	
@@ -185,8 +187,8 @@ public final class MailManager {
 			var ps = con.prepareStatement("UPDATE messages SET hasAttachments = 'false' WHERE messageId = ?")) {
 			ps.setInt(1, msgId);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error removing attachments in message:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error removing attachments in message Id {}!", msgId, ex);
 		}
 	}
 	
@@ -195,23 +197,19 @@ public final class MailManager {
 			var ps = con.prepareStatement("DELETE FROM messages WHERE messageId = ?")) {
 			ps.setInt(1, msgId);
 			ps.execute();
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Error deleting message:" + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error deleting message Id {}!", msgId, ex);
 		}
 		
 		_messages.remove(msgId);
 		IdFactory.getInstance().releaseId(msgId);
 	}
 	
-	/**
-	 * Gets the single instance of {@code MailManager}.
-	 * @return single instance of {@code MailManager}
-	 */
 	public static MailManager getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final MailManager _instance = new MailManager();
+		protected static final MailManager INSTANCE = new MailManager();
 	}
 }

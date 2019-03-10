@@ -21,7 +21,7 @@ package com.l2jserver.gameserver.model.zone.type;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.MountType;
-import com.l2jserver.gameserver.instancemanager.CHSiegeManager;
+import com.l2jserver.gameserver.instancemanager.ClanHallSiegeManager;
 import com.l2jserver.gameserver.instancemanager.FortManager;
 import com.l2jserver.gameserver.instancemanager.FortSiegeManager;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
@@ -117,7 +117,7 @@ public class L2SiegeZone extends L2ZoneType {
 				throw new IllegalArgumentException("Siege object already defined!");
 			}
 			getSettings().setSiegeableId(Integer.parseInt(value));
-			SiegableHall hall = CHSiegeManager.getInstance().getConquerableHalls().get(getSettings().getSiegeableId());
+			SiegableHall hall = ClanHallSiegeManager.getInstance().getConquerableHalls().get(getSettings().getSiegeableId());
 			if (hall == null) {
 				_log.warning("L2SiegeZone: Siegable clan hall with id " + value + " does not exist!");
 			} else {

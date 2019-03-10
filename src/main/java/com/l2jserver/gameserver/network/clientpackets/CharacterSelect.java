@@ -20,9 +20,8 @@ package com.l2jserver.gameserver.network.clientpackets;
 
 import static com.l2jserver.gameserver.network.L2GameClient.GameClientState.JOINING;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
@@ -48,7 +47,7 @@ public class CharacterSelect extends L2GameClientPacket {
 	
 	private static final String _C__12_CHARACTERSELECT = "[C] 12 CharacterSelect";
 	
-	protected static final Logger _logAccounting = Logger.getLogger("accounting");
+	private static final Logger LOG_ACCOUNTING = LoggerFactory.getLogger("accounting");
 	
 	// cd
 	private int _charSlot;
@@ -149,11 +148,7 @@ public class CharacterSelect extends L2GameClientPacket {
 				client.getActiveCharLock().unlock();
 			}
 			
-			LogRecord record = new LogRecord(Level.INFO, "Logged in");
-			record.setParameters(new Object[] {
-				client
-			});
-			_logAccounting.log(record);
+			LOG_ACCOUNTING.info("Client {} logged in.", client);
 		}
 	}
 	
