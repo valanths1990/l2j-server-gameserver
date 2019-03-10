@@ -19,27 +19,27 @@
 package com.l2jserver.gameserver.status;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Properties;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.handler.ITelnetHandler;
 import com.l2jserver.gameserver.handler.TelnetHandler;
 
 public final class GameStatusThread extends Thread {
-	private static final Logger _log = Logger.getLogger(GameStatusThread.class.getName());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(GameStatusThread.class);
 	
 	private final Socket _cSocket;
 	
 	private final PrintWriter _print;
+	
 	private final BufferedReader _read;
 	
 	private final int _uptime;
@@ -79,35 +79,19 @@ public final class GameStatusThread extends Thread {
 			telnetOutput(2, "");
 		}
 		
-		final File file = new File(Config.TELNET_FILE);
-		try (InputStream telnetIS = new FileInputStream(file)) {
-			Properties telnetSettings = new Properties();
-			telnetSettings.load(telnetIS);
-			
-			String HostList = telnetSettings.getProperty("ListOfHosts", "127.0.0.1,localhost,::1");
-			
-			if (Config.DEVELOPER) {
-				telnetOutput(3, "Comparing ip to list...");
-			}
-			
-			// compare
-			String ipToCompare = null;
-			for (String ip : HostList.split(",")) {
-				if (!result) {
-					ipToCompare = InetAddress.getByName(ip).getHostAddress();
-					if (clientStringIP.equals(ipToCompare)) {
-						result = true;
-					}
-					if (Config.DEVELOPER) {
-						telnetOutput(3, clientStringIP + " = " + ipToCompare + "(" + ip + ") = " + result);
-					}
+		for (String host : Config.TELNET_HOSTS.split(",")) {
+			try {
+				String ipToCompare = InetAddress.getByName(host).getHostAddress();
+				if (clientStringIP.equals(ipToCompare)) {
+					result = true;
 				}
+				
+				if (Config.DEBUG) {
+					telnetOutput(3, clientStringIP + " = " + ipToCompare + "(" + host + ") = " + result);
+				}
+			} catch (Exception ex) {
+				LOG.warn("There has been an error parsing host {}!", host, ex);
 			}
-		} catch (IOException e) {
-			if (Config.DEVELOPER) {
-				telnetOutput(4, "");
-			}
-			telnetOutput(1, "Error: " + e);
 		}
 		
 		if (Config.DEVELOPER) {
@@ -185,8 +169,8 @@ public final class GameStatusThread extends Thread {
 				_cSocket.close();
 			}
 			telnetOutput(1, "Connection from " + _cSocket.getInetAddress().getHostAddress() + " was closed by client.");
-		} catch (IOException e) {
-			_log.warning(getClass().getSimpleName() + ": " + e.getMessage());
+		} catch (Exception ex) {
+			LOG.warn("There has been an error executing game status task!", ex);
 		}
 	}
 }

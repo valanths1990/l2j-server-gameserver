@@ -24,7 +24,7 @@ import com.l2jserver.gameserver.model.items.type.ArmorType;
 import com.l2jserver.gameserver.model.items.type.ItemType1;
 import com.l2jserver.gameserver.model.items.type.ItemType2;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.util.StringUtil;
+import com.l2jserver.gameserver.util.StringUtil;
 
 /**
  * This class is dedicated to the management of armors.

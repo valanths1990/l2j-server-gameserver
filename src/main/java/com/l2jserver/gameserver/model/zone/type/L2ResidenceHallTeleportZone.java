@@ -20,10 +20,10 @@ package com.l2jserver.gameserver.model.zone.type;
 
 import java.util.concurrent.ScheduledFuture;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.util.Rnd;
 
 /**
  * Teleport residence zone for clan hall sieges

@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.L2World;
@@ -33,8 +32,10 @@ import com.l2jserver.gameserver.network.serverpackets.L2FriendSay;
  * @author Tempy
  */
 public final class RequestSendFriendMsg extends L2GameClientPacket {
+	
 	private static final String _C__6B_REQUESTSENDMSG = "[C] 6B RequestSendFriendMsg";
-	private static Logger _logChat = Logger.getLogger("chat");
+	
+	private static final Logger LOG_CHAT = LoggerFactory.getLogger("chat");
 	
 	private String _message;
 	private String _reciever;
@@ -63,14 +64,7 @@ public final class RequestSendFriendMsg extends L2GameClientPacket {
 		}
 		
 		if (Config.LOG_CHAT) {
-			LogRecord record = new LogRecord(Level.INFO, _message);
-			record.setLoggerName("chat");
-			record.setParameters(new Object[] {
-				"PRIV_MSG",
-				"[" + activeChar.getName() + " to " + _reciever + "]"
-			});
-			
-			_logChat.log(record);
+			LOG_CHAT.info("PRIV_MSG {} says [{}] to {}.", activeChar.getName(), _message, _reciever);
 		}
 		
 		targetPlayer.sendPacket(new L2FriendSay(activeChar.getName(), _reciever, _message));

@@ -20,7 +20,7 @@ package com.l2jserver.gameserver.network.gameserverpackets;
 
 import java.util.List;
 
-import com.l2jserver.util.network.BaseSendablePacket;
+import com.l2jserver.commons.network.BaseSendablePacket;
 
 /**
  * @author mrTJO Thanks to mochitto

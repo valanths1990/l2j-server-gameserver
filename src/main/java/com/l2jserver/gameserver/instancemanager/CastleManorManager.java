@@ -37,6 +37,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.enums.ManorMode;
@@ -51,7 +52,6 @@ import com.l2jserver.gameserver.model.interfaces.IStorable;
 import com.l2jserver.gameserver.model.itemcontainer.ItemContainer;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.util.IXmlReader;
-import com.l2jserver.util.Rnd;
 
 /**
  * Castle manor system.

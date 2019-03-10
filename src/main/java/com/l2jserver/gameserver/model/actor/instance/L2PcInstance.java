@@ -52,7 +52,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.ItemsAutoDestroy;
@@ -68,6 +68,7 @@ import com.l2jserver.gameserver.ai.L2SummonAI;
 import com.l2jserver.gameserver.cache.WarehouseCacheManager;
 import com.l2jserver.gameserver.communitybbs.BB.Forum;
 import com.l2jserver.gameserver.communitybbs.Manager.ForumsBBSManager;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
 import com.l2jserver.gameserver.data.sql.impl.CharNameTable;
 import com.l2jserver.gameserver.data.sql.impl.CharSummonTable;
@@ -325,16 +326,16 @@ import com.l2jserver.gameserver.network.serverpackets.UserInfo;
 import com.l2jserver.gameserver.network.serverpackets.ValidateLocation;
 import com.l2jserver.gameserver.taskmanager.AttackStanceTaskManager;
 import com.l2jserver.gameserver.util.Broadcast;
+import com.l2jserver.gameserver.util.EnumIntBitmask;
 import com.l2jserver.gameserver.util.FloodProtectors;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.EnumIntBitmask;
-import com.l2jserver.util.Rnd;
 
 /**
  * This class represents all player characters in the world.<br>
  * There is always a client-thread connected to this (except if a player-store is activated upon logout).
  */
 public final class L2PcInstance extends L2Playable {
+	
 	public static final int ID_NONE = -1;
 	public static final int REQUEST_TIMEOUT = 15;
 	private static final Logger LOG = LoggerFactory.getLogger(L2PcInstance.class);
@@ -5708,7 +5709,7 @@ public final class L2PcInstance extends L2Playable {
 		if (!AdminData.getInstance().hasAccessLevel(level)) {
 			LOG.warn("Tried to set unregistered access level {} for {}. Setting access level without privileges!", level, this);
 		} else if (level > 0) {
-			LOG.info("{} access level set for character {}.", _accessLevel.getName(), getName());
+			LOG.info("{} access level set for character {}.", _accessLevel.getName(), this);
 		}
 	}
 	

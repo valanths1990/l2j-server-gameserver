@@ -23,7 +23,7 @@ import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.l2jserver.util.Rnd;
+import com.l2jserver.commons.util.Rnd;
 
 /**
  * Dimensional Rift Room.

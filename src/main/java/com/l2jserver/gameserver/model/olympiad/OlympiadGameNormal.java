@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.Location;
@@ -37,7 +38,6 @@ import com.l2jserver.gameserver.network.serverpackets.ExOlympiadMatchResult;
 import com.l2jserver.gameserver.network.serverpackets.ExOlympiadUserInfo;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author GodKratos, Pere, DS

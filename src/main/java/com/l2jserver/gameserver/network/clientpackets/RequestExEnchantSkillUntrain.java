@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
@@ -44,10 +43,13 @@ import com.l2jserver.gameserver.network.serverpackets.UserInfo;
  * @author -Wooden-
  */
 public final class RequestExEnchantSkillUntrain extends L2GameClientPacket {
+	
+	private static final Logger LOG_ENCHANT_SKILL = LoggerFactory.getLogger("enchant_skill");
+	
 	private static final String _C__D0_33_REQUESTEXENCHANTSKILLUNTRAIN = "[C] D0:33 RequestExEnchantSkillUntrain";
-	private static final Logger _logEnchant = Logger.getLogger("enchant");
 	
 	private int _skillId;
+	
 	private int _skillLvl;
 	
 	@Override
@@ -138,14 +140,7 @@ public final class RequestExEnchantSkillUntrain extends L2GameClientPacket {
 		player.addSp((int) (requiredSp * 0.8));
 		
 		if (Config.LOG_SKILL_ENCHANTS) {
-			LogRecord record = new LogRecord(Level.INFO, "Untrain");
-			record.setParameters(new Object[] {
-				player,
-				skill,
-				spb
-			});
-			record.setLoggerName("skill");
-			_logEnchant.log(record);
+			LOG_ENCHANT_SKILL.info("UNTRAINED {} using {} by {}.", skill, spb, player);
 		}
 		
 		player.addSkill(skill, true);

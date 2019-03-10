@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.EnchantItemData;
@@ -43,11 +42,13 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
 
 public final class RequestEnchantItem extends L2GameClientPacket {
-	protected static final Logger _logEnchant = Logger.getLogger("enchant");
+	
+	private static final Logger LOG_ENCHANT_ITEM = LoggerFactory.getLogger("enchant_item");
 	
 	private static final String _C__5F_REQUESTENCHANTITEM = "[C] 5F RequestEnchantItem";
 	
 	private int _objectId;
+	
 	private int _supportId;
 	
 	@Override
@@ -158,7 +159,6 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 					break;
 				}
 				case SUCCESS: {
-					Skill enchant4Skill = null;
 					L2Item it = item.getItem();
 					// Increase enchant level only if scroll's base template has chance, some armors can success over +20 but they shouldn't have increased.
 					if (scrollTemplate.getChance(activeChar, item) > 0) {
@@ -168,15 +168,7 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 					activeChar.sendPacket(new EnchantResult(0, 0, 0));
 					
 					if (Config.LOG_ITEM_ENCHANTS) {
-						LogRecord record = new LogRecord(Level.INFO, "Success");
-						record.setParameters(new Object[] {
-							activeChar,
-							item,
-							scroll,
-							support,
-						});
-						record.setLoggerName("item");
-						_logEnchant.log(record);
+						LOG_ENCHANT_ITEM.info("ENCHANTED {} using {} and {} by {}.", item, scroll, support, activeChar);
 					}
 					
 					// announce the success
@@ -196,7 +188,7 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 					}
 					
 					if ((item.isArmor()) && (item.getEnchantLevel() == 4) && item.isEquipped()) {
-						enchant4Skill = it.getEnchant4Skill();
+						Skill enchant4Skill = it.getEnchant4Skill();
 						if (enchant4Skill != null) {
 							// add skills bestowed from +4 armor
 							activeChar.addSkill(enchant4Skill, false);
@@ -212,15 +204,7 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 						activeChar.sendPacket(new EnchantResult(5, 0, 0));
 						
 						if (Config.LOG_ITEM_ENCHANTS) {
-							LogRecord record = new LogRecord(Level.INFO, "Safe Fail");
-							record.setParameters(new Object[] {
-								activeChar,
-								item,
-								scroll,
-								support,
-							});
-							record.setLoggerName("item");
-							_logEnchant.log(record);
+							LOG_ENCHANT_ITEM.info("FAILED_SAFE_ENCHANTING {} using {} and {} by {}.", item, scroll, support, activeChar);
 						}
 					} else {
 						// unequip item on enchant failure to avoid item skills stack
@@ -254,15 +238,7 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 							activeChar.sendPacket(new EnchantResult(3, 0, 0));
 							
 							if (Config.LOG_ITEM_ENCHANTS) {
-								LogRecord record = new LogRecord(Level.INFO, "Blessed Fail");
-								record.setParameters(new Object[] {
-									activeChar,
-									item,
-									scroll,
-									support,
-								});
-								record.setLoggerName("item");
-								_logEnchant.log(record);
+								LOG_ENCHANT_ITEM.info("FAILED_BLESSED_ENCHANTING {} using {} and {} by {}.", item, scroll, support, activeChar);
 							}
 						} else {
 							// enchant failed, destroy item
@@ -274,15 +250,7 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 								activeChar.sendPacket(new EnchantResult(2, 0, 0));
 								
 								if (Config.LOG_ITEM_ENCHANTS) {
-									LogRecord record = new LogRecord(Level.INFO, "Unable to destroy");
-									record.setParameters(new Object[] {
-										activeChar,
-										item,
-										scroll,
-										support,
-									});
-									record.setLoggerName("item");
-									_logEnchant.log(record);
+									LOG_ENCHANT_ITEM.warn("CANNOT_DESTROY {} using {} and {} by {}.", item, scroll, support, activeChar);
 								}
 								return;
 							}
@@ -305,15 +273,7 @@ public final class RequestEnchantItem extends L2GameClientPacket {
 							}
 							
 							if (Config.LOG_ITEM_ENCHANTS) {
-								LogRecord record = new LogRecord(Level.INFO, "Fail");
-								record.setParameters(new Object[] {
-									activeChar,
-									item,
-									scroll,
-									support,
-								});
-								record.setLoggerName("item");
-								_logEnchant.log(record);
+								LOG_ENCHANT_ITEM.warn("FAILED_ENCHANTING {} using {} and {} by {}.", item, scroll, support, activeChar);
 							}
 						}
 					}

@@ -20,10 +20,11 @@ package com.l2jserver.gameserver.model.actor;
 
 import static com.l2jserver.gameserver.enums.InstanceType.L2Summon;
 
-import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2SummonAI;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.Race;
@@ -72,7 +73,6 @@ import com.l2jserver.gameserver.network.serverpackets.TeleportToLocation;
 import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.taskmanager.DecayTaskManager;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.Rnd;
 
 public abstract class L2Summon extends L2Playable {
 	private L2PcInstance _owner;

@@ -21,10 +21,10 @@ package com.l2jserver.gameserver.model.drops.strategy;
 import java.util.Collections;
 import java.util.List;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.drops.GeneralDropItem;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author Battlecruiser

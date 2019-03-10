@@ -20,8 +20,8 @@ package com.l2jserver.gameserver.network.clientpackets;
 
 import java.nio.BufferUnderflowException;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.ai.CtrlIntention;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;

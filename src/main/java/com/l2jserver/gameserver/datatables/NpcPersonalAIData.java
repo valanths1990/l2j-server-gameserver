@@ -21,9 +21,9 @@ package com.l2jserver.gameserver.datatables;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.model.L2Spawn;
 import com.l2jserver.gameserver.model.actor.L2Npc;
-import com.l2jserver.util.Rnd;
 
 /**
  * This class holds parameter, specific to certain NPCs.<br>

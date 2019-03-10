@@ -36,7 +36,7 @@ import com.l2jserver.gameserver.model.buylist.L2BuyList;
 import com.l2jserver.gameserver.model.buylist.Product;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.util.IXmlReader;
-import com.l2jserver.util.file.filter.NumericNameFilter;
+import com.l2jserver.gameserver.util.file.filter.NumericNameFilter;
 
 /**
  * Loads buy lists for NPCs.

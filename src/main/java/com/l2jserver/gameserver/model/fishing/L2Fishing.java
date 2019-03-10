@@ -20,6 +20,7 @@ package com.l2jserver.gameserver.model.fishing;
 
 import java.util.concurrent.Future;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.data.xml.impl.FishingMonstersData;
 import com.l2jserver.gameserver.enums.audio.Music;
@@ -30,7 +31,6 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ExFishingHpRegen;
 import com.l2jserver.gameserver.network.serverpackets.ExFishingStartCombat;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.util.Rnd;
 
 public class L2Fishing implements Runnable {
 	private L2PcInstance _fisher;

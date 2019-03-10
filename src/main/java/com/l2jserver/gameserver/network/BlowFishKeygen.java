@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network;
 
-import com.l2jserver.util.Rnd;
+import com.l2jserver.commons.util.Rnd;
 
 /**
  * Blowfish keygen for GameServer client connections.

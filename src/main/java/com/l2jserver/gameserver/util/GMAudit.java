@@ -48,8 +48,8 @@ public class GMAudit {
 	public static void auditGMAction(String gmName, String action, String target, String params) {
 		final SimpleDateFormat _formatter = new SimpleDateFormat("dd/MM/yyyy H:mm:ss");
 		final String date = _formatter.format(new Date());
-		String name = com.l2jserver.util.Util.replaceIllegalCharacters(gmName);
-		if (!com.l2jserver.util.Util.isValidFileName(name)) {
+		String name = com.l2jserver.commons.util.Util.replaceIllegalCharacters(gmName);
+		if (!com.l2jserver.commons.util.Util.isValidFileName(name)) {
 			name = "INVALID_GM_NAME_" + date;
 		}
 		

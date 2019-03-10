@@ -18,8 +18,8 @@
  */
 package com.l2jserver.gameserver.network.gameserverpackets;
 
+import com.l2jserver.commons.network.BaseSendablePacket;
 import com.l2jserver.gameserver.LoginServerThread.SessionKey;
-import com.l2jserver.util.network.BaseSendablePacket;
 
 /**
  * @author -Wooden-

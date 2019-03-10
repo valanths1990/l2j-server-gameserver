@@ -29,7 +29,6 @@ import com.l2jserver.gameserver.model.punishment.PunishmentAffect;
 import com.l2jserver.gameserver.model.punishment.PunishmentTask;
 import com.l2jserver.gameserver.model.punishment.PunishmentType;
 import com.l2jserver.gameserver.network.L2GameClient;
-import com.l2jserver.util.StringUtil;
 
 /**
  * Flood protector implementation.

@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.util.PrimeFinder;
+import com.l2jserver.gameserver.util.file.filter.PrimeFinder;
 
 /**
  * BitSet ID Factory.

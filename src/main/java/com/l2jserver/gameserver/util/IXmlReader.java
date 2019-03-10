@@ -33,7 +33,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
 import com.l2jserver.gameserver.config.Config;
-import com.l2jserver.util.file.filter.XMLFilter;
+import com.l2jserver.gameserver.util.file.filter.XMLFilter;
 
 /**
  * Interface for XML parsers.

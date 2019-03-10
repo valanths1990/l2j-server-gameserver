@@ -18,6 +18,7 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.model.ArenaParticipantsHolder;
 import com.l2jserver.gameserver.model.actor.L2Character;
@@ -28,7 +29,6 @@ import com.l2jserver.gameserver.network.serverpackets.AbstractNpcInfo;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.network.serverpackets.ExCubeGameChangePoints;
 import com.l2jserver.gameserver.network.serverpackets.ExCubeGameExtendedChangePoints;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author BiggBoss

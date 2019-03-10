@@ -39,9 +39,11 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.commons.util.Rnd;
+import com.l2jserver.commons.util.Util;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.ai.CtrlIntention;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.DoorData;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
@@ -145,8 +147,6 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 import com.l2jserver.gameserver.scripting.ScriptManager;
 import com.l2jserver.gameserver.util.MinionList;
-import com.l2jserver.util.Rnd;
-import com.l2jserver.util.Util;
 
 /**
  * Abstract script.
@@ -2647,9 +2647,13 @@ public abstract class AbstractScript implements INamable {
 		player.addExpAndSpQuest((long) (exp * Config.RATE_QUEST_REWARD_XP), (int) (sp * Config.RATE_QUEST_REWARD_SP));
 	}
 	
+	public static double getRandom() {
+		return Rnd.get();
+	}
+	
 	/**
 	 * Get a random integer from 0 (inclusive) to {@code max} (exclusive).<br>
-	 * Use this method instead of importing {@link com.l2jserver.util.Rnd} utility.
+	 * Use this method instead of importing {@link com.l2jserver.commons.util.Rnd} utility.
 	 * @param max the maximum value for randomization
 	 * @return a random integer number from 0 to {@code max - 1}
 	 */
@@ -2659,7 +2663,7 @@ public abstract class AbstractScript implements INamable {
 	
 	/**
 	 * Get a random integer from {@code min} (inclusive) to {@code max} (inclusive).<br>
-	 * Use this method instead of importing {@link com.l2jserver.util.Rnd} utility.
+	 * Use this method instead of importing {@link com.l2jserver.commons.util.Rnd} utility.
 	 * @param min the minimum value for randomization
 	 * @param max the maximum value for randomization
 	 * @return a random integer number from {@code min} to {@code max}
@@ -2670,7 +2674,7 @@ public abstract class AbstractScript implements INamable {
 	
 	/**
 	 * Get a random boolean.<br>
-	 * Use this method instead of importing {@link com.l2jserver.util.Rnd} utility.
+	 * Use this method instead of importing {@link com.l2jserver.commons.util.Rnd} utility.
 	 * @return {@code true} or {@code false} randomly
 	 */
 	public static boolean getRandomBoolean() {

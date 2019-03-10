@@ -23,10 +23,10 @@ import java.lang.reflect.Constructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
-import com.l2jserver.util.Rnd;
 
 public class MonsterRace {
 	protected static final Logger LOG = LoggerFactory.getLogger(MonsterRace.class);

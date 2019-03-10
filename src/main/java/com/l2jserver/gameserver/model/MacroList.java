@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.enums.ShortcutType;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.interfaces.IRestorable;
 import com.l2jserver.gameserver.network.serverpackets.SendMacroList;
-import com.l2jserver.util.StringUtil;
+import com.l2jserver.gameserver.util.StringUtil;
 
 public class MacroList implements IRestorable {
 	

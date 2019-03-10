@@ -18,10 +18,10 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -38,17 +38,19 @@ import com.l2jserver.gameserver.network.serverpackets.ExEnchantSkillInfoDetail;
 import com.l2jserver.gameserver.network.serverpackets.ExEnchantSkillResult;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
-import com.l2jserver.util.Rnd;
 
 /**
  * Format (ch) dd c: (id) 0xD0 h: (subid) 0x32 d: skill id d: skill lvl
  * @author -Wooden-
  */
 public final class RequestExEnchantSkillSafe extends L2GameClientPacket {
+	
+	private static final Logger LOG_ENCHANT_SKILL = LoggerFactory.getLogger("enchant_skill");
+	
 	private static final String _C__D0_32_REQUESTEXENCHANTSKILLSAFE = "[C] D0:32 RequestExEnchantSkillSafe";
-	private static final Logger _logEnchant = Logger.getLogger("enchant");
 	
 	private int _skillId;
+	
 	private int _skillLvl;
 	
 	@Override
@@ -133,15 +135,7 @@ public final class RequestExEnchantSkillSafe extends L2GameClientPacket {
 			// ok. Destroy ONE copy of the book
 			if (Rnd.get(100) <= rate) {
 				if (Config.LOG_SKILL_ENCHANTS) {
-					LogRecord record = new LogRecord(Level.INFO, "Safe Success");
-					record.setParameters(new Object[] {
-						player,
-						skill,
-						spb,
-						rate
-					});
-					record.setLoggerName("skill");
-					_logEnchant.log(record);
+					LOG_ENCHANT_SKILL.info("SAFE_ENCHANTED {} using {} with rate {} by {}.", skill, spb, rate, player);
 				}
 				
 				player.addSkill(skill, true);
@@ -157,15 +151,7 @@ public final class RequestExEnchantSkillSafe extends L2GameClientPacket {
 				player.sendPacket(sm);
 			} else {
 				if (Config.LOG_SKILL_ENCHANTS) {
-					LogRecord record = new LogRecord(Level.INFO, "Safe Fail");
-					record.setParameters(new Object[] {
-						player,
-						skill,
-						spb,
-						rate
-					});
-					record.setLoggerName("skill");
-					_logEnchant.log(record);
+					LOG_ENCHANT_SKILL.info("FAILED_SAFE_ENCHANTING {} using {} with rate {} by {}.", skill, spb, rate, player);
 				}
 				
 				SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.SKILL_ENCHANT_FAILED_S1_LEVEL_WILL_REMAIN);

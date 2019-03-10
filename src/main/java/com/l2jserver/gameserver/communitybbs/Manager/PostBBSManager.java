@@ -31,7 +31,7 @@ import com.l2jserver.gameserver.communitybbs.BB.Post.CPost;
 import com.l2jserver.gameserver.communitybbs.BB.Topic;
 import com.l2jserver.gameserver.handler.CommunityBoardHandler;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.util.StringUtil;
+import com.l2jserver.gameserver.util.StringUtil;
 
 public class PostBBSManager extends BaseBBSManager {
 	private final Map<Topic, Post> _postByTopic = new ConcurrentHashMap<>();

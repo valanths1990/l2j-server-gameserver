@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network.loginserverpackets;
 
-import com.l2jserver.util.network.BaseRecievePacket;
+import com.l2jserver.commons.network.BaseRecievePacket;
 
 /**
  * @author -Wooden-

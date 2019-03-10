@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.CreatureSay;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author Battlecruiser

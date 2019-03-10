@@ -30,12 +30,13 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.instancemanager.AntiFeedManager;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.StatsSet;
@@ -52,9 +53,9 @@ import com.l2jserver.gameserver.util.Broadcast;
  */
 public class Olympiad extends ListenersContainer {
 	
-	protected static final Logger _log = Logger.getLogger(Olympiad.class.getName());
+	private static final java.util.logging.Logger _log = java.util.logging.Logger.getLogger(Olympiad.class.getName());
 	
-	protected static final Logger _logResults = Logger.getLogger("olympiad");
+	private static final Logger LOG_OLYMPIAD = LoggerFactory.getLogger("olympiad");
 	
 	private static final Map<Integer, StatsSet> NOBLES = new ConcurrentHashMap<>();
 	
@@ -436,7 +437,8 @@ public class Olympiad extends ListenersContainer {
 			
 			Broadcast.toAllOnlinePlayers(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_STARTED));
 			_log.info("Olympiad System: Olympiad Game Started");
-			_logResults.info("Result,Player1,Player2,Player1 HP,Player2 HP,Player1 Damage,Player2 Damage,Points,Classed");
+			
+			LOG_OLYMPIAD.info("Result,Player1,Player2,Player1 HP,Player2 HP,Player1 Damage,Player2 Damage,Points,Classed");
 			
 			_gameManager = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(OlympiadGameManager.getInstance(), 30000, 30000);
 			if (Config.ALT_OLY_ANNOUNCE_GAMES) {
@@ -744,28 +746,13 @@ public class Olympiad extends ListenersContainer {
 			return;
 		}
 		
-		LogRecord record;
-		_logResults.info("Noble,charid,classid,compDone,points");
+		LOG_OLYMPIAD.info("Noble,charid,classid,compDone,points");
 		for (Entry<Integer, StatsSet> entry : NOBLES.entrySet()) {
 			StatsSet nobleInfo = entry.getValue();
 			if (nobleInfo == null) {
 				continue;
 			}
-			
-			int charId = entry.getKey();
-			int classId = nobleInfo.getInt(CLASS_ID);
-			String charName = nobleInfo.getString(CHAR_NAME);
-			int points = nobleInfo.getInt(POINTS);
-			int compDone = nobleInfo.getInt(COMP_DONE);
-			
-			record = new LogRecord(Level.INFO, charName);
-			record.setParameters(new Object[] {
-				charId,
-				classId,
-				compDone,
-				points
-			});
-			_logResults.log(record);
+			LOG_OLYMPIAD.info("{}, {}, {}, {}, {}", nobleInfo.getString(CHAR_NAME), entry.getKey(), nobleInfo.getInt(CLASS_ID), nobleInfo.getInt(COMP_DONE), nobleInfo.getInt(POINTS));
 		}
 		
 		try (var con = ConnectionFactory.getInstance().getConnection();
@@ -788,12 +775,8 @@ public class Olympiad extends ListenersContainer {
 							hero.set(CHAR_ID, rset.getInt(CHAR_ID));
 							soulHounds.add(hero);
 						} else {
-							record = new LogRecord(Level.INFO, "Hero " + hero.getString(CHAR_NAME));
-							record.setParameters(new Object[] {
-								hero.getInt(CHAR_ID),
-								hero.getInt(CLASS_ID)
-							});
-							_logResults.log(record);
+							LOG_OLYMPIAD.info("Hero {} {} {}", hero.getString(CHAR_NAME), hero.getInt(CHAR_ID), hero.getInt(CLASS_ID));
+							
 							HEROS_TO_BE.add(hero);
 						}
 					}
@@ -811,12 +794,8 @@ public class Olympiad extends ListenersContainer {
 					hero.set(CHAR_ID, winner.getInt(CHAR_ID));
 					hero.set(CHAR_NAME, winner.getString(CHAR_NAME));
 					
-					record = new LogRecord(Level.INFO, "Hero " + hero.getString(CHAR_NAME));
-					record.setParameters(new Object[] {
-						hero.getInt(CHAR_ID),
-						hero.getInt(CLASS_ID)
-					});
-					_logResults.log(record);
+					LOG_OLYMPIAD.info("Hero {} {} {}", hero.getString(CHAR_NAME), hero.getInt(CHAR_ID), hero.getInt(CLASS_ID));
+					
 					HEROS_TO_BE.add(hero);
 					break;
 				}
@@ -854,12 +833,8 @@ public class Olympiad extends ListenersContainer {
 					hero.set(CHAR_ID, winner.getInt(CHAR_ID));
 					hero.set(CHAR_NAME, winner.getString(CHAR_NAME));
 					
-					record = new LogRecord(Level.INFO, "Hero " + hero.getString(CHAR_NAME));
-					record.setParameters(new Object[] {
-						hero.getInt(CHAR_ID),
-						hero.getInt(CLASS_ID)
-					});
-					_logResults.log(record);
+					LOG_OLYMPIAD.info("Hero {} {} {}", hero.getString(CHAR_NAME), hero.getInt(CHAR_ID), hero.getInt(CLASS_ID));
+					
 					HEROS_TO_BE.add(hero);
 					break;
 				}

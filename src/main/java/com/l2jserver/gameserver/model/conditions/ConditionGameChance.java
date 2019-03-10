@@ -18,10 +18,10 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.util.Rnd;
 
 /**
  * The Class ConditionGameChance.

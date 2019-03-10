@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.network;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
+import com.l2jserver.commons.util.Util;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.network.L2GameClient.GameClientState;
 import com.l2jserver.gameserver.network.clientpackets.*;
@@ -29,7 +30,6 @@ import com.l2jserver.mmocore.IMMOExecutor;
 import com.l2jserver.mmocore.IPacketHandler;
 import com.l2jserver.mmocore.MMOConnection;
 import com.l2jserver.mmocore.ReceivablePacket;
-import com.l2jserver.util.Util;
 
 /**
  * Stateful Packet Handler<BR>

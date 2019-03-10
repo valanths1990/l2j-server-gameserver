@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.OptionData;
 import com.l2jserver.gameserver.model.L2Augmentation;
@@ -40,7 +41,6 @@ import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.options.Options;
 import com.l2jserver.gameserver.network.clientpackets.AbstractRefinePacket;
-import com.l2jserver.util.Rnd;
 
 /**
  * Loads augmentation bonuses and skills.

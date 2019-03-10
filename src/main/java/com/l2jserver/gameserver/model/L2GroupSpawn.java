@@ -20,12 +20,12 @@ package com.l2jserver.gameserver.model;
 
 import java.util.logging.Level;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.sql.impl.TerritoryTable;
 import com.l2jserver.gameserver.model.actor.L2Npc;
 import com.l2jserver.gameserver.model.actor.instance.L2ControllableMobInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author littlecrow A special spawn implementation to spawn controllable mob

@@ -32,7 +32,7 @@ import com.l2jserver.gameserver.engines.items.DocumentItem;
 import com.l2jserver.gameserver.engines.skills.DocumentSkill;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.util.file.filter.XMLFilter;
+import com.l2jserver.gameserver.util.file.filter.XMLFilter;
 
 /**
  * Document Engine.

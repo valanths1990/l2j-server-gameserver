@@ -20,10 +20,10 @@ package com.l2jserver.gameserver.model.zone.form;
 
 import java.awt.Rectangle;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.GeoData;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.model.zone.L2ZoneForm;
-import com.l2jserver.util.Rnd;
 
 /**
  * A primitive rectangular zone

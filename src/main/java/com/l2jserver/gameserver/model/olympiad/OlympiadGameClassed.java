@@ -20,8 +20,8 @@ package com.l2jserver.gameserver.model.olympiad;
 
 import java.util.List;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.config.Config;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author DS

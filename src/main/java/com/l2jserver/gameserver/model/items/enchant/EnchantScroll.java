@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.data.xml.impl.EnchantItemGroupsData;
 import com.l2jserver.gameserver.model.StatsSet;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -30,7 +31,6 @@ import com.l2jserver.gameserver.model.items.type.EtcItemType;
 import com.l2jserver.gameserver.model.items.type.ItemType;
 import com.l2jserver.gameserver.network.Debug;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.Rnd;
 
 /**
  * @author UnAfraid

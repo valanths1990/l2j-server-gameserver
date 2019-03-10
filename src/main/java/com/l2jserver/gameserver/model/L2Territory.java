@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-import com.l2jserver.util.Rnd;
+import com.l2jserver.commons.util.Rnd;
 
 /**
  * @version 0.1, 2005-03-12

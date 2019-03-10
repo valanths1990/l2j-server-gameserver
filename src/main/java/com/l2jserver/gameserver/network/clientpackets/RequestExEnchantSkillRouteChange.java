@@ -18,10 +18,10 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.EnchantSkillGroupsData;
 import com.l2jserver.gameserver.datatables.SkillData;
@@ -38,17 +38,19 @@ import com.l2jserver.gameserver.network.serverpackets.ExEnchantSkillInfoDetail;
 import com.l2jserver.gameserver.network.serverpackets.ExEnchantSkillResult;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
-import com.l2jserver.util.Rnd;
 
 /**
  * Format (ch) dd c: (id) 0xD0 h: (subid) 0x34 d: skill id d: skill lvl
  * @author -Wooden-
  */
 public final class RequestExEnchantSkillRouteChange extends L2GameClientPacket {
+	
+	private static final Logger LOG_ENCHANT_SKILL = LoggerFactory.getLogger("enchant_skill");
+	
 	private static final String _C__D0_34_REQUESTEXENCHANTSKILLROUTECHANGE = "[C] D0:34 RequestExEnchantSkillRouteChange";
-	private static final Logger _logEnchant = Logger.getLogger("enchant");
 	
 	private int _skillId;
+	
 	private int _skillLvl;
 	
 	@Override
@@ -151,14 +153,7 @@ public final class RequestExEnchantSkillRouteChange extends L2GameClientPacket {
 			
 			if (skill != null) {
 				if (Config.LOG_SKILL_ENCHANTS) {
-					LogRecord record = new LogRecord(Level.INFO, "Route Change");
-					record.setParameters(new Object[] {
-						player,
-						skill,
-						spb
-					});
-					record.setLoggerName("skill");
-					_logEnchant.log(record);
+					LOG_ENCHANT_SKILL.info("ROUTE_CHANGED {} using {} by {}.", skill, spb, player);
 				}
 				
 				player.addSkill(skill, true);

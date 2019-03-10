@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import com.l2jserver.gameserver.model.PageResult;
-import com.l2jserver.util.StringUtil;
 
 /**
  * A class containing useful methods for constructing HTML

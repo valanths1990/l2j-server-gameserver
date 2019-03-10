@@ -36,8 +36,8 @@ import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.util.StringUtil;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.StringUtil;
 
 /**
  * This class is dedicated to the management of weapons.

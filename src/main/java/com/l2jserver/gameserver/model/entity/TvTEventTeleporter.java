@@ -18,13 +18,13 @@
  */
 package com.l2jserver.gameserver.model.entity;
 
-import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.enums.DuelState;
 import com.l2jserver.gameserver.enums.Team;
 import com.l2jserver.gameserver.model.actor.L2Summon;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.util.Rnd;
 
 public class TvTEventTeleporter implements Runnable {
 	/** The instance of the player to teleport */

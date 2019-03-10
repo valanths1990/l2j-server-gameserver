@@ -31,9 +31,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.commons.util.Rnd;
+import com.l2jserver.commons.util.Util;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.enums.CategoryType;
 import com.l2jserver.gameserver.enums.Race;
 import com.l2jserver.gameserver.enums.TrapAction;
@@ -65,8 +67,6 @@ import com.l2jserver.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.NpcQuestHtmlMessage;
 import com.l2jserver.gameserver.network.serverpackets.TutorialShowHtml;
 import com.l2jserver.gameserver.scripting.ScriptManager;
-import com.l2jserver.util.Rnd;
-import com.l2jserver.util.Util;
 
 /**
  * Quest main class.
@@ -965,18 +965,11 @@ public class Quest extends AbstractScript implements IIdentifiable {
 	 * @param npc this parameter contains a reference to the exact instance of the NPC that the player is talking with.
 	 * @param player this parameter contains a reference to the exact instance of the player who is talking to the NPC.
 	 * @return the text returned by the event (may be {@code null}, a filename or just text)
-	 * @since <a href="http://trac.l2jserver.com/changeset/771">Jython AI support for "onFirstTalk"</a>
 	 */
 	public String onFirstTalk(L2Npc npc, L2PcInstance player) {
 		return null;
 	}
 	
-	/**
-	 * @param item
-	 * @param player
-	 * @param event
-	 * @return
-	 */
 	public String onItemEvent(L2ItemInstance item, L2PcInstance player, String event) {
 		return null;
 	}
@@ -1567,27 +1560,6 @@ public class Quest extends AbstractScript implements IIdentifiable {
 			return result;
 		}
 		return DEFAULT_ALREADY_COMPLETED_MSG;
-	}
-	
-	// TODO: Remove after all Jython scripts are replaced with Java versions.
-	public void addStartNpc(int npcId) {
-		setNpcQuestStartId(npcId);
-	}
-	
-	public void addFirstTalkId(int npcId) {
-		setNpcFirstTalkId(event -> notifyFirstTalk(event.getNpc(), event.getActiveChar()), npcId);
-	}
-	
-	public void addTalkId(int npcId) {
-		setNpcTalkId(npcId);
-	}
-	
-	public void addKillId(int npcId) {
-		setAttackableKillId(kill -> notifyKill(kill.getTarget(), kill.getAttacker(), kill.isSummon()), npcId);
-	}
-	
-	public void addAttackId(int npcId) {
-		setAttackableAttackId(attack -> notifyAttack(attack.getTarget(), attack.getAttacker(), attack.getDamage(), attack.isSummon(), attack.getSkill()), npcId);
 	}
 	
 	/**
@@ -2369,11 +2341,11 @@ public class Quest extends AbstractScript implements IIdentifiable {
 	 */
 	public String getHtm(String prefix, String fileName) {
 		final HtmCache hc = HtmCache.getInstance();
-		String content = hc.getHtm(prefix, fileName.startsWith("data/") ? fileName : "data/scripts/" + getDescr().toLowerCase() + "/" + getName() + "/" + fileName);
+		String content = hc.getHtm(prefix, fileName.startsWith("data/") ? fileName : "../java/com/l2jserver/datapack/" + getDescr().toLowerCase() + "/" + getName() + "/" + fileName);
 		if (content == null) {
-			content = hc.getHtm(prefix, "data/scripts/" + getDescr() + "/" + getName() + "/" + fileName);
+			content = hc.getHtm(prefix, "../java/com/l2jserver/datapack/" + getDescr() + "/" + getName() + "/" + fileName);
 			if (content == null) {
-				content = hc.getHtmForce(prefix, "data/scripts/quests/" + getName() + "/" + fileName);
+				content = hc.getHtmForce(prefix, "../java/com/l2jserver/datapack/quests/" + getName() + "/" + fileName);
 			}
 		}
 		return content;

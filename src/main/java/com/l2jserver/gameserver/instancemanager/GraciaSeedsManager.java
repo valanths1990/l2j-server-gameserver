@@ -21,8 +21,8 @@ package com.l2jserver.gameserver.instancemanager;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.instancemanager.tasks.UpdateSoDStateTask;
 import com.l2jserver.gameserver.model.quest.Quest;
 

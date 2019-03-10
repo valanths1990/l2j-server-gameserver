@@ -19,20 +19,20 @@
 package com.l2jserver.gameserver.datatables;
 
 import static com.l2jserver.gameserver.model.itemcontainer.Inventory.ADENA_ID;
+import static com.l2jserver.gameserver.model.items.type.EtcItemType.ARROW;
+import static com.l2jserver.gameserver.model.items.type.EtcItemType.SHOT;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.EnchantItemHPBonusData;
 import com.l2jserver.gameserver.engines.DocumentEngine;
 import com.l2jserver.gameserver.enums.ItemLocation;
@@ -58,7 +58,7 @@ public class ItemTable {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ItemTable.class);
 	
-	private static final java.util.logging.Logger LOGGER_ITEMS = java.util.logging.Logger.getLogger("item");
+	private static final Logger LOG_ITEM = LoggerFactory.getLogger("item");
 	
 	public static final Map<String, Integer> SLOTS = new HashMap<>();
 	
@@ -229,14 +229,9 @@ public class ItemTable {
 		
 		if (Config.LOG_ITEMS && !process.equals("Reset")) {
 			if (!Config.LOG_ITEMS_SMALL_LOG || (Config.LOG_ITEMS_SMALL_LOG && (item.isEquipable() || (item.getId() == ADENA_ID)))) {
-				LogRecord record = new LogRecord(Level.INFO, "CREATE:" + process);
-				record.setLoggerName("item");
-				record.setParameters(new Object[] {
-					item,
-					actor,
-					reference
-				});
-				LOGGER_ITEMS.log(record);
+				if (item.getItemType() != ARROW && item.getItemType() != SHOT) {
+					LOG_ITEM.info("CREATED {} by {}, referenced by {}.", item, actor, reference);
+				}
 			}
 		}
 		
@@ -290,15 +285,9 @@ public class ItemTable {
 			
 			if (Config.LOG_ITEMS) {
 				if (!Config.LOG_ITEMS_SMALL_LOG || (Config.LOG_ITEMS_SMALL_LOG && (item.isEquipable() || (item.getId() == ADENA_ID)))) {
-					LogRecord record = new LogRecord(Level.INFO, "DELETE:" + process);
-					record.setLoggerName("item");
-					record.setParameters(new Object[] {
-						item,
-						"PrevCount(" + old + ")",
-						actor,
-						reference
-					});
-					LOGGER_ITEMS.log(record);
+					if (item.getItemType() != ARROW && item.getItemType() != SHOT) {
+						LOG_ITEM.info("DELETED {} amount {} by {}, referenced by {}.", item, old, actor, reference);
+					}
 				}
 			}
 			

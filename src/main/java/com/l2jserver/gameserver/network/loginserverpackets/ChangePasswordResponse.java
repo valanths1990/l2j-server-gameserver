@@ -18,9 +18,9 @@
  */
 package com.l2jserver.gameserver.network.loginserverpackets;
 
+import com.l2jserver.commons.network.BaseRecievePacket;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.util.network.BaseRecievePacket;
 
 public class ChangePasswordResponse extends BaseRecievePacket {
 	

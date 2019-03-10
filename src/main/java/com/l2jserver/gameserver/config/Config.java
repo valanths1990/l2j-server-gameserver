@@ -65,9 +65,8 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
 import com.l2jserver.gameserver.util.FloodProtectorConfig;
 import com.l2jserver.gameserver.util.IXmlReader;
+import com.l2jserver.gameserver.util.StringUtil;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.PropertiesParser;
-import com.l2jserver.util.StringUtil;
 
 /**
  * This class loads all the game server related configurations from files.<br>
@@ -1029,7 +1028,10 @@ public final class Config {
 	public static double HP_REGEN_MULTIPLIER;
 	public static double MP_REGEN_MULTIPLIER;
 	public static double CP_REGEN_MULTIPLIER;
-	public static boolean IS_TELNET_ENABLED;
+	public static boolean TELNET_ENABLED;
+	public static int TELNET_PORT;
+	public static String TELNET_PASSWORD;
+	public static String TELNET_HOSTS;
 	public static boolean SHOW_LICENCE;
 	public static boolean ACCEPT_NEW_GAMESERVER;
 	public static int SERVER_ID;
@@ -1657,12 +1659,13 @@ public final class Config {
 		
 		// Load Telnet L2Properties file (if exists)
 		final PropertiesParser telnetSettings = new PropertiesParser(TELNET_FILE);
-		
-		IS_TELNET_ENABLED = telnetSettings.getBoolean("EnableTelnet", false);
+		TELNET_ENABLED = telnetSettings.getBoolean("EnableTelnet", false);
+		TELNET_PORT = telnetSettings.getInt("StatusPort", 54321);
+		TELNET_PASSWORD = telnetSettings.getString("StatusPW", null);
+		TELNET_HOSTS = telnetSettings.getString("ListOfHosts", "127.0.0.1,localhost");
 		
 		// MMO
 		final PropertiesParser mmoSettings = new PropertiesParser(MMO_CONFIG_FILE);
-		
 		MMO_SELECTOR_SLEEP_TIME = mmoSettings.getInt("SleepTime", 20);
 		MMO_MAX_SEND_PER_PASS = mmoSettings.getInt("MaxSendPerPass", 12);
 		MMO_MAX_READ_PER_PASS = mmoSettings.getInt("MaxReadPerPass", 12);
@@ -1671,7 +1674,6 @@ public final class Config {
 		
 		// Load IdFactory L2Properties file (if exists)
 		final PropertiesParser IdFactory = new PropertiesParser(ID_CONFIG_FILE);
-		
 		IDFACTORY_TYPE = IdFactory.getEnum("IDFactory", IdFactoryType.class, IdFactoryType.BitSet);
 		BAD_ID_CHECKING = IdFactory.getBoolean("BadIdChecking", true);
 		

@@ -27,13 +27,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.Calendar;
+import java.util.logging.LogManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.l2jserver.Server;
-import com.l2jserver.UPnPService;
+import com.l2jserver.commons.UPnPService;
+import com.l2jserver.commons.dao.ServerNameDAO;
 import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.commons.util.IPv4Filter;
+import com.l2jserver.commons.util.Util;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.dao.factory.impl.DAOFactory;
@@ -136,14 +140,12 @@ import com.l2jserver.gameserver.network.L2GamePacketHandler;
 import com.l2jserver.gameserver.pathfinding.PathFinding;
 import com.l2jserver.gameserver.script.faenor.FaenorScriptEngine;
 import com.l2jserver.gameserver.scripting.ScriptEngineManager;
+import com.l2jserver.gameserver.status.Status;
 import com.l2jserver.gameserver.taskmanager.KnownListUpdateTaskManager;
 import com.l2jserver.gameserver.taskmanager.TaskManager;
 import com.l2jserver.gameserver.util.DeadLockDetector;
 import com.l2jserver.mmocore.SelectorConfig;
 import com.l2jserver.mmocore.SelectorThread;
-import com.l2jserver.status.Status;
-import com.l2jserver.util.IPv4Filter;
-import com.l2jserver.util.Util;
 
 public final class GameServer {
 	
@@ -164,9 +166,23 @@ public final class GameServer {
 	public static final Calendar dateTimeServerStarted = Calendar.getInstance();
 	
 	public GameServer() throws Exception {
-		final var serverLoadStart = System.currentTimeMillis();
+		// TODO(Zoey76): Remove when loggers rework is completed.
+		LogManager.getLogManager().reset();
+		SLF4JBridgeHandler.install();
 		
-		LOG.info("Used memory {}MB.", getUsedMemoryMB());
+		final var serverLoadStart = System.currentTimeMillis();
+		printSection("Database");
+		ConnectionFactory.builder() //
+			.withDriver(Config.DATABASE_DRIVER) //
+			.withUrl(Config.DATABASE_URL) //
+			.withUser(Config.DATABASE_LOGIN) //
+			.withPassword(Config.DATABASE_PASSWORD) //
+			.withConnectionPool(Config.DATABASE_CONNECTION_POOL) //
+			.withMaxIdleTime(Config.DATABASE_MAX_IDLE_TIME) //
+			.withMaxPoolSize(Config.DATABASE_MAX_CONNECTIONS) //
+			.build();
+		
+		DAOFactory.getInstance();
 		
 		if (!IdFactory.getInstance().isInitialized()) {
 			LOG.error("Could not read object IDs from database. Please check your configuration.");
@@ -391,18 +407,22 @@ public final class GameServer {
 			System.exit(1);
 		}
 		
-		LOG.info("Maximum numbers of connected players: {}.", Config.MAXIMUM_ONLINE_USERS);
-		LOG.info("Server loaded in {} seconds.", MILLISECONDS.toSeconds(System.currentTimeMillis() - serverLoadStart));
-		
 		if (Config.ENABLE_UPNP) {
 			printSection("UPnP");
 			UPnPService.getInstance().load(Config.PORT_GAME, "L2J Game Server");
 		}
+		
+		if (Config.TELNET_ENABLED) {
+			new Status(Config.TELNET_PORT, Config.TELNET_PASSWORD).start();
+		} else {
+			LOG.info("Telnet server is currently disabled.");
+		}
+		
+		LOG.info("Maximum numbers of connected players {}.", Config.MAXIMUM_ONLINE_USERS);
+		LOG.info("Server {} loaded in {} seconds.", ServerNameDAO.getServer(Config.SERVER_ID), MILLISECONDS.toSeconds(System.currentTimeMillis() - serverLoadStart));
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Server.serverMode = Server.MODE_GAMESERVER;
-		
 		Config.load();
 		
 		final String dp = Util.parseArg(args, DATAPACK, true);
@@ -415,26 +435,7 @@ public final class GameServer {
 			Config.GEODATA_PATH = Paths.get(gd);
 		}
 		
-		printSection("Database");
-		ConnectionFactory.builder() //
-			.withDriver(Config.DATABASE_DRIVER) //
-			.withUrl(Config.DATABASE_URL) //
-			.withUser(Config.DATABASE_LOGIN) //
-			.withPassword(Config.DATABASE_PASSWORD) //
-			.withConnectionPool(Config.DATABASE_CONNECTION_POOL) //
-			.withMaxIdleTime(Config.DATABASE_MAX_IDLE_TIME) //
-			.withMaxPoolSize(Config.DATABASE_MAX_CONNECTIONS) //
-			.build();
-		
-		DAOFactory.getInstance();
-		
 		gameServer = new GameServer();
-		
-		if (Config.IS_TELNET_ENABLED) {
-			new Status(Server.serverMode).start();
-		} else {
-			LOG.info("Telnet server is currently disabled.");
-		}
 	}
 	
 	public long getUsedMemoryMB() {

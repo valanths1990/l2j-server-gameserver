@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.gameserver.config.PropertiesParser;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Object;
@@ -38,11 +40,10 @@ import com.l2jserver.gameserver.model.entity.Castle;
 import com.l2jserver.gameserver.model.entity.Siege;
 import com.l2jserver.gameserver.model.interfaces.ILocational;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.util.PropertiesParser;
 
 public final class SiegeManager {
 	
-	private static final Logger _log = Logger.getLogger(SiegeManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(SiegeManager.class);
 	
 	private final Map<Integer, List<TowerSpawn>> _controlTowers = new HashMap<>();
 	
@@ -97,8 +98,8 @@ public final class SiegeManager {
 					break;
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, getClass().getSimpleName() + ": Exception: checkIsRegistered(): " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error verifying if the clan is registered to the siege!", ex);
 		}
 		return register;
 	}
@@ -110,6 +111,8 @@ public final class SiegeManager {
 	}
 	
 	private final void load() {
+		// TODO(Zoey76): Move this to Config.
+		
 		final PropertiesParser siegeSettings = new PropertiesParser(Config.SIEGE_CONFIGURATION_FILE);
 		
 		// Siege setting
@@ -137,8 +140,8 @@ public final class SiegeManager {
 					final int npcId = Integer.parseInt(st.nextToken());
 					
 					controlTowers.add(new TowerSpawn(npcId, new Location(x, y, z)));
-				} catch (Exception e) {
-					_log.warning(getClass().getSimpleName() + ": Error while loading control tower(s) for " + castle.getName() + " castle.");
+				} catch (Exception ex) {
+					LOG.warn("There has been an error while loading control tower(s) for {} castle!", castle.getName(), ex);
 				}
 			}
 			
@@ -162,8 +165,8 @@ public final class SiegeManager {
 					}
 					
 					flameTowers.add(new TowerSpawn(npcId, new Location(x, y, z), zoneList));
-				} catch (Exception e) {
-					_log.warning(getClass().getSimpleName() + ": Error while loading flame tower(s) for " + castle.getName() + " castle.");
+				} catch (Exception ex) {
+					LOG.warn("There has been an error while loading flame tower(s) for {} castle!", castle.getName(), ex);
 				}
 			}
 			_controlTowers.put(castle.getResidenceId(), controlTowers);
@@ -246,8 +249,8 @@ public final class SiegeManager {
 					_flameTowers.get(castleId).get(rs.getInt("towerIndex")).setUpgradeLevel(rs.getInt("level"));
 				}
 			}
-		} catch (Exception e) {
-			_log.log(Level.WARNING, "Exception: loadTrapUpgrade(): " + e.getMessage(), e);
+		} catch (Exception ex) {
+			LOG.warn("There has been an error loading trap upgrade!", ex);
 		}
 	}
 	

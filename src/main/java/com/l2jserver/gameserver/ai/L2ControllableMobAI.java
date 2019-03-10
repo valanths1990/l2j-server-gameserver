@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.MobGroup;
 import com.l2jserver.gameserver.model.MobGroupTable;
@@ -38,7 +39,6 @@ import com.l2jserver.gameserver.model.actor.instance.L2NpcInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.skills.Skill;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.Rnd;
 
 /**
  * AI for controllable mobs

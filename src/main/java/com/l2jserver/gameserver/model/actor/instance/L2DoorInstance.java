@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2DoorAI;
@@ -60,7 +61,6 @@ import com.l2jserver.gameserver.network.serverpackets.DoorStatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.OnEventTrigger;
 import com.l2jserver.gameserver.network.serverpackets.StaticObject;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.util.Rnd;
 
 public class L2DoorInstance extends L2Character {
 	private static final Logger LOG = LoggerFactory.getLogger(L2DoorInstance.class);

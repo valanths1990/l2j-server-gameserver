@@ -25,11 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.l2jserver.commons.util.Util;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.quest.Quest;
 import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 import com.l2jserver.gameserver.scripting.ScriptManager;
-import com.l2jserver.util.Util;
 
 /**
  * Quests and scripts manager.

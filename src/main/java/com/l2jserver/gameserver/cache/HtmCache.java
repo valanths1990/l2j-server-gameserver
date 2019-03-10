@@ -30,9 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.file.filter.HTMLFilter;
+import com.l2jserver.gameserver.util.file.filter.HTMLFilter;
 
 /**
+ * HTML Cache.
  * @author Layane
  */
 public class HtmCache {

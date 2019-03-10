@@ -271,7 +271,7 @@ public abstract class IdFactory {
 			stmt.executeUpdate("UPDATE clanhall SET ownerId=0, paidUntil=0, paid=0 WHERE clanhall.ownerId NOT IN (SELECT clan_id FROM clan_data);");
 			stmt.executeUpdate("UPDATE fort SET owner=0 WHERE owner NOT IN (SELECT clan_id FROM clan_data);");
 			
-			LOG.info("Cleaned {} elements from database in {} s.", cleanCount, (System.currentTimeMillis() - cleanupStart) / 1000);
+			LOG.info("Cleaned {} elements from database in {}s.", cleanCount, (System.currentTimeMillis() - cleanupStart) / 1000);
 		} catch (Exception ex) {
 			LOG.warn("Could not clean up database!", ex);
 		}

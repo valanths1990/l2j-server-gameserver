@@ -34,7 +34,7 @@ import com.l2jserver.gameserver.script.Parser;
 import com.l2jserver.gameserver.script.ParserNotCreatedException;
 import com.l2jserver.gameserver.script.ScriptDocument;
 import com.l2jserver.gameserver.script.ScriptEngine;
-import com.l2jserver.util.file.filter.XMLFilter;
+import com.l2jserver.gameserver.util.file.filter.XMLFilter;
 
 /**
  * @author Luis Arias

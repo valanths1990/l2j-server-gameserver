@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.handler.ChatHandler;
@@ -37,13 +36,11 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.ActionFailed;
 import com.l2jserver.gameserver.util.Util;
 
-/**
- * This class ...
- * @version $Revision: 1.16.2.12.2.7 $ $Date: 2005/04/11 10:06:11 $
- */
 public final class Say2 extends L2GameClientPacket {
+	
 	private static final String _C__49_SAY2 = "[C] 49 Say2";
-	private static Logger _logChat = Logger.getLogger("chat");
+	
+	private static final Logger LOG_CHAT = LoggerFactory.getLogger("chat");
 	
 	public static final int ALL = 0;
 	public static final int SHOUT = 1; // !
@@ -212,22 +209,11 @@ public final class Say2 extends L2GameClientPacket {
 		}
 		
 		if (Config.LOG_CHAT) {
-			LogRecord record = new LogRecord(Level.INFO, _text);
-			record.setLoggerName("chat");
-			
 			if (_type == TELL) {
-				record.setParameters(new Object[] {
-					CHAT_NAMES[_type],
-					"[" + activeChar.getName() + " to " + _target + "]"
-				});
+				LOG_CHAT.info("{} {} says [{}] to {}.", CHAT_NAMES[_type], activeChar.getName(), _text, _target);
 			} else {
-				record.setParameters(new Object[] {
-					CHAT_NAMES[_type],
-					"[" + activeChar.getName() + "]"
-				});
+				LOG_CHAT.info("{} {} says [{}].", CHAT_NAMES[_type], activeChar.getName(), _text);
 			}
-			
-			_logChat.log(record);
 		}
 		
 		if (_text.indexOf(8) >= 0) {
@@ -296,8 +282,8 @@ public final class Say2 extends L2GameClientPacket {
 				return false;
 			}
 			pos1 = _text.indexOf(8, pos) + 1;
-			if (pos1 == 0) // missing ending tag
-			{
+			// missing ending tag
+			if (pos1 == 0) {
 				_log.info(getClient() + " sent invalid publish item msg! ID:" + id);
 				return false;
 			}

@@ -30,7 +30,7 @@ import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
 import com.l2jserver.gameserver.taskmanager.TaskTypes;
 
 public class TaskDailySkillReuseClean extends Task {
-
+	
 	private static final Logger LOG = LoggerFactory.getLogger(TaskDailySkillReuseClean.class);
 	
 	private static final String NAME = "daily_skill_clean";

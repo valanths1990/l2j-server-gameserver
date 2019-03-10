@@ -26,9 +26,8 @@ import java.lang.management.ThreadMXBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.Shutdown;
-import com.l2jserver.gameserver.util.Broadcast;
+import com.l2jserver.gameserver.config.Config;
 
 /**
  * Thread to check for deadlocked threads.

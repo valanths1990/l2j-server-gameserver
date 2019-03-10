@@ -18,7 +18,7 @@
  */
 package com.l2jserver.gameserver.network.gameserverpackets;
 
-import com.l2jserver.util.network.BaseSendablePacket;
+import com.l2jserver.commons.network.BaseSendablePacket;
 
 /**
  * @author mrTJO

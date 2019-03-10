@@ -42,6 +42,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.l2jserver.commons.database.ConnectionFactory;
+import com.l2jserver.commons.network.BaseSendablePacket;
+import com.l2jserver.commons.security.crypt.NewCrypt;
+import com.l2jserver.commons.util.Rnd;
+import com.l2jserver.commons.util.Util;
 import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -70,10 +74,6 @@ import com.l2jserver.gameserver.network.loginserverpackets.RequestCharacters;
 import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
 import com.l2jserver.gameserver.network.serverpackets.LoginFail;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
-import com.l2jserver.util.Rnd;
-import com.l2jserver.util.Util;
-import com.l2jserver.util.crypt.NewCrypt;
-import com.l2jserver.util.network.BaseSendablePacket;
 
 public class LoginServerThread extends Thread {
 	protected static final Logger LOG = LoggerFactory.getLogger(LoginServerThread.class);

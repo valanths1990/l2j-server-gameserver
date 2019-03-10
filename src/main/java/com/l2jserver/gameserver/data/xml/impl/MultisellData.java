@@ -46,7 +46,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.network.serverpackets.UserInfo;
 import com.l2jserver.gameserver.util.IXmlReader;
 import com.l2jserver.gameserver.util.Util;
-import com.l2jserver.util.file.filter.NumericNameFilter;
+import com.l2jserver.gameserver.util.file.filter.NumericNameFilter;
 
 public final class MultisellData implements IXmlReader {
 	
