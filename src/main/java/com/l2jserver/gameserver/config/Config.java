@@ -948,6 +948,7 @@ public final class Config {
 	public static Pattern CLAN_NAME_TEMPLATE;
 	public static int MAX_CHARACTERS_NUMBER_PER_ACCOUNT;
 	public static File DATAPACK_ROOT;
+	public static File SCRIPT_ROOT;
 	public static boolean ACCEPT_ALTERNATE_ID;
 	public static int REQUEST_ID;
 	public static boolean RESERVE_HOST_ON_LOGIN = false;
@@ -1154,8 +1155,8 @@ public final class Config {
 		ACCEPT_ALTERNATE_ID = serverSettings.getBoolean("AcceptAlternateID", true);
 		
 		DATABASE_ENGINE = serverSettings.getString("Database", "MySQL");
-		DATABASE_DRIVER = serverSettings.getString("Driver", "com.mysql.jdbc.Driver");
-		DATABASE_URL = serverSettings.getString("URL", "jdbc:mysql://localhost/l2jgs?useSSL=false&serverTimezone=UTC");
+		DATABASE_DRIVER = serverSettings.getString("Driver", "com.mysql.cj.jdbc.Driver");
+		DATABASE_URL = serverSettings.getString("URL", "jdbc:mysql://localhost/l2jgs?serverTimezone=UTC");
 		DATABASE_LOGIN = serverSettings.getString("Login", "root");
 		DATABASE_PASSWORD = serverSettings.getString("Password", "toor");
 		DATABASE_CONNECTION_POOL = serverSettings.getString("ConnectionPool", "HikariCP");
@@ -1164,9 +1165,16 @@ public final class Config {
 		
 		try {
 			DATAPACK_ROOT = new File(serverSettings.getString("DatapackRoot", ".").replaceAll("\\\\", "/")).getCanonicalFile();
-		} catch (IOException e) {
-			LOG.warn("Error setting datapack root!", e);
+		} catch (Exception ex) {
+			LOG.warn("Error setting datapack root!", ex);
 			DATAPACK_ROOT = new File(".");
+		}
+		
+		try {
+			SCRIPT_ROOT = new File(serverSettings.getString("ScriptRoot", "script").replaceAll("\\\\", "/")).getCanonicalFile();
+		} catch (Exception ex) {
+			LOG.warn("Error setting script root!", ex);
+			SCRIPT_ROOT = new File(".");
 		}
 		
 		PLAYER_NAME_TEMPLATE = Pattern.compile(serverSettings.getString("PlayerNameTemplate", "[a-zA-Z0-9]*"));

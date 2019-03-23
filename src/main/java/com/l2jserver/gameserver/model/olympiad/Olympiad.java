@@ -196,18 +196,18 @@ public class Olympiad extends ListenersContainer {
 				loaded = true;
 			}
 		} catch (Exception e) {
-			_log.log(Level.WARNING, "Olympiad System: Error loading olympiad data from database: ", e);
+			_log.log(Level.WARNING, "Error loading olympiad data from database: ", e);
 		}
 		
 		if (!loaded) {
-			_log.log(Level.INFO, "Olympiad System: failed to load data from database, trying to load from file.");
+			_log.log(Level.INFO, "Failed to load data from database, trying to load from file.");
 			
 			Properties OlympiadProperties = new Properties();
 			try (InputStream is = new FileInputStream(Config.OLYMPIAD_CONFIG_FILE)) {
 				
 				OlympiadProperties.load(is);
 			} catch (Exception e) {
-				_log.log(Level.SEVERE, "Olympiad System: Error loading olympiad properties: ", e);
+				_log.log(Level.SEVERE, "Error loading olympiad properties: ", e);
 				return;
 			}
 			
@@ -238,7 +238,7 @@ public class Olympiad extends ListenersContainer {
 				}
 				break;
 			default:
-				_log.warning("Olympiad System: Omg something went wrong in loading!! Period = " + _period);
+				_log.warning("Omg something went wrong in loading!! Period = " + _period);
 				return;
 		}
 		
@@ -264,15 +264,15 @@ public class Olympiad extends ListenersContainer {
 				addNobleStats(rset.getInt(CHAR_ID), statData);
 			}
 		} catch (Exception e) {
-			_log.log(Level.WARNING, "Olympiad System: Error loading noblesse data from database: ", e);
+			_log.log(Level.WARNING, "Error loading noblesse data from database: ", e);
 		}
 		
 		synchronized (this) {
-			_log.info("Olympiad System: Loading Olympiad System....");
+			_log.info("Loading Olympiad System....");
 			if (_period == 0) {
-				_log.info("Olympiad System: Currently in Olympiad Period");
+				_log.info("Currently in Olympiad Period");
 			} else {
-				_log.info("Olympiad System: Currently in Validation Period");
+				_log.info("Currently in Validation Period");
 			}
 			
 			long milliToEnd;
@@ -282,16 +282,16 @@ public class Olympiad extends ListenersContainer {
 				milliToEnd = getMillisToValidationEnd();
 			}
 			
-			_log.info("Olympiad System: " + (milliToEnd / 60000) + " minutes until period ends");
+			_log.info("" + (milliToEnd / 60000) + " minutes until period ends");
 			
 			if (_period == 0) {
 				milliToEnd = getMillisToWeekChange();
 				
-				_log.info("Olympiad System: Next weekly change is in " + (milliToEnd / 60000) + " minutes");
+				_log.info("Next weekly change is in " + (milliToEnd / 60000) + " minutes");
 			}
 		}
 		
-		_log.info("Olympiad System: Loaded " + NOBLES.size() + " Nobles");
+		_log.info("Loaded " + NOBLES.size() + " Nobles");
 		
 	}
 	
@@ -306,7 +306,7 @@ public class Olympiad extends ListenersContainer {
 				tmpPlace.put(rs.getInt(CHAR_ID), place++);
 			}
 		} catch (Exception e) {
-			_log.log(Level.WARNING, "Olympiad System: Error loading noblesse data from database for Ranking: ", e);
+			_log.log(Level.WARNING, "Error loading noblesse data from database for Ranking: ", e);
 		}
 		
 		int rank1 = (int) Math.round(tmpPlace.size() * 0.01);
@@ -423,9 +423,9 @@ public class Olympiad extends ListenersContainer {
 			int numHours = (int) Math.floor(countDown % 24);
 			int numDays = (int) Math.floor((countDown - numHours) / 24);
 			
-			_log.info("Olympiad System: Competition Period Starts in " + numDays + " days, " + numHours + " hours and " + numMins + " mins.");
+			_log.info("Competition Period Starts in " + numDays + " days, " + numHours + " hours and " + numMins + " mins.");
 			
-			_log.info("Olympiad System: Event starts/started : " + _compStart.getTime());
+			_log.info("Event starts/started : " + _compStart.getTime());
 		}
 		
 		_scheduledCompStart = ThreadPoolManager.getInstance().scheduleGeneral(() -> {
@@ -436,7 +436,7 @@ public class Olympiad extends ListenersContainer {
 			_inCompPeriod = true;
 			
 			Broadcast.toAllOnlinePlayers(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_STARTED));
-			_log.info("Olympiad System: Olympiad Game Started");
+			_log.info("Olympiad Game Started");
 			
 			LOG_OLYMPIAD.info("Result,Player1,Player2,Player1 HP,Player2 HP,Player1 Damage,Player2 Damage,Points,Classed");
 			
@@ -456,7 +456,7 @@ public class Olympiad extends ListenersContainer {
 				}
 				_inCompPeriod = false;
 				Broadcast.toAllOnlinePlayers(SystemMessage.getSystemMessage(SystemMessageId.THE_OLYMPIAD_GAME_HAS_ENDED));
-				_log.info("Olympiad System: Olympiad Game Ended");
+				_log.info("Olympiad Game Ended");
 				
 				while (OlympiadGameManager.getInstance().isBattleStarted()) // cleared in game manager
 				{
@@ -552,7 +552,7 @@ public class Olympiad extends ListenersContainer {
 		_compStart.add(Calendar.HOUR_OF_DAY, 24);
 		_compEnd = _compStart.getTimeInMillis() + COMP_PERIOD;
 		
-		_log.info("Olympiad System: New Schedule @ " + _compStart.getTime());
+		_log.info("New Schedule @ " + _compStart.getTime());
 		
 		return (_compStart.getTimeInMillis() - Calendar.getInstance().getTimeInMillis());
 	}
@@ -573,9 +573,9 @@ public class Olympiad extends ListenersContainer {
 	private void scheduleWeeklyChange() {
 		_scheduledWeeklyTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(() -> {
 			addWeeklyPoints();
-			_log.info("Olympiad System: Added weekly points to nobles");
+			_log.info("Added weekly points to nobles");
 			resetWeeklyMatches();
-			_log.info("Olympiad System: Reset weekly matches to nobles");
+			_log.info("Reset weekly matches to nobles");
 			
 			Calendar nextChange = Calendar.getInstance();
 			_nextWeeklyChange = nextChange.getTimeInMillis() + WEEKLY_PERIOD;
@@ -683,7 +683,7 @@ public class Olympiad extends ListenersContainer {
 				}
 			}
 		} catch (Exception e) {
-			_log.log(Level.SEVERE, "Olympiad System: Failed to save noblesse data to database: ", e);
+			_log.log(Level.SEVERE, "Failed to save noblesse data to database: ", e);
 		}
 	}
 	
@@ -707,7 +707,7 @@ public class Olympiad extends ListenersContainer {
 			ps.setLong(10, _nextWeeklyChange);
 			ps.execute();
 		} catch (Exception e) {
-			_log.log(Level.SEVERE, "Olympiad System: Failed to save olympiad data to database: ", e);
+			_log.log(Level.SEVERE, "Failed to save olympiad data to database: ", e);
 		}
 		
 		//@formatter:off
@@ -724,7 +724,7 @@ public class Olympiad extends ListenersContainer {
 		}
 		catch (Exception e)
 		{
-			_log.log(Level.WARNING, "Olympiad System: Unable to save olympiad properties to file: ", e);
+			_log.log(Level.WARNING, "Unable to save olympiad properties to file: ", e);
 		}
 		*/
 		//@formatter:on
@@ -737,7 +737,7 @@ public class Olympiad extends ListenersContainer {
 			s1.executeUpdate(OLYMPIAD_MONTH_CLEAR);
 			s2.executeUpdate(OLYMPIAD_MONTH_CREATE);
 		} catch (Exception e) {
-			_log.log(Level.SEVERE, "Olympiad System: Failed to update monthly noblese data: ", e);
+			_log.log(Level.SEVERE, "Failed to update monthly noblese data: ", e);
 		}
 	}
 	
@@ -840,7 +840,7 @@ public class Olympiad extends ListenersContainer {
 				}
 			}
 		} catch (Exception e) {
-			_log.warning("Olympiad System: Couldnt load heros from DB");
+			_log.warning("Couldnt load heros from DB");
 		}
 	}
 	
@@ -856,7 +856,7 @@ public class Olympiad extends ListenersContainer {
 				}
 			}
 		} catch (Exception e) {
-			_log.warning("Olympiad System: Couldn't load olympiad leaders from DB!");
+			_log.warning("Couldn't load olympiad leaders from DB!");
 		}
 		return names;
 	}
@@ -1035,7 +1035,7 @@ public class Olympiad extends ListenersContainer {
 			var s = con.createStatement()) {
 			s.executeUpdate(OLYMPIAD_DELETE_ALL);
 		} catch (Exception e) {
-			_log.warning("Olympiad System: Couldn't delete nobles from DB!");
+			_log.warning("Couldn't delete nobles from DB!");
 		}
 		NOBLES.clear();
 	}
@@ -1050,10 +1050,10 @@ public class Olympiad extends ListenersContainer {
 	}
 	
 	public static Olympiad getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final Olympiad _instance = new Olympiad();
+		protected static final Olympiad INSTANCE = new Olympiad();
 	}
 }

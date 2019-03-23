@@ -28,22 +28,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.l2jserver.gameserver.config.Config;
-import com.l2jserver.gameserver.util.Util;
 import com.l2jserver.gameserver.util.file.filter.HTMLFilter;
 
 /**
  * HTML Cache.
  * @author Layane
+ * @author Zoey76
  */
 public class HtmCache {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(HtmCache.class);
 	
 	private static final HTMLFilter HTML_FILTER = new HTMLFilter();
 	
-	private static final Map<String, String> _cache = Config.LAZY_CACHE ? new ConcurrentHashMap<>() : new HashMap<>();
+	private static final Map<String, String> HTML_CACHE = Config.LAZY_CACHE ? new ConcurrentHashMap<>() : new HashMap<>();
 	
 	private int _loadedFiles;
+	
 	private long _bytesBuffLen;
 	
 	protected HtmCache() {
@@ -58,18 +61,18 @@ public class HtmCache {
 		if (!Config.LAZY_CACHE) {
 			LOG.info("Html cache start...");
 			parseDir(f);
-			LOG.info("Cache[HTML]: " + String.format("%.3f", getMemoryUsage()) + " megabytes on " + getLoadedFiles() + " files loaded");
+			LOG.info(String.format("%.3f", getMemoryUsage()) + " megabytes on " + getLoadedFiles() + " files loaded");
 		} else {
-			_cache.clear();
+			HTML_CACHE.clear();
 			_loadedFiles = 0;
 			_bytesBuffLen = 0;
-			LOG.info("Cache[HTML]: Running lazy cache");
+			LOG.info("Running lazy cache.");
 		}
 	}
 	
 	public void reloadPath(File f) {
 		parseDir(f);
-		LOG.info("Cache[HTML]: Reloaded specified path.");
+		LOG.info("Reloaded specified path.");
 	}
 	
 	public double getMemoryUsage() {
@@ -98,10 +101,9 @@ public class HtmCache {
 			return null;
 		}
 		
-		final String relpath = Util.getRelativePath(Config.DATAPACK_ROOT, file);
 		String content = null;
-		try (FileInputStream fis = new FileInputStream(file);
-			BufferedInputStream bis = new BufferedInputStream(fis)) {
+		try (var fis = new FileInputStream(file);
+			var bis = new BufferedInputStream(fis)) {
 			final int bytes = bis.available();
 			byte[] raw = new byte[bytes];
 			
@@ -109,7 +111,7 @@ public class HtmCache {
 			content = new String(raw, "UTF-8");
 			content = content.replaceAll("(?s)<!--.*?-->", ""); // Remove html comments
 			
-			String oldContent = _cache.put(relpath, content);
+			String oldContent = HTML_CACHE.put(file.getCanonicalPath(), content);
 			if (oldContent == null) {
 				_bytesBuffLen += bytes;
 				_loadedFiles++;
@@ -122,48 +124,20 @@ public class HtmCache {
 		return content;
 	}
 	
-	public String getHtmForce(String prefix, String path) {
-		String content = getHtm(prefix, path);
-		if (content == null) {
-			content = "<html><body>My text is missing:<br>" + path + "</body></html>";
-			LOG.warn("Cache[HTML]: Missing HTML page: " + path);
-		}
-		return content;
-	}
-	
 	public String getHtm(String prefix, String path) {
-		String newPath = null;
-		String content;
-		if ((prefix != null) && !prefix.isEmpty()) {
-			newPath = prefix + path;
-			content = getHtm(newPath);
-			if (content != null) {
-				return content;
-			}
-		}
-		
-		content = getHtm(path);
-		if ((content != null) && (newPath != null)) {
-			_cache.put(newPath, content);
-		}
-		
-		return content;
-	}
-	
-	private String getHtm(String path) {
-		if ((path == null) || path.isEmpty()) {
-			return ""; // avoid possible NPE
-		}
-		
-		String content = _cache.get(path);
+		final var newPath = Objects.firstNonNull(prefix, "") + path;
+		var content = HTML_CACHE.get(newPath);
 		if (Config.LAZY_CACHE && (content == null)) {
-			content = loadFile(new File(Config.DATAPACK_ROOT, path));
+			content = loadFile(new File(Config.DATAPACK_ROOT, newPath));
+			if (content == null) {
+				content = loadFile(new File(Config.SCRIPT_ROOT, newPath));
+			}
 		}
 		return content;
 	}
 	
 	public boolean contains(String path) {
-		return _cache.containsKey(path);
+		return HTML_CACHE.containsKey(path);
 	}
 	
 	/**
@@ -175,10 +149,10 @@ public class HtmCache {
 	}
 	
 	public static HtmCache getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final HtmCache _instance = new HtmCache();
+		protected static final HtmCache INSTANCE = new HtmCache();
 	}
 }

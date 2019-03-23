@@ -153,6 +153,8 @@ public final class GameServer {
 	
 	private static final String DATAPACK = "-dp";
 	
+	private static final String SCRIPT = "-s";
+	
 	private static final String GEODATA = "-gd";
 	
 	private final SelectorThread<L2GameClient> _selectorThread;
@@ -354,7 +356,7 @@ public final class GameServer {
 		
 		Runtime.getRuntime().addShutdownHook(Shutdown.getInstance());
 		
-		LOG.info("IdFactory: Free ObjectID's remaining: {}", IdFactory.getInstance().size());
+		LOG.info("Free Object Ids remaining {}.", IdFactory.getInstance().size());
 		
 		TvTManager.getInstance();
 		KnownListUpdateTaskManager.getInstance();
@@ -425,14 +427,19 @@ public final class GameServer {
 	public static void main(String[] args) throws Exception {
 		Config.load();
 		
-		final String dp = Util.parseArg(args, DATAPACK, true);
-		if (dp != null) {
-			Config.DATAPACK_ROOT = new File(dp);
+		final String dataPack = Util.parseArg(args, DATAPACK, true);
+		if (dataPack != null) {
+			Config.DATAPACK_ROOT = new File(dataPack);
 		}
 		
-		final String gd = Util.parseArg(args, GEODATA, true);
-		if (gd != null) {
-			Config.GEODATA_PATH = Paths.get(gd);
+		final String scriptRoot = Util.parseArg(args, SCRIPT, true);
+		if (scriptRoot != null) {
+			Config.SCRIPT_ROOT = new File(scriptRoot);
+		}
+		
+		final String geodata = Util.parseArg(args, GEODATA, true);
+		if (geodata != null) {
+			Config.GEODATA_PATH = Paths.get(geodata);
 		}
 		
 		gameServer = new GameServer();

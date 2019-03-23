@@ -18,9 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.config.Config;
@@ -35,13 +34,11 @@ import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
 import com.l2jserver.gameserver.network.serverpackets.RestartResponse;
 import com.l2jserver.gameserver.taskmanager.AttackStanceTaskManager;
 
-/**
- * This class ...
- * @version $Revision: 1.11.2.1.2.4 $ $Date: 2005/03/27 15:29:30 $
- */
 public final class RequestRestart extends L2GameClientPacket {
+	
+	private static final Logger LOG_ACCOUNTING = LoggerFactory.getLogger("accounting");
+	
 	private static final String _C__57_REQUESTRESTART = "[C] 57 RequestRestart";
-	protected static final Logger _logAccounting = Logger.getLogger("accounting");
 	
 	@Override
 	protected void readImpl() {
@@ -110,11 +107,7 @@ public final class RequestRestart extends L2GameClientPacket {
 		
 		final L2GameClient client = getClient();
 		
-		LogRecord record = new LogRecord(Level.INFO, "Logged out");
-		record.setParameters(new Object[] {
-			client
-		});
-		_logAccounting.log(record);
+		LOG_ACCOUNTING.info("{} logged out.", client);
 		
 		// detach the client from the char so that the connection isnt closed in the deleteMe
 		player.setClient(null);

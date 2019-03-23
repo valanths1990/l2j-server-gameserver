@@ -18,6 +18,8 @@
  */
 package com.l2jserver.gameserver.scripting;
 
+import static com.l2jserver.gameserver.config.Config.SCRIPT_ROOT;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,10 +48,7 @@ import com.l2jserver.gameserver.config.Config;
 public final class ScriptEngineManager {
 	private static final Logger LOG = LoggerFactory.getLogger(ScriptEngineManager.class);
 	
-	// TODO(Zoey76): Implement this correctly.
-	public static final File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getParentFile(), "java");
-	
-	private static final String CLASS_PATH = SCRIPT_FOLDER.getAbsolutePath() + System.getProperty("path.separator") + System.getProperty("java.class.path");
+	private static final String CLASS_PATH = SCRIPT_ROOT.getAbsolutePath() + System.getProperty("path.separator") + System.getProperty("java.class.path");
 	
 	private static final String MAIN = "main";
 	
@@ -66,7 +65,7 @@ public final class ScriptEngineManager {
 	public void executeScriptList(File list) throws Exception {
 		if (Config.NO_QUESTS) {
 			if (!Config.NO_HANDLERS) {
-				addSource(new File(SCRIPT_FOLDER, "com/l2jserver/datapack/handlers/MasterHandler.java"));
+				addSource(new File(SCRIPT_ROOT, "com/l2jserver/datapack/handlers/MasterHandler.java"));
 				LOG.info("Handlers loaded, all other scripts skipped!");
 			}
 			return;
@@ -93,7 +92,7 @@ public final class ScriptEngineManager {
 							line = line.substring(0, line.length() - 2);
 						}
 						
-						final File file = new File(SCRIPT_FOLDER, line);
+						final File file = new File(SCRIPT_ROOT, line);
 						if (file.isDirectory() && parts[0].endsWith("/**")) {
 							executeAllScriptsInDirectory(file, true);
 						} else if (file.isDirectory() && parts[0].endsWith("/*")) {
@@ -156,7 +155,7 @@ public final class ScriptEngineManager {
 	}
 	
 	public void executeScript(String file) throws Exception {
-		executeScript(new File(SCRIPT_FOLDER, file));
+		executeScript(new File(SCRIPT_ROOT, file));
 	}
 	
 	public void addSource(File file) {
@@ -175,7 +174,7 @@ public final class ScriptEngineManager {
 	
 	private static String getClassForFile(File script) {
 		final String path = script.getAbsolutePath();
-		final String scpPath = SCRIPT_FOLDER.getAbsolutePath();
+		final String scpPath = SCRIPT_ROOT.getAbsolutePath();
 		if (path.startsWith(scpPath)) {
 			final int idx = path.lastIndexOf('.');
 			return path.substring(scpPath.length() + 1, idx).replace('/', '.').replace('\\', '.');

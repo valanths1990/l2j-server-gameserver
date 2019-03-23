@@ -57,10 +57,6 @@ public final class Util {
 		ThreadPoolManager.getInstance().scheduleGeneral(new IllegalPlayerActionTask(actor, message, punishment), 5000);
 	}
 	
-	public static String getRelativePath(File base, File file) {
-		return file.toURI().getPath().substring(base.toURI().getPath().length());
-	}
-	
 	/**
 	 * @param from
 	 * @param to

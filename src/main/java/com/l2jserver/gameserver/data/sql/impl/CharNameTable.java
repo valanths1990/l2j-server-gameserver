@@ -94,8 +94,8 @@ public class CharNameTable {
 					accessLevel = rs.getInt(2);
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("Could not check existing char name!", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not check existing char name!", ex);
 		}
 		
 		if (id > 0) {
@@ -132,8 +132,8 @@ public class CharNameTable {
 					return name;
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("Could not check existing char id!", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not check existing char id!", ex);
 		}
 		
 		return null; // not found
@@ -154,8 +154,8 @@ public class CharNameTable {
 			try (var rs = ps.executeQuery()) {
 				return rs.next();
 			}
-		} catch (Exception e) {
-			LOG.warn("Could not check existing charname!", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not check existing charname!", ex);
 		}
 		return false;
 	}
@@ -169,8 +169,8 @@ public class CharNameTable {
 					return rset.getInt(1);
 				}
 			}
-		} catch (Exception e) {
-			LOG.warn("Could not check existing char count!", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not check existing char count!", ex);
 		}
 		return 0;
 	}
@@ -184,17 +184,17 @@ public class CharNameTable {
 				_chars.put(id, rs.getString(2));
 				_accessLevels.put(id, rs.getInt(3));
 			}
-		} catch (Exception e) {
-			LOG.warn("Could not load char name!", e);
+		} catch (Exception ex) {
+			LOG.warn("Could not load char name!", ex);
 		}
-		LOG.info(getClass().getSimpleName() + ": Loaded " + _chars.size() + " char names.");
+		LOG.info("Loaded {} char names.", _chars.size());
 	}
 	
 	public static CharNameTable getInstance() {
-		return SingletonHolder._instance;
+		return SingletonHolder.INSTANCE;
 	}
 	
 	private static class SingletonHolder {
-		protected static final CharNameTable _instance = new CharNameTable();
+		protected static final CharNameTable INSTANCE = new CharNameTable();
 	}
 }

@@ -50,10 +50,12 @@ import com.l2jserver.gameserver.network.serverpackets.CharSelectionInfo;
 
 @SuppressWarnings("unused")
 public final class CharacterCreate extends L2GameClientPacket {
-	private static final String _C__0C_CHARACTERCREATE = "[C] 0C CharacterCreate";
-	private static final int PLAYER_NAME_MAX_LENGHT = 16;
 	
-	private static final Logger LOG = LoggerFactory.getLogger("accounting");
+	private static final Logger LOG_ACCOUNTING = LoggerFactory.getLogger("accounting");
+	
+	private static final String _C__0C_CHARACTERCREATE = "[C] 0C CharacterCreate";
+	
+	private static final int PLAYER_NAME_MAX_LENGHT = 16;
 	
 	// cSdddddddddddd
 	private String _name;
@@ -175,7 +177,7 @@ public final class CharacterCreate extends L2GameClientPacket {
 		
 		initNewChar(getClient(), newChar);
 		
-		LOG.info("Created new character {} {}.", newChar, getClient());
+		LOG_ACCOUNTING.info("Created new character {} {}.", newChar, getClient());
 	}
 	
 	private boolean isValidName(String text) {

@@ -2340,20 +2340,10 @@ public class Quest extends AbstractScript implements IIdentifiable {
 	 * @return the HTML file contents
 	 */
 	public String getHtm(String prefix, String fileName) {
-		final HtmCache hc = HtmCache.getInstance();
-		String content = hc.getHtm(prefix, fileName.startsWith("data/") ? fileName : "../java/com/l2jserver/datapack/" + getDescr().toLowerCase() + "/" + getName() + "/" + fileName);
-		if (content == null) {
-			content = hc.getHtm(prefix, "../java/com/l2jserver/datapack/" + getDescr() + "/" + getName() + "/" + fileName);
-			if (content == null) {
-				content = hc.getHtmForce(prefix, "../java/com/l2jserver/datapack/quests/" + getName() + "/" + fileName);
-			}
-		}
-		return content;
+		final var path = fileName.startsWith("data/") ? fileName : getClass().getPackageName().replace('.', '/') + "/" + fileName;
+		return HtmCache.getInstance().getHtm(prefix, path);
 	}
 	
-	/**
-	 * @return the registered quest items IDs.
-	 */
 	public int[] getRegisteredItemIds() {
 		return _questItemIds;
 	}

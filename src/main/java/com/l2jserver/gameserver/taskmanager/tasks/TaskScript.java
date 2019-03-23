@@ -23,6 +23,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.scripting.ScriptEngineManager;
 import com.l2jserver.gameserver.taskmanager.Task;
 import com.l2jserver.gameserver.taskmanager.TaskManager.ExecutedTask;
@@ -43,7 +44,7 @@ public class TaskScript extends Task {
 	
 	@Override
 	public void onTimeElapsed(ExecutedTask task) {
-		final File file = new File(ScriptEngineManager.SCRIPT_FOLDER, "cron/" + task.getParams()[2]);
+		final File file = new File(Config.SCRIPT_ROOT, "com/l2jserver/datapack/cron/" + task.getParams()[2]);
 		if (!file.isFile()) {
 			LOG.warn("File not found {}!", task.getParams()[2]);
 			return;
