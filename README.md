@@ -27,7 +27,7 @@ Server and Datapack may not be not be bundled or packaged.
 Requeriments
 ---
 
-Windows or Linux system with Java JDK 11+, Maven 3.5+, MySQL 8.0+.
+Windows or Linux system with Java JDK 11+, Maven 3.6+, MariaDB 10.4+.
 
 At least 4gb of RAM and 2 Cores.
 
