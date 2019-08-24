@@ -44,8 +44,6 @@ Links
 
 - [Live Support](https://gitter.im/L2J/L2J_Server)
 
-- [Downloads](http://www.l2jserver.com/#downloads)
-
-- [Documentation](https://bitbucket.org/l2jserver/l2j_server/wiki)
+- [Trello](https://trello.com/b/qjLoH966)
 
 - [@l2jserver](https://twitter.com/l2jserver)
