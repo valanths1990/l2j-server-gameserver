@@ -18,13 +18,16 @@
  */
 package com.l2jserver.gameserver.model.actor.instance;
 
+import static com.l2jserver.gameserver.config.Configuration.character;
+import static com.l2jserver.gameserver.config.Configuration.clan;
+import static java.util.concurrent.TimeUnit.DAYS;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.sql.impl.ClanTable;
 import com.l2jserver.gameserver.data.xml.impl.ClassListData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
@@ -188,7 +191,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 					return;
 				}
 				
-				if (Config.ALT_CLAN_LEADER_INSTANT_ACTIVATION) {
+				if (character().clanLeaderInstantActivation()) {
 					clan.setNewLeader(member);
 				} else {
 					final NpcHtmlMessage msg = new NpcHtmlMessage(getObjectId());
@@ -293,7 +296,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 						break;
 					case 1: // Add Subclass - Initial
 						// Avoid giving player an option to add a new sub class, if they have max sub-classes already.
-						if (player.getTotalSubClasses() >= Config.MAX_SUBCLASS) {
+						if (player.getTotalSubClasses() >= character().getMaxSubclass()) {
 							html.setFile(player.getHtmlPrefix(), getSubClassFail());
 							break;
 						}
@@ -395,7 +398,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 						
 						boolean allowAddition = true;
 						
-						if (player.getTotalSubClasses() >= Config.MAX_SUBCLASS) {
+						if (player.getTotalSubClasses() >= character().getMaxSubclass()) {
 							allowAddition = false;
 						}
 						
@@ -416,11 +419,10 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 							}
 						}
 						
-						/**
-						 * If quest checking is enabled, verify if the character has completed the Mimir's Elixir (Path to Subclass) and Fate's Whisper (A Grade Weapon) quests by checking for instances of their unique reward items. If they both exist, remove both unique items and continue with
-						 * adding the sub-class.
-						 */
-						if (allowAddition && !Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS) {
+						// If quest checking is enabled, verify if the character has completed the Mimir's Elixir (Path to Subclass)
+						// and Fate's Whisper (A Grade Weapon) quests by checking for instances of their unique reward items.
+						// If they both exist, remove both unique items and continue with adding the sub-class.
+						if (allowAddition && !character().subclassWithoutQuests()) {
 							allowAddition = checkQuests(player);
 						}
 						
@@ -471,7 +473,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 						return;
 					case 6: // Change/Cancel Subclass - Choice
 						// validity check
-						if ((paramOne < 1) || (paramOne > Config.MAX_SUBCLASS)) {
+						if ((paramOne < 1) || (paramOne > character().getMaxSubclass())) {
 							return;
 						}
 						
@@ -549,7 +551,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 	}
 	
 	protected String getSubClassMenu(Race race) {
-		if (Config.ALT_GAME_SUBCLASS_EVERYWHERE || (race != Race.KAMAEL)) {
+		if (character().subclassEverywhere() || (race != Race.KAMAEL)) {
 			return "data/html/villagemaster/SubClass.htm";
 		}
 		
@@ -693,7 +695,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 	 * @return
 	 */
 	public final boolean checkVillageMaster(PlayerClass pclass) {
-		if (Config.ALT_GAME_SUBCLASS_EVERYWHERE) {
+		if (character().subclassEverywhere()) {
 			return true;
 		}
 		
@@ -746,7 +748,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 			return;
 		}
 		
-		clan.setDissolvingExpiryTime(System.currentTimeMillis() + (Config.ALT_CLAN_DISSOLVE_DAYS * 86400000L)); // 24*60*60*1000 = 86400000
+		clan.setDissolvingExpiryTime(System.currentTimeMillis() + DAYS.toMillis(character().getDaysToPassToDissolveAClan()));
 		clan.updateClanInDB();
 		
 		// The clan leader should take the XP penalty of a full death.
@@ -968,6 +970,6 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 	}
 	
 	private static boolean isValidName(String name) {
-		return Config.CLAN_NAME_TEMPLATE.matcher(name).matches();
+		return clan().getClanNameTemplate().matcher(name).matches();
 	}
 }

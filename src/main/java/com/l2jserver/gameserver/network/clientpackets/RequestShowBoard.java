@@ -18,7 +18,8 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
-import com.l2jserver.gameserver.config.Config;
+import static com.l2jserver.gameserver.config.Configuration.general;
+
 import com.l2jserver.gameserver.handler.CommunityBoardHandler;
 
 /**
@@ -38,7 +39,7 @@ public final class RequestShowBoard extends L2GameClientPacket {
 	
 	@Override
 	protected void runImpl() {
-		CommunityBoardHandler.getInstance().handleParseCommand(Config.BBS_DEFAULT, getActiveChar());
+		CommunityBoardHandler.getInstance().handleParseCommand(general().getBBSDefault(), getActiveChar());
 	}
 	
 	@Override

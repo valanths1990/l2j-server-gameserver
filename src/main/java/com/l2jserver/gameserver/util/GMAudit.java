@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
+import com.l2jserver.gameserver.config.Configuration;
 
 /**
  * Audits Game Master's actions.
@@ -55,7 +55,7 @@ public class GMAudit {
 		
 		final File file = new File("log/GMAudit/" + name + ".txt");
 		try (FileWriter save = new FileWriter(file, true)) {
-			save.write(date + ">" + gmName + ">" + action + ">" + target + ">" + params + Config.EOL);
+			save.write(date + ">" + gmName + ">" + action + ">" + target + ">" + params + Configuration.EOL);
 		} catch (IOException e) {
 			_log.log(Level.SEVERE, "GMAudit for GM " + gmName + " could not be saved: ", e);
 		}

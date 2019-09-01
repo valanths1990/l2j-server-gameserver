@@ -18,11 +18,12 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
+import static com.l2jserver.gameserver.config.Configuration.castle;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.instancemanager.CastleManager;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.entity.Castle;
@@ -85,7 +86,7 @@ public class RequestSetCastleSiegeTime extends L2GameClientPacket {
 		Calendar cal2 = Calendar.getInstance();
 		cal2.setTimeInMillis(choosenDate);
 		
-		for (int hour : Config.SIEGE_HOUR_LIST) {
+		for (int hour : castle().getSiegeHourList()) {
 			cal1.set(Calendar.HOUR_OF_DAY, hour);
 			if (isEqual(cal1, cal2, Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH, Calendar.HOUR, Calendar.MINUTE, Calendar.SECOND)) {
 				return true;

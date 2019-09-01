@@ -1,7 +1,8 @@
-/.project
-/.classpath
-/.settings/
-/.idea/
-/target/
+.project
+.classpath
+.settings/
+.idea/
+target/
 logs/
+test-output/
 hexid.txt

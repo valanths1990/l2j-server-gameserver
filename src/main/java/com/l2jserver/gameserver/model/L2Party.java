@@ -18,6 +18,9 @@
  */
 package com.l2jserver.gameserver.model;
 
+import static com.l2jserver.gameserver.config.Configuration.character;
+import static com.l2jserver.gameserver.config.Configuration.rates;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +40,6 @@ import com.l2jserver.commons.util.Rnd;
 import com.l2jserver.gameserver.GameTimeController;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.enums.PartyDistributionType;
 import com.l2jserver.gameserver.model.actor.L2Attackable;
@@ -154,7 +156,7 @@ public class L2Party extends AbstractPlayerGroup {
 	private L2PcInstance getCheckedRandomMember(int itemId, L2Character target) {
 		List<L2PcInstance> availableMembers = new ArrayList<>();
 		for (L2PcInstance member : getMembers()) {
-			if (member.getInventory().validateCapacityByItemId(itemId) && Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true)) {
+			if (member.getInventory().validateCapacityByItemId(itemId) && Util.checkIfInRange(character().getPartyRange2(), target, member, true)) {
 				availableMembers.add(member);
 			}
 		}
@@ -178,7 +180,7 @@ public class L2Party extends AbstractPlayerGroup {
 			L2PcInstance member;
 			try {
 				member = getMembers().get(_itemLastLoot);
-				if (member.getInventory().validateCapacityByItemId(ItemId) && Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true)) {
+				if (member.getInventory().validateCapacityByItemId(ItemId) && Util.checkIfInRange(character().getPartyRange2(), target, member, true)) {
 					return member;
 				}
 			} catch (Exception e) {
@@ -348,7 +350,7 @@ public class L2Party extends AbstractPlayerGroup {
 		if (getMembers().contains(player)) {
 			final boolean isLeader = isLeader(player);
 			if (!_disbanding) {
-				if ((getMembers().size() == 2) || (isLeader && !Config.ALT_LEAVE_PARTY_LEADER && (type != messageType.Disconnected))) {
+				if ((getMembers().size() == 2) || (isLeader && !character().leavePartyLeader() && (type != messageType.Disconnected))) {
 					disbandParty();
 					return;
 				}
@@ -401,7 +403,7 @@ public class L2Party extends AbstractPlayerGroup {
 			if (isInCommandChannel()) {
 				player.sendPacket(new ExCloseMPCC());
 			}
-			if (isLeader && (getMembers().size() > 1) && (Config.ALT_LEAVE_PARTY_LEADER || (type == messageType.Disconnected))) {
+			if (isLeader && (getMembers().size() > 1) && (character().leavePartyLeader() || (type == messageType.Disconnected))) {
 				msg = SystemMessage.getSystemMessage(SystemMessageId.C1_HAS_BECOME_A_PARTY_LEADER);
 				msg.addString(getLeader().getName());
 				broadcastPacket(msg);
@@ -594,7 +596,7 @@ public class L2Party extends AbstractPlayerGroup {
 		final Map<L2PcInstance, AtomicLong> toReward = new HashMap<>(9);
 		
 		for (final L2PcInstance member : getMembers()) {
-			if (Util.checkIfInRange(Config.ALT_PARTY_RANGE2, target, member, true)) {
+			if (Util.checkIfInRange(character().getPartyRange2(), target, member, true)) {
 				toReward.put(member, new AtomicLong());
 			}
 		}
@@ -649,7 +651,7 @@ public class L2Party extends AbstractPlayerGroup {
 			sqLevelSum += (member.getLevel() * member.getLevel());
 		}
 		
-		final float vitalityPoints = (target.getVitalityPoints(partyDmg) * Config.RATE_PARTY_XP) / validMembers.size();
+		final float vitalityPoints = (target.getVitalityPoints(partyDmg) * rates().getRatePartyXp()) / validMembers.size();
 		final boolean useVitalityRate = target.useVitalityRate();
 		
 		for (L2PcInstance member : rewardedMembers) {
@@ -682,13 +684,13 @@ public class L2Party extends AbstractPlayerGroup {
 	private final long calculateExpSpPartyCutoff(L2PcInstance player, int topLvl, long addExp, int addSp, boolean vit) {
 		long xp = addExp;
 		int sp = addSp;
-		if (Config.PARTY_XP_CUTOFF_METHOD.equalsIgnoreCase("highfive")) {
+		if (character().getPartyXpCutoffMethod().equalsIgnoreCase("highfive")) {
 			int i = 0;
 			final int lvlDiff = topLvl - player.getLevel();
-			for (int[] gap : Config.PARTY_XP_CUTOFF_GAPS) {
-				if ((lvlDiff >= gap[0]) && (lvlDiff <= gap[1])) {
-					xp = (addExp * Config.PARTY_XP_CUTOFF_GAP_PERCENTS[i]) / 100;
-					sp = (addSp * Config.PARTY_XP_CUTOFF_GAP_PERCENTS[i]) / 100;
+			for (Entry<Integer, Integer> gap : character().getPartyXpCutoffGaps().entrySet()) {
+				if ((lvlDiff >= gap.getKey()) && (lvlDiff <= gap.getValue())) {
+					xp = (addExp * character().getPartyXpCutoffGapPercent().get(i)) / 100;
+					sp = (addSp * character().getPartyXpCutoffGapPercent().get(i)) / 100;
 					player.addExpAndSp(xp, sp, vit);
 					break;
 				}
@@ -722,15 +724,15 @@ public class L2Party extends AbstractPlayerGroup {
 		final List<L2PcInstance> validMembers = new ArrayList<>();
 		
 		// Fixed LevelDiff cutoff point
-		if (Config.PARTY_XP_CUTOFF_METHOD.equalsIgnoreCase("level")) {
+		if (character().getPartyXpCutoffMethod().equalsIgnoreCase("level")) {
 			for (L2PcInstance member : members) {
-				if ((topLvl - member.getLevel()) <= Config.PARTY_XP_CUTOFF_LEVEL) {
+				if ((topLvl - member.getLevel()) <= character().getPartyXpCutoffLevel()) {
 					validMembers.add(member);
 				}
 			}
 		}
 		// Fixed MinPercentage cutoff point
-		else if (Config.PARTY_XP_CUTOFF_METHOD.equalsIgnoreCase("percentage")) {
+		else if (character().getPartyXpCutoffMethod().equalsIgnoreCase("percentage")) {
 			int sqLevelSum = 0;
 			for (L2PcInstance member : members) {
 				sqLevelSum += (member.getLevel() * member.getLevel());
@@ -738,13 +740,13 @@ public class L2Party extends AbstractPlayerGroup {
 			
 			for (L2PcInstance member : members) {
 				int sqLevel = member.getLevel() * member.getLevel();
-				if ((sqLevel * 100) >= (sqLevelSum * Config.PARTY_XP_CUTOFF_PERCENT)) {
+				if ((sqLevel * 100) >= (sqLevelSum * character().getPartyXpCutoffPercent())) {
 					validMembers.add(member);
 				}
 			}
 		}
 		// Automatic cutoff method
-		else if (Config.PARTY_XP_CUTOFF_METHOD.equalsIgnoreCase("auto")) {
+		else if (character().getPartyXpCutoffMethod().equalsIgnoreCase("auto")) {
 			int sqLevelSum = 0;
 			for (L2PcInstance member : members) {
 				sqLevelSum += (member.getLevel() * member.getLevel());
@@ -766,9 +768,9 @@ public class L2Party extends AbstractPlayerGroup {
 			}
 		}
 		// High Five cutoff method
-		else if (Config.PARTY_XP_CUTOFF_METHOD.equalsIgnoreCase("highfive")) {
+		else if (character().getPartyXpCutoffMethod().equalsIgnoreCase("highfive")) {
 			validMembers.addAll(members);
-		} else if (Config.PARTY_XP_CUTOFF_METHOD.equalsIgnoreCase("none")) {
+		} else if (character().getPartyXpCutoffMethod().equalsIgnoreCase("none")) {
 			validMembers.addAll(members);
 		}
 		return validMembers;
@@ -787,11 +789,11 @@ public class L2Party extends AbstractPlayerGroup {
 	}
 	
 	private double getExpBonus(int membersCount) {
-		return (membersCount < 2) ? (getBaseExpSpBonus(membersCount)) : (getBaseExpSpBonus(membersCount) * Config.RATE_PARTY_XP);
+		return (membersCount < 2) ? (getBaseExpSpBonus(membersCount)) : (getBaseExpSpBonus(membersCount) * rates().getRatePartyXp());
 	}
 	
 	private double getSpBonus(int membersCount) {
-		return (membersCount < 2) ? (getBaseExpSpBonus(membersCount)) : (getBaseExpSpBonus(membersCount) * Config.RATE_PARTY_SP);
+		return (membersCount < 2) ? (getBaseExpSpBonus(membersCount)) : (getBaseExpSpBonus(membersCount) * rates().getRatePartySp());
 	}
 	
 	@Override

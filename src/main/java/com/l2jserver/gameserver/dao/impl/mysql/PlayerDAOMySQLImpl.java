@@ -18,6 +18,8 @@
  */
 package com.l2jserver.gameserver.dao.impl.mysql;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.sql.Timestamp;
 
 import org.slf4j.Logger;
@@ -257,7 +259,7 @@ public class PlayerDAOMySQLImpl implements PlayerDAO {
 	public void storeCharBase(L2PcInstance player) {
 		long totalOnlineTime = player.getOnlineTime();
 		if (player.getOnlineBeginTime() > 0) {
-			totalOnlineTime += (System.currentTimeMillis() - player.getOnlineBeginTime()) / 1000;
+			totalOnlineTime += MILLISECONDS.toSeconds(System.currentTimeMillis() - player.getOnlineBeginTime());
 		}
 		
 		try (var con = ConnectionFactory.getInstance().getConnection();

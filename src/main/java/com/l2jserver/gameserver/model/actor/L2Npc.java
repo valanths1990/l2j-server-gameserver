@@ -19,6 +19,12 @@
 package com.l2jserver.gameserver.model.actor;
 
 import static com.l2jserver.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
+import static com.l2jserver.gameserver.config.Configuration.character;
+import static com.l2jserver.gameserver.config.Configuration.general;
+import static com.l2jserver.gameserver.config.Configuration.npc;
+import static com.l2jserver.gameserver.config.Configuration.olympiad;
+import static com.l2jserver.gameserver.config.Configuration.rates;
+import static com.l2jserver.gameserver.config.Configuration.sevenSings;
 import static com.l2jserver.gameserver.enums.InstanceType.L2Npc;
 
 import java.util.Collection;
@@ -36,7 +42,6 @@ import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.ThreadPoolManager;
 import com.l2jserver.gameserver.cache.HtmCache;
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.datatables.NpcPersonalAIData;
@@ -162,7 +167,7 @@ public class L2Npc extends L2Character {
 		// initialize the "current" equipment
 		_currentLHandId = getTemplate().getLHandId();
 		_currentRHandId = getTemplate().getRHandId();
-		_currentEnchant = Config.ENABLE_RANDOM_ENCHANT_EFFECT ? Rnd.get(4, 21) : getTemplate().getWeaponEnchant();
+		_currentEnchant = npc().randomEnchantEffect() ? Rnd.get(4, 21) : getTemplate().getWeaponEnchant();
 		
 		// initialize the "current" collisions
 		_currentCollisionHeight = getTemplate().getfCollisionHeight();
@@ -275,8 +280,8 @@ public class L2Npc extends L2Character {
 			return;
 		}
 		
-		int minWait = isMob() ? Config.MIN_MONSTER_ANIMATION : Config.MIN_NPC_ANIMATION;
-		int maxWait = isMob() ? Config.MAX_MONSTER_ANIMATION : Config.MAX_NPC_ANIMATION;
+		int minWait = isMob() ? general().getMinMonsterAnimation() : general().getMinNPCAnimation();
+		int maxWait = isMob() ? general().getMaxMonsterAnimation() : general().getMaxNPCAnimation();
 		
 		// Calculate the delay before the next animation
 		int interval = Rnd.get(minWait, maxWait) * 1000;
@@ -290,7 +295,7 @@ public class L2Npc extends L2Character {
 	 * @return true if the server allows Random Animation.
 	 */
 	public boolean hasRandomAnimation() {
-		return ((Config.MAX_NPC_ANIMATION > 0) && _isRandomAnimationEnabled && !getAiType().equals(AIType.CORPSE));
+		return ((general().getMaxNPCAnimation() > 0) && _isRandomAnimationEnabled && !getAiType().equals(AIType.CORPSE));
 	}
 	
 	/**
@@ -355,7 +360,7 @@ public class L2Npc extends L2Character {
 	
 	@Override
 	public boolean canBeAttacked() {
-		return Config.ALT_ATTACKABLE_NPCS;
+		return npc().attackableNpcs();
 	}
 	
 	/**
@@ -745,7 +750,7 @@ public class L2Npc extends L2Character {
 		
 		String temp = "data/html/default/" + pom + ".htm";
 		
-		if (!Config.LAZY_CACHE) {
+		if (!general().lazyCache()) {
 			// If not running lazy cache the file must be in the cache or it doesnt exist
 			if (HtmCache.getInstance().contains(temp)) {
 				return temp;
@@ -801,15 +806,15 @@ public class L2Npc extends L2Character {
 			return;
 		}
 		if (player.getKarma() > 0) {
-			if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && (this instanceof L2MerchantInstance)) {
+			if (!character().karmaPlayerCanShop() && (this instanceof L2MerchantInstance)) {
 				if (showPkDenyChatWindow(player, "merchant")) {
 					return;
 				}
-			} else if (!Config.ALT_GAME_KARMA_PLAYER_CAN_USE_GK && (this instanceof L2TeleporterInstance)) {
+			} else if (!character().karmaPlayerCanUseGK() && (this instanceof L2TeleporterInstance)) {
 				if (showPkDenyChatWindow(player, "teleporter")) {
 					return;
 				}
-			} else if (!Config.ALT_GAME_KARMA_PLAYER_CAN_USE_WAREHOUSE && (this instanceof L2WarehouseInstance)) {
+			} else if (!character().karmaPlayerCanUseWareHouse() && (this instanceof L2WarehouseInstance)) {
 				if (showPkDenyChatWindow(player, "warehouse")) {
 					return;
 				}
@@ -848,7 +853,7 @@ public class L2Npc extends L2Character {
 				filename += "blkmrkt_1.htm";
 				break;
 			case 31113: // Merchant of Mammon
-				if (Config.ALT_STRICT_SEVENSIGNS) {
+				if (sevenSings().strictSevenSigns()) {
 					switch (compWinner) {
 						case SevenSigns.CABAL_DAWN:
 							if ((playerCabal != compWinner) || (playerCabal != sealAvariceOwner)) {
@@ -872,7 +877,7 @@ public class L2Npc extends L2Character {
 				filename += "mammmerch_1.htm";
 				break;
 			case 31126: // Blacksmith of Mammon
-				if (Config.ALT_STRICT_SEVENSIGNS) {
+				if (sevenSings().strictSevenSigns()) {
 					switch (compWinner) {
 						case SevenSigns.CABAL_DAWN:
 							if ((playerCabal != compWinner) || (playerCabal != sealGnosisOwner)) {
@@ -927,7 +932,7 @@ public class L2Npc extends L2Character {
 				break;
 			case 36402:
 				if (player.getOlympiadBuffCount() > 0) {
-					filename = (player.getOlympiadBuffCount() == Config.ALT_OLY_MAX_BUFFS ? Olympiad.OLYMPIAD_HTML_PATH + "olympiad_buffs.htm" : Olympiad.OLYMPIAD_HTML_PATH + "olympiad_5buffs.htm");
+					filename = (player.getOlympiadBuffCount() == olympiad().getMaxBuffs() ? Olympiad.OLYMPIAD_HTML_PATH + "olympiad_buffs.htm" : Olympiad.OLYMPIAD_HTML_PATH + "olympiad_5buffs.htm");
 				} else {
 					filename = Olympiad.OLYMPIAD_HTML_PATH + "olympiad_nobuffs.htm";
 				}
@@ -961,7 +966,7 @@ public class L2Npc extends L2Character {
 		html.setFile(player.getHtmlPrefix(), filename);
 		
 		if (this instanceof L2MerchantInstance) {
-			if (Config.LIST_PET_RENT_NPC.contains(npcId)) {
+			if (npc().getPetRentNPCs().contains(npcId)) {
 				html.replace("_Quest", "_RentPet\">Rent Pet</a><br><a action=\"bypass -h npc_%objectId%_Quest");
 			}
 		}
@@ -994,14 +999,14 @@ public class L2Npc extends L2Character {
 	 * @return the Exp Reward of this L2Npc (modified by RATE_XP).
 	 */
 	public long getExpReward() {
-		return (long) (getLevel() * getLevel() * getTemplate().getExpRate() * Config.RATE_XP);
+		return (long) (getLevel() * getLevel() * getTemplate().getExpRate() * rates().getRateXp());
 	}
 	
 	/**
 	 * @return the SP Reward of this L2Npc (modified by RATE_SP).
 	 */
 	public int getSpReward() {
-		return (int) (getTemplate().getSP() * Config.RATE_SP);
+		return (int) (getTemplate().getSP() * rates().getRateSp());
 	}
 	
 	/**
@@ -1226,7 +1231,7 @@ public class L2Npc extends L2Character {
 	@Override
 	public void sendInfo(L2PcInstance activeChar) {
 		if (isVisibleFor(activeChar)) {
-			if (Config.CHECK_KNOWN && activeChar.isGM()) {
+			if (general().checkKnownList() && activeChar.isGM()) {
 				activeChar.sendMessage("Added NPC: " + getName());
 			}
 			
@@ -1506,15 +1511,15 @@ public class L2Npc extends L2Character {
 			item.dropMe(this, newX, newY, newZ);
 			
 			// Add drop to auto destroy item task.
-			if (!Config.LIST_PROTECTED_ITEMS.contains(itemId)) {
-				if (((Config.AUTODESTROY_ITEM_AFTER > 0) && !item.getItem().hasExImmediateEffect()) || ((Config.HERB_AUTO_DESTROY_TIME > 0) && item.getItem().hasExImmediateEffect())) {
+			if (!general().getProtectedItems().contains(itemId)) {
+				if (((general().getAutoDestroyDroppedItemAfter() > 0) && !item.getItem().hasExImmediateEffect()) || ((general().getAutoDestroyHerbTime() > 0) && item.getItem().hasExImmediateEffect())) {
 					ItemsAutoDestroy.getInstance().addItem(item);
 				}
 			}
 			item.setProtected(false);
 			
 			// If stackable, end loop as entire count is included in 1 instance of item.
-			if (item.isStackable() || !Config.MULTIPLE_ITEM_DROP) {
+			if (item.isStackable() || !general().multipleItemDrop()) {
 				break;
 			}
 		}

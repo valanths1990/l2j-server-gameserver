@@ -18,11 +18,12 @@
  */
 package com.l2jserver.gameserver.model.actor.stat;
 
+import static com.l2jserver.gameserver.config.Configuration.character;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.json.ExperienceData;
 import com.l2jserver.gameserver.instancemanager.ZoneManager;
 import com.l2jserver.gameserver.model.actor.L2Playable;
@@ -234,7 +235,7 @@ public class PlayableStat extends CharStat {
 	 */
 	public int getMaxLevel() {
 		// Dummy method
-		return Config.MAX_PLAYER_LEVEL;
+		return character().getMaxPlayerLevel();
 	}
 	
 	/**
@@ -245,7 +246,7 @@ public class PlayableStat extends CharStat {
 	 */
 	public int getMaxExpLevel() {
 		// Dummy method
-		return Config.MAX_PLAYER_LEVEL + 1;
+		return character().getMaxPlayerLevel() + 1;
 	}
 	
 	@Override

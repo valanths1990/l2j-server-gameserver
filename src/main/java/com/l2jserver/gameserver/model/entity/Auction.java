@@ -18,8 +18,8 @@
  */
 package com.l2jserver.gameserver.model.entity;
 
+import static com.l2jserver.gameserver.config.Configuration.character;
 import static com.l2jserver.gameserver.model.itemcontainer.Inventory.ADENA_ID;
-import static com.l2jserver.gameserver.model.itemcontainer.Inventory.MAX_ADENA;
 
 import java.util.Calendar;
 import java.util.Map;
@@ -277,7 +277,7 @@ public class Auction {
 		}
 		
 		// avoid overflow on return
-		final long limit = MAX_ADENA - cwh.getAdena();
+		final long limit = character().getMaxAdena() - cwh.getAdena();
 		quantity = Math.min(quantity, limit);
 		
 		cwh.addItem("Outbidded", ADENA_ID, quantity, null, null);

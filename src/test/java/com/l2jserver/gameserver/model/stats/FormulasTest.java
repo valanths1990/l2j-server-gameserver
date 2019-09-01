@@ -1,5 +1,4 @@
-package com.l2jserver.gameserver.model.stats;
-
+package com.l2jserver.gameserver.model.stats;import static com.l2jserver.gameserver.config.Configuration.server;
 import static com.l2jserver.gameserver.enums.ShotType.BLESSED_SPIRITSHOTS;
 import static com.l2jserver.gameserver.enums.ShotType.SPIRITSHOTS;
 import static java.lang.Double.NaN;
@@ -8,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -19,7 +17,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.skills.Skill;
 
@@ -38,7 +35,7 @@ public class FormulasTest {
 	
 	@BeforeClass
 	private void init() {
-		Config.DATAPACK_ROOT = new File("src/test/resources");
+		server().setProperty("DatapackRoot", "src/test/resources");
 	}
 	
 	@Test(dataProvider = PROVIDE_CHARACTERS)

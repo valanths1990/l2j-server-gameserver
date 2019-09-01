@@ -18,6 +18,8 @@
  */
 package com.l2jserver.gameserver.data.xml.impl;
 
+import static com.l2jserver.gameserver.config.Configuration.general;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +39,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.datatables.SkillData;
 import com.l2jserver.gameserver.enums.AISkillScope;
 import com.l2jserver.gameserver.model.StatsSet;
@@ -79,7 +80,7 @@ public class NpcData implements IXmlReader {
 		parseDatapackDirectory("data/stats/npcs", false);
 		LOG.info("Loaded {} NPCs.", _npcs.size());
 		
-		if (Config.CUSTOM_NPC_DATA) {
+		if (general().customNpcData()) {
 			final int npcCount = _npcs.size();
 			parseDatapackDirectory("data/stats/npcs/custom", true);
 			LOG.info("Loaded {} custom NPCs.", (_npcs.size() - npcCount));

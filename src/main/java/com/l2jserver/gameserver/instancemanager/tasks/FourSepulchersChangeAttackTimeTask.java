@@ -18,11 +18,12 @@
  */
 package com.l2jserver.gameserver.instancemanager.tasks;
 
+import static com.l2jserver.gameserver.config.Configuration.general;
+
 import java.util.Calendar;
 import java.util.concurrent.ScheduledFuture;
 
 import com.l2jserver.gameserver.ThreadPoolManager;
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.instancemanager.FourSepulchersManager;
 
 /**
@@ -72,7 +73,7 @@ public final class FourSepulchersChangeAttackTimeTask implements Runnable {
 		if (manager.isFirstTimeRun()) {
 			interval = manager.getAttackTimeEnd() - Calendar.getInstance().getTimeInMillis();
 		} else {
-			interval = Config.FS_TIME_ATTACK * 60000L;
+			interval = general().getTimeOfAttack();
 		}
 		
 		manager.setChangeCoolDownTimeTask(ThreadPoolManager.getInstance().scheduleGeneral(new FourSepulchersChangeCoolDownTimeTask(), interval));

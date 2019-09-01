@@ -18,11 +18,12 @@
  */
 package com.l2jserver.gameserver.network.clientpackets;
 
+import static com.l2jserver.gameserver.config.Configuration.character;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.l2jserver.gameserver.config.Config;
 import com.l2jserver.gameserver.data.xml.impl.UIData;
 import com.l2jserver.gameserver.model.ActionKey;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -75,7 +76,7 @@ public class RequestSaveKeyMapping extends L2GameClientPacket {
 	@Override
 	protected void runImpl() {
 		final L2PcInstance player = getActiveChar();
-		if (!Config.STORE_UI_SETTINGS || (player == null) || (getClient().getState() != GameClientState.IN_GAME)) {
+		if (!character().storeUISettings() || (player == null) || (getClient().getState() != GameClientState.IN_GAME)) {
 			return;
 		}
 		player.getUISettings().storeAll(_catMap, _keyMap);
