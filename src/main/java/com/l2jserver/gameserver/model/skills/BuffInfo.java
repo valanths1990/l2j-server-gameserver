@@ -339,20 +339,25 @@ public final class BuffInfo {
 	 * Prevents multiple updates.
 	 */
 	private void addAbnormalVisualEffects() {
+		var updated = false;
 		if (_skill.hasAbnormalVisualEffects()) {
 			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
+			updated = true;
 		}
 		
 		if (_effected.isPlayer() && _skill.hasAbnormalVisualEffectsEvent()) {
 			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsEvent());
+			updated = true;
 		}
 		
 		if (_skill.hasAbnormalVisualEffectsSpecial()) {
 			_effected.startAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
+			updated = true;
 		}
 		
-		// Update abnormal visual effects.
-		_effected.updateAbnormalEffect();
+		if (updated) {
+			_effected.updateAbnormalEffect();
+		}
 	}
 	
 	/**
@@ -364,19 +369,25 @@ public final class BuffInfo {
 			return;
 		}
 		
+		var updated = false;
 		if (_skill.hasAbnormalVisualEffects()) {
 			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffects());
+			updated = true;
 		}
 		
 		if (_effected.isPlayer() && _skill.hasAbnormalVisualEffectsEvent()) {
 			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsEvent());
+			updated = true;
 		}
 		
 		if (_skill.hasAbnormalVisualEffectsSpecial()) {
 			_effected.stopAbnormalVisualEffect(false, _skill.getAbnormalVisualEffectsSpecial());
+			updated = true;
 		}
 		
-		_effected.updateAbnormalEffect();
+		if (updated) {
+			_effected.updateAbnormalEffect();
+		}
 	}
 	
 	/**
