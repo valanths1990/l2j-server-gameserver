@@ -192,4 +192,7 @@ public interface NPCConfiguration extends Config, Reloadable {
 	
 	@Key("DropItemMinLevelGapChance")
 	Integer getDropItemMinLevelGapChance();
+	
+	@Key("MaxAggroRange")
+	Integer getMaxAggroRange();
 }

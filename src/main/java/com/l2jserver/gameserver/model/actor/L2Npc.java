@@ -380,10 +380,19 @@ public class L2Npc extends L2Character {
 	}
 	
 	/**
-	 * @return the Aggro Range of this L2NpcInstance either contained in the L2NpcTemplate, or overridden by spawnlist AI value.
+	 * Gets the aggression range.<br>
+	 * Overridden by AI value, capped by MaxAggroRange.
+	 * @return the aggression range
 	 */
 	public int getAggroRange() {
-		return hasAIValue("aggroRange") ? getAIValue("aggroRange") : getTemplate().getAggroRange();
+		if (hasAIValue("aggroRange")) {
+			return getAIValue("aggroRange");
+		}
+		
+		if (npc().getMaxAggroRange() > 0) {
+			return Math.min(getTemplate().getAggroRange(), npc().getMaxAggroRange());
+		}
+		return getTemplate().getAggroRange();
 	}
 	
 	public boolean isInMyClan(L2Npc npc) {
