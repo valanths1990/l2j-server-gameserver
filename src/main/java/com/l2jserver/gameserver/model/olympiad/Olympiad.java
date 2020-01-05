@@ -200,11 +200,13 @@ public class Olympiad extends ListenersContainer {
 		if (!loaded) {
 			_log.log(Level.INFO, "Failed to load data from database, trying to load from file.");
 			
-			_currentCycle = olympiad().getCurrentCycle();
-			_period = olympiad().getPeriod();
-			_olympiadEnd = olympiad().getOlympiadEnd();
-			_validationEnd = olympiad().getValidationEnd();
-			_nextWeeklyChange = olympiad().getNextWeeklyChange();
+			if (olympiad().getCurrentCycle() != null) {
+				_currentCycle = olympiad().getCurrentCycle();
+				_period = olympiad().getPeriod();
+				_olympiadEnd = olympiad().getOlympiadEnd();
+				_validationEnd = olympiad().getValidationEnd();
+				_nextWeeklyChange = olympiad().getNextWeeklyChange();
+			}
 		}
 		
 		switch (_period) {
