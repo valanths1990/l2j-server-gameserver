@@ -58,7 +58,7 @@ public final class ScriptEngineManager {
 	};
 	
 	private static final InMemoryJavaCompiler COMPILER = InMemoryJavaCompiler.newInstance() //
-		.useOptions("-classpath", CLASS_PATH) //
+		.useOptions("-classpath", CLASS_PATH, "-g") //
 		.ignoreWarnings();
 	
 	public void executeScriptList(File list) throws Exception {
