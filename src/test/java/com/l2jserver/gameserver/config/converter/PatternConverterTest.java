@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 L2J Server
+ * Copyright © 2020 L2J Server
  *
  * This file is part of L2J Server.
  *
@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.config.converter;import java.util.regex.Pattern;
+package com.l2jserver.gameserver.config.converter;
+
+import java.util.regex.Pattern;
 
 import org.aeonbits.owner.Converter;
 import org.testng.Assert;
