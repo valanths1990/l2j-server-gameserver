@@ -1262,7 +1262,7 @@ public class L2Npc extends L2Character {
 			html = HtmCache.getInstance().getHtm(player.getHtmlPrefix(), "data/html/trainer/" + npcId + "-noteach.htm");
 			// Trainer Healer?
 			if (html == null) {
-				html = HtmCache.getInstance().getHtm(player.getHtmlPrefix(), "data/scripts/ai/npc/Trainers/HealerTrainer/" + npcId + "-noteach.html");
+				html = HtmCache.getInstance().getHtm(player.getHtmlPrefix(), "com/l2jserver/datapack/ai/npc/Trainers/HealerTrainer/" + npcId + "-noteach.html");
 			}
 		}
 		

@@ -74,7 +74,7 @@ public class TvTEvent {
 	
 	protected static final Logger _log = Logger.getLogger(TvTEvent.class.getName());
 	/** html path **/
-	private static final String HTML_PATH = "data/scripts/custom/events/TvT/TvTManager/";
+	private static final String HTML_PATH = "com/l2jserver/datapack/custom/events/TvT/TvTManager/";
 	/** The teams of the TvTEvent. */
 	private static TvTEventTeam[] _teams = new TvTEventTeam[2];
 	/** The state of the TvTEvent. */
@@ -202,8 +202,7 @@ public class TvTEvent {
 		}
 		
 		// Check for enough participants
-		if ((_teams[0].getParticipatedPlayerCount() < tvt().getMinPlayersInTeams()) || //
-			(_teams[1].getParticipatedPlayerCount() < tvt().getMaxPlayersInTeams())) {
+		if ((_teams[0].getParticipatedPlayerCount() < tvt().getMinPlayersInTeams()) || (_teams[1].getParticipatedPlayerCount() < tvt().getMinPlayersInTeams())) {
 			// Set state INACTIVE
 			setState(EventState.INACTIVE);
 			// Cleanup of teams
@@ -417,7 +416,7 @@ public class TvTEvent {
 	}
 	
 	public static boolean needParticipationFee() {
-		return tvt().getParticipationFee() != null;
+		return (tvt().getParticipationFee() != null) && (tvt().getParticipationFee().getId() > 0);
 	}
 	
 	public static boolean hasParticipationFee(L2PcInstance player) {

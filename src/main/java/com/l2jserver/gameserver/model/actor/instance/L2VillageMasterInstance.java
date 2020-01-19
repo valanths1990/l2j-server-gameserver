@@ -197,9 +197,9 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 					final NpcHtmlMessage msg = new NpcHtmlMessage(getObjectId());
 					if (clan.getNewLeaderId() == 0) {
 						clan.setNewLeaderId(member.getObjectId(), true);
-						msg.setFile(player.getHtmlPrefix(), "data/scripts/village_master/Clan/9000-07-success.htm");
+						msg.setFile(player.getHtmlPrefix(), "com/l2jserver/datapack/village_master/Clan/9000-07-success.htm");
 					} else {
-						msg.setFile(player.getHtmlPrefix(), "data/scripts/village_master/Clan/9000-07-in-progress.htm");
+						msg.setFile(player.getHtmlPrefix(), "com/l2jserver/datapack/village_master/Clan/9000-07-in-progress.htm");
 					}
 					player.sendPacket(msg);
 				}
@@ -215,7 +215,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 				final NpcHtmlMessage msg = new NpcHtmlMessage(getObjectId());
 				if (clan.getNewLeaderId() != 0) {
 					clan.setNewLeaderId(0, true);
-					msg.setFile(player.getHtmlPrefix(), "data/scripts/village_master/Clan/9000-07-canceled.htm");
+					msg.setFile(player.getHtmlPrefix(), "com/l2jserver/datapack/village_master/Clan/9000-07-canceled.htm");
 				} else {
 					msg.setHtml("<html><body>You don't have clan leader delegation applications submitted yet!</body></html>");
 				}
