@@ -576,6 +576,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable {
 			int z1 = 0;
 			final int range = npc().getMaxDriftRange();
 			
+			if (npc.isWalker()) 
+			{
+				return;
+			}
+			
 			for (Skill sk : npc.getTemplate().getAISkills(AISkillScope.BUFF)) {
 				if (cast(sk)) {
 					return;
