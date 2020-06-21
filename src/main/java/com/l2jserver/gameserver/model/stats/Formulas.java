@@ -970,7 +970,7 @@ public final class Formulas {
 	 * Returns true in case of physical skill critical hit
 	 * @param attacker
 	 * @param target
-	 * @param skill
+	 * @param criticalChance
 	 * @return
 	 */
 	public static boolean calcSkillCrit(L2Character attacker, L2Character target, int criticalChance) {

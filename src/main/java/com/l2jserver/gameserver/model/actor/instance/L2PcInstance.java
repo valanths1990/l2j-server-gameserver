@@ -3776,10 +3776,7 @@ public final class L2PcInstance extends L2Playable {
 			}
 			
 		} else {
-			// _interactTarget=null should never happen but one never knows ^^;
-			if (target != null) {
-				target.onAction(this);
-			}
+			target.onAction(this);
 		}
 	}
 	
@@ -4742,7 +4739,6 @@ public final class L2PcInstance extends L2Playable {
 	 * Used for quest no bonus and no pet consume
 	 * @param addToExp
 	 * @param addToSp
-	 * @param useBonuses
 	 */
 	public void addExpAndSpQuest(long addToExp, int addToSp) {
 		if (addToExp != 0) {
@@ -9392,7 +9388,6 @@ public final class L2PcInstance extends L2Playable {
 	/**
 	 * Decreases existing Souls.
 	 * @param count
-	 * @param skill
 	 * @return consumed souls count
 	 */
 	public int decreaseSouls(int count) {

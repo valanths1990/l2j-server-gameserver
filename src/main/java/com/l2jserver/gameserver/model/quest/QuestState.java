@@ -702,7 +702,7 @@ public final class QuestState {
 	
 	/**
 	 * Send a packet in order to play a sound to the player.
-	 * @param sound the {@link IAudio} object of the sound to play
+	 * @param audio the {@link IAudio} object of the sound to play
 	 */
 	public void playSound(IAudio audio) {
 		AbstractScript.playSound(_player, audio);
