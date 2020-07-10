@@ -303,13 +303,25 @@ public final class GameServer {
 		CursedWeaponsManager.getInstance();
 		TransformData.getInstance();
 		BotReportTable.getInstance();
-		
-		printSection("Scripts");
 		QuestManager.getInstance();
 		BoatManager.getInstance();
 		AirShipManager.getInstance();
 		GraciaSeedsManager.getInstance();
 		
+		printSection("Handlers");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/handlers/MasterHandler.java");
+		printSection("AI");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/ai/AILoader.java");
+		printSection("Instances");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/instances/InstanceLoader.java");
+		printSection("Gracia");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/gracia/GraciaLoader.java");
+		printSection("Hellbound");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/hellbound/HellboundLoader.java");
+		printSection("Quests");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/quests/QuestMasterHandler.java");
+		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/quests/TerritoryWarScripts/TerritoryWarSuperClass.java");
+		printSection("Scripts");
 		ScriptEngineManager.getInstance().executeScriptList(new File(server().getDatapackRoot(), "data/scripts.cfg"));
 		
 		SpawnTable.getInstance().load();
