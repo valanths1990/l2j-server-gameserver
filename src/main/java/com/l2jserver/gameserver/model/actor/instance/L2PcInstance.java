@@ -5797,7 +5797,7 @@ public final class L2PcInstance extends L2Playable {
 			final var mailRootForum = ForumsBBSManager.getInstance().getForumByName("MailRoot");
 			setMail(mailRootForum.getChildByName(getName()));
 			if (_forumMail == null) {
-				ForumsBBSManager.getInstance().createNewForum(getName(), mailRootForum, MAIL, OWNER_ONLY, getObjectId());
+				ForumsBBSManager.getInstance().create(getName(), mailRootForum, MAIL, OWNER_ONLY, getObjectId());
 				setMail(mailRootForum.getChildByName(getName()));
 			}
 		}
@@ -5813,7 +5813,7 @@ public final class L2PcInstance extends L2Playable {
 			final var memoRootForum = ForumsBBSManager.getInstance().getForumByName("MemoRoot");
 			setMemo(memoRootForum.getChildByName(_accountName));
 			if (_forumMemo == null) {
-				ForumsBBSManager.getInstance().createNewForum(_accountName, memoRootForum, MEMO, OWNER_ONLY, getObjectId());
+				ForumsBBSManager.getInstance().create(_accountName, memoRootForum, MEMO, OWNER_ONLY, getObjectId());
 				setMemo(memoRootForum.getChildByName(_accountName));
 			}
 		}
