@@ -4549,7 +4549,7 @@ public final class L2PcInstance extends L2Playable {
 					// Item listed in the non droppable item list
 					// Item listed in the non droppable pet item list
 					if (itemDrop.isShadowItem() || itemDrop.isTimeLimitedItem() || !itemDrop.isDropable() || (itemDrop.getId() == Inventory.ADENA_ID) || //
-						(itemDrop.getItem().getType2() == ItemType2.QUEST) || (hasSummon() && (getSummon().getControlObjectId() == itemDrop.getId())) || //
+						(itemDrop.getItem().getType2() == ItemType2.QUEST) || (hasSummon() && (getSummon().getControlObjectId() == itemDrop.getObjectId())) || //
 						pvp().getNonDroppableItems().contains(itemDrop.getId()) || pvp().getPetItems().contains(itemDrop.getId())) {
 						continue;
 					}
