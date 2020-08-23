@@ -1408,7 +1408,7 @@ public class Quest extends AbstractScript implements IIdentifiable {
 			ps.setString(1, getName());
 			ps.setString(2, var);
 			try (var rs = ps.executeQuery()) {
-				if (rs.first()) {
+				if (rs.next()) {
 					result = rs.getString(1);
 				}
 			}
