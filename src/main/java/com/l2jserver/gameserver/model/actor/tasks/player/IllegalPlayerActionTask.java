@@ -54,7 +54,7 @@ public final class IllegalPlayerActionTask implements Runnable {
 				_actor.sendMessage("You will be kicked for illegal action, GM informed.");
 				break;
 			}
-			case KICKBAN: {
+			case KICK_BAN: {
 				if (!_actor.isGM()) {
 					_actor.setAccessLevel(-1);
 					_actor.setAccountAccesslevel(-1);
@@ -84,7 +84,7 @@ public final class IllegalPlayerActionTask implements Runnable {
 					_actor.logout(false);
 					break;
 				}
-				case KICKBAN: {
+				case KICK_BAN: {
 					PunishmentManager.getInstance().startPunishment(new PunishmentTask(_actor.getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.BAN, System.currentTimeMillis() + general().getDefaultPunishParam(), _message, getClass().getSimpleName()));
 					break;
 				}
