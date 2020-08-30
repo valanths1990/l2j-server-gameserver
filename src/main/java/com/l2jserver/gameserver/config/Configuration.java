@@ -83,6 +83,8 @@ public class Configuration {
 	
 	private static final FloodProtectorConfiguration floodProtector = ConfigFactory.create(FloodProtectorConfiguration.class);
 	
+	private static final BufferServiceConfiguration bufferService = ConfigFactory.create(BufferServiceConfiguration.class);
+	
 	private Configuration() {
 		// Do nothing.
 	}
@@ -193,5 +195,9 @@ public class Configuration {
 	
 	public static IPConfigData ip() {
 		return ipConfigData;
+	}
+	
+	public static BufferServiceConfiguration bufferService() {
+		return bufferService;
 	}
 }
