@@ -18,25 +18,42 @@
  */
 package com.l2jserver.gameserver.model.conditions;
 
+import static com.l2jserver.gameserver.model.itemcontainer.Inventory.PAPERDOLL_LBRACELET;
+
+import com.l2jserver.gameserver.agathion.repository.AgathionRepository;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.skills.Skill;
 
 /**
- * Condition Player Agathion Id.
+ * Condition agathion energy.
  * @author Zoey76
  * @version 2.6.2.0
  */
-public class ConditionPlayerAgathionId extends Condition {
+public class ConditionPlayerAgathionEnergy extends Condition {
 	
-	private final int _agathionId;
+	private final int energy;
 	
-	public ConditionPlayerAgathionId(int agathionId) {
-		_agathionId = agathionId;
+	public ConditionPlayerAgathionEnergy(int energy) {
+		this.energy = energy;
 	}
 	
 	@Override
 	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
-		return effector.isPlayer() && (effector.getActingPlayer().getAgathionId() == _agathionId);
+		if (!effector.isPlayer()) {
+			return false;
+		}
+		
+		final var player = effector.getActingPlayer();
+		final var agathionInfo = AgathionRepository.getInstance().getByNpcId(player.getAgathionId());
+		if ((agathionInfo == null) || (agathionInfo.getMaxEnergy() <= 0)) {
+			return false;
+		}
+		
+		final var agathionItem = player.getInventory().getPaperdollItem(PAPERDOLL_LBRACELET);
+		if ((agathionItem == null) || (agathionInfo.getItemId() != agathionItem.getId())) {
+			return false;
+		}
+		return agathionItem.getAgathionRemainingEnergy() >= energy;
 	}
 }

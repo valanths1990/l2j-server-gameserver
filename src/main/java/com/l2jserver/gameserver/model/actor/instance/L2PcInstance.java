@@ -72,6 +72,7 @@ import com.l2jserver.gameserver.RecipeController;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.SevenSignsFestival;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.agathion.repository.AgathionRepository;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.ai.L2CharacterAI;
 import com.l2jserver.gameserver.ai.L2PlayerAI;
@@ -277,6 +278,7 @@ import com.l2jserver.gameserver.network.serverpackets.CharInfo;
 import com.l2jserver.gameserver.network.serverpackets.ConfirmDlg;
 import com.l2jserver.gameserver.network.serverpackets.EtcStatusUpdate;
 import com.l2jserver.gameserver.network.serverpackets.ExAutoSoulShot;
+import com.l2jserver.gameserver.network.serverpackets.ExBR_AgathionEnergyInfo;
 import com.l2jserver.gameserver.network.serverpackets.ExBrExtraUserInfo;
 import com.l2jserver.gameserver.network.serverpackets.ExDominionWarStart;
 import com.l2jserver.gameserver.network.serverpackets.ExDuelUpdateUserInfo;
@@ -1888,6 +1890,12 @@ public final class L2PcInstance extends L2Playable {
 		
 		if (getInventoryLimit() != oldInvLimit) {
 			sendPacket(new ExStorageMaxCount(this));
+		}
+		
+		// If item is agathion with energy, then send info to client.
+		final var agathionInfo = AgathionRepository.getInstance().getByItemId(item.getId());
+		if ((agathionInfo != null) && agathionInfo.getMaxEnergy() > 0) {
+			sendPacket(new ExBR_AgathionEnergyInfo(List.of(item)));
 		}
 		
 		// Notify to scripts
@@ -3893,7 +3901,7 @@ public final class L2PcInstance extends L2Playable {
 				}
 			}
 			
-			if ((target.getItemLootShedule() != null) && ((target.getOwnerId() == getObjectId()) || isInLooterParty(target.getOwnerId()))) {
+			if ((target.getItemLootSchedule() != null) && ((target.getOwnerId() == getObjectId()) || isInLooterParty(target.getOwnerId()))) {
 				target.resetOwnerTimer();
 			}
 			
@@ -9592,16 +9600,10 @@ public final class L2PcInstance extends L2Playable {
 		sendPacket(sm);
 	}
 	
-	/**
-	 * @return
-	 */
 	public int getAgathionId() {
 		return _agathionId;
 	}
 	
-	/**
-	 * @param npcId
-	 */
 	public void setAgathionId(int npcId) {
 		_agathionId = npcId;
 	}
@@ -9610,9 +9612,6 @@ public final class L2PcInstance extends L2Playable {
 		return getStat().getVitalityPoints();
 	}
 	
-	/**
-	 * @return Vitality Level
-	 */
 	public int getVitalityLevel() {
 		return getStat().getVitalityLevel();
 	}

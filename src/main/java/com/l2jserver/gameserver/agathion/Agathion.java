@@ -16,27 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.l2jserver.gameserver.model.conditions;
-
-import com.l2jserver.gameserver.model.actor.L2Character;
-import com.l2jserver.gameserver.model.items.L2Item;
-import com.l2jserver.gameserver.model.skills.Skill;
+package com.l2jserver.gameserver.agathion;
 
 /**
- * Condition Player Agathion Id.
+ * Agathion.
  * @author Zoey76
  * @version 2.6.2.0
  */
-public class ConditionPlayerAgathionId extends Condition {
+public class Agathion {
 	
-	private final int _agathionId;
+	private final int npcId;
 	
-	public ConditionPlayerAgathionId(int agathionId) {
-		_agathionId = agathionId;
+	private final int itemId;
+	
+	private final int energy;
+	
+	private final int maxEnergy;
+	
+	public Agathion(int npcId, int id, int itemId, int energy, int maxEnergy) {
+		this.npcId = npcId;
+		this.itemId = itemId;
+		this.energy = energy;
+		this.maxEnergy = maxEnergy;
 	}
 	
-	@Override
-	public boolean testImpl(L2Character effector, L2Character effected, Skill skill, L2Item item) {
-		return effector.isPlayer() && (effector.getActingPlayer().getAgathionId() == _agathionId);
+	public int getNpcId() {
+		return npcId;
+	}
+	
+	public int getItemId() {
+		return itemId;
+	}
+	
+	public int getEnergy() {
+		return energy;
+	}
+	
+	public int getMaxEnergy() {
+		return maxEnergy;
 	}
 }
