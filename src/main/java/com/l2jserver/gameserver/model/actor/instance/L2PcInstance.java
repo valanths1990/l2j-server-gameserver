@@ -3624,7 +3624,7 @@ public final class L2PcInstance extends L2Playable {
 		
 		// In duel MP updated only with CP or HP
 		if (isInDuel() && (needCpUpdate || needHpUpdate)) {
-			DuelManager.getInstance().broadcastToOppositTeam(this, new ExDuelUpdateUserInfo(this));
+			DuelManager.getInstance().broadcastToOpposingTeam(this, new ExDuelUpdateUserInfo(this));
 		}
 	}
 	
