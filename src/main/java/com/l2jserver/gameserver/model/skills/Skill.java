@@ -358,12 +358,7 @@ public class Skill implements IIdentifiable {
 	
 	public boolean isAOE() {
 		switch (_targetType) {
-			case AREA:
-			case AURA:
-			case BEHIND_AREA:
-			case BEHIND_AURA:
-			case FRONT_AREA:
-			case FRONT_AURA: {
+			case AREA, AURA, BEHIND_AREA, BEHIND_AURA, FRONT_AREA, FRONT_AURA -> {
 				return true;
 			}
 		}
@@ -1424,7 +1419,7 @@ public class Skill implements IIdentifiable {
 					avesEvent.add(ave);
 					continue;
 				}
-
+				
 				if (ave.isSpecial()) {
 					if (avesSpecial == null) {
 						avesSpecial = new ArrayList<>(1);
@@ -1432,7 +1427,7 @@ public class Skill implements IIdentifiable {
 					avesSpecial.add(ave);
 					continue;
 				}
-
+				
 				if (aves == null) {
 					aves = new ArrayList<>(1);
 				}

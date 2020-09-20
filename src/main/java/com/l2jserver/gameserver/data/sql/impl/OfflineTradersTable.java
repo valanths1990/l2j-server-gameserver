@@ -71,7 +71,7 @@ public class OfflineTradersTable {
 						String title = null;
 						
 						switch (pc.getPrivateStoreType()) {
-							case BUY:
+							case BUY -> {
 								if (!customs().offlineTradeEnable()) {
 									continue;
 								}
@@ -84,9 +84,8 @@ public class OfflineTradersTable {
 									stm_items.executeUpdate();
 									stm_items.clearParameters();
 								}
-								break;
-							case SELL:
-							case PACKAGE_SELL:
+							}
+							case SELL, PACKAGE_SELL -> {
 								if (!customs().offlineTradeEnable()) {
 									continue;
 								}
@@ -99,8 +98,8 @@ public class OfflineTradersTable {
 									stm_items.executeUpdate();
 									stm_items.clearParameters();
 								}
-								break;
-							case MANUFACTURE:
+							}
+							case MANUFACTURE -> {
 								if (!customs().offlineCraftEnable()) {
 									continue;
 								}
@@ -113,6 +112,7 @@ public class OfflineTradersTable {
 									stm_items.executeUpdate();
 									stm_items.clearParameters();
 								}
+							}
 						}
 						stm3.setString(4, title);
 						stm3.executeUpdate();
@@ -175,16 +175,15 @@ public class OfflineTradersTable {
 						stm_items.setInt(1, player.getObjectId());
 						try (var items = stm_items.executeQuery()) {
 							switch (type) {
-								case BUY:
+								case BUY -> {
 									while (items.next()) {
 										if (player.getBuyList().addItemByItemId(items.getInt(2), items.getLong(3), items.getLong(4)) == null) {
 											throw new NullPointerException();
 										}
 									}
 									player.getBuyList().setTitle(rs.getString("title"));
-									break;
-								case SELL:
-								case PACKAGE_SELL:
+								}
+								case SELL, PACKAGE_SELL -> {
 									while (items.next()) {
 										if (player.getSellList().addItem(items.getInt(2), items.getLong(3), items.getLong(4)) == null) {
 											throw new NullPointerException();
@@ -192,13 +191,13 @@ public class OfflineTradersTable {
 									}
 									player.getSellList().setTitle(rs.getString("title"));
 									player.getSellList().setPackaged(type == PrivateStoreType.PACKAGE_SELL);
-									break;
-								case MANUFACTURE:
+								}
+								case MANUFACTURE -> {
 									while (items.next()) {
 										player.getManufactureItems().put(items.getInt(2), new L2ManufactureItem(items.getInt(2), items.getLong(4)));
 									}
 									player.setStoreName(rs.getString("title"));
-									break;
+								}
 							}
 						}
 					}

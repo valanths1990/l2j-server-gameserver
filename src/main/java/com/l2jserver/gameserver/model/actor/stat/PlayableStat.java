@@ -51,18 +51,10 @@ public class PlayableStat extends CharStat {
 		return _sp.get();
 	}
 	
-	/**
-	 * This method not contains checks!
-	 * @param exp
-	 */
 	public void setExp(long exp) {
 		_exp.set(exp);
 	}
 	
-	/**
-	 * This method not contains checks!
-	 * @param sp
-	 */
 	public void setSp(int sp) {
 		_sp.set(sp);
 	}
@@ -173,7 +165,7 @@ public class PlayableStat extends CharStat {
 	
 	public boolean addSp(int sp) {
 		if (sp < 0) {
-			_log.warning("addSp acept only possitive numbers!");
+			_log.warning("addSp accepts only positive numbers!");
 			return false;
 		}
 		int currentSp = getSp();
@@ -239,13 +231,9 @@ public class PlayableStat extends CharStat {
 	}
 	
 	/**
-	 * Get maximum level of expirince is max level +1 for get (100%)<br>
-	 * <B><U> Overridden in </U> :</B>
-	 * <li>PcStat</li>
-	 * <li>PetStat</li>
+	 * Get maximum level of experience is max level +1 for get (100%).
 	 */
 	public int getMaxExpLevel() {
-		// Dummy method
 		return character().getMaxPlayerLevel() + 1;
 	}
 	
