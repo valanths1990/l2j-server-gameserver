@@ -306,6 +306,12 @@ public interface CharacterConfiguration extends Reloadable {
 	@Key("NpcTalkBlockingTime")
 	Integer getNpcTalkBlockingTime();
 	
+	@Key("FriendListLimit")
+	Integer getFriendListLimit();
+	
+	@Key("BlockListLimit")
+	Integer getBlockListLimit();
+	
 	// Enchanting
 	
 	@Key("EnchantChanceElementStone")
