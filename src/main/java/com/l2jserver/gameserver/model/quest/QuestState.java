@@ -548,7 +548,7 @@ public final class QuestState {
 	 * @param value the value
 	 * @return this QuestState
 	 */
-	public QuestState setMemoStateEx(int slot, int value) {
+	public QuestState setMemoStateEx(int slot, long value) {
 		set("memoStateEx" + slot, String.valueOf(value));
 		return this;
 	}
