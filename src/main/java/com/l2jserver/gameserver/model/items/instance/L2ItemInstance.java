@@ -673,11 +673,11 @@ public final class L2ItemInstance extends L2Object {
 	}
 	
 	/**
-	 * Returns if item is dropable
+	 * Returns if item is droppable
 	 * @return boolean
 	 */
-	public boolean isDropable() {
-		return !isAugmented() && _item.isDropable();
+	public boolean isDroppable() {
+		return !isAugmented() && _item.isDroppable();
 	}
 	
 	/**

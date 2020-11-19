@@ -83,7 +83,7 @@ public final class RequestGiveItemToPet extends L2GameClientPacket {
 			return;
 		}
 		
-		if (item.isHeroItem() || !item.isDropable() || !item.isDestroyable() || !item.isTradeable()) {
+		if (item.isHeroItem() || !item.isDroppable() || !item.isDestroyable() || !item.isTradeable()) {
 			player.sendPacket(SystemMessageId.ITEM_NOT_FOR_PETS);
 			return;
 		}

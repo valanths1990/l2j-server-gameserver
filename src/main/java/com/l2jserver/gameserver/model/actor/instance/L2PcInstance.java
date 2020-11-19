@@ -2786,7 +2786,7 @@ public final class L2PcInstance extends L2Playable {
 			sendPacket(su);
 			
 			// If over capacity, drop the item
-			if (!canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !_inventory.validateCapacity(0, item.isQuestItem()) && newitem.isDropable() && (!newitem.isStackable() || (newitem.getLastChange() != L2ItemInstance.MODIFIED))) {
+			if (!canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !_inventory.validateCapacity(0, item.isQuestItem()) && newitem.isDroppable() && (!newitem.isStackable() || (newitem.getLastChange() != L2ItemInstance.MODIFIED))) {
 				dropItem("InvDrop", newitem, null, true, true);
 			} else if (CursedWeaponsManager.getInstance().isCursed(newitem.getId())) {
 				CursedWeaponsManager.getInstance().activate(this, newitem);
@@ -2891,7 +2891,7 @@ public final class L2PcInstance extends L2Playable {
 				L2ItemInstance createdItem = _inventory.addItem(process, itemId, count, enchantLevel, this, reference);
 				
 				// If over capacity, drop the item
-				if (!canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !_inventory.validateCapacity(0, item.isQuestItem()) && createdItem.isDropable() && (!createdItem.isStackable() || (createdItem.getLastChange() != L2ItemInstance.MODIFIED))) {
+				if (!canOverrideCond(PcCondOverride.ITEM_CONDITIONS) && !_inventory.validateCapacity(0, item.isQuestItem()) && createdItem.isDroppable() && (!createdItem.isStackable() || (createdItem.getLastChange() != L2ItemInstance.MODIFIED))) {
 					dropItem("InvDrop", createdItem, null, true);
 				} else if (CursedWeaponsManager.getInstance().isCursed(createdItem.getId())) {
 					CursedWeaponsManager.getInstance().activate(this, createdItem);
@@ -4538,7 +4538,7 @@ public final class L2PcInstance extends L2Playable {
 					// Control Item of active pet
 					// Item listed in the non droppable item list
 					// Item listed in the non droppable pet item list
-					if (itemDrop.isShadowItem() || itemDrop.isTimeLimitedItem() || !itemDrop.isDropable() || (itemDrop.getId() == Inventory.ADENA_ID) || //
+					if (itemDrop.isShadowItem() || itemDrop.isTimeLimitedItem() || !itemDrop.isDroppable() || (itemDrop.getId() == Inventory.ADENA_ID) || //
 						(itemDrop.getItem().getType2() == ItemType2.QUEST) || (hasSummon() && (getSummon().getControlObjectId() == itemDrop.getObjectId())) || //
 						pvp().getNonDroppableItems().contains(itemDrop.getId()) || pvp().getPetItems().contains(itemDrop.getId())) {
 						continue;
