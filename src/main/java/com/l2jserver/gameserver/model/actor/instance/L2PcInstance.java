@@ -2492,7 +2492,7 @@ public final class L2PcInstance extends L2Playable {
 			return;
 		}
 		
-		if (!_waitTypeSitting && !isAttackingDisabled() && !isOutOfControl() && !isImmobilized()) {
+		if (!_waitTypeSitting && !isAttackingDisabled() && !isOutOfControl() && !isImmobilized() && !isMoving()) {
 			breakAttack();
 			setIsSitting(true);
 			getAI().setIntention(CtrlIntention.AI_INTENTION_REST);
