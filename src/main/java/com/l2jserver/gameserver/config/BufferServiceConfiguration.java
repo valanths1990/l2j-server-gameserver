@@ -54,7 +54,7 @@ public interface BufferServiceConfiguration extends Reloadable {
 	
 	@Key("Debug")
 	Boolean getDebug();
-
+	
 	@Key("ForbidInZones")
 	ZoneId[] getForbidInZones();
 	

@@ -32,23 +32,23 @@ import static org.aeonbits.owner.Config.LoadType.MERGE;
  * @version 2.6.2.0
  */
 @Config.Sources({
-		"file:${L2J_HOME}/custom/game/config/discord.properties",
-		"file:./config/discord.properties",
-		"classpath:config/discord.properties"
+	"file:${L2J_HOME}/custom/game/config/discord.properties",
+	"file:./config/discord.properties",
+	"classpath:config/discord.properties"
 })
 @Config.LoadPolicy(MERGE)
 @Config.HotReload(value = 20, unit = MINUTES, type = ASYNC)
 public interface DiscordConfiguration extends Mutable, Reloadable {
-
+	
 	@Config.Key("BotEnable")
 	Boolean enableBot();
-
+	
 	@Config.Key("BotPrefix")
 	String getPrefix();
-
+	
 	@Config.Key("BotToken")
 	String getBotToken();
-
+	
 	@Config.Key("ConsoleLogChannelId")
 	String getConsoleLogChannelId();
 }
