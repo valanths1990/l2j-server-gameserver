@@ -135,6 +135,14 @@ public class HtmCache {
 			if (content == null) {
 				content = loadFile(new File(server().getScriptRoot(), newPath));
 			}
+			
+			// If multilanguage content is not present, try default location.
+			if (prefix != null && content == null) {
+				content = loadFile(new File(server().getDatapackRoot(), path));
+				if (content == null) {
+					content = loadFile(new File(server().getScriptRoot(), path));
+				}
+			}
 		}
 		return content;
 	}
