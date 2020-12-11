@@ -645,7 +645,10 @@ public class Skill implements IIdentifiable {
 	}
 	
 	public int getAffectLimit() {
-		return (affectLimit[0] + Rnd.get(affectLimit[1]));
+		if (affectLimit[1] == 0) {
+			return Integer.MAX_VALUE;
+		}
+		return affectLimit[0] + Rnd.get(affectLimit[1]);
 	}
 	
 	public AffectObject getAffectObject() {
