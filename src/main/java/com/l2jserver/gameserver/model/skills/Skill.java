@@ -59,6 +59,7 @@ import com.l2jserver.gameserver.model.effects.L2EffectType;
 import com.l2jserver.gameserver.model.entity.TvTEvent;
 import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
+import com.l2jserver.gameserver.model.skills.targets.AffectObject;
 import com.l2jserver.gameserver.model.skills.targets.AffectScope;
 import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
@@ -130,15 +131,14 @@ public class Skill implements IIdentifiable {
 	
 	private int _refId;
 	// all times in milliseconds
-	private final int _hitTime;
-	// private final int _skillInterruptTime;
+	private final int hitTime;
+	private final int hitCancelTime;
 	private final int _coolTime;
 	private final int _reuseHashCode;
 	private final int _reuseDelay;
 	
 	/** Target type of the skill : SELF, PARTY, CLAN, PET... */
 	private final L2TargetType _targetType;
-	private final AffectScope _affectScope;
 	// base success chance
 	private final int _magicLevel;
 	private final int _lvlBonusRate;
@@ -146,11 +146,14 @@ public class Skill implements IIdentifiable {
 	private final int _minChance;
 	private final int _maxChance;
 	
+	
+	private final int[] affectLimit;
+	private final AffectObject affectObject;
 	// Effecting area of the skill, in radius.
 	// The radius center varies according to the _targetType:
 	// "caster" if targetType = AURA/PARTY/CLAN or "target" if targetType = AREA
-	private final int _affectRange;
-	private final int[] _affectLimit = new int[2];
+	private final int affectRange;
+	private final AffectScope affectScope;
 	
 	private final boolean _nextActionIsAttack;
 	
@@ -236,7 +239,8 @@ public class Skill implements IIdentifiable {
 		_stayAfterDeath = set.getBoolean("stayAfterDeath", false);
 		_stayOnSubclassChange = set.getBoolean("stayOnSubclassChange", true);
 		
-		_hitTime = set.getInt("hitTime", 0);
+		hitTime = set.getInt("hitTime", 0);
+		hitCancelTime = set.getInt("hitCancelTime", 0);
 		_coolTime = set.getInt("coolTime", 0);
 		_isDebuff = set.getBoolean("isDebuff", false);
 		_isRecoveryHerb = set.getBoolean("isRecoveryHerb", false);
@@ -252,8 +256,6 @@ public class Skill implements IIdentifiable {
 			_reuseDelay = set.getInt("reuseDelay", 0);
 		}
 		
-		_affectRange = set.getInt("affectRange", 0);
-		
 		final String rideState = set.getString("rideState", null);
 		if (rideState != null) {
 			String[] state = rideState.split(";");
@@ -268,19 +270,13 @@ public class Skill implements IIdentifiable {
 				}
 			}
 		}
-		final String affectLimit = set.getString("affectLimit", null);
-		if (affectLimit != null) {
-			try {
-				String[] valuesSplit = affectLimit.split("-");
-				_affectLimit[0] = Integer.parseInt(valuesSplit[0]);
-				_affectLimit[1] = Integer.parseInt(valuesSplit[1]);
-			} catch (Exception e) {
-				throw new IllegalArgumentException("SkillId: " + _id + " invalid affectLimit value: " + affectLimit + ", \"percent-percent\" required");
-			}
-		}
+		
+		affectLimit = set.getIntArray("affectLimit", "0-0", "-");
+		affectObject = set.getEnum("affectObject", AffectObject.class, AffectObject.NONE);
+		affectScope = set.getEnum("affectScope", AffectScope.class, AffectScope.NONE);
+		affectRange = set.getInt("affectRange", 0);
 		
 		_targetType = set.getEnum("targetType", L2TargetType.class, L2TargetType.SELF);
-		_affectScope = set.getEnum("affectScope", AffectScope.class, AffectScope.NONE);
 		_magicLevel = set.getInt("magicLvl", 0);
 		_lvlBonusRate = set.getInt("lvlBonusRate", 0);
 		_activateRate = set.getInt("activateRate", -1);
@@ -346,14 +342,6 @@ public class Skill implements IIdentifiable {
 	 */
 	public L2TargetType getTargetType() {
 		return _targetType;
-	}
-	
-	/**
-	 * Gets the affect scope of the skill.
-	 * @return the affect scope
-	 */
-	public AffectScope getAffectScope() {
-		return _affectScope;
 	}
 	
 	public boolean isAOE() {
@@ -529,31 +517,18 @@ public class Skill implements IIdentifiable {
 		return _nextActionIsAttack;
 	}
 	
-	/**
-	 * @return Returns the castRange.
-	 */
 	public int getCastRange() {
 		return _castRange;
 	}
 	
-	/**
-	 * @return Returns the effectRange.
-	 */
 	public int getEffectRange() {
 		return _effectRange;
 	}
 	
-	/**
-	 * @return Returns the hpConsume.
-	 */
 	public int getHpConsume() {
 		return _hpConsume;
 	}
 	
-	/**
-	 * Gets the skill ID.
-	 * @return the skill ID
-	 */
 	@Override
 	public int getId() {
 		return _id;
@@ -605,86 +580,50 @@ public class Skill implements IIdentifiable {
 		return _itemConsumeId;
 	}
 	
-	/**
-	 * @return Returns the level.
-	 */
 	public int getLevel() {
 		return _level;
 	}
 	
-	/**
-	 * @return Returns true to set physical skills.
-	 */
 	public boolean isPhysical() {
 		return _magic == 0;
 	}
 	
-	/**
-	 * @return Returns true to set magic skills.
-	 */
 	public boolean isMagic() {
 		return _magic == 1;
 	}
 	
-	/**
-	 * @return Returns true to set static skills.
-	 */
 	public boolean isStatic() {
 		return _magic == 2;
 	}
 	
-	/**
-	 * @return Returns true to set dance skills.
-	 */
 	public boolean isDance() {
 		return _magic == 3;
 	}
 	
-	/**
-	 * @return Returns true to set trigger skills.
-	 */
 	public boolean isTrigger() {
 		return _magic == 4;
 	}
 	
-	/**
-	 * @return Returns true to set static reuse.
-	 */
 	public boolean isReuseDelayLocked() {
 		return _reuseDelayLock;
 	}
 	
-	/**
-	 * @return Returns the mpConsume1.
-	 */
 	public int getMpConsume1() {
 		return _mpConsume1;
 	}
 	
-	/**
-	 * @return Returns the mpConsume2.
-	 */
 	public int getMpConsume2() {
 		return _mpConsume2;
 	}
 	
-	/**
-	 * @return Mana consumption per channeling tick.
-	 */
 	public int getMpPerChanneling() {
 		return _mpPerChanneling;
 	}
 	
-	/**
-	 * @return the skill name
-	 */
 	public String getName() {
 		return _name;
 	}
 	
-	/**
-	 * @return the reuse delay
-	 */
 	public int getReuseDelay() {
 		return _reuseDelay;
 	}
@@ -694,22 +633,31 @@ public class Skill implements IIdentifiable {
 	}
 	
 	public int getHitTime() {
-		return _hitTime;
+		return hitTime;
 	}
 	
-	/**
-	 * @return the cool time
-	 */
+	public int getHitCancelTime() {
+		return hitCancelTime;
+	}
+	
 	public int getCoolTime() {
 		return _coolTime;
 	}
 	
-	public int getAffectRange() {
-		return _affectRange;
+	public int getAffectLimit() {
+		return (affectLimit[0] + Rnd.get(affectLimit[1]));
 	}
 	
-	public int getAffectLimit() {
-		return (_affectLimit[0] + Rnd.get(_affectLimit[1]));
+	public AffectObject getAffectObject() {
+		return affectObject;
+	}
+	
+	public int getAffectRange() {
+		return affectRange;
+	}
+	
+	public AffectScope getAffectScope() {
+		return affectScope;
 	}
 	
 	public boolean isActive() {

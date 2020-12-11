@@ -252,7 +252,11 @@ public class StatsSet implements IParserAdvUtils {
 	}
 	
 	public int[] getIntArray(String key, String splitOn) {
-		Object val = _set.get(key);
+		return getIntArray(key, null, splitOn);
+	}
+	
+	public int[] getIntArray(String key, String defaultValue, String splitOn) {
+		Object val = _set.getOrDefault(key, defaultValue);
 		if (val == null) {
 			throw new IllegalArgumentException("Integer value required, but not specified");
 		}
