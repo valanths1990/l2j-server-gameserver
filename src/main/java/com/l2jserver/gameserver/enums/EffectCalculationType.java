@@ -19,7 +19,9 @@
 package com.l2jserver.gameserver.enums;
 
 /**
+ * Effect calculation type.
  * @author Zealar
+ * @version 2.6.2.0
  */
 public enum EffectCalculationType {
 	DIFF,

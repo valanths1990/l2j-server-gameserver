@@ -100,7 +100,7 @@ import com.l2jserver.gameserver.util.Util;
 /**
  * Global calculations.
  */
-public final class Formulas {
+public class Formulas {
 	private static final Logger _log = Logger.getLogger(Formulas.class.getName());
 	
 	/** Regeneration Task period. */

@@ -69,7 +69,7 @@ import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanTakeFort;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanTransform;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanUntransform;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCharges;
-import com.l2jserver.gameserver.model.conditions.ConditionPlayerCheckAbnormal;
+import com.l2jserver.gameserver.model.conditions.ConditionCheckAbnormal;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerClassIdRestriction;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCloakStatus;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCp;
@@ -620,12 +620,16 @@ public abstract class DocumentBase {
 				}
 				case "checkabnormal" -> {
 					final String value = a.getNodeValue();
-					if (value.contains(",")) {
-						final String[] values = value.split(",");
-						cond = joinAnd(cond, new ConditionPlayerCheckAbnormal(AbnormalType.valueOf(values[0]), Integer.decode(getValue(values[1], template))));
+					if (value.contains(";")) {
+						final String[] values = value.split(";");
+						final var type = AbnormalType.valueOf(values[0]);
+						final var level = Integer.decode(getValue(values[1], template));
+						final var mustHave = Boolean.parseBoolean(values[2]);
+						cond = joinAnd(cond, new ConditionCheckAbnormal(type, level, mustHave));
 					} else {
-						cond = joinAnd(cond, new ConditionPlayerCheckAbnormal(AbnormalType.valueOf(value)));
+						cond = joinAnd(cond, new ConditionCheckAbnormal(AbnormalType.valueOf(value), -1, true));
 					}
+					break;
 				}
 				case "categorytype" -> {
 					final String[] values = a.getNodeValue().split(",");
@@ -758,6 +762,19 @@ public abstract class DocumentBase {
 				case "invsize" -> {
 					int size = Integer.decode(getValue(a.getNodeValue(), null));
 					cond = joinAnd(cond, new ConditionTargetInvSize(size));
+				}
+				case "checkabnormal" -> {
+					final String value = a.getNodeValue();
+					if (value.contains(";")) {
+						final String[] values = value.split(";");
+						final var type = AbnormalType.valueOf(values[0]);
+						final var level = Integer.decode(getValue(values[1], template));
+						final var mustHave = Boolean.parseBoolean(values[2]);
+						cond = joinAnd(cond, new ConditionCheckAbnormal(type, level, mustHave));
+					} else {
+						cond = joinAnd(cond, new ConditionCheckAbnormal(AbnormalType.valueOf(value), -1, true));
+					}
+					break;
 				}
 			}
 		}

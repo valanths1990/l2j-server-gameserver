@@ -30,7 +30,7 @@ public enum AttributeType {
 	WIND(2),
 	EARTH(3),
 	HOLY(4),
-	DARK(5);
+	UNHOLY(5);
 	
 	private final byte _id;
 	
