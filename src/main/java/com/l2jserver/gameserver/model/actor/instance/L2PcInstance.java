@@ -6632,6 +6632,7 @@ public final class L2PcInstance extends L2Playable {
 			case FRONT_AURA:
 			case BEHIND_AURA:
 			case AREA_SUMMON:
+			case AURA_UNDEAD_ENEMY:
 			case GROUND:
 			case SELF:
 			case ENEMY:
