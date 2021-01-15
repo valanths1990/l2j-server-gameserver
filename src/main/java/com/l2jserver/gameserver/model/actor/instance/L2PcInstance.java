@@ -260,7 +260,7 @@ import com.l2jserver.gameserver.model.skills.AbnormalType;
 import com.l2jserver.gameserver.model.skills.BuffInfo;
 import com.l2jserver.gameserver.model.skills.CommonSkill;
 import com.l2jserver.gameserver.model.skills.Skill;
-import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
+import com.l2jserver.gameserver.model.skills.targets.TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.Stats;
@@ -6441,10 +6441,10 @@ public final class L2PcInstance extends L2Playable {
 		// ************************************* Check Target *******************************************
 		// Create and set a L2Object containing the target of the skill
 		L2Object target = null;
-		L2TargetType sklTargetType = skill.getTargetType();
+		TargetType sklTargetType = skill.getTargetType();
 		Location worldPosition = getCurrentSkillWorldPosition();
 		
-		if ((sklTargetType == L2TargetType.GROUND) && (worldPosition == null)) {
+		if ((sklTargetType == TargetType.GROUND) && (worldPosition == null)) {
 			LOG.warn("WorldPosition is null for {}, {}", skill.getName(), this);
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return false;
@@ -6597,7 +6597,7 @@ public final class L2PcInstance extends L2Playable {
 			// Check if the target is in the skill cast range
 			if (dontMove) {
 				// Calculate the distance between the L2PcInstance and the target
-				if (sklTargetType == L2TargetType.GROUND) {
+				if (sklTargetType == TargetType.GROUND) {
 					if (!isInsideRadius(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), skill.getCastRange() + getTemplate().getCollisionRadius(), false, false)) {
 						// Send a System Message to the caster
 						sendPacket(SystemMessageId.TARGET_TOO_FAR);
@@ -6651,7 +6651,7 @@ public final class L2PcInstance extends L2Playable {
 		
 		// GeoData Los Check here
 		if (skill.getCastRange() > 0) {
-			if (sklTargetType == L2TargetType.GROUND) {
+			if (sklTargetType == TargetType.GROUND) {
 				if (!GeoData.getInstance().canSeeTarget(this, worldPosition)) {
 					sendPacket(SystemMessageId.CANT_SEE_TARGET);
 					sendPacket(ActionFailed.STATIC_PACKET);

@@ -27,6 +27,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
 /**
  * Check Abnormal type and level.
  * @author Zoey76
+ * @version 2.6.2.0
  */
 public class ConditionCheckAbnormal extends Condition {
 	private final AbnormalType type;

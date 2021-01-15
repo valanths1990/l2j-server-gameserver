@@ -44,6 +44,7 @@ import com.l2jserver.gameserver.model.base.PlayerState;
 import com.l2jserver.gameserver.model.conditions.Condition;
 import com.l2jserver.gameserver.model.conditions.ConditionCategoryType;
 import com.l2jserver.gameserver.model.conditions.ConditionChangeWeapon;
+import com.l2jserver.gameserver.model.conditions.ConditionCheckAbnormal;
 import com.l2jserver.gameserver.model.conditions.ConditionGameChance;
 import com.l2jserver.gameserver.model.conditions.ConditionGameTime;
 import com.l2jserver.gameserver.model.conditions.ConditionGameTime.CheckGameTime;
@@ -69,7 +70,6 @@ import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanTakeFort;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanTransform;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCanUntransform;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCharges;
-import com.l2jserver.gameserver.model.conditions.ConditionCheckAbnormal;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerClassIdRestriction;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCloakStatus;
 import com.l2jserver.gameserver.model.conditions.ConditionPlayerCp;
@@ -114,7 +114,7 @@ import com.l2jserver.gameserver.model.conditions.ConditionTargetClassIdRestricti
 import com.l2jserver.gameserver.model.conditions.ConditionTargetInvSize;
 import com.l2jserver.gameserver.model.conditions.ConditionTargetLevel;
 import com.l2jserver.gameserver.model.conditions.ConditionTargetLevelRange;
-import com.l2jserver.gameserver.model.conditions.ConditionTargetMyPartyExceptMe;
+import com.l2jserver.gameserver.model.conditions.ConditionTargetMyParty;
 import com.l2jserver.gameserver.model.conditions.ConditionTargetNpcId;
 import com.l2jserver.gameserver.model.conditions.ConditionTargetNpcType;
 import com.l2jserver.gameserver.model.conditions.ConditionTargetPlayable;
@@ -677,7 +677,7 @@ public abstract class DocumentBase {
 						cond = joinAnd(cond, new ConditionTargetLevelRange(minimumLevel, maximumLevel));
 					}
 				}
-				case "mypartyexceptme" -> cond = joinAnd(cond, new ConditionTargetMyPartyExceptMe(Boolean.parseBoolean(a.getNodeValue())));
+				case "myparty" -> cond = joinAnd(cond, new ConditionTargetMyParty(a.getNodeValue()));
 				case "playable" -> cond = joinAnd(cond, new ConditionTargetPlayable());
 				case "class_id_restriction" -> {
 					StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");

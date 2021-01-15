@@ -1,5 +1,5 @@
 /*
- * Copyright © 2004-2020 L2J Server
+ * Copyright © 2004-2021 L2J Server
  * 
  * This file is part of L2J Server.
  * 
@@ -61,7 +61,7 @@ import com.l2jserver.gameserver.model.holders.ItemHolder;
 import com.l2jserver.gameserver.model.interfaces.IIdentifiable;
 import com.l2jserver.gameserver.model.skills.targets.AffectObject;
 import com.l2jserver.gameserver.model.skills.targets.AffectScope;
-import com.l2jserver.gameserver.model.skills.targets.L2TargetType;
+import com.l2jserver.gameserver.model.skills.targets.TargetType;
 import com.l2jserver.gameserver.model.stats.BaseStats;
 import com.l2jserver.gameserver.model.stats.Formulas;
 import com.l2jserver.gameserver.model.stats.TraitType;
@@ -72,7 +72,7 @@ import com.l2jserver.gameserver.network.SystemMessageId;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
 import com.l2jserver.gameserver.util.Util;
 
-public class Skill implements IIdentifiable {
+public final class Skill implements IIdentifiable {
 	private static final Logger _log = Logger.getLogger(Skill.class.getName());
 	
 	private static final L2Object[] EMPTY_TARGET_LIST = new L2Object[0];
@@ -137,15 +137,13 @@ public class Skill implements IIdentifiable {
 	private final int _reuseHashCode;
 	private final int _reuseDelay;
 	
-	/** Target type of the skill : SELF, PARTY, CLAN, PET... */
-	private final L2TargetType _targetType;
+	private final TargetType targetType;
 	// base success chance
 	private final int _magicLevel;
 	private final int _lvlBonusRate;
 	private final int _activateRate;
 	private final int _minChance;
 	private final int _maxChance;
-	
 	
 	private final int[] affectLimit;
 	private final AffectObject affectObject;
@@ -227,7 +225,7 @@ public class Skill implements IIdentifiable {
 		if (character().modifySkillDuration() && (skillDuration != null)) {
 			if ((getLevel() < 100) || (getLevel() > 140)) {
 				abnormalTime = skillDuration;
-			} else if ((getLevel() >= 100) && (getLevel() < 140)) {
+			} else if (getLevel() < 140) {
 				abnormalTime += skillDuration;
 			}
 		}
@@ -272,11 +270,11 @@ public class Skill implements IIdentifiable {
 		}
 		
 		affectLimit = set.getIntArray("affectLimit", "0-0", "-");
-		affectObject = set.getEnum("affectObject", AffectObject.class, AffectObject.NONE);
+		affectObject = set.getEnum("affectObject", AffectObject.class, AffectObject.ALL);
 		affectScope = set.getEnum("affectScope", AffectScope.class, AffectScope.NONE);
 		affectRange = set.getInt("affectRange", 0);
 		
-		_targetType = set.getEnum("targetType", L2TargetType.class, L2TargetType.SELF);
+		targetType = set.getEnum("targetType", TargetType.class, TargetType.SELF);
 		_magicLevel = set.getInt("magicLvl", 0);
 		_lvlBonusRate = set.getInt("lvlBonusRate", 0);
 		_activateRate = set.getInt("activateRate", -1);
@@ -336,16 +334,12 @@ public class Skill implements IIdentifiable {
 		return _attributePower;
 	}
 	
-	/**
-	 * Return the target type of the skill : SELF, PARTY, CLAN, PET...
-	 * @return
-	 */
-	public L2TargetType getTargetType() {
-		return _targetType;
+	public TargetType getTargetType() {
+		return targetType;
 	}
 	
 	public boolean isAOE() {
-		switch (_targetType) {
+		switch (targetType) {
 			case AREA, AURA, BEHIND_AREA, BEHIND_AURA, FRONT_AREA, FRONT_AURA -> {
 				return true;
 			}
@@ -760,7 +754,7 @@ public class Skill implements IIdentifiable {
 	}
 	
 	public boolean isBad() {
-		return (_effectPoint < 0) && (_targetType != L2TargetType.SELF);
+		return (_effectPoint < 0) && (targetType != TargetType.SELF);
 	}
 	
 	public boolean checkCondition(L2Character activeChar, L2Object object, boolean itemOrWeapon) {

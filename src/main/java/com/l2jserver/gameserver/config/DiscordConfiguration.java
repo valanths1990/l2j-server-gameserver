@@ -18,13 +18,13 @@
  */
 package com.l2jserver.gameserver.config;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.Mutable;
-import org.aeonbits.owner.Reloadable;
-
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.aeonbits.owner.Config.HotReloadType.ASYNC;
 import static org.aeonbits.owner.Config.LoadType.MERGE;
+
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Mutable;
+import org.aeonbits.owner.Reloadable;
 
 /**
  * Discord Configuration.

@@ -212,7 +212,8 @@ public abstract class L2Playable extends L2Character {
 			return false; // Target player has karma
 		}
 		
-		if ((player.getClan() != null) && (targetPlayer.getClan() != null) && targetPlayer.getClan().isAtWarWith(player.getClanId()) && player.getClan().isAtWarWith(targetPlayer.getClanId()) && (player.getWantsPeace() == 0) && (targetPlayer.getWantsPeace() == 0) && !player.isAcademyMember() && !targetPlayer.isAcademyMember()) {
+		if ((player.getClan() != null) && (targetPlayer.getClan() != null) && targetPlayer.getClan().isAtWarWith(player.getClanId()) && player.getClan().isAtWarWith(targetPlayer.getClanId()) && (player.getWantsPeace() == 0) && (targetPlayer.getWantsPeace() == 0) && !player.isAcademyMember()
+			&& !targetPlayer.isAcademyMember()) {
 			return true; // Target player and player has war
 		}
 		

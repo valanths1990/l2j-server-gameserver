@@ -43,7 +43,7 @@ import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
  * Complex DTO that holds all the information for a given buff (or debuff or dance/song) set of effects issued by an skill.
  * @author Zoey76
  */
-public class BuffInfo {
+public final class BuffInfo {
 	// Data
 	/** Data. */
 	private final L2Character _effector;
