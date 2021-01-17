@@ -27,51 +27,34 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
  * @author Maneco2
  * @version 2.6.2.0
  */
-public class AutoLootExtension
-{
-	public static void onLogin(L2PcInstance player)
-	{
-		if (customs().autoLootVoiceRestore())
-		{
-			if (player.getVariables().hasVariable("AutoLoot"))
-			{
+public class AutoLootExtension {
+	public static void onLogin(L2PcInstance player) {
+		if (customs().autoLootVoiceRestore()) {
+			if (player.getVariables().hasVariable("AutoLoot")) {
 				player.setAutoLoot(true);
 			}
-		}
-		else if (!customs().autoLootVoiceRestore())
-		{
-			if (player.getVariables().hasVariable("AutoLoot"))
-			{
+		} else if (!customs().autoLootVoiceRestore()) {
+			if (player.getVariables().hasVariable("AutoLoot")) {
 				player.getVariables().remove("AutoLoot");
 			}
 		}
 		
-		if (customs().autoLootItemsVoiceRestore())
-		{
-			if (player.getVariables().hasVariable("AutoLootItems"))
-			{
+		if (customs().autoLootItemsVoiceRestore()) {
+			if (player.getVariables().hasVariable("AutoLootItems")) {
 				player.setAutoLootItem(true);
 			}
-		}
-		else if (!customs().autoLootItemsVoiceRestore())
-		{
-			if (player.getVariables().hasVariable("AutoLootItems"))
-			{
+		} else if (!customs().autoLootItemsVoiceRestore()) {
+			if (player.getVariables().hasVariable("AutoLootItems")) {
 				player.getVariables().remove("AutoLootItems");
 			}
 		}
 		
-		if (customs().autoLootHerbsVoiceRestore())
-		{
-			if (player.getVariables().hasVariable("AutoLootHerbs"))
-			{
+		if (customs().autoLootHerbsVoiceRestore()) {
+			if (player.getVariables().hasVariable("AutoLootHerbs")) {
 				player.setAutoLootHerbs(true);
 			}
-		}
-		else if (!customs().autoLootHerbsVoiceRestore())
-		{
-			if (player.getVariables().hasVariable("AutoLootHerbs"))
-			{
+		} else if (!customs().autoLootHerbsVoiceRestore()) {
+			if (player.getVariables().hasVariable("AutoLootHerbs")) {
 				player.getVariables().remove("AutoLootHerbs");
 			}
 		}
