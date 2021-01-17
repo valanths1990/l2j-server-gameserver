@@ -232,6 +232,24 @@ public interface CustomsConfiguration extends Reloadable {
 	@Key("HellboundStatus")
 	Boolean hellboundStatus();
 	
+	@Key("AutoLootVoiceEnable")
+	Boolean autoLootVoiceCommand();
+	
+	@Key("AutoLootVoiceRestore")
+	Boolean autoLootVoiceRestore();
+	
+	@Key("AutoLootItemsVoiceRestore")
+	Boolean autoLootItemsVoiceRestore();
+	
+	@Key("AutoLootHerbsVoiceRestore")
+	Boolean autoLootHerbsVoiceRestore();
+	
+	@Key("AutoLootHerbsList")
+	Set<Integer> getAutoLootHerbsList();
+	
+	@Key("AutoLootItemsList")
+	Set<Integer> getAutoLootItemsList();
+	
 	@Key("MultiLangEnable")
 	Boolean multiLangEnable();
 	

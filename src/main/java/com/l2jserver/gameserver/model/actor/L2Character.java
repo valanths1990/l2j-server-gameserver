@@ -242,6 +242,11 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	private boolean _lethalable = true;
 	
+	/** Auto Loot Extension. */
+	private boolean _enableAutoLoot = false;
+	private boolean _enableAutoLootItem = false;
+	private boolean _enableAutoLootHerb = false;
+	
 	private volatile Map<Integer, OptionsSkillHolder> _triggerSkills;
 	
 	private volatile Map<Integer, InvulSkillHolder> _invulAgainst;
@@ -5485,6 +5490,30 @@ public abstract class L2Character extends L2Object implements ISkillsHolder, IDe
 	
 	public boolean isLethalable() {
 		return _lethalable;
+	}
+	
+	public boolean isAutoLoot() {
+		return _enableAutoLoot;
+	}
+	
+	public void setAutoLoot(boolean val) {
+		_enableAutoLoot = val;
+	}
+	
+	public boolean isAutoLootItem() {
+		return _enableAutoLootItem;
+	}
+	
+	public void setAutoLootItem(boolean val) {
+		_enableAutoLootItem = val;
+	}
+	
+	public boolean isAutoLootHerb() {
+		return _enableAutoLootHerb;
+	}
+	
+	public void setAutoLootHerbs(boolean val) {
+		_enableAutoLootHerb = val;
 	}
 	
 	public Map<Integer, OptionsSkillHolder> getTriggerSkills() {

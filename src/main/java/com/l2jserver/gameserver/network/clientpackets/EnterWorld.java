@@ -65,6 +65,7 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.entity.AutoLootExtension;
 import com.l2jserver.gameserver.model.entity.Couple;
 import com.l2jserver.gameserver.model.entity.Fort;
 import com.l2jserver.gameserver.model.entity.FortSiege;
@@ -477,6 +478,9 @@ public class EnterWorld extends L2GameClientPacket {
 		}
 		
 		TvTEvent.onLogin(activeChar);
+		
+		// Auto Loot Extension.
+		AutoLootExtension.onLogin(activeChar);
 		
 		if (customs().screenWelcomeMessageEnable()) {
 			activeChar.sendPacket(new ExShowScreenMessage(customs().getScreenWelcomeMessageText(), customs().getScreenWelcomeMessageTime()));
