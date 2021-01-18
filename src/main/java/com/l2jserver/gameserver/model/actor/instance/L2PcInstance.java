@@ -645,6 +645,10 @@ public final class L2PcInstance extends L2Playable {
 	private Map<Stats, Double> _servitorShare;
 	// Character UI
 	private UIKeysSettings _uiKeySettings;
+	/** Auto Loot Extension. */
+	private boolean _enableAutoLoot = false;
+	private boolean _enableAutoLootItem = false;
+	private boolean _enableAutoLootHerb = false;
 	// L2JMOD Wedding
 	private boolean _married = false;
 	private int _partnerId = 0;
@@ -4271,6 +4275,30 @@ public final class L2PcInstance extends L2Playable {
 			}
 		}
 		return false;
+	}
+	
+	public boolean isAutoLoot() {
+		return _enableAutoLoot;
+	}
+	
+	public void setAutoLoot(boolean val) {
+		_enableAutoLoot = val;
+	}
+	
+	public boolean isAutoLootItem() {
+		return _enableAutoLootItem;
+	}
+	
+	public void setAutoLootItem(boolean val) {
+		_enableAutoLootItem = val;
+	}
+	
+	public boolean isAutoLootHerb() {
+		return _enableAutoLootHerb;
+	}
+	
+	public void setAutoLootHerbs(boolean val) {
+		_enableAutoLootHerb = val;
 	}
 	
 	public boolean isMarried() {

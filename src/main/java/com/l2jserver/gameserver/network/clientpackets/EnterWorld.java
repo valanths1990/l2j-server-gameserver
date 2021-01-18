@@ -45,6 +45,7 @@ import java.util.Base64;
 import com.l2jserver.gameserver.LoginServerThread;
 import com.l2jserver.gameserver.SevenSigns;
 import com.l2jserver.gameserver.cache.HtmCache;
+import com.l2jserver.gameserver.custom.AutoLootExtension;
 import com.l2jserver.gameserver.data.sql.impl.AnnouncementsTable;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.data.xml.impl.SkillTreesData;
@@ -65,7 +66,6 @@ import com.l2jserver.gameserver.model.L2Clan;
 import com.l2jserver.gameserver.model.L2Object;
 import com.l2jserver.gameserver.model.L2World;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
-import com.l2jserver.gameserver.model.entity.AutoLootExtension;
 import com.l2jserver.gameserver.model.entity.Couple;
 import com.l2jserver.gameserver.model.entity.Fort;
 import com.l2jserver.gameserver.model.entity.FortSiege;
@@ -391,8 +391,8 @@ public class EnterWorld extends L2GameClientPacket {
 		
 		activeChar.sendMessage(getText("VGhpcyBzZXJ2ZXIgdXNlcyBMMkosIGEgcHJvamVjdCBmb3VuZGVkIGJ5IEwyQ2hlZg=="));
 		activeChar.sendMessage(getText("YW5kIGRldmVsb3BlZCBieSBMMkogVGVhbSBhdCB3d3cubDJqc2VydmVyLmNvbQ=="));
-		activeChar.sendMessage(getText("Q29weXJpZ2h0IDIwMDQtMjAyMA=="));
-		activeChar.sendMessage(getText("VGhhbmsgeW91IGZvciAxNiB5ZWFycyE="));
+		activeChar.sendMessage(getText("Q29weXJpZ2h0IDIwMDQtMjAyMQ"));
+		activeChar.sendMessage(getText("VGhhbmsgeW91IGZvciAxNyB5ZWFycyE"));
 		
 		SevenSigns.getInstance().sendCurrentPeriodMsg(activeChar);
 		AnnouncementsTable.getInstance().showAnnouncements(activeChar);
