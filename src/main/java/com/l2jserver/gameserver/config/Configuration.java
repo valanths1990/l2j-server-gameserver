@@ -85,6 +85,8 @@ public class Configuration {
 	
 	private static final BufferServiceConfiguration bufferService = ConfigFactory.create(BufferServiceConfiguration.class);
 	
+	private static final TeleporterServiceConfiguration teleporterService = ConfigFactory.create(TeleporterServiceConfiguration.class);
+	
 	private static final DiscordConfiguration discord = ConfigFactory.create(DiscordConfiguration.class);
 	
 	private Configuration() {
@@ -201,6 +203,10 @@ public class Configuration {
 	
 	public static BufferServiceConfiguration bufferService() {
 		return bufferService;
+	}
+	
+	public static TeleporterServiceConfiguration teleporterService() {
+		return teleporterService;
 	}
 	
 	public static DiscordConfiguration discord() {
