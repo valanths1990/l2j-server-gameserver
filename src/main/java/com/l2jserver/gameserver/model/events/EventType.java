@@ -1,34 +1,27 @@
 /*
  * Copyright © 2004-2021 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.l2jserver.gameserver.model.events;
 
 import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureAttack;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureAttackAvoid;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureAttacked;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureDamageDealt;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureDamageReceived;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureKill;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureSkillUse;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureTeleported;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureZoneEnter;
-import com.l2jserver.gameserver.model.events.impl.character.OnCreatureZoneExit;
+import com.l2jserver.gameserver.model.events.impl.OnDoorAction;
+import com.l2jserver.gameserver.model.events.impl.OnGameShutdown;
+import com.l2jserver.gameserver.model.events.impl.character.*;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcCanBeSeen;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcCreatureSee;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcEventReceived;
@@ -47,36 +40,7 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAtt
 import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableHate;
 import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableKill;
 import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableExpChanged;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerAugment;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerBypass;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerChat;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerCreate;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerDelete;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerDlgAnswer;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerEquipItem;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerFameChanged;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerHennaAdd;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerHennaRemove;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerKarmaChanged;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLevelChanged;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogin;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogout;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPKChanged;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionCancel;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerProfessionChange;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPChanged;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPvPKill;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerRestore;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSelect;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSit;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSkillLearn;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSummonSpawn;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerSummonTalk;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTransform;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialClientEvent;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialCmd;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialEvent;
-import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTutorialQuestionMark;
+import com.l2jserver.gameserver.model.events.impl.character.player.*;
 import com.l2jserver.gameserver.model.events.impl.character.player.clan.OnPlayerClanCreate;
 import com.l2jserver.gameserver.model.events.impl.character.player.clan.OnPlayerClanDestroy;
 import com.l2jserver.gameserver.model.events.impl.character.player.clan.OnPlayerClanJoin;
@@ -92,6 +56,7 @@ import com.l2jserver.gameserver.model.events.impl.character.player.inventory.OnP
 import com.l2jserver.gameserver.model.events.impl.character.player.inventory.OnPlayerItemPickup;
 import com.l2jserver.gameserver.model.events.impl.character.player.inventory.OnPlayerItemTransfer;
 import com.l2jserver.gameserver.model.events.impl.character.trap.OnTrapAction;
+import com.l2jserver.gameserver.model.events.impl.clan.OnClanReputationChanged;
 import com.l2jserver.gameserver.model.events.impl.clan.OnClanWarFinish;
 import com.l2jserver.gameserver.model.events.impl.clan.OnClanWarStart;
 import com.l2jserver.gameserver.model.events.impl.events.OnTvTEventFinish;
@@ -101,6 +66,7 @@ import com.l2jserver.gameserver.model.events.impl.events.OnTvTEventStart;
 import com.l2jserver.gameserver.model.events.impl.item.OnItemBypassEvent;
 import com.l2jserver.gameserver.model.events.impl.item.OnItemCreate;
 import com.l2jserver.gameserver.model.events.impl.item.OnItemTalk;
+import com.l2jserver.gameserver.model.events.impl.item.OnItemUse;
 import com.l2jserver.gameserver.model.events.impl.olympiad.OnOlympiadMatchResult;
 import com.l2jserver.gameserver.model.events.impl.sieges.castle.OnCastleSiegeFinish;
 import com.l2jserver.gameserver.model.events.impl.sieges.castle.OnCastleSiegeOwnerChange;
@@ -120,16 +86,17 @@ public enum EventType {
 	ON_ATTACKABLE_ATTACK(OnAttackableAttack.class, void.class),
 	ON_ATTACKABLE_FACTION_CALL(OnAttackableFactionCall.class, void.class),
 	ON_ATTACKABLE_KILL(OnAttackableKill.class, void.class),
-	
+
 	// Castle events
 	ON_CASTLE_SIEGE_FINISH(OnCastleSiegeFinish.class, void.class),
 	ON_CASTLE_SIEGE_OWNER_CHANGE(OnCastleSiegeOwnerChange.class, void.class),
 	ON_CASTLE_SIEGE_START(OnCastleSiegeStart.class, void.class),
-	
+
 	// Clan events
 	ON_CLAN_WAR_FINISH(OnClanWarFinish.class, void.class),
 	ON_CLAN_WAR_START(OnClanWarStart.class, void.class),
-	
+	ON_CLAN_REPUTATION_CHANGED(OnClanReputationChanged.class,void.class),
+
 	// Creature events
 	ON_CREATURE_ATTACK(OnCreatureAttack.class, void.class, TerminateReturn.class),
 	ON_CREATURE_ATTACK_AVOID(OnCreatureAttackAvoid.class, void.class, void.class),
@@ -141,16 +108,17 @@ public enum EventType {
 	ON_CREATURE_TELEPORTED(OnCreatureTeleported.class, void.class),
 	ON_CREATURE_ZONE_ENTER(OnCreatureZoneEnter.class, void.class),
 	ON_CREATURE_ZONE_EXIT(OnCreatureZoneExit.class, void.class),
-	
 	// Fortress events
 	ON_FORT_SIEGE_FINISH(OnFortSiegeFinish.class, void.class),
 	ON_FORT_SIEGE_START(OnFortSiegeStart.class, void.class),
-	
+
 	// Item events
 	ON_ITEM_BYPASS_EVENT(OnItemBypassEvent.class, void.class),
 	ON_ITEM_CREATE(OnItemCreate.class, void.class),
 	ON_ITEM_TALK(OnItemTalk.class, void.class),
-	
+	ON_ITEM_USE(OnItemUse.class,void.class),
+
+
 	// Npcs events
 	ON_NPC_CAN_BE_SEEN(OnNpcCanBeSeen.class, void.class, TerminateReturn.class),
 	ON_NPC_CREATURE_SEE(OnNpcCreatureSee.class, void.class),
@@ -167,24 +135,25 @@ public enum EventType {
 	ON_NPC_TALK(null, void.class),
 	ON_NPC_TELEPORT(OnNpcTeleport.class, void.class),
 	ON_NPC_MANOR_BYPASS(OnNpcManorBypass.class, void.class),
-	
+	ON_DOOR_ACTION(OnDoorAction.class,void.class),
+
 	// Olympiad events
 	ON_OLYMPIAD_MATCH_RESULT(OnOlympiadMatchResult.class, void.class),
-	
+
 	// Playable events
 	ON_PLAYABLE_EXP_CHANGED(OnPlayableExpChanged.class, void.class, TerminateReturn.class),
-	
+
 	// Player events
 	ON_PLAYER_AUGMENT(OnPlayerAugment.class, void.class),
 	ON_PLAYER_BYPASS(OnPlayerBypass.class, void.class),
 	ON_PLAYER_CHAT(OnPlayerChat.class, void.class, ChatFilterReturn.class),
-	
+
 	// Tutorial events
 	ON_PLAYER_TUTORIAL_EVENT(OnPlayerTutorialEvent.class, void.class, void.class),
 	ON_PLAYER_TUTORIAL_CMD(OnPlayerTutorialCmd.class, void.class, void.class),
 	ON_PLAYER_TUTORIAL_CLIENT_EVENT(OnPlayerTutorialClientEvent.class, void.class, void.class),
 	ON_PLAYER_TUTORIAL_QUESTION_MARK(OnPlayerTutorialQuestionMark.class, void.class, void.class),
-	
+
 	// Clan events
 	ON_PLAYER_CLAN_CREATE(OnPlayerClanCreate.class, void.class),
 	ON_PLAYER_CLAN_DESTROY(OnPlayerClanDestroy.class, void.class),
@@ -200,6 +169,7 @@ public enum EventType {
 	ON_PLAYER_DELETE(OnPlayerDelete.class, void.class),
 	ON_PLAYER_DLG_ANSWER(OnPlayerDlgAnswer.class, void.class, TerminateReturn.class),
 	ON_PLAYER_EQUIP_ITEM(OnPlayerEquipItem.class, void.class),
+	ON_PLAYER_UNEQUIP_ITEM(OnPlayerUnequipItem.class,TerminateReturn.class),
 	ON_PLAYER_FAME_CHANGED(OnPlayerFameChanged.class, void.class),
 	// Henna events
 	ON_PLAYER_HENNA_ADD(OnPlayerHennaAdd.class, void.class),
@@ -228,36 +198,46 @@ public enum EventType {
 	ON_PLAYER_SUMMON_SPAWN(OnPlayerSummonSpawn.class, void.class),
 	ON_PLAYER_SUMMON_TALK(OnPlayerSummonTalk.class, void.class),
 	ON_PLAYER_TRANSFORM(OnPlayerTransform.class, void.class),
-	
+	ON_PLAYER_ASSIST_KILL(OnPlayerAssistKill.class,void.class),
+	ON_PLAYER_PK_KILL(OnPlayerPkKill.class,void.class),
+	ON_PLAYER_PARTY_REQUEST(OnPlayerPartyRequest.class,TerminateReturn.class),
+	ON_PLAYER_TOWER_CAPTURE(OnPlayerTowerCapture.class,void.class),
+	ON_PLAYER_PARTY_JOIN(OnPlayerPartyJoin.class,TerminateReturn.class),
+	ON_PLAYER_PARTY_LEAVE(OnPlayerPartyLeave.class,TerminateReturn.class),
+	ON_PLAYER_USE_TELEPORT_TO_LOCATION(OnPlayerUseTeleportToLocation.class,TerminateReturn.class),
+
 	// Trap events
 	ON_TRAP_ACTION(OnTrapAction.class, void.class),
-	
+
 	// TvT events.
 	ON_TVT_EVENT_FINISH(OnTvTEventFinish.class, void.class),
 	ON_TVT_EVENT_KILL(OnTvTEventKill.class, void.class),
 	ON_TVT_EVENT_REGISTRATION_START(OnTvTEventRegistrationStart.class, void.class),
-	ON_TVT_EVENT_START(OnTvTEventStart.class, void.class);
-	
+	ON_TVT_EVENT_START(OnTvTEventStart.class, void.class),
+
+	//Game Events
+	ON_GAME_SHUTDOWN(OnGameShutdown.class,void.class);
+
 	private final Class<? extends IBaseEvent> _eventClass;
 	private final Class<?>[] _returnClass;
-	
+
 	EventType(Class<? extends IBaseEvent> eventClass, Class<?>... returnClasss) {
 		_eventClass = eventClass;
 		_returnClass = returnClasss;
 	}
-	
+
 	public Class<? extends IBaseEvent> getEventClass() {
 		return _eventClass;
 	}
-	
+
 	public Class<?>[] getReturnClasses() {
 		return _returnClass;
 	}
-	
+
 	public boolean isEventClass(Class<?> clazz) {
 		return _eventClass == clazz;
 	}
-	
+
 	public boolean isReturnClass(Class<?> clazz) {
 		return Util.contains(_returnClass, clazz);
 	}

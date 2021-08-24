@@ -44,6 +44,7 @@ public final class RequestMagicSkillUse extends L2GameClientPacket {
 	
 	@Override
 	protected void runImpl() {
+
 		// Get the current L2PcInstance of the player
 		final L2PcInstance activeChar = getActiveChar();
 		if (activeChar == null) {

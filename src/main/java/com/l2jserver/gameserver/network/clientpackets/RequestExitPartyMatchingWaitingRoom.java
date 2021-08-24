@@ -24,7 +24,8 @@ import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 /**
  * @author Gnacik
  */
-public final class RequestExitPartyMatchingWaitingRoom extends L2GameClientPacket {
+public final class
+RequestExitPartyMatchingWaitingRoom extends L2GameClientPacket {
 	private static final String _C__D0_25_REQUESTEXITPARTYMATCHINGWAITINGROOM = "[C] D0:25 RequestExitPartyMatchingWaitingRoom";
 	
 	@Override

@@ -41,6 +41,7 @@ import com.l2jserver.gameserver.network.serverpackets.ExOlympiadMatchEnd;
 import com.l2jserver.gameserver.network.serverpackets.ExOlympiadUserInfo;
 import com.l2jserver.gameserver.network.serverpackets.L2GameServerPacket;
 import com.l2jserver.gameserver.network.serverpackets.SystemMessage;
+import com.l2jserver.gameserver.script.ScriptPackage;
 
 /**
  * Olympiad stadium zone.
@@ -233,14 +234,14 @@ public class L2OlympiadStadiumZone extends L2ZoneRespawn {
 	}
 	
 	@Override
-	public void parseLoc(int x, int y, int z, String type) {
+	public void parseLoc(int x, int y, int z, String type,String spawnName) {
 		if ((type != null) && type.equals("spectatorSpawn")) {
 			if (_spectatorLocations == null) {
 				_spectatorLocations = new ArrayList<>();
 			}
 			_spectatorLocations.add(new Location(x, y, z));
 		} else {
-			super.parseLoc(x, y, z, type);
+			super.parseLoc(x, y, z, type, spawnName);
 		}
 	}
 	

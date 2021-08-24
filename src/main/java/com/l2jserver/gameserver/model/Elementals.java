@@ -42,9 +42,9 @@ public final class Elementals {
 	public static final byte HOLY = 4;
 	public static final byte DARK = 5;
 	
-	public static final int FIRST_WEAPON_BONUS = 20;
+	public static final int FIRST_WEAPON_BONUS = 300;
 	public static final int NEXT_WEAPON_BONUS = 5;
-	public static final int ARMOR_BONUS = 6;
+	public static final int ARMOR_BONUS = 120;
 	
 	public static final int[] WEAPON_VALUES = {
 		0, // Level 1

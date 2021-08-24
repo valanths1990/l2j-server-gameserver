@@ -27,7 +27,7 @@ import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
  * @author durgus
  */
 public abstract class L2ZoneForm {
-	protected static final int STEP = 10;
+	protected static final int STEP = 50;
 	
 	public abstract boolean isInsideZone(int x, int y, int z);
 	

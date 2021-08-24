@@ -1,18 +1,18 @@
 /*
  * Copyright © 2004-2021 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,9 +20,11 @@ package com.l2jserver.gameserver.network.clientpackets;
 
 import static com.l2jserver.gameserver.config.Configuration.general;
 
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
+import com.l2jserver.gameserver.BypassHasher;
 import com.l2jserver.gameserver.ai.CtrlIntention;
 import com.l2jserver.gameserver.data.xml.impl.AdminData;
 import com.l2jserver.gameserver.enums.InstanceType;
@@ -51,43 +53,53 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * RequestBypassToServer client packet implementation.
+ *
  * @author HorridoJoho
  */
 public final class RequestBypassToServer extends L2GameClientPacket {
 	private static final String _C__23_REQUESTBYPASSTOSERVER = "[C] 23 RequestBypassToServer";
 	// FIXME: This is for compatibility, will be changed when bypass functionality got an overhaul by NosBit
 	private static final String[] _possibleNonHtmlCommands = {
-		"_bbs",
-		"bbs",
-		"_mail",
-		"_friend",
-		"_match",
-		"_diary",
-		"_olympiad?command",
-		"manor_menu_select"
+		"home", "service", "action", "ranking", "store", "account", "skin", "clan"
 	};
-	
+
 	// S
 	private String _command;
-	
-	@Override
-	protected void readImpl() {
+
+	@Override protected void readImpl() {
 		_command = readS();
+		if (_command.matches("^-?[0-9]+")) {
+			_command = BypassHasher.getInstance().decodeHash(Integer.valueOf(_command));
+		}
+		if(_command.contains("-h ")){
+			_command = _command.replace("-h","").trim();
+		}
+		switch (_command) {
+			case "_bbshome" -> _command = "home;homepage";
+			case "_bbsgetfav" -> _command = "service;homepage";
+			case "_bbslink" -> _command = "action;homepage";
+			case "_bbsloc" -> _command = "ranking;homepage";
+			case "_bbsclan" -> _command = "clan;homepage";
+			case "_bbsmemo" -> _command = "skin;homepage";
+			case "_maillist" -> _command = "store;homepage";
+			case "_friendlist" -> _command = "account;homepage";
+		}
 	}
-	
+
 	@Override
 	protected void runImpl() {
+		System.out.println(_command);
 		final L2PcInstance activeChar = getClient().getActiveChar();
 		if (activeChar == null) {
 			return;
 		}
-		
+
 		if (_command.isEmpty()) {
 			_log.warning("Player " + activeChar.getName() + " sent empty bypass!");
 			activeChar.logout();
 			return;
 		}
-		
+
 		boolean requiresBypassValidation = true;
 		for (String possibleNonHtmlCommand : _possibleNonHtmlCommands) {
 			if (_command.startsWith(possibleNonHtmlCommand)) {
@@ -95,7 +107,7 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 				break;
 			}
 		}
-		
+
 		int bypassOriginId = 0;
 		if (requiresBypassValidation) {
 			bypassOriginId = activeChar.validateHtmlAction(_command);
@@ -103,23 +115,24 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 				_log.warning("Player " + activeChar.getName() + " sent non cached bypass: '" + _command + "'");
 				return;
 			}
-			
 			if ((bypassOriginId > 0) && !Util.isInsideRangeOfObjectId(activeChar, bypassOriginId, L2Npc.INTERACTION_DISTANCE)) {
 				// No logging here, this could be a common case where the player has the html still open and run too far away and then clicks a html action
 				return;
 			}
 		}
-		
+
 		if (!getClient().getFloodProtectors().getServerBypass().tryPerformAction(_command)) {
 			return;
 		}
-		
+
 		try {
-			if (_command.startsWith("admin_")) {
+			if (CommunityBoardHandler.getInstance().isCommunityBoardCommand(_command)) {
+				CommunityBoardHandler.getInstance().handleParseCommand(_command, activeChar);
+			} else if (_command.startsWith("admin_")) {
 				String command = _command.split(" ")[0];
-				
+
 				IAdminCommandHandler ach = AdminCommandHandler.getInstance().getHandler(command);
-				
+
 				if (ach == null) {
 					if (activeChar.isGM()) {
 						activeChar.sendMessage("The command " + command.substring(6) + " does not exist!");
@@ -127,13 +140,13 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 					_log.warning(activeChar + " requested not registered admin command '" + command + "'");
 					return;
 				}
-				
+
 				if (!AdminData.getInstance().hasAccess(command, activeChar.getAccessLevel())) {
 					activeChar.sendMessage("You don't have the access rights to use this command!");
 					_log.warning("Character " + activeChar.getName() + " tried to use admin command " + command + ", without proper access level!");
 					return;
 				}
-				
+
 				if (AdminData.getInstance().requireConfirm(command)) {
 					activeChar.setAdminConfirmCmd(_command);
 					ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.S1);
@@ -144,11 +157,9 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 					if (general().gmAudit()) {
 						GMAudit.auditGMAction(activeChar.getName() + " [" + activeChar.getObjectId() + "]", _command, (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"));
 					}
-					
+
 					ach.useAdminCommand(_command, activeChar);
 				}
-			} else if (CommunityBoardHandler.getInstance().isCommunityBoardCommand(_command)) {
-				CommunityBoardHandler.getInstance().handleParseCommand(_command, activeChar);
 			} else if (_command.equals("come_here") && activeChar.isGM()) {
 				comeHere(activeChar);
 			} else if (_command.startsWith("npc_")) {
@@ -161,12 +172,12 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 				}
 				if (Util.isDigit(id)) {
 					L2Object object = L2World.getInstance().findObject(Integer.parseInt(id));
-					
+
 					if ((object != null) && object.isNpc() && (endOfId > 0) && activeChar.isInsideRadius(object, L2Npc.INTERACTION_DISTANCE, false, false)) {
 						((L2Npc) object).onBypassFeedback(activeChar, _command.substring(endOfId + 1));
 					}
 				}
-				
+
 				activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 			} else if (_command.startsWith("item_")) {
 				int endOfId = _command.indexOf('_', 5);
@@ -181,7 +192,7 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 					if ((item != null) && (endOfId > 0)) {
 						item.onBypassFeedback(activeChar, _command.substring(endOfId + 1));
 					}
-					
+
 					activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 				} catch (NumberFormatException nfe) {
 					_log.log(Level.WARNING, "NFE for command [" + _command + "]", nfe);
@@ -238,7 +249,7 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 			}
 		} catch (Exception e) {
 			_log.log(Level.WARNING, "Exception processing bypass from player " + activeChar.getName() + ": " + _command, e);
-			
+
 			if (activeChar.isGM()) {
 				StringBuilder sb = new StringBuilder(200);
 				sb.append("<html><body>");
@@ -255,10 +266,10 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 				activeChar.sendPacket(msg);
 			}
 		}
-		
+
 		EventDispatcher.getInstance().notifyEventAsync(new OnPlayerBypass(activeChar, _command), activeChar);
 	}
-	
+
 	/**
 	 * @param activeChar
 	 */
@@ -273,9 +284,8 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 			temp.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, activeChar.getLocation());
 		}
 	}
-	
-	@Override
-	public String getType() {
+
+	@Override public String getType() {
 		return _C__23_REQUESTBYPASSTOSERVER;
 	}
 }

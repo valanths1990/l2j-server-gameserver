@@ -32,9 +32,13 @@ public class Location implements IPositionable {
 	private int _z;
 	private int _heading;
 	private int _instanceId;
-	
+	private String name;
 	public Location(int x, int y, int z) {
 		this(x, y, z, 0, -1);
+	}
+	public Location(int x, int y, int z,String name) {
+		this(x, y, z, 0, -1);
+		this.name=name;
 	}
 	
 	public Location(int x, int y, int z, int heading) {
@@ -52,7 +56,13 @@ public class Location implements IPositionable {
 		_heading = heading;
 		_instanceId = instanceId;
 	}
-	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 	/**
 	 * Get the x coordinate.
 	 * @return the x coordinate

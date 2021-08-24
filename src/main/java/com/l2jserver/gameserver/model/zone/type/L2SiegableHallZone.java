@@ -35,14 +35,14 @@ public final class L2SiegableHallZone extends L2ClanHallZone {
 	}
 	
 	@Override
-	public void parseLoc(int x, int y, int z, String type) {
+	public void parseLoc(int x, int y, int z, String type,String spawnName) {
 		if ((type != null) && type.equals("challenger")) {
 			if (_challengerLocations == null) {
 				_challengerLocations = new ArrayList<>();
 			}
 			_challengerLocations.add(new Location(x, y, z));
 		} else {
-			super.parseLoc(x, y, z, type);
+			super.parseLoc(x, y, z, type,spawnName);
 		}
 	}
 	

@@ -82,7 +82,7 @@ public class L2DoorInstance extends L2Character {
 	private int _meshindex = 1;
 	// used for autoclose on open
 	private Future<?> _autoCloseTask;
-	
+
 	public L2DoorInstance(L2DoorTemplate template) {
 		super(template);
 		setInstanceType(InstanceType.L2DoorInstance);
@@ -91,7 +91,6 @@ public class L2DoorInstance extends L2Character {
 		_open = template.isOpenByDefault();
 		_isAttackableDoor = template.isAttackable();
 		_isTargetable = template.isTargetable();
-		
 		if (getGroupName() != null) {
 			DoorData.addDoorGroup(getGroupName(), getId());
 		}
@@ -158,7 +157,7 @@ public class L2DoorInstance extends L2Character {
 	public DoorStat getStat() {
 		return (DoorStat) super.getStat();
 	}
-	
+
 	/**
 	 * @return {@code true} if door is open-able by skill.
 	 */

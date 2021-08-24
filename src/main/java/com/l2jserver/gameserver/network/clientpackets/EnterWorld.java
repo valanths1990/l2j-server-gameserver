@@ -425,8 +425,8 @@ public class EnterWorld extends L2GameClientPacket {
 		
 		sendPacket(new SkillCoolTime(activeChar));
 		sendPacket(new ExVoteSystemInfo(activeChar));
-		sendPacket(new ExNevitAdventPointInfoPacket(0));
-		sendPacket(new ExNevitAdventTimeChange(-1)); // only set pause state...
+//		sendPacket(new ExNevitAdventPointInfoPacket(0));
+//		sendPacket(new ExNevitAdventTimeChange(-1)); // only set pause state...
 		sendPacket(new ExShowContactList(activeChar));
 		
 		for (L2ItemInstance item : activeChar.getInventory().getItems()) {

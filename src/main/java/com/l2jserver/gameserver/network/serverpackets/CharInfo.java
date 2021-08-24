@@ -1,18 +1,18 @@
 /*
  * Copyright © 2004-2021 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,7 +35,7 @@ public class CharInfo extends L2GameServerPacket {
 	private int _objId;
 	private int _x, _y, _z, _heading;
 	private final int _mAtkSpd, _pAtkSpd;
-	
+
 	private final int _runSpd, _walkSpd;
 	private final int _swimRunSpd;
 	private final int _swimWalkSpd;
@@ -43,9 +43,9 @@ public class CharInfo extends L2GameServerPacket {
 	private final int _flyWalkSpd;
 	private final double _moveMultiplier;
 	private final float _attackSpeedMultiplier;
-	
+
 	private int _vehicleId = 0;
-	
+
 	private static final int[] PAPERDOLL_ORDER = new int[] {
 		Inventory.PAPERDOLL_UNDER,
 		Inventory.PAPERDOLL_HEAD,
@@ -69,7 +69,7 @@ public class CharInfo extends L2GameServerPacket {
 		Inventory.PAPERDOLL_DECO6,
 		Inventory.PAPERDOLL_BELT
 	};
-	
+
 	public CharInfo(L2PcInstance cha) {
 		_activeChar = cha;
 		_objId = cha.getObjectId();
@@ -88,7 +88,7 @@ public class CharInfo extends L2GameServerPacket {
 		_pAtkSpd = (int) _activeChar.getPAtkSpd();
 		_attackSpeedMultiplier = _activeChar.getAttackSpeedMultiplier();
 		setInvisible(cha.isInvisible());
-		
+
 		_moveMultiplier = cha.getMovementSpeedMultiplier();
 		_runSpd = (int) Math.round(cha.getRunSpeed() / _moveMultiplier);
 		_walkSpd = (int) Math.round(cha.getWalkSpeed() / _moveMultiplier);
@@ -97,7 +97,7 @@ public class CharInfo extends L2GameServerPacket {
 		_flyRunSpd = cha.isFlying() ? _runSpd : 0;
 		_flyWalkSpd = cha.isFlying() ? _walkSpd : 0;
 	}
-	
+
 	public CharInfo(L2Decoy decoy) {
 		this(decoy.getActingPlayer()); // init
 		_objId = decoy.getObjectId();
@@ -106,18 +106,17 @@ public class CharInfo extends L2GameServerPacket {
 		_z = decoy.getZ();
 		_heading = decoy.getHeading();
 	}
-	
-	@Override
-	protected final void writeImpl() {
+
+	@Override protected final void writeImpl() {
 		boolean gmSeeInvis = false;
-		
+
 		if (isInvisible()) {
 			final L2PcInstance activeChar = getClient().getActiveChar();
 			if ((activeChar != null) && activeChar.canOverrideCond(PcCondOverride.SEE_ALL_PLAYERS)) {
 				gmSeeInvis = true;
 			}
 		}
-		
+
 		final L2NpcTemplate template = _activeChar.getPoly().isMorphed() ? NpcData.getInstance().getTemplate(_activeChar.getPoly().getPolyId()) : null;
 		if (template != null) {
 			writeC(0x0C);
@@ -151,34 +150,34 @@ public class CharInfo extends L2GameServerPacket {
 			writeC(_activeChar.isInCombat() ? 1 : 0);
 			writeC(_activeChar.isAlikeDead() ? 1 : 0);
 			writeC(!gmSeeInvis && isInvisible() ? 1 : 0); // invisible ?? 0=false 1=true 2=summoned (only works if model has a summon animation)
-			
+
 			writeD(-1); // High Five NPCString ID
 			writeS(_activeChar.getAppearance().getVisibleName());
 			writeD(-1); // High Five NPCString ID
 			writeS(gmSeeInvis ? "Invisible" : _activeChar.getAppearance().getVisibleTitle());
-			
+
 			writeD(_activeChar.getAppearance().getTitleColor()); // Title color 0=client default
 			writeD(_activeChar.getPvpFlag()); // pvp flag
 			writeD(_activeChar.getKarma()); // karma ??
-			
+
 			writeD(gmSeeInvis ? (_activeChar.getAbnormalVisualEffects() | AbnormalVisualEffect.STEALTH.getMask()) : _activeChar.getAbnormalVisualEffects()); // C2
-			
+
 			writeD(_activeChar.getClanId()); // clan id
 			writeD(_activeChar.getClanCrestId()); // crest id
 			writeD(_activeChar.getAllyId()); // ally id
 			writeD(_activeChar.getAllyCrestId()); // all crest
-			
+
 			writeC(_activeChar.isFlying() ? 2 : 0); // is Flying
 			writeC(_activeChar.getTeam().getId());
-			
+
 			writeF(template.getfCollisionRadius());
 			writeF(template.getfCollisionHeight());
-			
+
 			writeD(0x00); // enchant effect
 			writeD(_activeChar.isFlying() ? 2 : 0); // is Flying again?
-			
+
 			writeD(0x00);
-			
+
 			writeD(0x00); // CT1.5 Pet form and skills, Color effect
 			writeC(template.isTargetable() ? 1 : 0); // targetable
 			writeC(template.isShowName() ? 1 : 0); // show name
@@ -195,26 +194,26 @@ public class CharInfo extends L2GameServerPacket {
 			writeD(_activeChar.getRace().ordinal());
 			writeD(_activeChar.getAppearance().getSex() ? 1 : 0);
 			writeD(_activeChar.getBaseClass());
-			
+
 			for (int slot : getPaperdollOrder()) {
 				writeD(_activeChar.getInventory().getPaperdollItemDisplayId(slot));
 			}
-			
+
 			for (int slot : getPaperdollOrder()) {
 				writeD(_activeChar.getInventory().getPaperdollAugmentationId(slot));
 			}
-			
+
 			writeD(_activeChar.getInventory().getTalismanSlots());
 			writeD(_activeChar.getInventory().canEquipCloak() ? 1 : 0);
-			
+
 			writeD(_activeChar.getPvpFlag());
 			writeD(_activeChar.getKarma());
-			
+
 			writeD(_mAtkSpd);
 			writeD(_pAtkSpd);
-			
+
 			writeD(0x00); // ?
-			
+
 			writeD(_runSpd);
 			writeD(_walkSpd);
 			writeD(_swimRunSpd);
@@ -225,16 +224,16 @@ public class CharInfo extends L2GameServerPacket {
 			writeD(_flyWalkSpd);
 			writeF(_moveMultiplier);
 			writeF(_activeChar.getAttackSpeedMultiplier());
-			
+
 			writeF(_activeChar.getCollisionRadius());
 			writeF(_activeChar.getCollisionHeight());
-			
+
 			writeD(_activeChar.getAppearance().getHairStyle());
 			writeD(_activeChar.getAppearance().getHairColor());
 			writeD(_activeChar.getAppearance().getFace());
-			
+
 			writeS(gmSeeInvis ? "Invisible" : _activeChar.getAppearance().getVisibleTitle());
-			
+
 			if (!_activeChar.isCursedWeaponEquipped()) {
 				writeD(_activeChar.getClanId());
 				writeD(_activeChar.getClanCrestId());
@@ -246,73 +245,72 @@ public class CharInfo extends L2GameServerPacket {
 				writeD(0x00);
 				writeD(0x00);
 			}
-			
+
 			writeC(_activeChar.isSitting() ? 0 : 1); // standing = 1 sitting = 0
 			writeC(_activeChar.isRunning() ? 1 : 0); // running = 1 walking = 0
 			writeC(_activeChar.isInCombat() ? 1 : 0);
-			
+
 			writeC(!_activeChar.isInOlympiadMode() && _activeChar.isAlikeDead() ? 1 : 0);
-			
+
 			writeC(!gmSeeInvis && isInvisible() ? 1 : 0); // invisible = 1 visible =0
-			
+
 			writeC(_activeChar.getMountType().ordinal()); // 1-on Strider, 2-on Wyvern, 3-on Great Wolf, 0-no mount
 			writeC(_activeChar.getPrivateStoreType().getId());
-			
+
 			writeH(_activeChar.getCubics().size());
 			for (int cubicId : _activeChar.getCubics().keySet()) {
 				writeH(cubicId);
 			}
-			
+
 			writeC(_activeChar.isInPartyMatchRoom() ? 1 : 0);
-			
+
 			writeD(gmSeeInvis ? (_activeChar.getAbnormalVisualEffects() | AbnormalVisualEffect.STEALTH.getMask()) : _activeChar.getAbnormalVisualEffects());
-			
+
 			writeC(_activeChar.isInsideZone(ZoneId.WATER) ? 1 : _activeChar.isFlyingMounted() ? 2 : 0);
-			
+
 			writeH(_activeChar.getRecomHave()); // Blue value for name (0 = white, 255 = pure blue)
 			writeD(_activeChar.getMountNpcId() + 1000000);
 			writeD(_activeChar.getClassId().getId());
 			writeD(0x00); // ?
 			writeC(_activeChar.isMounted() ? 0 : _activeChar.getEnchantEffect());
-			
+
 			writeC(_activeChar.getTeam().getId());
-			
+
 			writeD(_activeChar.getClanCrestLargeId());
 			writeC(_activeChar.isNoble() ? 1 : 0); // Symbol on char menu ctrl+I
 			writeC(_activeChar.isHero() || (_activeChar.isGM() && general().gmHeroAura()) ? 1 : 0); // Hero Aura
-			
+
 			writeC(_activeChar.isFishing() ? 1 : 0); // 0x01: Fishing Mode (Cant be undone by setting back to 0)
 			writeD(_activeChar.getFishx());
 			writeD(_activeChar.getFishy());
 			writeD(_activeChar.getFishz());
-			
+
 			writeD(_activeChar.getAppearance().getNameColor());
-			
+
 			writeD(_heading);
-			
+
 			writeD(_activeChar.getPledgeClass());
 			writeD(_activeChar.getPledgeType());
-			
+
 			writeD(_activeChar.getAppearance().getTitleColor());
-			
+
 			writeD(_activeChar.isCursedWeaponEquipped() ? CursedWeaponsManager.getInstance().getLevel(_activeChar.getCursedWeaponEquippedId()) : 0);
-			
+
 			writeD(_activeChar.getClanId() > 0 ? _activeChar.getClan().getReputationScore() : 0);
-			
+
 			// T1
 			writeD(_activeChar.getTransformationDisplayId());
 			writeD(_activeChar.getAgathionId());
-			
+
 			// T2
 			writeD(0x01);
-			
+
 			// T2.3
 			writeD(_activeChar.getAbnormalVisualEffectSpecial());
 		}
 	}
-	
-	@Override
-	protected int[] getPaperdollOrder() {
+
+	@Override protected int[] getPaperdollOrder() {
 		return PAPERDOLL_ORDER;
 	}
 }

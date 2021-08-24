@@ -57,7 +57,7 @@ public class L2DoorTemplate extends L2CharTemplate implements IIdentifiable {
 	private final boolean _isAttackableDoor;
 	private final int _clanhallId;
 	private final boolean _stealth;
-	
+
 	public L2DoorTemplate(StatsSet set) {
 		super(set);
 		_doorId = set.getInt("id");

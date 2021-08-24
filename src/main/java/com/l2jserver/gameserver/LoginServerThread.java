@@ -88,7 +88,7 @@ public class LoginServerThread extends Thread {
 	
 	protected static final Logger LOG_ACCOUNTING = LoggerFactory.getLogger("accounting");
 	
-	private static final String HEXID_FILE = "./config/hexid.txt";
+	private static final String HEXID_FILE = "src/main/resources/config/hexid.txt";
 	
 	private static final int TEENAGER = 15;
 	

@@ -1224,6 +1224,9 @@ public final class Formulas {
 			attacker.sendPacket(sm);
 			return false;
 		}
+		final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.DEBUFF_LANDED_SUCCESSFULLY);
+		sm.addSkillName(skill);
+		attacker.sendPacket(sm);
 		return true;
 	}
 	

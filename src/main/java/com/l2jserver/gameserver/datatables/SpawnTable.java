@@ -1,18 +1,18 @@
 /*
  * Copyright © 2004-2021 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,40 +45,41 @@ import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Spawn data retriever.
+ *
  * @author Zoey76
  */
 public final class SpawnTable implements IXmlReader {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(SpawnTable.class);
-	
+
 	private static final String SELECT_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM spawnlist";
-	
+
 	private static final String SELECT_CUSTOM_SPAWNS = "SELECT count, npc_templateid, locx, locy, locz, heading, respawn_delay, respawn_random, loc_id, periodOfDay FROM custom_spawnlist";
-	
+
 	private static final Map<Integer, Set<L2Spawn>> _spawnTable = new ConcurrentHashMap<>();
-	
+
 	private int _xmlSpawnCount = 0;
-	
-	@Override
-	public void load() {
+
+	@Override public void load() {
 		if (!general().noSpawns()) {
 			fillSpawnTable(false);
 			final int spawnCount = _spawnTable.size();
 			LOG.info("Loaded {} NPC spawns.", spawnCount);
-			
+
 			if (general().customSpawnlistTable()) {
 				fillSpawnTable(true);
 				LOG.info("Loaded {} custom NPC spawns.", (_spawnTable.size() - spawnCount));
 			}
-			
+
 			// Load XML list
 			parseDatapackDirectory("data/spawnlist", false);
 			LOG.info("Loaded {} NPC spawns from XML.", _xmlSpawnCount);
 		}
 	}
-	
+
 	/**
 	 * Verifies if the template exists and it's spawnable.
+	 *
 	 * @param npcId the NPC ID
 	 * @return {@code true} if the NPC ID belongs to an spawnable template, {@code false} otherwise
 	 */
@@ -88,13 +89,12 @@ public final class SpawnTable implements IXmlReader {
 			LOG.warn("Data missing in NPC table for ID {}!", npcId);
 			return false;
 		}
-		
+
 		// Don't spawn
 		return !npcTemplate.isType("L2SiegeGuard") && !npcTemplate.isType("L2RaidBoss");
 	}
-	
-	@Override
-	public void parseDocument(Document doc) {
+
+	@Override public void parseDocument(Document doc) {
 		NamedNodeMap attrs;
 		for (Node list = doc.getFirstChild(); list != null; list = list.getNextSibling()) {
 			if (list.getNodeName().equalsIgnoreCase("list")) {
@@ -108,8 +108,9 @@ public final class SpawnTable implements IXmlReader {
 					if (param.getNodeName().equalsIgnoreCase("spawn")) {
 						String territoryName = null;
 						String spawnName = null;
+						Boolean enabled = true;
 						Map<String, Integer> map = null;
-						
+
 						// Check, if spawn name specified
 						if (attrs.getNamedItem("name") != null) {
 							spawnName = parseString(attrs, "name");
@@ -118,7 +119,9 @@ public final class SpawnTable implements IXmlReader {
 						if ((attrs.getNamedItem("zone") != null) && (ZoneManager.getInstance().getSpawnTerritory(attrs.getNamedItem("zone").getNodeValue()) != null)) {
 							territoryName = parseString(attrs, "zone");
 						}
-						
+						if (attrs.getNamedItem("enabled") != null) {
+							enabled = parseBoolean(attrs, "enabled");
+						}
 						for (Node npctag = param.getFirstChild(); npctag != null; npctag = npctag.getNextSibling()) {
 							attrs = npctag.getAttributes();
 							// Check if there are any AI parameters
@@ -147,7 +150,7 @@ public final class SpawnTable implements IXmlReader {
 								int x = 0;
 								int y = 0;
 								int z = 0;
-								
+
 								try {
 									x = parseInteger(attrs, "x");
 									y = parseInteger(attrs, "y");
@@ -155,13 +158,13 @@ public final class SpawnTable implements IXmlReader {
 								} catch (NullPointerException npe) {
 									// x, y, z can be unspecified, if this spawn is territory based, do nothing
 								}
-								
+
 								if ((x == 0) && (y == 0) && (territoryName == null)) // Both coordinates and zone are unspecified
 								{
 									LOG.warn("Spawn could not be initialized, both coordinates and zone are unspecified for ID {}!", templateId);
 									continue;
 								}
-								
+
 								StatsSet spawnInfo = new StatsSet();
 								spawnInfo.set("npcTemplateid", templateId);
 								spawnInfo.set("x", x);
@@ -169,31 +172,31 @@ public final class SpawnTable implements IXmlReader {
 								spawnInfo.set("z", z);
 								spawnInfo.set("territoryName", territoryName);
 								spawnInfo.set("spawnName", spawnName);
-								
+								spawnInfo.set("enabled", enabled);
 								// trying to read optional parameters
 								if (attrs.getNamedItem("heading") != null) {
 									spawnInfo.set("heading", parseInteger(attrs, "heading"));
 								}
-								
+
 								if (attrs.getNamedItem("count") != null) {
 									spawnInfo.set("count", parseInteger(attrs, "count"));
 								}
-								
+
 								if (attrs.getNamedItem("respawnDelay") != null) {
 									spawnInfo.set("respawnDelay", parseInteger(attrs, "respawnDelay"));
 								}
-								
+
 								if (attrs.getNamedItem("respawnRandom") != null) {
 									spawnInfo.set("respawnRandom", parseInteger(attrs, "respawnRandom"));
 								}
-								
+
 								if (attrs.getNamedItem("periodOfDay") != null) {
 									String period = attrs.getNamedItem("periodOfDay").getNodeValue();
 									if (period.equalsIgnoreCase("day") || period.equalsIgnoreCase("night")) {
 										spawnInfo.set("periodOfDay", period.equalsIgnoreCase("day") ? 1 : 2);
 									}
 								}
-								
+
 								_xmlSpawnCount += addSpawn(spawnInfo, map);
 							}
 						}
@@ -202,27 +205,27 @@ public final class SpawnTable implements IXmlReader {
 			}
 		}
 	}
-	
+
 	/**
 	 * Retrieves spawn data from database.
+	 *
 	 * @param isCustom if {@code true} the spawns are loaded as custom from custom spawn table
 	 * @return the spawn count
 	 */
 	private int fillSpawnTable(boolean isCustom) {
 		int npcSpawnCount = 0;
-		try (var con = ConnectionFactory.getInstance().getConnection();
-			var s = con.createStatement();
-			var rs = s.executeQuery(isCustom ? SELECT_CUSTOM_SPAWNS : SELECT_SPAWNS)) {
+		try (
+			var con = ConnectionFactory.getInstance().getConnection(); var s = con.createStatement(); var rs = s.executeQuery(isCustom ? SELECT_CUSTOM_SPAWNS : SELECT_SPAWNS)) {
 			while (rs.next()) {
 				StatsSet spawnInfo = new StatsSet();
 				int npcId = rs.getInt("npc_templateid");
-				
+
 				// Check basic requirements first
 				if (!checkTemplate(npcId)) {
 					// Don't spawn
 					continue;
 				}
-				
+
 				spawnInfo.set("npcTemplateid", npcId);
 				spawnInfo.set("count", rs.getInt("count"));
 				spawnInfo.set("x", rs.getInt("locx"));
@@ -234,6 +237,7 @@ public final class SpawnTable implements IXmlReader {
 				spawnInfo.set("locId", rs.getInt("loc_id"));
 				spawnInfo.set("periodOfDay", rs.getInt("periodOfDay"));
 				spawnInfo.set("isCustomSpawn", isCustom);
+				spawnInfo.set("enabled", true);
 				npcSpawnCount += addSpawn(spawnInfo);
 			}
 		} catch (Exception ex) {
@@ -241,11 +245,12 @@ public final class SpawnTable implements IXmlReader {
 		}
 		return npcSpawnCount;
 	}
-	
+
 	/**
 	 * Creates NPC spawn
+	 *
 	 * @param spawnInfo StatsSet of spawn parameters
-	 * @param AIData Map of specific AI parameters for this spawn
+	 * @param AIData    Map of specific AI parameters for this spawn
 	 * @return count NPC instances, spawned by this spawn
 	 */
 	private int addSpawn(StatsSet spawnInfo, Map<String, Integer> AIData) {
@@ -273,7 +278,12 @@ public final class SpawnTable implements IXmlReader {
 			NpcPersonalAIData.getInstance().storeData(spawnDat, AIData);
 			switch (spawnInfo.getInt("periodOfDay", 0)) {
 				// default
-				case 0 -> ret += spawnDat.init();
+				case 0 -> {
+					if (spawnInfo.getBoolean("enabled")) {
+						ret += spawnDat.init();
+					}
+				}
+
 				// Day
 				case 1 -> {
 					DayNightSpawnManager.getInstance().addDayCreature(spawnDat);
@@ -285,70 +295,76 @@ public final class SpawnTable implements IXmlReader {
 					ret = 1;
 				}
 			}
-			
+
 			addSpawn(spawnDat);
 		} catch (Exception ex) {
 			LOG.warn("Spawn could not be initialized!", ex);
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Wrapper for {@link #addSpawn(StatsSet, Map)}.
+	 *
 	 * @param spawnInfo StatsSet of spawn parameters
 	 * @return count NPC instances, spawned by this spawn
 	 */
 	private int addSpawn(StatsSet spawnInfo) {
 		return addSpawn(spawnInfo, null);
 	}
-	
+
 	/**
 	 * Gets the spawn data.
+	 *
 	 * @return the spawn data
 	 */
 	public Map<Integer, Set<L2Spawn>> getSpawnTable() {
 		return _spawnTable;
 	}
-	
+
 	/**
 	 * Gets the spawns for the NPC Id.
+	 *
 	 * @param npcId the NPC Id
 	 * @return the spawn set for the given npcId
 	 */
 	public Set<L2Spawn> getSpawns(int npcId) {
 		return _spawnTable.getOrDefault(npcId, Collections.emptySet());
 	}
-	
+
 	/**
 	 * Gets the spawn count for the given NPC ID.
+	 *
 	 * @param npcId the NPC Id
 	 * @return the spawn count
 	 */
 	public int getSpawnCount(int npcId) {
 		return getSpawns(npcId).size();
 	}
-	
+
 	/**
 	 * Finds a spawn for the given NPC ID.
+	 *
 	 * @param npcId the NPC Id
 	 * @return a spawn for the given NPC ID or {@code null}
 	 */
 	public L2Spawn findAny(int npcId) {
 		return getSpawns(npcId).stream().findFirst().orElse(null);
 	}
-	
+
 	/**
 	 * Adds a new spawn to the spawn table.
-	 * @param spawn the spawn to add
+	 *
+	 * @param spawn     the spawn to add
 	 * @param storeInDb if {@code true} it'll be saved in the database
 	 */
 	public void addNewSpawn(L2Spawn spawn, boolean storeInDb) {
 		addSpawn(spawn);
-		
+
 		if (storeInDb) {
 			final String spawnTable = spawn.isCustom() && general().customSpawnlistTable() ? "custom_spawnlist" : "spawnlist";
-			try (var con = ConnectionFactory.getInstance().getConnection();
-				var insert = con.prepareStatement("INSERT INTO " + spawnTable + "(count,npc_templateid,locx,locy,locz,heading,respawn_delay,respawn_random,loc_id) values(?,?,?,?,?,?,?,?,?)")) {
+			try (
+				var con = ConnectionFactory.getInstance().getConnection(); var insert = con.prepareStatement("INSERT INTO " + spawnTable + "(count,npc_templateid,locx,locy,locz,heading,respawn_delay,respawn_random,loc_id) values(?,?,?,?,?,?,?,?,?)")) {
 				insert.setInt(1, spawn.getAmount());
 				insert.setInt(2, spawn.getId());
 				insert.setInt(3, spawn.getX());
@@ -364,20 +380,21 @@ public final class SpawnTable implements IXmlReader {
 			}
 		}
 	}
-	
+
 	/**
 	 * Delete an spawn from the spawn table.
-	 * @param spawn the spawn to delete
+	 *
+	 * @param spawn    the spawn to delete
 	 * @param updateDb if {@code true} database will be updated
 	 */
 	public void deleteSpawn(L2Spawn spawn, boolean updateDb) {
 		if (!removeSpawn(spawn)) {
 			return;
 		}
-		
+
 		if (updateDb) {
-			try (var con = ConnectionFactory.getInstance().getConnection();
-				var delete = con.prepareStatement("DELETE FROM " + (spawn.isCustom() ? "custom_spawnlist" : "spawnlist") + " WHERE locx=? AND locy=? AND locz=? AND npc_templateid=? AND heading=?")) {
+			try (
+				var con = ConnectionFactory.getInstance().getConnection(); var delete = con.prepareStatement("DELETE FROM " + (spawn.isCustom() ? "custom_spawnlist" : "spawnlist") + " WHERE locx=? AND locy=? AND locz=? AND npc_templateid=? AND heading=?")) {
 				delete.setInt(1, spawn.getX());
 				delete.setInt(2, spawn.getY());
 				delete.setInt(3, spawn.getZ());
@@ -389,17 +406,19 @@ public final class SpawnTable implements IXmlReader {
 			}
 		}
 	}
-	
+
 	/**
 	 * Add a spawn to the spawn set if present, otherwise add a spawn set and add the spawn to the newly created spawn set.
+	 *
 	 * @param spawn the NPC spawn to add
 	 */
 	private void addSpawn(L2Spawn spawn) {
 		_spawnTable.computeIfAbsent(spawn.getId(), k -> ConcurrentHashMap.newKeySet(1)).add(spawn);
 	}
-	
+
 	/**
 	 * Remove a spawn from the spawn set, if the spawn set is empty, remove it as well.
+	 *
 	 * @param spawn the NPC spawn to remove
 	 * @return {@code true} if the spawn was successfully removed, {@code false} otherwise
 	 */
@@ -414,10 +433,11 @@ public final class SpawnTable implements IXmlReader {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Execute a procedure over all spawns.<br>
 	 * <font size="4" color="red">Do not use it!</font>
+	 *
 	 * @param function the function to execute
 	 * @return {@code true} if all procedures were executed, {@code false} otherwise
 	 */
@@ -431,11 +451,11 @@ public final class SpawnTable implements IXmlReader {
 		}
 		return true;
 	}
-	
+
 	public static SpawnTable getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
+
 	private static class SingletonHolder {
 		protected static final SpawnTable INSTANCE = new SpawnTable();
 	}

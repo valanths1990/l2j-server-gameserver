@@ -1,18 +1,18 @@
 /*
  * Copyright © 2004-2021 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.l2jserver.gameserver.model.zone.L2ZoneRespawn;
+import com.l2jserver.gameserver.model.zone.type.L2PvpZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,36 +47,35 @@ import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
  * Map Region Manager.
+ *
  * @author Nyaran
  */
 public final class MapRegionManager implements IXmlReader {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(MapRegionManager.class);
-	
+
 	private static final Map<String, L2MapRegion> REGIONS = new HashMap<>();
-	
+
 	private static final String DEFAULT_RESPAWN = "talking_island_town";
-	
+
 	protected MapRegionManager() {
 		load();
 	}
-	
-	@Override
-	public void load() {
+
+	@Override public void load() {
 		REGIONS.clear();
 		parseDatapackDirectory("data/mapregion", false);
 		LOG.info("Loaded {} map regions.", REGIONS.size());
 	}
-	
-	@Override
-	public void parseDocument(Document doc) {
+
+	@Override public void parseDocument(Document doc) {
 		NamedNodeMap attrs;
 		String name;
 		String town;
 		int locId;
 		int castle;
 		int bbs;
-		
+
 		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
 			if ("list".equalsIgnoreCase(n.getNodeName())) {
 				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
@@ -85,7 +86,7 @@ public final class MapRegionManager implements IXmlReader {
 						locId = parseInteger(attrs, "locId");
 						castle = parseInteger(attrs, "castle");
 						bbs = parseInteger(attrs, "bbs");
-						
+
 						L2MapRegion region = new L2MapRegion(name, town, locId, castle, bbs);
 						for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
 							attrs = c.getAttributes();
@@ -93,11 +94,11 @@ public final class MapRegionManager implements IXmlReader {
 								int spawnX = parseInteger(attrs, "X");
 								int spawnY = parseInteger(attrs, "Y");
 								int spawnZ = parseInteger(attrs, "Z");
-								
+
 								boolean other = parseBoolean(attrs, "isOther", false);
 								boolean chaotic = parseBoolean(attrs, "isChaotic", false);
 								boolean banish = parseBoolean(attrs, "isBanish", false);
-								
+
 								if (other) {
 									region.addOtherSpawn(spawnX, spawnY, spawnZ);
 								} else if (chaotic) {
@@ -119,7 +120,7 @@ public final class MapRegionManager implements IXmlReader {
 			}
 		}
 	}
-	
+
 	public L2MapRegion getMapRegion(int locX, int locY) {
 		for (L2MapRegion region : REGIONS.values()) {
 			if (region.isZoneInRegion(getMapRegionX(locX), getMapRegionY(locY))) {
@@ -128,7 +129,7 @@ public final class MapRegionManager implements IXmlReader {
 		}
 		return null;
 	}
-	
+
 	public int getMapRegionLocId(int locX, int locY) {
 		L2MapRegion region = getMapRegion(locX, locY);
 		if (region != null) {
@@ -136,38 +137,39 @@ public final class MapRegionManager implements IXmlReader {
 		}
 		return 0;
 	}
-	
+
 	public L2MapRegion getMapRegion(L2Object obj) {
 		return getMapRegion(obj.getX(), obj.getY());
 	}
-	
+
 	public int getMapRegionLocId(L2Object obj) {
 		return getMapRegionLocId(obj.getX(), obj.getY());
 	}
-	
+
 	public int getMapRegionX(int posX) {
 		return (posX >> 15) + 9 + 11;// + centerTileX;
 	}
-	
+
 	public int getMapRegionY(int posY) {
 		return (posY >> 15) + 10 + 8;// + centerTileX;
 	}
-	
+
 	/**
 	 * Get town name by character position
+	 *
 	 * @param activeChar
 	 * @return
 	 */
 	public String getClosestTownName(L2Character activeChar) {
 		L2MapRegion region = getMapRegion(activeChar);
-		
+
 		if (region == null) {
 			return "Aden Castle Town";
 		}
-		
+
 		return region.getTown();
 	}
-	
+
 	public int getAreaCastle(L2Character activeChar) {
 		L2MapRegion region = getMapRegion(activeChar);
 		if (region == null) {
@@ -175,12 +177,12 @@ public final class MapRegionManager implements IXmlReader {
 		}
 		return region.getCastle();
 	}
-	
+
 	public Location getTeleToLocation(L2Character activeChar, TeleportWhereType teleportWhere) {
 		Location loc;
 		if (activeChar.isPlayer()) {
 			final L2PcInstance player = activeChar.getActingPlayer();
-			
+
 			// flying players in gracia cant use teleports to aden continent
 			if ((player.getClan() != null) && !player.isFlyingMounted() && !player.isFlying()) {
 				// If teleport to clan hall
@@ -196,7 +198,7 @@ public final class MapRegionManager implements IXmlReader {
 						}
 					}
 				}
-				
+
 				// If teleport to castle
 				if (teleportWhere == TeleportWhereType.CASTLE) {
 					var castle = CastleManager.getInstance().getCastleByOwner(player.getClan());
@@ -208,7 +210,7 @@ public final class MapRegionManager implements IXmlReader {
 							castle = null;
 						}
 					}
-					
+
 					if ((castle != null) && (castle.getResidenceId() > 0)) {
 						if (player.getKarma() > 0) {
 							return castle.getResidenceZone().getChaoticSpawnLoc();
@@ -216,7 +218,7 @@ public final class MapRegionManager implements IXmlReader {
 						return castle.getResidenceZone().getSpawnLoc();
 					}
 				}
-				
+
 				// If teleport to fortress
 				if (teleportWhere == TeleportWhereType.FORTRESS) {
 					var fort = FortManager.getInstance().getFortByOwner(player.getClan());
@@ -228,7 +230,7 @@ public final class MapRegionManager implements IXmlReader {
 							fort = null;
 						}
 					}
-					
+
 					if ((fort != null) && (fort.getResidenceId() > 0)) {
 						if (player.getKarma() > 0) {
 							return fort.getResidenceZone().getChaoticSpawnLoc();
@@ -236,7 +238,7 @@ public final class MapRegionManager implements IXmlReader {
 						return fort.getResidenceZone().getSpawnLoc();
 					}
 				}
-				
+
 				// If teleport to SiegeHQ
 				if (teleportWhere == TeleportWhereType.SIEGEFLAG) {
 					final var castle = CastleManager.getInstance().getCastle(player);
@@ -254,7 +256,7 @@ public final class MapRegionManager implements IXmlReader {
 								return flags.get(0).getLocation();
 							}
 						}
-						
+
 					} else if (fort != null) {
 						if (fort.getSiege().isInProgress()) {
 							// Check if player's clan is attacker
@@ -273,7 +275,7 @@ public final class MapRegionManager implements IXmlReader {
 					}
 				}
 			}
-			
+
 			// Karma player land out of city
 			if (player.getKarma() > 0) {
 				try {
@@ -289,7 +291,7 @@ public final class MapRegionManager implements IXmlReader {
 					return REGIONS.get(DEFAULT_RESPAWN).getChaoticSpawnLoc();
 				}
 			}
-			
+
 			// Checking if needed to be respawned in "far" town from the castle;
 			final var castle = CastleManager.getInstance().getCastle(player);
 			if (castle != null) {
@@ -300,7 +302,7 @@ public final class MapRegionManager implements IXmlReader {
 					}
 				}
 			}
-			
+
 			// Checking if in an instance
 			if (player.getInstanceId() > 0) {
 				Instance inst = InstanceManager.getInstance().getInstance(player.getInstanceId());
@@ -312,12 +314,16 @@ public final class MapRegionManager implements IXmlReader {
 				}
 			}
 		}
-		
+
 		// Get the nearest town
 		try {
 			L2RespawnZone zone = ZoneManager.getInstance().getZone(activeChar, L2RespawnZone.class);
 			if (zone != null) {
 				return getRestartRegion(activeChar, zone.getRespawnPoint((L2PcInstance) activeChar)).getSpawnLoc();
+			}
+			L2PvpZone zoneRespawn = ZoneManager.getInstance().getZone(activeChar, L2PvpZone.class);
+			if (zoneRespawn != null) {
+				return zoneRespawn.getSpawnLoc();
 			}
 			return getMapRegion(activeChar).getSpawnLoc();
 		} catch (Exception e) {
@@ -325,12 +331,12 @@ public final class MapRegionManager implements IXmlReader {
 			return REGIONS.get(DEFAULT_RESPAWN).getSpawnLoc();
 		}
 	}
-	
+
 	public L2MapRegion getRestartRegion(L2Character activeChar, String point) {
 		try {
 			L2PcInstance player = ((L2PcInstance) activeChar);
 			L2MapRegion region = REGIONS.get(point);
-			
+
 			if (region.getBannedRace().containsKey(player.getRace())) {
 				getRestartRegion(player, region.getBannedRace().get(player.getRace()));
 			}
@@ -339,7 +345,7 @@ public final class MapRegionManager implements IXmlReader {
 			return REGIONS.get(DEFAULT_RESPAWN);
 		}
 	}
-	
+
 	/**
 	 * @param regionName the map region name.
 	 * @return if exists the map region identified by that name, null otherwise.
@@ -347,11 +353,11 @@ public final class MapRegionManager implements IXmlReader {
 	public L2MapRegion getMapRegionByName(String regionName) {
 		return REGIONS.get(regionName);
 	}
-	
+
 	public static MapRegionManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
+
 	private static class SingletonHolder {
 		protected static final MapRegionManager INSTANCE = new MapRegionManager();
 	}

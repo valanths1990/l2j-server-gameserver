@@ -791,7 +791,6 @@ public class L2Attackable extends L2Npc {
 		}
 		return ai.getHate();
 	}
-	
 	public void doItemDrop(L2Character mainDamageDealer) {
 		doItemDrop(getTemplate(), mainDamageDealer);
 	}

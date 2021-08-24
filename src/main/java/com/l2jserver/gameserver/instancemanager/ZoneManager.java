@@ -270,7 +270,8 @@ public final class ZoneManager implements IXmlReader {
 								int spawnY = Integer.parseInt(attrs.getNamedItem("Y").getNodeValue());
 								int spawnZ = Integer.parseInt(attrs.getNamedItem("Z").getNodeValue());
 								Node val = attrs.getNamedItem("type");
-								((L2ZoneRespawn) temp).parseLoc(spawnX, spawnY, spawnZ, val == null ? null : val.getNodeValue());
+								Node spawnName = attrs.getNamedItem("spawnName");
+								((L2ZoneRespawn) temp).parseLoc(spawnX, spawnY, spawnZ, val == null ? null : val.getNodeValue(),spawnName==null ? null:spawnName.getNodeValue());
 							} else if ("race".equalsIgnoreCase(cd.getNodeName()) && (temp instanceof L2RespawnZone)) {
 								attrs = cd.getAttributes();
 								String race = attrs.getNamedItem("name").getNodeValue();

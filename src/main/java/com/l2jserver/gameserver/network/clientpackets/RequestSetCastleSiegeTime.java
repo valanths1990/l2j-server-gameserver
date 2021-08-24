@@ -35,7 +35,8 @@ import com.l2jserver.gameserver.util.Broadcast;
 /**
  * @author UnAfraid
  */
-public class RequestSetCastleSiegeTime extends L2GameClientPacket {
+public class
+RequestSetCastleSiegeTime extends L2GameClientPacket {
 	private int _castleId;
 	private long _time;
 	

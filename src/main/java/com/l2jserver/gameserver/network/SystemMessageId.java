@@ -15204,7 +15204,11 @@ public final class SystemMessageId {
 	 * Message: You did not rescue Santa, and Thomas D. Turkey has disappeared.
 	 */
 	public static final SystemMessageId THOMAS_D_TURKEY_DISAPPEARED = new SystemMessageId(6505);
-	
+
+	public static final SystemMessageId DEBUFF_LANDED_SUCCESSFULLY =new SystemMessageId(6507);
+
+	public static final SystemMessageId C1_KILL_ANNOUNCEMENT_S2 =new SystemMessageId(6506); //custom
+
 	static {
 		buildFastLookupTable();
 	}

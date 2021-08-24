@@ -1,18 +1,18 @@
 /*
  * Copyright © 2004-2021 L2J Server
- * 
+ *
  * This file is part of L2J Server.
- * 
+ *
  * L2J Server is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * L2J Server is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -57,41 +57,40 @@ import com.l2jserver.gameserver.util.Util;
 
 /**
  * NPC data parser.
+ *
  * @author NosBit
  */
 public class NpcData implements IXmlReader {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(NpcData.class);
-	
+
 	private final Map<Integer, L2NpcTemplate> _npcs = new ConcurrentHashMap<>();
-	
+
 	private final Map<String, Integer> _clans = new ConcurrentHashMap<>();
-	
+
 	private MinionData _minionData;
-	
+
 	protected NpcData() {
 		load();
 	}
-	
-	@Override
-	public synchronized void load() {
+
+	@Override public synchronized void load() {
 		_minionData = new MinionData();
-		
+
 		parseDatapackDirectory("data/stats/npcs", false);
 		LOG.info("Loaded {} NPCs.", _npcs.size());
-		
+
 		if (general().customNpcData()) {
 			final int npcCount = _npcs.size();
 			parseDatapackDirectory("data/stats/npcs/custom", true);
 			LOG.info("Loaded {} custom NPCs.", (_npcs.size() - npcCount));
 		}
-		
+
 		_minionData = null;
 		loadNpcsSkillLearn();
 	}
-	
-	@Override
-	public void parseDocument(Document doc, File f) {
+
+	@Override public void parseDocument(Document doc, File f) {
 		for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling()) {
 			if ("list".equalsIgnoreCase(node.getNodeName())) {
 				for (Node listNode = node.getFirstChild(); listNode != null; listNode = listNode.getNextSibling()) {
@@ -119,7 +118,7 @@ public class NpcData implements IXmlReader {
 									if (parameters == null) {
 										parameters = new HashMap<>();
 									}
-									
+
 									for (Node parametersNode = npcNode.getFirstChild(); parametersNode != null; parametersNode = parametersNode.getNextSibling()) {
 										attrs = parametersNode.getAttributes();
 										switch (parametersNode.getNodeName().toLowerCase()) {
@@ -133,7 +132,7 @@ public class NpcData implements IXmlReader {
 														minions.add(new MinionHolder(parseInteger(attrs, "id"), parseInteger(attrs, "count"), parseInteger(attrs, "respawnTime"), parseInteger(attrs, "weightPoint")));
 													}
 												}
-												
+
 												if (!minions.isEmpty()) {
 													parameters.put(parseString(parametersNode.getAttributes(), "name"), minions);
 												}
@@ -319,17 +318,17 @@ public class NpcData implements IXmlReader {
 								case "droplists" -> {
 									for (Node dropListsNode = npcNode.getFirstChild(); dropListsNode != null; dropListsNode = dropListsNode.getNextSibling()) {
 										DropListScope dropListScope = null;
-										
+
 										try {
 											dropListScope = Enum.valueOf(DropListScope.class, dropListsNode.getNodeName().toUpperCase());
 										} catch (Exception e) {
 										}
-										
+
 										if (dropListScope != null) {
 											if (dropLists == null) {
 												dropLists = new EnumMap<>(DropListScope.class);
 											}
-											
+
 											List<IDropItem> dropList = new ArrayList<>();
 											parseDropList(f, dropListsNode, dropListScope, dropList);
 											dropLists.put(dropListScope, Collections.unmodifiableList(dropList));
@@ -353,7 +352,7 @@ public class NpcData implements IXmlReader {
 								}
 							}
 						}
-						
+
 						L2NpcTemplate template = _npcs.get(npcId);
 						if (template == null) {
 							template = new L2NpcTemplate(set);
@@ -361,39 +360,39 @@ public class NpcData implements IXmlReader {
 						} else {
 							template.set(set);
 						}
-						
-						if (_minionData._tempMinions.containsKey(npcId)) {
+
+						if (_minionData != null && _minionData._tempMinions.containsKey(npcId)) {
 							if (parameters == null) {
 								parameters = new HashMap<>();
 							}
 							parameters.putIfAbsent("Privates", _minionData._tempMinions.get(npcId));
 						}
-						
+
 						if (parameters != null) {
 							// Using unmodifiable map parameters of template are not meant to be changed at runtime.
 							template.setParameters(new StatsSet(Collections.unmodifiableMap(parameters)));
 						} else {
 							template.setParameters(StatsSet.EMPTY_STATSET);
 						}
-						
+
 						if (skills != null) {
 							Map<AISkillScope, List<Skill>> aiSkillLists = null;
 							for (Skill skill : skills.values()) {
 								if (skill.isPassive()) {
 									continue;
 								}
-								
+
 								if (aiSkillLists == null) {
 									aiSkillLists = new EnumMap<>(AISkillScope.class);
 								}
-								
+
 								final List<AISkillScope> aiSkillScopes = new ArrayList<>();
 								final AISkillScope shortOrLongRangeScope = skill.getCastRange() <= 150 ? AISkillScope.SHORT_RANGE : AISkillScope.LONG_RANGE;
 								if (skill.isSuicideAttack()) {
 									aiSkillScopes.add(AISkillScope.SUICIDE);
 								} else {
 									aiSkillScopes.add(AISkillScope.GENERAL);
-									
+
 									if (skill.isContinuous()) {
 										if (!skill.isDebuff()) {
 											aiSkillScopes.add(AISkillScope.BUFF);
@@ -432,30 +431,30 @@ public class NpcData implements IXmlReader {
 										}
 									}
 								}
-								
+
 								for (AISkillScope aiSkillScope : aiSkillScopes) {
 									List<Skill> aiSkills = aiSkillLists.computeIfAbsent(aiSkillScope, k -> new ArrayList<>());
 									aiSkills.add(skill);
 								}
 							}
-							
+
 							template.setSkills(skills);
 							template.setAISkillLists(aiSkillLists);
 						} else {
 							template.setSkills(null);
 							template.setAISkillLists(null);
 						}
-						
+
 						template.setClans(clans);
 						template.setIgnoreClanNpcIds(ignoreClanNpcIds);
-						
+
 						template.setDropLists(dropLists);
 					}
 				}
 			}
 		}
 	}
-	
+
 	private void parseDropList(File f, Node dropListNode, DropListScope dropListScope, List<IDropItem> drops) {
 		for (Node dropNode = dropListNode.getFirstChild(); dropNode != null; dropNode = dropNode.getNextSibling()) {
 			NamedNodeMap attrs = dropNode.getAttributes();
@@ -465,7 +464,7 @@ public class NpcData implements IXmlReader {
 				for (Node groupNode = dropNode.getFirstChild(); groupNode != null; groupNode = groupNode.getNextSibling()) {
 					parseDropListItem(groupNode, dropListScope, groupedDropList);
 				}
-				
+
 				List<GeneralDropItem> items = new ArrayList<>(groupedDropList.size());
 				for (IDropItem item : groupedDropList) {
 					if (item instanceof GeneralDropItem) {
@@ -475,14 +474,14 @@ public class NpcData implements IXmlReader {
 					}
 				}
 				dropItem.setItems(items);
-				
+
 				drops.add(dropItem);
 			} else {
 				parseDropListItem(dropNode, dropListScope, drops);
 			}
 		}
 	}
-	
+
 	private void parseDropListItem(Node dropListItem, DropListScope dropListScope, List<IDropItem> drops) {
 		NamedNodeMap attrs = dropListItem.getAttributes();
 		if ("item".equals(dropListItem.getNodeName().toLowerCase())) {
@@ -492,9 +491,10 @@ public class NpcData implements IXmlReader {
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets or creates a clan id if it doesnt exists.
+	 *
 	 * @param clanName the clan name to get or create its id
 	 * @return the clan id for the given clan name
 	 */
@@ -506,9 +506,10 @@ public class NpcData implements IXmlReader {
 		}
 		return id;
 	}
-	
+
 	/**
 	 * Gets the clan id
+	 *
 	 * @param clanName the clan name to get its id
 	 * @return the clan id for the given clan name if it exists, -1 otherwise
 	 */
@@ -516,18 +517,20 @@ public class NpcData implements IXmlReader {
 		Integer id = _clans.get(clanName.toUpperCase());
 		return id != null ? id : -1;
 	}
-	
+
 	/**
 	 * Gets the template.
+	 *
 	 * @param id the template Id to get.
 	 * @return the template for the given id.
 	 */
 	public L2NpcTemplate getTemplate(int id) {
 		return _npcs.get(id);
 	}
-	
+
 	/**
 	 * Gets the template by name.
+	 *
 	 * @param name of the template to get.
 	 * @return the template for the given name.
 	 */
@@ -539,9 +542,10 @@ public class NpcData implements IXmlReader {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets all templates matching the filter.
+	 *
 	 * @param filter
 	 * @return the template list for the given filter
 	 */
@@ -552,43 +556,47 @@ public class NpcData implements IXmlReader {
 			.collect(Collectors.toList());
 		//@formatter:on
 	}
-	
+
 	/**
 	 * Gets the all of level.
+	 *
 	 * @param lvls of all the templates to get.
 	 * @return the template list for the given level.
 	 */
 	public List<L2NpcTemplate> getAllOfLevel(int... lvls) {
 		return getTemplates(template -> Util.contains(lvls, template.getLevel()));
 	}
-	
+
 	/**
 	 * Gets the all monsters of level.
+	 *
 	 * @param lvls of all the monster templates to get.
 	 * @return the template list for the given level.
 	 */
 	public List<L2NpcTemplate> getAllMonstersOfLevel(int... lvls) {
 		return getTemplates(template -> Util.contains(lvls, template.getLevel()) && template.isType("L2Monster"));
 	}
-	
+
 	/**
 	 * Gets the all npc starting with.
+	 *
 	 * @param text of all the NPC templates which its name start with.
 	 * @return the template list for the given letter.
 	 */
 	public List<L2NpcTemplate> getAllNpcStartingWith(String text) {
 		return getTemplates(template -> template.isType("L2Npc") && template.getName().startsWith(text));
 	}
-	
+
 	/**
 	 * Gets the all npc of class type.
+	 *
 	 * @param classTypes of all the templates to get.
 	 * @return the template list for the given class type.
 	 */
 	public List<L2NpcTemplate> getAllNpcOfClassType(String... classTypes) {
 		return getTemplates(template -> Util.contains(classTypes, template.getType(), true));
 	}
-	
+
 	public void loadNpcsSkillLearn() {
 		_npcs.values().forEach(template -> {
 			final List<ClassId> teachInfo = SkillLearnData.getInstance().getSkillLearnData(template.getId());
@@ -597,31 +605,30 @@ public class NpcData implements IXmlReader {
 			}
 		});
 	}
-	
+
 	/**
 	 * This class handles minions from Spawn System<br>
 	 * Once Spawn System gets reworked delete this class<br>
+	 *
 	 * @author Zealar
 	 */
 	private static class MinionData implements IXmlReader {
-		
+
 		private static final Logger LOG = LoggerFactory.getLogger(MinionData.class);
-		
+
 		public final Map<Integer, List<MinionHolder>> _tempMinions = new HashMap<>();
-		
+
 		protected MinionData() {
 			load();
 		}
-		
-		@Override
-		public void load() {
+
+		@Override public void load() {
 			_tempMinions.clear();
 			parseDatapackFile("data/minionData.xml");
 			LOG.info("Loaded {} minions data.", _tempMinions.size());
 		}
-		
-		@Override
-		public void parseDocument(Document doc) {
+
+		@Override public void parseDocument(Document doc) {
 			for (Node node = doc.getFirstChild(); node != null; node = node.getNextSibling()) {
 				if ("list".equals(node.getNodeName())) {
 					for (Node listNode = node.getFirstChild(); listNode != null; listNode = listNode.getNextSibling()) {
@@ -642,11 +649,11 @@ public class NpcData implements IXmlReader {
 			}
 		}
 	}
-	
+
 	public static NpcData getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
+
 	private static class SingletonHolder {
 		protected static final NpcData INSTANCE = new NpcData();
 	}

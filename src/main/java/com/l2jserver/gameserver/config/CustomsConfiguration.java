@@ -46,253 +46,282 @@ import com.l2jserver.gameserver.config.converter.Seconds2MillisecondsConverter;
 	"classpath:config/customs.properties"
 })
 @LoadPolicy(MERGE)
-@HotReload(value = 20, unit = MINUTES, type = ASYNC)
+@HotReload(value = 1, unit = MINUTES, type = ASYNC)
 public interface CustomsConfiguration extends Reloadable {
-	
+
 	@Key("ChampionEnable")
 	Boolean championEnable();
-	
+
 	@Key("ChampionPassive")
 	Boolean championPassive();
-	
+
 	@Key("ChampionFrequency")
 	Integer getChampionFrequency();
-	
+
 	@Key("ChampionTitle")
 	String getChampionTitle();
-	
+
 	@Key("ChampionMinLevel")
 	Integer getChampionMinLevel();
-	
+
 	@Key("ChampionMaxLevel")
 	Integer getChampionMaxLevel();
-	
+
 	@Key("ChampionHp")
 	Integer getChampionHp();
-	
+
 	@Key("ChampionHpRegen")
 	Double getChampionHpRegen();
-	
+
 	@Key("ChampionRewardsExpSp")
 	Double getChampionRewardsExpSp();
-	
+
 	@Key("ChampionRewardsChance")
 	Double getChampionRewardsChance();
-	
+
 	@Key("ChampionRewardsAmount")
 	Double getChampionRewardsAmount();
-	
+
 	@Key("ChampionAdenasRewardsChance")
 	Double getChampionAdenasRewardsChance();
-	
+
 	@Key("ChampionAdenasRewardsAmount")
 	Double getChampionAdenasRewardsAmount();
-	
+
 	@Key("ChampionAtk")
 	Float getChampionAtk();
-	
+
 	@Key("ChampionSpdAtk")
 	Float getChampionSpdAtk();
-	
+
 	@Key("ChampionRewardItemID")
 	Integer getChampionRewardItemID();
-	
+
 	@Key("ChampionRewardItemQty")
 	Integer getChampionRewardItemQty();
-	
+
 	@Key("ChampionRewardLowerLvlItemChance")
 	Integer getChampionRewardLowerLvlItemChance();
-	
+
 	@Key("ChampionRewardHigherLvlItemChance")
 	Integer getChampionRewardHigherLvlItemChance();
-	
+
 	@Key("ChampionEnableVitality")
 	Boolean championEnableVitality();
-	
+
 	@Key("ChampionEnableInInstances")
 	Boolean championEnableInInstances();
-	
+
 	@Key("AllowWedding")
 	Boolean allowWedding();
-	
+
 	@Key("WeddingPrice")
 	Integer getWeddingPrice();
-	
+
 	@Key("WeddingPunishInfidelity")
 	Boolean weddingPunishInfidelity();
-	
+
 	@Key("WeddingTeleport")
 	Boolean weddingTeleport();
-	
+
 	@Key("WeddingTeleportPrice")
 	Integer getWeddingTeleportPrice();
-	
+
 	@Key("WeddingTeleportDuration")
 	@ConverterClass(Seconds2MillisecondsConverter.class)
 	Integer getWeddingTeleportDuration();
-	
+
 	@Key("WeddingAllowSameSex")
 	Boolean weddingAllowSameSex();
-	
+
 	@Key("WeddingFormalWear")
 	Boolean weddingFormalWear();
-	
+
 	@Key("WeddingDivorceCosts")
 	Integer getWeddingDivorceCosts();
-	
+
 	@Key("BankingEnabled")
 	Boolean bankingEnabled();
-	
+
 	@Key("BankingGoldbarCount")
 	Integer getBankingGoldbarCount();
-	
+
 	@Key("BankingAdenaCount")
 	Integer getBankingAdenaCount();
-	
+
 	@Key("EnableWarehouseSortingClan")
 	Boolean enableWarehouseSortingClan();
-	
+
 	@Key("EnableWarehouseSortingPrivate")
 	Boolean enableWarehouseSortingPrivate();
-	
+
 	@Key("OfflineTradeEnable")
 	Boolean offlineTradeEnable();
-	
+
 	@Key("OfflineCraftEnable")
 	Boolean offlineCraftEnable();
-	
+
 	@Key("OfflineModeInPeaceZone")
 	Boolean offlineModeInPeaceZone();
-	
+
 	@Key("OfflineModeNoDamage")
 	Boolean offlineModeNoDamage();
-	
+
 	@Key("OfflineSetNameColor")
 	Boolean offlineSetNameColor();
-	
+
 	@Key("OfflineNameColor")
 	@ConverterClass(ColorConverter.class)
 	Integer getOfflineNameColor();
-	
+
 	@Key("OfflineFame")
 	Boolean offlineFame();
-	
+
 	@Key("RestoreOffliners")
 	Boolean restoreOffliners();
-	
+
 	@Key("OfflineMaxDays")
 	Integer getOfflineMaxDays();
-	
+
 	@Key("OfflineDisconnectFinished")
 	Boolean offlineDisconnectFinished();
-	
+
 	@Key("EnableManaPotionSupport")
 	Boolean enableManaPotionSupport();
-	
+
 	@Key("DisplayServerTime")
 	Boolean displayServerTime();
-	
+
 	@Key("ScreenWelcomeMessageEnable")
 	Boolean screenWelcomeMessageEnable();
-	
+
 	@Key("ScreenWelcomeMessageText")
 	String getScreenWelcomeMessageText();
-	
+
 	@Key("ScreenWelcomeMessageTime")
 	@ConverterClass(Seconds2MillisecondsConverter.class)
 	Integer getScreenWelcomeMessageTime();
-	
+
 	@Key("AntiFeedEnable")
 	Boolean antiFeedEnable();
-	
+
 	@Key("AntiFeedDualbox")
 	Boolean antiFeedDualbox();
-	
+
 	@Key("AntiFeedDisconnectedAsDualbox")
 	Boolean antiFeedDisconnectedAsDualbox();
-	
+
 	@Key("AntiFeedInterval")
 	Integer getAntiFeedInterval();
-	
+
 	@Key("AnnouncePkPvP")
 	Boolean announcePkPvP();
-	
+
 	@Key("AnnouncePkPvPNormalMessage")
 	Boolean announcePkPvPNormalMessage();
-	
+
 	@Key("AnnouncePkMsg")
 	String getAnnouncePkMsg();
-	
+
 	@Key("AnnouncePvpMsg")
 	String getAnnouncePvpMsg();
-	
+
 	@Key("ChatAdmin")
 	Boolean chatAdmin();
-	
+
 	@Key("HellboundStatus")
 	Boolean hellboundStatus();
-	
+
 	@Key("AutoLootVoiceEnable")
 	Boolean autoLootVoiceCommand();
-	
+
 	@Key("AutoLootVoiceRestore")
 	Boolean autoLootVoiceRestore();
-	
+
 	@Key("AutoLootItemsVoiceRestore")
 	Boolean autoLootItemsVoiceRestore();
-	
+
 	@Key("AutoLootHerbsVoiceRestore")
 	Boolean autoLootHerbsVoiceRestore();
-	
+
 	@Key("AutoLootHerbsList")
 	Set<Integer> getAutoLootHerbsList();
-	
+
 	@Key("AutoLootItemsList")
 	Set<Integer> getAutoLootItemsList();
-	
+
 	@Key("MultiLangEnable")
 	Boolean multiLangEnable();
-	
+
 	@Key("MultiLangDefault")
 	String getMultiLangDefault();
-	
+
 	@Key("MultiLangAllowed")
 	Set<String> getMultiLangAllowed();
-	
+
 	@Key("MultiLangVoiceCommand")
 	Boolean multiLangVoiceCommand();
-	
+
 	@Key("MultiLangSystemMessageEnable")
 	Boolean multiLangSystemMessageEnable();
-	
+
 	@Key("MultiLangSystemMessageAllowed")
 	List<String> getMultiLangSystemMessageAllowed();
-	
+
 	@Key("MultiLangNpcStringEnable")
 	Boolean multiLangNpcStringEnable();
-	
+
 	@Key("MultiLangNpcStringAllowed")
 	List<String> getMultiLangNpcStringAllowed();
-	
+
 	@Key("L2WalkerProtection")
 	Boolean l2WalkerProtection();
-	
+
 	@Key("DebugVoiceCommand")
 	Boolean debugVoiceCommand();
-	
+
 	@Key("DualboxCheckMaxPlayersPerIP")
 	Integer getDualboxCheckMaxPlayersPerIP();
-	
+
 	@Key("DualboxCheckMaxOlympiadParticipantsPerIP")
 	Integer getDualboxCheckMaxOlympiadParticipantsPerIP();
-	
+
 	@Key("DualboxCheckMaxL2EventParticipantsPerIP")
 	Integer getDualboxCheckMaxL2EventParticipantsPerIP();
-	
+
 	@Key("DualboxCheckWhitelist")
 	@ConverterClass(IPLimitConverter.class)
 	Map<Integer, Integer> getDualboxCheckWhitelist();
-	
+
 	@Key("AllowChangePassword")
 	Boolean allowChangePassword();
+
+	@Key("PvpZoneTime")
+	Integer getPvpZoneTime();
+	@Key("PvpZoneReviveDelay")
+	Integer getPvpzoneReviveDelay();
+
+	@Key("FarmZoneTime")
+	Integer getFarmZoneTime();
+
+	@Key("MonsterCount")
+	Integer getMonsterCount();
+
+	@Key("PrimaryRaidbossSpawnRate")
+	Integer getPrimaryRaidBossSpawnRate();
+
+	@Key("SecondaryRaidBossSpawnRate")
+	Integer getSecondaryRaidBossRate();
+
+	@Key("RewardFactorForMinion")
+	Float getRewardFactorForMinion();
+
+	@Key("BuffCancellationTime")
+	Integer getBuffCancellationTime();
+
+	@Key("RankingBoardRefreshTime")
+	Integer getRankingBoardRefreshTime();
+
+	@Key("SupportSkills")
+	Set<Integer> getSupportSkills();
 }

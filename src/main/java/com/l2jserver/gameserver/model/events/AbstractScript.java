@@ -199,6 +199,9 @@ public abstract class AbstractScript implements INamable {
 					if (annotation instanceof Id) {
 						final Id npc = (Id) annotation;
 						for (int id : npc.value()) {
+							if(id==24180001){
+								System.out.println("stop" );
+							}
 							ids.add(id);
 						}
 					} else if (annotation instanceof Ids) {

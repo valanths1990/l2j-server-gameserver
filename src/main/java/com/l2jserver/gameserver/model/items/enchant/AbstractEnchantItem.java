@@ -51,7 +51,8 @@ public abstract class AbstractEnchantItem {
 	private final CrystalType _grade;
 	private final int _maxEnchantLevel;
 	private final double _bonusRate;
-	
+	private final int increaseEnchant;
+
 	public AbstractEnchantItem(StatsSet set) {
 		_id = set.getInt("id");
 		if (getItem() == null) {
@@ -62,8 +63,12 @@ public abstract class AbstractEnchantItem {
 		_grade = set.getEnum("targetGrade", CrystalType.class, CrystalType.NONE);
 		_maxEnchantLevel = set.getInt("maxEnchant", 65535);
 		_bonusRate = set.getDouble("bonusRate", 0);
+		increaseEnchant=set.getInt("increaseEnchant",1);
 	}
-	
+
+	public int getIncreaseEnchant() {
+		return increaseEnchant;
+	}
 	/**
 	 * @return id of current item
 	 */

@@ -20,6 +20,7 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import java.util.logging.Level;
 
+import com.l2jserver.gameserver.BypassHasher;
 import com.l2jserver.gameserver.cache.HtmCache;
 import com.l2jserver.gameserver.enums.HtmlActionScope;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
@@ -122,8 +123,9 @@ public abstract class AbstractHtmlPacket extends L2GameServerPacket {
 		if (_disabledValidation) {
 			return;
 		}
-		
 		Util.buildHtmlActionCache(player, getScope(), _npcObjId, _html);
+		_html = BypassHasher.getInstance().hashBypassesFromHtml(_html);
+
 	}
 	
 	public final int getNpcObjId() {

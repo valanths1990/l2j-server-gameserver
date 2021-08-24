@@ -125,4 +125,7 @@ public class ZoneCylinder extends L2ZoneForm {
 			GeoData.getInstance().getHeight((int) x, (int) y, _z1)
 		};
 	}
+	public int getRadius(){
+		return _rad;
+	}
 }
