@@ -2,15 +2,19 @@ package com.l2jserver.gameserver.custom.skin;
 
 import com.l2jserver.commons.database.ConnectionFactory;
 import com.l2jserver.gameserver.ThreadPoolManager;
+import com.l2jserver.gameserver.datatables.ItemTable;
 import com.l2jserver.gameserver.handler.ItemHandler;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.Containers;
 import com.l2jserver.gameserver.model.events.EventType;
 import com.l2jserver.gameserver.model.events.listeners.ConsumerEventListener;
+import com.l2jserver.gameserver.model.items.L2ArmorSkin;
+import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.ArmorType;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,12 +22,14 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class SkinManager {
 
 	private final Map<Integer, PlayerWearingSkins> playersWearingSkins = new ConcurrentHashMap<>();
 	private final Map<Integer, List<SkinHolder>> playersSkins = new ConcurrentHashMap<>();
 	private final Map<Integer, PlayerSkinConfig> playersSkinConfig = new ConcurrentHashMap<>();
+	private final Map<BodyPart, List<L2Item>> skins = new HashMap<>();
 	private static final Map<Integer, String> types = new HashMap<>();
 
 	static {
@@ -31,8 +37,8 @@ public class SkinManager {
 		types.put(0x0400, "chest");
 		types.put(0x0800, "legs");
 		types.put(0x1000, "feet");
-		types.put(0x8000, "alldress");
-		types.put(0x020000, "onepiece");
+		types.put(0x8000, "chest"); // alldress
+		//		types.put(0x020000, "onepiece");
 		types.put(0x0080, "rhand");
 		types.put(0x0100, "lhand");
 		types.put(0x4000, "lrhand");
@@ -40,33 +46,82 @@ public class SkinManager {
 
 	private SkinManager() {
 		load();
-		ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(this::saveAll, 10, 10, TimeUnit.MINUTES);
+		ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(this::saveAll, 10, 10, TimeUnit.SECONDS);
 		Containers.Global().addListener(new ConsumerEventListener(Containers.Global(), EventType.ON_GAME_SHUTDOWN, e -> saveAll(), this));
 		ItemHandler.getInstance().registerHandler(new SkinItemHandler());
+
+		ItemTable.getInstance().getArmorSkin().forEach((key, value) -> {
+			BodyPart p = BodyPart.valueOf(((ArmorType) value.getItemType()).name().toUpperCase() + types.get(value.getBodyPart()).toUpperCase());
+			skins.computeIfAbsent(p, k -> new ArrayList<>()).add(value);
+		});
+		ItemTable.getInstance().getWeaponSkin().forEach((key, value) -> {
+			try {
+
+				BodyPart p = BodyPart.valueOf(((WeaponType) value.getItemType()).name().toUpperCase() + types.get(value.getBodyPart()).toUpperCase());
+				skins.computeIfAbsent(p, k -> new ArrayList<>()).add(value);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+
+		skins.forEach((k, v) -> {
+			v.forEach(i -> {
+				SkinHolder s = new SkinHolder(268481322, i.getId(), k, i.getIcon());
+				playersSkins.get(268481322).add(s);
+			});
+		});
+	}
+
+	public void addNewSkinForPlayer(L2PcInstance pc, SkinHolder skin) {
+		playersSkins.computeIfAbsent(pc.getObjectId(), k -> new ArrayList<>()).add(skin);
+	}
+
+	public List<SkinHolder> getPlayersSkinsByBodyPart(L2PcInstance pc, BodyPart bodyPart) {
+		return playersSkins.computeIfAbsent(pc.getObjectId(), k -> new ArrayList<>()).stream().filter(s -> s.getSkinPart() == bodyPart).collect(Collectors.toList());
+	}
+
+	public List<L2Item> getAllSkins(BodyPart bodypart) {
+		if (!skins.containsKey(bodypart))
+			return Collections.emptyList();
+		List<L2Item> bodySkins = skins.get(bodypart);
+		bodySkins.sort(Comparator.comparing(L2Item::getCrystalType));
+		return bodySkins;
 	}
 
 	public int getWearingSkin(L2PcInstance pc, L2ItemInstance equippedItem) {
 		if (equippedItem == null || !types.containsKey(equippedItem.getItem().getBodyPart()) || pc.isInOlympiadMode()) {
 			return -1;
 		}
-		BodyPart bodyPart = null;
-		if (equippedItem.getItemType() instanceof ArmorType) {
-			ArmorType armorType = (ArmorType) equippedItem.getItemType();
-			bodyPart = BodyPart.valueOf(armorType.name().toUpperCase() + types.get(equippedItem.getItem().getBodyPart()).toUpperCase());
-		}
-		if (equippedItem.getItemType() instanceof WeaponType) {
-			WeaponType weaponType = (WeaponType) equippedItem.getItemType();
-			bodyPart = BodyPart.valueOf(weaponType.name() + types.get(equippedItem.getItem().getBodyPart()));
-		}
-		if (bodyPart == null) {
+		Optional<BodyPart> bodyPart = getBodyPartFromL2Item(equippedItem.getItem());
+
+		if (bodyPart.isEmpty()) {
 			return -1;
 		}
-		Optional<SkinHolder> skinHolder = playersWearingSkins.computeIfAbsent(pc.getObjectId(), k -> new PlayerWearingSkins(pc.getObjectId())).getBodyPart(bodyPart);
+		Optional<SkinHolder> skinHolder = playersWearingSkins.computeIfAbsent(pc.getObjectId(), k -> new PlayerWearingSkins(pc.getObjectId())).getBodyPart(bodyPart.get());
 		return skinHolder.map(SkinHolder::getSkinId).orElse(-1);
 	}
 
-	public List<SkinHolder> getPlayersAllSkin(L2PcInstance pc) {
-		return null;// playersSkins.getOrDefault(pc, Collections.<SkinHolder>emptyList());
+	public static Optional<BodyPart> getBodyPartFromL2Item(L2Item item) {
+		BodyPart bodyPart = null;
+		if (item.getItemType() instanceof ArmorType) {
+			ArmorType armorType = (ArmorType) item.getItemType();
+			if (armorType == ArmorType.NONE) {
+				return Optional.empty();
+			}
+			bodyPart = BodyPart.valueOf(armorType.name().toUpperCase() + types.get(item.getBodyPart()).toUpperCase());
+		}
+		if (item.getItemType() instanceof WeaponType) {
+			WeaponType weaponType = (WeaponType) item.getItemType();
+			if (weaponType == WeaponType.NONE) {
+				return Optional.empty();
+			}
+			bodyPart = BodyPart.valueOf(weaponType.name() + types.get(item.getBodyPart()).toUpperCase());
+		}
+		return Optional.ofNullable(bodyPart);
+	}
+
+	public PlayerWearingSkins getPlayerWearingSkins(L2PcInstance pc) {
+		return playersWearingSkins.computeIfAbsent(pc.getObjectId(), k -> new PlayerWearingSkins(pc.getObjectId()));// playersSkins.getOrDefault(pc, Collections.<SkinHolder>emptyList());
 	}
 
 	public Visibility isEnabled(L2PcInstance pc) {
@@ -108,34 +163,50 @@ public class SkinManager {
 
 	}
 
-	public void addNewSkin(L2PcInstance pc, SkinHolder skin) {
-		if (skin == null || pc == null)
-			return;
-		//		playersSkins.computeIfAbsent(pc.getObjectId(), (key) -> new ArrayList<>()).add(skin);
-	}
-
 	private void saveAll() {
-		//		try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-		//			try (PreparedStatement st = con.prepareStatement("INSERT IGNORE INTO player_skins(char_id,skin_id,skin_part) values ( ? , ? , ?)")) {
-		//				playersSkins.forEach((key, value) -> value.forEach(ps -> {
-		//					try {
-		//						st.setInt(1, ps.getObjectId());
-		//						st.setInt(2, ps.getSkinId());
-		//						st.setString(3, ps.getSkinPart().name());
-		//						st.addBatch();
-		//					} catch (SQLException e) {
-		//						e.printStackTrace();
-		//					}
-		//				}));
-		//				st.executeBatch();
-		//			}
-		//			try (
-		//				PreparedStatement st = con.prepareStatement("INSERT INTO player_skin(char_id,visibility,heavy_chest,heavy_legs,heavy_feet,heavy_gloves,light_chest" + ",light_legs,light_feet,light_gloves,robe_chest,robe_legs,robe_feet,robe_gloves,sigil,shield,blunt,pole,sword,bow,dagger,crossbow,rapier" + ",ancientsword,dualfist,dualdagger,dual,alldress,onepiece) " + "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" + "on duplicate key update heavy_chest = ? and heavy_legs = ? and heavy_feet = ? and heavy_gloves = ? and light_chest = ? and light_legs = ? and light_feet = ? and light_gloves = ? and robe_chest = ? and robe_legs" + " = ? and robe_feet = ? and robe_gloves = ? and sigil = ? and shield = ? and blunt = ?" + " and pole = ? and sword = ? and bow = ? and dagger = ? and crossbow = ? and rapier = ? and ancientsword = ? and dualfist = ? and dualdagger = ? and dual = ? " + "and alldress = ? and onepiece = ? and visibility = ?")) {
-		//				st.executeBatch();
-		//			}
-		//		} catch (SQLException e) {
-		//			e.printStackTrace();
-		//		}
+		try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+			try (PreparedStatement st = con.prepareStatement("INSERT IGNORE INTO player_skins(char_id,skin_id,skin_part,icon) values ( ? , ? , ?, ?)")) {
+				playersSkins.forEach((key, value) -> value.forEach(ps -> {
+					try {
+						st.setInt(1, ps.getObjectId());
+						st.setInt(2, ps.getSkinId());
+						st.setString(3, ps.getSkinPart().name());
+						st.setString(4, ps.getIcon());
+						st.addBatch();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}));
+				st.executeBatch();
+			}
+			try (
+				PreparedStatement st = con.prepareStatement("INSERT INTO player_wearing_skin(char_id,skin_id,skin_part) VALUES (?,?,?)" + "ON DUPLICATE KEY UPDATE skin_id = ? AND skin_part = ?")) {
+
+				playersWearingSkins.forEach((k, v) -> {
+
+					v.getPlayersWearingSkins().forEach((bodyPart, skin) -> {
+						try {
+							st.execute("DELETE FROM player_wearing_skin where char_id = " + k);
+							st.setInt(1, k);
+							st.setInt(2, skin.getSkinId());
+							st.setString(3, bodyPart.name());
+
+							st.setInt(4, skin.getSkinId());
+							st.setString(5, bodyPart.name());
+
+							st.addBatch();
+						} catch (SQLException ex) {
+							ex.printStackTrace();
+						}
+					});
+
+				});
+
+				st.executeBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static SkinManager getInstance() {

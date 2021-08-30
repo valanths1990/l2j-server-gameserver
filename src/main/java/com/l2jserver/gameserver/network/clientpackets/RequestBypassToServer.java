@@ -100,6 +100,10 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 			return;
 		}
 
+		if(_command.contains("%objectId%")){
+
+		}
+
 		boolean requiresBypassValidation = true;
 		for (String possibleNonHtmlCommand : _possibleNonHtmlCommands) {
 			if (_command.startsWith(possibleNonHtmlCommand)) {

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
+import com.l2jserver.gameserver.model.items.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +46,6 @@ import com.l2jserver.gameserver.model.actor.instance.L2EventMonsterInstance;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.EventDispatcher;
 import com.l2jserver.gameserver.model.events.impl.item.OnItemCreate;
-import com.l2jserver.gameserver.model.items.L2Armor;
-import com.l2jserver.gameserver.model.items.L2EtcItem;
-import com.l2jserver.gameserver.model.items.L2Item;
-import com.l2jserver.gameserver.model.items.L2Weapon;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.util.GMAudit;
 
@@ -70,6 +67,10 @@ public class ItemTable {
 	private final Map<Integer, L2Armor> _armors = new HashMap<>();
 	
 	private final Map<Integer, L2Weapon> _weapons = new HashMap<>();
+
+	private final Map<Integer,L2ArmorSkin> armorSkin = new HashMap<>();
+
+	private final Map<Integer,L2WeaponSkin> weaponSkin = new HashMap<>();
 	
 	static {
 		SLOTS.put("shirt", L2Item.SLOT_UNDERWEAR);
@@ -131,8 +132,14 @@ public class ItemTable {
 				_etcItems.put(item.getId(), (L2EtcItem) item);
 			} else if (item instanceof L2Armor) {
 				_armors.put(item.getId(), (L2Armor) item);
-			} else {
+			} else if(item instanceof L2Weapon) {
 				_weapons.put(item.getId(), (L2Weapon) item);
+			}
+			else if(item instanceof L2ArmorSkin){
+					armorSkin.put(item.getId(),(L2ArmorSkin) item);
+			}
+			else {
+					weaponSkin.put(item.getId(),(L2WeaponSkin) item);
 			}
 		}
 		
@@ -350,7 +357,15 @@ public class ItemTable {
 	public int getArraySize() {
 		return _allTemplates.length;
 	}
-	
+
+	public Map<Integer, L2ArmorSkin> getArmorSkin() {
+		return armorSkin;
+	}
+
+	public Map<Integer, L2WeaponSkin> getWeaponSkin() {
+		return weaponSkin;
+	}
+
 	private static class SingletonHolder {
 		protected static final ItemTable _instance = new ItemTable();
 	}

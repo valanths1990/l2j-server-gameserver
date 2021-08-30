@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerWearingSkins {
 
-
 	private final int objectId;
 	private final Map<BodyPart, SkinHolder> wearingParts;
 
@@ -18,36 +17,22 @@ public class PlayerWearingSkins {
 		this.objectId = objectId;
 		this.wearingParts = new ConcurrentHashMap<>();
 	}
+	public void changeSkin(BodyPart bodyPart, SkinHolder skin){
+		wearingParts.remove(BodyPart.ALLDRESS);
+		wearingParts.put(bodyPart,skin);
+	}
 
 	public Optional<SkinHolder> getBodyPart(BodyPart bodyPart) {
-
-		//		BodyPart bodyPart = null;
-		//		if (item.getItem().getType2() == ItemType2.SHIELD_ARMOR) {
-		//			ArmorType type = (ArmorType) item.getItemType();
-		//			bodyPart = BodyPart.valueOf(type.name().toLowerCase());
-		//			if (type != ArmorType.SHIELD && type != ArmorType.SIGIL) {
-		//				int allDress = wearingBodyParts.get(BodyPart.alldress);
-		//				if (allDress > 0) {
-		//					return allDress;
-		//				}
-		//				bodyPart = BodyPart.valueOf(type.name() + "_" + types.get(item.getItem().getBodyPart()));
-		//			}
-		//
-		//		}
-		//		if (item.getItem().getType2() == ItemType2.WEAPON) {
-		//			WeaponType type = (WeaponType) item.getItemType();
-		//			bodyPart = BodyPart.valueOf(type.name() + types.get(item.getItem().getBodyPart()));
-		//		}
-		//		if (bodyPart == null)
-		//			return item.getDisplayId();
-		//		Integer id = wearingBodyParts.get(bodyPart);
-		//		return id == null || id == -1 ? item.getDisplayId() : id;
-		return null;
+		if (BodyPart.isArmor(bodyPart) && wearingParts.containsKey(BodyPart.ALLDRESS)) {
+			bodyPart = BodyPart.ALLDRESS;
+		}
+		return Optional.ofNullable(wearingParts.get(bodyPart));
 	}
 
 	public Map<BodyPart, SkinHolder> getPlayersWearingSkins() {
 		return Collections.unmodifiableMap(this.wearingParts);
 	}
+
 	public int getObjectId() {
 		return objectId;
 	}
