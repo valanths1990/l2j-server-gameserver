@@ -1,13 +1,13 @@
 package com.l2jserver.gameserver.custom.skin;
 
+import java.util.Objects;
+
 public class SkinHolder {
 
 	private int objectId;
 	private int skinId;
 	private BodyPart skinPart;
 	private String icon;
-
-
 
 	public SkinHolder(int objectId,int skinId ,BodyPart skinPart,String icon){
 		this.objectId = objectId;
@@ -44,5 +44,18 @@ public class SkinHolder {
 	}
 	public void setSkinPart(BodyPart skinPart) {
 		this.skinPart = skinPart;
+	}
+
+	@Override public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		SkinHolder that = (SkinHolder) o;
+		return objectId == that.objectId && skinId == that.skinId && skinPart == that.skinPart && Objects.equals(icon, that.icon);
+	}
+
+	@Override public int hashCode() {
+		return Objects.hash(objectId, skinId, skinPart, icon);
 	}
 }

@@ -19,11 +19,15 @@
 package com.l2jserver.gameserver.model.zone.type;
 
 import com.l2jserver.gameserver.GameServer;
+import com.l2jserver.gameserver.model.Location;
 import com.l2jserver.gameserver.model.TeleportWhereType;
 import com.l2jserver.gameserver.model.actor.L2Character;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.zone.L2ZoneType;
 import com.l2jserver.gameserver.model.zone.ZoneId;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple no restart zone
@@ -33,11 +37,39 @@ public class L2NoRestartZone extends L2ZoneType {
 	private int _restartAllowedTime = 0;
 	private int _restartTime = 0;
 	private boolean _enabled = true;
-	
+	private Location towerLocation;
+	private Location entranceLocation;
+	private List<Location> spawns=new ArrayList<>();
+	public Location getTowerLocation() {
+		return towerLocation;
+	}
+
+	public Location getEntranceLocation() {
+		return entranceLocation;
+	}
+
 	public L2NoRestartZone(int id) {
 		super(id);
 	}
-	
+
+	public void parseLoc(int x, int y, int z, String type,String spawnName) {
+
+		switch (type){
+			case "towerSpawn"->{
+					towerLocation = new Location(x,y,z,-1);
+			}
+			case "entrance"->{
+					entranceLocation = new Location(x,y,z,-1);
+			}
+			default -> {
+				if(spawnName!=null && !spawnName.isEmpty()){
+						spawns.add(new Location(x,y,z,spawnName));
+				}
+			}
+		}
+
+	}
+
 	@Override
 	public void setParameter(String name, String value) {
 		if (name.equalsIgnoreCase("default_enabled")) {
@@ -100,5 +132,8 @@ public class L2NoRestartZone extends L2ZoneType {
 	
 	public void setRestartTime(int time) {
 		_restartTime = time;
+	}
+	public List<Location> getSpawns(){
+		return spawns;
 	}
 }

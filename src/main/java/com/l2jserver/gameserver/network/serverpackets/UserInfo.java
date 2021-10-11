@@ -120,7 +120,7 @@ public final class UserInfo extends L2GameServerPacket {
 			if (equippedItem != null && (v== Visibility.MINE || v == Visibility.ALL)) {
 				actualItem = SkinManager.getInstance().getWearingSkin(_activeChar, equippedItem);
 			}
-			if(actualItem == -1){
+			if((actualItem == -1 || actualItem==0) && equippedItem!=null){
 					actualItem = equippedItem.getDisplayId();
 			}
 			writeD(actualItem);

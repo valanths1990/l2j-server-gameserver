@@ -720,6 +720,7 @@ public class L2VillageMasterInstance extends L2NpcInstance {
 		final L2Clan clan = player.getClan();
 		clan.setDissolvingExpiryTime(0);
 		clan.updateClanInDB();
+		player.sendMessage("Your Clan has been restored.");
 	}
 	
 	private static void createSubPledge(L2PcInstance player, String clanName, String leaderName, int pledgeType, int minClanLvl) {

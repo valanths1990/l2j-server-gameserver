@@ -22,12 +22,17 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.aeonbits.owner.Config.HotReloadType.ASYNC;
 import static org.aeonbits.owner.Config.LoadType.MERGE;
 
+import com.l2jserver.gameserver.config.converter.WeekHourConverter;
 import org.aeonbits.owner.Config.HotReload;
 import org.aeonbits.owner.Config.LoadPolicy;
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.Reloadable;
 
 import com.l2jserver.gameserver.config.converter.Minutes2MillisecondsConverter;
+
+import java.time.DayOfWeek;
+import java.time.temporal.WeekFields;
+import java.util.Map;
 
 /**
  * Grand Boss Configuration.
@@ -95,4 +100,11 @@ public interface GrandBossConfiguration extends Reloadable {
 	
 	@Key("BelethMinPlayers")
 	Integer getBelethMinPlayers();
+
+	@Key("GrandbossSpawnTimes")
+	@ConverterClass(WeekHourConverter.class)
+	Map<DayOfWeek,Integer> getGrandbossSpawnTimes();
+
+	@Key("GrandBossAliveTime")
+	Integer getGrandBossAliveTime();
 }

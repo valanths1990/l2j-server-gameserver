@@ -88,7 +88,7 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 
 	@Override
 	protected void runImpl() {
-		System.out.println(_command);
+//		System.out.println(_command);
 		final L2PcInstance activeChar = getClient().getActiveChar();
 		if (activeChar == null) {
 			return;
@@ -98,10 +98,6 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 			_log.warning("Player " + activeChar.getName() + " sent empty bypass!");
 			activeChar.logout();
 			return;
-		}
-
-		if(_command.contains("%objectId%")){
-
 		}
 
 		boolean requiresBypassValidation = true;

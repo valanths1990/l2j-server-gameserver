@@ -7,14 +7,14 @@ import com.l2jserver.gameserver.handler.ItemHandler;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.events.Containers;
 import com.l2jserver.gameserver.model.events.EventType;
+import com.l2jserver.gameserver.model.events.impl.IBaseEvent;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerLogin;
 import com.l2jserver.gameserver.model.events.listeners.ConsumerEventListener;
-import com.l2jserver.gameserver.model.items.L2ArmorSkin;
 import com.l2jserver.gameserver.model.items.L2Item;
 import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.items.type.ArmorType;
 import com.l2jserver.gameserver.model.items.type.WeaponType;
 
-import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SkinManager {
@@ -38,12 +40,11 @@ public class SkinManager {
 		types.put(0x0800, "legs");
 		types.put(0x1000, "feet");
 		types.put(0x8000, "chest"); // alldress
-		//		types.put(0x020000, "onepiece");
+		types.put(0x020000, "alldress");
 		types.put(0x0080, "rhand");
 		types.put(0x0100, "lhand");
 		types.put(0x4000, "lrhand");
 	}
-
 	private SkinManager() {
 		load();
 		ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(this::saveAll, 10, 10, TimeUnit.SECONDS);
@@ -51,23 +52,35 @@ public class SkinManager {
 		ItemHandler.getInstance().registerHandler(new SkinItemHandler());
 
 		ItemTable.getInstance().getArmorSkin().forEach((key, value) -> {
-			BodyPart p = BodyPart.valueOf(((ArmorType) value.getItemType()).name().toUpperCase() + types.get(value.getBodyPart()).toUpperCase());
-			skins.computeIfAbsent(p, k -> new ArrayList<>()).add(value);
+			try {
+				String armorType = "";
+				if ((armorType = ((ArmorType) value.getItemType()).name().toUpperCase()).equals("NONE")) {
+					armorType = "";
+				}
+				BodyPart p = BodyPart.valueOf((armorType + types.get(value.getBodyPart()).toUpperCase()));
+				skins.computeIfAbsent(p, k -> new ArrayList<>()).add(value);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
 		ItemTable.getInstance().getWeaponSkin().forEach((key, value) -> {
 			try {
-
 				BodyPart p = BodyPart.valueOf(((WeaponType) value.getItemType()).name().toUpperCase() + types.get(value.getBodyPart()).toUpperCase());
 				skins.computeIfAbsent(p, k -> new ArrayList<>()).add(value);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
+		Containers.Players().addListener(new ConsumerEventListener(Containers.Players(), EventType.ON_PLAYER_LOGIN, this::onLogin, this));
 
+	}
+
+	public void onLogin(IBaseEvent event) {
+		OnPlayerLogin onLogin = (OnPlayerLogin) event;
 		skins.forEach((k, v) -> {
 			v.forEach(i -> {
-				SkinHolder s = new SkinHolder(268481322, i.getId(), k, i.getIcon());
-				playersSkins.get(268481322).add(s);
+				SkinHolder s = new SkinHolder(onLogin.getActiveChar().getObjectId(), i.getId(), k, i.getIcon());
+				//playersSkins.computeIfAbsent(onLogin.getActiveChar().getObjectId(),kk->new ArrayList<>()).add(s);
 			});
 		});
 	}
@@ -102,22 +115,21 @@ public class SkinManager {
 	}
 
 	public static Optional<BodyPart> getBodyPartFromL2Item(L2Item item) {
-		BodyPart bodyPart = null;
 		if (item.getItemType() instanceof ArmorType) {
 			ArmorType armorType = (ArmorType) item.getItemType();
 			if (armorType == ArmorType.NONE) {
 				return Optional.empty();
 			}
-			bodyPart = BodyPart.valueOf(armorType.name().toUpperCase() + types.get(item.getBodyPart()).toUpperCase());
+		return BodyPart.getBodyPart(armorType.name().toUpperCase() + types.get(item.getBodyPart()).toUpperCase());
 		}
 		if (item.getItemType() instanceof WeaponType) {
 			WeaponType weaponType = (WeaponType) item.getItemType();
 			if (weaponType == WeaponType.NONE) {
 				return Optional.empty();
 			}
-			bodyPart = BodyPart.valueOf(weaponType.name() + types.get(item.getBodyPart()).toUpperCase());
+			return BodyPart.getBodyPart(weaponType.name() + types.get(item.getBodyPart()).toUpperCase());
 		}
-		return Optional.ofNullable(bodyPart);
+		return Optional.empty();
 	}
 
 	public PlayerWearingSkins getPlayerWearingSkins(L2PcInstance pc) {
@@ -127,7 +139,9 @@ public class SkinManager {
 	public Visibility isEnabled(L2PcInstance pc) {
 		return playersSkinConfig.computeIfAbsent(pc.getObjectId(), k -> new PlayerSkinConfig(pc.getObjectId(), Visibility.ALL)).getVisibility();
 	}
-
+	public void setVisibility(L2PcInstance pc, Visibility newVisibility){
+		playersSkinConfig.computeIfAbsent(pc.getObjectId(),k->new PlayerSkinConfig(pc.getObjectId(),newVisibility)).setVisibility(newVisibility);
+	}
 	private void load() {
 		int objectId;
 		try (Connection con = ConnectionFactory.getInstance().getConnection()) {

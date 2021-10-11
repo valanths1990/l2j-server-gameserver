@@ -21,6 +21,7 @@ package com.l2jserver.gameserver.data.sql.impl;
 import static com.l2jserver.gameserver.config.Configuration.customs;
 import static com.l2jserver.gameserver.enums.PrivateStoreType.NONE;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 
 import org.slf4j.Logger;
@@ -51,7 +52,8 @@ public class OfflineTradersTable {
 	private static final String LOAD_OFFLINE_STATUS = "SELECT * FROM character_offline_trade";
 	
 	private static final String LOAD_OFFLINE_ITEMS = "SELECT * FROM character_offline_trade_items WHERE charId = ?";
-	
+
+
 	public void storeOffliners() {
 		try (var con = ConnectionFactory.getInstance().getConnection();
 			var stm1 = con.prepareStatement(CLEAR_OFFLINE_TABLE);

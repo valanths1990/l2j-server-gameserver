@@ -21,6 +21,9 @@ package com.l2jserver.gameserver.network.clientpackets;
 import com.l2jserver.gameserver.model.ClanPrivilege;
 import com.l2jserver.gameserver.model.L2ClanMember;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
+import com.l2jserver.gameserver.model.events.EventDispatcher;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTitleChange;
+import com.l2jserver.gameserver.model.events.returns.TerminateReturn;
 import com.l2jserver.gameserver.network.SystemMessageId;
 
 public class RequestGiveNickName extends L2GameClientPacket {
@@ -41,7 +44,11 @@ public class RequestGiveNickName extends L2GameClientPacket {
 		if (activeChar == null) {
 			return;
 		}
-		
+		TerminateReturn terminator = EventDispatcher.getInstance().notifyEvent(new OnPlayerTitleChange(activeChar,activeChar.getTitle(),_title), activeChar, TerminateReturn.class);
+		if (terminator != null && terminator.abort()) {
+			activeChar.sendMessage("You cannot change your title.");
+			return;
+		}
 		// Noblesse can bestow a title to themselves
 		if (activeChar.isNoble() && _target.equalsIgnoreCase(activeChar.getName())) {
 			activeChar.setTitle(_title);

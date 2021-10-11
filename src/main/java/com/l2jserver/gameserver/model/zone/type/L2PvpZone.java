@@ -39,7 +39,7 @@ public class L2PvpZone extends L2ZoneRespawn {
 		pc.sendPacket(SystemMessageId.ENTERED_COMBAT_ZONE);
 		pc.setInsideZone(ZoneId.PVP, true);
 		pc.setInsideZone(ZoneId.PEACE, false);
-		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneEnter(pc, this), Containers.Players());
+//		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneEnter(pc, this), Containers.Players());
 	}
 
 	@Override protected void onExit(L2Character character) {
@@ -49,7 +49,7 @@ public class L2PvpZone extends L2ZoneRespawn {
 		L2PcInstance pc = (L2PcInstance) character;
 		pc.setInsideZone(ZoneId.PVP, false);
 		pc.sendPacket(SystemMessageId.LEFT_COMBAT_ZONE);
-		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneExit(pc, this), Containers.Players());
+//		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneExit(pc, this), Containers.Players());
 	}
 
 	@Override public void onDieInside(L2Character character) {
@@ -74,7 +74,10 @@ public class L2PvpZone extends L2ZoneRespawn {
 			L2PcInstance player = ((L2PcInstance) character);
 			player.sendPacket(new ExSendUIEvent(player, true, false, 0, 0, null));
 			if (noblessSkill != null) {
-				noblessSkill.applyEffects(player, player);
+				noblessSkill.applyEffects(player, player, true, 10800);
+				if(character.getSummon()!=null){
+					noblessSkill.applyEffects(player.getSummon(), player.getSummon(), true, 10800);
+				}
 			}
 		}
 	}
@@ -92,7 +95,7 @@ public class L2PvpZone extends L2ZoneRespawn {
 	}
 
 	private void displayReviveTime(L2PcInstance player) {
-		AtomicInteger reviveTime = new AtomicInteger(Configuration.customs().getPvpzoneReviveDelay().intValue());
+		AtomicInteger reviveTime = new AtomicInteger(Configuration.customs().getPvpzoneReviveDelay());
 		int delay = 1000;
 		int period = 1000;
 		Timer timer = new Timer();

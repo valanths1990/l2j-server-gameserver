@@ -1,25 +1,11 @@
 package com.l2jserver.gameserver.custom.skin;
 
-import com.l2jserver.gameserver.network.serverpackets.ExClosePartyRoom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public enum BodyPart {
-	HEAVYCHEST("icon.armor_t97_u_i00","Heavy Breastplate"),
-	HEAVYLEGS("icon.armor_t97_l_i00","Heavy Gaiters"),
-	HEAVYFEET("icon.armor_t97_b_i00","Heavy Boots"),
-	HEAVYGLOVES("icon.armor_t97_g_i00","Heavy Gloves"),
-	LIGHTCHEST("icon.armor_t98_u_i00","Light Chest"),
-	LIGHTLEGS("icon.armor_t98_l_i00","Light Legging"),
-	LIGHTFEET("icon.armor_t98_b_i00","Light Boots"),
-	LIGHTGLOVES("icon.armor_t98_g_i00","Light Gloves"),
-	MAGICCHEST("icon.armor_t99_u_i00","Robe Tunic"),
-	MAGICLEGS("icon.armor_t99_l_i00","Robe Stocking"),
-	MAGICFEET("icon.armor_t97_b_i00","Robe Shoes"),
-	MAGICGLOVES("icon.armor_t99_g_i00","Robe Gloves"),
-	SIGIL("icon.weapon_pricklelotus_i01","Sigil"),
-	SHIELD("icon.heavengate_shield_i01","Shield"),
 	SWORDRHAND("icon.weapon_incessantcore_sword_i01","Sword One Hand"),
 	SWORDLRHAND("icon.weapon_lavamond_saw_i00","Sword Two Hand"),
 	BLUNTRHAND("icon.weapon_expowder_mace_i00","Blunt One Hand"),
@@ -33,8 +19,21 @@ public enum BodyPart {
 	CROSSBOWLRHAND("icon.weapon_thorne_crossbow_i00","Crossbow"),
 	ANCIENTSWORDLRHAND("icon.weapon_pyseal_blade_i00","Ancientsword"),
 	RAPIERRHAND("icon.weapon_heavenstair_rapier_i00","Rapier"),
+	HEAVYCHEST("icon.armor_t97_u_i00","Heavy Breastplate"),
+	HEAVYLEGS("icon.armor_t97_l_i00","Heavy Gaiters"),
+	HEAVYFEET("icon.armor_t97_b_i00","Heavy Boots"),
+	HEAVYGLOVES("icon.armor_t97_g_i00","Heavy Gloves"),
+	LIGHTCHEST("icon.armor_t98_u_i00","Light Chest"),
+	LIGHTLEGS("icon.armor_t98_l_i00","Light Legging"),
+	LIGHTFEET("icon.armor_t98_b_i00","Light Boots"),
+	LIGHTGLOVES("icon.armor_t98_g_i00","Light Gloves"),
+	MAGICCHEST("icon.armor_t99_u_i00","Robe Tunic"),
+	MAGICLEGS("icon.armor_t99_l_i00","Robe Stocking"),
+	MAGICFEET("icon.armor_t99_b_i00","Robe Shoes"),
+	MAGICGLOVES("icon.armor_t99_g_i00","Robe Gloves"),
+	SIGILLHAND("icon.weapon_pricklelotus_i01","Sigil"),
+	SHIELDLHAND("icon.heavengate_shield_i01","Shield"),
 	ALLDRESS("icon.armor_t2000_ul_i00","Alldress");
-
 
 		public static final List<BodyPart> weapons = new ArrayList<>();
 		public static final List<BodyPart> armor = new ArrayList<>();
@@ -67,8 +66,8 @@ public enum BodyPart {
 				armor.add(MAGICFEET);
 				armor.add(MAGICGLOVES);
 
-				shield.add(SIGIL);
-				shield.add(SHIELD);
+				shield.add(SIGILLHAND);
+				shield.add(SHIELDLHAND);
 
 		}
 		private final String icon;
@@ -99,5 +98,15 @@ public enum BodyPart {
 		public static boolean isKaemelWeapon (BodyPart part){
 			return part == RAPIERRHAND || part == ANCIENTSWORDLRHAND || part == CROSSBOWLRHAND;
 		}
+		public static boolean isLightArmor(BodyPart part){
+			return part == LIGHTCHEST || part ==LIGHTFEET || part == LIGHTLEGS || part == LIGHTGLOVES;
+		}
+		public static Optional<BodyPart> getBodyPart(String bodyPart){
+			try{
+				return Optional.of(valueOf(bodyPart));
+			}catch (IllegalArgumentException ignored){
 
+			}
+			return Optional.empty();
+		}
 }

@@ -212,38 +212,38 @@ public final class GameServer {
 		GlobalVariablesManager.getInstance();
 
 		printSection("Data");
-		CategoryData.getInstance();
-		SecondaryAuthData.getInstance();
+//		CategoryData.getInstance();
+//		SecondaryAuthData.getInstance();
 
 		printSection("Effects");
 		EffectHandler.getInstance().executeScript();
 
 		printSection("Enchant Skill Groups");
-		EnchantSkillGroupsData.getInstance();
+//		EnchantSkillGroupsData.getInstance();
 
 		printSection("Skill Trees");
-		SkillTreesData.getInstance();
+		ThreadPoolManager.getInstance().scheduleGeneral(()->SkillTreesData.getInstance(),0); 						//this
 
 		printSection("Skills");
-		SkillData.getInstance();
+		ThreadPoolManager.getInstance().scheduleGeneral(()->SkillData.getInstance(),0); 							//this
 		SummonSkillsTable.getInstance();
 
 		printSection("Items");
-		ItemTable.getInstance();
-		EnchantItemGroupsData.getInstance();
-		EnchantItemData.getInstance();
-		EnchantItemOptionsData.getInstance();
-		OptionData.getInstance();
-		EnchantItemHPBonusData.getInstance();
-		MerchantPriceConfigTable.getInstance().loadInstances();
-		BuyListData.getInstance();
-		MultisellData.getInstance();
-		RecipeData.getInstance();
-		ArmorSetsData.getInstance();
-		FishData.getInstance();
-		FishingMonstersData.getInstance();
-		FishingRodsData.getInstance();
-		HennaData.getInstance();
+		ThreadPoolManager.getInstance().scheduleGeneral(()->ItemTable.getInstance(),0);							//this
+//		EnchantItemGroupsData.getInstance();				//this
+//		EnchantItemData.getInstance();
+//		EnchantItemOptionsData.getInstance();
+//		OptionData.getInstance();
+//		EnchantItemHPBonusData.getInstance();
+//		MerchantPriceConfigTable.getInstance().loadInstances();
+//		BuyListData.getInstance();
+//		MultisellData.getInstance();
+//		RecipeData.getInstance();
+//		ArmorSetsData.getInstance();
+//		FishData.getInstance();
+//		FishingMonstersData.getInstance();
+//		FishingRodsData.getInstance();
+//		HennaData.getInstance();
 
 		printSection("Characters");
 		ClassListData.getInstance();
@@ -273,9 +273,9 @@ public final class GameServer {
 		AuctionManager.getInstance();
 
 		printSection("Geodata");
-		GeoData.getInstance();
+		GeoData.getInstance();  //this
 		if (geodata().getPathFinding() > 0) {
-			PathFinding.getInstance();
+			PathFinding.getInstance(); //this
 		}
 
 		printSection("NPCs");
@@ -294,22 +294,22 @@ public final class GameServer {
 		ItemAuctionManager.getInstance();
 
 		printSection("Olympiad");
-		Olympiad.getInstance();
-		Hero.getInstance();
+//		Olympiad.getInstance();
+//		Hero.getInstance();
 
 		printSection("Seven Signs");
 		//		SevenSigns.getInstance();
 
 		// Call to load caches
 		printSection("Cache");
-		HtmCache.getInstance();
+		HtmCache.getInstance(); //this
 		CrestTable.getInstance();
 		TeleportLocationTable.getInstance();
 		UIData.getInstance();
 		PartyMatchWaitingList.getInstance();
 		PartyMatchRoomList.getInstance();
 		PetitionManager.getInstance();
-		AugmentationData.getInstance();
+		AugmentationData.getInstance();  				//this
 		CursedWeaponsManager.getInstance();
 		TransformData.getInstance();
 		BotReportTable.getInstance();
@@ -319,10 +319,10 @@ public final class GameServer {
 		GraciaSeedsManager.getInstance();
 
 		printSection("Handlers");
-		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/handlers/MasterHandler.java");
+		ThreadPoolManager.getInstance().scheduleGeneral(()->ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/handlers/MasterHandler.java"),0); //this
 
 		printSection("AI");
-		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/ai/AILoader.java");
+		ThreadPoolManager.getInstance().scheduleGeneral(()->ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/ai/AILoader.java"),0);  //this
 
 		printSection("Instances");
 		//ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/instances/InstanceLoader.java");
@@ -334,11 +334,17 @@ public final class GameServer {
 		//ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/hellbound/HellboundLoader.java");
 
 		printSection("Quests");
-		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/quests/QuestLoader.java");
+		ThreadPoolManager.getInstance().scheduleGeneral(()->ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/quests/QuestLoader.java"),0); //this
 		ScriptEngineManager.getInstance().executeScript("com/l2jserver/datapack/quests/TerritoryWarScripts/TerritoryWarSuperClass.java");
 
 		printSection("Scripts");
-		ScriptEngineManager.getInstance().executeScriptList(new File(server().getDatapackRoot(), "data/scripts.cfg"));
+		ThreadPoolManager.getInstance().scheduleGeneral(()-> {
+			try {
+				ScriptEngineManager.getInstance().executeScriptList(new File(server().getDatapackRoot(), "data/scripts.cfg"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		},0); //this
 
 		SpawnTable.getInstance().load();
 		DayNightSpawnManager.getInstance().trim().notifyChangeMode();

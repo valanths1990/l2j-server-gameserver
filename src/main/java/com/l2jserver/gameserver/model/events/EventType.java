@@ -34,11 +34,7 @@ import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillFinish
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSkillSee;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcSpawn;
 import com.l2jserver.gameserver.model.events.impl.character.npc.OnNpcTeleport;
-import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableAggroRangeEnter;
-import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableAttack;
-import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableFactionCall;
-import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableHate;
-import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.OnAttackableKill;
+import com.l2jserver.gameserver.model.events.impl.character.npc.attackable.*;
 import com.l2jserver.gameserver.model.events.impl.character.playable.OnPlayableExpChanged;
 import com.l2jserver.gameserver.model.events.impl.character.player.*;
 import com.l2jserver.gameserver.model.events.impl.character.player.clan.OnPlayerClanCreate;
@@ -86,7 +82,7 @@ public enum EventType {
 	ON_ATTACKABLE_ATTACK(OnAttackableAttack.class, void.class),
 	ON_ATTACKABLE_FACTION_CALL(OnAttackableFactionCall.class, void.class),
 	ON_ATTACKABLE_KILL(OnAttackableKill.class, void.class),
-
+	ON_GRANDBOSS_KILL(OnGrandBossKill.class,void.class),
 	// Castle events
 	ON_CASTLE_SIEGE_FINISH(OnCastleSiegeFinish.class, void.class),
 	ON_CASTLE_SIEGE_OWNER_CHANGE(OnCastleSiegeOwnerChange.class, void.class),
@@ -205,7 +201,7 @@ public enum EventType {
 	ON_PLAYER_PARTY_JOIN(OnPlayerPartyJoin.class,TerminateReturn.class),
 	ON_PLAYER_PARTY_LEAVE(OnPlayerPartyLeave.class,TerminateReturn.class),
 	ON_PLAYER_USE_TELEPORT_TO_LOCATION(OnPlayerUseTeleportToLocation.class,TerminateReturn.class),
-
+	ON_PLAYER_TITLE_CHANGE(OnPlayerTitleChange.class,TerminateReturn.class),
 	// Trap events
 	ON_TRAP_ACTION(OnTrapAction.class, void.class),
 

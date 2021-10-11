@@ -199,7 +199,6 @@ public abstract class L2ZoneRespawn extends L2ZoneType {
 	}
 
 	public final List<Location> getAllSpawns() {
-		List<Location> locs = Stream.of(Optional.ofNullable(_spawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(_otherSpawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(_chaoticSpawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(_banishSpawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(redStartPoint).orElse(Collections.emptyList()), Optional.ofNullable(blueStartPoint).orElse(Collections.emptyList())).flatMap(Collection::stream).collect(Collectors.toList());
-		return locs;
+		return Stream.of(Optional.ofNullable(_spawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(_otherSpawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(_chaoticSpawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(_banishSpawnLocs).orElse(Collections.emptyList()), Optional.ofNullable(redStartPoint).orElse(Collections.emptyList()), Optional.ofNullable(blueStartPoint).orElse(Collections.emptyList())).flatMap(Collection::stream).collect(Collectors.toList());
 	}
 }

@@ -42,6 +42,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.StampedLock;
 
 import com.l2jserver.gameserver.model.events.impl.character.*;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerPartyRequest;
+import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerTitleChange;
 import com.l2jserver.gameserver.model.events.impl.character.player.OnPlayerUseTeleportToLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

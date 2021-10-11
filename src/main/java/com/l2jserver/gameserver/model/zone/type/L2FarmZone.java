@@ -20,7 +20,7 @@ public class L2FarmZone extends L2ZoneRespawn {
 			return;
 		}
 		character.sendMessage("You have entered Farming zone.");
-		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneEnter(character, this),Containers.Players());
+//		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneEnter(character, this),Containers.Players());
 	}
 
 	@Override protected void onExit(L2Character character) {
@@ -28,7 +28,7 @@ public class L2FarmZone extends L2ZoneRespawn {
 			return;
 		}
 		character.sendMessage("You have left Farming zone.");
-		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneExit(character, this),Containers.Players());
+//		EventDispatcher.getInstance().notifyEventAsync(new OnCreatureZoneExit(character, this),Containers.Players());
 	}
 
 	@Override public void onDieInside(L2Character character) {

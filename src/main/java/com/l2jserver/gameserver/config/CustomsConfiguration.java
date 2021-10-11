@@ -324,4 +324,17 @@ public interface CustomsConfiguration extends Reloadable {
 
 	@Key("SupportSkills")
 	Set<Integer> getSupportSkills();
+
+	@Key("CaptureTowerId")
+	Integer getCaptureTowerId();
+
+	@Key("ResetTeleportToRaidBossTime")
+	Long getResetTeleportToRaidBossTime();
+
+	@Key("AugmentationItemId")
+	Integer getAugmentationItemId();
+
+	@Key("AugmentationItemAmount")
+	Long getAugmentationItemAmount();
+
 }

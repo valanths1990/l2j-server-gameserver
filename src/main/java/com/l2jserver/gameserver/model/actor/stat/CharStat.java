@@ -18,10 +18,6 @@
  */
 package com.l2jserver.gameserver.model.actor.stat;
 
-import static com.l2jserver.gameserver.config.Configuration.character;
-import static com.l2jserver.gameserver.config.Configuration.customs;
-import static com.l2jserver.gameserver.config.Configuration.npc;
-
 import java.util.Arrays;
 
 import com.l2jserver.gameserver.model.Elementals;
@@ -35,6 +31,8 @@ import com.l2jserver.gameserver.model.stats.MoveType;
 import com.l2jserver.gameserver.model.stats.Stats;
 import com.l2jserver.gameserver.model.stats.TraitType;
 import com.l2jserver.gameserver.model.zone.ZoneId;
+
+import static com.l2jserver.gameserver.config.Configuration.*;
 
 public class CharStat {
 	private final L2Character _activeChar;
@@ -99,6 +97,7 @@ public class CharStat {
 				case MAX_HP, MAX_MP, MAX_CP, MAGIC_DEFENCE, POWER_DEFENCE, POWER_ATTACK, MAGIC_ATTACK, POWER_ATTACK_SPEED, MAGIC_ATTACK_SPEED, SHIELD_DEFENCE, STAT_CON, STAT_DEX, STAT_INT, STAT_MEN, STAT_STR, STAT_WIT -> value = 1.0;
 			}
 		}
+
 		return value;
 	}
 	

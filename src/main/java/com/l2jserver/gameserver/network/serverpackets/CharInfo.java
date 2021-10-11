@@ -20,6 +20,8 @@ package com.l2jserver.gameserver.network.serverpackets;
 
 import static com.l2jserver.gameserver.config.Configuration.general;
 
+import com.l2jserver.gameserver.custom.skin.SkinManager;
+import com.l2jserver.gameserver.custom.skin.Visibility;
 import com.l2jserver.gameserver.data.xml.impl.NpcData;
 import com.l2jserver.gameserver.instancemanager.CursedWeaponsManager;
 import com.l2jserver.gameserver.model.PcCondOverride;
@@ -27,6 +29,7 @@ import com.l2jserver.gameserver.model.actor.L2Decoy;
 import com.l2jserver.gameserver.model.actor.instance.L2PcInstance;
 import com.l2jserver.gameserver.model.actor.templates.L2NpcTemplate;
 import com.l2jserver.gameserver.model.itemcontainer.Inventory;
+import com.l2jserver.gameserver.model.items.instance.L2ItemInstance;
 import com.l2jserver.gameserver.model.skills.AbnormalVisualEffect;
 import com.l2jserver.gameserver.model.zone.ZoneId;
 
@@ -196,7 +199,17 @@ public class CharInfo extends L2GameServerPacket {
 			writeD(_activeChar.getBaseClass());
 
 			for (int slot : getPaperdollOrder()) {
-				writeD(_activeChar.getInventory().getPaperdollItemDisplayId(slot));
+//				writeD(_activeChar.getInventory().getPaperdollItemDisplayId(slot));
+				L2ItemInstance equippedItem = _activeChar.getInventory().getEquipedItemBySlot(slot);
+				int actualItem = 0;
+				Visibility v = SkinManager.getInstance().isEnabled(_activeChar);
+				if (equippedItem != null && (v== Visibility.MINE || v == Visibility.ALL)) {
+					actualItem = SkinManager.getInstance().getWearingSkin(_activeChar, equippedItem);
+				}
+				if((actualItem == -1 || actualItem==0) && equippedItem!=null){
+					actualItem = equippedItem.getDisplayId();
+				}
+				writeD(actualItem);
 			}
 
 			for (int slot : getPaperdollOrder()) {

@@ -73,7 +73,9 @@ public class Options {
 		}
 		return funcs;
 	}
-	
+	public List<FuncTemplate> getStatFunc(){
+		return this._funcs;
+	}
 	public void addFunc(FuncTemplate template) {
 		_funcs.add(template);
 	}

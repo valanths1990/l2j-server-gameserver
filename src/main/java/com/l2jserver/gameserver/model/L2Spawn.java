@@ -88,7 +88,6 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable {
 	private boolean _isNoRndWalk = false; // Is no random walk
 	private String _areaName;
 	private int _globalMapId;
-	
 	/** The task launching the function doSpawn() */
 	class SpawnTask implements Runnable {
 		private final L2Npc _oldNpc;
@@ -143,7 +142,6 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable {
 		// Create the generic constructor of L2Npc managed by this L2Spawn
 		_constructor = Class.forName(className).asSubclass(L2Npc.class).getConstructor(L2NpcTemplate.class);
 	}
-	
 	/**
 	 * Creates a spawn.
 	 * @param npcId the NPC ID
@@ -513,7 +511,7 @@ public class L2Spawn implements IPositionable, IIdentifiable, INamable {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param mob
 	 * @return

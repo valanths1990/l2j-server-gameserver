@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.l2jserver.gameserver.model.zone.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,10 +46,6 @@ import com.l2jserver.gameserver.model.zone.L2ZoneType;
 import com.l2jserver.gameserver.model.zone.form.ZoneCuboid;
 import com.l2jserver.gameserver.model.zone.form.ZoneCylinder;
 import com.l2jserver.gameserver.model.zone.form.ZoneNPoly;
-import com.l2jserver.gameserver.model.zone.type.L2ArenaZone;
-import com.l2jserver.gameserver.model.zone.type.L2OlympiadStadiumZone;
-import com.l2jserver.gameserver.model.zone.type.L2RespawnZone;
-import com.l2jserver.gameserver.model.zone.type.NpcSpawnTerritory;
 import com.l2jserver.gameserver.util.IXmlReader;
 
 /**
@@ -272,7 +269,16 @@ public final class ZoneManager implements IXmlReader {
 								Node val = attrs.getNamedItem("type");
 								Node spawnName = attrs.getNamedItem("spawnName");
 								((L2ZoneRespawn) temp).parseLoc(spawnX, spawnY, spawnZ, val == null ? null : val.getNodeValue(),spawnName==null ? null:spawnName.getNodeValue());
-							} else if ("race".equalsIgnoreCase(cd.getNodeName()) && (temp instanceof L2RespawnZone)) {
+							}
+							else if ("spawn".equalsIgnoreCase(cd.getNodeName()) && (temp instanceof L2NoRestartZone)) {
+								attrs = cd.getAttributes();
+								int spawnX = Integer.parseInt(attrs.getNamedItem("X").getNodeValue());
+								int spawnY = Integer.parseInt(attrs.getNamedItem("Y").getNodeValue());
+								int spawnZ = Integer.parseInt(attrs.getNamedItem("Z").getNodeValue());
+								Node val = attrs.getNamedItem("type");
+								Node spawnName = attrs.getNamedItem("spawnName");
+								((L2NoRestartZone) temp).parseLoc(spawnX, spawnY, spawnZ, val == null ? null : val.getNodeValue(),spawnName==null ? null:spawnName.getNodeValue());
+							}else if ("race".equalsIgnoreCase(cd.getNodeName()) && (temp instanceof L2RespawnZone)) {
 								attrs = cd.getAttributes();
 								String race = attrs.getNamedItem("name").getNodeValue();
 								String point = attrs.getNamedItem("point").getNodeValue();

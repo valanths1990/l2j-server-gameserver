@@ -71,13 +71,13 @@ public class GeoData {
 					final Boolean loadFile = GEODATA_REGIONS.get(regionX + "_" + regionY);
 					if (loadFile != null) {
 						if (loadFile) {
-							LOG.info("Loading {}...", geoFilePath.getFileName());
+//							LOG.info("Loading {}...", geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						}
 					} else if (geodata().tryLoadUnspecifiedRegions() && Files.exists(geoFilePath)) {
 						try {
-							LOG.info("Loading {}...", geoFilePath.getFileName());
+//							LOG.info("Loading {}...", geoFilePath.getFileName());
 							_driver.loadRegion(geoFilePath, regionX, regionY);
 							loadedRegions++;
 						} catch (Exception ex) {

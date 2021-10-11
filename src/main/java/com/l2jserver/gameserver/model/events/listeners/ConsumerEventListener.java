@@ -40,7 +40,7 @@ public class ConsumerEventListener extends AbstractEventListener {
 	
 	@Override
 	public <R extends AbstractEventReturn> R executeEvent(IBaseEvent event, Class<R> returnBackClass) {
-		_callback.accept(event);
+		 _callback.accept(event);
 		return null;
 	}
 }

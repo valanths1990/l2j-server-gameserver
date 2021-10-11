@@ -46,7 +46,7 @@ import com.l2jserver.gameserver.model.skills.Skill;
  * NPC template.
  * @author NosBit
  */
-public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable {
+public class L2NpcTemplate extends L2CharTemplate implements IIdentifiable {
 	private int _id;
 	private int _displayId;
 	private byte _level;
@@ -250,6 +250,7 @@ public final class L2NpcTemplate extends L2CharTemplate implements IIdentifiable
 	public boolean isTargetable() {
 		return _targetable;
 	}
+	public void setIsTargetable(boolean targetable){_targetable=targetable;}
 	
 	public boolean isUndying() {
 		return _undying;
